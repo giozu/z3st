@@ -19,3 +19,5 @@ sudo apt upgrade
 sudo apt install fenicsx
 ```
 
+### Documentation and references
+A collection of tutorials is available at the official website https://docs.fenicsproject.org/dolfinx/main/python/demos.
