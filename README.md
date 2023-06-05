@@ -19,13 +19,3 @@ sudo apt upgrade
 sudo apt install fenicsx
 ```
 
-#### Anaconda
-After having installed [miniconda](https://conda.io), the latest stable release of FEniCSx can be installed through:
-
-```shell
-conda create -n fenicsx-env
-conda activate fenicsx-env
-conda install -c conda-forge fenics-dolfinx mpich pyvista
-```
-
-Then, the new fenicsx-env environment must be selected when running a python script or notebook (e.g., in Visual Studio Code).
