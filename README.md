@@ -21,3 +21,6 @@ sudo apt install fenicsx
 
 ### Documentation and references
 A collection of tutorials is available at the official website https://docs.fenicsproject.org/dolfinx/main/python/demos.
+
+# FEniCS
+FEniCS is the old version of FEniCSx. FEniCSx is recommended. The latest version of legacy FEniCS (2019.1.0) was released in April 2019.
