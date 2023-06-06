@@ -1,22 +1,39 @@
 # Finite element method
 
 The finite element method (FEM) is a numerical method for solving engineering, physics and mathematical problems.
-Several ways to use this method are available. 
 
 ## FEniCSx
 
 FEniCSx is a popular open-source computing platform, using FEM to solve partial differential equations (PDEs).
+Comprehensive tutorials and useful links are:
+* https://jsdokken.com/dolfinx-tutorial/
+* https://github.com/Steriva/FEniCSx-tutorials
+* https://fem-on-colab.github.io/packages.html
 
 ### How to install FEniCSx on Windows
 
 #### WSL
-On Windows, using WSL, write in Linux shell the following instructions:
+On Windows, using WSL, write in Linux shell the following instruction to install gmshio:
+
+```shell
+sudo apt install python3-gmsh
+```
+
+Then, to install FEniCSx:
 
 ```shell
 sudo add-apt-repository ppa:fenics-packages/fenics
 sudo apt update
 sudo apt upgrade
 sudo apt install fenicsx
+```
+
+Additional modules are:
+
+```shell
+pip install pyvista
+python3 -m pip install pyvista
+pip install trame
 ```
 
 ### Documentation and references
