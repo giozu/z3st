@@ -9,6 +9,7 @@ Comprehensive tutorials and useful links are:
 * https://jsdokken.com/dolfinx-tutorial/
 * https://github.com/Steriva/FEniCSx-tutorials
 * https://fem-on-colab.github.io/packages.html
+* https://github.com/RBniCS/RBniCS/tree/master/tutorials
 
 ### How to install FEniCSx on Windows
 
