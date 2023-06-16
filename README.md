@@ -10,6 +10,8 @@ Comprehensive tutorials and useful links are:
 * https://github.com/Steriva/FEniCSx-tutorials
 * https://fem-on-colab.github.io/packages.html
 * https://github.com/RBniCS/RBniCS/tree/master/tutorials
+* https://fenicsproject.org/pub/tutorial/sphinx1/
+* https://docs.fenicsproject.org/dolfinx/main/python/demos/demo_gmsh.html
 
 ### How to install FEniCSx on Windows
 
