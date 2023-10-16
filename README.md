@@ -39,6 +39,15 @@ python3 -m pip install pyvista
 pip install trame
 ```
 
+If *ImportError: cannot import name '_docstring'* happens:
+
+```shell
+sudo apt remove python3-matplotlib
+pip uninstall matplotlib
+pip install matplotlib
+```
+
+
 ### Documentation and references
 A collection of tutorials is available at the official website https://docs.fenicsproject.org/dolfinx/main/python/demos.
 
