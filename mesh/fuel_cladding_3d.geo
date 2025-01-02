@@ -33,30 +33,6 @@ Physical Surface("cladding_top", 19) = {8};
 //+
 Physical Surface("fuel_top", 20) = {10};
 //+
-Recombine Surface {5, 10, 2};
+// Physical Volume("fuel_region") = {1};
 //+
-Recombine Surface {3, 4};
-//+
-Transfinite Surface {2};
-//+
-Transfinite Surface {2};
-//+
-Transfinite Surface {2};
-//+
-Transfinite Surface {4};
-//+
-Transfinite Surface {1};
-//+
-Recombine Surface {2, 1, 3, 4, 5, 8, 10};
-//+
-Recombine Surface {3, 4, 1, 8};
-//+
-Recombine Surface {2, 5, 10};
-//+
-Recombine Surface {2};
-//+
-Recombine Surface {2, 10, 5};
-//+
-Recombine Surface {8, 4, 3, 1};
-//+
-Recombine Surface {10, 5, 2};
+// Physical Volume("cladding_region") = {2};
