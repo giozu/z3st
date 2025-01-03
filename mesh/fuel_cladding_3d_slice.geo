@@ -52,6 +52,7 @@ Physical Volume ("cladding", 2) = {5, 6, 2, 7};
 
 // Mesh
 MeshSize { PointsOf{ Volume{1, 2}; } } = 0.25;
+Mesh.ElementOrder = 1;
 Mesh 3; // 3 = volumes are meshed
 
 Save "fuel_cladding_3d_slice.msh";
