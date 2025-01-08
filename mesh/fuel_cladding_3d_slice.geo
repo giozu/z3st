@@ -53,7 +53,10 @@ Physical Volume ("cladding", 2) = {5, 6, 2, 7};
 Recombine Surface{1, 2}; // Recombine to create quadrangles instead of triangles
 
 // Mesh
-MeshSize { PointsOf{ Volume{1, 2}; } } = 0.2;
+// MeshSize { PointsOf{ Volume{1, 2}; } } = 0.2;
+MeshSize { PointsOf{ Volume{1}; } } = 0.2;
+MeshSize { PointsOf{ Volume{2}; } } = 0.2;
+
 Mesh.ElementOrder = 1;
 Mesh 3; // 3 = volumes are meshed
 

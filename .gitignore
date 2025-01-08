@@ -11,3 +11,6 @@ log.*
 
 # gmsh files
 *.msh
+
+# output files
+stiffness_matrix.txt
