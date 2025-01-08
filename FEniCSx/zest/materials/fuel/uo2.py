@@ -1,4 +1,4 @@
-uo2 = {
+fuel = {
     "name": "UO2",
     "E": 170e9,  # Young's modulus, Pa
     "nu": 0.3,   # Poisson's ratio
