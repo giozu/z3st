@@ -1,0 +1,22 @@
+Fuel:
+UO2
+Young's modulus = 170.00 GPa
+Poisson's ratio = 0.3
+Shear modulus = 65.38 GPa
+Lamé first parameter = 98.08 GPa
+Lamé second parameter = 65.38 GPa
+Thermal expansion coefficient = 1.45e-05 1/K
+Density = 10970 kg/m3
+Geometry = {'radius_fi': 0.0, 'radius_fo': 1.0, 'height': 2.0}
+
+Cladding:
+T91
+Young's modulus = 170.00 GPa
+Poisson's ratio = 0.3
+Shear modulus = 65.38 GPa
+Lamé first parameter = 98.08 GPa
+Lamé second parameter = 65.38 GPa
+Thermal expansion coefficient = 1.2e-05 1/K
+Density = 7750 kg/m3
+Geometry = {'radius_ci': 1.5, 'radius_co': 2.0, 'height': 2.0}
+
