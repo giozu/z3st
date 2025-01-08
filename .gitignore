@@ -8,3 +8,6 @@ log.*
 # paraview files
 *.h5
 *.xdmf
+
+# gmsh files
+*.msh

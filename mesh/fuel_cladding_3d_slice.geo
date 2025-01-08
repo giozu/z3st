@@ -51,7 +51,7 @@ Physical Volume ("fuel", 1) = {1};
 Physical Volume ("cladding", 2) = {5, 6, 2, 7};
 
 // Mesh
-MeshSize { PointsOf{ Volume{1, 2}; } } = 0.25;
+MeshSize { PointsOf{ Volume{1, 2}; } } = 0.1;
 Mesh.ElementOrder = 1;
 Mesh 3; // 3 = volumes are meshed
 

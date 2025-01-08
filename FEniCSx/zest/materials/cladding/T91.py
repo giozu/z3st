@@ -7,7 +7,7 @@ cladding = {
     "thermal conductivity": {
         "value": 28.7,
         "units": "W/m-K",
-        "reference": "handouts",   
+        "reference": "https://phi-motion.com/A387-Grade-91-T91-P91-F91-X10CrMoVNb9-1-1-4903-35-61",   
     },
     
     "alpha": 12e-6,  # Thermal expansion coefficient, 1/K, @20°C
