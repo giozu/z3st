@@ -38,7 +38,7 @@ h = 2;
 // }
 
 Extrude {0, 0, h} {
-    Surface{1,2}; Layers{ {8}, {1} };
+    Surface{1,2}; Layers{ {8}, {1} }; Recombine; // Recombine to create quadrangles instead of triangles
 }
 
 Physical Surface("fuel_lateral") = {3};
@@ -50,8 +50,10 @@ Physical Surface("cladding_top") = {7};
 Physical Volume ("fuel", 1) = {1};
 Physical Volume ("cladding", 2) = {5, 6, 2, 7};
 
+Recombine Surface{1, 2}; // Recombine to create quadrangles instead of triangles
+
 // Mesh
-MeshSize { PointsOf{ Volume{1, 2}; } } = 0.1;
+MeshSize { PointsOf{ Volume{1, 2}; } } = 0.2;
 Mesh.ElementOrder = 1;
 Mesh 3; // 3 = volumes are meshed
 
