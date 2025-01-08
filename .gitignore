@@ -1,2 +1,10 @@
+# cache files
 .vscode/
 __pycache__/
+
+# log files
+log.*
+
+# paraview files
+*.h5
+*.xmdf
