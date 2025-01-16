@@ -14,21 +14,21 @@ SetFactory("OpenCASCADE");
 // --------
 // 2D slice
 // --------
-Circle(1) = {0,0,0, 1.5};       Curve Loop(1) = 1;
+Circle(1) = {0,0,0, 1.0};       Curve Loop(1) = 1;
 Circle(2) = {0,0,0, 2.0};       Curve Loop(2) = 2;
 
 Plane Surface(1) = {1, 2};
+
+Transfinite Curve{1, 2} = 80 Using Progression 1;
 
 Physical Surface("cladding_bottom") = {1};
 
 // -------
 // Extrude
 // -------
-
 h = 2;
-
 Extrude {0, 0, h} {
-    Surface{1};
+    Surface{1}; Layers{10}; Recombine; // Recombine to create quadrangles instead of triangles
 }
 
 Physical Surface("cladding_inner_lateral") = {2};
@@ -37,9 +37,13 @@ Physical Surface("cladding_top") = {4};
 
 Physical Volume ("cladding", 1) = {3, 4, 1, 5};
 
+Recombine Surface{1}; // Recombine to create quadrangles instead of triangles
+
+Mesh.Smoothing = 80;
+
 // Mesh
-MeshSize { PointsOf{ Volume{1}; } } = 0.4;
-// Mesh.ElementOrder = 1;
+MeshSize { PointsOf{ Volume{1}; } } = 0.1;
 Mesh 3; // 3 = volumes are meshed
+
 
 Save "cladding_3d_slice.msh";
