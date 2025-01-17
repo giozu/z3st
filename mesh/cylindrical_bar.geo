@@ -15,8 +15,8 @@ r = 1.; // radius of the cylinder
 l = 0.5; // edge of the inner square
 h = 2.; // height of the cylinder
 
-n = 10; // number of elements on the square edge
-n_l = 10; // number of extruded layers
+n = 12; // number of elements on the square edge
+n_l = 12; // number of extruded layers
 ms = 1.; // mesh element size
 
 // Inner square
@@ -97,7 +97,7 @@ Extrude {0, 0, h} {
 // Physical Volume("volume3") = {3};
 // Physical Volume("volume4") = {4};
 // Physical Volume("volume5") = {5};
-// Physical Volume("volume") = {1, 2, 3, 4, 5};
+Physical Volume("volume") = {1, 2, 3, 4, 5};
 
 // Meshing
 Mesh 3;

@@ -8,9 +8,16 @@ log.*
 # paraview files
 *.h5
 *.xdmf
+*.vtu
+*.pvd
+*.pvtu
+*.pvsm
 
 # gmsh files
 *.msh
 
 # output files
 stiffness_matrix.txt
+
+# image files
+*.png
