@@ -216,6 +216,7 @@ def print_x_at_z_zero(problem):
     """
     z_value = 0.0
     coordinates = problem.mesh.geometry.x
+    X_coord2 = Xh0.x.array.reshape(len(mesh.geometry.x[:,1]),2)
 
     x = coordinates[:, 0]
     y = coordinates[:, 1]

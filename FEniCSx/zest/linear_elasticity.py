@@ -28,7 +28,10 @@ class LinearElasticity:
         """
         try:
             self.mesh, self.tags, self.ft = dolfinx.io.gmshio.read_from_msh(self.mesh_file, MPI.COMM_WORLD, rank=self.rank, gdim=self.gdim)
+
             self.tdim = self.mesh.topology.dim
+            print(f"Info    : Mesh topology dimension d={self.tdim}")
+
             self.fdim = self.tdim - 1
             self.mesh.topology.create_connectivity(self.fdim, self.tdim)
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
@@ -113,94 +116,6 @@ class LinearElasticity:
         Define and set the boundary conditions.
         """
 
-        # ----------------------        
-        # Locate boundary facets
-        # ----------------------
-
-        # top_facets = dolfinx.mesh.locate_entities_boundary(
-        #     self.mesh, self.fdim, lambda x: np.isclose(x[2], height_fuel)
-        # )
-
-        # bottom_facets = dolfinx.mesh.locate_entities_boundary(
-        #     self.mesh, self.fdim, lambda x: np.isclose(x[2], 0.0)
-        # )
-
-        # outer_facets_fuel = dolfinx.mesh.locate_entities_boundary(
-        #     self.mesh, self.fdim, lambda x: np.isclose(np.sqrt(x[0]**2 + x[1]**2), radius_fo)
-        # )
-        
-        # inner_facets_cladding = dolfinx.mesh.locate_entities_boundary(
-        #     self.mesh, self.fdim, lambda x: np.isclose(np.sqrt(x[0]**2 + x[1]**2), radius_ci)
-        # )
-        
-        # outer_facets_cladding = dolfinx.mesh.locate_entities_boundary(
-        #     self.mesh, self.fdim, lambda x: np.isclose(np.sqrt(x[0]**2 + x[1]**2), radius_co)
-        # )
-
-        # ---------------------
-        # Mesh marker, meshtags
-        # ---------------------
-
-        # num_facets = self.mesh.topology.index_map(self.fdim).size_local
-        # markers = np.zeros(num_facets, dtype=np.int32)
-
-        # self.outer_fuel = 1
-        # self.inner_cladding = 2
-        # self.outer_cladding = 3
-        # self.top = 4
-        # self.bottom = 5
-
-        # markers[outer_facets_fuel] = self.outer_fuel
-        # markers[inner_facets_cladding] = self.inner_cladding
-        # markers[outer_facets_cladding] = self.outer_cladding
-        # markers[top_facets] = self.top
-        # markers[bottom_facets] = self.bottom
-
-        # self.facet_marker = dolfinx.mesh.meshtags(self.mesh, self.fdim, np.arange(num_facets, dtype=np.int32), markers)
-
-        # ----------------------------------------------------------------
-        # Locate dofs for Dirichlet boundary conditions from facet_markers
-        # ----------------------------------------------------------------
-
-        # self.dofs_D_outer_fuel = dolfinx.fem.locate_dofs_topological(
-        #     self.V, self.facet_marker.dim, self.facet_marker.find(self.outer_fuel)
-        # )
-
-        # self.dofs_D_inner_cladding = dolfinx.fem.locate_dofs_topological(
-        #     self.V, self.facet_marker.dim, self.facet_marker.find(self.inner_cladding)
-        # )
-
-        # self.dofs_D_outer_cladding = dolfinx.fem.locate_dofs_topological(
-        #     self.V, self.facet_marker.dim, self.facet_marker.find(self.outer_cladding)
-        # )
-
-        # self.dofs_D_top = dolfinx.fem.locate_dofs_topological(
-        #     self.V, self.facet_marker.dim, self.facet_marker.find(self.top)
-        # )
-        
-        # self.dofs_D_bottom = dolfinx.fem.locate_dofs_topological(
-        #     self.V, self.facet_marker.dim, self.facet_marker.find(self.bottom)
-        # )
-
-        # ----------------------------------------------------------
-        # Locate dofs for Dirichlet boundary conditions from ft.find
-        # ----------------------------------------------------------
-
-        # self.dofs_D_bottom_fuel = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(1))
-
-        # self.dofs_D_bottom_cladding = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, 
-        # entities=self.ft.find(2))
-
-        # self.dofs_D_outer_fuel = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(3))
-
-        # self.dofs_D_top_fuel = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(4))
-
-        # self.dofs_D_inner_cladding = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(5))
-
-        # self.dofs_D_outer_cladding = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(6))
-
-        # self.dofs_D_top_cladding = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(7))
-
         # ---------
         # Fuel dofs
         # ---------
@@ -229,7 +144,8 @@ class LinearElasticity:
 
         # Clamped boundary conditions
         u_clamped = dolfinx.fem.Constant(
-            self.mesh, (0.0, 0.0, 0.0)
+            self.mesh,
+            (0.0, 0.0, 0.0)
         )
 
         self.bc_top_cladding  = dolfinx.fem.dirichletbc(

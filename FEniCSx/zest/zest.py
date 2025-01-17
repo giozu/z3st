@@ -16,6 +16,7 @@ import numpy as np
 # Importing FEniCS modules and custom classes
 from linear_elasticity import LinearElasticity
 from full_cylinder import FullCylinder
+from thick_cylinder import ThickCylinder
 
 # Importing materials
 from materials.fuel.uo2 import fuel
@@ -62,7 +63,8 @@ g = 0.0  # acceleration due to gravity, m/s2
 
 # problem = LinearElasticity(mesh_file='../../mesh/fuel_cladding_3d_slice.msh')
 # problem = LinearElasticity(mesh_file='../../mesh/cladding_3d_slice.msh')
-problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
+# problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
+problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice.msh')
 
 problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2)
 
@@ -126,16 +128,14 @@ print(f"strain_field = {strain_field}")
 # ----------------
 # Stiffness matrix
 # ----------------
-# rows, cols, values = problem.parse_matrix_file("stiffness_matrix.txt")
-# problem.plot_sparsity_pattern(rows, cols)
+rows, cols, values = problem.parse_matrix_file("stiffness_matrix.txt")
+problem.plot_sparsity_pattern(rows, cols)
 
 # ----------------
 # Post-processing
 # ----------------
 plot_results(displacement, problem)
-
 plot_stress_components(problem)
-
 to_paraview(problem)
 
 # plot_sigma_rr_at_z(problem, z_value=1.0)

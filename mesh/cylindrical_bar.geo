@@ -11,7 +11,7 @@
 
 SetFactory("OpenCASCADE");
 
-r = 1.; // radius of the cylinder
+r = 1.; // outer radius of the cylinder
 l = 0.5; // edge of the inner square
 h = 2.; // height of the cylinder
 
@@ -99,7 +99,6 @@ Extrude {0, 0, h} {
 // Physical Volume("volume5") = {5};
 Physical Volume("volume") = {1, 2, 3, 4, 5};
 
-// Meshing
 Mesh 3;
 
 Save "cylindrical_bar.msh";

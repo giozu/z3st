@@ -30,7 +30,7 @@ class FullCylinder:
             self.mesh, self.tags, self.ft = dolfinx.io.gmshio.read_from_msh(self.mesh_file, MPI.COMM_WORLD, rank=self.rank, gdim=self.gdim)
             
             self.tdim = self.mesh.topology.dim
-            print(f"Mesh topology dimension d={self.tdim}")
+            print(f"Info    : Mesh topology dimension d={self.tdim}")
 
             self.fdim = self.tdim - 1
             self.mesh.topology.create_connectivity(self.fdim, self.tdim)
@@ -44,10 +44,8 @@ class FullCylinder:
         Set up the function space for the problem.
         """
         
-        # The keyword "Lagrange" also works instead of "P". The vector function space of type "P" (Polynomial) implies standard Lagrange elements of degree deg=2.
-        # self.V = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (self.mesh.geometry.dim,)))
+        self.V = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (self.mesh.geometry.dim,)))
         # self.V = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 2, (self.mesh.geometry.dim,)))
-        self.V = dolfinx.fem.functionspace(self.mesh, ("P", 2, (self.mesh.geometry.dim,)))
 
         self.V_scalar = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
 
@@ -123,9 +121,7 @@ class FullCylinder:
         # ----
 
         self.dofs_bottom  = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(self.bottom_label))
-
         self.dofs_lateral = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(self.lateral_label))
-
         self.dofs_top     = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(self.top_label))
 
         # -----------------------------
@@ -191,32 +187,21 @@ class FullCylinder:
             domain=self.mesh,
             subdomain_data=self.ft
         )
-        ds = self.ds(self.lateral_label) # Neumann boundary condition
-
-        # def epsilon(u):
-        #     return 0.5 * (ufl.grad(u) + ufl.grad(u).T)
+        ds = self.ds(self.lateral_label)
 
         def epsilon(u):
-            return ufl.sym(
-                ufl.as_tensor(
-                    [
-                        [u[0].dx(0)                                     , 1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , 1/2*(u[0].dx(2)+u[2].dx(0))],
-                        [1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , (u[0] + u[1].dx(1)) / x[0]                     , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])],
-                        [1/2*(u[0].dx(2)+u[2].dx(0))                    , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])               , u[2].dx(2)],
-                    ]
-                )
-            )
-        
-        def epsilon_r(u):
-            return x[0] * ufl.sym(
-                ufl.as_tensor(
-                    [
-                        [u[0].dx(0)                                     , 1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , 1/2*(u[0].dx(2)+u[2].dx(0))],
-                        [1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , (u[0] + u[1].dx(1)) / x[0]                     , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])],
-                        [1/2*(u[0].dx(2)+u[2].dx(0))                    , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])               , u[2].dx(2)],
-                    ]
-                )
-            )
+            return 0.5 * (ufl.grad(u) + ufl.grad(u).T)
+
+        # def epsilon(u):
+        #     return ufl.sym(
+        #         ufl.as_tensor(
+        #             [
+        #                 [u[0].dx(0)                                     , 1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , 1/2*(u[0].dx(2)+u[2].dx(0))],
+        #                 [1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , (u[0] + u[1].dx(1)) / x[0]                     , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])],
+        #                 [1/2*(u[0].dx(2)+u[2].dx(0))                    , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])               , u[2].dx(2)],
+        #             ]
+        #         )
+        #     )
         
         def sigma(u, lmbda, mu):
             return lmbda * ufl.nabla_div(u) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
@@ -233,9 +218,9 @@ class FullCylinder:
         # -----------------
         # Variational forms
         # -----------------
-        self.a = ufl.inner(sigma(self.u, self.lmbda, self.mu), epsilon(self.v)) * x[0] * self.dx
-        self.L_body_forces = ufl.inner(self.f, self.v) * x[0] * self.dx
-        self.L_tractions = ufl.inner(self.traction, self.v) * x[0] * ds
+        self.a = ufl.inner(sigma(self.u, self.lmbda, self.mu), epsilon(self.v)) * self.dx
+        self.L_body_forces = ufl.inner(self.f, self.v) * self.dx
+        self.L_tractions = ufl.inner(self.traction, self.v) * ds
         self.L = self.L_body_forces + self.L_tractions
 
         # Extraction of the linear and bi-linear forms
@@ -287,15 +272,13 @@ class FullCylinder:
         self.problem = dolfinx.fem.petsc.LinearProblem(
             self.a,
             self.L,
-            u=self.displacement,
             bcs=self.bc,
             petsc_options=petsc_options,
             jit_options=jit_options,
         )
 
-        self.problem.solve()
+        self.displacement = self.problem.solve()
         # self.displacement.x.scatter_forward() # scatter_forward is necessary for dolfinx ?
-
         self.stress_field = sigma(self.displacement, self.lmbda, self.mu)
         self.strain_field = epsilon(self.displacement)
 
