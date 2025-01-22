@@ -13,6 +13,7 @@ SetFactory("OpenCASCADE");
 
 ri = 0.5;
 ro = 1.0;
+h  = 10.;
 
 // --------
 // 2D slice
@@ -30,7 +31,6 @@ Recombine Surface {1};
 // -------
 // Extrude
 // -------
-h = 10;
 Extrude {0, 0, h} {
     Surface{1}; Layers{10}; Recombine;
 }

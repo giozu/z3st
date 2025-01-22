@@ -24,6 +24,9 @@ from materials.cladding.T91 import cladding
 from materials.gap.gap import gap
 from materials.coolant.lead import coolant
 
+# Importing geometry
+from geometry.thickWalled_cylinder import geometry
+
 # Importing utilities
 from utils import *
 from output import *
@@ -37,7 +40,6 @@ fuel_E = fuel["E"]
 fuel_nu = fuel["nu"]
 fuel_alpha = fuel["alpha"]
 fuel_rho = fuel["rho"]
-fuel_geometry = fuel["geometry"]
 
 fuel_lame1 = fuel_E * fuel_nu / ((1 + fuel_nu) * (1 - 2 * fuel_nu))
 fuel_lame2 = fuel_E / (2 * (1 + fuel_nu))
@@ -47,7 +49,6 @@ cladding_E = cladding["E"]
 cladding_nu = cladding["nu"]
 cladding_alpha = cladding["alpha"]
 cladding_rho = cladding["rho"]
-cladding_geometry = cladding["geometry"]
 
 cladding_lame1 = cladding_E * cladding_nu / ((1 + cladding_nu) * (1 - 2 * cladding_nu))
 cladding_lame2 = cladding_E / (2 * (1 + cladding_nu))
@@ -74,16 +75,20 @@ problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2)
 volume = problem.volume()
 
 # Analytical volume calculations
-fuel_volume_analytical = np.pi * (fuel_geometry["radius_fo"]**2 - fuel_geometry["radius_fi"]**2) * fuel_geometry["height"]
-cladding_volume_analytical = np.pi * (cladding_geometry["radius_co"]**2 - cladding_geometry["radius_ci"]**2) * cladding_geometry["height"]
+# fuel_volume_analytical = np.pi * (fuel_geometry["radius_fo"]**2 - fuel_geometry["radius_fi"]**2) * fuel_geometry["height"]
+# cladding_volume_analytical = np.pi * (cladding_geometry["radius_co"]**2 - cladding_geometry["radius_ci"]**2) * cladding_geometry["height"]
+volume_analytical = np.pi * (geometry["outer_radius"]**2 - geometry["inner_radius"]**2) * geometry["height"]
 
 print("\n")
 print("------------------")
 print("Analytical volumes")
 print("------------------")
-print(f"Total volume, analytical = {fuel_volume_analytical + cladding_volume_analytical} m3")
-print(f"Fuel volume, analytical = {fuel_volume_analytical} m3")
-print(f"Cladding volume, analytical = {cladding_volume_analytical} m3")
+print(f"Total volume, analytical = {volume_analytical} m3")
+# print(f"Total volume, analytical = {fuel_volume_analytical + cladding_volume_analytical} m3")
+# print(f"Fuel volume, analytical = {fuel_volume_analytical} m3")
+# print(f"Cladding volume, analytical = {cladding_volume_analytical} m3")
+print("\n")
+print("Relative error (%) = ", abs(volume - volume_analytical) / volume_analytical * 100)
 print("\n")
 
 # -------------------

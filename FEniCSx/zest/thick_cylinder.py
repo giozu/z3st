@@ -26,6 +26,8 @@ class ThickCylinder:
         """
         Read the mesh and facet tags from the specified mesh file.
         """
+        print(f"Reading mesh file {self.mesh_file}")
+
         try:
             self.mesh, self.tags, self.ft = dolfinx.io.gmshio.read_from_msh(self.mesh_file, MPI.COMM_WORLD, rank=self.rank, gdim=self.gdim)
             
@@ -190,8 +192,18 @@ class ThickCylinder:
             """
             Strain-displacement compatibility relatio
             """
-            return 1/2 * (ufl.grad(u) + ufl.grad(u).T)
-            # return ufl.sym(ufl.grad(u))
+            return ufl.sym(ufl.grad(u))
+            # return 1/2 * (ufl.grad(u) + ufl.grad(u).T)
+            # x = ufl.SpatialCoordinate(self.mesh)
+            # return ufl.sym(
+            #     ufl.as_tensor(
+            #         [
+            #             [u[0].dx(0), u[0].dx(1), 0.],
+            #             [u[1].dx(0), u[1].dx(1), 0.],
+            #             [0.        , 0         , 0.],
+            #         ]
+            #     )
+            # )
             # return ufl.sym(
             #     ufl.as_tensor(
             #         [
@@ -206,6 +218,7 @@ class ThickCylinder:
             """
             Stress-strain constitutive relation.
             """
+            # return self.E / (1.0 - self.nu**2) * ((1.0 - self.nu) * epsilon(u) + self.nu * ufl.Identity(len(u)) * ufl.tr(epsilon(u))) # Constitutive relation, assuming plane-stress in XY
             return lmbda * ufl.nabla_div(u) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
 
         # -----------
