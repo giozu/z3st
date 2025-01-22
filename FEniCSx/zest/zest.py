@@ -65,7 +65,7 @@ g = 0.0  # acceleration due to gravity, m/s2
 # problem = LinearElasticity(mesh_file='../../mesh/fuel_cladding_3d_slice.msh')
 # problem = LinearElasticity(mesh_file='../../mesh/cladding_3d_slice.msh')
 # problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
-problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice.msh')
+problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice_2.msh')
 
 problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2)
 
@@ -80,9 +80,9 @@ volume = problem.volume()
 volume_analytical = np.pi * (geometry["outer_radius"]**2 - geometry["inner_radius"]**2) * geometry["height"]
 
 print("\n")
-print("------------------")
-print("Analytical volumes")
-print("------------------")
+print("-----------------")
+print("Analytical volume")
+print("-----------------")
 print(f"Total volume, analytical = {volume_analytical} m3")
 # print(f"Total volume, analytical = {fuel_volume_analytical + cladding_volume_analytical} m3")
 # print(f"Fuel volume, analytical = {fuel_volume_analytical} m3")
@@ -114,7 +114,7 @@ print("\n")
 # )
 # problem.assemble_system()
 
-problem.boundary_conditions(pressure=gap["gap_pressure"])
+problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
 
 # -------------------
 # Assembly and solve

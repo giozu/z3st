@@ -1,0 +1,18 @@
+#!/bin/bash
+cd ${0%/*} || exit 1 # run from this directory
+
+# log files
+rm log.*
+
+# paraview files
+rm *.h5
+rm *.xdmf
+rm *.vtu
+rm *.pvd
+rm *.pvtu
+
+# Zest output files
+rm stiffness_matrix.txt
+
+# Images
+rm *.png

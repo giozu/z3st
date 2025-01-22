@@ -4,5 +4,5 @@ coolant = {
     "density": 10520, # kg / m^3
     "dynamic viscosity": 0.002, # Pa s
     "thermal conductivity": 15.5, # W / m-K
-    "coolant_pressure": -1e6,  # Coolant pressure, Pa, negative for compression
+    "coolant_pressure": 0.0,  # Coolant pressure, Pa, negative for compression
 }

@@ -76,9 +76,9 @@ class ThickCylinder:
 
         # Print results
         print("\n")
-        print("------------")
-        print("Mesh volumes")
-        print("------------")
+        print("-----------")
+        print("Mesh volume")
+        print("-----------")
         print(f"Total volume, from mesh = {volume} m3")
 
         return volume
@@ -109,7 +109,7 @@ class ThickCylinder:
         if missing:
             raise KeyError(f"Missing keys in material: {missing}")
 
-    def boundary_conditions(self, pressure):
+    def boundary_conditions(self, inner_pressure, outer_pressure):
         """
         Define and set the boundary conditions.
         """
@@ -158,12 +158,19 @@ class ThickCylinder:
 
         self.normal = ufl.FacetNormal(self.mesh)
 
-        self.pressure = dolfinx.fem.Constant(
+        self.inner_pressure = dolfinx.fem.Constant(
             self.mesh,
-            pressure
+            inner_pressure
         )
         
-        self.traction = self.pressure * self.normal
+        self.inner_traction = self.inner_pressure * self.normal
+
+        self.outer_pressure = dolfinx.fem.Constant(
+            self.mesh,
+            outer_pressure
+        )
+        
+        self.outer_traction = self.outer_pressure * self.normal
 
     def assemble_and_solve(self):
         """
@@ -190,7 +197,7 @@ class ThickCylinder:
 
         def epsilon(u):
             """
-            Strain-displacement compatibility relatio
+            Strain-displacement compatibility relations
             """
             return ufl.sym(ufl.grad(u))
             # return 1/2 * (ufl.grad(u) + ufl.grad(u).T)
@@ -219,7 +226,8 @@ class ThickCylinder:
             Stress-strain constitutive relation.
             """
             # return self.E / (1.0 - self.nu**2) * ((1.0 - self.nu) * epsilon(u) + self.nu * ufl.Identity(len(u)) * ufl.tr(epsilon(u))) # Constitutive relation, assuming plane-stress in XY
-            return lmbda * ufl.nabla_div(u) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
+            # return lmbda * ufl.nabla_div(u) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
+            return lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
 
         # -----------
         # Body forces
@@ -234,7 +242,7 @@ class ThickCylinder:
         # -----------------
         self.a = ufl.inner(sigma(self.u, self.lmbda, self.mu), epsilon(self.v))  * dx
         self.L_body_forces = ufl.inner(self.f, self.v) * dx
-        self.L_tractions = ufl.inner(self.traction, self.v) * ds_i
+        self.L_tractions = ufl.inner(self.inner_traction, self.v) * ds_i + ufl.inner(self.outer_traction, self.v) * ds_o
         self.L = self.L_body_forces + self.L_tractions
 
         # Extraction of the linear and bi-linear forms
