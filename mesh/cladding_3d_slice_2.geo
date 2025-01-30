@@ -12,7 +12,7 @@
 SetFactory("OpenCASCADE");
 
 ri = 0.5; // inner radius of the cylinder
-ro = 1.; // outer radius of the cylinder
+ro = 1.5; // outer radius of the cylinder
 h = 10.; // height of the cylinder
 
 n = 20; // number of radial divisions

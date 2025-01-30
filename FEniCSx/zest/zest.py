@@ -63,9 +63,9 @@ g = 0.0  # acceleration due to gravity, m/s2
 # -------------------
 
 # problem = LinearElasticity(mesh_file='../../mesh/fuel_cladding_3d_slice.msh')
-# problem = LinearElasticity(mesh_file='../../mesh/cladding_3d_slice.msh')
 # problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
-problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice_2.msh')
+# problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice_2.msh')
+problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
 
 problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2)
 
