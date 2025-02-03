@@ -19,34 +19,32 @@ Comprehensive tutorials and useful links are:
 On Windows, using WSL, write in Linux shell the following instruction to install gmshio:
 
 ```shell
-sudo apt install python3-gmsh
+sudo apt install python3-pip python3-gmsh
 ```
 
 Then, to install FEniCSx:
 
 ```shell
 sudo add-apt-repository ppa:fenics-packages/fenics
-sudo apt update
-sudo apt upgrade
-sudo apt install fenicsx
+sudo apt update && sudo apt full-upgrade -y
+sudo apt install fenicsx -y
 ```
 
 Additional modules are:
 
 ```shell
-pip install pyvista
+pip install pyvista numpy==1.26.4
 python3 -m pip install pyvista
 pip install trame
 ```
 
-If *ImportError: cannot import name '_docstring'* happens:
+If *ImportError: cannot import name '_docstring'* happens, or multiple matplotlib versions:
 
 ```shell
 sudo apt remove python3-matplotlib
 pip uninstall matplotlib
 pip install matplotlib
 ```
-
 
 ### Documentation and references
 A collection of tutorials is available at the official website https://docs.fenicsproject.org/dolfinx/main/python/demos.

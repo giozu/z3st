@@ -74,6 +74,7 @@ problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2)
 # ------
 volume = problem.volume()
 
+
 # Analytical volume calculations
 # fuel_volume_analytical = np.pi * (fuel_geometry["radius_fo"]**2 - fuel_geometry["radius_fi"]**2) * fuel_geometry["height"]
 # cladding_volume_analytical = np.pi * (cladding_geometry["radius_co"]**2 - cladding_geometry["radius_ci"]**2) * cladding_geometry["height"]
