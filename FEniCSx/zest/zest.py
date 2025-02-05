@@ -67,7 +67,7 @@ g = 0.0  # acceleration due to gravity, m/s2
 # problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice_2.msh')
 problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
 
-problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2)
+problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2, k = 1, q_third = 100, alpha = 1e-5)
 
 # ------
 # Volume
@@ -125,11 +125,12 @@ problem.assemble_and_solve()
 # -------
 # Results
 # -------
-displacement, stress_field, strain_field = problem.get_results()
+displacement, stress_field, strain_field, temperature = problem.get_results()
 
 print(f"displacement = {displacement}")
 print(f"stress_field = {stress_field}")
 print(f"strain_field = {strain_field}")
+print(f"temperature = {temperature}")
 
 # ----------------
 # Stiffness matrix
@@ -141,6 +142,7 @@ problem.plot_sparsity_pattern(rows, cols)
 # Post-processing
 # ----------------
 plot_results(displacement, problem)
+plot_temperature(temperature, problem)
 plot_stress_components(problem)
 to_paraview(problem)
 

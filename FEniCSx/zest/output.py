@@ -26,22 +26,48 @@ def plot_results(displacement, problem):
 
     print(f"\nFunction plot_results()")
 
-    pyvista.start_xvfb()  # Start virtual framebuffer
+    pyvista.start_xvfb() # Start virtual framebuffer
 
     # Create plotter and pyvista grid
     p = pyvista.Plotter(off_screen=True)  # Enable off-screen rendering
-    topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V)
+    topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_m)
     grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
     # Attach vector values to grid and warp grid by vector
     grid["u"] = displacement.x.array.reshape((geometry.shape[0], 3))
 
-    p.add_mesh(grid, style="wireframe", color="k")  # style = "points"
+    p.add_mesh(grid, style="wireframe", color="k") # style = "points"
     warped = grid.warp_by_vector("u")
     p.add_mesh(warped, show_edges=True, cmap=matplotlib.colormaps.get_cmap("gist_rainbow").resampled(25), lighting=True)
     p.show_axes()
 
     figure_as_array = p.screenshot("displacement.png")
+    return figure_as_array
+
+def plot_temperature(temperature, problem):
+    """
+    Plot the temperature field of the problem
+    """
+
+    print(f"\nFunction plot_temperature()")
+
+    pyvista.start_xvfb() # Start virtual framebuffer
+
+    # Create plotter and pyvista grid
+    topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_t)
+    grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
+
+    # Attach vector values to grid and warp grid by vector
+    grid.point_data["T"] = temperature.x.array.real
+    grid.set_active_scalars("T")
+
+    p = pyvista.Plotter(off_screen=True) # Enable off-screen rendering
+    
+    p.add_mesh(grid, show_edges=True)
+    p.view_isometric()
+    p.show_axes()
+
+    figure_as_array = p.screenshot("temperature.png")
     return figure_as_array
 
 def plot_stress_components(problem):
@@ -67,7 +93,7 @@ def plot_stress_components(problem):
 
         # Create plotter and pyvista grid
         p = pyvista.Plotter(off_screen=True)  # Enable off-screen rendering
-        topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V)
+        topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_m)
         grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
         # Attach vector values to grid and warp grid by vector

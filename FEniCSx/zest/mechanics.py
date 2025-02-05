@@ -44,22 +44,46 @@ class Mechanics:
         Set up the function space for the problem.
         """
         
-        self.V = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (self.mesh.geometry.dim,)))
-        # self.V = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 2, (self.mesh.geometry.dim,)))
+        self.V_m = dolfinx.fem.functionspace(self.mesh, ("CG", 1, (self.mesh.topology.dim,)))  # vector function space
+        self.V_t = dolfinx.fem.functionspace(self.mesh, ("CG", 1))  # scalar function space
 
+        # self.V_m = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (self.mesh.geometry.dim,)))
+        # self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
+
+        # self.V_m = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 2, (self.mesh.geometry.dim,)))
         self.V_scalar = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
 
         # In FEniCSx, "CG" is a shorthand for "Lagrange" for scalar fields, but it does not account for vector-valued fields by default. 
         # Hence, "Lagrange" provides more flexibility when specifying vector-valued elements or higher dimensions 
-        # self.V = dolfinx.fem.functionspace(self.mesh, ("CG", 1))  # Continuous Galerkin space for displacement (does not work)
+        # self.V_m = dolfinx.fem.functionspace(self.mesh, ("CG", 1))  # Continuous Galerkin space for displacement (does not work)
+
+        print("\n")
+        print("Mechanical function space (V_m):", self.V_m)
+        print("Thermal function space (V_t):", self.V_t)
+
 
     def _initialize_functions(self):
         """
         Initialize trial and test functions.
         """
-        self.u = ufl.TrialFunction(self.V)
-        self.v = ufl.TestFunction(self.V)
-        self.displacement = dolfinx.fem.Function(self.V, name="u")
+
+        # Mechanics
+        self.u_m = ufl.TrialFunction(self.V_m)
+        self.v_m = ufl.TestFunction(self.V_m)
+        self.displacement = dolfinx.fem.Function(self.V_m, name="u")
+
+        # Thermal
+        self.u_t = ufl.TrialFunction(self.V_t)
+        self.v_t = ufl.TestFunction(self.V_t)
+        self.temperature = dolfinx.fem.Function(self.V_t, name="T")
+
+        print("\n")
+        print("Shape of mechanical trial function (u_m):", self.u_m.ufl_shape, "- Expected: (dim,) for a vector function space")
+        print("Shape of mechanical test function (v_m):", self.v_m.ufl_shape, "- Expected: (dim,) for a vector function space")
+
+        print("Shape of thermal trial function (u_t):", self.u_t.ufl_shape, "- Expected: () for a scalar function space")
+        print("Shape of thermal test function (v_t):", self.v_t.ufl_shape, "- Expected: () for a scalar function space")
+
 
     def parse_matrix_file(self, filename = 'stiffness_matrix.txt'):
         """

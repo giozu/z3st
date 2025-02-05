@@ -26,7 +26,7 @@ class ThickCylinder(Mechanics):
 
         return volume
 
-    def parameters(self, rho, g, lmbda, mu):
+    def parameters(self, rho, g, lmbda, mu, k, q_third, alpha):
         """
         Set material and physical parameters.
 
@@ -40,6 +40,9 @@ class ThickCylinder(Mechanics):
         self.g = g
         self.lmbda = lmbda
         self.mu = mu
+        self.k = k
+        self.q_third = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(q_third))
+        self.alpha = alpha
 
     def compute_material_properties(material):
         G = material["E"] / (2 * (1 + material["nu"]))
@@ -66,10 +69,10 @@ class ThickCylinder(Mechanics):
         # Dofs
         # ----
 
-        self.dofs_bottom        = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(self.bottom_label))
-        self.dofs_inner_lateral = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(self.inner_lateral_label))
-        self.dofs_top           = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(self.top_label))
-        self.dofs_outer_lateral = dolfinx.fem.locate_dofs_topological(V=self.V, entity_dim=self.fdim, entities=self.ft.find(self.outer_lateral_label))
+        self.dofs_bottom        = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.bottom_label))
+        self.dofs_inner_lateral = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.inner_lateral_label))
+        self.dofs_top           = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.top_label))
+        self.dofs_outer_lateral = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.outer_lateral_label))
 
         # -----------------------------
         # Dirichlet boundary conditions
@@ -81,20 +84,28 @@ class ThickCylinder(Mechanics):
             (0.0, 0.0, 0.0)
         )
 
-        self.bc_top  = dolfinx.fem.dirichletbc(
+        self.bc_mech_top = dolfinx.fem.dirichletbc(
             u_clamped,
             self.dofs_top,
-            self.V
+            self.V_m
         )
 
-        self.bc_bottom  = dolfinx.fem.dirichletbc(
+        self.bc_mech_bottom = dolfinx.fem.dirichletbc(
             u_clamped,
             self.dofs_bottom,
-            self.V
+            self.V_m
         )
 
-        self.bc = [self.bc_bottom]
-        # self.bc = [self.bc_bottom, self.bc_top]
+        self.bc_thermal_outer = dolfinx.fem.dirichletbc(
+            400.0,
+            self.dofs_outer_lateral,
+            self.V_t
+        )
+
+        # self.bc = [self.bc_mech_bottom]
+        self.bc = [self.bc_mech_bottom, self.bc_mech_top]
+
+        self.bc_thermal = [self.bc_thermal_outer]
 
         # ---------------------------
         # Neumann boundary conditions
@@ -122,13 +133,58 @@ class ThickCylinder(Mechanics):
         Solve the linear elasticity problem.
         """
 
+        # ----
+        # q'''
+        # ----
+        self.f_thermal = dolfinx.fem.Constant(
+            self.mesh,
+            PETSc.ScalarType(self.q_third)
+        )
+
+        # -----------------
+        # Variational forms
+        # -----------------
+        self.a_thermal = ufl.inner(ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
+        self.L_thermal = self.f_thermal * self.v_t * ufl.dx
+
+        # PETSc options
+        # LU factorization, a direct solver method (similar to Gaussian elimination).
+
+        petsc_options = {
+            "ksp_type": "preonly",
+            "pc_type": "lu",
+            "pc_factor_mat_solver_type": "mumps",
+        }
+
+        # For non-symmetric problems, a Krylov solver for non-symmetric systems, such as GMRES, is better.
+        # petsc_options = {
+        #     "ksp_type": "gmres",
+        #     "ksp_rtol": 1e-6,
+        #     "ksp_atol": 1e-10,
+        #     "ksp_max_it": 1000,
+        #     "pc_type": "none",
+        # }
+
+        jit_options = {
+            "timeout": 20,
+        }
+
+        self.problem_thermal = dolfinx.fem.petsc.LinearProblem(
+            self.a_thermal,
+            self.L_thermal,
+            u = self.temperature,
+            bcs=self.bc_thermal,
+            petsc_options=petsc_options,
+            jit_options=jit_options,
+        )
+
         # Measure "dx"
         # x = ufl.SpatialCoordinate(self.mesh)
-        dx = ufl.dx
         # self.dx = ufl.Measure(
         #     "dx",
         #     domain=self.mesh
         # )
+        dx = ufl.dx
 
         # Mesure "ds"
         self.ds = ufl.Measure(
@@ -144,35 +200,13 @@ class ThickCylinder(Mechanics):
             Strain-displacement compatibility relations
             """
             return ufl.sym(ufl.grad(u))
-            # return 1/2 * (ufl.grad(u) + ufl.grad(u).T)
-            # x = ufl.SpatialCoordinate(self.mesh)
-            # return ufl.sym(
-            #     ufl.as_tensor(
-            #         [
-            #             [u[0].dx(0), u[0].dx(1), 0.],
-            #             [u[1].dx(0), u[1].dx(1), 0.],
-            #             [0.        , 0         , 0.],
-            #         ]
-            #     )
-            # )
-            # return ufl.sym(
-            #     ufl.as_tensor(
-            #         [
-            #             [u[0].dx(0)                                     , 1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , 1/2*(u[0].dx(2)+u[2].dx(0))],
-            #             [1/2*(u[0].dx(1)/x[0] + u[1].dx(0) - u[1]/x[0]) , (u[0] + u[1].dx(1)) / x[0]                     , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])],
-            #             [1/2*(u[0].dx(2)+u[2].dx(0))                    , 1/2*(u[1].dx(2)+u[2].dx(1)/x[0])               , u[2].dx(2)],
-            #         ]
-            #     )
-            # )
         
         def sigma(u, lmbda, mu):
             """
             Stress-strain constitutive relation.
             """
-            # return self.E / (1.0 - self.nu**2) * ((1.0 - self.nu) * epsilon(u) + self.nu * ufl.Identity(len(u)) * ufl.tr(epsilon(u))) # Constitutive relation, assuming plane-stress in XY
-            # return lmbda * ufl.nabla_div(u) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
             return lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
-
+        
         # -----------
         # Body forces
         # -----------
@@ -184,10 +218,11 @@ class ThickCylinder(Mechanics):
         # -----------------
         # Variational forms
         # -----------------
-        self.a = ufl.inner(sigma(self.u, self.lmbda, self.mu), epsilon(self.v))  * dx
-        self.L_body_forces = ufl.inner(self.f, self.v) * dx
-        self.L_tractions = ufl.inner(self.inner_traction, self.v) * ds_i + ufl.inner(self.outer_traction, self.v) * ds_o
-        self.L = self.L_body_forces + self.L_tractions
+        self.a = ufl.inner(sigma(self.u_m, self.lmbda, self.mu), epsilon(self.v_m))  * dx
+        self.L_body_forces = ufl.inner(self.f, self.v_m) * dx
+        self.L_tractions = ufl.inner(self.inner_traction, self.v_m) * ds_i + ufl.inner(self.outer_traction, self.v_m) * ds_o
+        self.L_thermal = ufl.inner((3 * self.lmbda + 2 * self.mu) * self.alpha * self.temperature * ufl.Identity(len(self.u_m)), epsilon(self.v_m)) * ufl.dx
+        self.L = self.L_body_forces + self.L_tractions + self.L_thermal
 
         # Extraction of the linear and bi-linear forms
         F = self.a - self.L # full variational form
@@ -212,28 +247,6 @@ class ThickCylinder(Mechanics):
         # Solver
         # ------
 
-        # PETSc options
-        # LU factorization, a direct solver method (similar to Gaussian elimination).
-        # For non-symmetric problems, a Krylov solver for non-symmetric systems, such as GMRES is better.
-
-        petsc_options = {
-            "ksp_type": "preonly",
-            "pc_type": "lu",
-            "pc_factor_mat_solver_type": "mumps",
-        }
-
-        # petsc_options = {
-        #     "ksp_type": "gmres",
-        #     "ksp_rtol": 1e-6,
-        #     "ksp_atol": 1e-10,
-        #     "ksp_max_it": 1000,
-        #     "pc_type": "none",
-        # }
-
-        jit_options = {
-            "timeout": 20,
-        }
-
         # Linear problem definition
         self.problem = dolfinx.fem.petsc.LinearProblem(
             self.a,
@@ -249,12 +262,15 @@ class ThickCylinder(Mechanics):
         self.stress_field = sigma(self.displacement, self.lmbda, self.mu)
         self.strain_field = epsilon(self.displacement)
 
+        # self.problem_thermal.solve()
+        self.temperature = self.problem_thermal.solve()
+
         # --------------
         # Solver options
         # --------------
-        solver = self.problem.solver
-        viewer = PETSc.Viewer().createASCII("log.solver")
-        solver.view(viewer)
+        # solver = self.problem.solver
+        # viewer = PETSc.Viewer().createASCII("log.solver")
+        # solver.view(viewer)
         # solver_output = open("lu_output.txt", "r")
         # for line in solver_output.readlines():
         #     print(line)
@@ -298,4 +314,4 @@ class ThickCylinder(Mechanics):
         vtk.write_function(self.displacement)
         vtk.close()
 
-        return self.displacement, self.stress_field, self.strain_field
+        return self.displacement, self.stress_field, self.strain_field, self.temperature
