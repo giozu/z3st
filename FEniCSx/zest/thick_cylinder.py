@@ -2,14 +2,19 @@ import ufl
 import dolfinx
 import dolfinx.fem.petsc
 from petsc4py import PETSc
+import numpy as np
 
 from mechanics import Mechanics
 
 class ThickCylinder(Mechanics):
-    def volume(self):
+    def volume(self, outer_radius, inner_radius, height):
         """
         Compute the volume of the fuel and cladding.
         """
+
+        self.outer_radius = outer_radius
+        self.inner_radius = inner_radius
+        self.height = height
         
         # Integration measures for each subdomain
         dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
@@ -24,9 +29,20 @@ class ThickCylinder(Mechanics):
         print("-----------")
         print(f"Total volume, from mesh = {volume} m3")
 
+        volume_analytical = np.pi * (self.outer_radius**2 - self.inner_radius**2) * self.height
+
+        print("\n")
+        print("-----------------")
+        print("Analytical volume")
+        print("-----------------")
+        print(f"Total volume, analytical = {volume_analytical} m3")
+        print("\n")
+        print("Relative error (%) = ", abs(volume - volume_analytical) / volume_analytical * 100)
+        print("\n")
+
         return volume
 
-    def parameters(self, rho, g, lmbda, mu, k, q_third, alpha):
+    def parameters(self, rho, g, lmbda, mu, k, lhr, alpha):
         """
         Set material and physical parameters.
 
@@ -35,25 +51,36 @@ class ThickCylinder(Mechanics):
         g (float): Gravitational acceleration.
         lmbda (float): First Lamé parameter.
         mu (float): Second Lamé parameter.
+        k (float): Thermal conductivity.
+        lhr (float): Linear heat rate.
+        q_third (float): Volumetric power.
+        alpha (float): Thermal expansion coefficient.
         """
         self.rho = rho
         self.g = g
         self.lmbda = lmbda
         self.mu = mu
         self.k = k
-        self.q_third = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(q_third))
+        self.lhr = lhr
+        self.q_third = lhr / (np.pi * (self.outer_radius**2 - self.inner_radius**2))
         self.alpha = alpha
 
-    def compute_material_properties(material):
-        G = material["E"] / (2 * (1 + material["nu"]))
-        lame1 = material["nu"] * material["E"] / ((1 + material["nu"]) * (1 - 2 * material["nu"]))
-        return G, lame1
-
-    def validate_material(material):
-        required_keys = ["E", "nu", "alpha", "rho", "geometry"]
-        missing = [key for key in required_keys if key not in material]
-        if missing:
-            raise KeyError(f"Missing keys in material: {missing}")
+        print("\n")
+        print("----------")
+        print("Parameters")
+        print("----------")
+        print(f"Inner radius: {self.inner_radius} m")
+        print(f"Outer radius: {self.outer_radius} m")
+        print(f"Height: {self.height} m")
+        print(f"Material density: {self.rho} kg/m3")
+        print(f"Gravitational acceleration: {self.g} m/s2")
+        print(f"First Lamé parameter: {self.lmbda/1e9:.2f} GPa")
+        print(f"Second Lamé parameter: {self.mu/1e9:.2f} GPa")
+        print(f"Thermal conductivity: {self.k} W/mK")
+        print(f"Linear heat rate: {self.lhr/1000} kW/m")
+        print(f"Volumetric power: {self.q_third/1000:.2f} kW/m3")
+        print(f"Thermal expansion coefficient: {self.alpha} 1/K")
+        print("\n")
 
     def boundary_conditions(self, inner_pressure, outer_pressure):
         """
@@ -84,6 +111,7 @@ class ThickCylinder(Mechanics):
             (0.0, 0.0, 0.0)
         )
 
+        # Mechanical boundary conditions
         self.bc_mech_top = dolfinx.fem.dirichletbc(
             u_clamped,
             self.dofs_top,
@@ -96,14 +124,14 @@ class ThickCylinder(Mechanics):
             self.V_m
         )
 
+        self.bc_mech = [self.bc_mech_bottom, self.bc_mech_top]
+
+        # Thermal boundary conditions
         self.bc_thermal_outer = dolfinx.fem.dirichletbc(
             400.0,
             self.dofs_outer_lateral,
             self.V_t
         )
-
-        # self.bc = [self.bc_mech_bottom]
-        self.bc = [self.bc_mech_bottom, self.bc_mech_top]
 
         self.bc_thermal = [self.bc_thermal_outer]
 
@@ -144,7 +172,7 @@ class ThickCylinder(Mechanics):
         # -----------------
         # Variational forms
         # -----------------
-        self.a_thermal = ufl.inner(ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
+        self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
         self.L_thermal = self.f_thermal * self.v_t * ufl.dx
 
         # PETSc options
@@ -157,13 +185,13 @@ class ThickCylinder(Mechanics):
         }
 
         # For non-symmetric problems, a Krylov solver for non-symmetric systems, such as GMRES, is better.
-        # petsc_options = {
-        #     "ksp_type": "gmres",
-        #     "ksp_rtol": 1e-6,
-        #     "ksp_atol": 1e-10,
-        #     "ksp_max_it": 1000,
-        #     "pc_type": "none",
-        # }
+        petsc_options = {
+            "ksp_type": "gmres",
+            "ksp_rtol": 1e-6,
+            "ksp_atol": 1e-10,
+            "ksp_max_it": 1000,
+            "pc_type": "none",
+        }
 
         jit_options = {
             "timeout": 20,
@@ -177,6 +205,8 @@ class ThickCylinder(Mechanics):
             petsc_options=petsc_options,
             jit_options=jit_options,
         )
+
+        print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
 
         # Measure "dx"
         # x = ufl.SpatialCoordinate(self.mesh)
@@ -221,7 +251,7 @@ class ThickCylinder(Mechanics):
         self.a = ufl.inner(sigma(self.u_m, self.lmbda, self.mu), epsilon(self.v_m))  * dx
         self.L_body_forces = ufl.inner(self.f, self.v_m) * dx
         self.L_tractions = ufl.inner(self.inner_traction, self.v_m) * ds_i + ufl.inner(self.outer_traction, self.v_m) * ds_o
-        self.L_thermal = ufl.inner((3 * self.lmbda + 2 * self.mu) * self.alpha * self.temperature * ufl.Identity(len(self.u_m)), epsilon(self.v_m)) * ufl.dx
+        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * self.temperature * ufl.div(self.v_m) * ufl.dx
         self.L = self.L_body_forces + self.L_tractions + self.L_thermal
 
         # Extraction of the linear and bi-linear forms
@@ -252,7 +282,7 @@ class ThickCylinder(Mechanics):
             self.a,
             self.L,
             u = self.displacement,
-            bcs=self.bc,
+            bcs=self.bc_mech,
             petsc_options=petsc_options,
             jit_options=jit_options,
         )

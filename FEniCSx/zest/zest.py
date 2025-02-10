@@ -26,6 +26,7 @@ from materials.coolant.lead import coolant
 
 # Importing geometry
 from geometry.thickWalled_cylinder import geometry
+# from geometry.full_cylinder import geometry
 
 # Importing utilities
 from utils import *
@@ -53,6 +54,9 @@ cladding_rho = cladding["rho"]
 cladding_lame1 = cladding_E * cladding_nu / ((1 + cladding_nu) * (1 - 2 * cladding_nu))
 cladding_lame2 = cladding_E / (2 * (1 + cladding_nu))
 
+# History
+lhr = 15000 # LHR in W/m
+
 # ------------------
 # Physical constants
 # ------------------
@@ -67,30 +71,32 @@ g = 0.0  # acceleration due to gravity, m/s2
 # problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice_2.msh')
 problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
 
-problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2, k = 1, q_third = 100, alpha = 1e-5)
-
 # ------
 # Volume
 # ------
-volume = problem.volume()
-
+volume = problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
 
 # Analytical volume calculations
 # fuel_volume_analytical = np.pi * (fuel_geometry["radius_fo"]**2 - fuel_geometry["radius_fi"]**2) * fuel_geometry["height"]
 # cladding_volume_analytical = np.pi * (cladding_geometry["radius_co"]**2 - cladding_geometry["radius_ci"]**2) * cladding_geometry["height"]
-volume_analytical = np.pi * (geometry["outer_radius"]**2 - geometry["inner_radius"]**2) * geometry["height"]
+# volume_analytical = np.pi * (geometry["outer_radius"]**2 - geometry["inner_radius"]**2) * geometry["height"]
 
-print("\n")
-print("-----------------")
-print("Analytical volume")
-print("-----------------")
-print(f"Total volume, analytical = {volume_analytical} m3")
+# print("\n")
+# print("-----------------")
+# print("Analytical volume")
+# print("-----------------")
+# print(f"Total volume, analytical = {volume_analytical} m3")
 # print(f"Total volume, analytical = {fuel_volume_analytical + cladding_volume_analytical} m3")
 # print(f"Fuel volume, analytical = {fuel_volume_analytical} m3")
 # print(f"Cladding volume, analytical = {cladding_volume_analytical} m3")
-print("\n")
-print("Relative error (%) = ", abs(volume - volume_analytical) / volume_analytical * 100)
-print("\n")
+# print("\n")
+# print("Relative error (%) = ", abs(volume - volume_analytical) / volume_analytical * 100)
+# print("\n")
+
+# ----------
+# Parameters
+# ----------
+problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2, k = fuel["k"], lhr = lhr, alpha = fuel["alpha"])
 
 # -------------------
 # Boundary conditions
@@ -115,7 +121,11 @@ print("\n")
 # )
 # problem.assemble_system()
 
+# Thick cylinder
 problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
+
+# Full cylinder
+# problem.boundary_conditions(pressure=gap["gap_pressure"])
 
 # -------------------
 # Assembly and solve
