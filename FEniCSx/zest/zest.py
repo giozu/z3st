@@ -14,7 +14,7 @@ This project is currently under development.
 import numpy as np
 
 # Importing FEniCS modules and custom classes
-from linear_elasticity import LinearElasticity
+# from linear_elasticity import LinearElasticity
 from full_cylinder import FullCylinder
 from thick_cylinder import ThickCylinder
 
@@ -23,10 +23,6 @@ from materials.fuel.uo2 import fuel
 from materials.cladding.T91 import cladding
 from materials.gap.gap import gap
 from materials.coolant.lead import coolant
-
-# Importing geometry
-from geometry.thickWalled_cylinder import geometry
-# from geometry.full_cylinder import geometry
 
 # Importing utilities
 from utils import *
@@ -55,7 +51,7 @@ cladding_lame1 = cladding_E * cladding_nu / ((1 + cladding_nu) * (1 - 2 * claddi
 cladding_lame2 = cladding_E / (2 * (1 + cladding_nu))
 
 # History
-lhr = 15000 # LHR in W/m
+lhr = 15000.0 # LHR in W/m
 
 # ------------------
 # Physical constants
@@ -67,9 +63,14 @@ g = 0.0  # acceleration due to gravity, m/s2
 # -------------------
 
 # problem = LinearElasticity(mesh_file='../../mesh/fuel_cladding_3d_slice.msh')
-# problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
+
+problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
+from geometry.full_cylinder import geometry
+
 # problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice_2.msh')
-problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
+
+# problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
+# from geometry.thickWalled_cylinder import geometry
 
 # ------
 # Volume
@@ -122,10 +123,10 @@ problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2, k = fuel["k"], lhr = lhr
 # problem.assemble_system()
 
 # Thick cylinder
-problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
+# problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
 
 # Full cylinder
-# problem.boundary_conditions(pressure=gap["gap_pressure"])
+problem.boundary_conditions(pressure=gap["gap_pressure"])
 
 # -------------------
 # Assembly and solve
@@ -145,15 +146,18 @@ print(f"temperature = {temperature}")
 # ----------------
 # Stiffness matrix
 # ----------------
-rows, cols, values = problem.parse_matrix_file("stiffness_matrix.txt")
-problem.plot_sparsity_pattern(rows, cols)
+rows, cols, values = problem.parse_matrix_file("thermal_stiffness_matrix.txt")
+problem.plot_sparsity_pattern(rows, cols, "thermal_sparisity_pattern.png")
+
+rows, cols, values = problem.parse_matrix_file("mech_stiffness_matrix.txt")
+problem.plot_sparsity_pattern(rows, cols, "mech_sparisity_pattern")
 
 # ----------------
 # Post-processing
 # ----------------
 plot_results(displacement, problem)
 plot_temperature(temperature, problem)
-plot_stress_components(problem)
+# plot_stress_components(problem)
 to_paraview(problem)
 
 # plot_sigma_rr_at_z(problem, z_value=1.0)

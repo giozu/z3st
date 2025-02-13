@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 # Define problem parameters
 a = 0.5  # Inner radius (m)
-b = 1.5  # Outer radius (m)
-pi = 1e7  # Inner pressure (Pa)
+b = 1.0  # Outer radius (m)
+pi = 1e6  # Inner pressure (Pa)
 po = 0  # Outer pressure (Pa)
 
 nu = 0.3

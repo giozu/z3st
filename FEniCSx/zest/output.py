@@ -325,3 +325,32 @@ def to_paraview(problem):
         file.write_mesh(problem.mesh)
         file.write_function(problem.temperature)
     print(f"Temperature field written to {output_file}")
+
+    # Complete output file (in progress)
+    stress_space = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
+    stress_expression = dolfinx.fem.Expression(problem.stress_field, stress_space.element.interpolation_points())
+    stress_values = dolfinx.fem.Function(stress_space)
+    stress_values.interpolate(stress_expression)
+
+    strain_space = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
+    strain_expression = dolfinx.fem.Expression(problem.strain_field, strain_space.element.interpolation_points())
+    strain_values = dolfinx.fem.Function(strain_space)
+    strain_values.interpolate(strain_expression)
+
+    # Write results field to XDMF file
+    output_file = os.path.join(output_dir, "paraview_results.xdmf")
+    with dolfinx.io.XDMFFile(mesh.comm, output_file, "w") as xdmf:
+        xdmf.write_mesh(mesh)
+        problem.displacement.name = "displacement"
+        problem.temperature.name = "temperature"
+        stress_values.name = "stress"
+        strain_values.name = "strain"
+        xdmf.write_function(problem.displacement)
+        xdmf.write_function(problem.temperature)
+        xdmf.write_function(stress_values)
+        xdmf.write_function(strain_values)
+
+    print(f"Displacement field written to {output_file}")
+    print(f"Temperature field written to {output_file}")
+    print(f"Stress tensor written to {output_file}")
+    print(f"Strain tensor written to {output_file}")
