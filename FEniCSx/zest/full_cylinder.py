@@ -112,8 +112,9 @@ class FullCylinder(FiniteElementSetting):
 
         # Mechanical boundary conditions
         self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
-        self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
-        self.bc_mech = [self.bc_mech_bottom, self.bc_mech_top]
+        self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_lateral_m, self.V_m)
+        self.bc_mech_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
+        self.bc_mech = [self.bc_mech_bottom, self.bc_mech_top, self.bc_mech_lateral]
 
         # Thermal boundary conditions
         self.bc_thermal_lateral = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_t, self.V_t)
@@ -193,12 +194,18 @@ class FullCylinder(FiniteElementSetting):
             """
             return self.lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * self.mu * epsilon(u)
 
-        # Variational forms
+        T_ref = dolfinx.fem.Constant(self.mesh, 0.0)
+
+        # Define the weak form for the mechanical problem, including thermal expansion effects.
+        # The bilinear form a_mech represents the internal forces, defined using the stress-strain relationship.
+        # The linear form L_mech includes contributions from body forces, surface tractions, and thermal expansion.
+        # The thermal contribution is given by L_thermal, which accounts for the expansion induced by temperature changes.
+        # Note: The thermal term remains on the left-hand side with a negative sign, as required by FEniCSx's weak formulation.
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
         self.L_body_forces = ufl.inner(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
         self.L_tractions = ufl.inner(self.traction, self.v_m) * ds
-        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * self.temperature * ufl.div(self.v_m) * ufl.dx
-        self.L_mech = self.L_body_forces + self.L_tractions # + self.L_thermal
+        self.L_thermal = - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature) * ufl.div(self.v_m) * ufl.dx
+        self.L_mech = self.L_body_forces + self.L_tractions + self.L_thermal
 
         self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
@@ -264,10 +271,5 @@ class FullCylinder(FiniteElementSetting):
         stress_field (ufl.Expr): The stress field.
         strain_field (ufl.Expr): The strain field.
         """
-
-        # Save the displacement field to a VTK file
-        vtk = dolfinx.io.VTKFile(self.mesh.comm, "linear_elasticity.pvd", "w")
-        vtk.write_function(self.displacement)
-        vtk.close()
 
         return self.displacement, self.stress_field, self.strain_field, self.temperature
