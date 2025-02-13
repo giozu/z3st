@@ -197,7 +197,7 @@ class FullCylinder(FiniteElementSetting):
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
         self.L_body_forces = ufl.inner(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
         self.L_tractions = ufl.inner(self.traction, self.v_m) * ds
-        bself.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * self.temperature * ufl.div(self.v_m) * ufl.dx
+        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * self.temperature * ufl.div(self.v_m) * ufl.dx
         self.L_mech = self.L_body_forces + self.L_tractions # + self.L_thermal
 
         self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
