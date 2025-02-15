@@ -52,6 +52,9 @@ class FiniteElementSetting:
         self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))  # scalar function space
         self.V_scalar = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
 
+        print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
+        print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
+
         # Mixed-function space:
         # basix.ufl.mixed_element to create a mixed element for the displacement and temperature fields. 
         # We choose the Taylor-Hood finite element pair for this problem.

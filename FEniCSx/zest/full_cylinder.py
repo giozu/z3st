@@ -111,10 +111,12 @@ class FullCylinder(FiniteElementSetting):
         # -----------------------------
 
         # Mechanical boundary conditions
-        self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
-        self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_lateral_m, self.V_m)
-        self.bc_mech_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
-        self.bc_mech = [self.bc_mech_bottom, self.bc_mech_top, self.bc_mech_lateral]
+        # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
+        # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), self.dofs_top, self.V_m.sub(2))
+        self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
+        # self.bc_mech_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
+
+        self.bc_mech = [self.bc_mech_bottom]
 
         # Thermal boundary conditions
         self.bc_thermal_lateral = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_t, self.V_t)
@@ -140,14 +142,14 @@ class FullCylinder(FiniteElementSetting):
         self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
         self.L_thermal = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.q_third)) * self.v_t * ufl.dx
         
-        petsc_options = {
+        petsc_options_sym = {
             "ksp_type": "preonly",
             "pc_type": "lu", # LU factorization, a direct solver method (similar to Gaussian elimination)
             "pc_factor_mat_solver_type": "mumps",
         }
 
         # For non-symmetric problems, a Krylov solver for non-symmetric systems, such as GMRES, is better.
-        petsc_options = {
+        petsc_options_non_sym = {
             "ksp_type": "gmres",
             "ksp_rtol": 1e-6,
             "ksp_atol": 1e-10,
@@ -165,7 +167,7 @@ class FullCylinder(FiniteElementSetting):
             self.a_thermal,
             self.L_thermal,
             bcs = self.bc_thermal,
-            petsc_options=petsc_options,
+            petsc_options=petsc_options_sym,
             jit_options=jit_options,
         )
 
@@ -194,18 +196,15 @@ class FullCylinder(FiniteElementSetting):
             """
             return self.lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * self.mu * epsilon(u)
 
-        T_ref = dolfinx.fem.Constant(self.mesh, 0.0)
-
-        # Define the weak form for the mechanical problem, including thermal expansion effects.
-        # The bilinear form a_mech represents the internal forces, defined using the stress-strain relationship.
-        # The linear form L_mech includes contributions from body forces, surface tractions, and thermal expansion.
-        # The thermal contribution is given by L_thermal, which accounts for the expansion induced by temperature changes.
-        # Note: The thermal term remains on the left-hand side with a negative sign, as required by FEniCSx's weak formulation.
+        # Variational forms
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
         self.L_body_forces = ufl.inner(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
         self.L_tractions = ufl.inner(self.traction, self.v_m) * ds
-        self.L_thermal = - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature) * ufl.div(self.v_m) * ufl.dx
-        self.L_mech = self.L_body_forces + self.L_tractions + self.L_thermal
+        T_ref = dolfinx.fem.Constant(self.mesh, 300.0)
+        # dx = ufl.Measure("dx", domain=self.mesh)
+        # T_avg = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.temperature * dx)) / dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
+        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
+        self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
 
         self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
@@ -214,7 +213,7 @@ class FullCylinder(FiniteElementSetting):
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = petsc_options,
+            petsc_options = petsc_options_non_sym,
             jit_options = jit_options,
         )
 

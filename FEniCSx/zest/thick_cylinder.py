@@ -66,7 +66,6 @@ class ThickCylinder(FiniteElementSetting):
         self.q_third = lhr / (np.pi * (self.outer_radius**2 - self.inner_radius**2))
         self.alpha = alpha
 
-        print("\n")
         print("----------")
         print("Parameters")
         print("----------")
@@ -88,7 +87,6 @@ class ThickCylinder(FiniteElementSetting):
         Define and set the boundary conditions.
         """
 
-        print("\n")
         print("-------------------")
         print("Boundary conditions")
         print("-------------------")
@@ -110,19 +108,20 @@ class ThickCylinder(FiniteElementSetting):
         self.dofs_top           = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.top_label))
         self.dofs_outer_lateral = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.outer_lateral_label))
 
-        self.dofs_outer_lateral_t = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.outer_lateral_label))
-
         # -----------------------------
         # Dirichlet boundary conditions
         # -----------------------------
 
         # Mechanical boundary conditions
-        self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
         self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
-        self.bc_mech = [self.bc_mech_bottom, self.bc_mech_top]
+        self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
+        self.bc_mech_inner_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_inner_lateral, self.V_m)
+        self.bc_mech_outer_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_outer_lateral, self.V_m)
+
+        self.bc_mech = [self.bc_mech_bottom, self.bc_mech_top, self.bc_mech_inner_lateral, self.bc_mech_outer_lateral]
 
         # Thermal boundary conditions
-        self.bc_thermal_outer = dolfinx.fem.dirichletbc(400.0, self.dofs_outer_lateral_t, self.V_t)
+        self.bc_thermal_outer = dolfinx.fem.dirichletbc(400.0, self.dofs_outer_lateral, self.V_t)
         self.bc_thermal = [self.bc_thermal_outer]
 
         # ---------------------------
@@ -130,12 +129,9 @@ class ThickCylinder(FiniteElementSetting):
         # ---------------------------
 
         self.normal = ufl.FacetNormal(self.mesh)
+        self.inner_traction = inner_pressure * self.normal
+        self.outer_traction = outer_pressure * self.normal
 
-        self.inner_pressure = dolfinx.fem.Constant(self.mesh, inner_pressure)
-        self.inner_traction = self.inner_pressure * self.normal
-
-        self.outer_pressure = dolfinx.fem.Constant(self.mesh, outer_pressure)
-        self.outer_traction = self.outer_pressure * self.normal
 
     def assemble_and_solve(self):
         """
@@ -148,14 +144,14 @@ class ThickCylinder(FiniteElementSetting):
         self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
         self.L_thermal = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.q_third)) * self.v_t * ufl.dx
 
-        petsc_options = {
+        petsc_options_sym = {
             "ksp_type": "preonly",
             "pc_type": "lu", # LU factorization, a direct solver method (similar to Gaussian elimination)
             "pc_factor_mat_solver_type": "mumps",
         }
 
         # For non-symmetric problems, a Krylov solver for non-symmetric systems, such as GMRES, is better.
-        petsc_options = {
+        petsc_options_non_sym = {
             "ksp_type": "gmres",
             "ksp_rtol": 1e-6,
             "ksp_atol": 1e-10,
@@ -173,11 +169,12 @@ class ThickCylinder(FiniteElementSetting):
             self.a_thermal,
             self.L_thermal,
             bcs = self.bc_thermal,
-            petsc_options=petsc_options,
+            petsc_options=petsc_options_sym,
             jit_options=jit_options,
         )
 
         self.temperature = self.thermal_problem.solve()
+        self.temperature.x.scatter_forward() # to propagate the data among the processors
 
         print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
         print("\n")
@@ -207,8 +204,9 @@ class ThickCylinder(FiniteElementSetting):
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m))  * ufl.dx
         self.L_body_forces = ufl.inner(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
         self.L_tractions = ufl.inner(self.inner_traction, self.v_m) * ds_i + ufl.inner(self.outer_traction, self.v_m) * ds_o
-        # self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * self.temperature * ufl.div(self.v_m) * ufl.dx
-        self.L_mech = self.L_body_forces + self.L_tractions # + self.L_thermal
+        T_ref = dolfinx.fem.Constant(self.mesh, 300.0)
+        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
+        self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
 
         self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
@@ -217,12 +215,12 @@ class ThickCylinder(FiniteElementSetting):
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = petsc_options,
+            petsc_options = petsc_options_non_sym,
             jit_options = jit_options,
         )
 
         self.displacement = self.mech_problem.solve()
-        # self.displacement.x.scatter_forward() # scatter_forward is necessary for dolfinx ?
+        self.displacement.x.scatter_forward() # to propagate the data among the processors
         self.stress_field = sigma(self.displacement)
         self.strain_field = epsilon(self.displacement)
 
@@ -274,10 +272,5 @@ class ThickCylinder(FiniteElementSetting):
         stress_field (ufl.Expr): The stress field.
         strain_field (ufl.Expr): The strain field.
         """
-
-        # Save the displacement field to a VTK file
-        vtk = dolfinx.io.VTKFile(self.mesh.comm, "linear_elasticity.pvd", "w")
-        vtk.write_function(self.displacement)
-        vtk.close()
 
         return self.displacement, self.stress_field, self.strain_field, self.temperature

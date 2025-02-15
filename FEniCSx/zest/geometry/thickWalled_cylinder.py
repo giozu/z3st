@@ -3,5 +3,5 @@ geometry = {
 
     "inner_radius": 0.5,    # Inner radius, m
     "outer_radius": 1.0,    # Outer radius, m
-    "height":       2.0,   # Height, m
+    "height":       5.0,    # Height, m
 }

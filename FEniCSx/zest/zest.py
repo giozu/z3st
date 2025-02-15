@@ -12,6 +12,7 @@ This project is currently under development.
 
 # Importing python modules
 import numpy as np
+import time
 
 # Importing FEniCS modules and custom classes
 # from linear_elasticity import LinearElasticity
@@ -51,48 +52,29 @@ cladding_lame1 = cladding_E * cladding_nu / ((1 + cladding_nu) * (1 - 2 * claddi
 cladding_lame2 = cladding_E / (2 * (1 + cladding_nu))
 
 # History
-lhr = 15000.0 # LHR in W/m
+lhr = 15e4 # LHR in W/m
 
 # ------------------
 # Physical constants
 # ------------------
 g = 0.0  # acceleration due to gravity, m/s2
 
+start_time = time.time()
+
 # -------------------
 # Problem declaration
 # -------------------
 
-# problem = LinearElasticity(mesh_file='../../mesh/fuel_cladding_3d_slice.msh')
+# problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
+# from geometry.full_cylinder import geometry
 
-problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
-from geometry.full_cylinder import geometry
-
-# problem = ThickCylinder(mesh_file='../../mesh/cladding_3d_slice_2.msh')
-
-# problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
-# from geometry.thickWalled_cylinder import geometry
+problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
+from geometry.thickWalled_cylinder import geometry
 
 # ------
 # Volume
 # ------
 volume = problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
-
-# Analytical volume calculations
-# fuel_volume_analytical = np.pi * (fuel_geometry["radius_fo"]**2 - fuel_geometry["radius_fi"]**2) * fuel_geometry["height"]
-# cladding_volume_analytical = np.pi * (cladding_geometry["radius_co"]**2 - cladding_geometry["radius_ci"]**2) * cladding_geometry["height"]
-# volume_analytical = np.pi * (geometry["outer_radius"]**2 - geometry["inner_radius"]**2) * geometry["height"]
-
-# print("\n")
-# print("-----------------")
-# print("Analytical volume")
-# print("-----------------")
-# print(f"Total volume, analytical = {volume_analytical} m3")
-# print(f"Total volume, analytical = {fuel_volume_analytical + cladding_volume_analytical} m3")
-# print(f"Fuel volume, analytical = {fuel_volume_analytical} m3")
-# print(f"Cladding volume, analytical = {cladding_volume_analytical} m3")
-# print("\n")
-# print("Relative error (%) = ", abs(volume - volume_analytical) / volume_analytical * 100)
-# print("\n")
 
 # ----------
 # Parameters
@@ -103,41 +85,30 @@ problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2, k = fuel["k"], lhr = lhr
 # Boundary conditions
 # -------------------
 
-# problem.boundary_conditions(
-#     radius_fi=fuel_geometry["radius_fi"],
-#     radius_fo=fuel_geometry["radius_fo"],
-#     height_fuel=fuel_geometry["height"],
-#     radius_ci=cladding_geometry["radius_ci"],
-#     radius_co=cladding_geometry["radius_co"],
-#     height_cladding=cladding_geometry["height"],
-#     gap_pressure=gap["gap_pressure"],
-#     coolant_pressure=coolant["coolant_pressure"]
-# )
-# problem.boundary_conditions_thick_cylinder(
-#     radius_ci=cladding_geometry["radius_ci"],
-#     radius_co=cladding_geometry["radius_co"],
-#     height_cladding=cladding_geometry["height"],
-#     gap_pressure=gap["gap_pressure"],
-#     coolant_pressure=coolant["coolant_pressure"]
-# )
-# problem.assemble_system()
-
 # Thick cylinder
-# problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
+problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
 
 # Full cylinder
-problem.boundary_conditions(pressure=gap["gap_pressure"])
+# problem.boundary_conditions(pressure=gap["gap_pressure"])
 
 # -------------------
 # Assembly and solve
 # -------------------
 problem.assemble_and_solve()
 
+end_time = time.time()
+elapsed_time = end_time - start_time
+
+print(f"-----------------------")
+print(f"Elapsed time: {elapsed_time:.4f} s")
+print(f"-----------------------")
+
 # -------
 # Results
 # -------
 displacement, stress_field, strain_field, temperature = problem.get_results()
 
+print("\n")
 print(f"displacement = {displacement}")
 print(f"stress_field = {stress_field}")
 print(f"strain_field = {strain_field}")

@@ -42,7 +42,11 @@ def plot_results(displacement, problem):
     p.add_mesh(warped, show_edges=True, cmap=matplotlib.colormaps.get_cmap("gist_rainbow").resampled(25), lighting=True)
     p.show_axes()
 
-    figure_as_array = p.screenshot("displacement.png")
+    output_dir = "output"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    figure_as_array = p.screenshot("output/displacement.png")
     return figure_as_array
 
 def plot_temperature(temperature, problem):
@@ -68,7 +72,11 @@ def plot_temperature(temperature, problem):
     p.view_isometric()
     p.show_axes()
 
-    figure_as_array = p.screenshot("temperature.png")
+    output_dir = "output"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    figure_as_array = p.screenshot("output/temperature.png")
     return figure_as_array
 
 def plot_stress_components(problem):
@@ -114,7 +122,7 @@ def plot_stress_components(problem):
         p.add_mesh(warped, show_edges=True, cmap=matplotlib.colormaps.get_cmap("gist_rainbow").resampled(25), lighting=True)
         p.show_axes()
 
-        figure_as_array = p.screenshot(f"{name}.png")
+        figure_as_array = p.screenshot(f"output/{name}.png")
 
         return figure_as_array
 
@@ -194,7 +202,7 @@ def plot_sigma_rr_at_z(problem, z_value=1.0):
     plt.xlabel("Radius (r)")
     plt.ylabel("sigma_rr")
     plt.title(f"Radial stress component sigma_rr at z = {z_value}")
-    plt.savefig(f"sigma_rr_z_{z_value}.png")
+    plt.savefig(f"output/sigma_rr_z_{z_value}.png")
     plt.show()
 
 def plot_sigma_xx_at_z(problem, z_value=1.0):
@@ -234,7 +242,7 @@ def plot_sigma_xx_at_z(problem, z_value=1.0):
     plt.xlabel("Radius (r)")
     plt.ylabel("sigma_xx")
     plt.title(f"Stress component sigma_xx at z = {z_value}")
-    plt.savefig(f"sigma_xx_z_{z_value}.png")
+    plt.savefig(f"output/sigma_xx_z_{z_value}.png")
     plt.show()
 
 def print_x_at_z_zero(problem):
