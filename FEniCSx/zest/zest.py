@@ -18,6 +18,7 @@ import time
 # from linear_elasticity import LinearElasticity
 from full_cylinder import FullCylinder
 from thick_cylinder import ThickCylinder
+from cube import Cube
 
 # Importing materials
 from materials.fuel.uo2 import fuel
@@ -52,7 +53,7 @@ cladding_lame1 = cladding_E * cladding_nu / ((1 + cladding_nu) * (1 - 2 * claddi
 cladding_lame2 = cladding_E / (2 * (1 + cladding_nu))
 
 # History
-lhr = 15e4 # LHR in W/m
+lhr = 0 # LHR in W/m
 
 # ------------------
 # Physical constants
@@ -65,16 +66,20 @@ start_time = time.time()
 # Problem declaration
 # -------------------
 
+problem = Cube(mesh_file='../../mesh/cube.msh')
+from geometry.cube import geometry
+
 # problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
 # from geometry.full_cylinder import geometry
 
-problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
-from geometry.thickWalled_cylinder import geometry
+# problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
+# from geometry.thickWalled_cylinder import geometry
 
 # ------
 # Volume
 # ------
-volume = problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
+# volume = problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
+volume = problem.volume(geometry["edge"])
 
 # ----------
 # Parameters
@@ -86,10 +91,13 @@ problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2, k = fuel["k"], lhr = lhr
 # -------------------
 
 # Thick cylinder
-problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
+# problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
 
 # Full cylinder
 # problem.boundary_conditions(pressure=gap["gap_pressure"])
+
+# Cube
+problem.boundary_conditions(pressure=gap["gap_pressure"])
 
 # -------------------
 # Assembly and solve
