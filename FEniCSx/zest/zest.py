@@ -93,7 +93,7 @@ problem.parameters(fuel_rho, g, fuel_E, fuel_nu, k = fuel["k"], lhr = lhr, alpha
 # problem.boundary_conditions(pressure=gap["gap_pressure"])
 
 # Cube
-problem.boundary_conditions(pressure=conditions["gap pressure"])
+problem.boundary_conditions(pressure=conditions["gap pressure"], temperature=conditions["boundary temperature"])
 
 # -------------------
 # Assembly and solve

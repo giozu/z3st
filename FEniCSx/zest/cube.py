@@ -86,7 +86,7 @@ class Cube(FiniteElementSetting):
         print(f"Reference temperature: {self.T_ref:.2f} K")
         print("\n")
 
-    def boundary_conditions(self, pressure):
+    def boundary_conditions(self, pressure, temperature):
         """
         Define and set the boundary conditions.
         """
@@ -95,6 +95,7 @@ class Cube(FiniteElementSetting):
         print("Boundary conditions")
         print("-------------------")
         print(f"Pressure = {pressure*1e-6:.2f} MPa")
+        print(f"Temperature = {temperature:.2f} K")
         print("\n")
 
         self.bottom_label = 1
@@ -163,8 +164,8 @@ class Cube(FiniteElementSetting):
         self.bc_mech = []
 
         # Thermal boundary conditions
-        bc_thermal_x_0 = dolfinx.fem.dirichletbc(self.T_ref, self.dofs_lateral_x_0_boundary, self.V_t)
-        bc_thermal_x_L = dolfinx.fem.dirichletbc(self.T_ref, self.dofs_lateral_x_L_boundary, self.V_t)
+        bc_thermal_x_0 = dolfinx.fem.dirichletbc(temperature, self.dofs_lateral_x_0_boundary, self.V_t)
+        bc_thermal_x_L = dolfinx.fem.dirichletbc(temperature, self.dofs_lateral_x_L_boundary, self.V_t)
         self.bc_thermal = [bc_thermal_x_0, bc_thermal_x_L]
         # self.bc_thermal_lateral_1 = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_1, self.V_t)
         # self.bc_thermal_lateral_3 = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_3, self.V_t)

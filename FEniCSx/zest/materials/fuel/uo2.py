@@ -4,5 +4,5 @@ fuel = {
     "nu": 0.3,   # Poisson's ratio
     "alpha": 1.45e-5,  # Thermal expansion coefficient, 1/K
     "rho": 10970,  # Density, kg/m3
-    "k": 2.5,  # Thermal conductivity, W/m/K
+    "k": 2.5,  # Thermal conductivity, W/m-K
 }
