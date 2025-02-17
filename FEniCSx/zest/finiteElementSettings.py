@@ -4,6 +4,8 @@ import dolfinx.fem.petsc
 from mpi4py import MPI
 import basix.ufl
 from petsc4py import PETSc
+import meshio
+import numpy as np
 
 class FiniteElementSetting:
     def __init__(self, mesh_file, rank=0, gdim=3):
@@ -33,11 +35,28 @@ class FiniteElementSetting:
             
             self.tdim = self.mesh.topology.dim
             print(f"Info    : Mesh topology dimension d={self.tdim}")
-            print(f"Info    : Mesh geometry dimension d={self.mesh.geometry.dim}")
+            # print(f"Info    : Mesh geometry dimension d={self.mesh.geometry.dim}")
 
             self.fdim = self.tdim - 1
             self.mesh.topology.create_connectivity(self.fdim, self.tdim)
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
+
+            msh = meshio.read(self.mesh_file)
+
+            facet_tags = self.tags
+            boundary_facets = np.where(facet_tags.values > 0)[0]  # Prendi solo le facce con tag
+            boundary_values = facet_tags.values[boundary_facets]  # Prendi i valori dei tag fisici
+
+            # print("Facce di contorno lette:", boundary_facets)
+            # print("Tag fisici associati:", boundary_values)
+
+            # print(msh.cells_dict)
+            # print(msh.cell_data_dict)
+
+            # for cell_block in msh.cells:
+            #     if cell_block.type == "triangle":
+                    # print("Triangular faces:", cell_block.data)
+                    # print("Face tags:", msh.cell_data_dict["gmsh:physical"]["triangle"])
 
         except Exception as e:
             raise ValueError(f"Error reading mesh file {self.mesh_file}: {e}")
@@ -52,6 +71,7 @@ class FiniteElementSetting:
         self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))  # scalar function space
         self.V_scalar = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
 
+        print("\n")
         print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
         print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
 

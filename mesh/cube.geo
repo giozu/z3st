@@ -63,7 +63,7 @@ Volume(1) = {1};
 Transfinite Curve {1, 2, 3, 4, 9, 10, 11, 12} = n Using Progression 1;
 Transfinite Curve {5, 6, 7, 8} = n Using Progression 1;
 Transfinite Surface {1, 2, 3, 4, 5, 6};
-Recombine Surface {1, 2, 3, 4, 5, 6};
+// Recombine Surface {1, 2, 3, 4, 5, 6};
 Transfinite Volume {1};
 
 // Define physical groups for boundary conditions

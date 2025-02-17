@@ -40,25 +40,19 @@ fuel_nu = fuel["nu"]
 fuel_alpha = fuel["alpha"]
 fuel_rho = fuel["rho"]
 
-fuel_lame1 = fuel_E * fuel_nu / ((1 + fuel_nu) * (1 - 2 * fuel_nu))
-fuel_lame2 = fuel_E / (2 * (1 + fuel_nu))
-
 # Cladding properties
 cladding_E = cladding["E"]
 cladding_nu = cladding["nu"]
 cladding_alpha = cladding["alpha"]
 cladding_rho = cladding["rho"]
 
-cladding_lame1 = cladding_E * cladding_nu / ((1 + cladding_nu) * (1 - 2 * cladding_nu))
-cladding_lame2 = cladding_E / (2 * (1 + cladding_nu))
-
 # History
-lhr = 0 # LHR in W/m
+lhr = 15000 # LHR in W/m
 
 # ------------------
 # Physical constants
 # ------------------
-g = 0.0  # acceleration due to gravity, m/s2
+g = 9.81  # acceleration due to gravity, m/s2
 
 start_time = time.time()
 
@@ -84,7 +78,7 @@ volume = problem.volume(geometry["edge"])
 # ----------
 # Parameters
 # ----------
-problem.parameters(fuel_rho, g, fuel_lame1, fuel_lame2, k = fuel["k"], lhr = lhr, alpha = fuel["alpha"])
+problem.parameters(fuel_rho, g, fuel_E, fuel_nu, k = fuel["k"], lhr = lhr, alpha = fuel["alpha"])
 
 # -------------------
 # Boundary conditions

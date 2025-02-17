@@ -126,7 +126,7 @@ def plot_stress_components(problem):
 
         return figure_as_array
 
-    stress = problem.stress_field
+    stress = problem.stress
 
     sigma_xx = stress[0, 0]
     sigma_xy = stress[0, 1]
@@ -140,7 +140,7 @@ def plot_stress_components(problem):
     sigma_zy = stress[2, 1]
     sigma_zz = stress[2, 2]
 
-    strain = problem.strain_field
+    strain = problem.strain
 
     strain_xx = strain[0, 0]
     strain_xy = strain[0, 1]
@@ -172,7 +172,7 @@ def plot_sigma_rr_at_z(problem, z_value=1.0):
     z = ufl.SpatialCoordinate(problem.mesh)[2]
 
     # Stress components
-    stress = problem.stress_field
+    stress = problem.stress
     sigma_xx = stress[0, 0]
     sigma_xy = stress[0, 1]
     sigma_yy = stress[1, 1]
@@ -217,7 +217,7 @@ def plot_sigma_xx_at_z(problem, z_value=1.0):
     z = ufl.SpatialCoordinate(problem.mesh)[2]
 
     # Stress components
-    stress = problem.stress_field
+    stress = problem.stress
     sigma_xx = stress[0, 0]
 
     # Function space for sigma_xx
@@ -245,21 +245,21 @@ def plot_sigma_xx_at_z(problem, z_value=1.0):
     plt.savefig(f"output/sigma_xx_z_{z_value}.png")
     plt.show()
 
-def print_x_at_z_zero(problem):
-    """
-    Print the values of x at z = 0.
-    """
-    z_value = 0.0
-    coordinates = problem.mesh.geometry.x
-    X_coord2 = Xh0.x.array.reshape(len(mesh.geometry.x[:,1]),2)
+# def print_x_at_z_zero(problem):
+#     """
+#     Print the values of x at z = 0.
+#     """
+#     z_value = 0.0
+#     coordinates = problem.mesh.geometry.x
+#     X_coord2 = Xh0.x.array.reshape(len(mesh.geometry.x[:,1]),2)
 
-    x = coordinates[:, 0]
-    y = coordinates[:, 1]
-    z = coordinates[:, 2]
+#     x = coordinates[:, 0]
+#     y = coordinates[:, 1]
+#     z = coordinates[:, 2]
 
-    print(x)
-    print(y)
-    print(z)
+#     print(x)
+#     print(y)
+#     print(z)
 
     # x_at_z_zero = coordinates[np.isclose(coordinates[:, 2], z_value)]
     # print(f"Values of x at z = {z_value}:")
@@ -303,11 +303,11 @@ def to_paraview(problem):
 
     # Write stress tensor field to XDMF file
     stress_space = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
-    stress_expression = dolfinx.fem.Expression(problem.stress_field, stress_space.element.interpolation_points())
+    stress_expression = dolfinx.fem.Expression(problem.stress, stress_space.element.interpolation_points())
     stress_values = dolfinx.fem.Function(stress_space)
     stress_values.interpolate(stress_expression)
 
-    output_file = os.path.join(output_dir, "stress_tensor.xdmf")
+    output_file = os.path.join(output_dir, "stress.xdmf")
     with dolfinx.io.XDMFFile(mesh.comm, output_file, "w") as xdmf:
         xdmf.write_mesh(mesh)
         stress_values.name = "stress"
@@ -316,11 +316,11 @@ def to_paraview(problem):
 
     # Write strain tensor field to XDMF file
     strain_space = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
-    strain_expression = dolfinx.fem.Expression(problem.strain_field, strain_space.element.interpolation_points())
+    strain_expression = dolfinx.fem.Expression(problem.strain, strain_space.element.interpolation_points())
     strain_values = dolfinx.fem.Function(strain_space)
     strain_values.interpolate(strain_expression)
 
-    output_file = os.path.join(output_dir, "strain_tensor.xdmf")
+    output_file = os.path.join(output_dir, "strain.xdmf")
     with dolfinx.io.XDMFFile(mesh.comm, output_file, "w") as xdmf:
         xdmf.write_mesh(mesh)
         strain_values.name = "strain"
@@ -335,30 +335,20 @@ def to_paraview(problem):
     print(f"Temperature field written to {output_file}")
 
     # Complete output file (in progress)
-    stress_space = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
-    stress_expression = dolfinx.fem.Expression(problem.stress_field, stress_space.element.interpolation_points())
-    stress_values = dolfinx.fem.Function(stress_space)
-    stress_values.interpolate(stress_expression)
-
-    strain_space = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
-    strain_expression = dolfinx.fem.Expression(problem.strain_field, strain_space.element.interpolation_points())
-    strain_values = dolfinx.fem.Function(strain_space)
-    strain_values.interpolate(strain_expression)
-
     # Write results field to XDMF file
-    output_file = os.path.join(output_dir, "paraview_results.xdmf")
-    with dolfinx.io.XDMFFile(mesh.comm, output_file, "w") as xdmf:
-        xdmf.write_mesh(mesh)
-        problem.displacement.name = "displacement"
-        problem.temperature.name = "temperature"
-        stress_values.name = "stress"
-        strain_values.name = "strain"
-        xdmf.write_function(problem.displacement)
-        xdmf.write_function(problem.temperature)
-        xdmf.write_function(stress_values)
-        xdmf.write_function(strain_values)
+    # output_file = os.path.join(output_dir, "paraview_results.xdmf")
+    # with dolfinx.io.XDMFFile(mesh.comm, output_file, "w") as xdmf:
+    #     xdmf.write_mesh(mesh)
+    #     problem.displacement.name = "displacement"
+    #     problem.temperature.name = "temperature"
+    #     stress_values.name = "stress"
+    #     strain_values.name = "strain"
+    #     xdmf.write_function(problem.displacement)
+    #     xdmf.write_function(problem.temperature)
+    #     xdmf.write_function(stress_values)
+    #     xdmf.write_function(strain_values)
 
-    print(f"Displacement field written to {output_file}")
-    print(f"Temperature field written to {output_file}")
-    print(f"Stress tensor written to {output_file}")
-    print(f"Strain tensor written to {output_file}")
+    # print(f"Displacement field written to {output_file}")
+    # print(f"Temperature field written to {output_file}")
+    # print(f"Stress tensor written to {output_file}")
+    # print(f"Strain tensor written to {output_file}")
