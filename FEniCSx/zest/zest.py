@@ -80,7 +80,7 @@ volume = problem.volume(geometry["edge"])
 # ----------
 # Parameters
 # ----------
-problem.parameters(fuel_rho, g, fuel_E, fuel_nu, k = fuel["k"], lhr = lhr, alpha = fuel["alpha"])
+problem.parameters(fuel_rho, g, fuel_E, fuel_nu, k = fuel["k"], lhr = lhr, alpha = fuel["alpha"], T_ref = conditions["reference temperature"])
 
 # -------------------
 # Boundary conditions

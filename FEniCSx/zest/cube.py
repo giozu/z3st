@@ -40,7 +40,7 @@ class Cube(FiniteElementSetting):
 
         return volume
 
-    def parameters(self, rho, g, E, poisson, k, lhr, alpha):
+    def parameters(self, rho, g, E, poisson, k, lhr, alpha, T_ref):
         """
         Set material and physical parameters.
 
@@ -66,7 +66,7 @@ class Cube(FiniteElementSetting):
         self.lhr = lhr
         self.q_third = lhr / (self.edge**2)
         self.alpha = alpha
-        self.T_ref = 300.0
+        self.T_ref = T_ref
 
         print("----------")
         print("Parameters")
@@ -273,7 +273,7 @@ class Cube(FiniteElementSetting):
         self.displacement = self.mech_problem.solve()
         self.displacement.name = "Displacement"
         self.displacement.x.scatter_forward() # to propagate the data among the processors
-        self.stress = sigma(self.displacement)
+        self.stress = self.lmbda * ufl.tr(epsilon(self.displacement)) * ufl.Identity(len(self.displacement)) + 2.0 * self.mu * epsilon(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
         self.strain = epsilon(self.displacement)
 
         print(f"Principal strain: {self.pressure / self.bulk_modulus / 3:.2e}")
