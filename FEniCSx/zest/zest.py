@@ -23,8 +23,10 @@ from cube import Cube
 # Importing materials
 from materials.fuel.uo2 import fuel
 from materials.cladding.T91 import cladding
-from materials.gap.gap import gap
 from materials.coolant.lead import coolant
+
+# Importing conditions
+from conditions.conditions import conditions
 
 # Importing utilities
 from utils import *
@@ -47,12 +49,12 @@ cladding_alpha = cladding["alpha"]
 cladding_rho = cladding["rho"]
 
 # History
-lhr = 0.0 # LHR in W/m
+lhr = conditions["LHR"] # LHR in W/m
 
 # ------------------
 # Physical constants
 # ------------------
-g = 0.0  # acceleration due to gravity, m/s2
+g = conditions["gravitational acceleration"]  # acceleration due to gravity, m/s2
 
 start_time = time.time()
 
@@ -91,7 +93,7 @@ problem.parameters(fuel_rho, g, fuel_E, fuel_nu, k = fuel["k"], lhr = lhr, alpha
 # problem.boundary_conditions(pressure=gap["gap_pressure"])
 
 # Cube
-problem.boundary_conditions(pressure=gap["gap_pressure"])
+problem.boundary_conditions(pressure=conditions["gap pressure"])
 
 # -------------------
 # Assembly and solve
