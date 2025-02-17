@@ -66,6 +66,7 @@ class Cube(FiniteElementSetting):
         self.lhr = lhr
         self.q_third = lhr / (self.edge**2)
         self.alpha = alpha
+        self.T_ref = 300.0
 
         print("----------")
         print("Parameters")
@@ -82,6 +83,7 @@ class Cube(FiniteElementSetting):
         print(f"Linear heat rate: {self.lhr/1000} kW/m")
         print(f"Volumetric power: {self.q_third/1000:.2f} kW/m3")
         print(f"Thermal expansion coefficient: {self.alpha} 1/K")
+        print(f"Reference temperature: {self.T_ref:.2f} K")
         print("\n")
 
     def boundary_conditions(self, pressure):
@@ -155,15 +157,15 @@ class Cube(FiniteElementSetting):
 
         # Mechanical boundary conditions
         # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), self.dofs_top, self.V_m.sub(2))
-        self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom_boundary, self.V_m)
         # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
         # self.bc_mech_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
+        self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom_boundary, self.V_m)
 
-        self.bc_mech = [self.bc_mech_bottom]
+        self.bc_mech = []
 
         # Thermal boundary conditions
-        bc_thermal_x_0 = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_x_0_boundary, self.V_t)
-        bc_thermal_x_L = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_x_L_boundary, self.V_t)
+        bc_thermal_x_0 = dolfinx.fem.dirichletbc(self.T_ref, self.dofs_lateral_x_0_boundary, self.V_t)
+        bc_thermal_x_L = dolfinx.fem.dirichletbc(self.T_ref, self.dofs_lateral_x_L_boundary, self.V_t)
         self.bc_thermal = [bc_thermal_x_0, bc_thermal_x_L]
         # self.bc_thermal_lateral_1 = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_1, self.V_t)
         # self.bc_thermal_lateral_3 = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_3, self.V_t)
@@ -174,8 +176,13 @@ class Cube(FiniteElementSetting):
         # ---------------------------
 
         self.normal = ufl.FacetNormal(self.mesh)
-        self.pressure = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(pressure))
-        self.traction = self.pressure * self.normal
+        self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
+        # self.traction_bottom = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((0.0, 0.0, pressure)))
+        # self.traction_up = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((0.0, 0.0, - pressure)))
+        # self.traction_y_0 = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((pressure, 0.0, 0.0)))
+
+        print("Traction")
+        print(self.traction)
 
     def assemble_and_solve(self):
         """
@@ -183,7 +190,7 @@ class Cube(FiniteElementSetting):
         """
 
         # Mesure "ds"
-        self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
+        self.ds = ufl.Measure("ds", domain=self.mesh)
         ds_1 = self.ds(self.lateral_1_label)
         ds_2 = self.ds(self.lateral_2_label)
         ds_3 = self.ds(self.lateral_3_label)
@@ -194,7 +201,7 @@ class Cube(FiniteElementSetting):
         print("---------------")
 
         self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.q_third)) * self.v_t * ufl.dx
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(self.q_third)) * self.v_t * ufl.dx
         
         petsc_options_sym = {
             "ksp_type": "preonly",
@@ -230,7 +237,8 @@ class Cube(FiniteElementSetting):
         self.temperature.name = "Temperature"
 
         print(f"Analytical thermal jump: {self.q_third * (self.edge / 2)**2 / (2 *self.k):.2f} K")
-
+        print("\n")
+        
         print("-------------------")
         print("Mechcanical problem")
         print("-------------------")
@@ -249,9 +257,10 @@ class Cube(FiniteElementSetting):
 
         # Variational forms
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
-        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
-        self.L_tractions = ufl.dot(self.traction, self.v_m) * ds_1 + ufl.dot(self.traction, self.v_m) * ds_2 + ufl.dot(self.traction, self.v_m) * ds_3 + ufl.dot(self.traction, self.v_m) * ds_4
-        T_ref = dolfinx.fem.Constant(self.mesh, 300.0)
+        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((0.0, 0.0, - self.rho * self.g))), self.v_m) * ufl.dx
+        # self.L_tractions = ufl.dot(self.traction, self.v_m) * ds_1 + ufl.dot(self.traction, self.v_m) * ds_2 + ufl.dot(self.traction, self.v_m) * ds_3 + ufl.dot(self.traction, self.v_m) * ds_4
+        self.L_tractions = ufl.dot(self.traction, self.v_m) * self.ds
+        T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
         # dx = ufl.Measure("dx", domain=self.mesh)
         # T_avg = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.temperature * dx)) / dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
         self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx

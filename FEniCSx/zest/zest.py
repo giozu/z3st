@@ -47,12 +47,12 @@ cladding_alpha = cladding["alpha"]
 cladding_rho = cladding["rho"]
 
 # History
-lhr = 15000 # LHR in W/m
+lhr = 0.0 # LHR in W/m
 
 # ------------------
 # Physical constants
 # ------------------
-g = 9.81  # acceleration due to gravity, m/s2
+g = 0.0  # acceleration due to gravity, m/s2
 
 start_time = time.time()
 

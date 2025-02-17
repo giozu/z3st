@@ -18,6 +18,8 @@ log.*
 
 # output files
 stiffness_matrix.txt
+mech_stiffness_matrix
+thermal_stiffness_matrix
 
 # image files
 *.png
