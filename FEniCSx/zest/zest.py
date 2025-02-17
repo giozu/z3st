@@ -60,13 +60,13 @@ start_time = time.time()
 # Problem declaration
 # -------------------
 
-problem = Cube(mesh_file='../../mesh/cube.msh')
+problem = Cube(mesh_file='mesh/cube.msh')
 from geometry.cube import geometry
 
-# problem = FullCylinder(mesh_file='../../mesh/cylindrical_bar.msh')
+# problem = FullCylinder(mesh_file='mesh/cylindrical_bar.msh')
 # from geometry.full_cylinder import geometry
 
-# problem = ThickCylinder(mesh_file='../../mesh/cylindrical_shell_structured.msh')
+# problem = ThickCylinder(mesh_file='mesh/cylindrical_shell_structured.msh')
 # from geometry.thickWalled_cylinder import geometry
 
 # ------
