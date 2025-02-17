@@ -156,7 +156,6 @@ class Cube(FiniteElementSetting):
         # -----------------------------
 
         # Mechanical boundary conditions
-        # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), self.dofs_top, self.V_m.sub(2))
         # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
         # self.bc_mech_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
         self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom_boundary, self.V_m)
@@ -176,13 +175,8 @@ class Cube(FiniteElementSetting):
         # ---------------------------
 
         self.normal = ufl.FacetNormal(self.mesh)
+        self.pressure = pressure
         self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
-        # self.traction_bottom = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((0.0, 0.0, pressure)))
-        # self.traction_up = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((0.0, 0.0, - pressure)))
-        # self.traction_y_0 = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((pressure, 0.0, 0.0)))
-
-        print("Traction")
-        print(self.traction)
 
     def assemble_and_solve(self):
         """
@@ -201,7 +195,7 @@ class Cube(FiniteElementSetting):
         print("---------------")
 
         self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(self.q_third)) * self.v_t * ufl.dx
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * ufl.dx
         
         petsc_options_sym = {
             "ksp_type": "preonly",
@@ -257,8 +251,7 @@ class Cube(FiniteElementSetting):
 
         # Variational forms
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
-        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type((0.0, 0.0, - self.rho * self.g))), self.v_m) * ufl.dx
-        # self.L_tractions = ufl.dot(self.traction, self.v_m) * ds_1 + ufl.dot(self.traction, self.v_m) * ds_2 + ufl.dot(self.traction, self.v_m) * ds_3 + ufl.dot(self.traction, self.v_m) * ds_4
+        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
         self.L_tractions = ufl.dot(self.traction, self.v_m) * self.ds
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
         # dx = ufl.Measure("dx", domain=self.mesh)
@@ -277,21 +270,14 @@ class Cube(FiniteElementSetting):
             jit_options = jit_options,
         )
 
-        # Non-linear problem definition
-        # F_mech = self.a_mech - self.L_body_forces
-        # mech_problem = dolfinx.fem.petsc.NonlinearProblem(F_mech, self.u_m, bcs=self.bc_mech)
-        # solver = dolfinx.nls.petsc.NewtonSolver(MPI.COMM_WORLD, mech_problem)
-        # solver.convergence_criterion = "incremental"
-        # solver.rtol = 1e-6
-        # solver.report = True
-        # solver.solve(self.u_m)
-
-        # self.displacement = self.u_m
         self.displacement = self.mech_problem.solve()
         self.displacement.name = "Displacement"
         self.displacement.x.scatter_forward() # to propagate the data among the processors
         self.stress = sigma(self.displacement)
         self.strain = epsilon(self.displacement)
+
+        print(f"Principal strain: {self.pressure / self.bulk_modulus / 3:.2e}")
+        print(f"Volumetric dilatation: {self.pressure / self.bulk_modulus:.2e}")
 
         # Solver options
         solver = self.thermal_problem.solver
