@@ -1,3 +1,4 @@
+import dolfinx.fem.petsc
 import ufl
 import dolfinx
 import dolfinx.fem.petsc
@@ -68,7 +69,8 @@ class FullCylinder(FiniteElementSetting):
         self.q_third = lhr / self.area
         self.alpha = alpha
         self.T_ref = T_ref
-        
+        self.cp = 100
+       
         print("----------")
         print("Parameters")
         print("----------")
@@ -194,12 +196,66 @@ class FullCylinder(FiniteElementSetting):
         print("Thermal problem")
         print("---------------")
 
-        # conversions
+        t = 0  # Start time
+        T = 1.0  # Final time
+        num_steps = 50
+        dt = T / num_steps  # time step size
 
-        self.a_thermal = ufl.inner((self.k*1e-3) * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx # k (W/mm-K)
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third*1e-9) * self.v_t * ufl.dx # q_third (W/mm3)
+        # Define solution variable, and interpolate initial solution for visualization in Paraview
+        xdmf = dolfinx.io.XDMFFile(self.mesh.comm, "diffusion.xdmf", "w")
+        xdmf.write_mesh(self.mesh)
+
+        uh = dolfinx.fem.Function(self.V_t)
+        uh.name = "uh"
+        uh.interpolate(lambda x: np.zeros(x.shape[1]))
+        xdmf.write_function(uh, t)
+
+        u_n = dolfinx.fem.Function(self.V_t)
+        u_n.name = "u_n"
+        u_n.interpolate(lambda x: np.zeros(x.shape[1]))
+
+        self.a_thermal = self.u_t * self.v_t * ufl.dx + dt * ufl.dot((self.k*1e-3 / (self.rho * self.cp)) * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx # k (W/mm-K)
+        self.L_thermal = (u_n + dt / (self.rho * self.cp) * dolfinx.fem.Constant(self.mesh, self.q_third*1e-9)) * self.v_t * ufl.dx # q_third (W/mm3)
         
         self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
+
+        # linear algebra structures
+        bilinear_form_thermal = dolfinx.fem.form(self.a_thermal)
+        linear_form_thermal = dolfinx.fem.form(self.L_thermal)
+
+        A = dolfinx.fem.petsc.assemble_matrix(bilinear_form_thermal, bcs = self.bc_thermal)
+        A.assemble()
+        b = dolfinx.fem.petsc.create_vector(linear_form_thermal)
+
+        solver = PETSc.KSP().create(self.mesh.comm)
+        solver.setOperators(A)
+        solver.setType(PETSc.KSP.Type.PREONLY)
+        solver.getPC().setType(PETSc.PC.Type.LU)
+
+        for i in range(num_steps):
+            t += dt
+
+            # Update the right hand side reusing the initial vector
+            with b.localForm() as loc_b:
+                loc_b.set(0)
+
+            dolfinx.fem.petsc.assemble_vector(b, linear_form_thermal)
+
+            # Apply Dirichlet boundary condition to the vector
+            dolfinx.fem.petsc.apply_lifting(b, [bilinear_form_thermal], [self.bc_thermal])
+            b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
+            dolfinx.fem.petsc.set_bc(b, self.bc_thermal)
+
+            # Solve linear problem
+            solver.solve(b, uh.x.petsc_vec)
+            uh.x.scatter_forward()
+
+            # Update solution at previous time step (u_n)
+            u_n.x.array[:] = uh.x.array
+
+            # Write solution to file
+            xdmf.write_function(uh, t)
+        xdmf.close()
 
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
