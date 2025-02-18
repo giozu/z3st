@@ -13,6 +13,8 @@ class Cube(FiniteElementSetting):
         Compute the volume of the domain.
         """
         self.edge = edge
+        self.height = edge
+        self.area = edge**2
         
         # Integration measures the domain
         dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
@@ -27,7 +29,7 @@ class Cube(FiniteElementSetting):
         print("-----------")
         print(f"Total volume, from mesh = {volume:.3f} m3")
 
-        analytical_volume = self.edge**3
+        analytical_volume = self.area * self.height
 
         print("\n")
         print("-----------------")
@@ -62,7 +64,7 @@ class Cube(FiniteElementSetting):
         self.bulk_modulus = E / (3 * (1 - 2 * poisson))
         self.k = k
         self.lhr = lhr
-        self.q_third = lhr / (self.edge**2)
+        self.q_third = lhr / self.area
         self.alpha = alpha
         self.T_ref = T_ref
 
@@ -182,12 +184,58 @@ class Cube(FiniteElementSetting):
         Assemble and solve the system for the linear thermo-elastic problem.
         """
 
+
+        # Direct solver + MUMPS
+        petsc_options_lu = {
+            "ksp_type": "preonly",
+            "pc_type": "lu",
+            "pc_factor_mat_solver_type": "mumps",
+            "ksp_rtol": 1e-8,
+            "ksp_max_it": 1000,
+            "ksp_monitor": None
+        }
+
+        # CG-solver + jacobi
+        petsc_options_cg = {
+            "ksp_type": "cg",
+            "pc_type": "jacobi",
+            "ksp_rtol": 1e-6,
+            "ksp_atol": 1e-10,
+            "ksp_max_it": 1000,
+            "ksp_monitor": None
+        }
+
+        # GMRES solver + pre-conditioner AMG (Algebraic Multigrid)
+        petsc_options_gmres = {
+            "ksp_type": "gmres",
+            "pc_type": "hypre",
+            "pc_hypre_type": "boomeramg",
+            "ksp_rtol": 1e-7,
+            "ksp_atol": 1e-10,
+            "ksp_max_it": 1000,
+            "pc_type": None,
+        }
+
+        # GMRES iterative solver + ILU pre-conditioner
+        petsc_options_ilu = {
+            "ksp_type": "gmres",
+            "pc_type": "ilu",
+            "ksp_rtol": 1e-6,
+            "ksp_max_it": 500,
+            "ksp_monitor": None
+        }
+
+        jit_options = {
+            "timeout": 20,
+        }
+
         # Mesure "ds"
         self.ds = ufl.Measure("ds", domain=self.mesh)
         ds_1 = self.ds(self.lateral_1_label)
         ds_2 = self.ds(self.lateral_2_label)
         ds_3 = self.ds(self.lateral_3_label)
         ds_4 = self.ds(self.lateral_4_label)
+        ds = self.ds
 
         print("---------------")
         print("Thermal problem")
@@ -196,45 +244,27 @@ class Cube(FiniteElementSetting):
         self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
         self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * ufl.dx
         
-        petsc_options_sym = {
-            "ksp_type": "preonly",
-            "pc_type": "lu", # LU factorization, a direct solver method (similar to Gaussian elimination)
-            "pc_factor_mat_solver_type": "mumps",
-        }
-
-        # For non-symmetric problems, a Krylov solver for non-symmetric systems, such as GMRES, is better.
-        petsc_options_non_sym = {
-            "ksp_type": "gmres",
-            "ksp_rtol": 1e-6,
-            "ksp_atol": 1e-10,
-            "ksp_max_it": 1000,
-            "pc_type": "none",
-        }
-
-        jit_options = {
-            "timeout": 20,
-        }
-
         self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
 
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
             self.L_thermal,
             bcs = self.bc_thermal,
-            petsc_options=petsc_options_sym,
+            petsc_options=petsc_options_cg,
             jit_options=jit_options,
         )
 
         self.temperature = self.thermal_problem.solve()
         self.temperature.x.scatter_forward() # to propagate the data among the processors
         self.temperature.name = "Temperature"
-
-        print(f"Analytical thermal jump: {self.q_third * (self.edge / 2)**2 / (2 *self.k):.2f} K")
+        
+        thermal_resistance = 8.0 * self.k
+        print(f"Analytical thermal jump: {self.lhr / thermal_resistance:.2f} K")
         print("\n")
         
-        print("-------------------")
-        print("Mechcanical problem")
-        print("-------------------")
+        print("------------------")
+        print("Mechanical problem")
+        print("------------------")
 
         def epsilon(u):
             """
@@ -251,7 +281,7 @@ class Cube(FiniteElementSetting):
         # Variational forms
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
         self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
-        self.L_tractions = ufl.dot(self.traction, self.v_m) * self.ds
+        self.L_tractions = ufl.dot(self.traction, self.v_m) * ds
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
         # dx = ufl.Measure("dx", domain=self.mesh)
         # T_avg = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.temperature * dx)) / dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
@@ -265,7 +295,7 @@ class Cube(FiniteElementSetting):
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = petsc_options_sym,
+            petsc_options = petsc_options_ilu,
             jit_options = jit_options,
         )
 

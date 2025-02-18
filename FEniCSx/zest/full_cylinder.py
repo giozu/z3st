@@ -15,6 +15,7 @@ class FullCylinder(FiniteElementSetting):
         self.outer_radius = outer_radius
         self.inner_radius = inner_radius
         self.height = height
+        self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
         
         # Integration measures the domain
         dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
@@ -29,7 +30,7 @@ class FullCylinder(FiniteElementSetting):
         print("-----------")
         print(f"Total volume, from mesh = {volume:.3f} m3")
 
-        analytical_volume = np.pi * (self.outer_radius**2 - self.inner_radius**2) * self.height
+        analytical_volume = self.area * self.height
 
         print("\n")
         print("-----------------")
@@ -39,8 +40,6 @@ class FullCylinder(FiniteElementSetting):
         print("\n")
         print(f"Relative error (%) = {abs(volume - analytical_volume) / analytical_volume * 100:.3e}")
         print("\n")
-
-        return volume
 
     def parameters(self, rho, g, E, poisson, k, lhr, alpha, T_ref):
         """
@@ -66,7 +65,7 @@ class FullCylinder(FiniteElementSetting):
         self.bulk_modulus = E / (3 * (1 - 2 * poisson))
         self.k = k
         self.lhr = lhr
-        self.q_third = lhr / (np.pi * (self.outer_radius**2 - self.inner_radius**2))
+        self.q_third = lhr / self.area
         self.alpha = alpha
         self.T_ref = T_ref
         
@@ -134,6 +133,7 @@ class FullCylinder(FiniteElementSetting):
         # ---------------------------
 
         self.normal = ufl.FacetNormal(self.mesh)
+        self.pressure = pressure
         self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
 
     def assemble_and_solve(self):
@@ -187,7 +187,7 @@ class FullCylinder(FiniteElementSetting):
 
         # Mesure "ds"
         self.ds = ufl.Measure("ds", domain=self.mesh)
-        # ds = self.ds(self.lateral_label)
+        ds_lateral = self.ds(self.lateral_label)
         ds = self.ds
 
         print("---------------")
@@ -211,7 +211,8 @@ class FullCylinder(FiniteElementSetting):
         self.temperature.x.scatter_forward() # to propagate the data among the processors
         self.temperature.name = "Temperature"
 
-        print(f"Analytical thermal jump: {self.lhr / (4.0 * np.pi * self.k):.2f} K")
+        thermal_resistance = 4.0 * np.pi * self.k
+        print(f"Analytical thermal jump: {self.lhr / thermal_resistance:.2f} K")
         print("\n")
 
         print("------------------")
