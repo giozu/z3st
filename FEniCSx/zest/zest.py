@@ -90,8 +90,8 @@ problem.plot_sparsity_pattern(rows, cols, "mech_sparisity_pattern")
 # ----------------
 # Post-processing
 # ----------------
-plot_results(displacement, problem)
-plot_temperature(temperature, problem)
+# plot_results(displacement, problem)
+# plot_temperature(temperature, problem)
 to_paraview(problem)
 # plot_stress_components(problem)
 # plot_sigma_rr_at_z(problem, z_value=1.0)

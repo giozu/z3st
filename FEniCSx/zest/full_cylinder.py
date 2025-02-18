@@ -28,15 +28,15 @@ class FullCylinder(FiniteElementSetting):
         print("-----------")
         print("Mesh volume")
         print("-----------")
-        print(f"Total volume, from mesh = {volume:.3f} m3")
+        print(f"Total volume, from mesh = {volume:.3f} mm3")
 
-        analytical_volume = self.area * self.height
+        analytical_volume = self.area * self.height * 1e9
 
         print("\n")
         print("-----------------")
         print("Analytical volume")
         print("-----------------")
-        print(f"Total volume, analytical = {analytical_volume:.3f} m3")
+        print(f"Total volume, analytical = {analytical_volume:.3f} mm3")
         print("\n")
         print(f"Relative error (%) = {abs(volume - analytical_volume) / analytical_volume * 100:.3e}")
         print("\n")
@@ -72,19 +72,19 @@ class FullCylinder(FiniteElementSetting):
         print("----------")
         print("Parameters")
         print("----------")
-        print(f"Inner radius: {self.inner_radius:.2f} m")
-        print(f"Outer radius: {self.outer_radius:.2f} m")
-        print(f"Height: {self.height:.2f} m")
+        print(f"Inner radius: {self.inner_radius:.3e} m")
+        print(f"Outer radius: {self.outer_radius:.3e} m")
+        print(f"Height: {self.height:.3e} m")
         print(f"Material density: {self.rho:.2f} kg/m3")
         print(f"Gravitational acceleration: {self.g:.2f} m/s2")
-        print(f"Elastic Modulus: {self.E/1e9:.2f} GPa")
+        print(f"Elastic modulus: {self.E/1e9:.2f} GPa")
         print(f"Poisson's ratio: {self.poisson:.2f}")
         print(f"Bulk modulus: {self.bulk_modulus/1e9:.2f} GPa")
         print(f"First Lamé parameter: {self.lmbda/1e9:.2f} GPa")
         print(f"Second Lamé parameter: {self.mu/1e9:.2f} GPa")
         print(f"Thermal conductivity: {self.k:.2f} W/mK")
         print(f"Linear heat rate: {self.lhr/1000:.2f} kW/m")
-        print(f"Volumetric power: {self.q_third/1000:.2f} kW/m3")
+        print(f"Volumetric power: {self.q_third/1000000:.2f} MW/m3")
         print(f"Thermal expansion coefficient: {self.alpha:.2e} 1/K")
         print(f"Reference temperature: {self.T_ref:.2f} K")
         print("\n")
@@ -155,7 +155,7 @@ class FullCylinder(FiniteElementSetting):
         petsc_options_cg = {
             "ksp_type": "cg",
             "pc_type": "jacobi",
-            "ksp_rtol": 1e-6,
+            "ksp_rtol": 1e-7,
             "ksp_atol": 1e-10,
             "ksp_max_it": 1000,
             "ksp_monitor": None
@@ -176,7 +176,7 @@ class FullCylinder(FiniteElementSetting):
         petsc_options_ilu = {
             "ksp_type": "gmres",
             "pc_type": "ilu",
-            "ksp_rtol": 1e-6,
+            "ksp_rtol": 1e-8,
             "ksp_max_it": 500,
             "ksp_monitor": None
         }
@@ -194,8 +194,10 @@ class FullCylinder(FiniteElementSetting):
         print("Thermal problem")
         print("---------------")
 
-        self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * ufl.dx
+        # conversions
+
+        self.a_thermal = ufl.inner((self.k*1e-3) * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx # k (W/mm-K)
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third*1e-9) * self.v_t * ufl.dx # q_third (W/mm3)
         
         self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
 
@@ -209,7 +211,7 @@ class FullCylinder(FiniteElementSetting):
 
         self.temperature = self.thermal_problem.solve()
         self.temperature.x.scatter_forward() # to propagate the data among the processors
-        self.temperature.name = "Temperature"
+        self.temperature.name = "temperature"
 
         thermal_resistance = 4.0 * np.pi * self.k
         print(f"Analytical thermal jump: {self.lhr / thermal_resistance:.2f} K")
@@ -246,12 +248,12 @@ class FullCylinder(FiniteElementSetting):
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = petsc_options_ilu,
+            petsc_options = petsc_options_cg,
             jit_options = jit_options,
         )
 
         self.displacement = self.mech_problem.solve()
-        self.displacement.name = "Displacement"
+        self.displacement.name = "displacement"
         self.displacement.x.scatter_forward() # to propagate the data among the processors
         self.stress = self.lmbda * ufl.tr(epsilon(self.displacement)) * ufl.Identity(len(self.displacement)) + 2.0 * self.mu * epsilon(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
         self.strain = epsilon(self.displacement)

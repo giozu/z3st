@@ -12,11 +12,11 @@
 SetFactory("OpenCASCADE");
 
 r = 1.;  // outer radius of the cylinder
-l = 0.8; // edge of the inner square
+l = 0.4; // edge of the inner square
 h = 2.;  // height of the cylinder
 
-n = 18; // number of elements on the square edge
-n_l = 20; // number of extruded layers
+n = 30; // number of elements on the square edge
+n_l = 30; // number of extruded layers
 ms = 1.; // mesh element size
 
 // Inner square
@@ -98,6 +98,8 @@ Extrude {0, 0, h} {
 // Physical Volume("volume4") = {4};
 // Physical Volume("volume5") = {5};
 Physical Volume("volume") = {1, 2, 3, 4, 5};
+
+Mesh.ElementOrder = 1;
 
 Mesh 3;
 

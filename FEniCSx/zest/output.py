@@ -294,10 +294,13 @@ def to_paraview(problem):
     gdim = mesh.geometry.dim
 
     # Write displacement field to XDMF file
+    # displacement_space = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim,)))
+    # displacement_expression = dolfinx.fem.Expression(problem.displacement, displacement_space.element.interpolation_points())
+    # displacement_values = dolfinx.fem.Function(displacement_space)
+    # displacement_values.interpolate(displacement_expression)
     output_file = os.path.join(output_dir, "displacement.xdmf")
     with dolfinx.io.XDMFFile(mesh.comm, output_file, "w") as xdmf:
         xdmf.write_mesh(mesh)
-        problem.displacement.name = "displacement"
         xdmf.write_function(problem.displacement)
     print(f"Displacement field written to {output_file}")
 
