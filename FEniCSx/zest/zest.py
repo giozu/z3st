@@ -32,68 +32,28 @@ from conditions.conditions import conditions
 from utils import *
 from output import *
 
-# -------------------
-# Material properties
-# -------------------
-
-# Fuel properties
-fuel_E = fuel["E"]
-fuel_nu = fuel["nu"]
-fuel_alpha = fuel["alpha"]
-fuel_rho = fuel["rho"]
-
-# Cladding properties
-cladding_E = cladding["E"]
-cladding_nu = cladding["nu"]
-cladding_alpha = cladding["alpha"]
-cladding_rho = cladding["rho"]
-
-# History
-lhr = conditions["LHR"] # LHR in W/m
-
-# ------------------
-# Physical constants
-# ------------------
-g = conditions["gravitational acceleration"]  # acceleration due to gravity, m/s2
-
 start_time = time.time()
 
 # -------------------
 # Problem declaration
 # -------------------
+# from geometry.cube import geometry
+# problem = Cube(mesh_file='mesh/cube.msh')
+# problem.volume(geometry["edge"])
+# problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"])
+# problem.boundary_conditions(conditions["gap pressure"], conditions["boundary temperature"])
 
-problem = Cube(mesh_file='mesh/cube.msh')
-from geometry.cube import geometry
-
-# problem = FullCylinder(mesh_file='mesh/cylindrical_bar.msh')
-# from geometry.full_cylinder import geometry
-
-# problem = ThickCylinder(mesh_file='mesh/cylindrical_shell_structured.msh')
-# from geometry.thickWalled_cylinder import geometry
-
-# ------
-# Volume
-# ------
-# volume = problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
-volume = problem.volume(geometry["edge"])
-
-# ----------
-# Parameters
-# ----------
-problem.parameters(fuel_rho, g, fuel_E, fuel_nu, k = fuel["k"], lhr = lhr, alpha = fuel["alpha"], T_ref = conditions["reference temperature"])
-
-# -------------------
-# Boundary conditions
-# -------------------
-
-# Thick cylinder
-# problem.boundary_conditions(inner_pressure=gap["gap_pressure"], outer_pressure=coolant["coolant_pressure"])
-
-# Full cylinder
-# problem.boundary_conditions(pressure=gap["gap_pressure"])
-
-# Cube
+from geometry.full_cylinder import geometry
+problem = FullCylinder(mesh_file='mesh/full_cylinder.msh')
+problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
+problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"])
 problem.boundary_conditions(pressure=conditions["gap pressure"], temperature=conditions["boundary temperature"])
+
+# from geometry.thickWalled_cylinder import geometry
+# problem = ThickCylinder(mesh_file='mesh/cylindrical_shell_structured.msh')
+# problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
+# problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"])
+# problem.boundary_conditions(inner_pressure=conditions["gap_pressure"], outer_pressure=coolant["coolant_pressure"], temperature=conditions["boundary temperature"])
 
 # -------------------
 # Assembly and solve
@@ -110,12 +70,12 @@ print(f"-----------------------")
 # -------
 # Results
 # -------
-displacement, stress_field, strain_field, temperature = problem.get_results()
+displacement, stress, strain, temperature = problem.get_results()
 
 print("\n")
 print(f"displacement = {displacement}")
-print(f"stress_field = {stress_field}")
-print(f"strain_field = {strain_field}")
+print(f"stress = {stress}")
+print(f"strain = {strain}")
 print(f"temperature = {temperature}")
 
 # ----------------
@@ -132,9 +92,8 @@ problem.plot_sparsity_pattern(rows, cols, "mech_sparisity_pattern")
 # ----------------
 plot_results(displacement, problem)
 plot_temperature(temperature, problem)
-plot_stress_components(problem)
 to_paraview(problem)
-
+# plot_stress_components(problem)
 # plot_sigma_rr_at_z(problem, z_value=1.0)
 # plot_sigma_xx_at_z(problem, z_value=1.0)
 # print_x_at_z_zero(problem)

@@ -12,11 +12,11 @@
 SetFactory("OpenCASCADE");
 
 r = 1.;  // outer radius of the cylinder
-l = 0.2; // edge of the inner square
+l = 0.8; // edge of the inner square
 h = 2.;  // height of the cylinder
 
-n = 12; // number of elements on the square edge
-n_l = 12; // number of extruded layers
+n = 18; // number of elements on the square edge
+n_l = 20; // number of extruded layers
 ms = 1.; // mesh element size
 
 // Inner square
@@ -101,4 +101,4 @@ Physical Volume("volume") = {1, 2, 3, 4, 5};
 
 Mesh 3;
 
-Save "cylindrical_bar.msh";
+Save "full_cylinder.msh";

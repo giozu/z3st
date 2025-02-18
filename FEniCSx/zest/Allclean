@@ -13,6 +13,8 @@ rm *.pvtu
 
 # Zest output files
 rm stiffness_matrix.txt
+rm mech_stiffness_matrix.txt
+rm thermal_stiffness_matrix.txt
 
 # Images
 rm *.png

@@ -37,9 +37,7 @@ class Cube(FiniteElementSetting):
         print("\n")
         print(f"Relative error (%) = {abs(volume - analytical_volume) / analytical_volume * 100:.3e}")
         print("\n")
-
-        return volume
-
+        
     def parameters(self, rho, g, E, poisson, k, lhr, alpha, T_ref):
         """
         Set material and physical parameters.

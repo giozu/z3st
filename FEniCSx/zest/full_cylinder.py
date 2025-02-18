@@ -37,20 +37,20 @@ class FullCylinder(FiniteElementSetting):
         print("-----------------")
         print(f"Total volume, analytical = {analytical_volume:.3f} m3")
         print("\n")
-        print("Relative error (%) = ", abs(volume - analytical_volume) / analytical_volume * 100)
+        print(f"Relative error (%) = {abs(volume - analytical_volume) / analytical_volume * 100:.3e}")
         print("\n")
 
         return volume
 
-    def parameters(self, rho, g, lmbda, mu, k, lhr, alpha):
+    def parameters(self, rho, g, E, poisson, k, lhr, alpha, T_ref):
         """
         Set material and physical parameters.
 
         Parameters:
         rho (float): Density.
         g (float): Gravitational acceleration.
-        lmbda (float): First Lamé parameter.
-        mu (float): Second Lamé parameter.
+        E (float): Young/Elastic Modulus.
+        poisson (float): Poisson's ratio.
         k (float): Thermal conductivity.
         lhr (float): Linear heat rate.
         q_third (float): Volumetric power.
@@ -59,30 +59,38 @@ class FullCylinder(FiniteElementSetting):
 
         self.rho = rho
         self.g = g
-        self.lmbda = lmbda
-        self.mu = mu
+        self.E = E
+        self.poisson = poisson
+        self.lmbda =  E * poisson / ((1 + poisson) * (1 - 2 * poisson))
+        self.mu = E / (2 * (1 + poisson))
+        self.bulk_modulus = E / (3 * (1 - 2 * poisson))
         self.k = k
         self.lhr = lhr
         self.q_third = lhr / (np.pi * (self.outer_radius**2 - self.inner_radius**2))
         self.alpha = alpha
+        self.T_ref = T_ref
         
         print("----------")
         print("Parameters")
         print("----------")
-        print(f"Inner radius: {self.inner_radius} m")
-        print(f"Outer radius: {self.outer_radius} m")
-        print(f"Height: {self.height} m")
-        print(f"Material density: {self.rho} kg/m3")
-        print(f"Gravitational acceleration: {self.g} m/s2")
+        print(f"Inner radius: {self.inner_radius:.2f} m")
+        print(f"Outer radius: {self.outer_radius:.2f} m")
+        print(f"Height: {self.height:.2f} m")
+        print(f"Material density: {self.rho:.2f} kg/m3")
+        print(f"Gravitational acceleration: {self.g:.2f} m/s2")
+        print(f"Elastic Modulus: {self.E/1e9:.2f} GPa")
+        print(f"Poisson's ratio: {self.poisson:.2f}")
+        print(f"Bulk modulus: {self.bulk_modulus/1e9:.2f} GPa")
         print(f"First Lamé parameter: {self.lmbda/1e9:.2f} GPa")
         print(f"Second Lamé parameter: {self.mu/1e9:.2f} GPa")
-        print(f"Thermal conductivity: {self.k} W/mK")
-        print(f"Linear heat rate: {self.lhr/1000} kW/m")
+        print(f"Thermal conductivity: {self.k:.2f} W/mK")
+        print(f"Linear heat rate: {self.lhr/1000:.2f} kW/m")
         print(f"Volumetric power: {self.q_third/1000:.2f} kW/m3")
-        print(f"Thermal expansion coefficient: {self.alpha} 1/K")
+        print(f"Thermal expansion coefficient: {self.alpha:.2e} 1/K")
+        print(f"Reference temperature: {self.T_ref:.2f} K")
         print("\n")
 
-    def boundary_conditions(self, pressure):
+    def boundary_conditions(self, pressure, temperature):
         """
         Define and set the boundary conditions.
         """
@@ -91,6 +99,7 @@ class FullCylinder(FiniteElementSetting):
         print("Boundary conditions")
         print("-------------------")
         print(f"Pressure = {pressure*1e-6:.2f} MPa")
+        print(f"Temperature = {temperature:.2f} K")
         print("\n")
 
         self.bottom_label = 1
@@ -101,10 +110,9 @@ class FullCylinder(FiniteElementSetting):
         # Dofs
         # ----
 
-        self.dofs_bottom    = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.bottom_label))
-        self.dofs_lateral_m = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.lateral_label))
-        self.dofs_lateral_t = dolfinx.fem.locate_dofs_topological(V=self.V_t, entity_dim=self.fdim, entities=self.ft.find(self.lateral_label))
-        self.dofs_top       = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.top_label))
+        self.dofs_bottom  = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.bottom_label))
+        self.dofs_lateral = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.lateral_label))
+        self.dofs_top     = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.top_label))
 
         # -----------------------------
         # Dirichlet boundary conditions
@@ -112,14 +120,13 @@ class FullCylinder(FiniteElementSetting):
 
         # Mechanical boundary conditions
         # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
-        # self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), self.dofs_top, self.V_m.sub(2))
         self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
         # self.bc_mech_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
 
-        self.bc_mech = [self.bc_mech_bottom]
+        self.bc_mech = []
 
         # Thermal boundary conditions
-        self.bc_thermal_lateral = dolfinx.fem.dirichletbc(400.0, self.dofs_lateral_t, self.V_t)
+        self.bc_thermal_lateral = dolfinx.fem.dirichletbc(temperature, self.dofs_lateral, self.V_t)
         self.bc_thermal = [self.bc_thermal_lateral]
 
         # ---------------------------
@@ -127,62 +134,89 @@ class FullCylinder(FiniteElementSetting):
         # ---------------------------
 
         self.normal = ufl.FacetNormal(self.mesh)
-        self.pressure = dolfinx.fem.Constant(self.mesh, pressure)
-        self.traction = self.pressure * self.normal
+        self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
 
     def assemble_and_solve(self):
         """
         Assemble and solve the system for the linear thermo-elastic problem.
         """
 
-        # ---------------
-        # Thermal problem
-        # ---------------
-
-        self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.q_third)) * self.v_t * ufl.dx
-        
-        petsc_options_sym = {
+        # Direct solver + MUMPS
+        petsc_options_lu = {
             "ksp_type": "preonly",
-            "pc_type": "lu", # LU factorization, a direct solver method (similar to Gaussian elimination)
+            "pc_type": "lu",
             "pc_factor_mat_solver_type": "mumps",
+            "ksp_rtol": 1e-8,
+            "ksp_max_it": 1000,
+            "ksp_monitor": None
         }
 
-        # For non-symmetric problems, a Krylov solver for non-symmetric systems, such as GMRES, is better.
-        petsc_options_non_sym = {
-            "ksp_type": "gmres",
+        # CG-solver + jacobi
+        petsc_options_cg = {
+            "ksp_type": "cg",
+            "pc_type": "jacobi",
             "ksp_rtol": 1e-6,
             "ksp_atol": 1e-10,
             "ksp_max_it": 1000,
-            "pc_type": "none",
+            "ksp_monitor": None
+        }
+
+        # GMRES solver + pre-conditioner AMG (Algebraic Multigrid)
+        petsc_options_gmres = {
+            "ksp_type": "gmres",
+            "pc_type": "hypre",
+            "pc_hypre_type": "boomeramg",
+            "ksp_rtol": 1e-7,
+            "ksp_atol": 1e-10,
+            "ksp_max_it": 1000,
+            "pc_type": None,
+        }
+
+        # GMRES iterative solver + ILU pre-conditioner
+        petsc_options_ilu = {
+            "ksp_type": "gmres",
+            "pc_type": "ilu",
+            "ksp_rtol": 1e-6,
+            "ksp_max_it": 500,
+            "ksp_monitor": None
         }
 
         jit_options = {
             "timeout": 20,
         }
 
+        # Mesure "ds"
+        self.ds = ufl.Measure("ds", domain=self.mesh)
+        # ds = self.ds(self.lateral_label)
+        ds = self.ds
+
+        print("---------------")
+        print("Thermal problem")
+        print("---------------")
+
+        self.a_thermal = ufl.inner(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * ufl.dx
+        
         self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
 
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
             self.L_thermal,
             bcs = self.bc_thermal,
-            petsc_options=petsc_options_sym,
+            petsc_options=petsc_options_cg,
             jit_options=jit_options,
         )
 
         self.temperature = self.thermal_problem.solve()
         self.temperature.x.scatter_forward() # to propagate the data among the processors
+        self.temperature.name = "Temperature"
 
         print(f"Analytical thermal jump: {self.lhr / (4.0 * np.pi * self.k):.2f} K")
+        print("\n")
 
-        # -----------------
-        # Mechnical problem
-        # -----------------
-
-        # Mesure "ds"
-        self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
-        ds = self.ds(self.lateral_label)
+        print("------------------")
+        print("Mechanical problem")
+        print("------------------")
 
         def epsilon(u):
             """
@@ -198,11 +232,9 @@ class FullCylinder(FiniteElementSetting):
 
         # Variational forms
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
-        self.L_body_forces = ufl.inner(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
-        self.L_tractions = ufl.inner(self.traction, self.v_m) * ds
-        T_ref = dolfinx.fem.Constant(self.mesh, 300.0)
-        # dx = ufl.Measure("dx", domain=self.mesh)
-        # T_avg = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.temperature * dx)) / dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
+        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
+        self.L_tractions = ufl.dot(self.traction, self.v_m) * ds
+        T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
         self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
         self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
 
@@ -213,29 +245,24 @@ class FullCylinder(FiniteElementSetting):
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = petsc_options_non_sym,
+            petsc_options = petsc_options_ilu,
             jit_options = jit_options,
         )
 
         self.displacement = self.mech_problem.solve()
+        self.displacement.name = "Displacement"
         self.displacement.x.scatter_forward() # to propagate the data among the processors
-        self.stress_field = sigma(self.displacement)
-        self.strain_field = epsilon(self.displacement)
+        self.stress = self.lmbda * ufl.tr(epsilon(self.displacement)) * ufl.Identity(len(self.displacement)) + 2.0 * self.mu * epsilon(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+        self.strain = epsilon(self.displacement)
 
         # Solver options
         solver = self.thermal_problem.solver
         viewer = PETSc.Viewer().createASCII("log.thermal_solver")
         solver.view(viewer)
-        # solver_output = open("log.thermal_solver", "r")
-        # for line in solver_output.readlines():
-        #     print(line)
 
         solver = self.mech_problem.solver
         viewer = PETSc.Viewer().createASCII("log.mech_solver")
         solver.view(viewer)
-        # solver_output = open("log.mech_solver", "r")
-        # for line in solver_output.readlines():
-        #     print(line)
 
     def volumetric_stress(self):
         """
@@ -245,7 +272,7 @@ class FullCylinder(FiniteElementSetting):
         """
 
         I = ufl.Identity(self.gdim)
-        volumetric_stress = ufl.tr(self.stress_field) * I / self.gdim
+        volumetric_stress = ufl.tr(self.stress) * I / self.gdim
 
         return volumetric_stress
 
@@ -257,7 +284,7 @@ class FullCylinder(FiniteElementSetting):
         """
         
         I = ufl.Identity(self.gdim)
-        deviatoric_stress = self.stress_field - ufl.tr(self.stress_field) * I / self.gdim
+        deviatoric_stress = self.stress - ufl.tr(self.stress) * I / self.gdim
 
         return deviatoric_stress
 
@@ -267,8 +294,8 @@ class FullCylinder(FiniteElementSetting):
 
         Returns:
         displacement (Function): The displacement field.
-        stress_field (ufl.Expr): The stress field.
-        strain_field (ufl.Expr): The strain field.
+        stress (ufl.Expr): The stress field.
+        strain (ufl.Expr): The strain field.
         """
 
-        return self.displacement, self.stress_field, self.strain_field, self.temperature
+        return self.displacement, self.stress, self.strain, self.temperature
