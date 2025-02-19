@@ -11,9 +11,9 @@
 
 SetFactory("OpenCASCADE");
 
-r = 4.;  // outer radius of the cylinder
-l = 2.; // edge of the inner square
-h = 10.;  // height of the cylinder
+r = 0.004;  // outer radius of the cylinder
+l = 0.002; // edge of the inner square
+h = 0.010;  // height of the cylinder
 
 n = 20; // number of elements on the square edge
 n_l = 20; // number of extruded layers

@@ -29,20 +29,20 @@ class FullCylinder(FiniteElementSetting):
         print("-----------")
         print("Mesh volume")
         print("-----------")
-        print(f"Total volume, from mesh = {volume:.3f} mm3")
+        print(f"Total volume, from mesh = {volume*1e9:.3e} mm3")
 
-        analytical_volume = self.area * self.height * 1e9
+        analytical_volume = self.area * self.height
 
         print("\n")
         print("-----------------")
         print("Analytical volume")
         print("-----------------")
-        print(f"Total volume, analytical = {analytical_volume:.3f} mm3")
+        print(f"Total volume, analytical = {analytical_volume*1e9:.3e} mm3")
         print("\n")
         print(f"Relative error (%) = {abs(volume - analytical_volume) / analytical_volume * 100:.3e}")
         print("\n")
 
-    def parameters(self, rho, g, E, poisson, k, lhr, alpha, T_ref):
+    def parameters(self, rho, g, E, poisson, k, lhr, alpha, T_ref, cp):
         """
         Set material and physical parameters.
 
@@ -55,6 +55,8 @@ class FullCylinder(FiniteElementSetting):
         lhr (float): Linear heat rate.
         q_third (float): Volumetric power.
         alpha (float): Thermal expansion coefficient.
+        T_ref (float): Reference temperature.
+        cp (float): Specific heat capacity.
         """
 
         self.rho = rho
@@ -69,7 +71,7 @@ class FullCylinder(FiniteElementSetting):
         self.q_third = lhr / self.area
         self.alpha = alpha
         self.T_ref = T_ref
-        self.cp = 100
+        self.cp = cp
        
         print("----------")
         print("Parameters")
@@ -85,6 +87,7 @@ class FullCylinder(FiniteElementSetting):
         print(f"First Lamé parameter: {self.lmbda/1e9:.2f} GPa")
         print(f"Second Lamé parameter: {self.mu/1e9:.2f} GPa")
         print(f"Thermal conductivity: {self.k:.2f} W/mK")
+        print(f"Specific heat capacity: {self.cp:.2f} J/kg-K")
         print(f"Linear heat rate: {self.lhr/1000:.2f} kW/m")
         print(f"Volumetric power: {self.q_third/1000000:.2f} MW/m3")
         print(f"Thermal expansion coefficient: {self.alpha:.2e} 1/K")
@@ -127,6 +130,7 @@ class FullCylinder(FiniteElementSetting):
         self.bc_mech = []
 
         # Thermal boundary conditions
+        self.T_bc = temperature
         self.bc_thermal_lateral = dolfinx.fem.dirichletbc(temperature, self.dofs_lateral, self.V_t)
         self.bc_thermal = [self.bc_thermal_lateral]
 
@@ -196,66 +200,13 @@ class FullCylinder(FiniteElementSetting):
         print("Thermal problem")
         print("---------------")
 
-        t = 0  # Start time
-        T = 1.0  # Final time
-        num_steps = 50
-        dt = T / num_steps  # time step size
+        characteristic_time = self.rho * self.cp / self.k * self.area
+        print(f"Characteristic time: {characteristic_time:.3e} s")
 
-        # Define solution variable, and interpolate initial solution for visualization in Paraview
-        xdmf = dolfinx.io.XDMFFile(self.mesh.comm, "diffusion.xdmf", "w")
-        xdmf.write_mesh(self.mesh)
-
-        uh = dolfinx.fem.Function(self.V_t)
-        uh.name = "uh"
-        uh.interpolate(lambda x: np.zeros(x.shape[1]))
-        xdmf.write_function(uh, t)
-
-        u_n = dolfinx.fem.Function(self.V_t)
-        u_n.name = "u_n"
-        u_n.interpolate(lambda x: np.zeros(x.shape[1]))
-
-        self.a_thermal = self.u_t * self.v_t * ufl.dx + dt * ufl.dot((self.k*1e-3 / (self.rho * self.cp)) * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx # k (W/mm-K)
-        self.L_thermal = (u_n + dt / (self.rho * self.cp) * dolfinx.fem.Constant(self.mesh, self.q_third*1e-9)) * self.v_t * ufl.dx # q_third (W/mm3)
+        self.a_thermal = ufl.dot(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * ufl.dx
         
         self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
-
-        # linear algebra structures
-        bilinear_form_thermal = dolfinx.fem.form(self.a_thermal)
-        linear_form_thermal = dolfinx.fem.form(self.L_thermal)
-
-        A = dolfinx.fem.petsc.assemble_matrix(bilinear_form_thermal, bcs = self.bc_thermal)
-        A.assemble()
-        b = dolfinx.fem.petsc.create_vector(linear_form_thermal)
-
-        solver = PETSc.KSP().create(self.mesh.comm)
-        solver.setOperators(A)
-        solver.setType(PETSc.KSP.Type.PREONLY)
-        solver.getPC().setType(PETSc.PC.Type.LU)
-
-        for i in range(num_steps):
-            t += dt
-
-            # Update the right hand side reusing the initial vector
-            with b.localForm() as loc_b:
-                loc_b.set(0)
-
-            dolfinx.fem.petsc.assemble_vector(b, linear_form_thermal)
-
-            # Apply Dirichlet boundary condition to the vector
-            dolfinx.fem.petsc.apply_lifting(b, [bilinear_form_thermal], [self.bc_thermal])
-            b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-            dolfinx.fem.petsc.set_bc(b, self.bc_thermal)
-
-            # Solve linear problem
-            solver.solve(b, uh.x.petsc_vec)
-            uh.x.scatter_forward()
-
-            # Update solution at previous time step (u_n)
-            u_n.x.array[:] = uh.x.array
-
-            # Write solution to file
-            xdmf.write_function(uh, t)
-        xdmf.close()
 
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
