@@ -42,20 +42,20 @@ start_time = time.time()
 # problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"])
 # problem.boundary_conditions(conditions["gap pressure"], conditions["boundary temperature"])
 
-from full_cylinder import FullCylinder
-from geometry.full_cylinder import geometry
-problem = FullCylinder(mesh_file='mesh/full_cylinder.msh')
-problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
-problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"], fuel["cp"])
-problem.boundary_conditions(pressure=conditions["gap pressure"], temperature=conditions["boundary temperature"])
-
-# from full_cylinder_time import FullCylinder_time
+# from full_cylinder import FullCylinder
 # from geometry.full_cylinder import geometry
-# problem = FullCylinder_time(mesh_file='mesh/full_cylinder.msh')
+# problem = FullCylinder(mesh_file='mesh/full_cylinder.msh')
 # problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
 # problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"], fuel["cp"])
-# problem.temporal_solver(0,3600,50)
 # problem.boundary_conditions(pressure=conditions["gap pressure"], temperature=conditions["boundary temperature"])
+
+from full_cylinder_time import FullCylinder_time
+from geometry.full_cylinder import geometry
+problem = FullCylinder_time(mesh_file='mesh/full_cylinder.msh')
+problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
+problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"], fuel["cp"])
+problem.temporal_solver(0,120,3)
+problem.boundary_conditions(pressure=conditions["gap pressure"], temperature=conditions["boundary temperature"])
 
 # from full_cylinder import FullCylinder
 # from geometry.thickWalled_cylinder import geometry

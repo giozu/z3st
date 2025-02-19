@@ -229,7 +229,7 @@ class FullCylinder_time(FiniteElementSetting):
 
         self.displacement = dolfinx.fem.Function(self.V_m)
         self.displacement.name = "displacement"
-        self.displacement.interpolate(lambda x: np.zeros(x.shape[1],))
+        # self.displacement.interpolate(lambda x: np.zeros((self.gdim, x.shape[1])))
         xdmf_displacement.write_function(self.displacement, t)
 
         T_0 = dolfinx.fem.Function(self.V_t)
@@ -262,8 +262,8 @@ class FullCylinder_time(FiniteElementSetting):
         self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
         self.L_tractions = ufl.dot(self.traction, self.v_m) * ds
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
-        self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
+        self.L_thermal_exp = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
+        self.L_mech = self.L_body_forces + self.L_thermal_exp + self.L_tractions
 
         # linear algebra structures
         bilinear_form_thermal = dolfinx.fem.form(self.a_thermal)
@@ -286,7 +286,7 @@ class FullCylinder_time(FiniteElementSetting):
         b_mech = dolfinx.fem.petsc.create_vector(linear_form_mech)
 
         solver_mech = PETSc.KSP().create(self.mesh.comm)
-        solver_mech.setOperators(A_th)
+        solver_mech.setOperators(A_mech)
         solver_mech.setType(PETSc.KSP.Type.PREONLY)
         solver_mech.getPC().setType(PETSc.PC.Type.LU)
 
@@ -327,63 +327,15 @@ class FullCylinder_time(FiniteElementSetting):
             # Write solution to file
             xdmf_temperature.write_function(self.temperature, t)
             xdmf_displacement.write_function(self.displacement, t)
+
         xdmf_temperature.close()
         xdmf_displacement.close()
 
-        # self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
-        #     self.a_thermal,
-        #     self.L_thermal,
-        #     bcs = self.bc_thermal,
-        #     petsc_options=petsc_options_cg,
-        #     jit_options=jit_options,
-        # )
-
-        # self.temperature = self.thermal_problem.solve()
-        # self.temperature.x.scatter_forward() # to propagate the data among the processors
-        # self.temperature.name = "temperature"
-
         thermal_resistance = 4.0 * np.pi * self.k
+        print("\n")
         print(f"Analytical thermal jump: {self.lhr / thermal_resistance:.2f} K")
         print("\n")
 
-        # print("------------------")
-        # print("Mechanical problem")
-        # print("------------------")
-
-        # def epsilon(u):
-        #     """
-        #     Strain-displacement compatibility relations
-        #     """
-        #     return ufl.sym(ufl.grad(u))
-        
-        # def sigma(u):
-        #     """
-        #     Stress-strain constitutive relation.
-        #     """
-        #     return self.lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * self.mu * epsilon(u)
-
-        # # Variational forms
-        # self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
-        # self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
-        # self.L_tractions = ufl.dot(self.traction, self.v_m) * ds
-        # T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        # self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
-        # self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
-
-        # self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
-
-        # Linear problem definition
-        # self.mech_problem = dolfinx.fem.petsc.LinearProblem(
-        #     self.a_mech,
-        #     self.L_mech,
-        #     bcs = self.bc_mech,
-        #     petsc_options = petsc_options_cg,
-        #     jit_options = jit_options,
-        # )
-
-        self.displacement = self.mech_problem.solve()
-        self.displacement.name = "displacement"
-        self.displacement.x.scatter_forward() # to propagate the data among the processors
         self.stress = self.lmbda * ufl.tr(epsilon(self.displacement)) * ufl.Identity(len(self.displacement)) + 2.0 * self.mu * epsilon(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
         self.strain = epsilon(self.displacement)
 
@@ -395,30 +347,6 @@ class FullCylinder_time(FiniteElementSetting):
         # solver = self.mech_problem.solver
         # viewer = PETSc.Viewer().createASCII("log.mech_solver")
         # solver.view(viewer)
-
-    def volumetric_stress(self):
-        """
-        Compute the volumetric component of the stress field.
-        The volumetric stress is the trace of the stress tensor divided by the geometric dimension.
-        It is related to the change in volume of the material, and the hydrostatic pressure.
-        """
-
-        I = ufl.Identity(self.gdim)
-        volumetric_stress = ufl.tr(self.stress) * I / self.gdim
-
-        return volumetric_stress
-
-    def deviatoric_stress(self):
-        """
-        Compute the deviatoric component of the stress field.
-        The deviatoric stress is the stress tensor minus the volumetric stress.
-        It is related to the shape change of the material, and the shear stress.
-        """
-        
-        I = ufl.Identity(self.gdim)
-        deviatoric_stress = self.stress - ufl.tr(self.stress) * I / self.gdim
-
-        return deviatoric_stress
 
     def get_results(self):
         """
