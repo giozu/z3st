@@ -73,7 +73,11 @@ Transfinite Surface {1} = {1, 2, 3, 4};
 
 // Transfinite commands for structured mesh - outer sectors
 Transfinite Line {5, 6, 7, 8, 9, 10, 11, 12} = n;
-Transfinite Surface {2, 3, 4, 5} = {9, 5, -10, 1, 10, 6, -11, 2, 11, 7, -12, 3, 12, 8, -9, 4};
+
+Transfinite Surface {2} = {1, 5, 6, 2};
+Transfinite Surface {3} = {2, 6, 7, 3};
+Transfinite Surface {4} = {3, 7, 8, 4};
+Transfinite Surface {5} = {4, 8, 5, 1};
 
 Recombine Surface {1};
 Recombine Surface {2};
@@ -90,6 +94,7 @@ Physical Surface("top") = {10, 14, 17, 20, 22};
 Extrude {0, 0, h} {
   Surface{1, 2, 3, 4, 5}; Layers {n_l}; Recombine;
 }
+Transfinite Volume {1, 2, 3, 4, 5};
 
 // Physical volume
 // Physical Volume("volume1") = {1};
