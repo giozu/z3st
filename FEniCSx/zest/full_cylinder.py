@@ -191,10 +191,14 @@ class FullCylinder(FiniteElementSetting):
             "timeout": 20,
         }
 
-        # Mesure "ds"
-        self.ds = ufl.Measure("ds", domain=self.mesh)
-        ds_lateral = self.ds(self.lateral_label)
+        # Integration mesures "ds", "dx"
+        metadata = {"quadrature_degree": 4}
+
+        self.ds = ufl.Measure("ds", domain=self.mesh, metadata=metadata)
+        # ds_lateral = self.ds(self.lateral_label)
         ds = self.ds
+        dx = ufl.Measure("dx", domain=self.mesh, metadata=metadata)
+
 
         print("---------------")
         print("Thermal problem")

@@ -1,3 +1,4 @@
+import dolfinx.fem.function
 import dolfinx.fem.petsc
 import ufl
 import dolfinx
@@ -227,20 +228,13 @@ class FullCylinder_time(FiniteElementSetting):
         self.temperature.interpolate(lambda x: self.T_bc*np.ones(x.shape[1]))
         xdmf_temperature.write_function(self.temperature, t)
 
-        self.displacement = dolfinx.fem.Function(self.V_m)
-        self.displacement.name = "displacement"
-        # self.displacement.interpolate(lambda x: np.zeros((self.gdim, x.shape[1])))
-        xdmf_displacement.write_function(self.displacement, t)
-
         T_0 = dolfinx.fem.Function(self.V_t)
-        T_0.name = "T_0"
+        T_0.name = "temperature_0"
         T_0.interpolate(lambda x: self.T_bc*np.ones(x.shape[1]))
 
         self.a_thermal = (self.u_t * self.v_t * ufl.dx) + self.dt * ufl.dot((self.k / (self.rho * self.cp)) * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
         self.L_thermal = (T_0 + self.dt / (self.rho * self.cp) * dolfinx.fem.Constant(self.mesh, self.q_third)) * self.v_t * ufl.dx
         
-        # self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
-
         print("------------------")
         print("Mechanical problem")
         print("------------------")
@@ -258,12 +252,24 @@ class FullCylinder_time(FiniteElementSetting):
             return self.lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * self.mu * epsilon(u)
 
         # Variational forms
-        self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
+        self.displacement = dolfinx.fem.Function(self.V_m)
+
+        self.a_mech = ufl.inner(sigma(self.displacement), epsilon(self.v_m)) * ufl.dx
         self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
         self.L_tractions = ufl.dot(self.traction, self.v_m) * ds
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
         self.L_thermal_exp = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
         self.L_mech = self.L_body_forces + self.L_thermal_exp + self.L_tractions
+
+        F = self.a_mech - self.L_mech
+        problem_mech = dolfinx.fem.petsc.NonlinearProblem(F, self.displacement, self.bc_mech)
+
+        # Newton solver
+        from dolfinx.nls.petsc import NewtonSolver
+        solver_mech = NewtonSolver(self.mesh.comm, problem_mech)
+        solver_mech.atol = 1e-8
+        solver_mech.rtol = 1e-8
+        solver_mech.convergence_criterion = "incremental"
 
         # linear algebra structures
         bilinear_form_thermal = dolfinx.fem.form(self.a_thermal)
@@ -278,18 +284,6 @@ class FullCylinder_time(FiniteElementSetting):
         solver_th.setType(PETSc.KSP.Type.PREONLY)
         solver_th.getPC().setType(PETSc.PC.Type.LU)
 
-        bilinear_form_mech = dolfinx.fem.form(self.a_mech)
-        linear_form_mech = dolfinx.fem.form(self.L_mech)
-
-        A_mech = dolfinx.fem.petsc.assemble_matrix(bilinear_form_mech, bcs = self.bc_mech)
-        A_mech.assemble()
-        b_mech = dolfinx.fem.petsc.create_vector(linear_form_mech)
-
-        solver_mech = PETSc.KSP().create(self.mesh.comm)
-        solver_mech.setOperators(A_mech)
-        solver_mech.setType(PETSc.KSP.Type.PREONLY)
-        solver_mech.getPC().setType(PETSc.PC.Type.LU)
-
         print(f"Time: {t} s")
         for i in range(self.n_steps):
             t += self.dt
@@ -299,30 +293,23 @@ class FullCylinder_time(FiniteElementSetting):
             with b_th.localForm() as loc_b:
                 loc_b.set(0)
 
-            with b_mech.localForm() as loc_b:
-                loc_b.set(0)
-
             dolfinx.fem.petsc.assemble_vector(b_th, linear_form_thermal)
-            dolfinx.fem.petsc.assemble_vector(b_mech, linear_form_mech)
 
             # Apply Dirichlet boundary condition to the vector
             dolfinx.fem.petsc.apply_lifting(b_th, [bilinear_form_thermal], [self.bc_thermal])
             b_th.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
             dolfinx.fem.petsc.set_bc(b_th, self.bc_thermal)
 
-            dolfinx.fem.petsc.apply_lifting(b_mech, [bilinear_form_mech], [self.bc_mech])
-            b_mech.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-            dolfinx.fem.petsc.set_bc(b_mech, self.bc_mech)
-
             # Solve linear problem
             solver_th.solve(b_th, self.temperature.x.petsc_vec)
             self.temperature.x.scatter_forward()
 
-            solver_mech.solve(b_mech, self.displacement.x.petsc_vec)
-            self.displacement.x.scatter_forward()
-
             # Update solution at previous time step (u_n)
             T_0.x.array[:] = self.temperature.x.array
+
+            num_its, converged = solver_mech.solve(self.displacement)
+            assert (converged)
+            self.displacement.x.scatter_forward()
 
             # Write solution to file
             xdmf_temperature.write_function(self.temperature, t)
