@@ -3,6 +3,8 @@ cladding = {
 
     "E": 170e9, # Young's modulus, Pa
     "nu": 0.3,  # Poisson's ratio
+    "k": 10,
+    "cp": 200,
     
     "thermal conductivity": {
         "value": 13.95 + 0.01163 * (T-273.15),

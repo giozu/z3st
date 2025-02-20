@@ -146,9 +146,19 @@ class FullCylinder(FiniteElementSetting):
         """
         Assemble and solve the system for the linear thermo-elastic problem.
         """
+        # Integration mesures "ds", "dx"
+        metadata = {"quadrature_degree": 4}
+        self.ds = ufl.Measure("ds", domain=self.mesh, metadata=metadata)
+        self.dx = ufl.Measure("dx", domain=self.mesh, metadata=metadata)
 
+        self.solver_options()
+       
+        self.thermal_solver()
+        self.mechanical_solver()
+
+    def solver_options(self):
         # Direct solver + MUMPS
-        petsc_options_lu = {
+        self.petsc_options_lu = {
             "ksp_type": "preonly",
             "pc_type": "lu",
             "pc_factor_mat_solver_type": "mumps",
@@ -158,7 +168,7 @@ class FullCylinder(FiniteElementSetting):
         }
 
         # CG-solver + jacobi
-        petsc_options_cg = {
+        self.petsc_options_cg = {
             "ksp_type": "cg",
             "pc_type": "jacobi",
             "ksp_rtol": 1e-7,
@@ -168,7 +178,7 @@ class FullCylinder(FiniteElementSetting):
         }
 
         # GMRES solver + pre-conditioner AMG (Algebraic Multigrid)
-        petsc_options_gmres = {
+        self.petsc_options_gmres = {
             "ksp_type": "gmres",
             "pc_type": "hypre",
             "pc_hypre_type": "boomeramg",
@@ -179,7 +189,7 @@ class FullCylinder(FiniteElementSetting):
         }
 
         # GMRES iterative solver + ILU pre-conditioner
-        petsc_options_ilu = {
+        self.petsc_options_ilu = {
             "ksp_type": "gmres",
             "pc_type": "ilu",
             "ksp_rtol": 1e-8,
@@ -187,50 +197,45 @@ class FullCylinder(FiniteElementSetting):
             "ksp_monitor": None
         }
 
-        jit_options = {
+        self.jit_options = {
             "timeout": 20,
         }
 
-        # Integration mesures "ds", "dx"
-        metadata = {"quadrature_degree": 4}
+    def thermal_solver(self):
 
-        self.ds = ufl.Measure("ds", domain=self.mesh, metadata=metadata)
-        # ds_lateral = self.ds(self.lateral_label)
-        ds = self.ds
-        dx = ufl.Measure("dx", domain=self.mesh, metadata=metadata)
-
-
-        print("---------------")
-        print("Thermal problem")
-        print("---------------")
+        print("--------------")
+        print("Thermal solver")
+        print("--------------")
 
         characteristic_time = self.rho * self.cp / self.k * self.area
         print(f"Characteristic time: {characteristic_time:.3e} s")
 
-        self.a_thermal = ufl.dot(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * ufl.dx
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * ufl.dx
+        self.a_thermal = ufl.dot(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * self.dx
         
-        self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
+        # self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
 
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
             self.L_thermal,
             bcs = self.bc_thermal,
-            petsc_options=petsc_options_cg,
-            jit_options=jit_options,
+            petsc_options=self.petsc_options_cg,
+            jit_options=self.jit_options,
         )
 
         self.temperature = self.thermal_problem.solve()
         self.temperature.x.scatter_forward() # to propagate the data among the processors
         self.temperature.name = "temperature"
 
-        thermal_resistance = 4.0 * np.pi * self.k
-        print(f"Analytical thermal jump: {self.lhr / thermal_resistance:.2f} K")
+        thermal_resistance = 1 / (4.0 * np.pi * self.k)
+        print(f"Analytical thermal jump: {self.lhr * thermal_resistance:.2f} K")
         print("\n")
 
-        print("------------------")
-        print("Mechanical problem")
-        print("------------------")
+    def mechanical_solver(self):
+
+        print("-----------------")
+        print("Mechanical solver")
+        print("-----------------")
 
         def epsilon(u):
             """
@@ -245,22 +250,22 @@ class FullCylinder(FiniteElementSetting):
             return self.lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * self.mu * epsilon(u)
 
         # Variational forms
-        self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * ufl.dx
-        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * ufl.dx
-        self.L_tractions = ufl.dot(self.traction, self.v_m) * ds
+        self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * self.dx
+        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * self.dx
+        self.L_tractions = ufl.dot(self.traction, self.v_m) * self.ds
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * ufl.dx
+        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx
         self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
 
-        self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
+        # self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
         # Linear problem definition
         self.mech_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = petsc_options_cg,
-            jit_options = jit_options,
+            petsc_options = self.petsc_options_cg,
+            jit_options = self.jit_options,
         )
 
         self.displacement = self.mech_problem.solve()
@@ -268,39 +273,6 @@ class FullCylinder(FiniteElementSetting):
         self.displacement.x.scatter_forward() # to propagate the data among the processors
         self.stress = self.lmbda * ufl.tr(epsilon(self.displacement)) * ufl.Identity(len(self.displacement)) + 2.0 * self.mu * epsilon(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
         self.strain = epsilon(self.displacement)
-
-        # Solver options
-        solver = self.thermal_problem.solver
-        viewer = PETSc.Viewer().createASCII("log.thermal_solver")
-        solver.view(viewer)
-
-        solver = self.mech_problem.solver
-        viewer = PETSc.Viewer().createASCII("log.mech_solver")
-        solver.view(viewer)
-
-    def volumetric_stress(self):
-        """
-        Compute the volumetric component of the stress field.
-        The volumetric stress is the trace of the stress tensor divided by the geometric dimension.
-        It is related to the change in volume of the material, and the hydrostatic pressure.
-        """
-
-        I = ufl.Identity(self.gdim)
-        volumetric_stress = ufl.tr(self.stress) * I / self.gdim
-
-        return volumetric_stress
-
-    def deviatoric_stress(self):
-        """
-        Compute the deviatoric component of the stress field.
-        The deviatoric stress is the stress tensor minus the volumetric stress.
-        It is related to the shape change of the material, and the shear stress.
-        """
-        
-        I = ufl.Identity(self.gdim)
-        deviatoric_stress = self.stress - ufl.tr(self.stress) * I / self.gdim
-
-        return deviatoric_stress
 
     def get_results(self):
         """

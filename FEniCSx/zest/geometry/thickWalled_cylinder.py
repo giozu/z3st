@@ -1,7 +1,7 @@
 geometry = {
     "name": "thick-walled cylinder",
 
-    "inner_radius": 0.5,    # Inner radius, m
-    "outer_radius": 1.0,    # Outer radius, m
-    "height":       5.0,    # Height, m
+    "inner radius": 0.0042,    # Inner radius, m
+    "outer radius": 0.0047,    # Outer radius, m
+    "height":       0.0100,    # Height, m
 }
