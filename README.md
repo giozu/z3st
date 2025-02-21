@@ -33,9 +33,8 @@ sudo apt install fenicsx -y
 Additional modules are:
 
 ```shell
-pip install pyvista numpy==1.26.4
+pip install pyvista numpy==1.26.4 trame
 python3 -m pip install pyvista
-pip install trame
 ```
 
 If *ImportError: cannot import name '_docstring'* happens, or multiple matplotlib versions:
