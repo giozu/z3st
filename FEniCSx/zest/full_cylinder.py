@@ -171,9 +171,9 @@ class FullCylinder(FiniteElementSetting):
         self.petsc_options_cg = {
             "ksp_type": "cg",
             "pc_type": "jacobi",
-            "ksp_rtol": 1e-7,
+            "ksp_rtol": 1e-8,
             "ksp_atol": 1e-10,
-            "ksp_max_it": 1000,
+            "ksp_max_it": 2000,
             "ksp_monitor": None
         }
 
@@ -193,7 +193,8 @@ class FullCylinder(FiniteElementSetting):
             "ksp_type": "gmres",
             "pc_type": "ilu",
             "ksp_rtol": 1e-8,
-            "ksp_max_it": 500,
+            "ksp_atol": 1e-10,
+            "ksp_max_it": 2000,
             "ksp_monitor": None
         }
 
@@ -219,7 +220,7 @@ class FullCylinder(FiniteElementSetting):
             self.a_thermal,
             self.L_thermal,
             bcs = self.bc_thermal,
-            petsc_options=self.petsc_options_cg,
+            petsc_options=self.petsc_options_lu,
             jit_options=self.jit_options,
         )
 
@@ -229,6 +230,8 @@ class FullCylinder(FiniteElementSetting):
 
         thermal_resistance = 1 / (4.0 * np.pi * self.k)
         print(f"Analytical thermal jump: {self.lhr * thermal_resistance:.2f} K")
+        print(f"Min temperature from thermal solver: {np.min(self.temperature.x.array):.2f} K")
+        print(f"Max temperature from thermal solver: {np.max(self.temperature.x.array):.2f} K")
         print("\n")
 
     def mechanical_solver(self):
@@ -254,8 +257,8 @@ class FullCylinder(FiniteElementSetting):
         self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * self.dx
         self.L_tractions = ufl.dot(self.traction, self.v_m) * self.ds
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx
-        self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
+        self.L_thermal_exp = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx
+        self.L_mech = self.L_body_forces + self.L_thermal_exp + self.L_tractions
 
         # self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
@@ -264,15 +267,21 @@ class FullCylinder(FiniteElementSetting):
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = self.petsc_options_cg,
+            petsc_options = self.petsc_options_ilu,
             jit_options = self.jit_options,
         )
 
         self.displacement = self.mech_problem.solve()
         self.displacement.name = "displacement"
         self.displacement.x.scatter_forward() # to propagate the data among the processors
-        self.stress = self.lmbda * ufl.tr(epsilon(self.displacement)) * ufl.Identity(len(self.displacement)) + 2.0 * self.mu * epsilon(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+        T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
+        self.stress = sigma(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
         self.strain = epsilon(self.displacement)
+
+        max_displacement = np.max(np.abs(self.displacement.x.array))
+        print(f"\nMax displacement: {max_displacement:.3e} m")
+
+
 
     def get_results(self):
         """

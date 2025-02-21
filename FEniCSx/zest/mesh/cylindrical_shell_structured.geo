@@ -90,6 +90,7 @@ Physical Surface("cladding_top") = {9, 13, 17, 20};
 Physical Volume("cladding") = {1, 2, 3, 4};
 
 // Mesh
+Mesh.ElementOrder = 1;
 Mesh.Optimize = 1;
 Mesh.OptimizeNetgen = 1;
 Mesh.MeshSizeFromPoints = 0.5;

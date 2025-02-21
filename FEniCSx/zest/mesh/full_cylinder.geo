@@ -15,9 +15,9 @@ r = 0.004;  // outer radius of the cylinder
 l = 0.002; // edge of the inner square
 h = 0.010;  // height of the cylinder
 
-n = 20; // number of elements on the square edge
-n_l = 20; // number of extruded layers
-ms = 1.; // mesh element size
+n = 18; // number of elements on the square edge
+n_l = 18; // number of extruded layers
+ms = 0.4; // mesh element size
 
 // Inner square
 Point(1) = {l/2, l/2, 0, ms};
@@ -97,15 +97,15 @@ Extrude {0, 0, h} {
 Transfinite Volume {1, 2, 3, 4, 5};
 
 // Physical volume
-// Physical Volume("volume1") = {1};
-// Physical Volume("volume2") = {2};
-// Physical Volume("volume3") = {3};
-// Physical Volume("volume4") = {4};
-// Physical Volume("volume5") = {5};
 Physical Volume("volume") = {1, 2, 3, 4, 5};
 
+// Mesh
 Mesh.ElementOrder = 1;
-
+Mesh.Optimize = 1;
+Mesh.OptimizeNetgen = 1;
+Mesh.MeshSizeFromPoints = 0.5;
+Mesh.MeshSizeExtendFromBoundary = 0.5;
 Mesh 3;
 
+// Save the mesh
 Save "full_cylinder.msh";
