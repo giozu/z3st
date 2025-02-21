@@ -19,6 +19,7 @@ import matplotlib
 import ufl
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 def plot_results(displacement, problem):
     """
@@ -159,6 +160,71 @@ def plot_stress_components(problem):
 
     plot_tensor_component("sigma_zz", sigma_zz)
     plot_tensor_component("strain_zz", strain_zz)
+
+def plot_sigma_rr(problem):
+    x = ufl.SpatialCoordinate(problem.mesh)[0]
+    y = ufl.SpatialCoordinate(problem.mesh)[1]
+
+    stress = problem.stress
+    sigma_rr = (stress[0, 0] * x**2 + 2 * x * y * stress[0, 1] + stress[1, 1] * y**2) / (x**2 + y**2)
+
+    V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
+    sigma_rr_expr = dolfinx.fem.Expression(sigma_rr, V_scalar.element.interpolation_points())
+    sigma_rr_func = dolfinx.fem.Function(V_scalar)
+    sigma_rr_func.interpolate(sigma_rr_expr)
+
+    coordinates = problem.mesh.geometry.x
+    radii = np.sqrt(coordinates[:, 0]**2 + coordinates[:, 1]**2)
+    stress_values = sigma_rr_func.x.array
+
+    plt.scatter(radii, stress_values, label="σ_rr")
+    plt.xlabel("Raggio [m]")
+    plt.ylabel("Sforzo radiale [Pa]")
+    plt.legend()
+    plt.show()
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
+    """
+    Plotta il profilo dello spostamento radiale a una data altezza z_target.
+    
+    Parameters:
+    - problem: oggetto contenente la mesh e il campo degli spostamenti.
+    - z_target: valore di z in cui estrarre i dati.
+    - tol: tolleranza per selezionare i punti vicini a z_target.
+    """
+    # Estrai coordinate dei nodi della mesh
+    x = problem.mesh.geometry.x[:, 0]
+    y = problem.mesh.geometry.x[:, 1]
+    z = problem.mesh.geometry.x[:, 2]  # Altezza dei punti
+
+    # Seleziona i punti nel piano z ≈ z_target
+    mask = np.abs(z - z_target) < tol
+
+    if np.sum(mask) == 0:
+        print(f"Nessun punto trovato vicino a z = {z_target} con tolleranza {tol}")
+        return
+
+    # Calcola il raggio e il modulo dello spostamento radiale
+    r = np.sqrt(x[mask]**2 + y[mask]**2)
+
+    # Ricostruisci il displacement in formato vettoriale (se necessario)
+    u_values = problem.displacement.x.array
+    if len(u_values.shape) == 1:  # Se è piatto, lo risistemiamo
+        u_values = u_values.reshape(-1, problem.mesh.geometry.dim)
+
+    # Estrarre solo i valori degli spostamenti nel piano z_target
+    u_r = np.sqrt(u_values[mask, 0]**2 + u_values[mask, 1]**2)
+
+    # Plot
+    plt.scatter(r, u_r, label=f"Displacement at z={z_target:.2f}m")
+    plt.xlabel("Raggio [m]")
+    plt.ylabel("Spostamento radiale [m]")
+    plt.legend()
+    plt.grid()
+    plt.show()
 
 def plot_sigma_rr_at_z(problem, z_value=1.0):
     """

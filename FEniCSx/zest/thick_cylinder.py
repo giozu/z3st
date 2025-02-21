@@ -240,6 +240,8 @@ class ThickCylinder(FiniteElementSetting):
         # print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
         thermal_resistance = np.log(self.outer_radius/self.inner_radius) / (2.0*np.pi*self.k)
         print(f"Analytical thermal jump: {self.lhr * thermal_resistance:.2f} K")
+        print(f"Min temperature from thermal solver: {np.min(self.temperature.x.array):.2f} K")
+        print(f"Max temperature from thermal solver: {np.max(self.temperature.x.array):.2f} K")
         print("\n")
 
     def mechanical_solver(self):
@@ -265,8 +267,8 @@ class ThickCylinder(FiniteElementSetting):
         self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * self.dx
         self.L_tractions = ufl.dot(self.inner_traction, self.v_m) * self.ds_i + ufl.inner(self.outer_traction, self.v_m) * self.ds_o
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        self.L_thermal = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx
-        self.L_mech = self.L_body_forces + self.L_thermal + self.L_tractions
+        self.L_thermal_exp = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx
+        self.L_mech = self.L_body_forces + self.L_thermal_exp + self.L_tractions
 
         # self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
@@ -282,8 +284,14 @@ class ThickCylinder(FiniteElementSetting):
         self.displacement = self.mech_problem.solve()
         self.displacement.name = "displacement"
         self.displacement.x.scatter_forward() # to propagate the data among the processors
+        T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
         self.stress = sigma(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
         self.strain = epsilon(self.displacement)
+
+        max_displacement = np.max(np.abs(self.displacement.x.array))
+        print(f"\nMax displacement: {max_displacement:.3e} m")
+
+
 
     def get_results(self):
         """
