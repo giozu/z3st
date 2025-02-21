@@ -224,49 +224,6 @@ def plot_sigma_rr_at_heights(problem, z_values=[0.005, 0.01, 0.015], tol=0.0001)
     plt.title("Radial Stress σ_rr at Different Heights")
     plt.show()
 
-def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
-    """
-    Plot the radial displacement profile at a specified height z_target.
-    
-    Parameters:
-    - problem: Object containing the mesh and displacement field.
-    - z_target: The height (z-value) at which to extract the data.
-    - tol: Tolerance to select points near z_target (to account for numerical precision).
-    """
-    # Extract node coordinates from the mesh
-    x = problem.mesh.geometry.x[:, 0]  # X-coordinates
-    y = problem.mesh.geometry.x[:, 1]  # Y-coordinates
-    z = problem.mesh.geometry.x[:, 2]  # Z-coordinates (height)
-
-    unique_z_values = np.unique(problem.mesh.geometry.x[:, 2])
-    print("Available z-coordinates in the mesh:", unique_z_values)
-
-    # Select only points that are close to the target height z_target
-    mask = np.abs(z - z_target) < tol
-
-    if np.sum(mask) == 0:
-        print(f"No points found near z = {z_target} with tolerance {tol}")
-        return
-
-    # Compute the radial coordinate r = sqrt(x² + y²)
-    r = np.sqrt(x[mask]**2 + y[mask]**2)
-
-    # Reshape the displacement field if necessary
-    u_values = problem.displacement.x.array
-    if len(u_values.shape) == 1:  # If flattened, reshape it properly
-        u_values = u_values.reshape(-1, problem.mesh.geometry.dim)
-
-    # Extract only the displacement values for the selected z-plane
-    u_r = np.sqrt(u_values[mask, 0]**2 + u_values[mask, 1]**2)
-
-    # Plot the radial displacement
-    plt.scatter(r, u_r, label=f"Displacement at z={z_target:.2f}m")
-    plt.xlabel("Radius (m)")
-    plt.ylabel("Radial displacement (m)")
-    plt.legend()
-    plt.grid()
-    plt.show()
-
 def to_paraview(problem):
     """
     Export the displacement, stress, strain, and temperature fields to XDMF files for visualization in ParaView.

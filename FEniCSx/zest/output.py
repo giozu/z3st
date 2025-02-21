@@ -93,7 +93,8 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     """
 
     # Compute cell centers (for DG(0) function space)
-    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim, np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
+    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim, 
+                                     np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
 
     # Extract cell center coordinates
     x = cell_centers[:, 0]
@@ -108,7 +109,7 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     # Find the closest available z-value
     if np.all(np.abs(unique_z_values - z_target) > tol):
         z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]
-        print(f"WARNING: Closest available z-value used instead: {z_target:.6f}")
+        print(f"⚠️ Closest available z-value used instead: {z_target:.6f}")
 
     # Select only the points close to the chosen z-value
     mask = np.abs(z - z_target) < tol
@@ -117,7 +118,7 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
 
     if num_points == 0:
-        print(f" No points found at z = {z_target} within tolerance {tol}. Try increasing `tol`.")
+        print(f"⚠️ No points found at z = {z_target} within tolerance {tol}. Try increasing `tol`.")
         return
 
     # Define the function space for stress tensor (DG, 0)
@@ -153,4 +154,48 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     plt.legend()
     plt.grid()
     plt.title(f"Stress Components at z={z_target:.4f}m")
+    plt.show()
+
+
+def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
+    """
+    Plot the radial displacement profile at a specified height z_target.
+    
+    Parameters:
+    - problem: Object containing the mesh and displacement field.
+    - z_target: The height (z-value) at which to extract the data.
+    - tol: Tolerance to select points near z_target (to account for numerical precision).
+    """
+    # Extract node coordinates from the mesh
+    x = problem.mesh.geometry.x[:, 0]  # X-coordinates
+    y = problem.mesh.geometry.x[:, 1]  # Y-coordinates
+    z = problem.mesh.geometry.x[:, 2]  # Z-coordinates (height)
+
+    unique_z_values = np.unique(problem.mesh.geometry.x[:, 2])
+    print("Available z-coordinates in the mesh:", unique_z_values)
+
+    # Select only points that are close to the target height z_target
+    mask = np.abs(z - z_target) < tol
+
+    if np.sum(mask) == 0:
+        print(f"No points found near z = {z_target} with tolerance {tol}")
+        return
+
+    # Compute the radial coordinate r = sqrt(x² + y²)
+    r = np.sqrt(x[mask]**2 + y[mask]**2)
+
+    # Reshape the displacement field if necessary
+    u_values = problem.displacement.x.array
+    if len(u_values.shape) == 1:  # If flattened, reshape it properly
+        u_values = u_values.reshape(-1, problem.mesh.geometry.dim)
+
+    # Extract only the displacement values for the selected z-plane
+    u_r = np.sqrt(u_values[mask, 0]**2 + u_values[mask, 1]**2)
+
+    # Plot the radial displacement
+    plt.scatter(r, u_r, label=f"Displacement at z={z_target:.2f}m")
+    plt.xlabel("Radius (m)")
+    plt.ylabel("Radial displacement (m)")
+    plt.legend()
+    plt.grid()
     plt.show()
