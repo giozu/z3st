@@ -99,7 +99,7 @@ print(f"temperature = {temperature}")
 # ----------------
 # Post-processing
 # ----------------
-plot_results(displacement, problem)
+plot_displacement(displacement, problem)
 plot_temperature(temperature, problem)
 plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001)
 # to_paraview(problem)
