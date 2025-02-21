@@ -1,5 +1,5 @@
 conditions = {
-    "gap pressure": -1e6,              # Gap pressure, Pa, negative for compression
+    "gap pressure": 0.0,              # Gap pressure, Pa, negative for compression
     "gap composition": "He",
     "LHR": 15000.0,                     # Linear heat rate, W/m
     "gravitational acceleration": 9.81, # m/s^2

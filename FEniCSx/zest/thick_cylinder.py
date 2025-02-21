@@ -198,7 +198,8 @@ class ThickCylinder(FiniteElementSetting):
             "ksp_type": "gmres",
             "pc_type": "ilu",
             "ksp_rtol": 1e-8,
-            "ksp_max_it": 500,
+            "ksp_atol": 1e-10,
+            "ksp_max_it": 2000,
             "ksp_monitor": None
         }
 
@@ -228,7 +229,7 @@ class ThickCylinder(FiniteElementSetting):
             self.a_thermal,
             self.L_thermal,
             bcs = self.bc_thermal,
-            petsc_options=self.petsc_options_cg,
+            petsc_options=self.petsc_options_lu,
             jit_options=self.jit_options,
         )
 
@@ -274,14 +275,14 @@ class ThickCylinder(FiniteElementSetting):
             self.a_mech,
             self.L_mech,
             bcs = self.bc_mech,
-            petsc_options = self.petsc_options_cg,
+            petsc_options = self.petsc_options_ilu,
             jit_options = self.jit_options,
         )
 
         self.displacement = self.mech_problem.solve()
         self.displacement.name = "displacement"
         self.displacement.x.scatter_forward() # to propagate the data among the processors
-        self.stress = self.lmbda * ufl.tr(epsilon(self.displacement)) * ufl.Identity(len(self.displacement)) + 2.0 * self.mu * epsilon(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+        self.stress = sigma(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
         self.strain = epsilon(self.displacement)
 
     def get_results(self):
