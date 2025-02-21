@@ -11,8 +11,8 @@ SetFactory("OpenCASCADE");
 // Inner and outer radii
 ri = 0.0042;
 ro = 0.0047;
-n_r = 18;
-n_h = 16;
+n_r = 36;
+n_h = 36;
 
 h = 0.01; // Height of the 3D extrusion
 
@@ -90,6 +90,10 @@ Physical Surface("cladding_top") = {9, 13, 17, 20};
 Physical Volume("cladding") = {1, 2, 3, 4};
 
 // Mesh
+Mesh.Optimize = 1;
+Mesh.OptimizeNetgen = 1;
+Mesh.MeshSizeFromPoints = 0.5;
+Mesh.MeshSizeExtendFromBoundary = 0.5;
 Mesh 3;
 
 // Save the mesh
