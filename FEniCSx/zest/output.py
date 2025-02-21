@@ -12,14 +12,15 @@ output.py contains functions to visualize the results of the ZEST code.
 """
 
 # Import necessary modules
+import matplotlib
 import matplotlib.pyplot
+import matplotlib.pyplot as plt
 import pyvista
 import dolfinx
-import matplotlib
+from dolfinx.mesh import compute_midpoints
 import ufl
 import numpy as np
 import os
-import matplotlib.pyplot as plt
 
 def plot_results(displacement, problem):
     """
@@ -161,114 +162,168 @@ def plot_stress_components(problem):
     plot_tensor_component("sigma_zz", sigma_zz)
     plot_tensor_component("strain_zz", strain_zz)
 
-def plot_sigma_rr(problem):
-    x = ufl.SpatialCoordinate(problem.mesh)[0]
-    y = ufl.SpatialCoordinate(problem.mesh)[1]
+def plot_sigma_rr_at_z(problem, z_target=0.005, tol=0.0001):
+    """
+    Compute and plot the radial stress σ_rr as a function of radius at a specific height z_target.
+    
+    Parameters:
+    - problem: The finite element problem containing the mesh and stress field.
+    - z_target: The height (z-value) at which to extract and plot σ_rr.
+    - tol: Tolerance to select points near the target z-value.
+    """
 
-    stress = problem.stress
-    sigma_rr = (stress[0, 0] * x**2 + 2 * x * y * stress[0, 1] + stress[1, 1] * y**2) / (x**2 + y**2)
+    # Compute cell centers (for DG(0) function space)
+    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim, np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
 
-    V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
-    sigma_rr_expr = dolfinx.fem.Expression(sigma_rr, V_scalar.element.interpolation_points())
-    sigma_rr_func = dolfinx.fem.Function(V_scalar)
-    sigma_rr_func.interpolate(sigma_rr_expr)
+    # Extract cell center coordinates
+    x = cell_centers[:, 0]
+    y = cell_centers[:, 1]
+    z = cell_centers[:, 2]  # Heights
+    r = np.sqrt(x**2 + y**2)  # Compute the radius
 
-    coordinates = problem.mesh.geometry.x
-    radii = np.sqrt(coordinates[:, 0]**2 + coordinates[:, 1]**2)
-    stress_values = sigma_rr_func.x.array
+    unique_z_values = np.unique(cell_centers[:, 2])
+    print("Unique z-values in the mesh:", unique_z_values)
 
-    plt.scatter(radii, stress_values, label="σ_rr")
-    plt.xlabel("Raggio [m]")
-    plt.ylabel("Sforzo radiale [Pa]")
+    # Select only the points close to the chosen z-value
+    mask = np.abs(z - z_target) < tol
+    num_points = np.sum(mask)  # Count the number of selected points
+
+    # Debug print
+    print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
+
+    if num_points == 0:
+        print(f"No points found at z = {z_target} within tolerance {tol}. Try increasing `tol`.")
+        return
+
+    # Define the function space for stress tensor (DG, 0)
+    V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (3, 3)))
+
+    # Interpolate the stress tensor
+    stress_expr = dolfinx.fem.Expression(problem.stress, V_tensor.element.interpolation_points())
+    stress_func = dolfinx.fem.Function(V_tensor)
+    stress_func.interpolate(stress_expr)
+
+    # Extract the stress tensor values
+    stress_values = stress_func.x.array.reshape(-1, 3, 3)  # Reshape for a 3x3 tensor
+
+    # Compute the radial stress component σ_rr for selected points
+    sigma_xx = stress_values[mask, 0, 0]  # σ_xx
+    sigma_xy = stress_values[mask, 0, 1]  # σ_xy
+    sigma_yy = stress_values[mask, 1, 1]  # σ_yy
+    sigma_rr = (sigma_xx * x[mask]**2 + 2 * x[mask] * y[mask] * sigma_xy + sigma_yy * y[mask]**2) / (x[mask]**2 + y[mask]**2)
+
+    # Plot the radial stress distribution
+    plt.figure(figsize=(8, 6))
+    plt.scatter(r[mask], sigma_rr, label=f"σ_rr at z={z_target:.4f}m", color="b")
+    plt.xlabel("Radius [m]")
+    plt.ylabel("Radial Stress σ_rr [Pa]")
     plt.legend()
+    plt.grid()
+    plt.title(f"Radial Stress σ_rr at z={z_target:.4f}m")
     plt.show()
 
-import numpy as np
-import matplotlib.pyplot as plt
+def plot_sigma_rr_at_heights(problem, z_values=[0.005, 0.01, 0.015], tol=0.0001):
+    """
+    Compute and plot the radial stress σ_rr as a function of radius for multiple heights (z).
+    
+    Parameters:
+    - problem: The finite element problem containing the mesh and stress field.
+    - z_values: List of heights at which to extract and plot σ_rr.
+    - tol: Tolerance to select points near the target z-values.
+    """
+
+    # Compute cell centers (for DG(0) function space)
+    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim, np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
+
+    # Define the function space for stress tensor (DG, 0)
+    V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (3, 3)))
+
+    # Interpolate the stress tensor
+    stress_expr = dolfinx.fem.Expression(problem.stress, V_tensor.element.interpolation_points())
+    stress_func = dolfinx.fem.Function(V_tensor)
+    stress_func.interpolate(stress_expr)
+
+    # Extract the stress tensor values
+    stress_values = stress_func.x.array.reshape(-1, 3, 3)  # Reshape for a 3x3 tensor
+
+    # Extract cell center coordinates
+    x = cell_centers[:, 0]
+    y = cell_centers[:, 1]
+    z = cell_centers[:, 2]  # Heights
+    r = np.sqrt(x**2 + y**2)  # Compute the radius
+
+    # Create figure
+    plt.figure(figsize=(8, 6))
+
+    for z_target in z_values:
+        # Select only the points close to the chosen z-value
+        mask = np.abs(z - z_target) < tol
+        num_points = np.sum(mask)  # Count the number of selected points
+
+        print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
+
+        if num_points == 0:
+            print(f"No points found at z = {z_target} within tolerance {tol}.")
+            continue
+
+        # Compute the radial stress component σ_rr
+        sigma_xx = stress_values[mask, 0, 0]  # σ_xx
+        sigma_xy = stress_values[mask, 0, 1]  # σ_xy
+        sigma_yy = stress_values[mask, 1, 1]  # σ_yy
+        sigma_rr = (sigma_xx * x[mask]**2 + 2 * x[mask] * y[mask] * sigma_xy + sigma_yy * y[mask]**2) / (x[mask]**2 + y[mask]**2)
+
+        # Plot the profile for this height
+        plt.scatter(r[mask], sigma_rr, label=f"σ_rr at z={z_target:.4f}m", alpha=0.7)
+
+    # Final plot settings
+    plt.xlabel("Radius [m]")
+    plt.ylabel("Radial Stress σ_rr [Pa]")
+    plt.legend()
+    plt.grid()
+    plt.title("Radial Stress σ_rr at Different Heights")
+    plt.show()
 
 def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
     """
-    Plotta il profilo dello spostamento radiale a una data altezza z_target.
+    Plot the radial displacement profile at a specified height z_target.
     
     Parameters:
-    - problem: oggetto contenente la mesh e il campo degli spostamenti.
-    - z_target: valore di z in cui estrarre i dati.
-    - tol: tolleranza per selezionare i punti vicini a z_target.
+    - problem: Object containing the mesh and displacement field.
+    - z_target: The height (z-value) at which to extract the data.
+    - tol: Tolerance to select points near z_target (to account for numerical precision).
     """
-    # Estrai coordinate dei nodi della mesh
-    x = problem.mesh.geometry.x[:, 0]
-    y = problem.mesh.geometry.x[:, 1]
-    z = problem.mesh.geometry.x[:, 2]  # Altezza dei punti
+    # Extract node coordinates from the mesh
+    x = problem.mesh.geometry.x[:, 0]  # X-coordinates
+    y = problem.mesh.geometry.x[:, 1]  # Y-coordinates
+    z = problem.mesh.geometry.x[:, 2]  # Z-coordinates (height)
 
-    # Seleziona i punti nel piano z ≈ z_target
+    unique_z_values = np.unique(problem.mesh.geometry.x[:, 2])
+    print("Available z-coordinates in the mesh:", unique_z_values)
+
+    # Select only points that are close to the target height z_target
     mask = np.abs(z - z_target) < tol
 
     if np.sum(mask) == 0:
-        print(f"Nessun punto trovato vicino a z = {z_target} con tolleranza {tol}")
+        print(f"No points found near z = {z_target} with tolerance {tol}")
         return
 
-    # Calcola il raggio e il modulo dello spostamento radiale
+    # Compute the radial coordinate r = sqrt(x² + y²)
     r = np.sqrt(x[mask]**2 + y[mask]**2)
 
-    # Ricostruisci il displacement in formato vettoriale (se necessario)
+    # Reshape the displacement field if necessary
     u_values = problem.displacement.x.array
-    if len(u_values.shape) == 1:  # Se è piatto, lo risistemiamo
+    if len(u_values.shape) == 1:  # If flattened, reshape it properly
         u_values = u_values.reshape(-1, problem.mesh.geometry.dim)
 
-    # Estrarre solo i valori degli spostamenti nel piano z_target
+    # Extract only the displacement values for the selected z-plane
     u_r = np.sqrt(u_values[mask, 0]**2 + u_values[mask, 1]**2)
 
-    # Plot
+    # Plot the radial displacement
     plt.scatter(r, u_r, label=f"Displacement at z={z_target:.2f}m")
-    plt.xlabel("Raggio [m]")
-    plt.ylabel("Spostamento radiale [m]")
+    plt.xlabel("Radius (m)")
+    plt.ylabel("Radial displacement (m)")
     plt.legend()
     plt.grid()
-    plt.show()
-
-def plot_sigma_rr_at_z(problem, z_value=1.0):
-    """
-    Plot sigma_rr as a function of the radius r at a specific z value.
-    """
-    print(f"\nFunction plot_sigma_rr_at_z()")
-
-    # Coordinate system
-    x = ufl.SpatialCoordinate(problem.mesh)[0]
-    y = ufl.SpatialCoordinate(problem.mesh)[1]
-    z = ufl.SpatialCoordinate(problem.mesh)[2]
-
-    # Stress components
-    stress = problem.stress
-    sigma_xx = stress[0, 0]
-    sigma_xy = stress[0, 1]
-    sigma_yy = stress[1, 1]
-
-    # Radial stress component
-    sigma_rr = (sigma_xx * x**2 + 2 * x * y * sigma_xy + sigma_yy * y**2) / (x**2 + y**2)
-
-    # Function space for sigma_rr
-    V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
-    sigma_rr_expr = dolfinx.fem.Expression(sigma_rr, V_scalar.element.interpolation_points())
-    sigma_rr_func = dolfinx.fem.Function(V_scalar)
-    sigma_rr_func.interpolate(sigma_rr_expr)
-
-    # Extract values at z = z_value
-    dofs_z = dolfinx.fem.locate_dofs_geometrical(V_scalar, lambda x: np.isclose(x[2], z_value))
-    sigma_rr_values = sigma_rr_func.x.array[dofs_z]
-
-    # Compute radius values
-    coordinates = problem.mesh.geometry.x[dofs_z]
-    radius_values = np.sqrt(coordinates[:, 0]**2 + coordinates[:, 1]**2)
-
-    # Plot sigma_rr as a function of radius
-    import matplotlib.pyplot as plt
-
-    plt.figure()
-    plt.plot(radius_values, sigma_rr_values, 'o')
-    plt.xlabel("Radius (r)")
-    plt.ylabel("sigma_rr")
-    plt.title(f"Radial stress component sigma_rr at z = {z_value}")
-    plt.savefig(f"output/sigma_rr_z_{z_value}.png")
     plt.show()
 
 def plot_sigma_xx_at_z(problem, z_value=1.0):
