@@ -98,6 +98,7 @@ class FuelRod(FiniteElementSetting):
         self.cladding["lmbda"] = cladding["E"] * cladding["nu"] / ((1 + cladding["nu"]) * (1 - 2 * cladding["nu"]))
         self.cladding["mu"] = cladding["E"] / (2 * (1 + cladding["nu"]))
         self.cladding["bulk_modulus"] = cladding["E"] / (3 * (1 - 2 * cladding["nu"]))
+        self.cladding["cp"] = cladding["cp"]
 
         # Compute the volumetric heat generation (q_third) using the fuel area.
         self.q_third = lhr / self.area_fuel
@@ -131,6 +132,7 @@ class FuelRod(FiniteElementSetting):
         print(f"Cladding Lamé parameters: {self.cladding['lmbda']/1e9:.2f} GPa, {self.cladding['mu']/1e9:.2f} GPa")
         print(f"Cladding Thermal conductivity: {self.cladding['k']:.2f} W/mK")
         print(f"Cladding Thermal expansion coefficient: {self.cladding['alpha']:.2e} 1/K")
+        print(f"Cladding specific heat capacity: {self.cladding["cp"]:.2f} J/kgK")
         print("-----------------")
         
         # Print global parameters
@@ -188,8 +190,7 @@ class FuelRod(FiniteElementSetting):
         self.T_bc = temperature
         self.bc_Tco = dolfinx.fem.dirichletbc(temperature, self.dofs_cladding_outer, self.V_t)
         self.bc_Tfo = dolfinx.fem.dirichletbc(temperature, self.dofs_fuel_outer, self.V_t)
-        self.bc_thermal = [self.bc_Tco]
-
+    
         # ---------------------------
         # Neumann boundary conditions
         # ---------------------------
@@ -264,7 +265,6 @@ class FuelRod(FiniteElementSetting):
         }
 
     def thermal_solver(self):
-
         print("--------------")
         print("Thermal solver")
         print("--------------")
@@ -293,7 +293,7 @@ class FuelRod(FiniteElementSetting):
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
             self.L_thermal,
-            bcs=self.bc_thermal,
+            bcs=[self.bc_Tco, self.bc_Tfo],
             petsc_options=self.petsc_options_lu,
             jit_options=self.jit_options,
         )
@@ -305,13 +305,12 @@ class FuelRod(FiniteElementSetting):
         T_interface = np.mean(T_values)
         print(f"Average temperature on inner cladding: {T_interface:.2f} K")
 
-        fuel_outer_bc = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, T_interface), self.dofs_fuel_outer, self.V_t)
-        self.bc_thermal.append(fuel_outer_bc)
+        self.bc_Tfo = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, T_interface), self.dofs_fuel_outer, self.V_t)
 
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
             self.L_thermal,
-            bcs=self.bc_thermal,
+            bcs=[self.bc_Tco, self.bc_Tfo],
             petsc_options=self.petsc_options_lu,
             jit_options=self.jit_options,
         )
@@ -320,6 +319,8 @@ class FuelRod(FiniteElementSetting):
         self.temperature.x.scatter_forward()
         
         self.temperature.name = "temperature"
+
+        self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
 
         # print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
         thermal_resistance_cladding = np.log(self.cladding_outer_radius/self.cladding_inner_radius) / (2.0*np.pi*self.cladding["k"])
@@ -377,7 +378,7 @@ class FuelRod(FiniteElementSetting):
         # Total mechanical load is the sum of the body forces, thermal expansion, and traction forces.
         self.L_mech = self.L_body_forces + self.L_thermal_exp + self.L_tractions
 
-        # self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
+        self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
         # Linear problem definition
         self.mech_problem = dolfinx.fem.petsc.LinearProblem(
@@ -394,12 +395,10 @@ class FuelRod(FiniteElementSetting):
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
 
         # Stress expression for the fuel region using fuel parameters
-        self.stress_fuel_expr = sigma(self.displacement, self.fuel["lmbda"], self.fuel["mu"]) \
-            - (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+        self.stress_fuel_expr = sigma(self.displacement, self.fuel["lmbda"], self.fuel["mu"]) - (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
 
         # Stress expression for the cladding region using cladding parameters
-        self.stress_cladding_expr = sigma(self.displacement, self.cladding["lmbda"], self.cladding["mu"]) \
-            - (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+        self.stress_cladding_expr = sigma(self.displacement, self.cladding["lmbda"], self.cladding["mu"]) - (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
 
         self.stress = self.stress_cladding_expr
         self.strain = epsilon(self.displacement)

@@ -100,11 +100,11 @@ print(f"temperature = {temperature}")
 # ----------------
 # Stiffness matrix
 # ----------------
-# rows, cols, values = problem.parse_matrix_file("thermal_stiffness_matrix.txt")
-# problem.plot_sparsity_pattern(rows, cols, "thermal_sparisity_pattern.png")
+rows, cols, values = problem.parse_matrix_file("thermal_stiffness_matrix.txt")
+problem.plot_sparsity_pattern(rows, cols, "thermal_sparisity_pattern.png")
 
-# rows, cols, values = problem.parse_matrix_file("mech_stiffness_matrix.txt")
-# problem.plot_sparsity_pattern(rows, cols, "mech_sparisity_pattern")
+rows, cols, values = problem.parse_matrix_file("mech_stiffness_matrix.txt")
+problem.plot_sparsity_pattern(rows, cols, "mech_sparisity_pattern")
 
 # ----------------
 # Post-processing
