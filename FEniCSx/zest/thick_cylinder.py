@@ -329,11 +329,14 @@ class ThickCylinder(FiniteElementSetting):
         # Create the plotter and grid for visualization
         topology, cell_types, geometry = dolfinx.plot.vtk_mesh(self.V_m)
         grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
+        
+        # Attach vector values to grid and warp grid by vector
         grid["u"] = self.displacement.x.array.reshape((geometry.shape[0], 3))
+        
         p.add_mesh(grid, style="wireframe", color="k") 
         
         # Attach Von Mises stress data to the grid
-        warped = grid.warp_by_vector("u")
+        warped = grid.warp_by_vector("u", factor=1)
         warped.cell_data["VonMises"] = von_mises_func.x.array
         warped.set_active_scalars("VonMises")
 
@@ -346,6 +349,11 @@ class ThickCylinder(FiniteElementSetting):
             p.show()
         else:
             p.screenshot("output/von_mises_stress.png")
+
+        import os
+        output_dir = "output"
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
         with dolfinx.io.XDMFFile(self.mesh.comm, "output/von_mises_stress.xdmf", "w") as xdmf:
             xdmf.write_mesh(self.mesh)

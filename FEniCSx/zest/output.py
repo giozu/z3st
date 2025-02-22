@@ -27,29 +27,42 @@ def plot_displacement(displacement, problem):
     Plot the displacement field of the problem
     """
 
-    print(f"\nFunction plot_results()")
+    # Start PyVista visualization
+    import pyvista
+    p = pyvista.Plotter()
 
-    pyvista.start_xvfb() # Start virtual framebuffer
-
-    # Create plotter and pyvista grid
-    p = pyvista.Plotter(off_screen=True)  # Enable off-screen rendering
+    # Create the plotter and grid for visualization
     topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_m)
     grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
     # Attach vector values to grid and warp grid by vector
     grid["u"] = displacement.x.array.reshape((geometry.shape[0], 3))
 
-    p.add_mesh(grid, style="wireframe", color="k") # style = "points"
-    warped = grid.warp_by_vector("u")
-    p.add_mesh(warped, show_edges=True, cmap=matplotlib.colormaps.get_cmap("gist_rainbow").resampled(25), lighting=True)
+    p.add_mesh(grid, style="wireframe", color="k")
+
+    # Attach data to the grid
+    warped = grid.warp_by_vector("u", factor=1)
+
+    # Plot the results
+    p.add_mesh(warped)
     p.show_axes()
+
+    # Show the plot (if not in off-screen mode)
+    if not pyvista.OFF_SCREEN:
+        p.show()
+    else:
+        p.screenshot("output/displacement.png")
 
     output_dir = "output"
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    figure_as_array = p.screenshot("output/displacement.png")
-    return figure_as_array
+    with dolfinx.io.XDMFFile(problem.mesh.comm, "output/displacement.xdmf", "w") as xdmf:
+        xdmf.write_mesh(problem.mesh)
+        displacement.name = "displacement"
+        xdmf.write_function(displacement)
+
+    return displacement
 
 def plot_temperature(temperature, problem):
     """
