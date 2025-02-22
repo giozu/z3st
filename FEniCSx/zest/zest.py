@@ -79,6 +79,7 @@ print(f"-----------------------")
 # -------
 # Results
 # -------
+problem.vonMises_equivalent()
 displacement, stress, strain, temperature = problem.get_results()
 
 print("\n")

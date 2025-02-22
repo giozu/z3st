@@ -291,8 +291,6 @@ class ThickCylinder(FiniteElementSetting):
         max_displacement = np.max(np.abs(self.displacement.x.array))
         print(f"\nMax displacement: {max_displacement:.3e} m")
 
-
-
     def get_results(self):
         """
         Get the computed displacement, stress, and strain fields.
@@ -304,3 +302,54 @@ class ThickCylinder(FiniteElementSetting):
         """
 
         return self.displacement, self.stress, self.strain, self.temperature
+
+    def vonMises_equivalent(self):
+        """
+        Compute and visualize the Von Mises stress field.
+        """
+
+        # Compute deviatoric stress
+        deviatoric_stress = self.stress - (1.0 / 3.0) * ufl.tr(self.stress) * ufl.Identity(len(self.displacement))
+        
+        # Compute Von Mises stress
+        von_Mises = ufl.sqrt(3.0 / 2.0 * ufl.inner(deviatoric_stress, deviatoric_stress))
+
+        # Define function space for Von Mises stress
+        V_von_mises = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
+
+        # Interpolate the computed Von Mises stress
+        von_mises_expr = dolfinx.fem.Expression(von_Mises, V_von_mises.element.interpolation_points())
+        von_mises_func = dolfinx.fem.Function(V_von_mises)
+        von_mises_func.interpolate(von_mises_expr)
+
+        # Start PyVista visualization
+        import pyvista
+        p = pyvista.Plotter()
+
+        # Create the plotter and grid for visualization
+        topology, cell_types, geometry = dolfinx.plot.vtk_mesh(self.V_m)
+        grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
+        grid["u"] = self.displacement.x.array.reshape((geometry.shape[0], 3))
+        p.add_mesh(grid, style="wireframe", color="k") 
+        
+        # Attach Von Mises stress data to the grid
+        warped = grid.warp_by_vector("u")
+        warped.cell_data["VonMises"] = von_mises_func.x.array
+        warped.set_active_scalars("VonMises")
+
+        # Plot the results
+        p.add_mesh(warped)
+        p.show_axes()
+
+        # Show the plot (if not in off-screen mode)
+        if not pyvista.OFF_SCREEN:
+            p.show()
+        else:
+            p.screenshot("output/von_mises_stress.png")
+
+        with dolfinx.io.XDMFFile(self.mesh.comm, "output/von_mises_stress.xdmf", "w") as xdmf:
+            xdmf.write_mesh(self.mesh)
+            von_mises_func.name = "VonMises"
+            xdmf.write_function(von_mises_func)
+
+        return von_mises_func
