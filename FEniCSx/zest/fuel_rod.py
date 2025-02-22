@@ -153,7 +153,7 @@ class FuelRod(FiniteElementSetting):
         self.T_bc = temperature
         self.bc_Tco = dolfinx.fem.dirichletbc(temperature, self.dofs_cladding_outer, self.V_t)
         self.bc_Tfo = dolfinx.fem.dirichletbc(temperature, self.dofs_fuel_outer, self.V_t)
-        self.bc_thermal = [self.bc_Tco, self.bc_Tfo]
+        self.bc_thermal = [self.bc_Tco]
 
         # ---------------------------
         # Neumann boundary conditions
@@ -269,11 +269,37 @@ class FuelRod(FiniteElementSetting):
         self.temperature.x.scatter_forward()
         self.temperature.name = "temperature"
 
+        # 1. Localizza i dofs sul bordo interno della guaina (cladding inner)
+        # 2. Estrai i valori di temperatura e calcola la media
+        T_values = self.temperature.x.array[self.dofs_cladding_inner]
+        T_interface = np.mean(T_values)
+        print(f"Temperatura media sul bordo interno della guaina: {T_interface:.2f} K")
+
+        # 3. Localizza i dofs sul bordo esterno del combustibile (fuel outer)
+        # Imposta la condizione al contorno di Dirichlet sul fuel_outer usando la temperatura calcolata
+        fuel_outer_bc = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, T_interface), self.dofs_fuel_outer, self.V_t)
+        self.bc_thermal.append(fuel_outer_bc)
+
+        self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
+            self.a_thermal,
+            self.L_thermal,
+            bcs=self.bc_thermal,
+            petsc_options=self.petsc_options_lu,
+            jit_options=self.jit_options,
+        )
+
+        self.temperature = self.thermal_problem.solve()
+        self.temperature.x.scatter_forward()
+        self.temperature.name = "temperature"
+
         # print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
-        thermal_resistance = np.log(self.cladding_outer_radius/self.cladding_inner_radius) / (2.0*np.pi*self.k)
-        print(f"Analytical thermal jump: {self.lhr * thermal_resistance:.2f} K")
+        thermal_resistance_cladding = np.log(self.cladding_outer_radius/self.cladding_inner_radius) / (2.0*np.pi*self.k)
+        thermal_resistance_fuel = 1./(4.*np.pi*self.k_fuel)
+        print(f"Analytical thermal jump - cladding: {self.lhr * thermal_resistance_cladding:.2f} K")
+        print(f"Analytical thermal jump - fuel: {self.lhr * thermal_resistance_fuel} K")
         print(f"Min temperature from thermal solver: {np.min(self.temperature.x.array):.2f} K")
         print(f"Max temperature from thermal solver: {np.max(self.temperature.x.array):.2f} K")
+
         print("\n")
 
     def mechanical_solver(self):
