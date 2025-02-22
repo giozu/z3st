@@ -20,6 +20,7 @@ On Windows, using WSL, write in Linux shell the following instruction to install
 
 ```shell
 sudo apt install python3-pip python3-gmsh
+sudo apt install libgl1 xvfb
 ```
 
 Then, to install FEniCSx:

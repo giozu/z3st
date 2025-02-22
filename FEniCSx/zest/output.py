@@ -199,3 +199,63 @@ def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
     plt.legend()
     plt.grid()
     plt.show()
+    
+def plot_temperature_at_z(problem, z_target=0.005, tol=0.0001):
+    """
+    Compute and plot the temperature distribution as a function of radius at a specific height z_target.
+    
+    Parameters:
+    - problem: The finite element problem containing the mesh and temperature field.
+    - z_target: The height (z-value) at which to extract and plot temperature.
+    - tol: Tolerance to select points near the target z-value.
+    """
+
+    # Compute cell centers (for DG(0) function space)
+    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim, 
+                                     np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
+
+    # Extract cell center coordinates
+    x = cell_centers[:, 0]
+    y = cell_centers[:, 1]
+    z = cell_centers[:, 2]  # Heights
+    r = np.sqrt(x**2 + y**2)  # Compute the radius
+
+    # Print available z-values in the mesh
+    unique_z_values = np.unique(z)
+    print("Unique z-values in the mesh:", unique_z_values)
+
+    # Find the closest available z-value
+    if np.all(np.abs(unique_z_values - z_target) > tol):
+        z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]
+        print(f"⚠️ Closest available z-value used instead: {z_target:.6f}")
+
+    # Select only the points close to the chosen z-value
+    mask = np.abs(z - z_target) < tol
+    num_points = np.sum(mask)  # Count the number of selected points
+
+    print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
+
+    if num_points == 0:
+        print(f"⚠️ No points found at z = {z_target} within tolerance {tol}. Try increasing `tol`.")
+        return
+
+    # Define the function space for temperature (DG, 0)
+    V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))  # Discontinuous Galerkin space
+
+    # Interpolate the temperature at cell centers
+    temperature_expr = dolfinx.fem.Expression(problem.temperature, V_scalar.element.interpolation_points())
+    temperature_func = dolfinx.fem.Function(V_scalar)
+    temperature_func.interpolate(temperature_expr)
+
+    # Extract the interpolated temperature values
+    temperature_values = temperature_func.x.array[mask]
+
+    # Plot the temperature distribution
+    plt.figure(figsize=(8, 6))
+    plt.scatter(r[mask], temperature_values, label=f"Temperature at z={z_target:.4f}m", color="r", marker="o")
+    plt.xlabel("Radius [m]")
+    plt.ylabel("Temperature [K]")
+    plt.legend()
+    plt.grid()
+    plt.title(f"Temperature Distribution at z={z_target:.4f}m")
+    plt.show()

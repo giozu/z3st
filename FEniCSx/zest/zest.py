@@ -99,9 +99,11 @@ print(f"temperature = {temperature}")
 # ----------------
 # Post-processing
 # ----------------
-plot_sigma_components_at_z(problem, z_target=0.005278, tol=0.0001)
-plot_radial_displacement(problem, z_target=0.005278, tol = 0.0001)
-plot_displacement(displacement, problem)
+plot_sigma_components_at_z(problem, z_target=0.0055, tol=0.0001)
+plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
+plot_temperature_at_z(problem, z_target=0.005, tol=0.0005)
+
+# plot_displacement(displacement, problem)
 # plot_temperature(temperature, problem)
 # to_paraview(problem)
 # plot_stress_components(problem)
