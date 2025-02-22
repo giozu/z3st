@@ -46,6 +46,10 @@ pip uninstall matplotlib
 pip install matplotlib
 ```
 
+echo "export LIBGL_ALWAYS_SOFTWARE=1" >> ~/.bashrc
+source ~/.bashrc
+
+
 ### Documentation and references
 A collection of tutorials is available at the official website https://docs.fenicsproject.org/dolfinx/main/python/demos.
 
