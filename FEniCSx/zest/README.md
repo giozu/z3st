@@ -53,6 +53,7 @@ gmsh cylindrical_shell_structured.geo -3 -o cylindrical_shell_structured.vtk
 ```
 
 ## Future Developments
+- **Fuel and cladding:** Learn how to model two subdomains, one for the fuel and one cladding, with different material properties.
 - **Transient Analysis:** Implementation of time-dependent behavior for fuel performance assessment.
 - **Advanced Material Models:** Incorporation of irradiation effects and creep mechanisms.
 - **Coupling with Other Codes:** Integration with external fuel performance codes for multiphysics simulations.
