@@ -105,7 +105,7 @@ class FuelRod(FiniteElementSetting):
         print(f"Reference temperature: {self.T_ref:.2f} K")
         print("\n")
 
-    def boundary_conditions(self, inner_pressure, outer_pressure, temperature):
+    def boundary_conditions(self, gap_pressure, coolant_pressure, temperature):
         """
         Define and set the boundary conditions.
         """
@@ -113,51 +113,56 @@ class FuelRod(FiniteElementSetting):
         print("-------------------")
         print("Boundary conditions")
         print("-------------------")
-        print(f"Inner pressure = {inner_pressure*1e-6:.2f} MPa")
-        print(f"Outer pressure = {outer_pressure*1e-6:.2f} MPa")
+        print(f"Gap pressure = {gap_pressure*1e-6:.2f} MPa")
+        print(f"Coolant pressure = {coolant_pressure*1e-6:.2f} MPa")
         print(f"Temperature = {temperature:.2f} K")
         print("\n")
 
-        self.bottom_label = 1
-        self.inner_lateral_label = 2
-        self.outer_lateral_label = 3
-        self.top_label= 4
+        self.fuel_bottom_label = 1
+        self.cladding_bottom_label = 2
+        self.fuel_outer_label = 3
+        self.cladding_outer_label = 4
+        self.cladding_inner_label = 5
+        self.cladding_top_label = 6
+        self.fuel_top_label = 7
 
         # ----
         # Dofs
         # ----
 
-        self.dofs_bottom        = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.bottom_label))
-        self.dofs_inner_lateral = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.inner_lateral_label))
-        self.dofs_top           = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.top_label))
-        self.dofs_outer_lateral = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.outer_lateral_label))
+        self.dofs_fuel_bottom     = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.fuel_bottom_label))
+        self.dofs_cladding_bottom = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.cladding_bottom_label))
+        self.dofs_fuel_outer      = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.fuel_outer_label))
+        self.dofs_cladding_outer  = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.cladding_outer_label))
+        self.dofs_cladding_inner  = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.cladding_inner_label))
+        self.dofs_cladding_top    = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.cladding_top_label))
+        self.dofs_fuel_top        = dolfinx.fem.locate_dofs_topological(V=self.V_m, entity_dim=self.fdim, entities=self.ft.find(self.fuel_top_label))
 
         # -----------------------------
         # Dirichlet boundary conditions
         # -----------------------------
 
         # Mechanical boundary conditions
-        self.bc_mech_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
-        self.bc_mech_top = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_top, self.V_m)
-        self.bc_mech_inner_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_inner_lateral, self.V_m)
-        self.bc_mech_outer_lateral = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_outer_lateral, self.V_m)
+        self.bc_mech_fuel_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_fuel_bottom, self.V_m)
+        self.bc_mech_cladding_bottom = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_cladding_bottom, self.V_m)
 
-        self.bc_mech = []
+        self.bc_mech = [self.bc_mech_fuel_bottom, self.bc_mech_cladding_bottom]
 
         # Thermal boundary conditions
         self.T_bc = temperature
-        self.bc_thermal_outer = dolfinx.fem.dirichletbc(temperature, self.dofs_outer_lateral, self.V_t)
-        self.bc_thermal = [self.bc_thermal_outer]
+        self.bc_Tco = dolfinx.fem.dirichletbc(temperature, self.dofs_cladding_outer, self.V_t)
+        self.bc_Tfo = dolfinx.fem.dirichletbc(temperature, self.dofs_fuel_outer, self.V_t)
+        self.bc_thermal = [self.bc_Tco, self.bc_Tfo]
 
         # ---------------------------
         # Neumann boundary conditions
         # ---------------------------
 
         self.normal = ufl.FacetNormal(self.mesh)
-        self.inner_traction = dolfinx.fem.Constant(self.mesh, inner_pressure) * self.normal
-        self.outer_traction = dolfinx.fem.Constant(self.mesh, outer_pressure) * self.normal
+        self.gap_traction = dolfinx.fem.Constant(self.mesh, gap_pressure) * self.normal
+        self.coolant_traction = dolfinx.fem.Constant(self.mesh, coolant_pressure) * self.normal
 
-        self.heat_flux = self.lhr / (2.0 * np.pi * self.inner_radius) # W/m2
+        self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius) # W/m2
 
     def assemble_and_solve(self):
         """
@@ -167,8 +172,9 @@ class FuelRod(FiniteElementSetting):
         metadata = {"quadrature_degree": 4}
         self.dx = ufl.Measure("dx", domain=self.mesh, metadata=metadata)
         self.ds = ufl.Measure("ds", domain=self.mesh, metadata=metadata, subdomain_data=self.ft)
-        self.ds_i = self.ds(self.inner_lateral_label)
-        self.ds_o = self.ds(self.outer_lateral_label)
+        self.ds_ci = self.ds(self.cladding_inner_label)
+        self.ds_co = self.ds(self.cladding_outer_label)
+        self.ds_fo = self.ds(self.fuel_outer_label)
 
         self.solver_options()
        
@@ -227,13 +233,13 @@ class FuelRod(FiniteElementSetting):
         print("Thermal solver")
         print("--------------")
 
-        characteristic_time = self.rho * self.cp / self.k * self.area
+        characteristic_time = self.rho * self.cp / self.k * self.area_fuel
         print(f"Characteristic time: {characteristic_time:.3e} s")
 
         self.a_thermal = ufl.dot(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx
-        self.L_thermal = self.heat_flux * self.v_t * self.ds_i
+        self.L_thermal = self.heat_flux * self.v_t * self.ds_ci
 
-        integral_value = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.heat_flux * self.ds_i))
+        integral_value = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.heat_flux * self.ds_ci))
         print(f"Total power from the integrated value of the heat flux on the inner wall: {integral_value:.3f} W")
         print(f"Total power from the analytical value: {self.lhr * self.height:.3f} W")
 
@@ -252,7 +258,7 @@ class FuelRod(FiniteElementSetting):
         self.temperature.name = "temperature"
 
         # print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
-        thermal_resistance = np.log(self.outer_radius/self.inner_radius) / (2.0*np.pi*self.k)
+        thermal_resistance = np.log(self.cladding_outer_radius/self.cladding_inner_radius) / (2.0*np.pi*self.k)
         print(f"Analytical thermal jump: {self.lhr * thermal_resistance:.2f} K")
         print(f"Min temperature from thermal solver: {np.min(self.temperature.x.array):.2f} K")
         print(f"Max temperature from thermal solver: {np.max(self.temperature.x.array):.2f} K")
@@ -279,7 +285,7 @@ class FuelRod(FiniteElementSetting):
         # Variational forms
         self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * self.dx
         self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * self.dx
-        self.L_tractions = ufl.dot(self.inner_traction, self.v_m) * self.ds_i + ufl.inner(self.outer_traction, self.v_m) * self.ds_o
+        self.L_tractions = ufl.dot(self.gap_traction, self.v_m) * self.ds_fo + ufl.dot(self.gap_traction, self.v_m) * self.ds_ci + ufl.dot(self.coolant_traction, self.v_m) * self.ds_co
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
         self.L_thermal_exp = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx
         self.L_mech = self.L_body_forces + self.L_thermal_exp + self.L_tractions

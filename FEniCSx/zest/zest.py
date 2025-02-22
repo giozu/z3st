@@ -69,12 +69,12 @@ from geometry.fuel_rod import geometry
 problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
 problem.parameters(cladding["rho"], conditions["gravitational acceleration"], cladding["E"], cladding["nu"], cladding["k"], conditions["LHR"], cladding["alpha"], conditions["reference temperature"], cladding["cp"])
-# problem.boundary_conditions(inner_pressure=conditions["gap pressure"], outer_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
+problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
 # -------------------
 # Assembly and solve
 # -------------------
-# problem.assemble_and_solve()
+problem.assemble_and_solve()
 
 end_time = time.time()
 elapsed_time = end_time - start_time
@@ -86,14 +86,14 @@ print(f"-----------------------")
 # -------
 # Results
 # -------
-# problem.vonMises_equivalent()
-# displacement, stress, strain, temperature = problem.get_results()
+problem.vonMises_equivalent()
+displacement, stress, strain, temperature = problem.get_results()
 
-# print("\n")
-# print(f"displacement = {displacement}")
-# print(f"stress = {stress}")
-# print(f"strain = {strain}")
-# print(f"temperature = {temperature}")
+print("\n")
+print(f"displacement = {displacement}")
+print(f"stress = {stress}")
+print(f"strain = {strain}")
+print(f"temperature = {temperature}")
 
 # ----------------
 # Stiffness matrix
@@ -107,11 +107,11 @@ print(f"-----------------------")
 # ----------------
 # Post-processing
 # ----------------
-# plot_sigma_components_at_z(problem, z_target=0.0055, tol=0.0001)
-# plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
-# plot_temperature_at_z(problem, z_target=0.005, tol=0.0005)
+plot_sigma_components_at_z(problem, z_target=0.0055, tol=0.0001)
+plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
+plot_temperature_at_z(problem, z_target=0.005, tol=0.0005)
 
-# plot_displacement(displacement, problem)
+plot_displacement(displacement, problem)
 
 # plot_temperature(temperature, problem)
 # to_paraview(problem)
