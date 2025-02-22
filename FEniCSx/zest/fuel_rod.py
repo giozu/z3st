@@ -78,6 +78,7 @@ class FuelRod(FiniteElementSetting):
         self.bulk_modulus = E / (3 * (1 - 2 * poisson))
         self.k = k
         self.lhr = lhr
+        self.q_third = lhr / self.area_fuel
         self.alpha = alpha
         self.T_ref = T_ref
         self.cp = cp
@@ -233,28 +234,39 @@ class FuelRod(FiniteElementSetting):
         print("Thermal solver")
         print("--------------")
 
-        characteristic_time = self.rho * self.cp / self.k * self.area_fuel
+        # Characteristic time, fuel thermal evolution
+        self.k_fuel = 2.5
+        self.k_cladding = 26
+        characteristic_time = self.rho * self.cp / self.k_fuel * self.area_fuel
         print(f"Characteristic time: {characteristic_time:.3e} s")
 
-        self.a_thermal = ufl.dot(self.k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx
-        self.L_thermal = self.heat_flux * self.v_t * self.ds_ci
+        dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
+        dx_fuel = dx_subdomain(1)
+        dx_cladding = dx_subdomain(2)
+
+        # bilinear forms
+        a_thermal_fuel = ufl.dot(self.k_fuel * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_fuel
+        a_thermal_cladding = ufl.dot(self.k_cladding * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_cladding
+        self.a_thermal = a_thermal_fuel + a_thermal_cladding
+
+        self.L_fuel = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * dx_fuel
+        self.L_cladding = self.heat_flux * self.v_t * self.ds_ci
+        self.L_thermal = self.L_fuel + self.L_cladding
 
         integral_value = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.heat_flux * self.ds_ci))
         print(f"Total power from the integrated value of the heat flux on the inner wall: {integral_value:.3f} W")
         print(f"Total power from the analytical value: {self.lhr * self.height:.3f} W")
 
-        # self.assemble_and_print_matrix(a = self.a_thermal, L = self.L_thermal, filename = 'thermal_stiffness_matrix.txt')
-
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
             self.L_thermal,
-            bcs = self.bc_thermal,
+            bcs=self.bc_thermal,
             petsc_options=self.petsc_options_lu,
             jit_options=self.jit_options,
         )
 
         self.temperature = self.thermal_problem.solve()
-        self.temperature.x.scatter_forward() # to propagate the data among the processors
+        self.temperature.x.scatter_forward()
         self.temperature.name = "temperature"
 
         # print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
