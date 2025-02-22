@@ -11,20 +11,17 @@ This project is currently under development.
 """)
 
 # Importing python modules
-import numpy as np
 import time
 
 # Importing FEniCS modules and custom classes
 # from linear_elasticity import LinearElasticity
-from thick_cylinder import ThickCylinder
-from cube import Cube
+# from thick_cylinder import ThickCylinder
+# from cube import Cube
 
-# Importing materials
-from materials.fuel.uo2 import fuel
-from materials.cladding.T91 import cladding
 from materials.coolant.lead import coolant
+from materials.fuel.uo2 import fuel as fuel_material
+from materials.cladding.T91 import cladding as cladding_material
 
-# Importing conditions
 from conditions.conditions import conditions
 
 # Importing utilities
@@ -68,7 +65,12 @@ from fuel_rod import FuelRod
 from geometry.fuel_rod import geometry
 problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
-problem.parameters(cladding["rho"], conditions["gravitational acceleration"], cladding["E"], cladding["nu"], cladding["k"], conditions["LHR"], cladding["alpha"], conditions["reference temperature"], cladding["cp"])
+
+problem.parameters(fuel_material, cladding_material,
+                   g=conditions["gravitational acceleration"],
+                   lhr=conditions["LHR"],
+                   T_ref=conditions["reference temperature"]) 
+
 problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
 # -------------------

@@ -1,5 +1,5 @@
 cladding = {
-    "name": "T91",  # Material name
+    "name": "T91", # Material name
 
     # Mechanical properties
     "E": 200e9,  # Young's modulus (Pa)

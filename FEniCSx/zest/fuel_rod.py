@@ -54,56 +54,91 @@ class FuelRod(FiniteElementSetting):
         print(f"Relative error (%) = {abs(volume - (analytical_volume)) / analytical_volume * 100:.3e}")
         print("\n")
 
-    def parameters(self, rho, g, E, poisson, k, lhr, alpha, T_ref, cp):
+    def parameters(self, fuel, cladding, g, lhr, T_ref):
         """
-        Set material and physical parameters.
+        Set material and physical parameters for both the fuel and the cladding.
 
         Parameters:
-        rho (float): Density.
-        g (float): Gravitational acceleration.
-        E (float): Young/Elastic Modulus.
-        poisson (float): Poisson's ratio.
-        k (float): Thermal conductivity.
-        lhr (float): Linear heat rate.
-        alpha (float): Thermal expansion coefficient.
-        T_ref (float): Reference temperature.
-        cp (float): Specific heat capacity.
+        fuel (dict): Material parameters for the fuel with keys:
+            "rho"   : density [kg/m³],
+            "E"     : Young's modulus [Pa],
+            "nu"    : Poisson's ratio,
+            "k"     : thermal conductivity [W/mK],
+            "alpha" : thermal expansion coefficient [1/K].
+        cladding (dict): Material parameters for the cladding with the same keys.
+        g (float): Gravitational acceleration [m/s²].
+        lhr (float): Linear heat rate [W/m].
+        T_ref (float): Reference temperature [K].
+        cp (float): Specific heat capacity [J/kgK].
         """
-        self.rho = rho
+        # Set global parameters
         self.g = g
-        self.E = E
-        self.poisson = poisson
-        self.lmbda =  E * poisson / ((1 + poisson) * (1 - 2 * poisson))
-        self.mu = E / (2 * (1 + poisson))
-        self.bulk_modulus = E / (3 * (1 - 2 * poisson))
-        self.k = k
         self.lhr = lhr
-        self.q_third = lhr / self.area_fuel
-        self.alpha = alpha
         self.T_ref = T_ref
-        self.cp = cp
 
-        print("----------")
-        print("Parameters")
-        print("----------")
+        # Set fuel parameters and compute elastic properties for fuel
+        self.fuel = {}
+        self.fuel["rho"] = fuel["rho"]
+        self.fuel["E"] = fuel["E"]
+        self.fuel["nu"] = fuel["nu"]
+        self.fuel["k"] = fuel["k"]
+        self.fuel["alpha"] = fuel["alpha"]
+        self.fuel["lmbda"] = fuel["E"] * fuel["nu"] / ((1 + fuel["nu"]) * (1 - 2 * fuel["nu"]))
+        self.fuel["mu"] = fuel["E"] / (2 * (1 + fuel["nu"]))
+        self.fuel["bulk_modulus"] = fuel["E"] / (3 * (1 - 2 * fuel["nu"]))
+        self.fuel["cp"] = fuel["cp"]
+
+        # Set cladding parameters and compute elastic properties for cladding
+        self.cladding = {}
+        self.cladding["rho"] = cladding["rho"]
+        self.cladding["E"] = cladding["E"]
+        self.cladding["nu"] = cladding["nu"]
+        self.cladding["k"] = cladding["k"]
+        self.cladding["alpha"] = cladding["alpha"]
+        self.cladding["lmbda"] = cladding["E"] * cladding["nu"] / ((1 + cladding["nu"]) * (1 - 2 * cladding["nu"]))
+        self.cladding["mu"] = cladding["E"] / (2 * (1 + cladding["nu"]))
+        self.cladding["bulk_modulus"] = cladding["E"] / (3 * (1 - 2 * cladding["nu"]))
+
+        # Compute the volumetric heat generation (q_third) using the fuel area.
+        self.q_third = lhr / self.area_fuel
+
+        # Print fuel parameters
+        print("---------------")
+        print("Fuel parameters")
+        print("---------------")
         print(f"Fuel inner radius: {self.fuel_outer_radius:.3e} m")
+        print(f"Fuel density: {self.fuel['rho']:.2f} kg/m³")
+        print(f"Fuel Elastic modulus: {self.fuel['E']/1e9:.2f} GPa")
+        print(f"Fuel Poisson's ratio: {self.fuel['nu']:.2f}")
+        print(f"Fuel Bulk modulus: {self.fuel['bulk_modulus']/1e9:.2f} GPa")
+        print(f"Fuel Lamé parameters: {self.fuel['lmbda']/1e9:.2f} GPa, {self.fuel['mu']/1e9:.2f} GPa")
+        print(f"Fuel Thermal conductivity: {self.fuel['k']:.2f} W/mK")
+        print(f"Fuel Thermal expansion coefficient: {self.fuel['alpha']:.2e} 1/K")
+        print(f"Fuel specific heat capacity: {self.fuel["cp"]:.2f} J/kgK")
+        print("-------------------")
+        
+        # Print cladding parameters
+        print("Cladding Parameters")
+        print("-------------------")
         print(f"Cladding inner radius: {self.cladding_inner_radius:.3e} m")
         print(f"Cladding outer radius: {self.cladding_outer_radius:.3e} m")
         print(f"Gap thickness: {(self.cladding_inner_radius - self.fuel_outer_radius)*1e6:.3f} micron")
         print(f"Cladding thickness: {(self.cladding_outer_radius - self.cladding_inner_radius)*1e6:.3f} micron")
-        print(f"Height: {self.height:.3e} m")
-        print(f"Material density: {self.rho:.2f} kg/m3")
-        print(f"Gravitational acceleration: {self.g:.2f} m/s2")
-        print(f"Elastic modulus: {self.E/1e9:.2f} GPa")
-        print(f"Poisson's ratio: {self.poisson:.2f}")
-        print(f"Bulk modulus: {self.bulk_modulus/1e9:.2f} GPa")
-        print(f"First Lamé parameter: {self.lmbda/1e9:.2f} GPa")
-        print(f"Second Lamé parameter: {self.mu/1e9:.2f} GPa")
-        print(f"Thermal conductivity: {self.k:.2f} W/mK")
-        print(f"Specific heat capacity: {self.cp:.2f} J/kg-K")
-        print(f"Linear heat rate: {self.lhr/1000:.2f} kW/m")
-        print(f"Thermal expansion coefficient: {self.alpha:.2e} 1/K")
-        print(f"Reference temperature: {self.T_ref:.2f} K")
+        print(f"Cladding density: {self.cladding['rho']:.2f} kg/m³")
+        print(f"Cladding Elastic modulus: {self.cladding['E']/1e9:.2f} GPa")
+        print(f"Cladding Poisson's ratio: {self.cladding['nu']:.2f}")
+        print(f"Cladding Bulk modulus: {self.cladding['bulk_modulus']/1e9:.2f} GPa")
+        print(f"Cladding Lamé parameters: {self.cladding['lmbda']/1e9:.2f} GPa, {self.cladding['mu']/1e9:.2f} GPa")
+        print(f"Cladding Thermal conductivity: {self.cladding['k']:.2f} W/mK")
+        print(f"Cladding Thermal expansion coefficient: {self.cladding['alpha']:.2e} 1/K")
+        print("-----------------")
+        
+        # Print global parameters
+        print("Global parameters")
+        print("-----------------")
+        print(f"Gravitational acceleration: {g:.2f} m/s²")
+        print(f"Linear heat rate: {lhr/1000:.2f} kW/m")
+        print(f"Reference temperature: {T_ref:.2f} K")
         print("\n")
 
     def boundary_conditions(self, gap_pressure, coolant_pressure, temperature):
@@ -235,9 +270,7 @@ class FuelRod(FiniteElementSetting):
         print("--------------")
 
         # Characteristic time, fuel thermal evolution
-        self.k_fuel = 2.5
-        self.k_cladding = 26
-        characteristic_time = self.rho * self.cp / self.k_fuel * self.area_fuel
+        characteristic_time = self.fuel["rho"] * self.fuel["cp"] / self.fuel["k"] * self.area_fuel
         print(f"Characteristic time: {characteristic_time:.3e} s")
 
         dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
@@ -245,8 +278,8 @@ class FuelRod(FiniteElementSetting):
         dx_cladding = dx_subdomain(2)
 
         # bilinear forms
-        a_thermal_fuel = ufl.dot(self.k_fuel * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_fuel
-        a_thermal_cladding = ufl.dot(self.k_cladding * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_cladding
+        a_thermal_fuel = ufl.dot(self.fuel["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_fuel
+        a_thermal_cladding = ufl.dot(self.cladding["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_cladding
         self.a_thermal = a_thermal_fuel + a_thermal_cladding
 
         self.L_fuel = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * dx_fuel
@@ -267,16 +300,11 @@ class FuelRod(FiniteElementSetting):
 
         self.temperature = self.thermal_problem.solve()
         self.temperature.x.scatter_forward()
-        self.temperature.name = "temperature"
 
-        # 1. Localizza i dofs sul bordo interno della guaina (cladding inner)
-        # 2. Estrai i valori di temperatura e calcola la media
         T_values = self.temperature.x.array[self.dofs_cladding_inner]
         T_interface = np.mean(T_values)
-        print(f"Temperatura media sul bordo interno della guaina: {T_interface:.2f} K")
+        print(f"Average temperature on inner cladding: {T_interface:.2f} K")
 
-        # 3. Localizza i dofs sul bordo esterno del combustibile (fuel outer)
-        # Imposta la condizione al contorno di Dirichlet sul fuel_outer usando la temperatura calcolata
         fuel_outer_bc = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, T_interface), self.dofs_fuel_outer, self.V_t)
         self.bc_thermal.append(fuel_outer_bc)
 
@@ -290,13 +318,14 @@ class FuelRod(FiniteElementSetting):
 
         self.temperature = self.thermal_problem.solve()
         self.temperature.x.scatter_forward()
+        
         self.temperature.name = "temperature"
 
         # print(f"Analytical thermal jump: {self.lhr / ( 4.0 * np.pi * self.k) * (1. - self.inner_radius**2/(self.outer_radius**2 - self.inner_radius**2) * 2. * np.log(self.outer_radius/self.inner_radius)):.2f} K")
-        thermal_resistance_cladding = np.log(self.cladding_outer_radius/self.cladding_inner_radius) / (2.0*np.pi*self.k)
-        thermal_resistance_fuel = 1./(4.*np.pi*self.k_fuel)
+        thermal_resistance_cladding = np.log(self.cladding_outer_radius/self.cladding_inner_radius) / (2.0*np.pi*self.cladding["k"])
+        thermal_resistance_fuel = 1./(4.*np.pi*self.fuel["k"])
         print(f"Analytical thermal jump - cladding: {self.lhr * thermal_resistance_cladding:.2f} K")
-        print(f"Analytical thermal jump - fuel: {self.lhr * thermal_resistance_fuel} K")
+        print(f"Analytical thermal jump - fuel: {self.lhr * thermal_resistance_fuel:.2f} K")
         print(f"Min temperature from thermal solver: {np.min(self.temperature.x.array):.2f} K")
         print(f"Max temperature from thermal solver: {np.max(self.temperature.x.array):.2f} K")
 
@@ -308,24 +337,44 @@ class FuelRod(FiniteElementSetting):
         print("Mechanical solver")
         print("-----------------")
 
+        dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
+        dx_fuel = dx_subdomain(1)
+        dx_cladding = dx_subdomain(2)
+
         def epsilon(u):
             """
-            Strain-displacement compatibility relations
+            Strain-displacement compatibility relation.
             """
             return ufl.sym(ufl.grad(u))
-        
-        def sigma(u):
+
+        def sigma(u, lmbda, mu):
             """
             Stress-strain constitutive relation.
             """
-            return self.lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * self.mu * epsilon(u)
+            return lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
 
-        # Variational forms
-        self.a_mech = ufl.inner(sigma(self.u_m), epsilon(self.v_m)) * self.dx
-        self.L_body_forces = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, - self.rho * self.g)), self.v_m) * self.dx
-        self.L_tractions = ufl.dot(self.gap_traction, self.v_m) * self.ds_fo + ufl.dot(self.gap_traction, self.v_m) * self.ds_ci + ufl.dot(self.coolant_traction, self.v_m) * self.ds_co
+        # Mechanical stiffness (bilinear form) split into fuel and cladding contributions.
+        a_mech_fuel = ufl.inner(sigma(self.u_m, self.fuel["lmbda"], self.fuel["mu"]), epsilon(self.v_m)) * dx_fuel
+        a_mech_cladding = ufl.inner(sigma(self.u_m, self.cladding["lmbda"], self.cladding["mu"]), epsilon(self.v_m)) * dx_cladding
+        self.a_mech = a_mech_fuel + a_mech_cladding
+
+        # Body force contributions: different densities for fuel and cladding.
+        L_body_forces_fuel = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -self.fuel["rho"] * self.g)), self.v_m) * dx_fuel
+        L_body_forces_cladding = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -self.cladding["rho"] * self.g)), self.v_m) * dx_cladding
+        self.L_body_forces = L_body_forces_fuel + L_body_forces_cladding
+
+        # Traction forces remain defined on the boundary (using ds measures already set up).
+        self.L_tractions = (ufl.dot(self.gap_traction, self.v_m) * self.ds_fo +
+                            ufl.dot(self.gap_traction, self.v_m) * self.ds_ci +
+                            ufl.dot(self.coolant_traction, self.v_m) * self.ds_co)
+
+        # Thermal expansion contributions: split the term for fuel and cladding.
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        self.L_thermal_exp = (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx
+        L_thermal_exp_fuel = (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.div(self.v_m) * dx_fuel
+        L_thermal_exp_cladding = (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.div(self.v_m) * dx_cladding
+        self.L_thermal_exp = L_thermal_exp_fuel + L_thermal_exp_cladding
+
+        # Total mechanical load is the sum of the body forces, thermal expansion, and traction forces.
         self.L_mech = self.L_body_forces + self.L_thermal_exp + self.L_tractions
 
         # self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
@@ -341,9 +390,18 @@ class FuelRod(FiniteElementSetting):
 
         self.displacement = self.mech_problem.solve()
         self.displacement.name = "displacement"
-        self.displacement.x.scatter_forward() # to propagate the data among the processors
+        self.displacement.x.scatter_forward()
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        self.stress = sigma(self.displacement) - (3 * self.lmbda + 2 * self.mu) * self.alpha * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+
+        # Stress expression for the fuel region using fuel parameters
+        self.stress_fuel_expr = sigma(self.displacement, self.fuel["lmbda"], self.fuel["mu"]) \
+            - (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+
+        # Stress expression for the cladding region using cladding parameters
+        self.stress_cladding_expr = sigma(self.displacement, self.cladding["lmbda"], self.cladding["mu"]) \
+            - (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+
+        self.stress = self.stress_cladding_expr
         self.strain = epsilon(self.displacement)
 
         max_displacement = np.max(np.abs(self.displacement.x.array))
@@ -359,7 +417,7 @@ class FuelRod(FiniteElementSetting):
         strain (ufl.Expr): The strain field.
         """
 
-        return self.displacement, self.stress, self.strain, self.temperature
+        return self.displacement, self.stress_fuel_expr, self.strain, self.temperature
 
     def vonMises_equivalent(self):
         """
@@ -367,7 +425,7 @@ class FuelRod(FiniteElementSetting):
         """
 
         # Compute deviatoric stress
-        deviatoric_stress = self.stress - (1.0 / 3.0) * ufl.tr(self.stress) * ufl.Identity(len(self.displacement))
+        deviatoric_stress = self.stress_cladding_expr - (1.0 / 3.0) * ufl.tr(self.stress_cladding_expr) * ufl.Identity(len(self.displacement))
         
         # Compute Von Mises stress
         von_Mises = ufl.sqrt(3.0 / 2.0 * ufl.inner(deviatoric_stress, deviatoric_stress))
