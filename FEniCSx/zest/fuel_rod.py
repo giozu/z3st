@@ -25,13 +25,13 @@ class FuelRod(FiniteElementSetting):
 
         # Integration measures the domain
         dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
-        dx_fuel = dx_subdomain(1)      # Marker ID for fuel region
-        dx_cladding = dx_subdomain(2)  # Marker ID for cladding region
+        self.dx_fuel = dx_subdomain(1)      # Marker ID for fuel region
+        self.dx_cladding = dx_subdomain(2)  # Marker ID for cladding region
 
         # Compute volumes
         volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx_subdomain))
-        volume_fuel = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx_fuel))
-        volume_cladding = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx_cladding))
+        volume_fuel = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_fuel))
+        volume_cladding = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_cladding))
 
         # Print results
         print("\n")
@@ -54,7 +54,7 @@ class FuelRod(FiniteElementSetting):
         print(f"Relative error (%) = {abs(volume - (analytical_volume)) / analytical_volume * 100:.3e}")
         print("\n")
 
-    def parameters(self, fuel, cladding, g, lhr, T_ref):
+    def parameters(self, fuel, cladding, filling_gas, g, lhr, T_ref):
         """
         Set material and physical parameters for both the fuel and the cladding.
 
@@ -103,6 +103,9 @@ class FuelRod(FiniteElementSetting):
         # Compute the volumetric heat generation (q_third) using the fuel area.
         self.q_third = lhr / self.area_fuel
 
+        # Compute the (radial) gap thickness
+        self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
+
         # Print fuel parameters
         print("---------------")
         print("Fuel parameters")
@@ -119,7 +122,7 @@ class FuelRod(FiniteElementSetting):
         print("-------------------")
         
         # Print cladding parameters
-        print("Cladding Parameters")
+        print("Cladding parameters")
         print("-------------------")
         print(f"Cladding inner radius: {self.cladding_inner_radius:.3e} m")
         print(f"Cladding outer radius: {self.cladding_outer_radius:.3e} m")
@@ -133,6 +136,11 @@ class FuelRod(FiniteElementSetting):
         print(f"Cladding Thermal conductivity: {self.cladding['k']:.2f} W/mK")
         print(f"Cladding Thermal expansion coefficient: {self.cladding['alpha']:.2e} 1/K")
         print(f"Cladding specific heat capacity: {self.cladding['cp']:.2f} J/kgK")
+        print("-----------------")
+
+        # Print cladding parameters
+        print(f"Filling gas: {filling_gas['name']}")
+        self.filling_gas = filling_gas
         print("-----------------")
         
         # Print global parameters
@@ -224,8 +232,9 @@ class FuelRod(FiniteElementSetting):
             "ksp_type": "preonly",
             "pc_type": "lu",
             "pc_factor_mat_solver_type": "mumps",
-            "ksp_rtol": 1e-8,
-            "ksp_max_it": 1000,
+            "ksp_rtol": 1e-7,
+            "ksp_atol": 1e-7,
+            "ksp_max_it": 2000,
             "ksp_monitor": None
         }
 
@@ -233,8 +242,8 @@ class FuelRod(FiniteElementSetting):
         self.petsc_options_cg = {
             "ksp_type": "cg",
             "pc_type": "jacobi",
-            "ksp_rtol": 1e-8,
-            "ksp_atol": 1e-10,
+            "ksp_rtol": 1e-7,
+            "ksp_atol": 1e-7,
             "ksp_max_it": 2000,
             "ksp_monitor": None
         }
@@ -245,8 +254,8 @@ class FuelRod(FiniteElementSetting):
             "pc_type": "hypre",
             "pc_hypre_type": "boomeramg",
             "ksp_rtol": 1e-7,
-            "ksp_atol": 1e-10,
-            "ksp_max_it": 1000,
+            "ksp_atol": 1e-7,
+            "ksp_max_it": 2000,
             "pc_type": None,
         }
 
@@ -254,8 +263,8 @@ class FuelRod(FiniteElementSetting):
         self.petsc_options_ilu = {
             "ksp_type": "gmres",
             "pc_type": "ilu",
-            "ksp_rtol": 1e-8,
-            "ksp_atol": 1e-10,
+            "ksp_rtol": 1e-7,
+            "ksp_atol": 1e-7,
             "ksp_max_it": 2000,
             "ksp_monitor": None
         }
@@ -271,20 +280,19 @@ class FuelRod(FiniteElementSetting):
 
         # Characteristic time, fuel thermal evolution
         characteristic_time = self.fuel["rho"] * self.fuel["cp"] / self.fuel["k"] * self.area_fuel
-        print(f"Characteristic time: {characteristic_time:.3e} s")
+        print(f"Characteristic time (fuel): {characteristic_time:.3e} s")
 
-        dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
-        dx_fuel = dx_subdomain(1)
-        dx_cladding = dx_subdomain(2)
+        # Characteristic time, cladding thermal evolution
+        characteristic_time = self.cladding["rho"] * self.cladding["cp"] / self.cladding["k"] * self.area_cladding
+        print(f"Characteristic time (cladding): {characteristic_time:.3e} s")
 
-        # bilinear forms
-        a_thermal_fuel = ufl.dot(self.fuel["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_fuel
-        a_thermal_cladding = ufl.dot(self.cladding["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_cladding
+        a_thermal_fuel = ufl.dot(self.fuel["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_fuel
+        a_thermal_cladding = ufl.dot(self.cladding["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_cladding
         self.a_thermal = a_thermal_fuel + a_thermal_cladding
 
-        self.L_fuel = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * dx_fuel
-        self.L_cladding = self.heat_flux * self.v_t * self.ds_ci
-        self.L_thermal = self.L_fuel + self.L_cladding
+        L_thermal_fuel = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * self.dx_fuel
+        L_thermal_cladding = self.heat_flux * self.v_t * self.ds_ci
+        self.L_thermal = L_thermal_fuel + L_thermal_cladding
 
         integral_value = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.heat_flux * self.ds_ci))
         print(f"Total power from the integrated value of the heat flux on the inner wall: {integral_value:.3f} W")
@@ -301,11 +309,24 @@ class FuelRod(FiniteElementSetting):
         self.temperature = self.thermal_problem.solve()
         self.temperature.x.scatter_forward()
 
-        T_values = self.temperature.x.array[self.dofs_cladding_inner]
-        T_interface = np.mean(T_values)
-        print(f"Average temperature on inner cladding: {T_interface:.2f} K")
+        temperature_cladding_inner = self.temperature.x.array[self.dofs_cladding_inner]
+        print(f"Average temperature on inner cladding: {np.mean(temperature_cladding_inner):.2f} K")
 
-        self.bc_Tfo = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, T_interface), self.dofs_fuel_outer, self.V_t)
+        # Gap conductance
+        temperature_gap = np.mean(temperature_cladding_inner)
+        for i in range(15):
+            k_gas = self.filling_gas['A'] * 1e-4 * temperature_gap**0.79 # W/m-K
+            h_gap = k_gas / self.gap_thickness
+
+            thermal_resistance_gap = 1./(2.0 * np.pi * self.fuel_outer_radius * h_gap )
+
+            d_temperature_gap = self.lhr * thermal_resistance_gap
+
+            print(f"Analytical thermal jump - gap: {self.lhr * thermal_resistance_gap:.2f} K")
+
+            temperature_gap = np.mean(temperature_cladding_inner) + d_temperature_gap
+
+        self.bc_Tfo = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, np.mean(temperature_cladding_inner) + d_temperature_gap), self.dofs_fuel_outer, self.V_t)
 
         self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
             self.a_thermal,
@@ -326,6 +347,7 @@ class FuelRod(FiniteElementSetting):
         thermal_resistance_cladding = np.log(self.cladding_outer_radius/self.cladding_inner_radius) / (2.0*np.pi*self.cladding["k"])
         thermal_resistance_fuel = 1./(4.*np.pi*self.fuel["k"])
         print(f"Analytical thermal jump - cladding: {self.lhr * thermal_resistance_cladding:.2f} K")
+        print(f"Analytical thermal jump - gap: {self.lhr * thermal_resistance_gap:.2f} K")
         print(f"Analytical thermal jump - fuel: {self.lhr * thermal_resistance_fuel:.2f} K")
         print(f"Min temperature from thermal solver: {np.min(self.temperature.x.array):.2f} K")
         print(f"Max temperature from thermal solver: {np.max(self.temperature.x.array):.2f} K")
