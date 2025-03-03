@@ -225,7 +225,9 @@ class FuelRod(FiniteElementSetting):
        
         self.thermal_solver()
         self.mechanical_solver()
-        
+
+        self.update_mesh()
+
     def solver_options(self):
 
         ksp_rtol = 1e-6
@@ -458,28 +460,20 @@ class FuelRod(FiniteElementSetting):
         print(f"Cladding Inner Radius (Deformed): {cladding_inner_radius_deformed:.6e} m")
         print(f"Cladding Outer Radius (Deformed): {cladding_outer_radius_deformed:.6e} m")
 
-    def update_mesh(problem):
+    def update_mesh(self):
         """
         Update the computational domain based on the computed displacement field.
         This deforms the mesh and allows solving the problem on the updated geometry.
         """
+        mesh_deformed = self.mesh
+        mesh_deformed.geometry.x[:,:mesh_deformed.geometry.dim] += self.displacement.x.array.reshape((-1, mesh_deformed.geometry.dim))
 
-        # Extract original mesh coordinates
-        mesh_geometry = problem.mesh.geometry.x
-
-        # Extract displacement field
-        displacement = problem.displacement.x.array.reshape(mesh_geometry.shape)
-
-        # Apply the displacement to update node positions
-        mesh_geometry[:, :] += displacement
-
-        # Update the mesh topology
-        problem.mesh.geometry.x = mesh_geometry
+        # Write deformed mesh file to XDMF file
+        # with dolfinx.io.XDMFFile(mesh_deformed.comm, "deformed_mesh.xdmf", "w") as file:
+        #     file.write_mesh(mesh_deformed)
+        # print(f"Deformed mesh written to deformed_mesh.xdmf")
 
         print("\nMesh successfully updated with deformed geometry.")
-
-        return problem.mesh
-
 
     def get_results(self):
         """

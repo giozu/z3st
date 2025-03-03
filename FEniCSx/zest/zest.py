@@ -19,9 +19,9 @@ import time
 # from cube import Cube
 
 from materials.lead import coolant
-from materials.uo2 import fuel as fuel_material
-from materials.T91 import cladding as cladding_material
-from materials.he import he as filling_gas
+from materials.uo2 import fuel
+from materials.T91 import cladding
+from materials.he import he
 
 from conditions.conditions import conditions
 
@@ -67,7 +67,7 @@ from geometry.fuel_rod import geometry
 problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
 
-problem.parameters(fuel_material, cladding_material, filling_gas,
+problem.parameters(fuel, cladding, he,
                    g=conditions["gravitational acceleration"],
                    lhr=conditions["LHR"],
                    T_ref=conditions["reference temperature"]) 
