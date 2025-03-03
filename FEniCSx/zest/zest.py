@@ -89,11 +89,12 @@ print(f"-----------------------")
 # Results
 # -------
 problem.vonMises_equivalent()
-displacement, stress, strain, temperature = problem.get_results()
+displacement, stress_fuel, stress_cladding, strain, temperature = problem.get_results()
 
 print("\n")
 print(f"displacement = {displacement}")
-print(f"stress = {stress}")
+print(f"stress (fuel)= {stress_fuel}")
+print(f"stress (cladding)= {stress_cladding}")
 print(f"strain = {strain}")
 print(f"temperature = {temperature}")
 

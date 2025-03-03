@@ -115,7 +115,7 @@ class FuelRod(FiniteElementSetting):
         print(f"Fuel Lamé parameters: {self.fuel['lmbda']/1e9:.2f} GPa, {self.fuel['mu']/1e9:.2f} GPa")
         print(f"Fuel Thermal conductivity: {self.fuel['k']:.2f} W/mK")
         print(f"Fuel Thermal expansion coefficient: {self.fuel['alpha']:.2e} 1/K")
-        print(f"Fuel specific heat capacity: {self.fuel["cp"]:.2f} J/kgK")
+        print(f"Fuel specific heat capacity: {self.fuel['cp']:.2f} J/kgK")
         print("-------------------")
         
         # Print cladding parameters
@@ -132,7 +132,7 @@ class FuelRod(FiniteElementSetting):
         print(f"Cladding Lamé parameters: {self.cladding['lmbda']/1e9:.2f} GPa, {self.cladding['mu']/1e9:.2f} GPa")
         print(f"Cladding Thermal conductivity: {self.cladding['k']:.2f} W/mK")
         print(f"Cladding Thermal expansion coefficient: {self.cladding['alpha']:.2e} 1/K")
-        print(f"Cladding specific heat capacity: {self.cladding["cp"]:.2f} J/kgK")
+        print(f"Cladding specific heat capacity: {self.cladding['cp']:.2f} J/kgK")
         print("-----------------")
         
         # Print global parameters
@@ -394,13 +394,10 @@ class FuelRod(FiniteElementSetting):
         self.displacement.x.scatter_forward()
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
 
-        # Stress expression for the fuel region using fuel parameters
-        self.stress_fuel_expr = sigma(self.displacement, self.fuel["lmbda"], self.fuel["mu"]) - (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+        self.stress_fuel = sigma(self.displacement, self.fuel["lmbda"], self.fuel["mu"]) - (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
 
-        # Stress expression for the cladding region using cladding parameters
-        self.stress_cladding_expr = sigma(self.displacement, self.cladding["lmbda"], self.cladding["mu"]) - (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
+        self.stress_cladding = sigma(self.displacement, self.cladding["lmbda"], self.cladding["mu"]) - (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
 
-        self.stress = self.stress_cladding_expr
         self.strain = epsilon(self.displacement)
 
         max_displacement = np.max(np.abs(self.displacement.x.array))
@@ -416,7 +413,7 @@ class FuelRod(FiniteElementSetting):
         strain (ufl.Expr): The strain field.
         """
 
-        return self.displacement, self.stress_fuel_expr, self.strain, self.temperature
+        return self.displacement, self.stress_fuel, self.stress_cladding, self.strain, self.temperature
 
     def vonMises_equivalent(self):
         """
@@ -424,7 +421,7 @@ class FuelRod(FiniteElementSetting):
         """
 
         # Compute deviatoric stress
-        deviatoric_stress = self.stress_cladding_expr - (1.0 / 3.0) * ufl.tr(self.stress_cladding_expr) * ufl.Identity(len(self.displacement))
+        deviatoric_stress = self.stress_cladding - (1.0 / 3.0) * ufl.tr(self.stress_cladding) * ufl.Identity(len(self.displacement))
         
         # Compute Von Mises stress
         von_Mises = ufl.sqrt(3.0 / 2.0 * ufl.inner(deviatoric_stress, deviatoric_stress))

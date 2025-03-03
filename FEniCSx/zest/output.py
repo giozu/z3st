@@ -138,7 +138,7 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (3, 3)))
 
     # Interpolate the stress tensor
-    stress_expr = dolfinx.fem.Expression(problem.stress, V_tensor.element.interpolation_points())
+    stress_expr = dolfinx.fem.Expression(problem.stress_fuel, V_tensor.element.interpolation_points())
     stress_func = dolfinx.fem.Function(V_tensor)
     stress_func.interpolate(stress_expr)
 
@@ -160,6 +160,42 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     plt.scatter(r[mask], sigma_rr, label=f"σ_rr at z={z_target:.4f}m", color="b", marker="o")
     plt.scatter(r[mask], sigma_tt, label=f"σ_θθ at z={z_target:.4f}m", color="r", marker="s")
     plt.scatter(r[mask], sigma_zz, label=f"σ_zz at z={z_target:.4f}m", color="g", marker="^")
+
+    plt.xlim(0, 0.004)
+
+    # Set labels and title
+    plt.xlabel("Radius [m]")
+    plt.ylabel("Stress [Pa]")
+    plt.legend()
+    plt.grid()
+    plt.title(f"Stress Components at z={z_target:.4f}m")
+    plt.show()
+
+    # Interpolate the stress tensor
+    stress_expr = dolfinx.fem.Expression(problem.stress_cladding, V_tensor.element.interpolation_points())
+    stress_func = dolfinx.fem.Function(V_tensor)
+    stress_func.interpolate(stress_expr)
+
+    # Extract the stress tensor values
+    stress_values = stress_func.x.array.reshape(-1, 3, 3)  # Reshape for a 3x3 tensor
+
+    # Compute the stress components for selected points
+    sigma_xx = stress_values[mask, 0, 0]  # σ_xx
+    sigma_xy = stress_values[mask, 0, 1]  # σ_xy
+    sigma_yy = stress_values[mask, 1, 1]  # σ_yy
+    sigma_zz = stress_values[mask, 2, 2]  # σ_zz
+
+    # Compute cylindrical stress components
+    sigma_rr = (sigma_xx * x[mask]**2 + 2 * x[mask] * y[mask] * sigma_xy + sigma_yy * y[mask]**2) / (x[mask]**2 + y[mask]**2)
+    sigma_tt = (sigma_xx * y[mask]**2 - 2 * x[mask] * y[mask] * sigma_xy + sigma_yy * x[mask]**2) / (x[mask]**2 + y[mask]**2)
+
+    # Plot the stress components
+    plt.figure(figsize=(8, 6))
+    plt.scatter(r[mask], sigma_rr, label=f"σ_rr at z={z_target:.4f}m", color="b", marker="o")
+    plt.scatter(r[mask], sigma_tt, label=f"σ_θθ at z={z_target:.4f}m", color="r", marker="s")
+    plt.scatter(r[mask], sigma_zz, label=f"σ_zz at z={z_target:.4f}m", color="g", marker="^")
+
+    plt.xlim(0.0042, 0.0047)
 
     # Set labels and title
     plt.xlabel("Radius [m]")
