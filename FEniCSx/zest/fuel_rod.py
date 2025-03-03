@@ -227,13 +227,17 @@ class FuelRod(FiniteElementSetting):
         self.mechanical_solver()
         
     def solver_options(self):
+
+        ksp_rtol = 1e-6
+        ksp_atol = 1e-6
+
         # Direct solver + MUMPS
         self.petsc_options_lu = {
             "ksp_type": "preonly",
             "pc_type": "lu",
             "pc_factor_mat_solver_type": "mumps",
-            "ksp_rtol": 1e-7,
-            "ksp_atol": 1e-7,
+            "ksp_rtol": ksp_rtol,
+            "ksp_atol": ksp_atol,
             "ksp_max_it": 2000,
             "ksp_monitor": None
         }
@@ -242,8 +246,8 @@ class FuelRod(FiniteElementSetting):
         self.petsc_options_cg = {
             "ksp_type": "cg",
             "pc_type": "jacobi",
-            "ksp_rtol": 1e-7,
-            "ksp_atol": 1e-7,
+            "ksp_rtol": ksp_rtol,
+            "ksp_atol": ksp_atol,
             "ksp_max_it": 2000,
             "ksp_monitor": None
         }
@@ -253,8 +257,8 @@ class FuelRod(FiniteElementSetting):
             "ksp_type": "gmres",
             "pc_type": "hypre",
             "pc_hypre_type": "boomeramg",
-            "ksp_rtol": 1e-7,
-            "ksp_atol": 1e-7,
+            "ksp_rtol": ksp_rtol,
+            "ksp_atol": ksp_atol,
             "ksp_max_it": 2000,
             "pc_type": None,
         }
@@ -263,8 +267,8 @@ class FuelRod(FiniteElementSetting):
         self.petsc_options_ilu = {
             "ksp_type": "gmres",
             "pc_type": "ilu",
-            "ksp_rtol": 1e-7,
-            "ksp_atol": 1e-7,
+            "ksp_rtol": ksp_rtol,
+            "ksp_atol": ksp_atol,
             "ksp_max_it": 2000,
             "ksp_monitor": None
         }
@@ -424,6 +428,58 @@ class FuelRod(FiniteElementSetting):
 
         max_displacement = np.max(np.abs(self.displacement.x.array))
         print(f"\nMax displacement: {max_displacement:.3e} m")
+
+        self.compute_deformed_radii()
+
+    def compute_deformed_radii(self):
+        """
+        Compute and print the deformed fuel outer radius, cladding inner radius, and cladding outer radius
+        after solving the mechanical problem.
+        """
+        # Extract displacement field
+        displacement = self.displacement.x.array.reshape((-1, 3))  # Assuming 3D problem
+        mesh_geometry = self.mesh.geometry.x  # Get the original mesh coordinates
+
+        # Compute original radial positions
+        r_initial = np.sqrt(mesh_geometry[:, 0]**2 + mesh_geometry[:, 1]**2)  # Radial coordinate
+        r_displacement = np.sqrt(displacement[:, 0]**2 + displacement[:, 1]**2)  # Radial displacement
+
+        # Compute deformed radii
+        r_deformed = r_initial + r_displacement
+
+        # Get max/min values for specific regions
+        fuel_outer_radius_deformed = np.max(r_deformed[np.isclose(r_initial, self.fuel_outer_radius, atol=1e-6)])
+        cladding_inner_radius_deformed = np.min(r_deformed[np.isclose(r_initial, self.cladding_inner_radius, atol=1e-6)])
+        cladding_outer_radius_deformed = np.max(r_deformed[np.isclose(r_initial, self.cladding_outer_radius, atol=1e-6)])
+
+        # Print results
+        print("\nDeformed Geometry:")
+        print(f"Fuel Outer Radius (Deformed): {fuel_outer_radius_deformed:.6e} m")
+        print(f"Cladding Inner Radius (Deformed): {cladding_inner_radius_deformed:.6e} m")
+        print(f"Cladding Outer Radius (Deformed): {cladding_outer_radius_deformed:.6e} m")
+
+    def update_mesh(problem):
+        """
+        Update the computational domain based on the computed displacement field.
+        This deforms the mesh and allows solving the problem on the updated geometry.
+        """
+
+        # Extract original mesh coordinates
+        mesh_geometry = problem.mesh.geometry.x
+
+        # Extract displacement field
+        displacement = problem.displacement.x.array.reshape(mesh_geometry.shape)
+
+        # Apply the displacement to update node positions
+        mesh_geometry[:, :] += displacement
+
+        # Update the mesh topology
+        problem.mesh.geometry.x = mesh_geometry
+
+        print("\nMesh successfully updated with deformed geometry.")
+
+        return problem.mesh
+
 
     def get_results(self):
         """
