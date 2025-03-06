@@ -300,20 +300,51 @@ class FuelRod(FiniteElementSetting):
         L_thermal_cladding = self.heat_flux * self.v_t * self.ds_ci
         self.L_thermal = L_thermal_fuel + L_thermal_cladding
 
+        # Variational formulation
+        F_thermal = a_thermal_fuel + a_thermal_cladding - L_thermal_fuel - L_thermal_cladding
+
+        a1 = dolfinx.fem.form(ufl.lhs(F_thermal))
+        L1 = dolfinx.fem.form(ufl.rhs(F_thermal))
+        A1 = dolfinx.fem.petsc.create_matrix(a1)
+        b1 = dolfinx.fem.petsc.create_vector(L1)
+
+        # Solver for thermal problem
+        solver1 = PETSc.KSP().create(self.mesh.comm)
+        solver1.setOperators(A1)
+        solver1.setType(PETSc.KSP.Type.BCGS)
+        pc1 = solver1.getPC()
+        pc1.setType(PETSc.PC.Type.JACOBI)
+
         integral_value = dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.heat_flux * self.ds_ci))
         print(f"Total power from the integrated value of the heat flux on the inner wall: {integral_value:.3f} W")
         print(f"Total power from the analytical value: {self.lhr * self.height:.3f} W")
 
-        self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
-            self.a_thermal,
-            self.L_thermal,
-            bcs=[self.bc_Tco, self.bc_Tfo],
-            petsc_options=self.petsc_options_lu,
-            jit_options=self.jit_options,
-        )
+        self.temperature = dolfinx.fem.Function(self.V_t)
+        bcu = [self.bc_Tco, self.bc_Tfo]
 
-        self.temperature = self.thermal_problem.solve()
+        # Step 1: 
+        A1.zeroEntries()
+        dolfinx.fem.petsc.assemble_matrix(A1, a1, bcs=bcu)
+        A1.assemble()
+        with b1.localForm() as loc:
+            loc.set(0)
+        dolfinx.fem.petsc.assemble_vector(b1, L1)
+        dolfinx.fem.petsc.apply_lifting(b1, [a1], [bcu])
+        b1.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
+        dolfinx.fem.petsc.set_bc(b1, bcu)
+        solver1.solve(b1, self.temperature.x.petsc_vec)
         self.temperature.x.scatter_forward()
+
+        # self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
+        #     self.a_thermal,
+        #     self.L_thermal,
+        #     bcs=[self.bc_Tco, self.bc_Tfo],
+        #     petsc_options=self.petsc_options_lu,
+        #     jit_options=self.jit_options,
+        # )
+
+        # self.temperature = self.thermal_problem.solve()
+        # self.temperature.x.scatter_forward()
 
         temperature_cladding_inner = self.temperature.x.array[self.dofs_cladding_inner]
         print(f"Average temperature on inner cladding: {np.mean(temperature_cladding_inner):.2f} K")
