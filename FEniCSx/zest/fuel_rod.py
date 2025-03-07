@@ -323,16 +323,21 @@ class FuelRod(FiniteElementSetting):
         bcu = [self.bc_Tco, self.bc_Tfo]
 
         # Step 1: 
-        A1.zeroEntries()
-        dolfinx.fem.petsc.assemble_matrix(A1, a1, bcs=bcu)
+        A1.zeroEntries() # initialization
+        dolfinx.fem.petsc.assemble_matrix(A1, a1, bcs=bcu) # assemble the matrix with bcs
         A1.assemble()
-        with b1.localForm() as loc:
+
+        with b1.localForm() as loc: # clear existing values
             loc.set(0)
-        dolfinx.fem.petsc.assemble_vector(b1, L1)
-        dolfinx.fem.petsc.apply_lifting(b1, [a1], [bcu])
-        b1.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        dolfinx.fem.petsc.set_bc(b1, bcu)
+
+        dolfinx.fem.petsc.assemble_vector(b1, L1) # computes rhs vector
+        dolfinx.fem.petsc.apply_lifting(b1, [a1], [bcu]) # apply bcs to the rhs vector
+
+        b1.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE) # ensures correct values across parallel processes.
+        dolfinx.fem.petsc.set_bc(b1, bcu) # Modifies b1 to enforce Dirichlet conditions
+
         solver1.solve(b1, self.temperature.x.petsc_vec)
+
         self.temperature.x.scatter_forward()
 
         # self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
@@ -363,18 +368,43 @@ class FuelRod(FiniteElementSetting):
 
             temperature_gap = np.mean(temperature_cladding_inner) + d_temperature_gap
 
-        self.bc_Tfo = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, np.mean(temperature_cladding_inner) + d_temperature_gap), self.dofs_fuel_outer, self.V_t)
-
-        self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
-            self.a_thermal,
-            self.L_thermal,
-            bcs=[self.bc_Tco, self.bc_Tfo],
-            petsc_options=self.petsc_options_lu,
-            jit_options=self.jit_options,
+        # Step 1: Update the boundary condition
+        self.bc_Tfo = dolfinx.fem.dirichletbc(
+            dolfinx.fem.Constant(self.mesh, np.mean(temperature_cladding_inner) + d_temperature_gap),
+            self.dofs_fuel_outer,
+            self.V_t
         )
 
-        self.temperature = self.thermal_problem.solve()
+        # Step 2: Define the list of updated boundary conditions
+        bcu = [self.bc_Tco, self.bc_Tfo]  # Include all Dirichlet BCs
+
+        # Step 3: Clear matrix A1 and reassemble
+        A1.zeroEntries()  # Reset previous values
+        dolfinx.fem.petsc.assemble_matrix(A1, a1, bcs=bcu)  # Reassemble with new BCs
+        A1.assemble()
+
+        # Step 4: Clear and reassemble vector b1
+        with b1.localForm() as loc:
+            loc.set(0)  # Reset b1
+        dolfinx.fem.petsc.assemble_vector(b1, L1)  # Reassemble RHS vector
+        dolfinx.fem.petsc.apply_lifting(b1, [a1], [bcu])  # Apply boundary conditions
+        b1.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
+        dolfinx.fem.petsc.set_bc(b1, bcu)  # Apply Dirichlet BCs
+
+        # Step 5: Solve the system again
+        solver1.solve(b1, self.temperature.x.petsc_vec)
         self.temperature.x.scatter_forward()
+
+        # self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
+        #     self.a_thermal,
+        #     self.L_thermal,
+        #     bcs=[self.bc_Tco, self.bc_Tfo],
+        #     petsc_options=self.petsc_options_lu,
+        #     jit_options=self.jit_options,
+        # )
+
+        # self.temperature = self.thermal_problem.solve()
+        # self.temperature.x.scatter_forward()
         
         self.temperature.name = "temperature"
 
