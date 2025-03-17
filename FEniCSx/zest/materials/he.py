@@ -1,4 +1,4 @@
 he = {
     "name": "He", # Material name
-    "A": 15.8,  # Coefficient for thermal conductivity
+    "A": 15.8e-4,  # Coefficient for thermal conductivity
 }

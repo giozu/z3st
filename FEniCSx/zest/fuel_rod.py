@@ -17,7 +17,6 @@ class FuelRod(FiniteElementSetting):
         self.fuel_outer_radius = fuel_outer_radius
         self.cladding_inner_radius = cladding_inner_radius
         self.cladding_outer_radius = cladding_outer_radius
-
         self.height = height
         
         self.area_fuel = np.pi * self.fuel_outer_radius**2
@@ -25,10 +24,11 @@ class FuelRod(FiniteElementSetting):
 
         # Integration measures the domain
         dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
+
         self.dx_fuel = dx_subdomain(1)      # Marker ID for fuel region
         self.dx_cladding = dx_subdomain(2)  # Marker ID for cladding region
 
-        # Compute volumes
+        # Compute mesh volumes
         volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx_subdomain))
         volume_fuel = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_fuel))
         volume_cladding = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_cladding))
@@ -48,8 +48,8 @@ class FuelRod(FiniteElementSetting):
         
         analytical_volume = (self.area_fuel + self.area_cladding)*self.height
 
-        print(f"Fuel volume, analytical = {self.area_fuel*self.height*1e9:.3e} mm3")
-        print(f"Cladding volume, analytical = {self.area_cladding*self.height*1e9:.3e} mm3")
+        print(f"Fuel volume, analytical = {self.area_fuel * self.height*1e9:.3e} mm3")
+        print(f"Cladding volume, analytical = {self.area_cladding * self.height*1e9:.3e} mm3")
         print("\n")
         print(f"Relative error (%) = {abs(volume - (analytical_volume)) / analytical_volume * 100:.3e}")
         print("\n")
@@ -226,6 +226,7 @@ class FuelRod(FiniteElementSetting):
         self.thermal_solver()
         self.mechanical_solver()
 
+        self.compute_deformed_radii()
         self.update_mesh()
 
     def solver_options(self):
@@ -333,11 +334,11 @@ class FuelRod(FiniteElementSetting):
         dolfinx.fem.petsc.assemble_vector(b1, L1) # computes rhs vector
         dolfinx.fem.petsc.apply_lifting(b1, [a1], [bcu]) # apply bcs to the rhs vector
 
-        b1.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE) # ensures correct values across parallel processes.
-        dolfinx.fem.petsc.set_bc(b1, bcu) # Modifies b1 to enforce Dirichlet conditions
+        b1.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE) # ensures correct values across parallel processes
+        dolfinx.fem.petsc.set_bc(b1, bcu) # modifies b1 to enforce Dirichlet conditions
 
+        # solve the thermal problem to get the inner temperature of the cladding
         solver1.solve(b1, self.temperature.x.petsc_vec)
-
         self.temperature.x.scatter_forward()
 
         # self.thermal_problem = dolfinx.fem.petsc.LinearProblem(
@@ -356,21 +357,27 @@ class FuelRod(FiniteElementSetting):
 
         # Gap conductance
         temperature_gap = np.mean(temperature_cladding_inner)
-        for i in range(15):
-            k_gas = self.filling_gas['A'] * 1e-4 * temperature_gap**0.79 # W/m-K
-            h_gap = k_gas / self.gap_thickness
+        error = 1.0
+        iteration = 0
+        gap_temperature_jump_0 = 1.0
+        while error > 1e-2:
+            iteration += 1
 
-            thermal_resistance_gap = 1./(2.0 * np.pi * self.fuel_outer_radius * h_gap )
+            k_gas = self.filling_gas['A'] * temperature_gap**0.79 # thermal conductivity of the gas, W/m-K
+            h_gap = k_gas / self.gap_thickness # gap conductance, W/m2-K
+            thermal_resistance_gap = 1./(2.0 * np.pi * self.fuel_outer_radius * h_gap)
 
-            d_temperature_gap = self.lhr * thermal_resistance_gap
+            gap_temperature_jump_1 = self.lhr * thermal_resistance_gap
+            error = np.abs(gap_temperature_jump_1 - gap_temperature_jump_0) / gap_temperature_jump_0
 
-            print(f"Analytical thermal jump - gap: {self.lhr * thermal_resistance_gap:.2f} K")
+            print(f"Thermal jump - gap: {gap_temperature_jump_1:.2f} K, iteration {iteration}, relative error = {error:.2e}")
 
-            temperature_gap = np.mean(temperature_cladding_inner) + d_temperature_gap
+            gap_temperature_jump_0 = gap_temperature_jump_1
+            temperature_gap = np.mean(temperature_cladding_inner) + gap_temperature_jump_1
 
         # Step 1: Update the boundary condition
         self.bc_Tfo = dolfinx.fem.dirichletbc(
-            dolfinx.fem.Constant(self.mesh, np.mean(temperature_cladding_inner) + d_temperature_gap),
+            dolfinx.fem.Constant(self.mesh, np.mean(temperature_cladding_inner) + gap_temperature_jump_1),
             self.dofs_fuel_outer,
             self.V_t
         )
@@ -427,10 +434,6 @@ class FuelRod(FiniteElementSetting):
         print("Mechanical solver")
         print("-----------------")
 
-        dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
-        dx_fuel = dx_subdomain(1)
-        dx_cladding = dx_subdomain(2)
-
         def epsilon(u):
             """
             Strain-displacement compatibility relation.
@@ -444,13 +447,13 @@ class FuelRod(FiniteElementSetting):
             return lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
 
         # Mechanical stiffness (bilinear form) split into fuel and cladding contributions.
-        a_mech_fuel = ufl.inner(sigma(self.u_m, self.fuel["lmbda"], self.fuel["mu"]), epsilon(self.v_m)) * dx_fuel
-        a_mech_cladding = ufl.inner(sigma(self.u_m, self.cladding["lmbda"], self.cladding["mu"]), epsilon(self.v_m)) * dx_cladding
+        a_mech_fuel = ufl.inner(sigma(self.u_m, self.fuel["lmbda"], self.fuel["mu"]), epsilon(self.v_m)) * self.dx_fuel
+        a_mech_cladding = ufl.inner(sigma(self.u_m, self.cladding["lmbda"], self.cladding["mu"]), epsilon(self.v_m)) * self.dx_cladding
         self.a_mech = a_mech_fuel + a_mech_cladding
 
         # Body force contributions: different densities for fuel and cladding.
-        L_body_forces_fuel = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -self.fuel["rho"] * self.g)), self.v_m) * dx_fuel
-        L_body_forces_cladding = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -self.cladding["rho"] * self.g)), self.v_m) * dx_cladding
+        L_body_forces_fuel = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -self.fuel["rho"] * self.g)), self.v_m) * self.dx_fuel
+        L_body_forces_cladding = ufl.dot(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -self.cladding["rho"] * self.g)), self.v_m) * self.dx_cladding
         self.L_body_forces = L_body_forces_fuel + L_body_forces_cladding
 
         # Traction forces remain defined on the boundary (using ds measures already set up).
@@ -460,8 +463,8 @@ class FuelRod(FiniteElementSetting):
 
         # Thermal expansion contributions: split the term for fuel and cladding.
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-        L_thermal_exp_fuel = (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.div(self.v_m) * dx_fuel
-        L_thermal_exp_cladding = (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.div(self.v_m) * dx_cladding
+        L_thermal_exp_fuel = (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx_fuel
+        L_thermal_exp_cladding = (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.temperature - T_ref) * ufl.div(self.v_m) * self.dx_cladding
         self.L_thermal_exp = L_thermal_exp_fuel + L_thermal_exp_cladding
 
         # Total mechanical load is the sum of the body forces, thermal expansion, and traction forces.
@@ -469,18 +472,52 @@ class FuelRod(FiniteElementSetting):
 
         self.assemble_and_print_matrix(a = self.a_mech, L = self.L_mech, filename = 'mech_stiffness_matrix.txt')
 
-        # Linear problem definition
-        self.mech_problem = dolfinx.fem.petsc.LinearProblem(
-            self.a_mech,
-            self.L_mech,
-            bcs = self.bc_mech,
-            petsc_options = self.petsc_options_ilu,
-            jit_options = self.jit_options,
-        )
+        # Mechanical solver - low-level PETSc setup
+        a2 = dolfinx.fem.form(self.a_mech)
+        L2 = dolfinx.fem.form(self.L_mech)
 
-        self.displacement = self.mech_problem.solve()
+        A2 = dolfinx.fem.petsc.create_matrix(a2)
+        b2 = dolfinx.fem.petsc.create_vector(L2)
+
+        solver2 = PETSc.KSP().create(self.mesh.comm)
+        solver2.setOperators(A2)
+        solver2.setType(PETSc.KSP.Type.GMRES)  # or "cg" or "preonly"
+        pc2 = solver2.getPC()
+        pc2.setType(PETSc.PC.Type.ILU)  # or LU, HYPRE, etc.
+
+        # Create solution function
+        self.displacement = dolfinx.fem.Function(self.V_m)
+
+        # Apply BCs and assemble
+        A2.zeroEntries()
+        dolfinx.fem.petsc.assemble_matrix(A2, a2, bcs=self.bc_mech)
+        A2.assemble()
+
+        with b2.localForm() as loc:
+            loc.set(0)
+
+        dolfinx.fem.petsc.assemble_vector(b2, L2)
+        dolfinx.fem.petsc.apply_lifting(b2, [a2], [self.bc_mech])
+        b2.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
+        dolfinx.fem.petsc.set_bc(b2, self.bc_mech)
+
+        # Solve
+        solver2.solve(b2, self.displacement.x.petsc_vec)
+        self.displacement.x.scatter_forward()
+
+        # # Linear problem definition
+        # self.mech_problem = dolfinx.fem.petsc.LinearProblem(
+        #     self.a_mech,
+        #     self.L_mech,
+        #     bcs = self.bc_mech,
+        #     petsc_options = self.petsc_options_ilu,
+        #     jit_options = self.jit_options,
+        # )
+        # self.displacement = self.mech_problem.solve()
+
         self.displacement.name = "displacement"
         self.displacement.x.scatter_forward()
+
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
 
         self.stress_fuel = sigma(self.displacement, self.fuel["lmbda"], self.fuel["mu"]) - (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.temperature - T_ref) * ufl.Identity(len(self.displacement))
@@ -492,15 +529,13 @@ class FuelRod(FiniteElementSetting):
         max_displacement = np.max(np.abs(self.displacement.x.array))
         print(f"\nMax displacement: {max_displacement:.3e} m")
 
-        self.compute_deformed_radii()
-
     def compute_deformed_radii(self):
         """
         Compute and print the deformed fuel outer radius, cladding inner radius, and cladding outer radius
         after solving the mechanical problem.
         """
         # Extract displacement field
-        displacement = self.displacement.x.array.reshape((-1, 3))  # Assuming 3D problem
+        displacement = self.displacement.x.array.reshape((-1, 3))  # 3D problem
         mesh_geometry = self.mesh.geometry.x  # Get the original mesh coordinates
 
         # Compute original radial positions
