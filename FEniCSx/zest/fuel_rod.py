@@ -7,6 +7,7 @@ from petsc4py import PETSc
 import numpy as np
 
 from finiteElementSettings import FiniteElementSetting
+from geometryManager import GeometryManager
 
 class FuelRod(FiniteElementSetting):
     def volume(self, fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height):
@@ -53,6 +54,23 @@ class FuelRod(FiniteElementSetting):
         print("\n")
         print(f"Relative error (%) = {abs(volume - (analytical_volume)) / analytical_volume * 100:.3e}")
         print("\n")
+
+    def initialize_geometry(self):
+        self.geometry_manager = GeometryManager(self.mesh, self.fuel_outer_radius, self.cladding_inner_radius, self.cladding_outer_radius)
+        self.geometry_manager.initialize_geometry()
+
+    def update_geometry(self):
+        """
+        Apply displacement, update mesh geometry, and update dimensions.
+        Call this AFTER assemble_and_solve().
+        """
+        self.geometry_manager.apply_displacement(self.displacement)
+        self.geometry_manager.update_deformed_dimensions()
+        self.geometry_manager.radial_displacement_summary(self.displacement)
+
+        self.fuel_outer_radius = self.geometry_manager.fuel_outer_radius
+        self.cladding_inner_radius = self.geometry_manager.cladding_inner_radius
+        self.cladding_outer_radius = self.geometry_manager.cladding_outer_radius
 
     def parameters(self, fuel, cladding, filling_gas, g, lhr, T_ref):
         """
@@ -225,9 +243,6 @@ class FuelRod(FiniteElementSetting):
        
         self.thermal_solver()
         self.mechanical_solver()
-
-        self.compute_deformed_radii()
-        self.update_mesh()
 
     def solver_options(self):
 
@@ -529,6 +544,11 @@ class FuelRod(FiniteElementSetting):
         max_displacement = np.max(np.abs(self.displacement.x.array))
         print(f"\nMax displacement: {max_displacement:.3e} m")
 
+        u = self.displacement.x.array.reshape(self.mesh.geometry.x.shape)
+        disp_r = np.sqrt(u[:, 0]**2 + u[:, 1]**2)
+        print(f"Max radial displacement: {np.max(disp_r):.3e} m")
+        print(f"Average radial displacement at fuel outer: {np.mean(disp_r[self.geometry_manager.idx_fuel_outer]):.3e} m")
+
     def compute_deformed_radii(self):
         """
         Compute and print the deformed fuel outer radius, cladding inner radius, and cladding outer radius
@@ -564,12 +584,34 @@ class FuelRod(FiniteElementSetting):
         mesh_deformed = self.mesh
         mesh_deformed.geometry.x[:,:mesh_deformed.geometry.dim] += self.displacement.x.array.reshape((-1, mesh_deformed.geometry.dim))
 
+        self.mesh = mesh_deformed
+
         # Write deformed mesh file to XDMF file
         # with dolfinx.io.XDMFFile(mesh_deformed.comm, "deformed_mesh.xdmf", "w") as file:
         #     file.write_mesh(mesh_deformed)
         # print(f"Deformed mesh written to deformed_mesh.xdmf")
 
         print("\nMesh successfully updated with deformed geometry.")
+
+    def update_deformed_fuel_outer_radius(self, atol=1e-6):
+        """
+        Update self.fuel_outer_radius based on the deformed geometry.
+        This uses the updated mesh geometry (after applying displacement).
+        """
+        # Extract radial coordinate from deformed mesh
+        mesh_geometry = self.mesh.geometry.x
+        r = np.sqrt(mesh_geometry[:, 0]**2 + mesh_geometry[:, 1]**2)
+
+        # Find nodes that originally matched the fuel outer radius
+        mask = np.isclose(r, self.fuel_outer_radius, atol=atol)
+
+        if np.any(mask):
+            new_radius = np.max(r[mask])
+            self.fuel_outer_radius = new_radius
+            print(f"✅ Updated fuel_outer_radius = {new_radius:.6e} m")
+        else:
+            print("⚠️ No nodes found close to original fuel outer radius. Radius not updated.")
+
 
     def get_results(self):
         """

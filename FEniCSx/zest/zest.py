@@ -77,7 +77,9 @@ problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pre
 # -------------------
 # Assembly and solve
 # -------------------
+problem.initialize_geometry()
 problem.assemble_and_solve()
+problem.update_geometry()
 
 end_time = time.time()
 elapsed_time = end_time - start_time
