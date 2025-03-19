@@ -62,7 +62,6 @@ class FuelRod(FiniteElementSetting):
     def update_geometry(self):
         """
         Apply displacement, update mesh geometry, and update dimensions.
-        Call this AFTER assemble_and_solve().
         """
         self.geometry_manager.apply_displacement(self.displacement)
         self.geometry_manager.update_deformed_dimensions()
@@ -575,23 +574,6 @@ class FuelRod(FiniteElementSetting):
         print(f"Fuel Outer Radius (Deformed): {fuel_outer_radius_deformed:.6e} m")
         print(f"Cladding Inner Radius (Deformed): {cladding_inner_radius_deformed:.6e} m")
         print(f"Cladding Outer Radius (Deformed): {cladding_outer_radius_deformed:.6e} m")
-
-    def update_mesh(self):
-        """
-        Update the computational domain based on the computed displacement field.
-        This deforms the mesh and allows solving the problem on the updated geometry.
-        """
-        mesh_deformed = self.mesh
-        mesh_deformed.geometry.x[:,:mesh_deformed.geometry.dim] += self.displacement.x.array.reshape((-1, mesh_deformed.geometry.dim))
-
-        self.mesh = mesh_deformed
-
-        # Write deformed mesh file to XDMF file
-        # with dolfinx.io.XDMFFile(mesh_deformed.comm, "deformed_mesh.xdmf", "w") as file:
-        #     file.write_mesh(mesh_deformed)
-        # print(f"Deformed mesh written to deformed_mesh.xdmf")
-
-        print("\nMesh successfully updated with deformed geometry.")
 
     def update_deformed_fuel_outer_radius(self, atol=1e-6):
         """

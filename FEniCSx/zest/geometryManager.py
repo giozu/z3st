@@ -23,8 +23,7 @@ class GeometryManager:
         self.idx_clad_inner = np.where(np.isclose(r, self.cladding_inner_radius, atol=atol))[0]
         self.idx_clad_outer = np.where(np.isclose(r, self.cladding_outer_radius, atol=atol))[0]
 
-        print(f"Original indices stored: fuel_outer={len(self.idx_fuel_outer)}, \
-              clad_inner={len(self.idx_clad_inner)}, clad_outer={len(self.idx_clad_outer)}")
+        print(f"Original indices stored: fuel_outer={len(self.idx_fuel_outer)}, clad_inner={len(self.idx_clad_inner)}, clad_outer={len(self.idx_clad_outer)}")
 
     def apply_displacement(self, displacement):
         """
@@ -32,12 +31,19 @@ class GeometryManager:
         """
         u = displacement.x.array.reshape(self.mesh.geometry.x.shape)
         self.mesh.geometry.x[:] += u
+        print("apply_displacement: Mesh successfully updated with deformed geometry.")
+
+        import dolfinx.io
+        with dolfinx.io.XDMFFile(self.mesh.comm, "deformed_mesh.xdmf", "w") as file:
+            file.write_mesh(self.mesh)
+        print(f"Deformed mesh written to deformed_mesh.xdmf")
 
     def update_deformed_dimensions(self):
         """
         Recalculate and update fuel/cladding radii from deformed geometry.
-        """
+        """     
         mesh_geometry = self.mesh.geometry.x
+
         r_new = np.sqrt(mesh_geometry[:, 0]**2 + mesh_geometry[:, 1]**2)
 
         self.fuel_outer_radius = np.max(r_new[self.idx_fuel_outer])
