@@ -143,7 +143,6 @@ class FuelRod(FiniteElementSetting):
         print("-------------------")
         print(f"Cladding inner radius: {self.cladding_inner_radius:.3e} m")
         print(f"Cladding outer radius: {self.cladding_outer_radius:.3e} m")
-        print(f"Gap thickness: {(self.cladding_inner_radius - self.fuel_outer_radius)*1e6:.3f} micron")
         print(f"Cladding thickness: {(self.cladding_outer_radius - self.cladding_inner_radius)*1e6:.3f} micron")
         print(f"Cladding density: {self.cladding['rho']:.2f} kg/m³")
         print(f"Cladding Elastic modulus: {self.cladding['E']/1e9:.2f} GPa")
@@ -155,7 +154,8 @@ class FuelRod(FiniteElementSetting):
         print(f"Cladding specific heat capacity: {self.cladding['cp']:.2f} J/kgK")
         print("-----------------")
 
-        # Print cladding parameters
+        # Print other parameters
+        print(f"Gap thickness: {(self.cladding_inner_radius - self.fuel_outer_radius)*1e6:.3f} micron")
         print(f"Filling gas: {filling_gas['name']}")
         self.filling_gas = filling_gas
         print("-----------------")
