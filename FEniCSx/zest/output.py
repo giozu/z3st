@@ -308,3 +308,28 @@ def plot_temperature_at_z(problem, z_target=0.005, tol=0.0001):
     plt.grid()
     plt.title(f"Temperature Distribution at z={z_target:.4f}m")
     plt.show()
+
+def export_fields(problem, step, t=None, lhr=None, output_dir="output"):
+    """
+    Export temperature and displacement at a single time step.
+    """
+    import os
+    from dolfinx.io import XDMFFile
+
+    folder = os.path.join(output_dir, f"step_{step:03d}")
+    os.makedirs(folder, exist_ok=True)
+
+    temp_file = os.path.join(output_dir, "temperature.xdmf")
+    disp_file = os.path.join(output_dir, "displacement.xdmf")
+
+    with XDMFFile(problem.mesh.comm, temp_file, "w") as xdmf_temp:
+        xdmf_temp.write_mesh(problem.mesh)
+        problem.temperature.name = "temperature"
+        xdmf_temp.write_function(problem.temperature)
+
+    with XDMFFile(problem.mesh.comm, disp_file, "w") as xdmf_disp:
+        xdmf_disp.write_mesh(problem.mesh)
+        problem.displacement.name = "displacement"
+        xdmf_disp.write_function(problem.displacement)
+
+    print(f"📝 Results saved for step {step} (t = {t}, LHR = {lhr})")

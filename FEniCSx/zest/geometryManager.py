@@ -23,7 +23,7 @@ class GeometryManager:
         self.idx_clad_inner = np.where(np.isclose(r, self.cladding_inner_radius, atol=atol))[0]
         self.idx_clad_outer = np.where(np.isclose(r, self.cladding_outer_radius, atol=atol))[0]
 
-        print(f"Original indices stored: fuel_outer={len(self.idx_fuel_outer)}, clad_inner={len(self.idx_clad_inner)}, clad_outer={len(self.idx_clad_outer)}")
+        # print(f"Original indices stored: fuel_outer={len(self.idx_fuel_outer)}, clad_inner={len(self.idx_clad_inner)}, clad_outer={len(self.idx_clad_outer)}")
 
     def apply_displacement(self, displacement):
         """
