@@ -76,33 +76,26 @@ problem.parameters(fuel, cladding, he,
 
 problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
-problem.solver_options()
-
 problem.initialize_geometry()
 
-# Imposta estremi della storia di potenza
-t_start = 0.0
-t_end = 365 * 24 * 3600  # 60 giorni
-lhr_start = 0       # W/m
-lhr_end = 20000
-n_steps = 20
+t_points = [0, 3600, 10*86400, 60*86400, 70*86400, 100*86400]         # secondi
+lhr_points = [0, 0, 18000, 18000, 20000, 20000]                # W/m
 
-times = np.linspace(t_start, t_end, n_steps)
-lhrs = np.linspace(lhr_start, lhr_end, n_steps)
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=20, filename="power_history.csv")
+# times, lhrs = read_power_history("power_history.csv")
 
 os.makedirs("output", exist_ok=True)
 
 temp_path = os.path.join("output", "temperature.xdmf")
-disp_path = os.path.join("output", "displacement.xdmf")
-
 xtemp = dolfinx.io.XDMFFile(problem.mesh.comm, temp_path, "w")
 xtemp.write_mesh(problem.mesh)
 
+disp_path = os.path.join("output", "displacement.xdmf")
 xdisp = dolfinx.io.XDMFFile(problem.mesh.comm, disp_path, "w")
 xdisp.write_mesh(problem.mesh)
 
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
-    print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.1f} days | LHR = {lhr/1000:.1f} kW/m")
+    print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m")
 
     problem.lhr = lhr
 

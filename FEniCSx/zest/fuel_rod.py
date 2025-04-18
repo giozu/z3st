@@ -35,14 +35,12 @@ class FuelRod(FiniteElementSetting):
         volume_cladding = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_cladding))
 
         # Print results
-        print("\n")
         print("-----------")
         print("Mesh volume")
         print("-----------")
         print(f"Fuel volume, from mesh = {volume_fuel*1e9:.3e} mm3")
         print(f"Cladding volume, from mesh = {volume_cladding*1e9:.3e} mm3")
 
-        print("\n")
         print("-----------------")
         print("Analytical volume")
         print("-----------------")
@@ -212,6 +210,12 @@ class FuelRod(FiniteElementSetting):
         self.cladding_top_label = 6
         self.fuel_top_label = 7
 
+        self.dx = ufl.Measure("dx", domain=self.mesh, metadata={"quadrature_degree": 4})
+        self.ds = ufl.Measure("ds", domain=self.mesh, metadata={"quadrature_degree": 4}, subdomain_data=self.ft)
+        self.ds_ci = self.ds(self.cladding_inner_label)
+        self.ds_co = self.ds(self.cladding_outer_label)
+        self.ds_fo = self.ds(self.fuel_outer_label)
+
         # ----
         # Dofs
         # ----
@@ -265,18 +269,15 @@ class FuelRod(FiniteElementSetting):
         for it in range(1, max_iter + 1):
             print(f"\n🔁 Thermo-mechanical iteration {it}")
 
-            # Step 1: Thermal solve
             self.thermal_solver()
-
-            # Step 2: Mechanical solve
             self.mechanical_solver()
 
-            # Step 3: Compute radial displacement
+            # Compute radial displacement
             u = self.displacement.x.array.reshape(self.mesh.geometry.x.shape)
             disp_r = np.sqrt(u[:, 0]**2 + u[:, 1]**2)
             u_r_max = np.max(disp_r)
 
-            # Step 4: Convergence check
+            # Convergence check
             if u_r_max_prev is not None:
 
                 den = max(abs(u_r_max_prev), 1e-12)
@@ -291,11 +292,11 @@ class FuelRod(FiniteElementSetting):
             else:
                 print(f"   Initial u_r_max = {u_r_max:.3e} m")
 
-            # Step 5: Logging
-            r_geo = np.linalg.norm(self.mesh.geometry.x[:, :2], axis=1)
-            T_center = self.temperature.x.array[np.argmin(r_geo)]
-            print(f"   → Max u_r = {u_r_max:.3e} m")
-            print(f"   → T_center = {T_center:.1f} K")
+            # Logging
+            # r_geo = np.linalg.norm(self.mesh.geometry.x[:, :2], axis=1)
+            # T_center = self.temperature.x.array[np.argmin(r_geo)]
+            # print(f"   → Max u_r = {u_r_max:.3e} m")
+            # print(f"   → T_center = {T_center:.1f} K")
 
             u_r_max_prev = u_r_max
         
@@ -306,16 +307,7 @@ class FuelRod(FiniteElementSetting):
         if not converged:
             print("⚠️ Warning: convergence not reached in max_iter.")
 
-    def solver_options(self):
-
-        # 🔧 Inizializzazione delle misure d'integrazione (necessarie per thermal e mechanical solver)
-        metadata = {"quadrature_degree": 4}
-        self.dx = ufl.Measure("dx", domain=self.mesh, metadata=metadata)
-        self.ds = ufl.Measure("ds", domain=self.mesh, metadata=metadata, subdomain_data=self.ft)
-        self.ds_ci = self.ds(self.cladding_inner_label)
-        self.ds_co = self.ds(self.cladding_outer_label)
-        self.ds_fo = self.ds(self.fuel_outer_label)
-
+    # def solver_options(self):
         # ksp_rtol = 1e-6
         # ksp_atol = 1e-6
 
@@ -378,7 +370,6 @@ class FuelRod(FiniteElementSetting):
         # characteristic_time = self.cladding["rho"] * self.cladding["cp"] / self.cladding["k"] * self.area_cladding
         # print(f"Characteristic time (cladding): {characteristic_time:.3e} s")
 
-        # Controllo fisico sul gap
         if self.gap_thickness < 0:
             raise RuntimeError(f"❌ Gap thickness < 0: {self.gap_thickness*1e6:.2e} micron")
 
@@ -425,7 +416,6 @@ class FuelRod(FiniteElementSetting):
         dolfinx.fem.petsc.apply_lifting(b1, [a1], [bcu]) # apply bcs to the rhs vector
         b1.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE) # ensures correct values across parallel processes
         dolfinx.fem.petsc.set_bc(b1, bcu) # modifies b1 to enforce Dirichlet conditions
-        # solve the thermal problem to get the inner temperature of the cladding
         solver1.solve(b1, self.temperature.x.petsc_vec)
         its = solver1.getIterationNumber()
         reason = solver1.getConvergedReason()
@@ -456,7 +446,7 @@ class FuelRod(FiniteElementSetting):
             error = 1.0
             iteration = 0
             gap_temperature_jump_0 = 1.0
-            while error > 1e-2 and iteration < 20:
+            while error > 1e-3 and iteration < 20:
                 iteration += 1
                 k_gas = self.filling_gas['A'] * temperature_gap**0.79 # thermal conductivity of the gas, W/m-K
                 h_gap = k_gas / self.gap_thickness # gap conductance, W/m2-K
@@ -572,7 +562,7 @@ class FuelRod(FiniteElementSetting):
         # solver2.getPC().setType(PETSc.PC.Type.ILU)        # Incomplete LU
         solver2.getPC().setType(PETSc.PC.Type.HYPRE)      # Algebraic multigrid
         # PETSc.Options().setValue("pc_hypre_type", "boomeramg")
-        solver2.setTolerances(rtol=1e-4, atol=1e-4, max_it=1000)
+        solver2.setTolerances(rtol=1e-5, atol=1e-5, max_it=1000)
         solver2.setMonitor(lambda ksp, its, rnorm: print(f"[KSP] Iteration {its}, residual = {rnorm:.3e}"))
 
         # Create solution function
@@ -591,7 +581,6 @@ class FuelRod(FiniteElementSetting):
         b2.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
         dolfinx.fem.petsc.set_bc(b2, self.bc_mech)
 
-        # Solve
         solver2.solve(b2, self.displacement.x.petsc_vec)
         its = solver2.getIterationNumber()
         reason = solver2.getConvergedReason()
