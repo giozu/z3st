@@ -64,6 +64,7 @@ start_time = time.time()
 
 from fuel_rod import FuelRod
 from geometry.fuel_rod import geometry
+from postprocessing import save_temperature_history
 
 problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 
@@ -94,6 +95,12 @@ disp_path = os.path.join("output", "displacement.xdmf")
 xdisp = dolfinx.io.XDMFFile(problem.mesh.comm, disp_path, "w")
 xdisp.write_mesh(problem.mesh)
 
+T_fuel_inner = []
+T_fuel_outer = []
+T_clad_inner = []
+T_clad_outer = []
+time_values = []
+
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
     print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m")
 
@@ -101,11 +108,19 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
 
     problem.solve()
 
+    T_fuel_inner.append(np.max(problem.temperature.x.array))
+    T_fuel_outer.append(np.mean(problem.temperature.x.array[problem.dofs_fuel_outer]))
+    T_clad_inner.append(np.mean(problem.temperature.x.array[problem.dofs_cladding_inner]))
+    T_clad_outer.append(np.mean(problem.temperature.x.array[problem.dofs_cladding_outer]))
+    time_values.append(t)
+
     xtemp.write_function(problem.temperature, t)
     xdisp.write_function(problem.displacement, t)
 
 end_time = time.time()
 elapsed_time = end_time - start_time
+
+save_temperature_history(time_values, T_fuel_inner, T_fuel_outer, T_clad_inner, T_clad_outer)
 
 print(f"-----------------------")
 print(f"Elapsed time: {elapsed_time:.4f} s")
