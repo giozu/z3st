@@ -10,7 +10,7 @@ from finiteElementSettings import FiniteElementSetting
 from geometryManager import GeometryManager
 
 class FuelRod(FiniteElementSetting):
-    def volume(self, fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height):
+    def volume(self, fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height, log_path="output/simulation_log.txt"):
         """
         Compute the volume of the domain.
         """
@@ -33,25 +33,18 @@ class FuelRod(FiniteElementSetting):
         volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx_subdomain))
         volume_fuel = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_fuel))
         volume_cladding = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_cladding))
-
-        # Print results
-        print("-----------")
-        print("Mesh volume")
-        print("-----------")
-        print(f"Fuel volume, from mesh = {volume_fuel*1e9:.3e} mm3")
-        print(f"Cladding volume, from mesh = {volume_cladding*1e9:.3e} mm3")
-
-        print("-----------------")
-        print("Analytical volume")
-        print("-----------------")
         
         analytical_volume = (self.area_fuel + self.area_cladding)*self.height
+        rel_error = abs(volume - analytical_volume) / analytical_volume * 100
 
-        print(f"Fuel volume, analytical = {self.area_fuel * self.height*1e9:.3e} mm3")
-        print(f"Cladding volume, analytical = {self.area_cladding * self.height*1e9:.3e} mm3")
-        print("\n")
-        print(f"Relative error (%) = {abs(volume - (analytical_volume)) / analytical_volume * 100:.3e}")
-        print("\n")
+        with open(log_path, "a") as f:
+            f.write("📦 Mesh Volumes\n")
+            f.write("──────────────────────────────────────────────\n")
+            f.write(f"{'Fuel volume (from mesh)':<32}: {volume_fuel*1e9:.3e} mm³\n")
+            f.write(f"{'Cladding volume (from mesh)':<32}: {volume_cladding*1e9:.3e} mm³\n")
+            f.write(f"{'Fuel volume (analytical)':<32}: {self.area_fuel * self.height * 1e9:.3e} mm³\n")
+            f.write(f"{'Cladding volume (analytical)':<32}: {self.area_cladding * self.height * 1e9:.3e} mm³\n")
+            f.write(f"{'Relative error':<32}: {rel_error:.3e} %\n\n")
 
     def initialize_geometry(self):
         self.geometry_manager = GeometryManager(self.mesh, self.fuel_outer_radius, self.cladding_inner_radius, self.cladding_outer_radius)
@@ -91,8 +84,7 @@ class FuelRod(FiniteElementSetting):
         print(f"[update_state] q''' = {self.q_third:.2f} W/m³")
         print(f"[update_state] heat_flux = {self.heat_flux:.2f} W/m²")
 
-
-    def parameters(self, fuel, cladding, filling_gas, g, lhr, T_ref):
+    def parameters(self, fuel, cladding, filling_gas, g, lhr, T_ref, log_path="output/simulation_log.txt"):
         """
         Set material and physical parameters for both the fuel and the cladding.
 
@@ -143,64 +135,53 @@ class FuelRod(FiniteElementSetting):
 
         # Compute the (radial) gap thickness
         self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
-
-        # Print fuel parameters
-        print("---------------")
-        print("Fuel parameters")
-        print("---------------")
-        print(f"Fuel inner radius: {self.fuel_outer_radius:.3e} m")
-        print(f"Fuel density: {self.fuel['rho']:.2f} kg/m³")
-        print(f"Fuel Elastic modulus: {self.fuel['E']/1e9:.2f} GPa")
-        print(f"Fuel Poisson's ratio: {self.fuel['nu']:.2f}")
-        print(f"Fuel Bulk modulus: {self.fuel['bulk_modulus']/1e9:.2f} GPa")
-        print(f"Fuel Lamé parameters: {self.fuel['lmbda']/1e9:.2f} GPa, {self.fuel['mu']/1e9:.2f} GPa")
-        print(f"Fuel Thermal conductivity: {self.fuel['k']:.2f} W/mK")
-        print(f"Fuel Thermal expansion coefficient: {self.fuel['alpha']:.2e} 1/K")
-        print(f"Fuel specific heat capacity: {self.fuel['cp']:.2f} J/kgK")
-        print("-------------------")
-        
-        # Print cladding parameters
-        print("Cladding parameters")
-        print("-------------------")
-        print(f"Cladding inner radius: {self.cladding_inner_radius:.3e} m")
-        print(f"Cladding outer radius: {self.cladding_outer_radius:.3e} m")
-        print(f"Cladding thickness: {(self.cladding_outer_radius - self.cladding_inner_radius)*1e6:.3f} micron")
-        print(f"Cladding density: {self.cladding['rho']:.2f} kg/m³")
-        print(f"Cladding Elastic modulus: {self.cladding['E']/1e9:.2f} GPa")
-        print(f"Cladding Poisson's ratio: {self.cladding['nu']:.2f}")
-        print(f"Cladding Bulk modulus: {self.cladding['bulk_modulus']/1e9:.2f} GPa")
-        print(f"Cladding Lamé parameters: {self.cladding['lmbda']/1e9:.2f} GPa, {self.cladding['mu']/1e9:.2f} GPa")
-        print(f"Cladding Thermal conductivity: {self.cladding['k']:.2f} W/mK")
-        print(f"Cladding Thermal expansion coefficient: {self.cladding['alpha']:.2e} 1/K")
-        print(f"Cladding specific heat capacity: {self.cladding['cp']:.2f} J/kgK")
-        print("-----------------")
-
-        # Print other parameters
-        print(f"Gap thickness: {(self.cladding_inner_radius - self.fuel_outer_radius)*1e6:.3f} micron")
-        print(f"Filling gas: {filling_gas['name']}")
         self.filling_gas = filling_gas
-        print("-----------------")
-        
-        # Print global parameters
-        print("Global parameters")
-        print("-----------------")
-        print(f"Gravitational acceleration: {g:.2f} m/s²")
-        print(f"Linear heat rate: {lhr/1000:.2f} kW/m")
-        print(f"Reference temperature: {T_ref:.2f} K")
-        print("\n")
 
-    def boundary_conditions(self, gap_pressure, coolant_pressure, temperature):
+        with open(log_path, "a") as f:
+            f.write("🔥 Fuel Parameters\n")
+            f.write("──────────────────────────────────────────────\n")
+            f.write(f"{'Inner radius':<32}: {self.fuel_outer_radius:.3e} m\n")
+            f.write(f"{'Density':<32}: {self.fuel['rho']:.2f} kg/m³\n")
+            f.write(f"{'Elastic modulus':<32}: {self.fuel['E']/1e9:.2f} GPa\n")
+            f.write(f"{'Poisson\'s ratio':<32}: {self.fuel['nu']:.2f}\n")
+            f.write(f"{'Bulk modulus':<32}: {self.fuel['bulk_modulus']/1e9:.2f} GPa\n")
+            f.write(f"{'Lamé λ, μ':<32}: {self.fuel['lmbda']/1e9:.2f} GPa, {self.fuel['mu']/1e9:.2f} GPa\n")
+            f.write(f"{'Thermal conductivity':<32}: {self.fuel['k']:.2f} W/mK\n")
+            f.write(f"{'Thermal expansion coefficient':<32}: {self.fuel['alpha']:.2e} 1/K\n")
+            f.write(f"{'Specific heat capacity':<32}: {self.fuel['cp']:.2f} J/kgK\n\n")
+
+            f.write("🧊 Cladding Parameters\n")
+            f.write("──────────────────────────────────────────────\n")
+            f.write(f"{'Inner radius':<32}: {self.cladding_inner_radius:.3e} m\n")
+            f.write(f"{'Outer radius':<32}: {self.cladding_outer_radius:.3e} m\n")
+            f.write(f"{'Thickness':<32}: {(self.cladding_outer_radius - self.cladding_inner_radius)*1e6:.3f} micron\n")
+            f.write(f"{'Density':<32}: {self.cladding['rho']:.2f} kg/m³\n")
+            f.write(f"{'Elastic modulus':<32}: {self.cladding['E']/1e9:.2f} GPa\n")
+            f.write(f"{'Poisson\'s ratio':<32}: {self.cladding['nu']:.2f}\n")
+            f.write(f"{'Bulk modulus':<32}: {self.cladding['bulk_modulus']/1e9:.2f} GPa\n")
+            f.write(f"{'Lamé λ, μ':<32}: {self.cladding['lmbda']/1e9:.2f} GPa, {self.cladding['mu']/1e9:.2f} GPa\n")
+            f.write(f"{'Thermal conductivity':<32}: {self.cladding['k']:.2f} W/mK\n")
+            f.write(f"{'Thermal expansion coefficient':<32}: {self.cladding['alpha']:.2e} 1/K\n")
+            f.write(f"{'Specific heat capacity':<32}: {self.cladding['cp']:.2f} J/kgK\n\n")
+
+            f.write("🧪 Gas and Global Conditions\n")
+            f.write("──────────────────────────────────────────────\n")
+            f.write(f"{'Gap thickness':<32}: {self.gap_thickness*1e6:.3f} micron\n")
+            f.write(f"{'Filling gas':<32}: {self.filling_gas['name']}\n")
+            f.write(f"{'Gravitational acceleration':<32}: {self.g:.2f} m/s²\n")
+            f.write(f"{'Reference temperature':<32}: {self.T_ref:.2f} K\n\n")
+
+    def boundary_conditions(self, gap_pressure, coolant_pressure, temperature, log_path="output/simulation_log.txt"):
         """
         Define and set the boundary conditions.
         """
 
-        print("-------------------")
-        print("Boundary conditions")
-        print("-------------------")
-        print(f"Gap pressure = {gap_pressure*1e-6:.2f} MPa")
-        print(f"Coolant pressure = {coolant_pressure*1e-6:.2f} MPa")
-        print(f"Temperature = {temperature:.2f} K")
-        print("\n")
+        with open(log_path, "a") as f:
+            f.write("🔧 Boundary Conditions\n")
+            f.write("──────────────────────────────────────────────\n")
+            f.write(f"{'Gap pressure':<32}: {gap_pressure*1e-6:.2f} MPa\n")
+            f.write(f"{'Coolant pressure':<32}: {coolant_pressure*1e-6:.2f} MPa\n")
+            f.write(f"{'Boundary temperature':<32}: {temperature:.2f} K\n\n")
 
         self.fuel_bottom_label = 1
         self.cladding_bottom_label = 2

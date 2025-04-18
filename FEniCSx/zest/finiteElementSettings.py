@@ -71,7 +71,6 @@ class FiniteElementSetting:
         self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))  # scalar function space
         self.V_scalar = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
 
-        print("\n")
         print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
         print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
 
@@ -93,7 +92,6 @@ class FiniteElementSetting:
         # Hence, "Lagrange" provides more flexibility when specifying vector-valued elements or higher dimensions 
         # self.V_m = dolfinx.fem.functionspace(self.mesh, ("CG", 1))  # Continuous Galerkin space for displacement (does not work)
 
-        print("\n")
         print("Mechanical function space (V_m):", self.V_m)
         print("Thermal function space (V_t):", self.V_t)
         # print("Mixed-element function space (V):", self.V)
@@ -121,7 +119,6 @@ class FiniteElementSetting:
         self.u_t = ufl.TrialFunction(self.V_t)
         self.v_t = ufl.TestFunction(self.V_t)
         
-        print("\n")
         print("Shape of mechanical trial function (u_m):", self.u_m.ufl_shape, "- Expected: (dim,) for a vector function space")
         print("Shape of mechanical test function (v_m):", self.v_m.ufl_shape, "- Expected: (dim,) for a vector function space")
 
@@ -200,4 +197,3 @@ class FiniteElementSetting:
 
         print(f"Matrix A -{filename}- is symmetric after assembly: {A.isSymmetric(1e-5)}")
         # If the matrix A isn't symmetric we need to exclude a whole class of iterative solvers (Conjugate Gradient).
-        print("\n")

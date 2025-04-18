@@ -62,6 +62,38 @@ start_time = time.time()
 # problem.parameters(cladding["rho"], conditions["gravitational acceleration"], cladding["E"], cladding["nu"], cladding["k"], conditions["LHR"], cladding["alpha"], conditions["reference temperature"], cladding["cp"])
 # problem.boundary_conditions(inner_pressure=conditions["gap pressure"], outer_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
+from datetime import datetime
+
+def clear_log_file(log_path="output/simulation_log.txt"):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(log_path, "w") as f:
+        f.write("ZEST simulation log\n───────────────────\n\n")
+        f.write(f"Author: Giovanni Zullo\n\n")
+        f.write(f"Started: {timestamp}\n\n")
+
+def log_step_info(step, n_steps, t, lhr, problem, log_path="output/simulation_log.txt"):
+    u = problem.displacement.x.array.reshape(problem.mesh.geometry.x.shape)
+    disp_r = np.sqrt(u[:, 0]**2 + u[:, 1]**2)
+    u_r_max = np.max(disp_r)
+
+    r_geo = np.linalg.norm(problem.mesh.geometry.x[:, :2], axis=1)
+    T_center = problem.temperature.x.array[np.argmin(r_geo)]
+    T_max = np.max(problem.temperature.x.array)
+    T_min = np.min(problem.temperature.x.array)
+
+    with open(log_path, "a") as f:
+        f.write(f"Step {step+1:02d}/{n_steps}, t = {t/86400:.2f} d, LHR = {lhr/1000:.2f} kW/m\n")
+        f.write(f"   Max u_r       = {u_r_max:.4e} m\n")
+        f.write(f"   T_center      = {T_center:.2f} K\n")
+        f.write(f"   T_min / max   = {T_min:.2f} K / {T_max:.2f} K\n")
+        f.write(f"   Gap thickness = {problem.gap_thickness:.4e} m\n")
+        f.write("-" * 50 + "\n")
+
+
+log_path = "output/simulation_log.txt"
+clear_log_file(log_path)
+
 from fuel_rod import FuelRod
 from geometry.fuel_rod import geometry
 from postprocessing import save_temperature_history
@@ -73,16 +105,17 @@ problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"],
 problem.parameters(fuel, cladding, he,
                    g=conditions["gravitational acceleration"],
                    lhr=conditions["LHR"],
-                   T_ref=conditions["reference temperature"]) 
+                   T_ref=conditions["reference temperature"],
+                   log_path=log_path)
 
 problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
 problem.initialize_geometry()
 
 t_points = [0, 3600, 10*86400, 60*86400, 70*86400, 100*86400]         # secondi
-lhr_points = [0, 0, 18000, 18000, 20000, 20000]                # W/m
+lhr_points = [20000, 20000, 20000, 20000, 20000, 20000]                # W/m
 
-times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=20, filename="power_history.csv")
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=10, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
 
 os.makedirs("output", exist_ok=True)
@@ -113,6 +146,8 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
     T_clad_inner.append(np.mean(problem.temperature.x.array[problem.dofs_cladding_inner]))
     T_clad_outer.append(np.mean(problem.temperature.x.array[problem.dofs_cladding_outer]))
     time_values.append(t)
+    
+    log_step_info(step, n_steps, t, lhr, problem, log_path=log_path)
 
     xtemp.write_function(problem.temperature, t)
     xdisp.write_function(problem.displacement, t)
