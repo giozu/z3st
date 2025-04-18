@@ -124,6 +124,7 @@ class FiniteElementSetting:
 
         print("Shape of thermal trial function (u_t):", self.u_t.ufl_shape, "- Expected: () for a scalar function space")
         print("Shape of thermal test function (v_t):", self.v_t.ufl_shape, "- Expected: () for a scalar function space")
+        print("\n")
 
 
     def parse_matrix_file(self, filename = 'stiffness_matrix.txt'):
