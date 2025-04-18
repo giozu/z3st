@@ -21,7 +21,7 @@ This guide walks you through the installation of a Python environment named `zes
 Open your WSL terminal and run:
 
 ```bash
-conda create -n zest python=3.11 -y
+conda create -n zest python=3.12.9 -y
 conda activate zest
 ```
 
