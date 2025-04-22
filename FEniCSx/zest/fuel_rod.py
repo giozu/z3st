@@ -46,42 +46,32 @@ class FuelRod(FiniteElementSetting):
             f.write(f"{'Relative error':<32}: {rel_error:.3e} %\n\n")
 
     def initialize_geometry(self):
-        self.geometry_manager = GeometryManager(self.mesh, self.fuel_outer_radius, self.cladding_inner_radius, self.cladding_outer_radius)
+        self.geometry_manager = GeometryManager(self.mesh, self.fuel_outer_radius, self.cladding_inner_radius, self.cladding_outer_radius, self.height)
         self.geometry_manager.initialize_geometry()
-
-    def update_geometry(self):
-        """
-        Apply displacement, update mesh geometry, and update dimensions.
-        """
-        self.geometry_manager.apply_displacement(self.displacement)
-        self.geometry_manager.update_deformed_dimensions()
-        self.geometry_manager.radial_displacement_summary(self.displacement)
-
-        self.fuel_outer_radius = self.geometry_manager.fuel_outer_radius
-        self.cladding_inner_radius = self.geometry_manager.cladding_inner_radius
-        self.cladding_outer_radius = self.geometry_manager.cladding_outer_radius
-
-        self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
-        if self.gap_thickness < 0:
-            raise RuntimeError(f"❌ Error: gap thickness < 0 ({self.gap_thickness:.2e} m). Check update_geometry().")
 
     def update_state(self):
         """
         Update derived physical quantities after mesh deformation.
         Must be called after update_geometry().
         """
-        # Aggiorna area della sezione trasversale del combustibile
+
+        self.fuel_outer_radius = self.geometry_manager.fuel_outer_radius
+        self.cladding_inner_radius = self.geometry_manager.cladding_inner_radius
+        self.cladding_outer_radius = self.geometry_manager.cladding_outer_radius
+        self.height = self.geometry_manager.height
+
         self.area_fuel = np.pi * self.fuel_outer_radius**2
-
-        # Aggiorna potenza volumetrica nel combustibile (q''')
         self.q_third = self.lhr / self.area_fuel
-
-        # Aggiorna flusso termico sulla superficie interna della cladding
         self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius)
+        self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
 
-        print(f"[update_state] area_fuel = {self.area_fuel:.4e} m²")
-        print(f"[update_state] q''' = {self.q_third:.2f} W/m³")
-        print(f"[update_state] heat_flux = {self.heat_flux:.2f} W/m²")
+        print(f"   fuel outer       : {self.fuel_outer_radius:.6e}")
+        print(f"   cladding inner   : {self.cladding_inner_radius:.6e}")
+        print(f"   cladding outer   : {self.cladding_outer_radius:.6e}")
+        print(f"   fuel area = {self.area_fuel:.4e} m²")
+        print(f"   gap thickness = {self.gap_thickness*1e6:.3f} micron\n")
+        print(f"   q''' = {self.q_third:.2f} W/m³")
+        print(f"   heat flux at cladding inner surface = {self.heat_flux:.2f} W/m²")
 
     def parameters(self, fuel, cladding, filling_gas, g, lhr, T_ref, log_path="output/simulation_log.txt"):
         """
@@ -131,13 +121,13 @@ class FuelRod(FiniteElementSetting):
         self.cladding["cp"] = cladding["cp"]
 
         # Compute the volumetric heat generation (q_third) using the fuel area.
-        self.q_third = self.lhr / self.area_fuel
-        self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius) # W/m2
+        # self.q_third = self.lhr / self.area_fuel
+        # self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius) # W/m2
 
-        characteristic_time = self.fuel["rho"] * self.fuel["cp"] / self.fuel["k"] * self.area_fuel
-        print(f"\nCharacteristic time (fuel): {characteristic_time:.3e} s")
-        characteristic_time = self.cladding["rho"] * self.cladding["cp"] / self.cladding["k"] * self.area_cladding
-        print(f"Characteristic time (cladding): {characteristic_time:.3e} s")
+        # characteristic_time = self.fuel["rho"] * self.fuel["cp"] / self.fuel["k"] * self.area_fuel
+        # print(f"\nCharacteristic time (fuel): {characteristic_time:.3e} s")
+        # characteristic_time = self.cladding["rho"] * self.cladding["cp"] / self.cladding["k"] * self.area_cladding
+        # print(f"Characteristic time (cladding): {characteristic_time:.3e} s")
 
         with open(log_path, "a") as f:
             f.write("🔥 Fuel Parameters\n")
@@ -448,24 +438,16 @@ class FuelRod(FiniteElementSetting):
         bcs = [self.bc_Tco, self.bc_Tfo]
         self.solve_temperature_field(bcs)
 
-        print(f"Cladding outer temperature = {float(self.T_bc_co.value)} K")
-        print(f"Cladding inner temperature = {np.mean(self.temperature.x.array[self.dofs_cladding_inner])} K")
-        print(f"Fuel outer temperature = {float(self.T_bc_fo.value)} K")
-
         # Extract temperature at cladding inner surface
         T_clad_inner = np.mean(self.temperature.x.array[self.dofs_cladding_inner])
         T_fuel_outer = float(self.T_bc_fo.value)
-        T_gap_guess = 0.5 * (T_clad_inner + T_fuel_outer)
 
+        T_gap_guess = 0.5 * (T_clad_inner + T_fuel_outer)
         delta_T_gap = self.compute_gap_conductance(T_gap_guess)
 
         # Update fuel outer surface temperature boundary condition
         self.T_bc_fo = dolfinx.fem.Constant(self.mesh, T_clad_inner + delta_T_gap)
         self.bc_Tfo = dolfinx.fem.dirichletbc(self.T_bc_fo, self.dofs_fuel_outer, self.V_t)
-
-        print(f"Cladding outer temperature = {float(self.T_bc_co.value)} K")
-        print(f"Cladding inner temperature = {np.mean(self.temperature.x.array[self.dofs_cladding_inner])} K")
-        print(f"Fuel outer temperature = {float(self.T_bc_fo.value)} K")
 
         # Solve again with updated BC
         bcs = [self.bc_Tco, self.bc_Tfo]
@@ -621,26 +603,6 @@ class FuelRod(FiniteElementSetting):
         print(f"Fuel Outer Radius (Deformed): {fuel_outer_radius_deformed:.6e} m")
         print(f"Cladding Inner Radius (Deformed): {cladding_inner_radius_deformed:.6e} m")
         print(f"Cladding Outer Radius (Deformed): {cladding_outer_radius_deformed:.6e} m")
-
-    def update_deformed_fuel_outer_radius(self, atol=1e-6):
-        """
-        Update self.fuel_outer_radius based on the deformed geometry.
-        This uses the updated mesh geometry (after applying displacement).
-        """
-        # Extract radial coordinate from deformed mesh
-        mesh_geometry = self.mesh.geometry.x
-        r = np.sqrt(mesh_geometry[:, 0]**2 + mesh_geometry[:, 1]**2)
-
-        # Find nodes that originally matched the fuel outer radius
-        mask = np.isclose(r, self.fuel_outer_radius, atol=atol)
-
-        if np.any(mask):
-            new_radius = np.max(r[mask])
-            self.fuel_outer_radius = new_radius
-            print(f"✅ Updated fuel_outer_radius = {new_radius:.6e} m")
-        else:
-            print("⚠️ No nodes found close to original fuel outer radius. Radius not updated.")
-
 
     def get_results(self):
         """

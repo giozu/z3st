@@ -90,7 +90,6 @@ def log_step_info(step, n_steps, t, lhr, problem, log_path="output/simulation_lo
         f.write(f"   Gap thickness = {problem.gap_thickness:.4e} m\n")
         f.write("-" * 50 + "\n")
 
-
 log_path = "output/simulation_log.txt"
 clear_log_file(log_path)
 
@@ -101,6 +100,7 @@ from postprocessing import save_temperature_history
 problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 
 problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
+problem.initialize_geometry()
 
 # problem.initialize_geometry()
 
@@ -126,18 +126,25 @@ T_clad_inner = []
 T_clad_outer = []
 time_values = []
 
+problem.parameters(fuel, cladding, he, 
+                   g=conditions["gravitational acceleration"],
+                   lhr=lhr_points[0],
+                   T_ref=conditions["reference temperature"],
+                   log_path=log_path)
+
+problem.boundary_conditions(gap_pressure=conditions["gap pressure"], 
+                            coolant_pressure=coolant["coolant pressure"], 
+                            temperature=conditions["boundary temperature"])
+
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
     print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m")
 
-    problem.parameters(fuel, cladding, he,
-                    g=conditions["gravitational acceleration"],
-                    lhr=lhr,
-                    T_ref=conditions["reference temperature"],
-                    log_path=log_path)
-
-    problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
-
+    problem.lhr = lhr
+    problem.update_state()
     problem.solve()
+
+    problem.geometry_manager.geometry_summary(problem.displacement)
+    problem.geometry_manager.update_geometry(problem.displacement)
 
     T_fuel_inner.append(np.max(problem.temperature.x.array))
     T_fuel_outer.append(np.mean(problem.temperature.x.array[problem.dofs_fuel_outer]))
