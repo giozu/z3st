@@ -43,4 +43,9 @@ rm -f output/*.txt
 rm -f output/*.png
 rm -f output/*.xdmf.index
 
+# ----------------------
+# Python __pycache__ folders
+# ----------------------
+find . -type d -name "__pycache__" -exec rm -rf {} +
+
 echo "✅ Done. All output and temporary files cleaned."

@@ -417,6 +417,9 @@ class FuelRod(FiniteElementSetting):
             error = abs(delta_T_new - delta_T_old) / max(abs(delta_T_old), 1e-6)
 
             print(f"  Iteration {iteration:02d} | ΔT_gap: {delta_T_new:.2f} K | Error: {error:.2e} | h_gap: {h_gap:.2f} W/m²K")
+            # print(f"     → r_fuel_outer = {self.fuel_outer_radius:.6e} m")
+            # print(f"     → LHR = {self.lhr:.2f} W/m")
+            # print(f"     → gap_thickness = {self.gap_thickness:.6e} m")
 
             delta_T_old = delta_T_new
             T_gap = T_gap_initial + delta_T_new  # update based on current ΔT

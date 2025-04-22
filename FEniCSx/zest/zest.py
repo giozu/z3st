@@ -102,14 +102,6 @@ problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 
 problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
 
-problem.parameters(fuel, cladding, he,
-                   g=conditions["gravitational acceleration"],
-                   lhr=conditions["LHR"],
-                   T_ref=conditions["reference temperature"],
-                   log_path=log_path)
-
-problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
-
 # problem.initialize_geometry()
 
 t_points = [0, 100*86400]         # secondi
@@ -137,7 +129,13 @@ time_values = []
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
     print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m")
 
-    problem.lhr = lhr
+    problem.parameters(fuel, cladding, he,
+                    g=conditions["gravitational acceleration"],
+                    lhr=lhr,
+                    T_ref=conditions["reference temperature"],
+                    log_path=log_path)
+
+    problem.boundary_conditions(gap_pressure=conditions["gap pressure"], coolant_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
     problem.solve()
 
