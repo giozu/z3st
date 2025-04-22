@@ -104,8 +104,8 @@ problem.initialize_geometry()
 
 # problem.initialize_geometry()
 
-t_points = [0, 100*86400]         # secondi
-lhr_points = [20000, 20000]                # W/m
+t_points = [0, 86400, 100*86400]    # s
+lhr_points = [0, 20000, 20000]      # W/m
 
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=10, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
