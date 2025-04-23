@@ -1,18 +1,38 @@
 import numpy as np
 
 class GeometryManager:
-    def __init__(self, mesh, fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height):
+    def __init__(self, mesh, surface_tags,
+             fuel_outer_label, cladding_inner_label, cladding_outer_label,
+             cladding_bottom_label, cladding_top_label,
+             fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height,
+             dofs_fuel_outer, dofs_cladding_inner, dofs_cladding_outer,
+             dofs_cladding_bottom, dofs_cladding_top):
+        
         self.mesh = mesh
+        self.surface_tags = surface_tags
+
+        self.fuel_outer_label = fuel_outer_label
+        self.cladding_inner_label = cladding_inner_label
+        self.cladding_outer_label = cladding_outer_label
+        self.cladding_bottom_label = cladding_bottom_label
+        self.cladding_top_label = cladding_top_label
+
         self.fuel_outer_radius = fuel_outer_radius
         self.cladding_inner_radius = cladding_inner_radius
         self.cladding_outer_radius = cladding_outer_radius
         self.height = height
 
-        # To be populated in initialize_geometry()
-        self.idx_fuel_outer = None
-        self.idx_clad_inner = None
-        self.idx_clad_outer = None
-        self.idx_height = None
+        self.dofs_fuel_outer = dofs_fuel_outer
+        self.dofs_cladding_inner = dofs_cladding_inner
+        self.dofs_cladding_outer = dofs_cladding_outer
+        self.dofs_cladding_bottom = dofs_cladding_bottom
+        self.dofs_cladding_top = dofs_cladding_top
+
+        print("📏 Initial geometry loaded:")
+        print(f"   Fuel outer radius     = {self.fuel_outer_radius:.6e} m")
+        print(f"   Cladding inner radius = {self.cladding_inner_radius:.6e} m")
+        print(f"   Cladding outer radius = {self.cladding_outer_radius:.6e} m")
+        print(f"   Height                = {self.height:.6e} m")
 
     def initialize_geometry(self, atol=1e-6):
         """
@@ -29,93 +49,88 @@ class GeometryManager:
 
         # print(f"Original indices stored: fuel_outer={len(self.idx_fuel_outer)}, clad_inner={len(self.idx_clad_inner)}, clad_outer={len(self.idx_clad_outer)}")
 
-    def geometry_summary(self, displacement):
+    def geometry_summary(self, u_fuel, u_cladding):
         """
-        Print a detailed summary of radial and axial geometry:
-        - Input (reference) radii
-        - Current mesh radii (undeformed)
-        - Radial displacements
-        - Updated estimated radii
-        - Axial height and displacement
+        Print deformed geometry summary using u_fuel and u_cladding.
         """
+        print("\n📐 Updated geometric values (from displacement):")
 
-        # Extract undeformed mesh geometry
-        mesh_geometry = self.mesh.geometry.x
-        r_initial = np.sqrt(mesh_geometry[:, 0]**2 + mesh_geometry[:, 1]**2)
-        z_initial = mesh_geometry[:, 2]
+        # Coordinate mesh
+        x = self.mesh.geometry.x[:, 0]
+        y = self.mesh.geometry.x[:, 1]
+        z = self.mesh.geometry.x[:, 2]
+        r = np.sqrt(x**2 + y**2)
 
-        # Displacement field
-        u = displacement.x.array.reshape(mesh_geometry.shape)
-        u_r = np.sqrt(u[:, 0]**2 + u[:, 1]**2)
-        u_z = u[:, 2]
+        # Displacement arrays
+        u_fuel_array = u_fuel.x.array.reshape(self.mesh.geometry.x.shape)
+        u_clad_array = u_cladding.x.array.reshape(self.mesh.geometry.x.shape)
 
-        # Estimated deformed radial positions
-        r_updated = r_initial + u_r
-        z_updated = z_initial + u_z
+        # Radial displacement
+        u_r_fuel = np.sqrt(u_fuel_array[:, 0]**2 + u_fuel_array[:, 1]**2)
+        u_r_clad = np.sqrt(u_clad_array[:, 0]**2 + u_clad_array[:, 1]**2)
 
-        # Axial info
-        height = np.max(z_initial) - np.min(z_initial)
-        avg_axial_disp = np.mean(u_z)
-        max_axial_disp = np.max(u_z)
-        min_axial_disp = np.min(u_z)
+        # Axial displacement
+        u_z_fuel = u_fuel_array[:, 2]
+        u_z_clad = u_clad_array[:, 2]
 
-        print("\n📐 Radial & Axial Geometry Summary")
-        print("────────────────────────────────────────────")
+        # Fuel outer surface
+        r_fuel_outer = r[self.dofs_fuel_outer] + u_r_fuel[self.dofs_fuel_outer]
+        r_fuel_outer_avg = np.mean(r_fuel_outer)
 
-        print("📎 Input Radii (m) (from FuelRod):")
-        print(f"   Fuel outer       : {self.fuel_outer_radius:.6e}")
-        print(f"   Cladding inner   : {self.cladding_inner_radius:.6e}")
-        print(f"   Cladding outer   : {self.cladding_outer_radius:.6e}")
+        # Cladding inner and outer surfaces
+        r_clad_inner = r[self.dofs_cladding_inner] + u_r_clad[self.dofs_cladding_inner]
+        r_clad_outer = r[self.dofs_cladding_outer] + u_r_clad[self.dofs_cladding_outer]
 
-        print("\n📍 Mesh Radii (m) (undeformed):")
-        print(f"   Fuel outer (avg) : {np.mean(r_initial[self.idx_fuel_outer]):.6e}")
-        print(f"   Cladding inner   : {np.mean(r_initial[self.idx_clad_inner]):.6e}")
-        print(f"   Cladding outer   : {np.mean(r_initial[self.idx_clad_outer]):.6e}")
+        r_clad_inner_avg = np.mean(r_clad_inner)
+        r_clad_outer_avg = np.mean(r_clad_outer)
 
-        print("\n🔁 Radial Displacements (m):")
-        print(f"   Fuel outer (avg) : {np.mean(u_r[self.idx_fuel_outer]):.3e}")
-        print(f"   Cladding inner   : {np.mean(u_r[self.idx_clad_inner]):.3e}")
-        print(f"   Cladding outer   : {np.mean(u_r[self.idx_clad_outer]):.3e}")
+        # Apparent gap
+        gap_apparent = (r_clad_inner_avg - r_fuel_outer_avg) * 1e6  # μm
 
-        print("\n📏 Updated Radii (m) (estimated):")
-        print(f"   Fuel outer       : {np.mean(r_updated[self.idx_fuel_outer]):.6e}")
-        print(f"   Cladding inner   : {np.mean(r_updated[self.idx_clad_inner]):.6e}")
-        print(f"   Cladding outer   : {np.mean(r_updated[self.idx_clad_outer]):.6e}")
+        # Axial deformation (top-bottom)
+        z_bot = z[self.dofs_cladding_bottom] + u_z_clad[self.dofs_cladding_bottom]
+        z_top = z[self.dofs_cladding_top] + u_z_clad[self.dofs_cladding_top]
 
-        print("\n📐 Axial Geometry:")
-        print(f"   Original height  : {height:.6e} m")
-        print(f"   Axial disp (avg) : {avg_axial_disp:.3e} m")
-        print(f"   Axial disp (min/max): {min_axial_disp:.3e} / {max_axial_disp:.3e} m")
-        print(f"   Height           : {np.max(z_updated) - np.min(z_updated):.6e} m")
+        dz = np.mean(z_top) - np.mean(z_bot)
 
-    def update_geometry(self, displacement):
+        print(f"   Fuel outer radius       = {r_fuel_outer_avg:.6e} m")
+        print(f"   Cladding inner radius   = {r_clad_inner_avg:.6e} m")
+        print(f"   Cladding outer radius   = {r_clad_outer_avg:.6e} m")
+        print(f"   Axial height            = {dz:.6e} m")
+        print(f"   Apparent gap thickness  = {gap_apparent:.2f} μm")
+
+    def update_geometry(self, u_fuel, u_cladding):
         """
-        Update effective geometry (radii and height) based on displacement field,
-        without modifying the mesh coordinates.
+        Update geometry based on current displacements.
         """
+        # Coordinate mesh
+        x = self.mesh.geometry.x[:, 0]
+        y = self.mesh.geometry.x[:, 1]
+        z = self.mesh.geometry.x[:, 2]
+        r = np.sqrt(x**2 + y**2)
 
-        # Reshape geometry and displacement
-        u = displacement.x.array.reshape(self.mesh.geometry.x.shape)
-        mesh_geometry = self.mesh.geometry.x
+        # Displacement arrays
+        u_fuel_array = u_fuel.x.array.reshape(self.mesh.geometry.x.shape)
+        u_clad_array = u_cladding.x.array.reshape(self.mesh.geometry.x.shape)
 
-        # Radial: estimate r_deformed = r + u_r
-        r_initial = np.sqrt(mesh_geometry[:, 0]**2 + mesh_geometry[:, 1]**2)
-        u_r = np.sqrt(u[:, 0]**2 + u[:, 1]**2)
-        r_deformed = r_initial + u_r
+        u_r_fuel = np.sqrt(u_fuel_array[:, 0]**2 + u_fuel_array[:, 1]**2)
+        u_r_clad = np.sqrt(u_clad_array[:, 0]**2 + u_clad_array[:, 1]**2)
+        u_z_clad = u_clad_array[:, 2]
 
-        # Update radii using max/mean in selected regions
-        self.fuel_outer_radius = np.mean(r_deformed[self.idx_fuel_outer])
-        self.cladding_inner_radius = np.mean(r_deformed[self.idx_clad_inner])
-        self.cladding_outer_radius = np.mean(r_deformed[self.idx_clad_outer])
+        # Fuel outer radius
+        r_fuel_outer = r[self.dofs_fuel_outer] + u_r_fuel[self.dofs_fuel_outer]
+        self.fuel_outer_radius = np.mean(r_fuel_outer)
 
-        # Axial: estimate z_deformed = z + u_z
-        z_initial = mesh_geometry[:, 2]
-        z_deformed = z_initial + u[:, 2]
-        self.height = np.max(z_deformed) - np.min(z_deformed)
+        # Cladding inner/outer radius
+        r_clad_inner = r[self.dofs_cladding_inner] + u_r_clad[self.dofs_cladding_inner]
+        r_clad_outer = r[self.dofs_cladding_outer] + u_r_clad[self.dofs_cladding_outer]
 
-        print("\n✅ Updated geometric values (from displacement):")
-        print(f"   Fuel outer radius       = {self.fuel_outer_radius:.6e} m")
-        print(f"   Cladding inner radius   = {self.cladding_inner_radius:.6e} m")
-        print(f"   Cladding outer radius   = {self.cladding_outer_radius:.6e} m")
-        print(f"   Axial height            = {self.height:.6e} m")
-        
+        self.cladding_inner_radius = np.mean(r_clad_inner)
+        self.cladding_outer_radius = np.mean(r_clad_outer)
+
+        # Axial deformation (top-bottom)
+        z_bot = z[self.dofs_cladding_bottom] + u_z_clad[self.dofs_cladding_bottom]
+        z_top = z[self.dofs_cladding_top] + u_z_clad[self.dofs_cladding_top]
+
+        dz = np.mean(z_top) - np.mean(z_bot)
+        self.height = dz

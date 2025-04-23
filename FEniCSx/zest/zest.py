@@ -73,21 +73,24 @@ def clear_log_file(log_path="output/simulation_log.txt"):
         f.write(f"Started: {timestamp}\n\n")
 
 def log_step_info(step, n_steps, t, lhr, problem, log_path="output/simulation_log.txt"):
-    u = problem.displacement.x.array.reshape(problem.mesh.geometry.x.shape)
-    disp_r = np.sqrt(u[:, 0]**2 + u[:, 1]**2)
+    u_fuel = problem.u_fuel.x.array.reshape(problem.mesh.geometry.x.shape)
+    disp_r = np.sqrt(u_fuel[:, 0]**2 + u_fuel[:, 1]**2)
     u_r_max = np.max(disp_r)
 
     r_geo = np.linalg.norm(problem.mesh.geometry.x[:, :2], axis=1)
-    T_center = problem.temperature.x.array[np.argmin(r_geo)]
-    T_max = np.max(problem.temperature.x.array)
-    T_min = np.min(problem.temperature.x.array)
+    T_array = problem.T_fuel.x.array
+    T_center = T_array[np.argmin(r_geo)]
+    T_max = np.max(T_array)
+    T_min = np.min(T_array)
+
+    gap = problem.cladding_inner_radius - problem.fuel_outer_radius
 
     with open(log_path, "a") as f:
         f.write(f"Step {step+1:02d}/{n_steps}, t = {t/86400:.2f} d, LHR = {lhr/1000:.2f} kW/m\n")
         f.write(f"   Max u_r       = {u_r_max:.4e} m\n")
         f.write(f"   T_center      = {T_center:.2f} K\n")
         f.write(f"   T_min / max   = {T_min:.2f} K / {T_max:.2f} K\n")
-        f.write(f"   Gap thickness = {problem.gap_thickness:.4e} m\n")
+        f.write(f"   Gap thickness = {gap:.4e} m\n")
         f.write("-" * 50 + "\n")
 
 log_path = "output/simulation_log.txt"
@@ -100,7 +103,6 @@ from postprocessing import save_temperature_history
 problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 
 problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
-problem.initialize_geometry()
 
 # problem.initialize_geometry()
 
@@ -113,13 +115,13 @@ times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=10, 
 
 os.makedirs("output", exist_ok=True)
 
-temp_path = os.path.join("output", "temperature.xdmf")
-xtemp = dolfinx.io.XDMFFile(problem.mesh.comm, temp_path, "w")
-xtemp.write_mesh(problem.mesh)
+# temp_path = os.path.join("output", "temperature.xdmf")
+# xtemp = dolfinx.io.XDMFFile(problem.mesh.comm, temp_path, "w")
+# xtemp.write_mesh(problem.mesh)
 
-disp_path = os.path.join("output", "displacement.xdmf")
-xdisp = dolfinx.io.XDMFFile(problem.mesh.comm, disp_path, "w")
-xdisp.write_mesh(problem.mesh)
+# disp_path = os.path.join("output", "displacement.xdmf")
+# xdisp = dolfinx.io.XDMFFile(problem.mesh.comm, disp_path, "w")
+# xdisp.write_mesh(problem.mesh)
 
 T_fuel_inner = []
 T_fuel_outer = []
@@ -138,6 +140,7 @@ problem.boundary_conditions(gap_pressure=conditions["gap pressure"],
                             temperature=conditions["boundary temperature"])
 
 problem.initialize_fields()
+problem.initialize_geometry()
 
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
     print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m\n")
@@ -146,19 +149,16 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
     problem.update_state()
     problem.solve()
 
-    problem.geometry_manager.geometry_summary(problem.displacement)
-    problem.geometry_manager.update_geometry(problem.displacement)
-
-    T_fuel_inner.append(np.max(problem.temperature.x.array))
-    T_fuel_outer.append(np.mean(problem.temperature.x.array[problem.dofs_fuel_outer]))
-    T_clad_inner.append(np.mean(problem.temperature.x.array[problem.dofs_cladding_inner]))
-    T_clad_outer.append(np.mean(problem.temperature.x.array[problem.dofs_cladding_outer]))
+    T_fuel_inner.append(np.max(problem.T_fuel.x.array))
+    T_fuel_outer.append(np.mean(problem.T_fuel.x.array[problem.dofs_fuel_outer]))
+    T_clad_inner.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_inner]))
+    T_clad_outer.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_outer]))
     time_values.append(t)
     
     log_step_info(step, n_steps, t, lhr, problem, log_path=log_path)
 
-    xtemp.write_function(problem.temperature, t)
-    xdisp.write_function(problem.displacement, t)
+    # xtemp.write_function(problem.temperature, t)
+    # xdisp.write_function(problem.displacement, t)
 
 end_time = time.time()
 elapsed_time = end_time - start_time
@@ -174,14 +174,7 @@ print(f"Elapsed time: {elapsed_time:.4f} s")
 # Results
 # -------
 # problem.vonMises_equivalent()
-displacement, stress_fuel, stress_cladding, strain, temperature = problem.get_results()
-
-print("\n")
-print(f"displacement = {displacement}")
-print(f"stress (fuel)= {stress_fuel}")
-print(f"stress (cladding)= {stress_cladding}")
-print(f"strain = {strain}")
-print(f"temperature = {temperature}")
+results = problem.get_results()
 
 # ----------------
 # Stiffness matrix
