@@ -71,8 +71,8 @@ class FiniteElementSetting:
         self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))  # scalar function space
         self.V_scalar = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
 
-        print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
-        print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
+        # print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
+        # print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
 
         # Mixed-function space:
         # basix.ufl.mixed_element to create a mixed element for the displacement and temperature fields. 
@@ -92,8 +92,8 @@ class FiniteElementSetting:
         # Hence, "Lagrange" provides more flexibility when specifying vector-valued elements or higher dimensions 
         # self.V_m = dolfinx.fem.functionspace(self.mesh, ("CG", 1))  # Continuous Galerkin space for displacement (does not work)
 
-        print("Mechanical function space (V_m):", self.V_m)
-        print("Thermal function space (V_t):", self.V_t)
+        # print("Mechanical function space (V_m):", self.V_m)
+        # print("Thermal function space (V_t):", self.V_t)
         # print("Mixed-element function space (V):", self.V)
 
     def _initialize_functions(self):
@@ -119,11 +119,11 @@ class FiniteElementSetting:
         self.u_t = ufl.TrialFunction(self.V_t)
         self.v_t = ufl.TestFunction(self.V_t)
         
-        print("Shape of mechanical trial function (u_m):", self.u_m.ufl_shape, "- Expected: (dim,) for a vector function space")
-        print("Shape of mechanical test function (v_m):", self.v_m.ufl_shape, "- Expected: (dim,) for a vector function space")
+        # print("Shape of mechanical trial function (u_m):", self.u_m.ufl_shape, "- Expected: (dim,) for a vector function space")
+        # print("Shape of mechanical test function (v_m):", self.v_m.ufl_shape, "- Expected: (dim,) for a vector function space")
 
-        print("Shape of thermal trial function (u_t):", self.u_t.ufl_shape, "- Expected: () for a scalar function space")
-        print("Shape of thermal test function (v_t):", self.v_t.ufl_shape, "- Expected: () for a scalar function space")
+        # print("Shape of thermal trial function (u_t):", self.u_t.ufl_shape, "- Expected: () for a scalar function space")
+        # print("Shape of thermal test function (v_t):", self.v_t.ufl_shape, "- Expected: () for a scalar function space")
 
 
     def parse_matrix_file(self, filename = 'stiffness_matrix.txt'):

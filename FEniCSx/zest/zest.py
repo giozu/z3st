@@ -107,6 +107,7 @@ problem.initialize_geometry()
 t_points = [0, 86400, 100*86400]    # s
 lhr_points = [0, 20000, 20000]      # W/m
 
+print("\n")
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=10, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
 
@@ -136,8 +137,10 @@ problem.boundary_conditions(gap_pressure=conditions["gap pressure"],
                             coolant_pressure=coolant["coolant pressure"], 
                             temperature=conditions["boundary temperature"])
 
+problem.initialize_fields()
+
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
-    print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m")
+    print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m\n")
 
     problem.lhr = lhr
     problem.update_state()
@@ -160,11 +163,12 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
 end_time = time.time()
 elapsed_time = end_time - start_time
 
+
 save_temperature_history(time_values, T_fuel_inner, T_fuel_outer, T_clad_inner, T_clad_outer)
 
-print(f"-----------------------")
+print("\n")
+print(f"Total thermal iterations = {problem.total_thermal_iterations}, total mechanical iterations = {problem.total_mech_iterations}")
 print(f"Elapsed time: {elapsed_time:.4f} s")
-print(f"-----------------------")
 
 # -------
 # Results

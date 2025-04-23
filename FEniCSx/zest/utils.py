@@ -82,3 +82,26 @@ def read_power_history(filename):
     times = np.array(times)
     lhrs = np.array(lhrs)
     return times, lhrs, len(times)
+
+def get_ksp_reason_name(reason_code):
+    """
+    Convert PETSc KSP converged/diverged reason code to a human-readable name.
+
+    Parameters:
+    - reason_code (int): The integer code from PETSc KSP solver
+
+    Returns:
+    - str: Name of the reason (e.g., 'CONVERGED_RTOL', 'DIVERGED_ITS', etc.)
+    """
+    reason_map = {
+        2:  "CONVERGED_RTOL",
+        3:  "CONVERGED_ATOL",
+        4:  "CONVERGED_ITS",
+        -2: "DIVERGED_NULL",
+        -3: "DIVERGED_BREAKDOWN",
+        -4: "DIVERGED_BREAKDOWN_BICG",
+        -5: "DIVERGED_DIVERGENCE",
+        -7: "DIVERGED_ITS",
+        -8: "DIVERGED_NONSYMMETRIC",
+    }
+    return reason_map.get(reason_code, "UNKNOWN_REASON")
