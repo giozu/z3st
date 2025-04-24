@@ -239,6 +239,9 @@ class FuelRod(FiniteElementSetting):
             dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_cladding_bottom, self.V_m)
         ]
 
+        print(f"Cladding BCs: {len(self.bc_mech_cladding)}")
+        assert self.bc_mech_cladding and len(self.bc_mech_cladding) > 0, "❌ No Dirichlet BCs for cladding!"
+
         # Thermal boundary conditions
         self.T_bc_co = dolfinx.fem.Constant(self.mesh, temperature)
         self.bc_Tco = dolfinx.fem.dirichletbc(self.T_bc_co, self.dofs_cladding_outer, self.V_t)
@@ -334,7 +337,7 @@ class FuelRod(FiniteElementSetting):
             u_fuel_prev = self.u_fuel.x.array.copy()
             u_cladding_prev = self.u_cladding.x.array.copy()
 
-            print(f"   🔁 Relaxation applied with ω = {omega}")
+            print(f"\n🔁 Relaxation applied with ω = {omega}")
 
             # Compute radial displacement from u_fuel
             u_fuel_array = self.u_fuel.x.array.reshape(self.mesh.geometry.x.shape)
@@ -350,8 +353,8 @@ class FuelRod(FiniteElementSetting):
                 print(f"\tΔu_r_rel = {delta_u:.2e}")
 
                 if delta_u < tol:
-                    print(f" >> Thermo-mechanical convergence achieved.")
-                    print(f" >> Iterations: thermal = {it_therm}, mechanical = {it_mech}")
+                    print(f">> Thermo-mechanical convergence achieved.")
+                    print(f">> Iterations: thermal = {it_therm}, mechanical = {it_mech}")
 
                     self.geometry_manager.geometry_summary(self.u_fuel, self.u_cladding)
                     self.geometry_manager.update_geometry(self.u_fuel, self.u_cladding)
@@ -383,56 +386,6 @@ class FuelRod(FiniteElementSetting):
         if not converged:
             print("⚠️ Warning: convergence not reached in max_iter.")
 
-    # def solver_options(self):
-        # ksp_rtol = 1e-6
-        # ksp_atol = 1e-6
-
-        # # Direct solver + MUMPS
-        # self.petsc_options_lu = {
-        #     "ksp_type": "preonly",
-        #     "pc_type": "lu",
-        #     "pc_factor_mat_solver_type": "mumps",
-        #     "ksp_rtol": ksp_rtol,
-        #     "ksp_atol": ksp_atol,
-        #     "ksp_max_it": 2000,
-        #     "ksp_monitor": None
-        # }
-
-        # # CG-solver + jacobi
-        # self.petsc_options_cg = {
-        #     "ksp_type": "cg",
-        #     "pc_type": "jacobi",
-        #     "ksp_rtol": ksp_rtol,
-        #     "ksp_atol": ksp_atol,
-        #     "ksp_max_it": 2000,
-        #     "ksp_monitor": None
-        # }
-
-        # # GMRES solver + pre-conditioner AMG (Algebraic Multigrid)
-        # self.petsc_options_gmres = {
-        #     "ksp_type": "gmres",
-        #     "pc_type": "hypre",
-        #     "pc_hypre_type": "boomeramg",
-        #     "ksp_rtol": ksp_rtol,
-        #     "ksp_atol": ksp_atol,
-        #     "ksp_max_it": 2000,
-        #     "pc_type": None,
-        # }
-
-        # # GMRES iterative solver + ILU pre-conditioner
-        # self.petsc_options_ilu = {
-        #     "ksp_type": "gmres",
-        #     "pc_type": "ilu",
-        #     "ksp_rtol": ksp_rtol,
-        #     "ksp_atol": ksp_atol,
-        #     "ksp_max_it": 2000,
-        #     "ksp_monitor": None
-        # }
-
-        # self.jit_options = {
-        #     "timeout": 20,
-        # }
-
     def assemble_fuel_system(self):
         k_fuel_expr = 1.0 / (0.0452 + 2.46e-4 * self.T_fuel)
         a_fuel = ufl.dot(k_fuel_expr * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_fuel
@@ -455,7 +408,7 @@ class FuelRod(FiniteElementSetting):
         3. Solve fuel temperature field.
         """
         # --- STEP 1: Cladding system ---
-        print("⚙️  Assembling and solving cladding thermal system")
+        print("\n⚙️  Assembling and solving cladding thermal system")
         a_clad, L_clad = self.assemble_cladding_system()
         its_clad = self.solve_temperature_field_single(a_clad, L_clad, self.T_cladding, bcs=[self.bc_Tco])
 
@@ -474,7 +427,7 @@ class FuelRod(FiniteElementSetting):
         T_fuel_outer_bc = float(self.T_bc_fo.value)
         T_gap_guess = 0.5 * (T_clad_inner_avg + T_fuel_outer_bc)
 
-        print(f"🔁 Estimating gap conductance from T_cladding_inner = {T_clad_inner_avg:.2f} K")
+        print(f"\n🔁 Estimating gap conductance from T_cladding_inner = {T_clad_inner_avg:.2f} K")
         delta_T_gap = self.compute_gap_conductance(T_gap_guess)
 
         # Update boundary condition on fuel outer surface
@@ -484,7 +437,7 @@ class FuelRod(FiniteElementSetting):
         print(f"🔧 Updated T_bc_fo = {float(self.T_bc_fo.value):.2f} K (ΔT_gap = {delta_T_gap:.2f} K)")
 
         # --- STEP 3: Fuel system ---
-        print("⚙️  Assembling and solving fuel thermal system")
+        print("\n⚙️  Assembling and solving fuel thermal system")
         a_fuel, L_fuel = self.assemble_fuel_system()
         its_fuel = self.solve_temperature_field_single(a_fuel, L_fuel, self.T_fuel, bcs=[self.bc_Tfo])
 
@@ -535,7 +488,7 @@ class FuelRod(FiniteElementSetting):
         # solver.getPC().setType("ilu")  # incomplete LU
         solver.getPC().setType("jacobi")  # diagonal preconditioner
 
-        solver.setTolerances(rtol=1e-5, atol=1e-5, max_it=500)
+        solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
         
         try:
             solver.solve(b, T_field.x.petsc_vec)
@@ -552,51 +505,51 @@ class FuelRod(FiniteElementSetting):
 
         return its
 
-    def solve_temperature_field(self, bcs):
-        """
-        Solve the thermal problem using PETSc KSP solver.
-        Update both T_fuel and T_cladding separately.
-        """
-        # --- Bilinear and linear forms ---
-        F = self.a_thermal - self.L_thermal
-        a_form = dolfinx.fem.form(ufl.lhs(F))
-        L_form = dolfinx.fem.form(ufl.rhs(F))
+    # def solve_temperature_field(self, bcs):
+    #     """
+    #     Solve the thermal problem using PETSc KSP solver.
+    #     Update both T_fuel and T_cladding separately.
+    #     """
+    #     # --- Bilinear and linear forms ---
+    #     F = self.a_thermal - self.L_thermal
+    #     a_form = dolfinx.fem.form(ufl.lhs(F))
+    #     L_form = dolfinx.fem.form(ufl.rhs(F))
 
-        A = dolfinx.fem.petsc.create_matrix(a_form)
-        b = dolfinx.fem.petsc.create_vector(L_form)
+    #     A = dolfinx.fem.petsc.create_matrix(a_form)
+    #     b = dolfinx.fem.petsc.create_vector(L_form)
 
-        dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=bcs)
-        A.assemble()
+    #     dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=bcs)
+    #     A.assemble()
 
-        with b.localForm() as loc:
-            loc.set(0.0)
-        dolfinx.fem.petsc.assemble_vector(b, L_form)
-        dolfinx.fem.petsc.apply_lifting(b, [a_form], [bcs])
-        b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        dolfinx.fem.petsc.set_bc(b, bcs)
+    #     with b.localForm() as loc:
+    #         loc.set(0.0)
+    #     dolfinx.fem.petsc.assemble_vector(b, L_form)
+    #     dolfinx.fem.petsc.apply_lifting(b, [a_form], [bcs])
+    #     b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
+    #     dolfinx.fem.petsc.set_bc(b, bcs)
 
-        # --- Solver setup ---
-        solver = PETSc.KSP().create(self.mesh.comm)
-        solver.setOperators(A)
-        solver.setType(PETSc.KSP.Type.GMRES)
-        solver.getPC().setType(PETSc.PC.Type.HYPRE)
-        solver.setTolerances(rtol=1e-5, atol=1e-5, max_it=500)
+    #     # --- Solver setup ---
+    #     solver = PETSc.KSP().create(self.mesh.comm)
+    #     solver.setOperators(A)
+    #     solver.setType(PETSc.KSP.Type.GMRES)
+    #     solver.getPC().setType(PETSc.PC.Type.HYPRE)
+    #     solver.setTolerances(rtol=1e-8, atol=0.0, max_it=1000)
 
-        # --- Solve T_fuel ---
-        solver.solve(b, self.T_fuel.x.petsc_vec)
-        self.T_fuel.x.scatter_forward()
-        its_fuel = solver.getIterationNumber()
-        reason_fuel = solver.getConvergedReason()
-        print(f"\t[KSP] T_fuel    → {its_fuel} iterations, reason = {reason_fuel}: {get_ksp_reason_name(reason_fuel)}")
+    #     # --- Solve T_fuel ---
+    #     solver.solve(b, self.T_fuel.x.petsc_vec)
+    #     self.T_fuel.x.scatter_forward()
+    #     its_fuel = solver.getIterationNumber()
+    #     reason_fuel = solver.getConvergedReason()
+    #     print(f"\t[KSP] T_fuel    → {its_fuel} iterations, reason = {reason_fuel}: {get_ksp_reason_name(reason_fuel)}")
 
-        # --- Solve T_cladding (reusing matrix/vector, since system is global) ---
-        solver.solve(b, self.T_cladding.x.petsc_vec)
-        self.T_cladding.x.scatter_forward()
-        its_clad = solver.getIterationNumber()
-        reason_clad = solver.getConvergedReason()
-        print(f"\t[KSP] T_clad    → {its_clad} iterations, reason = {reason_clad}: {get_ksp_reason_name(reason_clad)}")
+    #     # --- Solve T_cladding (reusing matrix/vector, since system is global) ---
+    #     solver.solve(b, self.T_cladding.x.petsc_vec)
+    #     self.T_cladding.x.scatter_forward()
+    #     its_clad = solver.getIterationNumber()
+    #     reason_clad = solver.getConvergedReason()
+    #     print(f"\t[KSP] T_clad    → {its_clad} iterations, reason = {reason_clad}: {get_ksp_reason_name(reason_clad)}")
 
-        return its_fuel, its_clad
+    #     return its_fuel, its_clad
 
     def compute_gap_conductance(self, T_gap_initial):
         """
@@ -640,6 +593,7 @@ class FuelRod(FiniteElementSetting):
         3. Updates fuel outer surface BC and resolves temperature field.
         """
 
+        print("--------------")
         print("Thermal solver")
         print("--------------")
 
@@ -704,16 +658,6 @@ class FuelRod(FiniteElementSetting):
         # print(f"🔍 dofs_fuel_bottom = {len(self.dofs_fuel_bottom)}")
         # print(f"🔍 dofs_cladding_bottom = {len(self.dofs_cladding_bottom)}")
 
-        # --- Fuel system ---
-        a_fuel = ufl.inner(sigma_fuel, epsilon(self.v_m)) * self.dx_fuel
-        L_fuel = (
-            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.fuel["rho"] * self.g)), self.v_m) * self.dx_fuel +
-            (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.T_fuel - T_ref) * ufl.div(self.v_m) * self.dx_fuel +
-            ufl.dot(self.gap_traction, self.v_m) * self.ds_fo
-        )
-
-        its_fuel = self.solve_mechanical_subsystem(a_fuel, L_fuel, self.u_fuel, bcs=self.bc_mech_fuel)
-
         # --- Cladding system ---
         a_clad = ufl.inner(sigma_clad, epsilon(self.v_m)) * self.dx_cladding
         L_clad = (
@@ -723,9 +667,19 @@ class FuelRod(FiniteElementSetting):
             ufl.dot(self.coolant_traction, self.v_m) * self.ds_co
         )
 
+        # print("Form rank =", len(ufl.algorithms.analysis.extract_arguments(L_clad)))
+        
         its_clad = self.solve_mechanical_subsystem(a_clad, L_clad, self.u_cladding, bcs=self.bc_mech_cladding)
 
-        print("✅ Mechanical systems solved")
+        # --- Fuel system ---
+        a_fuel = ufl.inner(sigma_fuel, epsilon(self.v_m)) * self.dx_fuel
+        L_fuel = (
+            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.fuel["rho"] * self.g)), self.v_m) * self.dx_fuel +
+            (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.T_fuel - T_ref) * ufl.div(self.v_m) * self.dx_fuel +
+            ufl.dot(self.gap_traction, self.v_m) * self.ds_fo
+        )
+
+        its_fuel = self.solve_mechanical_subsystem(a_fuel, L_fuel, self.u_fuel, bcs=self.bc_mech_fuel)
 
         return its_fuel + its_clad
 
@@ -746,8 +700,30 @@ class FuelRod(FiniteElementSetting):
         A = dolfinx.fem.petsc.create_matrix(a_form)
         b = dolfinx.fem.petsc.create_vector(L_form)
 
+        print("\n‣ Solving system for:", u_field.name)
+        assert bcs is not None and len(bcs) > 0, "❌ No boundary conditions!"
+
         dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=bcs)
         A.assemble()
+
+        if getattr(self, "debug_mode", False):
+
+            # Matrix info
+            size = A.getSize()
+            info = A.getInfo()
+            print(f"[DEBUG] ‣ Matrix size         = {size}")
+            print(f"[DEBUG] ‣ Nonzeros used       = {info['nz_used']}, allocated = {info['nz_allocated']}")
+            print(f"[DEBUG] ‣ Matrix memory used  = {info['memory'] / 1024:.1f} KB")
+
+            # Vector norms
+            print(f"[DEBUG] ‣ Initial guess norm   = {u_field.x.petsc_vec.norm():.4e}")
+
+            # Viewer output
+            viewer = PETSc.Viewer().createASCII(f"matrix_A_{u_field.name}.txt", "w")
+            viewer.pushFormat(PETSc.Viewer.Format.ASCII_INFO_DETAIL)
+            A.view(viewer)
+            viewer.popFormat()
+            print(f"[DEBUG] ‣ Matrix structure written to matrix_A_{u_field.name}.txt")
 
         with b.localForm() as loc:
             loc.set(0.0)
@@ -756,15 +732,27 @@ class FuelRod(FiniteElementSetting):
         b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
         dolfinx.fem.petsc.set_bc(b, bcs)
 
+        if getattr(self, "debug_mode", False):
+            print(f"[DEBUG] ‣ RHS norm (after BCs)  = {b.norm():.4e}")
+
         solver = PETSc.KSP().create(self.mesh.comm)
         solver.setOperators(A)
         solver.setType(PETSc.KSP.Type.GMRES)
         # solver.getPC().setType(PETSc.PC.Type.HYPRE)
         solver.getPC().setType("jacobi")
-        solver.setTolerances(rtol=1e-5, atol=1e-5, max_it=500)
+        # solver.getPC().setType("ilu")
+        solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
         # solver.setMonitor(lambda ksp, its, rnorm: print(f"\t[KSP] Mech iteration {its} | residual = {rnorm:.2e}"))
 
         solver.solve(b, u_field.x.petsc_vec)
+
+        if getattr(self, "debug_mode", False):
+            try:
+                normA = A.norm()
+                print(f"[DEBUG] ‣ Matrix 2-norm estimate = {normA:.2e}")
+            except Exception as e:
+                print(f"[DEBUG] ‣ Norm estimate failed: {e}")
+
         u_field.x.scatter_forward()
 
         its = solver.getIterationNumber()

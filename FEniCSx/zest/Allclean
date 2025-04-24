@@ -20,11 +20,12 @@ rm -f *.pvd
 rm -f *.btr
 
 # ----------------------
-# Zest stiffness matrix exports
+# Zest matrix exports
 # ----------------------
 rm -f stiffness_matrix.txt
 rm -f mech_stiffness_matrix.txt
 rm -f thermal_stiffness_matrix.txt
+rm -f matrix_A_*.txt
 
 # ----------------------
 # Images

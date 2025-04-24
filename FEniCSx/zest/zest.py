@@ -13,6 +13,9 @@ This project is currently under development.
 # Importing python modules
 import time
 
+import sys
+DEBUG_MODE = "--debug" in sys.argv
+
 # Importing FEniCS modules and custom classes
 # from linear_elasticity import LinearElasticity
 # from thick_cylinder import ThickCylinder
@@ -101,6 +104,7 @@ from geometry.fuel_rod import geometry
 from postprocessing import save_temperature_history
 
 problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
+problem.debug_mode = DEBUG_MODE
 
 problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
 
