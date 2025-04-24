@@ -742,11 +742,25 @@ class FuelRod(FiniteElementSetting):
         solver.getPC().setType("jacobi")
         # solver.getPC().setType("ilu")
         solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
-        # solver.setMonitor(lambda ksp, its, rnorm: print(f"\t[KSP] Mech iteration {its} | residual = {rnorm:.2e}"))
+
+        residuals = []
+        if getattr(self, "debug_mode", False):
+            def monitor(ksp, its, rnorm):
+                residuals.append((its, rnorm))
+                print(f"\t[KSP] Mech iteration {its} | residual = {rnorm:.2e}")
+            solver.setMonitor(monitor)
 
         solver.solve(b, u_field.x.petsc_vec)
 
         if getattr(self, "debug_mode", False):
+            # Residuals
+            filename = f"residuals_{u_field.name}.tsv"
+            with open(filename, "a") as f:
+                f.write("# Iter Residual\n")
+                for its, r in residuals:
+                    f.write(f"{its}\t{r:.6e}\n")
+
+            # Matrix norm
             try:
                 normA = A.norm()
                 print(f"[DEBUG] ‣ Matrix 2-norm estimate = {normA:.2e}")

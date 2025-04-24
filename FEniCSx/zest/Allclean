@@ -25,7 +25,21 @@ rm -f *.btr
 rm -f stiffness_matrix.txt
 rm -f mech_stiffness_matrix.txt
 rm -f thermal_stiffness_matrix.txt
-rm -f matrix_A_*.txt
+
+# ----------------------
+# Remove output directories/files
+# ----------------------
+# rm -rf output
+rm -f power_history.csv
+rm -f temperature_history.tsv
+
+# ----------------------
+# Remove debug residuals and matrices
+# ----------------------
+rm -f residuals_u_fuel.tsv
+rm -f residuals_u_cladding.tsv
+rm -f matrix_A_u_fuel.txt
+rm -f matrix_A_u_cladding.txt
 
 # ----------------------
 # Images
