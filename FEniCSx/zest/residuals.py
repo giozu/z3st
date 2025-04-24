@@ -32,7 +32,7 @@ for seg in df["Segment"].unique()[1:]:
 plt.xlabel("Iteration (global index)")
 plt.ylabel("Residual")
 plt.yscale("log")
-plt.title("Mechanical Solver Residuals per Iteration (Fuel)")
+plt.title("Mechanical solver residuals per iteration (fuel)")
 plt.legend()
 plt.grid(True, which="both", linestyle="--", linewidth=0.5)
 
