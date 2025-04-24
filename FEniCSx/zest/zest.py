@@ -92,7 +92,6 @@ def log_step_info(step, n_steps, t, lhr, problem, log_path="output/simulation_lo
         f.write(f"Step {step+1:02d}/{n_steps}, t = {t/86400:.2f} d, LHR = {lhr/1000:.2f} kW/m\n")
         f.write(f"   Max u_r       = {u_r_max:.4e} m\n")
         f.write(f"   T_center      = {T_center:.2f} K\n")
-        f.write(f"   T_min / max   = {T_min:.2f} K / {T_max:.2f} K\n")
         f.write(f"   Gap thickness = {gap:.4e} m\n")
         f.write("-" * 50 + "\n")
 
