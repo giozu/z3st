@@ -285,6 +285,48 @@ class FuelRod(FiniteElementSetting):
         self.total_thermal_iterations = 0
         self.total_mech_iterations = 0
 
+    def compute_gap(self):
+        """
+        Compute the current apparent gap between the fuel outer surface
+        and the cladding inner surface, based on the deformed geometry.
+
+        Returns:
+            gap_mean (float): Mean gap (m) between cladding inner surface and fuel outer surface.
+            gap_min (float): Minimum gap (m) (possible local contact detection).
+            gap_max (float): Maximum gap (m).
+        """
+        # Extract undeformed coordinates
+        x = self.mesh.geometry.x[:, 0]
+        y = self.mesh.geometry.x[:, 1]
+
+        # Compute radial coordinate
+        r = np.sqrt(x**2 + y**2)
+
+        # Displacement arrays (reshaped)
+        u_fuel_array = self.u_fuel.x.array.reshape(self.mesh.geometry.x.shape)
+        u_clad_array = self.u_cladding.x.array.reshape(self.mesh.geometry.x.shape)
+
+        # Radial displacements
+        u_r_fuel = np.sqrt(u_fuel_array[:, 0]**2 + u_fuel_array[:, 1]**2)
+        u_r_clad = np.sqrt(u_clad_array[:, 0]**2 + u_clad_array[:, 1]**2)
+
+        # Degrees of freedom
+        dofs_fuel_outer = self.dofs_fuel_outer
+        dofs_cladding_inner = self.dofs_cladding_inner
+
+        # Deformed radii
+        r_fuel_outer = r[dofs_fuel_outer] + u_r_fuel[dofs_fuel_outer]
+        r_clad_inner = r[dofs_cladding_inner] + u_r_clad[dofs_cladding_inner]
+
+        # Gap
+        gap = r_clad_inner - r_fuel_outer
+
+        if min(np.mean(gap), np.min(gap), np.max(gap)) < 0:
+            print(f"⚠️ Warning: apparent gap closure!")
+
+        # Return mean, min, and max gap
+        return np.mean(gap), np.min(gap), np.max(gap)
+
     def solve(self, max_iter=10, tol=1e-2):
         """
         Iterative thermo-mechanical steady-state solver with fixed mesh.
@@ -307,7 +349,10 @@ class FuelRod(FiniteElementSetting):
         print("======================")
 
         converged = False
+
         u_r_max_prev = None
+        gap_mean_prev = None
+        
         omega = 0.7  # Relaxation factor
 
         print(f"🔁 Using relaxation factor ω = {omega}")
@@ -343,13 +388,18 @@ class FuelRod(FiniteElementSetting):
             disp_r = np.sqrt(u_fuel_array[:, 0]**2 + u_fuel_array[:, 1]**2)
             u_r_max = np.max(disp_r)
 
-            # --- Convergence check ---
-            if u_r_max_prev is not None:
-                den = max(abs(u_r_max_prev), 1e-12)
-                delta_u = abs(u_r_max - u_r_max_prev) / den
-                print(f"\tΔu_r_rel = {delta_u:.2e}")
+            gap_mean, gap_min, gap_max = self.compute_gap()
+            print(f"   Mean apparent gap = {gap_mean*1e6:.2f} μm (min = {gap_min*1e6:.2f} μm, max = {gap_max*1e6:.2f} μm)")
 
-                if delta_u < tol:
+            # --- Convergence check ---
+            if u_r_max_prev is not None and gap_mean_prev is not None:
+                delta_u = abs(u_r_max - u_r_max_prev) / max(abs(u_r_max_prev), 1e-12)
+                delta_gap = abs(gap_mean - gap_mean_prev) / max(abs(gap_mean_prev), 1e-12)
+
+                print(f"\tΔu_r_rel = {delta_u:.2e}")
+                print(f"\tΔgap_rel = {delta_gap:.2e}")
+
+                if delta_u < tol and delta_gap < tol:
                     print(f">> Thermo-mechanical convergence achieved.")
                     print(f">> Iterations: thermal = {it_therm}, mechanical = {it_mech}")
 
@@ -358,19 +408,15 @@ class FuelRod(FiniteElementSetting):
 
                     self.total_thermal_iterations += it_therm
                     self.total_mech_iterations += it_mech
+
                     converged = True
                     break
             else:
-                print(f"\tInitial u_r_max = {u_r_max:.3e} m")
+                print(f"\tInitial u_r_max = {u_r_max*1e6:.2f} μm")
+                print(f"\tInitial gap_mean = {gap_mean*1e6:.2f} μm)")
 
             u_r_max_prev = u_r_max
-
-            gap = self.cladding_inner_radius - self.fuel_outer_radius - 2 * u_r_max
-            print(f"   Max radial displacement (fuel) = {u_r_max:.3e} m")
-            print(f"   Apparent gap = {gap * 1e6:.2f} μm")
-
-            if gap < 0:
-                print(f"⚠️ Warning: apparent gap closure (gap = {gap * 1e6:.2f} μm)")
+            gap_mean_prev = gap_mean
 
         if not converged:
             print("⚠️ Warning: convergence not reached in max_iter.")
@@ -401,7 +447,7 @@ class FuelRod(FiniteElementSetting):
         # --- STEP 1: Cladding system ---
         print("\n⚙️  Assembling and solving cladding thermal system")
         a_clad, L_clad = self.assemble_cladding_system()
-        its_clad = self.solve_temperature_field_single(a_clad, L_clad, self.T_cladding, bcs=[self.bc_Tco])
+        its_clad = self.solve_thermal_problem(a_clad, L_clad, self.T_cladding, bcs=[self.bc_Tco])
 
         # --- STEP 2: Compute ΔT_gap ---
         T_clad_inner_values = self.T_cladding.x.array[self.dofs_cladding_inner]
@@ -430,11 +476,11 @@ class FuelRod(FiniteElementSetting):
         # --- STEP 3: Fuel system ---
         print("\n⚙️  Assembling and solving fuel thermal system")
         a_fuel, L_fuel = self.assemble_fuel_system()
-        its_fuel = self.solve_temperature_field_single(a_fuel, L_fuel, self.T_fuel, bcs=[self.bc_Tfo])
+        its_fuel = self.solve_thermal_problem(a_fuel, L_fuel, self.T_fuel, bcs=[self.bc_Tfo])
 
         return its_clad, its_fuel
 
-    def solve_temperature_field_single(self, a, L, T_field, bcs):
+    def solve_thermal_problem(self, a, L, T_field, bcs):
         """
         Solve a thermal system for a single domain using PETSc KSP.
 
