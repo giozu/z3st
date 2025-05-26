@@ -85,9 +85,9 @@ class FuelRod(FiniteElementSetting):
         self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius)
         self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
 
-        print(f"   fuel outer radius = {self.fuel_outer_radius:.6e} m")
-        print(f"   cladding inner radius = {self.cladding_inner_radius:.6e} m")
-        print(f"   cladding outer radius = {self.cladding_outer_radius:.6e} m")
+        print(f"   fuel outer radius = {self.fuel_outer_radius:.3f} μm")
+        print(f"   cladding inner radius = {self.cladding_inner_radius:.3f} μm")
+        print(f"   cladding outer radius = {self.cladding_outer_radius:.3f} μm")
         print(f"   fuel area = {self.area_fuel:.4e} m²")
         print(f"   gap thickness = {self.gap_thickness*1e6:.3f} micron")
         print(f"   q''' = {self.q_third:.2f} W/m³")
@@ -285,48 +285,6 @@ class FuelRod(FiniteElementSetting):
         self.total_thermal_iterations = 0
         self.total_mech_iterations = 0
 
-    def compute_gap(self):
-        """
-        Compute the current apparent gap between the fuel outer surface
-        and the cladding inner surface, based on the deformed geometry.
-
-        Returns:
-            gap_mean (float): Mean gap (m) between cladding inner surface and fuel outer surface.
-            gap_min (float): Minimum gap (m) (possible local contact detection).
-            gap_max (float): Maximum gap (m).
-        """
-        # Extract undeformed coordinates
-        x = self.mesh.geometry.x[:, 0]
-        y = self.mesh.geometry.x[:, 1]
-
-        # Compute radial coordinate
-        r = np.sqrt(x**2 + y**2)
-
-        # Displacement arrays (reshaped)
-        u_fuel_array = self.u_fuel.x.array.reshape(self.mesh.geometry.x.shape)
-        u_clad_array = self.u_cladding.x.array.reshape(self.mesh.geometry.x.shape)
-
-        # Radial displacements
-        u_r_fuel = np.sqrt(u_fuel_array[:, 0]**2 + u_fuel_array[:, 1]**2)
-        u_r_clad = np.sqrt(u_clad_array[:, 0]**2 + u_clad_array[:, 1]**2)
-
-        # Degrees of freedom
-        dofs_fuel_outer = self.dofs_fuel_outer
-        dofs_cladding_inner = self.dofs_cladding_inner
-
-        # Deformed radii
-        r_fuel_outer = r[dofs_fuel_outer] + u_r_fuel[dofs_fuel_outer]
-        r_clad_inner = r[dofs_cladding_inner] + u_r_clad[dofs_cladding_inner]
-
-        # Gap
-        gap = r_clad_inner - r_fuel_outer
-
-        if min(np.mean(gap), np.min(gap), np.max(gap)) < 0:
-            print(f"⚠️ Warning: apparent gap closure!")
-
-        # Return mean, min, and max gap
-        return np.mean(gap), np.min(gap), np.max(gap)
-
     def solve(self, max_iter=10, tol=1e-2):
         """
         Iterative thermo-mechanical steady-state solver with fixed mesh.
@@ -388,8 +346,15 @@ class FuelRod(FiniteElementSetting):
             disp_r = np.sqrt(u_fuel_array[:, 0]**2 + u_fuel_array[:, 1]**2)
             u_r_max = np.max(disp_r)
 
-            gap_mean, gap_min, gap_max = self.compute_gap()
-            print(f"   Mean apparent gap = {gap_mean*1e6:.2f} μm (min = {gap_min*1e6:.2f} μm, max = {gap_max*1e6:.2f} μm)")
+            (gap_mean, gap_min, gap_max,
+            fuel_outer_mean, fuel_outer_min, fuel_outer_max,
+            clad_inner_mean, clad_inner_min, clad_inner_max,
+            clad_outer_mean, clad_outer_min, clad_outer_max) = self.geometry_manager.compute_deformed_geometry(self.u_fuel, self.u_cladding)
+
+            print(f"   Gap mean = {gap_mean*1e6:.2f} μm, min = {gap_min*1e6:.2f} μm, max = {gap_max*1e6:.2f} μm")
+            print(f"   Fuel outer radius (mean/min/max) = {fuel_outer_mean*1e6:.3f} / {fuel_outer_min*1e6:.3f} / {fuel_outer_max*1e6:.3f} μm")
+            print(f"   Clad inner radius (mean/min/max) = {clad_inner_mean*1e6:.3f} / {clad_inner_min*1e6:.3f} / {clad_inner_max*1e6:.3f} μm")
+            print(f"   Clad outer radius (mean/min/max) = {clad_outer_mean*1e6:.3f} / {clad_outer_min*1e6:.3f} / {clad_outer_max*1e6:.3f} μm")
 
             # --- Convergence check ---
             if u_r_max_prev is not None and gap_mean_prev is not None:
@@ -413,7 +378,7 @@ class FuelRod(FiniteElementSetting):
                     break
             else:
                 print(f"\tInitial u_r_max = {u_r_max*1e6:.2f} μm")
-                print(f"\tInitial gap_mean = {gap_mean*1e6:.2f} μm)")
+                print(f"\tInitial gap_mean = {gap_mean*1e6:.2f} μm")
 
             u_r_max_prev = u_r_max
             gap_mean_prev = gap_mean
@@ -569,9 +534,9 @@ class FuelRod(FiniteElementSetting):
             error = abs(delta_T_new - delta_T_old) / max(abs(delta_T_old), 1e-6)
 
             # print(f"  Iteration {iteration:02d} | ΔT_gap: {delta_T_new:.2f} K | Error: {error:.2e} | h_gap: {h_gap:.2f} W/m²K")
-            # print(f"     → r_fuel_outer = {self.fuel_outer_radius:.6e} m")
+            # print(f"     → r_fuel_outer = {self.fuel_outer_radius:.3f} μm")
             # print(f"     → LHR = {self.lhr:.2f} W/m")
-            # print(f"     → gap_thickness = {self.gap_thickness:.6e} m")
+            # print(f"     → gap_thickness = {self.gap_thickness:.3f} μm")
 
             delta_T_old = delta_T_new
             T_gap = T_gap_initial + delta_T_new  # update based on current ΔT
@@ -729,7 +694,7 @@ class FuelRod(FiniteElementSetting):
             with open(filename, "a") as f:
                 f.write("# Iter Residual\n")
                 for its, r in residuals:
-                    f.write(f"{its}\t{r:.6e}\n")
+                    f.write(f"{its}\t{r:.3f}\n")
 
             # Matrix norm
             try:
@@ -769,9 +734,9 @@ class FuelRod(FiniteElementSetting):
 
         # Print results
         print("\nDeformed Geometry:")
-        print(f"Fuel Outer Radius (Deformed): {fuel_outer_radius_deformed:.6e} m")
-        print(f"Cladding Inner Radius (Deformed): {cladding_inner_radius_deformed:.6e} m")
-        print(f"Cladding Outer Radius (Deformed): {cladding_outer_radius_deformed:.6e} m")
+        print(f"Fuel Outer Radius (Deformed): {fuel_outer_radius_deformed:.3f} μm")
+        print(f"Cladding Inner Radius (Deformed): {cladding_inner_radius_deformed:.3f} μm")
+        print(f"Cladding Outer Radius (Deformed): {cladding_outer_radius_deformed:.3f} μm")
 
     def get_results(self):
         """

@@ -110,10 +110,10 @@ problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"],
 # problem.initialize_geometry()
 
 t_points = [0, 86400, 100*86400]    # s
-lhr_points = [0, 20000, 20000]      # W/m
+lhr_points = [0, 25000, 25000]      # W/m
 
 print("\n")
-times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=10, filename="power_history.csv")
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=20, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
 
 os.makedirs("output", exist_ok=True)
@@ -151,7 +151,7 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
     problem.lhr = lhr
     problem.update_state()
     problem.solve()
-
+    
     T_fuel_inner.append(np.max(problem.T_fuel.x.array))
     T_fuel_outer.append(np.mean(problem.T_fuel.x.array[problem.dofs_fuel_outer]))
     T_clad_inner.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_inner]))
@@ -166,7 +166,6 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
 end_time = time.time()
 elapsed_time = end_time - start_time
 
-
 save_temperature_history(time_values, T_fuel_inner, T_fuel_outer, T_clad_inner, T_clad_outer)
 
 print("\n")
@@ -176,7 +175,6 @@ print(f"Elapsed time: {elapsed_time:.4f} s")
 # -------
 # Results
 # -------
-# problem.vonMises_equivalent()
 results = problem.get_results()
 
 # ----------------
