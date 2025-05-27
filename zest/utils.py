@@ -10,6 +10,30 @@
 # =============================================================================
 
 import numpy as np
+import yaml
+
+def load(yaml_file):
+    """
+    Load a material from a YAML file and ensure all values (except 'name') are floats.
+
+    Parameters:
+        yaml_file (str): Path to the .yaml file.
+
+    Returns:
+        dict: A dictionary with material properties, properly typed.
+    """
+    with open(yaml_file, "r") as f:
+        data = yaml.safe_load(f)
+
+    for key, value in data.items():
+        if key != "name":
+            try:
+                data[key] = float(value)
+            except Exception as e:
+                raise ValueError(f"Key '{key}' could not be converted to float: {value}") from e
+
+    return data
+
 
 def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_history.tsv"):
     """

@@ -1,0 +1,7 @@
+name: H2O
+
+# Thermophysical properties
+cp: 5241                  # Specific isobaric heat capacity (J/kg·K)
+rho: 746                  # Density (kg/m³)
+mu: 9.24e-5               # Dynamic viscosity (Pa·s)
+k: 0.58                   # Thermal conductivity (W/m·K)

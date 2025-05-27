@@ -1,0 +1,13 @@
+name: T91
+
+# Mechanical properties
+E: 2.0e11         # Young's modulus (Pa)
+nu: 0.3           # Poisson's ratio (-)
+
+# Thermal properties
+k: 28.7           # Thermal conductivity (W/m·K)
+cp: 4600          # Specific heat capacity (J/kg·K)
+alpha: 1.04e-5    # Thermal expansion coefficient (1/K)
+
+# Physical properties
+rho: 7800         # Density (kg/m³)

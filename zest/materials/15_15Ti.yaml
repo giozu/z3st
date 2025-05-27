@@ -1,0 +1,19 @@
+name: 15-15 Ti
+
+# Mechanical properties
+E: 1.7e11         # Young's modulus (Pa)
+nu: 0.3           # Poisson's ratio (-)
+
+# Thermal properties
+k: 10             # Constant thermal conductivity (W/m·K)
+cp: 200           # Specific heat capacity (J/kg·K)
+alpha: 1.2e-5     # Thermal expansion coefficient (1/K)
+
+# Physical properties
+rho: 7750         # Density (kg/m³)
+
+# Optional note on temperature-dependent model
+thermal_conductivity_model:
+  expression: "13.95 + 0.01163 * (T - 273.15)"
+  units: "W/m·K"
+  reference: "Homework 2024-2025, NDT"

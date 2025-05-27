@@ -21,12 +21,27 @@ DEBUG_MODE = "--debug" in sys.argv
 # from thick_cylinder import ThickCylinder
 # from cube import Cube
 
-from materials.lead import coolant
-from materials.uo2 import fuel
-from materials.T91 import cladding
-from materials.he import he
+# Materials
+from utils import load
 
-from conditions.conditions import conditions
+fuel = load("materials/uo2.yaml")
+gas = load("materials/he.yaml")
+cladding = load("materials/T91.yaml")
+coolant = load("materials/h2o.yaml")
+
+conditions = load("conditions/conditions.yaml")
+
+# Debug info
+if DEBUG_MODE:
+    print("[DEBUG] Loaded material:")
+    for k, v in fuel.items():
+        print(f"{k:>8} → {v} ({type(v)})")
+    for k, v in gas.items():
+        print(f"{k:>8} → {v} ({type(v)})")
+    for k, v in cladding.items():
+        print(f"{k:>8} → {v} ({type(v)})")
+    for k, v in coolant.items():
+        print(f"{k:>8} → {v} ({type(v)})")
 
 # Importing utilities
 from utils import *
@@ -132,15 +147,15 @@ T_clad_inner = []
 T_clad_outer = []
 time_values = []
 
-problem.parameters(fuel, cladding, he, 
-                   g=conditions["gravitational acceleration"],
+problem.parameters(fuel, cladding, gas, 
+                   g=conditions["gravitational_acceleration"],
                    lhr=lhr_points[0],
-                   T_ref=conditions["reference temperature"],
+                   T_ref=conditions["reference_temperature"],
                    log_path=log_path)
 
-problem.boundary_conditions(gap_pressure=conditions["gap pressure"], 
-                            coolant_pressure=coolant["coolant pressure"], 
-                            temperature=conditions["boundary temperature"])
+problem.boundary_conditions(gap_pressure=conditions["gap_pressure"], 
+                            coolant_pressure=conditions["coolant_pressure"], 
+                            temperature=conditions["boundary_temperature"])
 
 problem.initialize_fields()
 problem.initialize_geometry()
