@@ -9,6 +9,9 @@ import numpy as np
 from finiteElementSettings import FiniteElementSetting
 from geometryManager import GeometryManager
 
+from models.thermal_model import ThermalSolver
+from models.mechanical_model import MechanicalSolver
+
 from utils import get_ksp_reason_name
 
 class FuelRod(FiniteElementSetting):
@@ -249,39 +252,83 @@ class FuelRod(FiniteElementSetting):
         self.coolant_traction = dolfinx.fem.Constant(self.mesh, coolant_pressure) * self.normal
 
     def initialize_fields(self):
-        """
-        Initialize separate temperature and displacement fields for fuel and cladding,
-        using physically meaningful boundary conditions.
-        This should be called once before the time loop.
-        """
         print("🧪 Initializing temperature and displacement fields...")
 
-        # -- Temperature fields --
+        # --- Temperature ---
         T_init_fuel = float(self.T_bc_fo.value)
         T_init_clad = float(self.T_bc_co.value)
 
         self.T_fuel = dolfinx.fem.Function(self.V_t)
         self.T_fuel.name = "T_fuel"
         self.T_fuel.x.array[:] = T_init_fuel
-        print(f"\t🌡️  Fuel temperature initialized at {T_init_fuel:.2f} K")
 
         self.T_cladding = dolfinx.fem.Function(self.V_t)
         self.T_cladding.name = "T_cladding"
         self.T_cladding.x.array[:] = T_init_clad
-        print(f"\t🌡️  Cladding temperature initialized at {T_init_clad:.2f} K")
 
-        # -- Displacement fields --
+        # --- Displacement ---
         self.u_fuel = dolfinx.fem.Function(self.V_m)
         self.u_fuel.name = "u_fuel"
         self.u_fuel.x.array[:] = 0.0
-        print(f"\t📦 Fuel displacement initialized at 0.0 m")
 
         self.u_cladding = dolfinx.fem.Function(self.V_m)
         self.u_cladding.name = "u_cladding"
         self.u_cladding.x.array[:] = 0.0
-        print(f"\t📦 Cladding displacement initialized at 0.0 m")
 
-        # -- Iteration counters --
+        # --- Derived quantities ---
+        self.q_third = self.lhr / self.area_fuel
+        self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius)
+
+        # --- Solver objects ---
+        self.thermal_solver = ThermalSolver(
+            mesh=self.mesh,
+            V_t=self.V_t,
+            dx_fuel=self.dx_fuel,
+            dx_cladding=self.dx_cladding,
+            ds_ci=self.ds_ci,
+            dofs_fuel_outer=self.dofs_fuel_outer,
+            dofs_cladding_outer=self.dofs_cladding_outer,
+            dofs_cladding_inner=self.dofs_cladding_inner,
+            T_bc_fo=self.T_bc_fo,
+            T_bc_co=self.T_bc_co,
+            lhr=self.lhr,
+            q_third=self.q_third,
+            heat_flux=self.heat_flux,
+            fuel_props=self.fuel,
+            cladding_props=self.cladding,
+            gap_thickness=self.gap_thickness,
+            fuel_outer_radius=self.fuel_outer_radius,
+            filling_gas=self.filling_gas,
+            T_fuel=self.T_fuel,
+            T_cladding=self.T_cladding,
+            debug=getattr(self, "debug_mode", False)
+        )
+
+        self.mechanical_solver = MechanicalSolver(
+            mesh=self.mesh,
+            V_m=self.V_m,
+            dx_fuel=self.dx_fuel,
+            dx_cladding=self.dx_cladding,
+            ds_fo=self.ds_fo,
+            ds_ci=self.ds_ci,
+            ds_co=self.ds_co,
+            dofs_fuel_bottom=self.dofs_fuel_bottom,
+            dofs_cladding_bottom=self.dofs_cladding_bottom,
+            fuel_props=self.fuel,
+            cladding_props=self.cladding,
+            g=self.g,
+            T_ref=self.T_ref,
+            bc_mech_fuel=self.bc_mech_fuel,
+            bc_mech_cladding=self.bc_mech_cladding,
+            u_fuel=self.u_fuel,
+            u_cladding=self.u_cladding,
+            T_fuel=self.T_fuel,
+            T_cladding=self.T_cladding,
+            gap_traction=self.gap_traction,
+            coolant_traction=self.coolant_traction,
+            debug=getattr(self, "debug_mode", False)
+        )
+
         self.total_thermal_iterations = 0
         self.total_mech_iterations = 0
 
@@ -324,8 +371,8 @@ class FuelRod(FiniteElementSetting):
         for it in range(1, max_iter + 1):
             print(f"\n🔁 Thermo-mechanical iteration {it}")
 
-            it_therm = self.thermal_solver()
-            it_mech  = self.mechanical_solver()
+            it_therm = self.thermal_solver.thermal_solver(self.u_t, self.v_t)
+            it_mech = self.mechanical_solver.mechanical_solver(self.u_m, self.v_m)
 
             # --- Relaxation step ---
             self.T_fuel.x.array[:]     = (1 - omega) * T_fuel_prev     + omega * self.T_fuel.x.array
@@ -387,21 +434,7 @@ class FuelRod(FiniteElementSetting):
             print("⚠️ Warning: convergence not reached in max_iter.")
 
         return converged
-
-    def assemble_fuel_system(self):
-        k_fuel_expr = 1.0 / (0.0452 + 2.46e-4 * self.T_fuel)
-        a_fuel = ufl.dot(k_fuel_expr * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_fuel
-        q_vol = dolfinx.fem.Constant(self.mesh, self.q_third)
-        L_fuel = q_vol * self.v_t * self.dx_fuel
-        return a_fuel, L_fuel
-
-    def assemble_cladding_system(self):
-        k_clad = self.cladding["k"]
-        a_clad = ufl.dot(k_clad * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_cladding
-        heat_flux = dolfinx.fem.Constant(self.mesh, self.heat_flux)
-        L_clad = heat_flux * self.v_t * self.ds_ci
-        return a_clad, L_clad
-
+    
     def assemble_thermal_system(self):
         """
         Solve the thermal problem separately in cladding and fuel domains.
@@ -444,272 +477,6 @@ class FuelRod(FiniteElementSetting):
         its_fuel = self.solve_thermal_problem(a_fuel, L_fuel, self.T_fuel, bcs=[self.bc_Tfo])
 
         return its_clad, its_fuel
-
-    def solve_thermal_problem(self, a, L, T_field, bcs):
-        """
-        Solve a thermal system for a single domain using PETSc KSP.
-
-        Parameters:
-        - a (ufl.Form): Bilinear form for the system
-        - L (ufl.Form): Linear form (RHS)
-        - T_field (dolfinx.fem.Function): Field to store the solution
-        - bcs (list): List of Dirichlet BCs
-
-        Returns:
-        - its (int): Number of KSP iterations
-        """
-        # Assemble system
-        a_form = dolfinx.fem.form(a)
-        L_form = dolfinx.fem.form(L)
-
-        A = dolfinx.fem.petsc.create_matrix(a_form)
-        b = dolfinx.fem.petsc.create_vector(L_form)
-
-        dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=bcs)
-        A.assemble()
-
-        print(f"🔍 Solving system for field: {T_field.name}")
-
-        if getattr(self, "debug_mode", False):
-            print(f"[DEBUG] ‣ Temperature solver diagnostics:")
-            print(f"[DEBUG] ‣ Vector size = {T_field.x.petsc_vec.getSize()}")
-            print(f"[DEBUG] ‣ Norm RHS = {b.norm():.3e}")
-            print(f"[DEBUG] ‣ Norm initial guess = {T_field.x.petsc_vec.norm():.3e}")
-            print(f"[DEBUG] ‣ # dofs_fuel_outer = {len(self.dofs_fuel_outer)}")
-            print(f"[DEBUG] ‣ T_bc_fo = {float(self.T_bc_fo.value):.2f} K")
-
-        with b.localForm() as loc:
-            loc.set(0.0)
-        dolfinx.fem.petsc.assemble_vector(b, L_form)
-        dolfinx.fem.petsc.apply_lifting(b, [a_form], [bcs])
-        b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        dolfinx.fem.petsc.set_bc(b, bcs)
-
-        # Solve
-        solver = PETSc.KSP().create(self.mesh.comm)
-        solver.setOperators(A)
-        solver.setType(PETSc.KSP.Type.GMRES)
-        # solver.getPC().setType(PETSc.PC.Type.HYPRE)
-        # solver.getPC().setType("ilu")  # incomplete LU
-        solver.getPC().setType("jacobi")  # diagonal preconditioner
-
-        solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
-        
-        try:
-            solver.solve(b, T_field.x.petsc_vec)
-        except Exception as e:
-            print("❌ PETSc solve failed:", e)
-            raise
-
-        T_field.x.scatter_forward()
-
-        # Report convergence
-        its = solver.getIterationNumber()
-        reason = solver.getConvergedReason()
-        print(f"\t[KSP] Converged in {its} iterations, reason = {reason}: {get_ksp_reason_name(reason)}")
-
-        return its
-
-    def compute_gap_conductance(self, T_gap_initial):
-        """
-        Iteratively computes the temperature drop across the gap (ΔT_gap),
-        given an initial guess for the gap temperature.
-        """
-        if self.lhr < 1e-6:
-            return 0.0
-
-        T_gap = T_gap_initial
-        delta_T_old = 1.0
-        tol = 1e-3
-        error = 1.0
-        max_iter = 20
-        iteration = 0
-
-        while error > tol and iteration < max_iter:
-            iteration += 1
-            k_gas = self.filling_gas['A'] * T_gap**0.79
-            h_gap = k_gas / self.gap_thickness
-            R_gap = 1.0 / (2.0 * np.pi * self.fuel_outer_radius * h_gap)
-            delta_T_new = self.lhr * R_gap
-            error = abs(delta_T_new - delta_T_old) / max(abs(delta_T_old), 1e-6)
-
-            # print(f"  Iteration {iteration:02d} | ΔT_gap: {delta_T_new:.2f} K | Error: {error:.2e} | h_gap: {h_gap:.2f} W/m²K")
-            # print(f"     → r_fuel_outer = {self.fuel_outer_radius:.3f} μm")
-            # print(f"     → LHR = {self.lhr:.2f} W/m")
-            # print(f"     → gap_thickness = {self.gap_thickness:.3f} μm")
-
-            delta_T_old = delta_T_new
-            T_gap = T_gap_initial + delta_T_new  # update based on current ΔT
-
-        print(f"\tIteration {iteration:02d} | ΔT_gap: {delta_T_new:.2f} K | Error: {error:.2e} | h_gap: {h_gap:.2f} W/m²K")
-        return delta_T_new
-
-    def thermal_solver(self):
-        """
-        Thermal solver:
-        1. Solves temperature with initial BCs.
-        2. Computes gap conductance using the cladding inner surface temperature.
-        3. Updates fuel outer surface BC and resolves temperature field.
-        """
-
-        print("--------------")
-        print("Thermal solver")
-        print("--------------")
-
-        if self.gap_thickness < 0:
-            raise RuntimeError(f"❌ Gap thickness < 0: {self.gap_thickness*1e6:.2f} microns")
-
-        # Assemble forms for a and L (dependent on q_third and heat_flux)
-        its_clad, its_fuel = self.assemble_thermal_system()
-
-        # Postprocess (optional): print analytical reference values
-        R_clad = np.log(self.cladding_outer_radius / self.cladding_inner_radius) / (2.0 * np.pi * self.cladding["k"])
-        R_fuel = 1.0 / (4.0 * np.pi * self.fuel["k"])
-
-        # print(f"Analytical temperature drop - Cladding: {self.lhr * R_clad:.2f} K")
-        # print(f"Analytical temperature drop - Gap:      {delta_T_gap:.2f} K")
-        # print(f"Analytical temperature drop - Fuel:     {self.lhr * R_fuel:.2f} K")
-
-        return its_clad + its_fuel
-
-    def mechanical_solver(self):
-        """
-        Solve mechanical equilibrium in fuel and cladding separately.
-        """
-        print("-----------------")
-        print("Mechanical solver")
-        print("-----------------")
-
-        T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
-
-        # -- Fuel: elasticity, body forces, thermal expansion --
-        def epsilon(u): return ufl.sym(ufl.grad(u))
-        def sigma(u, lmbda, mu): return lmbda * ufl.tr(epsilon(u)) * ufl.Identity(len(u)) + 2.0 * mu * epsilon(u)
-
-        sigma_fuel = sigma(self.u_m, self.fuel["lmbda"], self.fuel["mu"])
-        sigma_clad = sigma(self.u_m, self.cladding["lmbda"], self.cladding["mu"])
-
-        # print(f"🔍 bc_mech_fuel → {len(self.bc_mech_fuel)} BCs")
-        # print(f"🔍 bc_mech_cladding → {len(self.bc_mech_cladding)} BCs")
-        # print(f"🔍 dofs_fuel_bottom = {len(self.dofs_fuel_bottom)}")
-        # print(f"🔍 dofs_cladding_bottom = {len(self.dofs_cladding_bottom)}")
-
-        # --- Cladding system ---
-        a_clad = ufl.inner(sigma_clad, epsilon(self.v_m)) * self.dx_cladding
-        L_clad = (
-            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.cladding["rho"] * self.g)), self.v_m) * self.dx_cladding +
-            (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.T_cladding - T_ref) * ufl.div(self.v_m) * self.dx_cladding +
-            ufl.dot(self.gap_traction, self.v_m) * self.ds_ci +
-            ufl.dot(self.coolant_traction, self.v_m) * self.ds_co
-        )
-
-        # print("Form rank =", len(ufl.algorithms.analysis.extract_arguments(L_clad)))
-        
-        its_clad = self.solve_mechanical_subsystem(a_clad, L_clad, self.u_cladding, bcs=self.bc_mech_cladding)
-
-        # --- Fuel system ---
-        a_fuel = ufl.inner(sigma_fuel, epsilon(self.v_m)) * self.dx_fuel
-        L_fuel = (
-            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.fuel["rho"] * self.g)), self.v_m) * self.dx_fuel +
-            (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.T_fuel - T_ref) * ufl.div(self.v_m) * self.dx_fuel +
-            ufl.dot(self.gap_traction, self.v_m) * self.ds_fo
-        )
-
-        its_fuel = self.solve_mechanical_subsystem(a_fuel, L_fuel, self.u_fuel, bcs=self.bc_mech_fuel)
-
-        return its_fuel + its_clad
-
-
-    def solve_mechanical_subsystem(self, a, L, u_field, bcs):
-        """
-        Solve a mechanical system (fuel or cladding) using PETSc KSP.
-
-        Parameters:
-        - a (ufl.Form): Bilinear form (stiffness matrix)
-        - L (ufl.Form): Linear form (RHS)
-        - u_field (dolfinx.fem.Function): Function to hold the displacement result
-        - bcs (list): List of Dirichlet boundary conditions
-        """
-        a_form = dolfinx.fem.form(a)
-        L_form = dolfinx.fem.form(L)
-
-        A = dolfinx.fem.petsc.create_matrix(a_form)
-        b = dolfinx.fem.petsc.create_vector(L_form)
-
-        print("\n‣ Solving system for:", u_field.name)
-        assert bcs is not None and len(bcs) > 0, "❌ No boundary conditions!"
-
-        dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=bcs)
-        A.assemble()
-
-        if getattr(self, "debug_mode", False):
-
-            # Matrix info
-            size = A.getSize()
-            info = A.getInfo()
-            print(f"[DEBUG] ‣ Matrix size         = {size}")
-            print(f"[DEBUG] ‣ Nonzeros used       = {info['nz_used']}, allocated = {info['nz_allocated']}")
-            print(f"[DEBUG] ‣ Matrix memory used  = {info['memory'] / 1024:.1f} KB")
-
-            # Vector norms
-            print(f"[DEBUG] ‣ Initial guess norm   = {u_field.x.petsc_vec.norm():.4e}")
-
-            # Viewer output
-            viewer = PETSc.Viewer().createASCII(f"matrix_A_{u_field.name}.txt", "w")
-            viewer.pushFormat(PETSc.Viewer.Format.ASCII_INFO_DETAIL)
-            A.view(viewer)
-            viewer.popFormat()
-            print(f"[DEBUG] ‣ Matrix structure written to matrix_A_{u_field.name}.txt")
-
-        with b.localForm() as loc:
-            loc.set(0.0)
-        dolfinx.fem.petsc.assemble_vector(b, L_form)
-        dolfinx.fem.petsc.apply_lifting(b, [a_form], [bcs])
-        b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        dolfinx.fem.petsc.set_bc(b, bcs)
-
-        if getattr(self, "debug_mode", False):
-            print(f"[DEBUG] ‣ RHS norm (after BCs)  = {b.norm():.4e}")
-
-        solver = PETSc.KSP().create(self.mesh.comm)
-        solver.setOperators(A)
-        solver.setType(PETSc.KSP.Type.GMRES)
-        # solver.getPC().setType(PETSc.PC.Type.HYPRE)
-        solver.getPC().setType("jacobi")
-        # solver.getPC().setType("ilu")
-        solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
-
-        residuals = []
-        if getattr(self, "debug_mode", False):
-            def monitor(ksp, its, rnorm):
-                residuals.append((its, rnorm))
-                print(f"\t[KSP] Mech iteration {its} | residual = {rnorm:.2e}")
-            solver.setMonitor(monitor)
-
-        solver.solve(b, u_field.x.petsc_vec)
-
-        if getattr(self, "debug_mode", False):
-            # Residuals
-            filename = f"residuals_{u_field.name}.tsv"
-            with open(filename, "a") as f:
-                f.write("# Iter Residual\n")
-                for its, r in residuals:
-                    f.write(f"{its}\t{r:.3f}\n")
-
-            # Matrix norm
-            try:
-                normA = A.norm()
-                print(f"[DEBUG] ‣ Matrix 2-norm estimate = {normA:.2e}")
-            except Exception as e:
-                print(f"[DEBUG] ‣ Norm estimate failed: {e}")
-
-        u_field.x.scatter_forward()
-
-        its = solver.getIterationNumber()
-        reason = solver.getConvergedReason()
-        print(f"\t[KSP] Converged in {its} iterations, reason = {reason}: {get_ksp_reason_name(reason)}")
-
-        return its
 
     def compute_deformed_radii(self):
         """
