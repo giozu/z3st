@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: zest-api
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 zest_api.py
