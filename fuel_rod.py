@@ -88,6 +88,10 @@ class FuelRod(FiniteElementSetting):
         self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius)
         self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
 
+        # Propagate to thermal solver
+        self.thermal_solver.q_third = self.q_third
+        self.thermal_solver.heat_flux = self.heat_flux
+
         print(f"   fuel outer radius = {self.fuel_outer_radius:.3f} μm")
         print(f"   cladding inner radius = {self.cladding_inner_radius:.3f} μm")
         print(f"   cladding outer radius = {self.cladding_outer_radius:.3f} μm")

@@ -32,16 +32,25 @@ class ThermalSolver:
 
     def assemble_fuel_system(self, u_t, v_t, T_fuel):
         k_fuel_expr = 1.0 / (0.0452 + 2.46e-4 * T_fuel)
-        if self.debug:
-            print("ThermalSolver.assemble_fuel_system")
-            T_vals = T_fuel.x.array
-            k_vals = 1.0 / (0.0452 + 2.46e-4 * T_vals)
-            print("\n[DEBUG] Fuel conductivity:")
-            print(f"  k_min = {np.min(k_vals):.4f}, k_max = {np.max(k_vals):.4f}, k_mean = {np.mean(k_vals):.4f}")
 
         a_fuel = ufl.dot(k_fuel_expr * ufl.grad(u_t), ufl.grad(v_t)) * self.dx_fuel
         q_vol = dolfinx.fem.Constant(self.mesh, self.q_third)
         L_fuel = q_vol * v_t * self.dx_fuel
+
+        if self.debug:
+            print("[DEBUG] ThermalSolver.assemble_fuel_system")
+    
+            T_vals = T_fuel.x.array
+            k_vals = 1.0 / (0.0452 + 2.46e-4 * T_vals)
+    
+            print("\n[DEBUG] Fuel conductivity:")
+            print(f"  k_min = {np.min(k_vals):.4f}, k_max = {np.max(k_vals):.4f}, k_mean = {np.mean(k_vals):.4f}")
+
+            L_fuel_form = dolfinx.fem.form(L_fuel)
+            rhs_norm = dolfinx.fem.assemble_scalar(L_fuel_form)
+            print("[DEBUG] q_third:", self.q_third)
+            print("[DEBUG] Fuel RHS norm:", rhs_norm)
+
         return a_fuel, L_fuel
 
     def assemble_cladding_system(self, u_t, v_t):
@@ -119,6 +128,9 @@ class ThermalSolver:
         # Update BC and STEP 3: Solve fuel
         self.T_bc_fo = dolfinx.fem.Constant(self.mesh, new_T_bc_fo)
         a_fuel, L_fuel = self.assemble_fuel_system(u_t, v_t, self.T_fuel)
+
+        # print("[DEBUG] Dirichlet DOFs fuel outer:", len(self.dofs_fuel_outer))
+
         its_fuel = self.solve_thermal_problem(a_fuel, L_fuel, self.T_fuel, [
             dolfinx.fem.dirichletbc(self.T_bc_fo, self.dofs_fuel_outer, self.V_t)
         ])
