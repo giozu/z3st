@@ -32,6 +32,13 @@ class ThermalSolver:
 
     def assemble_fuel_system(self, u_t, v_t, T_fuel):
         k_fuel_expr = 1.0 / (0.0452 + 2.46e-4 * T_fuel)
+        if self.debug:
+            print("ThermalSolver.assemble_fuel_system")
+            T_vals = T_fuel.x.array
+            k_vals = 1.0 / (0.0452 + 2.46e-4 * T_vals)
+            print("\n[DEBUG] Fuel conductivity:")
+            print(f"  k_min = {np.min(k_vals):.4f}, k_max = {np.max(k_vals):.4f}, k_mean = {np.mean(k_vals):.4f}")
+
         a_fuel = ufl.dot(k_fuel_expr * ufl.grad(u_t), ufl.grad(v_t)) * self.dx_fuel
         q_vol = dolfinx.fem.Constant(self.mesh, self.q_third)
         L_fuel = q_vol * v_t * self.dx_fuel

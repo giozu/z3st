@@ -372,6 +372,10 @@ class FuelRod(FiniteElementSetting):
             print(f"\n🔁 Thermo-mechanical iteration {it}")
 
             it_therm = self.thermal_solver.thermal_solver(self.u_t, self.v_t)
+            
+            T_vals = self.T_fuel.x.array
+            print(f"[DEBUG] T_fuel min/max = {T_vals.min():.2f} / {T_vals.max():.2f}")
+
             it_mech = self.mechanical_solver.mechanical_solver(self.u_m, self.v_m)
 
             # --- Relaxation step ---
