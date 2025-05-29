@@ -18,9 +18,3 @@ thermal_conductivity_model:
   value: 21.5
   units: "W/m·K"
   reference: "https://www.azom.com/article.aspx?ArticleID=7644"
-
-# Geometry
-geometry:
-  radius_ci: 1.5   # Inner radius (m)
-  radius_co: 2.0   # Outer radius (m)
-  height: 2.0      # Height (m)

@@ -1,7 +1,7 @@
 name: lead
 
 # Thermophysical properties
-cp: 146                    # Specific heat capacity (J/kg·K)
+cp: 146                   # Specific heat capacity (J/kg·K)
 rho: 10520                # Density (kg/m³)
 mu: 0.002                 # Dynamic viscosity (Pa·s)
 k: 15.5                   # Thermal conductivity (W/m·K)
