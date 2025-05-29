@@ -32,4 +32,4 @@ def get_file():
         return jsonify({"error": "File not found or access denied"}), response.status_code
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000, debug=True)
