@@ -3,6 +3,5 @@ services:
     name: zest-api
     env: python
     plan: free
-    rootDir: zest-api
-    buildCommand: pip install -r zest-api/requirements.txt
-    startCommand: python3 zest-api/zest_api.py
+    buildCommand: pip install -r requirements.txt
+    startCommand: python3 zest_api.py
