@@ -31,7 +31,7 @@ class ThermalSolver:
         self.debug = debug
 
         if self.debug:
-            print("🔍 ThermalSolver Debug Info (init):")
+            print("[DEBUG] ThermalSolver.__init__")
             print(f"  Linear Heat Rate (lhr): {self.lhr} W/m")
             print(f"  Volumetric Heat Source (q_third): {self.q_third}")
             print(f"  Heat Flux: {self.heat_flux}")
@@ -47,15 +47,17 @@ class ThermalSolver:
             print(f"  Initial BC T_bc_co: {float(self.T_bc_co.value)}")
 
     def update(self, lhr: float, fuel_outer_radius: float):
+        self.lhr = lhr
+        self.fuel_outer_radius = fuel_outer_radius
         self.area_fuel = np.pi * fuel_outer_radius**2
         self.q_third = lhr / self.area_fuel
         self.heat_flux = lhr / (2.0 * np.pi * fuel_outer_radius)
 
         if self.debug:
-            print(f"[DEBUG] Updated source terms:")
-            print(f"  LHR = {lhr:.2f} kW/m")
-            print(f"  Fuel outer radius = {fuel_outer_radius*1e6:.1f} μm")
-            print(f"  Area = {self.area_fuel:.5e} m²")
+            print("[DEBUG] ThermalSolver.update:")
+            print(f"  LHR = {self.lhr*1e-3:.2f} kW/m")
+            print(f"  Fuel outer radius = {fuel_outer_radius*1e3:.2f} mm")
+            print(f"  Area = {self.area_fuel:.2e} m²")
             print(f"  q''' = {self.q_third:.2f} W/m³")
             print(f"  Heat flux = {self.heat_flux:.2f} W/m²")
 
