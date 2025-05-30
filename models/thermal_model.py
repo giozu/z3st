@@ -30,6 +30,35 @@ class ThermalSolver:
         self.T_cladding = T_cladding
         self.debug = debug
 
+        if self.debug:
+            print("🔍 ThermalSolver Debug Info (init):")
+            print(f"  Linear Heat Rate (lhr): {self.lhr} W/m")
+            print(f"  Volumetric Heat Source (q_third): {self.q_third}")
+            print(f"  Heat Flux: {self.heat_flux}")
+            print(f"  Fuel Properties: {self.fuel}")
+            print(f"  Cladding Properties: {self.cladding}")
+            print(f"  Gap Thickness: {self.gap_thickness} m")
+            print(f"  Fuel Outer Radius: {self.fuel_outer_radius} m")
+            print(f"  Filling Gas Properties: {self.filling_gas}")
+            print(f"  Dirichlet DOFs - Fuel Outer: {len(self.dofs_fuel_outer)}")
+            print(f"  Dirichlet DOFs - Cladding Outer: {len(self.dofs_cladding_outer)}")
+            print(f"  Dirichlet DOFs - Cladding Inner: {len(self.dofs_cladding_inner)}")
+            print(f"  Initial BC T_bc_fo: {float(self.T_bc_fo.value)}")
+            print(f"  Initial BC T_bc_co: {float(self.T_bc_co.value)}")
+
+    def update(self, lhr: float, fuel_outer_radius: float):
+        self.area_fuel = np.pi * fuel_outer_radius**2
+        self.q_third = lhr / self.area_fuel
+        self.heat_flux = lhr / (2.0 * np.pi * fuel_outer_radius)
+
+        if self.debug:
+            print(f"[DEBUG] Updated source terms:")
+            print(f"  LHR = {lhr:.2f} kW/m")
+            print(f"  Fuel outer radius = {fuel_outer_radius*1e6:.1f} μm")
+            print(f"  Area = {self.area_fuel:.5e} m²")
+            print(f"  q''' = {self.q_third:.2f} W/m³")
+            print(f"  Heat flux = {self.heat_flux:.2f} W/m²")
+
     def assemble_fuel_system(self, u_t, v_t, T_fuel):
         k_fuel_expr = 1.0 / (0.0452 + 2.46e-4 * T_fuel)
 
@@ -90,7 +119,12 @@ class ThermalSolver:
 
     def compute_gap_conductance(self, T_gap_initial):
         if self.lhr < 1e-6:
+            print("[DEBUG] Linear Heat Rate too low:", self.lhr)
             return 0.0
+
+        print("[DEBUG] Starting gap conductance calculation")
+        print(f"[DEBUG] Inputs - T_gap_initial: {T_gap_initial}, gap_thickness: {self.gap_thickness}, "
+            f"fuel_outer_radius: {self.fuel_outer_radius}, gas A: {self.filling_gas['A']}")
 
         T_gap = T_gap_initial
         delta_T_old = 1.0
@@ -100,14 +134,21 @@ class ThermalSolver:
         iteration = 0
 
         while error > tol and iteration < max_iter:
-            iteration += 1
             k_gas = self.filling_gas['A'] * T_gap**0.79
             h_gap = k_gas / self.gap_thickness
             R_gap = 1.0 / (2.0 * np.pi * self.fuel_outer_radius * h_gap)
             delta_T_new = self.lhr * R_gap
             error = abs(delta_T_new - delta_T_old) / max(abs(delta_T_old), 1e-6)
+
+            print(f"[DEBUG] Iter {iteration}: T_gap = {T_gap:.4f}, k_gas = {k_gas:.4f}, "
+                f"h_gap = {h_gap:.4f}, R_gap = {R_gap:.6f}, delta_T = {delta_T_new:.4f}, error = {error:.4e}")
+
             delta_T_old = delta_T_new
             T_gap = T_gap_initial + delta_T_new
+            iteration += 1
+
+        if iteration == max_iter:
+            print("[WARNING] Gap conductance iteration reached max iterations")
 
         return delta_T_new
 
@@ -130,6 +171,10 @@ class ThermalSolver:
         a_fuel, L_fuel = self.assemble_fuel_system(u_t, v_t, self.T_fuel)
 
         # print("[DEBUG] Dirichlet DOFs fuel outer:", len(self.dofs_fuel_outer))
+        print(f"[DEBUG] Temperature jump across the gap = {delta_T_gap} K")
+        print("[DEBUG] dofs_cladding_inner length:", len(self.dofs_cladding_inner))
+        print("[DEBUG] T_clad_inner_values:", T_clad_inner_values)
+        print("[DEBUG] Initial T_bc_fo:", float(self.T_bc_fo.value))
 
         its_fuel = self.solve_thermal_problem(a_fuel, L_fuel, self.T_fuel, [
             dolfinx.fem.dirichletbc(self.T_bc_fo, self.dofs_fuel_outer, self.V_t)

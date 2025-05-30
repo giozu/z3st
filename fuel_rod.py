@@ -83,22 +83,21 @@ class FuelRod(FiniteElementSetting):
         self.cladding_outer_radius = self.geometry_manager.cladding_outer_radius
         self.height = self.geometry_manager.height
 
-        self.area_fuel = np.pi * self.fuel_outer_radius**2
-        self.q_third = self.lhr / self.area_fuel
-        self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius)
-        self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
+        self.thermal_solver.update(self.lhr, self.fuel_outer_radius)
 
-        # Propagate to thermal solver
-        self.thermal_solver.q_third = self.q_third
-        self.thermal_solver.heat_flux = self.heat_flux
+        # self.area_fuel = np.pi * self.fuel_outer_radius**2
+        # self.q_third = self.lhr / self.area_fuel
+        # self.heat_flux = self.lhr / (2.0 * np.pi * self.cladding_inner_radius)
+        # self.gap_thickness = self.cladding_inner_radius - self.fuel_outer_radius
 
-        print(f"   fuel outer radius = {self.fuel_outer_radius:.3f} μm")
-        print(f"   cladding inner radius = {self.cladding_inner_radius:.3f} μm")
-        print(f"   cladding outer radius = {self.cladding_outer_radius:.3f} μm")
-        print(f"   fuel area = {self.area_fuel:.4e} m²")
-        print(f"   gap thickness = {self.gap_thickness*1e6:.3f} micron")
-        print(f"   q''' = {self.q_third:.2f} W/m³")
-        print(f"   heat flux at cladding inner surface = {self.heat_flux:.2f} W/m²")
+        # print(f"   fuel outer radius = {self.fuel_outer_radius:.3f} μm")
+        # print(f"   cladding inner radius = {self.cladding_inner_radius:.3f} μm")
+        # print(f"   cladding outer radius = {self.cladding_outer_radius:.3f} μm")
+        # print(f"   fuel area = {self.area_fuel:.4e} m²")
+        # print(f"   gap thickness = {self.gap_thickness*1e6:.3f} micron")
+        # print(f"   q''' = {self.q_third:.2f} W/m³")
+        # print(f"   heat flux at cladding inner surface = {self.heat_flux:.2f} W/m²")
+
 
     def parameters(self, fuel, cladding, filling_gas, g, lhr, T_ref, log_path="output/simulation_log.txt"):
         """
