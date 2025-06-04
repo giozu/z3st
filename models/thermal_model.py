@@ -121,12 +121,14 @@ class ThermalSolver:
 
     def compute_gap_conductance(self, T_gap_initial):
         if self.lhr < 1e-6:
-            print("[DEBUG] Linear Heat Rate too low:", self.lhr)
+            if self.debug:
+                print("[DEBUG] Linear Heat Rate too low:", self.lhr)
             return 0.0
-
-        print("[DEBUG] Starting gap conductance calculation")
-        print(f"[DEBUG] Inputs - T_gap_initial: {T_gap_initial}, gap_thickness: {self.gap_thickness}, "
-            f"fuel_outer_radius: {self.fuel_outer_radius}, gas A: {self.filling_gas['A']}")
+        
+        if self.debug:
+            print("[DEBUG] Starting gap conductance calculation")
+            print(f"[DEBUG] Inputs - T_gap_initial: {T_gap_initial}, gap_thickness: {self.gap_thickness}, "
+                f"fuel_outer_radius: {self.fuel_outer_radius}, gas A: {self.filling_gas['A']}")
 
         T_gap = T_gap_initial
         delta_T_old = 1.0
@@ -142,7 +144,8 @@ class ThermalSolver:
             delta_T_new = self.lhr * R_gap
             error = abs(delta_T_new - delta_T_old) / max(abs(delta_T_old), 1e-6)
 
-            print(f"[DEBUG] Iter {iteration}: T_gap = {T_gap:.4f}, k_gas = {k_gas:.4f}, "
+            if self.debug:
+                print(f"[DEBUG] Iter {iteration}: T_gap = {T_gap:.4f}, k_gas = {k_gas:.4f}, "
                 f"h_gap = {h_gap:.4f}, R_gap = {R_gap:.6f}, delta_T = {delta_T_new:.4f}, error = {error:.4e}")
 
             delta_T_old = delta_T_new
@@ -172,11 +175,12 @@ class ThermalSolver:
         self.T_bc_fo = dolfinx.fem.Constant(self.mesh, new_T_bc_fo)
         a_fuel, L_fuel = self.assemble_fuel_system(u_t, v_t, self.T_fuel)
 
-        # print("[DEBUG] Dirichlet DOFs fuel outer:", len(self.dofs_fuel_outer))
-        print(f"[DEBUG] Temperature jump across the gap = {delta_T_gap} K")
-        print("[DEBUG] dofs_cladding_inner length:", len(self.dofs_cladding_inner))
-        print("[DEBUG] T_clad_inner_values:", T_clad_inner_values)
-        print("[DEBUG] Initial T_bc_fo:", float(self.T_bc_fo.value))
+        if self.debug:
+            # print("[DEBUG] Dirichlet DOFs fuel outer:", len(self.dofs_fuel_outer))
+            print(f"[DEBUG] Temperature jump across the gap = {delta_T_gap} K")
+            print("[DEBUG] dofs_cladding_inner length:", len(self.dofs_cladding_inner))
+            print("[DEBUG] T_clad_inner_values:", T_clad_inner_values)
+            print("[DEBUG] Initial T_bc_fo:", float(self.T_bc_fo.value))
 
         its_fuel = self.solve_thermal_problem(a_fuel, L_fuel, self.T_fuel, [
             dolfinx.fem.dirichletbc(self.T_bc_fo, self.dofs_fuel_outer, self.V_t)
