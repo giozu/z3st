@@ -291,7 +291,7 @@ def plot_temperature_at_z(problem, z_target=0.005, tol=0.0001):
     V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))  # Discontinuous Galerkin space
 
     # Interpolate the temperature at cell centers
-    temperature_expr = dolfinx.fem.Expression(problem.temperature, V_scalar.element.interpolation_points())
+    temperature_expr = dolfinx.fem.Expression(problem.T, V_scalar.element.interpolation_points())
     temperature_func = dolfinx.fem.Function(V_scalar)
     temperature_func.interpolate(temperature_expr)
 
@@ -305,7 +305,7 @@ def plot_temperature_at_z(problem, z_target=0.005, tol=0.0001):
     plt.ylabel("Temperature [K]")
     plt.legend()
     plt.grid()
-    plt.title(f"Temperature Distribution at z={z_target:.4f}m")
+    plt.title(f"Temperature distribution at z={z_target:.4f}m")
     plt.show()
 
 def export_fields(problem, step, t=None, lhr=None, output_dir="output"):

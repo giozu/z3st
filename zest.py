@@ -206,10 +206,10 @@ results = problem.get_results()
 # ----------------
 plot_displacement(problem)
 plot_temperature(problem)
+plot_temperature_at_z(problem, z_target=0.005, tol=0.0005)
 plot_stress(problem, z_target=0.0055, tol=0.0001)
 
 # plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
-# plot_temperature_at_z(problem, z_target=0.005, tol=0.0005)
 
 
 # plot_temperature(temperature, problem)
