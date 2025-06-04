@@ -538,31 +538,41 @@ class FuelRod(FiniteElementSetting):
         T_ref = dolfinx.fem.Constant(self.mesh, self.T_ref)
 
         # Strain
-        strain_fuel = epsilon(self.u_fuel)
-        strain_cladding = epsilon(self.u_cladding)
+        self.strain_fuel = epsilon(self.u_fuel)
+        self.strain_cladding = epsilon(self.u_cladding)
 
-        # Stress (contributo termico incluso)
-        stress_fuel = (
+        # Stress
+        self.stress_fuel = (
             sigma(self.u_fuel, self.fuel["lmbda"], self.fuel["mu"]) -
             (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] *
             (self.T_fuel - T_ref) * ufl.Identity(3)
         )
 
-        stress_cladding = (
+        self.stress_cladding = (
             sigma(self.u_cladding, self.cladding["lmbda"], self.cladding["mu"]) -
             (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] *
             (self.T_cladding - T_ref) * ufl.Identity(3)
         )
 
+        self.T = dolfinx.fem.Function(self.V_t)
+        self.T.name = "T"
+        self.T.x.array[:] = self.T_fuel.x.array + self.T_cladding.x.array
+
+        self.u = dolfinx.fem.Function(self.V_m)
+        self.u.name = "u"
+        self.u.x.array[:] = self.u_fuel.x.array + self.u_cladding.x.array
+
         return (
             self.u_fuel,
             self.u_cladding,
-            strain_fuel,
-            strain_cladding,
-            stress_fuel,
-            stress_cladding,
+            self.u,
+            self.strain_fuel,
+            self.strain_cladding,
+            self.stress_fuel,
+            self.stress_cladding,
+            self.T,
             self.T_fuel,
-            self.T_cladding
+            self.T_cladding,
         )
 
     def vonMises_equivalent(self):

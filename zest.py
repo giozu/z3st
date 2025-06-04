@@ -124,11 +124,11 @@ problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"],
 
 # problem.initialize_geometry()
 
-t_points = [0, 86400, 100*86400]    # s
-lhr_points = [0, 25000, 25000]      # W/m
+t_points = [0]       # s
+lhr_points = [25000]     # W/m
 
 print("\n")
-times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=20, filename="power_history.csv")
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
 
 os.makedirs("output", exist_ok=True)
@@ -204,11 +204,13 @@ results = problem.get_results()
 # ----------------
 # Post-processing
 # ----------------
-# plot_sigma_components_at_z(problem, z_target=0.0055, tol=0.0001)
+plot_displacement(problem)
+plot_temperature(problem)
+plot_stress(problem, z_target=0.0055, tol=0.0001)
+
 # plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
 # plot_temperature_at_z(problem, z_target=0.005, tol=0.0005)
 
-# plot_displacement(displacement, problem)
 
 # plot_temperature(temperature, problem)
 # to_paraview(problem)

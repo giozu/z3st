@@ -1,5 +1,4 @@
 """
-
 Zest: A FEniCSx module for fuel performance modeling
 =====================================================
 Author: Giovanni Zullo
@@ -8,27 +7,22 @@ Date: 16/01/2025
 Description:
 ------------
 output.py contains functions to visualize the results of the ZEST code.
-
 """
 
 # Import necessary modules
-import matplotlib
-import matplotlib.pyplot
 import matplotlib.pyplot as plt
 import pyvista
 import dolfinx
 from dolfinx.mesh import compute_midpoints
-import ufl
 import numpy as np
 import os
 
-def plot_displacement(displacement, problem):
+def plot_displacement(problem):
     """
     Plot the displacement field of the problem
     """
 
     # Start PyVista visualization
-    import pyvista
     p = pyvista.Plotter()
 
     # Create the plotter and grid for visualization
@@ -36,7 +30,7 @@ def plot_displacement(displacement, problem):
     grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
     # Attach vector values to grid and warp grid by vector
-    grid["u"] = displacement.x.array.reshape((geometry.shape[0], 3))
+    grid["u"] = problem.u.x.array.reshape((geometry.shape[0], 3))
 
     p.add_mesh(grid, style="wireframe", color="k")
 
@@ -59,42 +53,46 @@ def plot_displacement(displacement, problem):
 
     with dolfinx.io.XDMFFile(problem.mesh.comm, "output/displacement.xdmf", "w") as xdmf:
         xdmf.write_mesh(problem.mesh)
-        displacement.name = "displacement"
-        xdmf.write_function(displacement)
+        problem.u.name = "displacement"
+        xdmf.write_function(problem.u)
 
-    return displacement
-
-def plot_temperature(temperature, problem):
+def plot_temperature(problem):
     """
-    Plot the temperature field of the problem
+    Plot the temperature field of the problem using PyVista
+    and save it to disk.
     """
-
-    print(f"\nFunction plot_temperature()")
-
-    pyvista.start_xvfb() # Start virtual framebuffer
 
     # Create plotter and pyvista grid
     topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_t)
-    grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
-
-    # Attach vector values to grid and warp grid by vector
-    grid.point_data["T"] = temperature.x.array.real
-    grid.set_active_scalars("T")
-
-    p = pyvista.Plotter(off_screen=True) # Enable off-screen rendering
     
-    p.add_mesh(grid, show_edges=True)
-    p.view_isometric()
+    displacement = problem.u.x.array.reshape(geometry.shape)
+    deformed_geometry = geometry + displacement    
+
+    grid = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
+
+    # Attach scalar values to grid
+    grid["T"] = problem.T.x.array.real
+
+    # Visualize scalar field
+    p = pyvista.Plotter()
+    p.add_mesh(grid, scalars="T", cmap="plasma")
     p.show_axes()
 
-    output_dir = "output"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    # Show or save plot
+    if not pyvista.OFF_SCREEN:
+        p.show()
+    else:
+        p.screenshot("output/temperature.png")
 
-    figure_as_array = p.screenshot("output/temperature.png")
-    return figure_as_array
+    os.makedirs("output", exist_ok=True)
 
-def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
+    # Write to XDMF
+    with dolfinx.io.XDMFFile(problem.mesh.comm, "output/temperature.xdmf", "w") as xdmf:
+        xdmf.write_mesh(problem.mesh)
+        problem.T.name = "T"
+        xdmf.write_function(problem.T)
+
+def plot_stress(problem, z_target=0.005, tol=0.0001):
     """
     Compute and plot the radial (σ_rr), hoop (σ_θθ), and axial (σ_zz) stress components
     as a function of radius at a specific height z_target.
@@ -106,8 +104,10 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     """
 
     # Compute cell centers (for DG(0) function space)
-    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim, 
-                                     np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
+    cell_centers = compute_midpoints(
+        problem.mesh, problem.mesh.topology.dim, 
+        np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local)
+    )
 
     # Extract cell center coordinates
     x = cell_centers[:, 0]
@@ -204,7 +204,6 @@ def plot_sigma_components_at_z(problem, z_target=0.005, tol=0.0001):
     plt.grid()
     plt.title(f"Stress Components at z={z_target:.4f}m")
     plt.show()
-
 
 def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
     """
