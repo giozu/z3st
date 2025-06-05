@@ -6,7 +6,7 @@ from petsc4py import PETSc
 from finiteElementSettings import FiniteElementSetting
 from models.thermal_model_cube import ThermalSolver
 from models.mechanical_model_cube import MechanicalSolver
-from utils import get_ksp_reason_name
+import pyvista
 
 class Cube(FiniteElementSetting):
     def volume(self, edge, log_path="output/simulation_log.txt"):
@@ -41,16 +41,47 @@ class Cube(FiniteElementSetting):
 
         self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
         self.dofs_bottom = dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(self.bottom_label))
-        self.dofs_lateral = dolfinx.fem.locate_dofs_topological(self.V_t, self.fdim, self.ft.find(2))
 
-        self.bc_mech = [
+        self.bc_M = [
             dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
         ]
-        self.T_bc = dolfinx.fem.Constant(self.mesh, temperature)
-        self.bc_thermal = [dolfinx.fem.dirichletbc(self.T_bc, self.dofs_lateral, self.V_t)]
+
+        self.T_bottom = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
+        self.bc_T = [
+            dolfinx.fem.dirichletbc(self.T_bc, self.dofs_bottom, self.V_t)
+        ]
 
         self.normal = ufl.FacetNormal(self.mesh)
         self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
+
+        topology, cell_types, _ = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
+        surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
+
+        plotter = pyvista.Plotter()
+        unique_labels = np.unique(self.ft.values)
+
+        label_map = {
+                1: ("Bottom", "red"),
+                2: ("Face 1", "blue"),
+                3: ("Face 2", "green"),
+                4: ("Face 3", "orange"),
+                5: ("Face 4", "purple"),
+                6: ("Top", "black")
+            }
+
+        print("Face labels present:", unique_labels)
+        for label in unique_labels:
+            facets = self.ft.find(label)
+            print(f"Label {label}: {len(facets)} facets")
+
+        for label in np.unique(self.ft.values):
+            facets = self.ft.find(label)
+            surface_cells = surface.extract_cells(facets)
+            name, color = label_map.get(label, (f"Face {label}", "white"))
+            plotter.add_mesh(surface_cells, show_edges=True, opacity=1.0, color=color, label=name)
+
+        plotter.add_legend()
+        plotter.show()
 
     def update_state(self):
         self.q_third = self.lhr / self.area
@@ -68,14 +99,14 @@ class Cube(FiniteElementSetting):
             V_t=self.V_t,
             q_third=self.q_third,
             k=self.material["k"],
-            bc=self.bc_thermal,
+            bc=self.bc_T,
             source_domain=ufl.dx
         )
 
         self.mechanical_solver = MechanicalSolver(
             mesh=self.mesh,
             V_m=self.V_m,
-            bc=self.bc_mech,
+            bc=self.bc_M,
             lmbda=self.material["lmbda"],
             mu=self.material["mu"],
             alpha=self.material["alpha"],

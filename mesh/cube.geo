@@ -76,7 +76,8 @@ Physical Surface("top") = {6};
 Physical Volume("cube") = {1};
 
 // Generate structured mesh
-Mesh 3;
+Mesh.RecombineAll = 1;
+Mesh 3; // gmsh cube.geo -3 -format msh2
 
 // Save mesh file
 Save "cube.msh";
