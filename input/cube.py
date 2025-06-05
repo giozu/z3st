@@ -133,9 +133,31 @@ class Cube(FiniteElementSetting):
         self.idx_front = np.where(np.isclose(y, 0.0, atol=atol))[0]
         self.idx_back = np.where(np.isclose(y, edge, atol=atol))[0]
 
-    def solve(self):
-        self.thermal_solver.solve(self.T)
-        self.mechanical_solver.solve(self.u)
+    def solve(self, max_iters=20, tol=1e-6):
+
+        converged = False
+        for iteration in range(max_iters):
+            # Store previous displacement
+            u_old = self.u.x.array.copy()
+
+            # Solve thermal problem
+            self.thermal_solver.solve(self.T)
+
+            # Solve mechanical problem
+            self.mechanical_solver.solve(self.u)
+
+            # Compute displacement increment
+            du = self.u.x.array - u_old
+            norm_du = np.linalg.norm(du)
+
+            print(f"Iteration {iteration}, ||Δu|| = {norm_du:.3e}")
+            if norm_du < tol:
+                converged = True
+                print("Converged.")
+                break
+
+        if not converged:
+            print("Warning: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
 

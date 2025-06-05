@@ -12,24 +12,35 @@ This project is currently under development.
 
 # Importing python modules
 import time
-
 import sys
+
 DEBUG_MODE = "--debug" in sys.argv
 
-# Importing FEniCS modules and custom classes
-# from linear_elasticity import LinearElasticity
-# from thick_cylinder import ThickCylinder
+# Importing utilities
 from input.cube import Cube
+from fuel_rod import FuelRod
+# from geometry.fuel_rod import geometry
+from geometry.cube import geometry
+from postprocessing import save_temperature_history
+from utils import *
+from output import *
 
 # Materials
-from utils import load
-
 fuel = load("materials/uo2.yaml")
 gas = load("materials/he.yaml")
 cladding = load("materials/T91.yaml")
 coolant = load("materials/h2o.yaml")
 
+# Initial and boundary conditions
 conditions = load("conditions/conditions.yaml")
+
+t_points = [0]          # s
+lhr_points = [25000]    # W/m
+
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
+# times, lhrs = read_power_history("power_history.csv")
+
+os.makedirs("output", exist_ok=True)
 
 # Debug info
 if DEBUG_MODE:
@@ -42,10 +53,6 @@ if DEBUG_MODE:
         print(f"{k:>8} → {v} ({type(v)})")
     for k, v in coolant.items():
         print(f"{k:>8} → {v} ({type(v)})")
-
-# Importing utilities
-from utils import *
-from output import *
 
 start_time = time.time()
 
@@ -76,56 +83,14 @@ problem = Cube(mesh_file='mesh/cube.msh')
 # problem.parameters(cladding["rho"], conditions["gravitational acceleration"], cladding["E"], cladding["nu"], cladding["k"], conditions["LHR"], cladding["alpha"], conditions["reference temperature"], cladding["cp"])
 # problem.boundary_conditions(inner_pressure=conditions["gap pressure"], outer_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
-from datetime import datetime
-
-def clear_log_file(log_path="output/simulation_log.txt"):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    with open(log_path, "w") as f:
-        f.write("ZEST simulation log\n───────────────────\n\n")
-        f.write(f"Author: Giovanni Zullo\n\n")
-        f.write(f"Started: {timestamp}\n\n")
-
-def log_step_info(step, n_steps, t, lhr, problem, log_path="output/simulation_log.txt"):
-    u_fuel = problem.u_fuel.x.array.reshape(problem.mesh.geometry.x.shape)
-    disp_r = np.sqrt(u_fuel[:, 0]**2 + u_fuel[:, 1]**2)
-    u_r_max = np.max(disp_r)
-
-    r_geo = np.linalg.norm(problem.mesh.geometry.x[:, :2], axis=1)
-    T_array = problem.T_fuel.x.array
-    T_center = T_array[np.argmin(r_geo)]
-
-    gap = problem.cladding_inner_radius - problem.fuel_outer_radius
-
-    with open(log_path, "a") as f:
-        f.write(f"Step {step+1:02d}/{n_steps}, t = {t/86400:.2f} d, LHR = {lhr/1000:.2f} kW/m\n")
-        f.write(f"   Max u_r       = {u_r_max:.4e} m\n")
-        f.write(f"   T_center      = {T_center:.2f} K\n")
-        f.write(f"   Gap thickness = {gap:.4e} m\n")
-        f.write("-" * 50 + "\n")
-
 log_path = "output/simulation_log.txt"
 clear_log_file(log_path)
-
-from fuel_rod import FuelRod
-# from geometry.fuel_rod import geometry
-from geometry.cube import geometry
-from postprocessing import save_temperature_history
 
 # problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 problem.debug_mode = DEBUG_MODE
 
 # problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
 problem.volume(geometry["edge"])
-
-t_points = [0]       # s
-lhr_points = [25000]     # W/m
-
-print("\n")
-times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
-# times, lhrs = read_power_history("power_history.csv")
-
-os.makedirs("output", exist_ok=True)
 
 # temp_path = os.path.join("output", "temperature.xdmf")
 # xtemp = dolfinx.io.XDMFFile(problem.mesh.comm, temp_path, "w")
@@ -167,19 +132,20 @@ problem.parameters(
     T_ref=conditions["reference_temperature"]
 )
 
-
 # problem.boundary_conditions(gap_pressure=conditions["gap_pressure"], 
 #                             coolant_pressure=conditions["coolant_pressure"], 
 #                             temperature=conditions["boundary_temperature"])
 
-problem.boundary_conditions(pressure=conditions["coolant_pressure"], 
-                            temperature=conditions["boundary_temperature"])
+problem.boundary_conditions(
+    pressure=conditions["coolant_pressure"], 
+    temperature=conditions["boundary_temperature"]
+)
 
 problem.initialize_fields()
 problem.initialize_geometry()
 
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
-    print(f"\n⏱️ Step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m\n")
+    print(f"\n Time step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m\n")
 
     problem.lhr = lhr
     problem.update_state()

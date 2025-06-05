@@ -9,6 +9,7 @@
 # Date: 2025-04-18
 # =============================================================================
 
+from datetime import datetime
 import numpy as np
 import yaml
 
@@ -33,7 +34,6 @@ def load(yaml_file):
                 raise ValueError(f"Key '{key}' could not be converted to float: {value}") from e
 
     return data
-
 
 def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_history.tsv"):
     """
@@ -129,3 +129,30 @@ def get_ksp_reason_name(reason_code):
         -8: "DIVERGED_NONSYMMETRIC",
     }
     return reason_map.get(reason_code, "UNKNOWN_REASON")
+
+
+def clear_log_file(log_path="output/simulation_log.txt"):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    with open(log_path, "w") as f:
+        f.write("ZEST simulation log\n───────────────────\n\n")
+        f.write(f"Author: Giovanni Zullo\n\n")
+        f.write(f"Started: {timestamp}\n\n")
+
+def log_step_info(step, n_steps, t, lhr, problem, log_path="output/simulation_log.txt"):
+    u_fuel = problem.u_fuel.x.array.reshape(problem.mesh.geometry.x.shape)
+    disp_r = np.sqrt(u_fuel[:, 0]**2 + u_fuel[:, 1]**2)
+    u_r_max = np.max(disp_r)
+
+    r_geo = np.linalg.norm(problem.mesh.geometry.x[:, :2], axis=1)
+    T_array = problem.T_fuel.x.array
+    T_center = T_array[np.argmin(r_geo)]
+
+    gap = problem.cladding_inner_radius - problem.fuel_outer_radius
+
+    with open(log_path, "a") as f:
+        f.write(f"Step {step+1:02d}/{n_steps}, t = {t/86400:.2f} d, LHR = {lhr/1000:.2f} kW/m\n")
+        f.write(f"   Max u_r       = {u_r_max:.4e} m\n")
+        f.write(f"   T_center      = {T_center:.2f} K\n")
+        f.write(f"   Gap thickness = {gap:.4e} m\n")
+        f.write("-" * 50 + "\n")
