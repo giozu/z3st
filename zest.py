@@ -19,7 +19,7 @@ DEBUG_MODE = "--debug" in sys.argv
 # Importing FEniCS modules and custom classes
 # from linear_elasticity import LinearElasticity
 # from thick_cylinder import ThickCylinder
-# from cube import Cube
+from input.cube import Cube
 
 # Materials
 from utils import load
@@ -52,11 +52,7 @@ start_time = time.time()
 # -------------------
 # Problem declaration
 # -------------------
-# from geometry.cube import geometry
-# problem = Cube(mesh_file='mesh/cube.msh')
-# problem.volume(geometry["edge"])
-# problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"])
-# problem.boundary_conditions(conditions["gap pressure"], conditions["boundary temperature"])
+problem = Cube(mesh_file='mesh/cube.msh')
 
 # from full_cylinder import FullCylinder
 # from geometry.full_cylinder import geometry
@@ -98,8 +94,6 @@ def log_step_info(step, n_steps, t, lhr, problem, log_path="output/simulation_lo
     r_geo = np.linalg.norm(problem.mesh.geometry.x[:, :2], axis=1)
     T_array = problem.T_fuel.x.array
     T_center = T_array[np.argmin(r_geo)]
-    T_max = np.max(T_array)
-    T_min = np.min(T_array)
 
     gap = problem.cladding_inner_radius - problem.fuel_outer_radius
 
@@ -114,15 +108,15 @@ log_path = "output/simulation_log.txt"
 clear_log_file(log_path)
 
 from fuel_rod import FuelRod
-from geometry.fuel_rod import geometry
+# from geometry.fuel_rod import geometry
+from geometry.cube import geometry
 from postprocessing import save_temperature_history
 
-problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
+# problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
 problem.debug_mode = DEBUG_MODE
 
-problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
-
-# problem.initialize_geometry()
+# problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
+problem.volume(geometry["edge"])
 
 t_points = [0]       # s
 lhr_points = [25000]     # W/m
@@ -147,14 +141,38 @@ T_clad_inner = []
 T_clad_outer = []
 time_values = []
 
-problem.parameters(fuel, cladding, gas, 
-                   g=conditions["gravitational_acceleration"],
-                   lhr=lhr_points[0],
-                   T_ref=conditions["reference_temperature"],
-                   log_path=log_path)
+# problem.parameters(fuel, 
+#                    cladding, 
+#                    gas, 
+#                    g=conditions["gravitational_acceleration"],
+#                    lhr=lhr_points[0],
+#                    T_ref=conditions["reference_temperature"],
+#                    log_path=log_path)
 
-problem.boundary_conditions(gap_pressure=conditions["gap_pressure"], 
-                            coolant_pressure=conditions["coolant_pressure"], 
+# problem.parameters(
+#     rho=fuel["rho"],
+#     g=conditions["gravitational_acceleration"],
+#     E=fuel["E"],
+#     poisson=fuel["nu"],
+#     k=fuel["k"],
+#     lhr=lhr_points[0],
+#     alpha=fuel["alpha"],
+#     T_ref=conditions["reference_temperature"]
+# )
+
+problem.parameters(
+    material=fuel,
+    g=conditions["gravitational_acceleration"],
+    lhr=lhr_points[0],
+    T_ref=conditions["reference_temperature"]
+)
+
+
+# problem.boundary_conditions(gap_pressure=conditions["gap_pressure"], 
+#                             coolant_pressure=conditions["coolant_pressure"], 
+#                             temperature=conditions["boundary_temperature"])
+
+problem.boundary_conditions(pressure=conditions["coolant_pressure"], 
                             temperature=conditions["boundary_temperature"])
 
 problem.initialize_fields()
@@ -167,13 +185,14 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
     problem.update_state()
     problem.solve()
     
-    T_fuel_inner.append(np.max(problem.T_fuel.x.array))
-    T_fuel_outer.append(np.mean(problem.T_fuel.x.array[problem.dofs_fuel_outer]))
-    T_clad_inner.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_inner]))
-    T_clad_outer.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_outer]))
+    T_fuel_inner.append(np.max(problem.T.x.array))
+    # T_fuel_inner.append(np.max(problem.T_fuel.x.array))
+    # T_fuel_outer.append(np.mean(problem.T_fuel.x.array[problem.dofs_fuel_outer]))
+    # T_clad_inner.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_inner]))
+    # T_clad_outer.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_outer]))
     time_values.append(t)
     
-    log_step_info(step, n_steps, t, lhr, problem, log_path=log_path)
+    # log_step_info(step, n_steps, t, lhr, problem, log_path=log_path)
 
     # xtemp.write_function(problem.temperature, t)
     # xdisp.write_function(problem.displacement, t)
@@ -184,7 +203,7 @@ elapsed_time = end_time - start_time
 save_temperature_history(time_values, T_fuel_inner, T_fuel_outer, T_clad_inner, T_clad_outer)
 
 print("\n")
-print(f"Total thermal iterations = {problem.total_thermal_iterations}, total mechanical iterations = {problem.total_mech_iterations}")
+# print(f"Total thermal iterations = {problem.total_thermal_iterations}, total mechanical iterations = {problem.total_mech_iterations}")
 print(f"Elapsed time: {elapsed_time:.4f} s")
 
 # -------
@@ -207,7 +226,7 @@ results = problem.get_results()
 plot3d_displacement(problem)
 plot3d_temperature(problem)
 plot1d_temperature_at_z(problem, z_target=0.005, tol=0.0005)
-plot1d_stress(problem, z_target=0.0055, tol=0.0001)
+plot1d_stress_cube(problem, z_target=0.0055, tol=0.0001)
 
 # plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
 # plot_temperature(temperature, problem)
