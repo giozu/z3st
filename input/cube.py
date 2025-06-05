@@ -100,7 +100,7 @@ class Cube(FiniteElementSetting):
             q_third=self.q_third,
             k=self.material["k"],
             bc=self.bc_T,
-            source_domain=ufl.dx
+            dx=ufl.dx
         )
 
         self.mechanical_solver = MechanicalSolver(
@@ -133,25 +133,30 @@ class Cube(FiniteElementSetting):
         self.idx_front = np.where(np.isclose(y, 0.0, atol=atol))[0]
         self.idx_back = np.where(np.isclose(y, edge, atol=atol))[0]
 
-    def solve(self, max_iters=20, tol=1e-6):
-
+    def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
         converged = False
         for iteration in range(max_iters):
-            # Store previous displacement
+            # Store previous states
             u_old = self.u.x.array.copy()
+            T_old = self.T.x.array.copy()
 
             # Solve thermal problem
-            self.thermal_solver.solve(self.T)
+            a, L = self.thermal_solver.assemble(self.u_t, self.v_t)
+            self.thermal_solver.solve(a, L, self.T, self.bc_T)
 
             # Solve mechanical problem
             self.mechanical_solver.solve(self.u)
 
-            # Compute displacement increment
+            # Compute increments
             du = self.u.x.array - u_old
-            norm_du = np.linalg.norm(du)
+            dT = self.T.x.array - T_old
 
-            print(f"Iteration {iteration}, ||Δu|| = {norm_du:.3e}")
-            if norm_du < tol:
+            norm_du = np.linalg.norm(du)
+            norm_dT = np.linalg.norm(dT)
+
+            print(f"Iteration {iteration}: ||Δu|| = {norm_du:.3e}, ||ΔT|| = {norm_dT:.3e}")
+
+            if norm_du < tol_u and norm_dT < tol_T:
                 converged = True
                 print("Converged.")
                 break

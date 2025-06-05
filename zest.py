@@ -18,7 +18,7 @@ DEBUG_MODE = "--debug" in sys.argv
 
 # Importing utilities
 from input.cube import Cube
-from fuel_rod import FuelRod
+from input.fuel_rod import FuelRod
 # from geometry.fuel_rod import geometry
 from geometry.cube import geometry
 from postprocessing import save_temperature_history
@@ -34,8 +34,8 @@ coolant = load("materials/h2o.yaml")
 # Initial and boundary conditions
 conditions = load("conditions/conditions.yaml")
 
-t_points = [0]          # s
-lhr_points = [25000]    # W/m
+t_points = [0, 86400]          # s
+lhr_points = [0, 25000]    # W/m
 
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
