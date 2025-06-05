@@ -48,7 +48,7 @@ class Cube(FiniteElementSetting):
 
         self.T_bottom = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
         self.bc_T = [
-            dolfinx.fem.dirichletbc(self.T_bc, self.dofs_bottom, self.V_t)
+            dolfinx.fem.dirichletbc(self.T_bottom, self.dofs_bottom, self.V_t)
         ]
 
         self.normal = ufl.FacetNormal(self.mesh)
@@ -89,7 +89,7 @@ class Cube(FiniteElementSetting):
 
     def initialize_fields(self):
         self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
-        self.T.x.array[:] = float(self.T_bc.value)
+        self.T.x.array[:] = float(self.T_bottom.value)
 
         self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
         self.u.x.array[:] = 0.0
