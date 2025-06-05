@@ -17,7 +17,7 @@ from dolfinx.mesh import compute_midpoints
 import numpy as np
 import os
 
-def plot_displacement(problem):
+def plot3d_displacement(problem):
     """
     Plot the displacement field of the problem
     """
@@ -56,7 +56,7 @@ def plot_displacement(problem):
         problem.u.name = "displacement"
         xdmf.write_function(problem.u)
 
-def plot_temperature(problem):
+def plot3d_temperature(problem):
     """
     Plot the temperature field of the problem using PyVista
     and save it to disk.
@@ -92,7 +92,7 @@ def plot_temperature(problem):
         problem.T.name = "T"
         xdmf.write_function(problem.T)
 
-def plot_stress(problem, z_target=0.005, tol=0.0001):
+def plot1d_stress(problem, z_target=0.005, tol=0.0001):
     """
     Compute and plot the radial (σ_rr), hoop (σ_θθ), and axial (σ_zz) stress components
     as a function of radius at a specific height z_target.
@@ -248,7 +248,7 @@ def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
     plt.grid()
     plt.show()
     
-def plot_temperature_at_z(problem, z_target=0.005, tol=0.0001):
+def plot1d_temperature_at_z(problem, z_target=0.005, tol=0.0001):
     """
     Compute and plot the temperature distribution as a function of radius at a specific height z_target.
     
