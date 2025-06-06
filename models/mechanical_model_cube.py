@@ -25,7 +25,7 @@ class MechanicalSolver:
         self.L_mechanical = (
             ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.material["rho"] * self.g)), self.v_m) * self.dx +
             (3 * self.material["lmbda"] + 2 * self.material["mu"]) * self.material["alpha"] * (self.T - self.material["T_ref"]) * ufl.div(self.v_m) * self.dx
-            # + ufl.dot(self.traction, self.v_t) * self.ds
+            + ufl.dot(self.traction, self.v_m) * self.ds(self.top_label)
         )
 
     def solve_mechanical_problem(self):

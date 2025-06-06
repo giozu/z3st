@@ -34,7 +34,7 @@ coolant = load("materials/h2o.yaml")
 # Initial and boundary conditions
 conditions = load("conditions/conditions.yaml")
 
-t_points = [0, 86400]          # s
+t_points = [0, 86400]      # s
 lhr_points = [0, 25000]    # W/m
 
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
@@ -147,7 +147,7 @@ problem.initialize_fields()
 # problem.initialize_geometry()
 
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
-    print(f"\n Time step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m\n")
+    print(f"\nTime step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m\n")
 
     problem.lhr = lhr
     problem.update_state()
@@ -193,8 +193,8 @@ results = problem.get_results()
 # ----------------
 plot3d_displacement(problem)
 plot3d_temperature(problem)
-plot1d_temperature_at_z(problem, z_target=0.005, tol=0.0005)
-plot1d_stress(problem, z_target=0.0055, tol=0.0001)
+# plot1d_temperature_at_z(problem, z_target=0.5, tol=0.0001)
+# plot1d_stress(problem, z_target=0.5, tol=0.0001)
 
 # plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
 # plot_temperature(temperature, problem)

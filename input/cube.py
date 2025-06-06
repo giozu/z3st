@@ -41,11 +41,6 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             print(f"{k:>8} → {v} ({type(v)})")
             
     def boundary_conditions(self, pressure, temperature):
-        self.bottom_label = 1
-        self.top_label = 6
-
-        self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
-
         self.dofs_bottom = dolfinx.fem.locate_dofs_topological(
             self.V_m, self.fdim, self.ft.find(self.bottom_label)
         )
@@ -61,7 +56,6 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             dolfinx.fem.dirichletbc(self.T_bottom, self.dofs_bottom, self.V_t)
         ]
 
-        self.normal = ufl.FacetNormal(self.mesh)
         self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
 
         # topology, cell_types, _ = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
@@ -97,8 +91,51 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
         self.q_third = self.lhr / self.area
 
     def initialize_fields(self):
+        # v_t: Test Function
+        # - Symbolic function defined as v_t = TestFunction(V_t)
+        # - Represents virtual temperature variations in the weak form
+        # - Used in assembling the thermal right-hand side
+        # - Does not hold any actual values
+
+        # u_t: Trial Function
+        # - Symbolic unknown defined as u_t = TrialFunction(V_t)
+        # - Represents the temperature field being solved for
+        # - Used to assemble the thermal stiffness matrix
+        # - Not used directly for numerical evaluation
+
+        # T: Function
+        # - Created with T = Function(V_t, name="Temperature")
+        # - Contains the actual computed temperature field
+        # - Updated by the solver during the thermal solution process
+        # - Access values via T.x.array
+        # - This is the field to use for output, visualization, or coupling to mechanics
+
+        # Important: 'T' holds the real temperature solution.
+        # 'u_t' and 'v_t' are symbolic and only used to define the variational forms.
+
         self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
         self.T.x.array[:] = float(self.T_bottom.value)
+
+        # v_m: Test Function
+        # - Defined symbolically using v_m = TestFunction(V_m)
+        # - Represents virtual displacements in the weak form
+        # - Used when assembling the right-hand side of the variational equation
+        # - Does not contain solution data
+
+        # u_m: Trial Function
+        # - Defined symbolically using u_m = TrialFunction(V_m)
+        # - Represents the unknown displacement field in the variational problem
+        # - Used in assembling the system matrix (stiffness matrix)
+        # - Not assigned or modified during solution
+
+        # u: Function
+        # - Created with u = Function(V_m, name="Displacement")
+        # - Stores the actual numerical solution of the displacement field
+        # - Values are updated during solve(): solver.solve(b, u.x.petsc_vec)
+        # - This is the field to use in postprocessing (e.g., stress evaluation)
+
+        # Important: Only 'u' contains the computed displacement.
+        # 'u_m' and 'v_m' are symbolic and used solely to define the variational problem
 
         self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
         self.u.x.array[:] = 0.0
@@ -133,9 +170,9 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             self.assemble_mechanical_solver()
             self.solve_mechanical_problem()
 
-            print("Max displacement:", np.max(self.u.x.array))
-            print("Max temperature:", np.max(self.T.x.array))
-            print("q_third:", self.q_third)
+            print(f"Max displacement: {np.max(self.u.x.array):2.2f} m")
+            print(f"Max temperature: {np.max(self.T.x.array):2.2f} K")
+            print(f"q_third: {self.q_third:2.2f} W/m3")
 
             # Compute increments
             du = self.u.x.array - u_old
@@ -155,7 +192,6 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             print("Warning: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
-
         self.stress = self.sigma(self.u, self.material) - self.sigma_th(self.T, self.material)
         self.strain = self.epsilon(self.u)
 

@@ -27,15 +27,20 @@ class Mesh:
 
         try:
             self.mesh, self.tags, self.ft = dolfinx.io.gmshio.read_from_msh(self.mesh_file, MPI.COMM_WORLD, rank=self.rank, gdim=self.gdim)
-            
             self.tdim = self.mesh.topology.dim
             print(f"Info    : Mesh topology dimension d={self.tdim}")
-
             self.fdim = self.tdim - 1
             self.mesh.topology.create_connectivity(self.fdim, self.tdim)
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
-    
+
+            # Labels
+            self.bottom_label = 1
+            self.top_label = 6
+
+            self.normal = ufl.FacetNormal(self.mesh)
+
             self.dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
+            self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
 
             # msh = meshio.read(self.mesh_file)
 

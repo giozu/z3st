@@ -18,13 +18,6 @@ import numpy as np
 import os
 
 def plot3d_displacement(problem):
-    """
-    Plot the displacement field of the problem
-    """
-
-    # Start PyVista visualization
-    p = pyvista.Plotter()
-
     # Create the plotter and grid for visualization
     topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_m)
     grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
@@ -32,6 +25,7 @@ def plot3d_displacement(problem):
     # Attach vector values to grid and warp grid by vector
     grid["u"] = problem.u.x.array.reshape((geometry.shape[0], 3))
 
+    p = pyvista.Plotter()
     p.add_mesh(grid, style="wireframe", color="k")
 
     # Attach data to the grid
@@ -58,24 +52,28 @@ def plot3d_displacement(problem):
 
 def plot3d_temperature(problem):
     """
-    Plot the temperature field of the problem using PyVista
-    and save it to disk.
+    Visualize the temperature field on the deformed and original mesh using PyVista.
+    Also exports the solution to an XDMF file.
     """
 
-    # Create plotter and pyvista grid
+    # Extract mesh data
     topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_t)
-    
+
+    # Deformation field
     displacement = problem.u.x.array.reshape(geometry.shape)
     deformed_geometry = geometry + displacement    
 
-    grid = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
+    # Create PyVista grids
+    grid_original = pyvista.UnstructuredGrid(topology, cell_types, geometry)
+    grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
 
-    # Attach scalar values to grid
-    grid["T"] = problem.T.x.array.real
+    # Attach temperature to the deformed grid
+    grid_deformed["T"] = problem.T.x.array.real
 
-    # Visualize scalar field
+    # Setup PyVista plot
     p = pyvista.Plotter()
-    p.add_mesh(grid, scalars="T", cmap="plasma")
+    p.add_mesh(grid_original, style="wireframe", color="black")
+    p.add_mesh(grid_deformed, scalars="T", cmap="plasma")
     p.show_axes()
 
     # Show or save plot
@@ -84,9 +82,10 @@ def plot3d_temperature(problem):
     else:
         p.screenshot("output/temperature.png")
 
+    # Ensure output directory exists
     os.makedirs("output", exist_ok=True)
 
-    # Write to XDMF
+    # Export temperature field to XDMF
     with dolfinx.io.XDMFFile(problem.mesh.comm, "output/temperature.xdmf", "w") as xdmf:
         xdmf.write_mesh(problem.mesh)
         problem.T.name = "T"
