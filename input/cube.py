@@ -25,10 +25,9 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             f.write(f"Analytical volume: {analytical_volume:.6e} m3\n")
             f.write(f"Relative error: {rel_error:.3e} %\n")
 
-    def parameters(self, g, lhr, T_ref):
+    def parameters(self, g, lhr):
         self.g = g
         self.lhr = lhr
-        self.T_ref = T_ref
         self.q_third = lhr / self.area
 
     def materials(self, material):
@@ -134,6 +133,10 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             self.assemble_mechanical_solver()
             self.solve_mechanical_problem()
 
+            print("Max displacement:", np.max(self.u.x.array))
+            print("Max temperature:", np.max(self.T.x.array))
+            print("q_third:", self.q_third)
+
             # Compute increments
             du = self.u.x.array - u_old
             dT = self.T.x.array - T_old
@@ -152,4 +155,8 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             print("Warning: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
+
+        self.stress = self.sigma(self.u, self.material) - self.sigma_th(self.T, self.material)
+        self.strain = self.epsilon(self.u)
+
         return self.u, self.strain, self.stress, self.T

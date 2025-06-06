@@ -8,6 +8,7 @@ nu: 0.3          # -
 k: 2.5           # W/m-K
 cp: 300          # J/kg-K
 alpha: 1.45e-5   # 1/K
+T_ref: 300       # K
 
 # Physical properties
 rho: 10970       # kg/m³
