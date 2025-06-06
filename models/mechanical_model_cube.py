@@ -9,23 +9,22 @@ class MechanicalSolver:
     def epsilon(self, u):
         return ufl.sym(ufl.grad(u))
 
-    def sigma(self, u, material):
+    def sigma_mech(self, u, material):
         return material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.gdim) + 2 * material["mu"] * ufl.sym(ufl.grad(u))
     
     def sigma_th(self, T, material):
         return (3 * material["lmbda"] + 2 * material["mu"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.gdim)
 
     def assemble_mechanical_solver(self):
-
         self.strain = self.epsilon(self.v_m)
-        self.stress = self.sigma(self.u_m, self.material)
+        self.stress = self.sigma_mech(self.u_m, self.material)
 
         self.a_mechanical = ufl.inner(self.stress, self.strain) * self.dx
 
         self.L_mechanical = (
             ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.material["rho"] * self.g)), self.v_m) * self.dx +
             (3 * self.material["lmbda"] + 2 * self.material["mu"]) * self.material["alpha"] * (self.T - self.material["T_ref"]) * ufl.div(self.v_m) * self.dx
-            + ufl.dot(self.traction, self.v_m) * self.ds(self.top_label)
+            + ufl.dot(self.traction, self.v_m) * self.ds(self.label_map["Top"])
         )
 
     def solve_mechanical_problem(self):

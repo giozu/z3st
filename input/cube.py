@@ -25,8 +25,9 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             f.write(f"Analytical volume: {analytical_volume:.6e} m3\n")
             f.write(f"Relative error: {rel_error:.3e} %\n")
 
-    def parameters(self, g, lhr):
-        self.g = g
+    def parameters(self, conditions, g, lhr):
+        self.conditions = conditions
+        self.g = conditions["gravitational_acceleration"]
         self.lhr = lhr
         self.q_third = lhr / self.area
 
@@ -40,10 +41,9 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
         for k, v in material.items():
             print(f"{k:>8} → {v} ({type(v)})")
             
-    def boundary_conditions(self, pressure, temperature):
-        self.dofs_bottom = dolfinx.fem.locate_dofs_topological(
-            self.V_m, self.fdim, self.ft.find(self.bottom_label)
-        )
+    def boundary_conditions(self):
+        self.dofs_bottom = self.locateDofs(self.label_map["Bottom"])
+        self.dofs_top = self.locateDofs(self.label_map["Top"])
 
         self.bcs_mechanical = [
             dolfinx.fem.dirichletbc(
@@ -51,12 +51,13 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             )
         ]
 
-        self.T_bottom = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
         self.bcs_thermal = [
-            dolfinx.fem.dirichletbc(self.T_bottom, self.dofs_bottom, self.V_t)
+            dolfinx.fem.dirichletbc(
+                dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.conditions["boundary_temperature"])), self.dofs_bottom, self.V_t
+            )
         ]
 
-        self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
+        self.traction = dolfinx.fem.Constant(self.mesh, self.conditions["coolant_pressure"]) * self.normal
 
         # topology, cell_types, _ = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
         # surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
@@ -64,6 +65,10 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
         # plotter = pyvista.Plotter()
         # unique_labels = np.unique(self.ft.values)
 
+        # print("Face labels present:", unique_labels)
+        # for label in unique_labels:
+        #     facets = self.ft.find(label)
+        #     print(f"Label {label}: {len(facets)} facets")
         # label_map = {
         #         1: ("Bottom", "red"),
         #         2: ("Face 1", "blue"),
@@ -72,12 +77,6 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
         #         5: ("Face 4", "purple"),
         #         6: ("Top", "black")
         #     }
-
-        # print("Face labels present:", unique_labels)
-        # for label in unique_labels:
-        #     facets = self.ft.find(label)
-        #     print(f"Label {label}: {len(facets)} facets")
-
         # for label in np.unique(self.ft.values):
         #     facets = self.ft.find(label)
         #     surface_cells = surface.extract_cells(facets)
@@ -114,7 +113,8 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
         # 'u_t' and 'v_t' are symbolic and only used to define the variational forms.
 
         self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
-        self.T.x.array[:] = float(self.T_bottom.value)
+        # self.T.x.array[:] = float(self.T_bottom.value)
+        self.T.x.array[:] = self.material["T_ref"]
 
         # v_m: Test Function
         # - Defined symbolically using v_m = TestFunction(V_m)
@@ -192,7 +192,7 @@ class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
             print("Warning: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
-        self.stress = self.sigma(self.u, self.material) - self.sigma_th(self.T, self.material)
+        self.stress = self.sigma_mech(self.u, self.material) - self.sigma_th(self.T, self.material)
         self.strain = self.epsilon(self.u)
 
         return self.u, self.strain, self.stress, self.T

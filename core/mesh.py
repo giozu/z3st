@@ -34,9 +34,23 @@ class Mesh:
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
 
             # Labels
-            self.bottom_label = 1
-            self.top_label = 6
+            # --- Cube ---
+            self.label_map = {
+                    "Bottom": 1,
+                    "Face 1": 2,
+                    "Face 2": 3,
+                    "Face 3": 4,
+                    "Face 4": 5,
+                    "Top": 6,
+                }
 
+            # --- Cylindrical inclusion ---
+            label_map = {
+                    "Domain": 1,
+                    "Inclusion": 2,
+                    "Boundary": 3,
+                }
+            
             self.normal = ufl.FacetNormal(self.mesh)
 
             self.dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
@@ -61,3 +75,6 @@ class Mesh:
 
         except Exception as e:
             raise ValueError(f"Error reading mesh file {self.mesh_file}: {e}")
+        
+    def locateDofs(self, label):
+        return dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(label))

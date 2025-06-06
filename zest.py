@@ -34,8 +34,8 @@ coolant = load("materials/h2o.yaml")
 # Initial and boundary conditions
 conditions = load("conditions/conditions.yaml")
 
-t_points = [0, 86400]      # s
-lhr_points = [0, 25000]    # W/m
+t_points = [0]      # s
+lhr_points = [25000]    # W/m
 
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
@@ -130,6 +130,7 @@ problem.materials(
 )
 
 problem.parameters(
+    conditions=conditions,
     g=conditions["gravitational_acceleration"],
     lhr=lhr_points[0],
 )
@@ -138,10 +139,7 @@ problem.parameters(
 #                             coolant_pressure=conditions["coolant_pressure"], 
 #                             temperature=conditions["boundary_temperature"])
 
-problem.boundary_conditions(
-    pressure=conditions["coolant_pressure"], 
-    temperature=conditions["boundary_temperature"]
-)
+problem.boundary_conditions()
 
 problem.initialize_fields()
 # problem.initialize_geometry()
