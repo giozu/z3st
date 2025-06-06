@@ -125,8 +125,11 @@ time_values = []
 #     T_ref=conditions["reference_temperature"]
 # )
 
+problem.materials(
+    material=fuel
+)
+
 problem.parameters(
-    material=fuel,
     g=conditions["gravitational_acceleration"],
     lhr=lhr_points[0],
     T_ref=conditions["reference_temperature"]

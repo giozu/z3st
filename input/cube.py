@@ -3,19 +3,19 @@ import ufl
 import numpy as np
 from mpi4py import MPI
 from petsc4py import PETSc
+from core.mesh import Mesh
 from finiteElementSettings import FiniteElementSetting
 from models.thermal_model_cube import ThermalSolver
 from models.mechanical_model_cube import MechanicalSolver
 import pyvista
 
-class Cube(FiniteElementSetting):
+class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
     def volume(self, edge, log_path="output/simulation_log.txt"):
         self.edge = edge
         self.area = edge**2
         self.height = edge
 
-        dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
-        mesh_volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
+        mesh_volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx))
         analytical_volume = self.area * self.height
         rel_error = abs(mesh_volume - analytical_volume) / analytical_volume * 100
 
@@ -25,67 +25,77 @@ class Cube(FiniteElementSetting):
             f.write(f"Analytical volume: {analytical_volume:.6e} m3\n")
             f.write(f"Relative error: {rel_error:.3e} %\n")
 
-    def parameters(self, material, g, lhr, T_ref):
+    def parameters(self, g, lhr, T_ref):
         self.g = g
         self.lhr = lhr
         self.T_ref = T_ref
+        self.q_third = lhr / self.area
+
+    def materials(self, material):
         self.material = material
         self.material["lmbda"] = material["E"] * material["nu"] / ((1 + material["nu"]) * (1 - 2 * material["nu"]))
         self.material["mu"] = material["E"] / (2 * (1 + material["nu"]))
         self.material["bulk_modulus"] = material["E"] / (3 * (1 - 2 * material["nu"]))
-        self.q_third = lhr / self.area
 
+        print(f"Material loaded:")
+        for k, v in material.items():
+            print(f"{k:>8} → {v} ({type(v)})")
+            
     def boundary_conditions(self, pressure, temperature):
         self.bottom_label = 1
         self.top_label = 6
 
         self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
-        self.dofs_bottom = dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(self.bottom_label))
 
-        self.bc_M = [
-            dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m)
+        self.dofs_bottom = dolfinx.fem.locate_dofs_topological(
+            self.V_m, self.fdim, self.ft.find(self.bottom_label)
+        )
+
+        self.bcs_mechanical = [
+            dolfinx.fem.dirichletbc(
+                dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0)), self.dofs_bottom, self.V_m
+            )
         ]
 
         self.T_bottom = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
-        self.bc_T = [
+        self.bcs_thermal = [
             dolfinx.fem.dirichletbc(self.T_bottom, self.dofs_bottom, self.V_t)
         ]
 
         self.normal = ufl.FacetNormal(self.mesh)
         self.traction = dolfinx.fem.Constant(self.mesh, pressure) * self.normal
 
-        topology, cell_types, _ = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
-        surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
+        # topology, cell_types, _ = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
+        # surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
 
-        plotter = pyvista.Plotter()
-        unique_labels = np.unique(self.ft.values)
+        # plotter = pyvista.Plotter()
+        # unique_labels = np.unique(self.ft.values)
 
-        label_map = {
-                1: ("Bottom", "red"),
-                2: ("Face 1", "blue"),
-                3: ("Face 2", "green"),
-                4: ("Face 3", "orange"),
-                5: ("Face 4", "purple"),
-                6: ("Top", "black")
-            }
+        # label_map = {
+        #         1: ("Bottom", "red"),
+        #         2: ("Face 1", "blue"),
+        #         3: ("Face 2", "green"),
+        #         4: ("Face 3", "orange"),
+        #         5: ("Face 4", "purple"),
+        #         6: ("Top", "black")
+        #     }
 
-        print("Face labels present:", unique_labels)
-        for label in unique_labels:
-            facets = self.ft.find(label)
-            print(f"Label {label}: {len(facets)} facets")
+        # print("Face labels present:", unique_labels)
+        # for label in unique_labels:
+        #     facets = self.ft.find(label)
+        #     print(f"Label {label}: {len(facets)} facets")
 
-        for label in np.unique(self.ft.values):
-            facets = self.ft.find(label)
-            surface_cells = surface.extract_cells(facets)
-            name, color = label_map.get(label, (f"Face {label}", "white"))
-            plotter.add_mesh(surface_cells, show_edges=True, opacity=1.0, color=color, label=name)
+        # for label in np.unique(self.ft.values):
+        #     facets = self.ft.find(label)
+        #     surface_cells = surface.extract_cells(facets)
+        #     name, color = label_map.get(label, (f"Face {label}", "white"))
+        #     plotter.add_mesh(surface_cells, show_edges=True, opacity=1.0, color=color, label=name)
 
-        plotter.add_legend()
-        plotter.show()
+        # plotter.add_legend()
+        # plotter.show()
 
     def update_state(self):
         self.q_third = self.lhr / self.area
-        self.thermal_solver.q_third = self.q_third
 
     def initialize_fields(self):
         self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
@@ -93,30 +103,6 @@ class Cube(FiniteElementSetting):
 
         self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
         self.u.x.array[:] = 0.0
-
-        self.thermal_solver = ThermalSolver(
-            mesh=self.mesh,
-            V_t=self.V_t,
-            q_third=self.q_third,
-            k=self.material["k"],
-            bc=self.bc_T,
-            dx=ufl.dx
-        )
-
-        self.mechanical_solver = MechanicalSolver(
-            mesh=self.mesh,
-            V_m=self.V_m,
-            bc=self.bc_M,
-            lmbda=self.material["lmbda"],
-            mu=self.material["mu"],
-            alpha=self.material["alpha"],
-            T=self.T,
-            T_ref=self.T_ref,
-            traction=self.traction,
-            rho=self.material["rho"],
-            g=self.g,
-            ds=self.ds
-        )
 
     def initialize_geometry(self, atol=1e-6):
         """
@@ -141,11 +127,12 @@ class Cube(FiniteElementSetting):
             T_old = self.T.x.array.copy()
 
             # Solve thermal problem
-            a, L = self.thermal_solver.assemble(self.u_t, self.v_t)
-            self.thermal_solver.solve(a, L, self.T, self.bc_T)
+            self.assemble_thermal_problem()
+            self.solve_thermal_problem()
 
             # Solve mechanical problem
-            self.mechanical_solver.solve(self.u)
+            self.assemble_mechanical_solver()
+            self.solve_mechanical_problem()
 
             # Compute increments
             du = self.u.x.array - u_old
@@ -165,18 +152,4 @@ class Cube(FiniteElementSetting):
             print("Warning: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
-
-        def epsilon(u):
-            return ufl.sym(ufl.grad(u))
-
-        def sigma(u, lmbda, mu):
-            return lmbda * ufl.tr(epsilon(u)) * ufl.Identity(3) + 2 * mu * epsilon(u)
-        
-        self.strain = epsilon(self.u)
-
-        self.stress = (
-            sigma(self.u, self.material["lmbda"], self.material["mu"]) -
-            (3 * self.material["lmbda"] + 2 * self.material["mu"]) * self.material["alpha"] *
-            (self.T - self.T_ref) * ufl.Identity(3)
-        )
         return self.u, self.strain, self.stress, self.T
