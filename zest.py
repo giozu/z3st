@@ -145,13 +145,13 @@ problem.boundary_conditions(
 )
 
 problem.initialize_fields()
-problem.initialize_geometry()
+# problem.initialize_geometry()
 
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
     print(f"\n Time step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m\n")
 
     problem.lhr = lhr
-    problem.update_state()
+    # problem.update_state()
     problem.solve()
     
     T_fuel_inner.append(np.max(problem.T.x.array))
