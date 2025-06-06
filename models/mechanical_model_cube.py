@@ -19,9 +19,11 @@ class MechanicalSolver:
 
         self.a_mechanical = ufl.inner(self.stress, self.strain) * self.dx
 
-        self.L_mechanical = ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.material["rho"] * self.g)), self.v_m) * self.dx
-        + (3 * self.material["lmbda"] + 2 * self.material["mu"]) * self.material["alpha"] * (self.T - self.T_ref) * ufl.div(self.v_m) * self.dx
-        + ufl.dot(self.traction, self.v_m) * self.ds
+        self.L_mechanical = (
+            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.material["rho"] * self.g)), self.v_m) * self.dx +
+            (3 * self.material["lmbda"] + 2 * self.material["mu"]) * self.material["alpha"] * (self.T - self.T_ref) * ufl.div(self.v_m) * self.dx
+            # + ufl.dot(self.traction, self.v_t) * self.ds
+        )
 
     def solve_mechanical_problem(self):
         a_form = dolfinx.fem.form(self.a_mechanical)
@@ -32,7 +34,7 @@ class MechanicalSolver:
 
         dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=self.bcs_mechanical)
         A.assemble()
-        
+
         with b.localForm() as loc:
             loc.set(0.0)
         dolfinx.fem.petsc.assemble_vector(b, L_form)

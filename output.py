@@ -206,6 +206,16 @@ def plot1d_stress(problem, z_target=0.005, tol=0.0001):
     plt.show()
 
 def plot1d_stress_cube(problem, z_target=0.005, tol=0.0001):
+    """
+    Compute and plot the radial (σ_rr), hoop (σ_θθ), and axial (σ_zz) stress components
+    as a function of radius at a specific height z_target.
+    
+    Parameters:
+    - problem: The finite element problem containing the mesh and stress field.
+    - z_target: The height (z-value) at which to extract and plot stress components.
+    - tol: Tolerance to select points near the target z-value.
+    """
+
     # Compute cell centers (for DG(0) function space)
     cell_centers = compute_midpoints(
         problem.mesh, problem.mesh.topology.dim, 
@@ -216,6 +226,7 @@ def plot1d_stress_cube(problem, z_target=0.005, tol=0.0001):
     x = cell_centers[:, 0]
     y = cell_centers[:, 1]
     z = cell_centers[:, 2]  # Heights
+    r = np.sqrt(x**2 + y**2)  # Compute the radius
 
     # Print available z-values in the mesh
     unique_z_values = np.unique(z)
@@ -237,7 +248,7 @@ def plot1d_stress_cube(problem, z_target=0.005, tol=0.0001):
         return
 
     # Define the function space for stress tensor (DG, 0)
-    V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (3, 3)))
+    V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.gdim, problem.gdim)))
 
     # Interpolate the stress tensor
     stress_expr = dolfinx.fem.Expression(problem.stress, V_tensor.element.interpolation_points())
@@ -245,7 +256,7 @@ def plot1d_stress_cube(problem, z_target=0.005, tol=0.0001):
     stress_func.interpolate(stress_expr)
 
     # Extract the stress tensor values
-    stress_values = stress_func.x.array.reshape(-1, 3, 3)  # Reshape for a 3x3 tensor
+    stress_values = stress_func.x.array.reshape(-1, problem.gdim, problem.gdim)  # Reshape for a 3x3 tensor
 
     # Compute the stress components for selected points
     sigma_xx = stress_values[mask, 0, 0]  # σ_xx
@@ -253,18 +264,24 @@ def plot1d_stress_cube(problem, z_target=0.005, tol=0.0001):
     sigma_yy = stress_values[mask, 1, 1]  # σ_yy
     sigma_zz = stress_values[mask, 2, 2]  # σ_zz
 
+    # Compute cylindrical stress components
+    sigma_rr = (sigma_xx * x[mask]**2 + 2 * x[mask] * y[mask] * sigma_xy + sigma_yy * y[mask]**2) / (x[mask]**2 + y[mask]**2)
+    sigma_tt = (sigma_xx * y[mask]**2 - 2 * x[mask] * y[mask] * sigma_xy + sigma_yy * x[mask]**2) / (x[mask]**2 + y[mask]**2)
+
     # Plot the stress components
     plt.figure(figsize=(8, 6))
-    plt.scatter(x[mask], sigma_xx, label=f"σ_xx at z={z_target:.4f}m", color="b", marker="o")
+    plt.scatter(r[mask], sigma_rr, label=f"σ_rr at z={z_target:.4f}m", color="b", marker="o")
+    plt.scatter(r[mask], sigma_tt, label=f"σ_θθ at z={z_target:.4f}m", color="r", marker="s")
+    plt.scatter(r[mask], sigma_zz, label=f"σ_zz at z={z_target:.4f}m", color="g", marker="^")
 
-    # plt.xlim(0, 0.004)
+    plt.xlim(0, 0.004)
 
     # Set labels and title
-    plt.xlabel("Edge (m)")
-    plt.ylabel("Stress (Pa)")
+    plt.xlabel("Radius [m]")
+    plt.ylabel("Stress [Pa]")
     plt.legend()
     plt.grid()
-    plt.title(f"Stress components at z={z_target:.4f}m")
+    plt.title(f"Stress Components at z={z_target:.4f}m")
     plt.show()
 
 def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
