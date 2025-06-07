@@ -6,7 +6,7 @@ from mpi4py import MPI
 from petsc4py import PETSc
 import numpy as np
 
-from finiteElementSettings import FiniteElementSetting
+from core.finiteElementSettings import FiniteElementSetting
 from geometryManager import GeometryManager
 
 from models.thermal_model import ThermalSolver

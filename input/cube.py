@@ -1,13 +1,11 @@
 import dolfinx
-import ufl
 import numpy as np
 from mpi4py import MPI
 from petsc4py import PETSc
 from core.mesh import Mesh
-from finiteElementSettings import FiniteElementSetting
+from core.finiteElementSettings import FiniteElementSetting
 from models.thermal_model_cube import ThermalSolver
 from models.mechanical_model_cube import MechanicalSolver
-import pyvista
 
 class Cube(Mesh, FiniteElementSetting, ThermalSolver, MechanicalSolver):
     def volume(self, edge, log_path="output/simulation_log.txt"):

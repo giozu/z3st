@@ -2,10 +2,9 @@ import ufl
 import dolfinx
 import dolfinx.fem.petsc
 from mpi4py import MPI
-import basix.ufl
 from petsc4py import PETSc
-import meshio
-import numpy as np
+# import meshio
+# import numpy as np
 
 class FiniteElementSetting:
     def _setup_function_space(self):

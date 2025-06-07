@@ -6,7 +6,7 @@ from mpi4py import MPI
 from petsc4py import PETSc
 import numpy as np
 
-from finiteElementSettings import FiniteElementSetting
+from core.finiteElementSettings import FiniteElementSetting
 
 class ThickCylinder(FiniteElementSetting):
     def volume(self, outer_radius, inner_radius, height):
