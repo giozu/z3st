@@ -14,15 +14,19 @@ class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         self.lhr = lhr
         self.q_third = lhr / self.area
 
-    def materials(self, material):
-        self.material = material
-        self.material["lmbda"] = material["E"] * material["nu"] / ((1 + material["nu"]) * (1 - 2 * material["nu"]))
-        self.material["mu"] = material["E"] / (2 * (1 + material["nu"]))
-        self.material["bulk_modulus"] = material["E"] / (3 * (1 - 2 * material["nu"]))
+    def materials(self, **materials):
+        self.materials = {}
 
-        print(f"Material loaded:")
-        for k, v in material.items():
-            print(f"{k:>8} → {v} ({type(v)})")
+        for name, mat in materials.items():
+            mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
+            mat["mu"] = mat["E"] / (2 * (1 + mat["nu"]))
+            mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
+            self.materials[name] = mat
+
+            print(f"\n{name.capitalize()} material loaded:")
+            for k in sorted(mat.keys()):
+                v = mat[k]
+                print(f"  {k:<15} → {v} ({type(v).__name__})")
             
     def boundary_conditions(self):
         self.dofs_bottom = self.locateDofs(self.label_map["Bottom"])
@@ -73,50 +77,52 @@ class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         self.q_third = self.lhr / self.area
 
     def initialize_fields(self):
+        # --- Temperature field ---
         # v_t: Test Function
         # - Symbolic function defined as v_t = TestFunction(V_t)
         # - Represents virtual temperature variations in the weak form
         # - Used in assembling the thermal right-hand side
         # - Does not hold any actual values
-
         # u_t: Trial Function
         # - Symbolic unknown defined as u_t = TrialFunction(V_t)
         # - Represents the temperature field being solved for
         # - Used to assemble the thermal stiffness matrix
         # - Not used directly for numerical evaluation
-
         # T: Function
         # - Created with T = Function(V_t, name="Temperature")
         # - Contains the actual computed temperature field
         # - Updated by the solver during the thermal solution process
         # - Access values via T.x.array
         # - This is the field to use for output, visualization, or coupling to mechanics
-
         # Important: 'T' holds the real temperature solution.
         # 'u_t' and 'v_t' are symbolic and only used to define the variational forms.
 
-        self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
-        # self.T.x.array[:] = float(self.T_bottom.value)
-        self.T.x.array[:] = self.material["T_ref"]
+        print(f"Initializing temperature fields for: {list(self.materials.keys())}")
+        self.T = {}  # dictionary to store temperature functions per material
+        # T_fuel = self.T["fuel"]
+        # T_cladding = self.T["cladding"]
 
+        for name, mat in self.materials.items():
+            T_func = dolfinx.fem.Function(self.V_t, name=f"Temperature_{name}")
+            T_func.x.array[:] = mat["T_ref"]
+            self.T[name] = T_func
+
+        # --- Displacement ---
         # v_m: Test Function
         # - Defined symbolically using v_m = TestFunction(V_m)
         # - Represents virtual displacements in the weak form
         # - Used when assembling the right-hand side of the variational equation
         # - Does not contain solution data
-
         # u_m: Trial Function
         # - Defined symbolically using u_m = TrialFunction(V_m)
         # - Represents the unknown displacement field in the variational problem
         # - Used in assembling the system matrix (stiffness matrix)
         # - Not assigned or modified during solution
-
         # u: Function
         # - Created with u = Function(V_m, name="Displacement")
         # - Stores the actual numerical solution of the displacement field
         # - Values are updated during solve(): solver.solve(b, u.x.petsc_vec)
         # - This is the field to use in postprocessing (e.g., stress evaluation)
-
         # Important: Only 'u' contains the computed displacement.
         # 'u_m' and 'v_m' are symbolic and used solely to define the variational problem
 
@@ -143,7 +149,8 @@ class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         for iteration in range(max_iters):
             # Store previous states
             u_old = self.u.x.array.copy()
-            T_old = self.T.x.array.copy()
+            T_old = self.T["fuel"].x.array.copy()
+            # T_old = {name: T.x.array.copy() for name, T in self.T.items()}
 
             # Solve thermal problem
             self.assemble_thermal_problem()
@@ -154,12 +161,12 @@ class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             self.solve_mechanical_problem()
 
             print(f"Max displacement: {np.max(self.u.x.array):2.2f} m")
-            print(f"Max temperature: {np.max(self.T.x.array):2.2f} K")
+            print(f"Max temperature: {np.max(self.T["fuel"].x.array):2.2f} K")
             print(f"q_third: {self.q_third:2.2f} W/m3")
 
             # Compute increments
             du = self.u.x.array - u_old
-            dT = self.T.x.array - T_old
+            dT = self.T["fuel"].x.array - T_old
 
             norm_du = np.linalg.norm(du)
             norm_dT = np.linalg.norm(dT)
@@ -175,7 +182,10 @@ class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             print("Warning: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
-        self.stress = self.sigma_mech(self.u, self.material) - self.sigma_th(self.T, self.material)
-        self.strain = self.epsilon(self.u)
+        material_name = "fuel"
+        material = self.materials[material_name]
 
-        return self.u, self.strain, self.stress, self.T
+        self.strain = self.epsilon(self.v_m)
+        self.stress = self.sigma_mech(self.u_m, material) - self.sigma_th(self.T["fuel"], material)
+
+        return self.u, self.strain, self.stress, self.T["fuel"]

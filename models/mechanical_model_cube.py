@@ -10,20 +10,25 @@ class MechanicalSolver:
         return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
-        return material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.gdim) + 2 * material["mu"] * ufl.sym(ufl.grad(u))
-    
+        return material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.gdim) + 2 * material["mu"] * self.epsilon(u)
+
     def sigma_th(self, T, material):
         return (3 * material["lmbda"] + 2 * material["mu"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.gdim)
 
-    def assemble_mechanical_solver(self):
+    def assemble_mechanical_solver(self, material_name="fuel", T_field=None):
+        material = self.materials[material_name]
+        T = self.T[material_name] if T_field is None else T_field
+
         self.strain = self.epsilon(self.v_m)
-        self.stress = self.sigma_mech(self.u_m, self.material)
+        self.stress = self.sigma_mech(self.u_m, material)
 
         self.a_mechanical = ufl.inner(self.stress, self.strain) * self.dx
 
+        body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -material["rho"] * self.g))
+
         self.L_mechanical = (
-            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.material["rho"] * self.g)), self.v_m) * self.dx +
-            (3 * self.material["lmbda"] + 2 * self.material["mu"]) * self.material["alpha"] * (self.T - self.material["T_ref"]) * ufl.div(self.v_m) * self.dx
+            ufl.dot(body_force, self.v_m) * self.dx
+            + self.sigma_th(T, material)[0, 0] * ufl.div(self.v_m) * self.dx
             + ufl.dot(self.traction, self.v_m) * self.ds(self.label_map["Top"])
         )
 

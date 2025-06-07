@@ -7,7 +7,7 @@ class ThermalSolver:
         print(f"ThermalSolver")
 
     def assemble_thermal_problem(self):
-        self.a_thermal = ufl.dot(self.material["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx
+        self.a_thermal = ufl.dot(self.materials["fuel"]["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx
         self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * self.dx
 
     def solve_thermal_problem(self):
@@ -35,7 +35,7 @@ class ThermalSolver:
         solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
 
         # Solve system
-        solver.solve(b, self.T.x.petsc_vec)
-        self.T.x.scatter_forward()
+        solver.solve(b, self.T["fuel"].x.petsc_vec)
+        self.T["fuel"].x.scatter_forward()
 
         return solver.getIterationNumber()

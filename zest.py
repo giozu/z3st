@@ -53,7 +53,7 @@ if DEBUG_MODE:
     for k, v in coolant.items():
         print(f"{k:>8} → {v} ({type(v)})")
 
-problem.materials(material=fuel)
+problem.materials(fuel=fuel)
 
 # Initial and boundary conditions
 conditions = load("conditions/conditions.yaml")
@@ -146,7 +146,7 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
     problem.update_state()
     problem.solve()
     
-    T_fuel_inner.append(np.max(problem.T.x.array))
+    T_fuel_inner.append(np.max(problem.T["fuel"].x.array))
     # T_fuel_inner.append(np.max(problem.T_fuel.x.array))
     # T_fuel_outer.append(np.mean(problem.T_fuel.x.array[problem.dofs_fuel_outer]))
     # T_clad_inner.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_inner]))

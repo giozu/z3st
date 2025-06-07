@@ -68,7 +68,7 @@ def plot3d_temperature(problem):
     grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
 
     # Attach temperature to the deformed grid
-    grid_deformed["T"] = problem.T.x.array.real
+    grid_deformed["T"] = problem.T["fuel"].x.array.real
 
     # Setup PyVista plot
     p = pyvista.Plotter()
@@ -88,8 +88,8 @@ def plot3d_temperature(problem):
     # Export temperature field to XDMF
     with dolfinx.io.XDMFFile(problem.mesh.comm, "output/temperature.xdmf", "w") as xdmf:
         xdmf.write_mesh(problem.mesh)
-        problem.T.name = "T"
-        xdmf.write_function(problem.T)
+        problem.T["fuel"].name = "T"
+        xdmf.write_function(problem.T["fuel"])
 
 def plot1d_stress(problem, z_target=0.005, tol=0.0001):
     """
