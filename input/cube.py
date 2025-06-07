@@ -3,7 +3,7 @@ import numpy as np
 from mpi4py import MPI
 from petsc4py import PETSc
 from core.mesh import Mesh
-from core.FiniteElementSetup import FiniteElementSetup
+from core.finiteElementSetup import FiniteElementSetup
 from models.thermal_model_cube import ThermalSolver
 from models.mechanical_model_cube import MechanicalSolver
 
