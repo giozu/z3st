@@ -8,22 +8,7 @@ from models.thermal_model_cube import ThermalSolver
 from models.mechanical_model_cube import MechanicalSolver
 
 class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
-    def volume(self, edge, log_path="output/simulation_log.txt"):
-        self.edge = edge
-        self.area = edge**2
-        self.height = edge
-
-        mesh_volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx))
-        analytical_volume = self.area * self.height
-        rel_error = abs(mesh_volume - analytical_volume) / analytical_volume * 100
-
-        with open(log_path, "a") as f:
-            f.write("\nVolume Comparison\n")
-            f.write(f"Mesh volume: {mesh_volume:.6e} m3\n")
-            f.write(f"Analytical volume: {analytical_volume:.6e} m3\n")
-            f.write(f"Relative error: {rel_error:.3e} %\n")
-
-    def parameters(self, conditions, g, lhr):
+    def parameters(self, conditions, lhr):
         self.conditions = conditions
         self.g = conditions["gravitational_acceleration"]
         self.lhr = lhr

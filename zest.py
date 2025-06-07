@@ -66,7 +66,6 @@ times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, f
 
 problem.parameters(
     conditions=conditions,
-    g=conditions["gravitational_acceleration"],
     lhr=lhr_points[0],
 )
 

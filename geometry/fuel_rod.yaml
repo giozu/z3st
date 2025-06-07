@@ -1,0 +1,15 @@
+name: fuel_rod
+
+fuel_outer_radius: 0.004         # m
+cladding_inner_radius: 0.0042    # m
+cladding_outer_radius: 0.0047    # m
+height: 0.0100                   # m
+
+labels:
+  fuel_bottom: 1
+  cladding_bottom: 2
+  fuel_outer: 3
+  cladding_outer: 4
+  cladding_inner: 5
+  cladding_top: 6
+  fuel_top: 7
