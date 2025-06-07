@@ -3,7 +3,7 @@ import dolfinx
 import ufl
 
 class Mesh:
-    def __init__(self, mesh_file, rank=0, gdim=3):
+    def __init__(self, mesh_file, geometry, rank=0, gdim=3):
         """
         Initialize the class with the mesh file.
 
@@ -15,6 +15,8 @@ class Mesh:
         self.mesh_file = mesh_file
         self.rank = rank
         self.gdim = gdim
+        self.geometry = geometry
+        
         self._read_mesh()
         self._setup_function_space()
         self._initialize_functions()
@@ -35,14 +37,7 @@ class Mesh:
 
             # Labels
             # --- Cube ---
-            self.label_map = {
-                    "Bottom": 1,
-                    "Face 1": 2,
-                    "Face 2": 3,
-                    "Face 3": 4,
-                    "Face 4": 5,
-                    "Top": 6,
-                }
+            self.label_map = self.geometry["labels"]
 
             # --- Cylindrical inclusion ---
             label_map = {

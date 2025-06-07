@@ -20,10 +20,12 @@ DEBUG_MODE = "--debug" in sys.argv
 from input.cube import Cube
 from input.fuel_rod import FuelRod
 # from geometry.fuel_rod import geometry
-from geometry.cube import geometry
 from postprocessing import save_temperature_history
 from utils import *
 from output import *
+
+# Geometry
+geometry = load("geometry/cube.yaml")
 
 # Materials
 fuel = load("materials/uo2.yaml")
@@ -59,7 +61,7 @@ start_time = time.time()
 # -------------------
 # Problem declaration
 # -------------------
-problem = Cube(mesh_file='mesh/cube.msh')
+problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
 
 # from full_cylinder import FullCylinder
 # from geometry.full_cylinder import geometry

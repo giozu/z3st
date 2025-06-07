@@ -15,19 +15,19 @@ import yaml
 
 def load(yaml_file):
     """
-    Load a material from a YAML file and ensure all values (except 'name') are floats.
+    Load a YAML file. Convert top-level values to float unless key is 'name' or the value is a dict.
 
     Parameters:
         yaml_file (str): Path to the .yaml file.
 
     Returns:
-        dict: A dictionary with material properties, properly typed.
+        dict: Parsed dictionary with converted values where applicable.
     """
     with open(yaml_file, "r") as f:
         data = yaml.safe_load(f)
 
     for key, value in data.items():
-        if key != "name":
+        if key != "name" and not isinstance(value, dict):
             try:
                 data[key] = float(value)
             except Exception as e:

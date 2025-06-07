@@ -1,0 +1,10 @@
+name: cube
+edge: 1.0  # meters
+
+labels:
+  Bottom: 1
+  Face 1: 2
+  Face 2: 3
+  Face 3: 4
+  Face 4: 5
+  Top: 6
