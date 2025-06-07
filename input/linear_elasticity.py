@@ -5,7 +5,7 @@ import dolfinx.fem.petsc
 from mpi4py import MPI
 from petsc4py import PETSc
 
-from FEniCSx.zest.finiteElementSettings import Mechanics
+from FEniCSx.zest.FiniteElementSetups import Mechanics
 
 class LinearElasticity(Mechanics):
     def volume(self):

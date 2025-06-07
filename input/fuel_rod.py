@@ -6,7 +6,7 @@ from mpi4py import MPI
 from petsc4py import PETSc
 import numpy as np
 
-from core.finiteElementSettings import FiniteElementSetting
+from core.FiniteElementSetup import FiniteElementSetup
 from geometryManager import GeometryManager
 
 from models.thermal_model import ThermalSolver
@@ -14,7 +14,7 @@ from models.mechanical_model import MechanicalSolver
 
 from utils import get_ksp_reason_name
 
-class FuelRod(FiniteElementSetting):
+class FuelRod(FiniteElementSetup):
     def volume(self, fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height, log_path="output/simulation_log.txt"):
         """
         Compute the volume of the domain.

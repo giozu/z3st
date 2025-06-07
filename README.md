@@ -28,7 +28,7 @@ ZEST/
  ├── zest.py                    # Main script
  ├── fuel_rod.py               # Core thermo-mechanical class
  ├── geometryManager.py        # Manages geometry update/deformation
- ├── finiteElementSettings.py  # FEM setup and function spaces
+ ├── FiniteElementSetups.py  # FEM setup and function spaces
  ├── utils.py                  # Helpers (power history, KSP log)
  ├── materials/
  │    ├── uo2.yaml

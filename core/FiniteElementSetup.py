@@ -6,7 +6,7 @@ from petsc4py import PETSc
 # import meshio
 # import numpy as np
 
-class FiniteElementSetting:
+class FiniteElementSetup:
     def _setup_function_space(self):
         """
         Set up the function space for the problem.

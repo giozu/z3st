@@ -7,9 +7,9 @@ from mpi4py import MPI
 from petsc4py import PETSc
 import numpy as np
 
-from core.finiteElementSettings import FiniteElementSetting
+from core.FiniteElementSetup import FiniteElementSetup
 
-class FullCylinder_time(FiniteElementSetting):
+class FullCylinder_time(FiniteElementSetup):
     def volume(self, outer_radius, inner_radius, height):
         """
         Compute the volume of the domain.
