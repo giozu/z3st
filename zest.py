@@ -10,39 +10,36 @@ Zest is a thermomechanical fuel performance code written in Python.
 This project is currently under development.
 """)
 
-# Importing python modules
+# Python modules
 import time
 import sys
-
-DEBUG_MODE = "--debug" in sys.argv
-
-# Importing utilities
-from input.cube import Cube
-from input.fuel_rod import FuelRod
 # from geometry.fuel_rod import geometry
 from postprocessing import save_temperature_history
 from utils import *
 from output import *
 
-# Geometry
+DEBUG_MODE = "--debug" in sys.argv
+
+# --- Output settings ---
+log_path = "output/simulation_log.txt"
+clear_log_file(log_path)
+os.makedirs("output", exist_ok=True)
+
+# --- Simulation frame ---
+from input.cube import Cube
 geometry = load("geometry/cube.yaml")
+problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
+
+problem.debug_mode = DEBUG_MODE
+
+problem.volume(geometry["edge"])
+# from input.fuel_rod import FuelRod
 
 # Materials
 fuel = load("materials/uo2.yaml")
 gas = load("materials/he.yaml")
 cladding = load("materials/T91.yaml")
 coolant = load("materials/h2o.yaml")
-
-# Initial and boundary conditions
-conditions = load("conditions/conditions.yaml")
-
-t_points = [0]      # s
-lhr_points = [25000]    # W/m
-
-times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
-# times, lhrs = read_power_history("power_history.csv")
-
-os.makedirs("output", exist_ok=True)
 
 # Debug info
 if DEBUG_MODE:
@@ -56,12 +53,24 @@ if DEBUG_MODE:
     for k, v in coolant.items():
         print(f"{k:>8} → {v} ({type(v)})")
 
-start_time = time.time()
+problem.materials(material=fuel)
 
-# -------------------
-# Problem declaration
-# -------------------
-problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
+# Initial and boundary conditions
+conditions = load("conditions/conditions.yaml")
+
+t_points = [0]      # s
+lhr_points = [25000]    # W/m
+
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
+# times, lhrs = read_power_history("power_history.csv")
+
+problem.parameters(
+    conditions=conditions,
+    g=conditions["gravitational_acceleration"],
+    lhr=lhr_points[0],
+)
+
+start_time = time.time()
 
 # from full_cylinder import FullCylinder
 # from geometry.full_cylinder import geometry
@@ -85,14 +94,9 @@ problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
 # problem.parameters(cladding["rho"], conditions["gravitational acceleration"], cladding["E"], cladding["nu"], cladding["k"], conditions["LHR"], cladding["alpha"], conditions["reference temperature"], cladding["cp"])
 # problem.boundary_conditions(inner_pressure=conditions["gap pressure"], outer_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
 
-log_path = "output/simulation_log.txt"
-clear_log_file(log_path)
-
 # problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
-problem.debug_mode = DEBUG_MODE
 
 # problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
-problem.volume(geometry["edge"])
 
 # temp_path = os.path.join("output", "temperature.xdmf")
 # xtemp = dolfinx.io.XDMFFile(problem.mesh.comm, temp_path, "w")
@@ -126,16 +130,6 @@ time_values = []
 #     alpha=fuel["alpha"],
 #     T_ref=conditions["reference_temperature"]
 # )
-
-problem.materials(
-    material=fuel
-)
-
-problem.parameters(
-    conditions=conditions,
-    g=conditions["gravitational_acceleration"],
-    lhr=lhr_points[0],
-)
 
 # problem.boundary_conditions(gap_pressure=conditions["gap_pressure"], 
 #                             coolant_pressure=conditions["coolant_pressure"], 

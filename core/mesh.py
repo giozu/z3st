@@ -40,11 +40,11 @@ class Mesh:
             self.label_map = self.geometry["labels"]
 
             # --- Cylindrical inclusion ---
-            label_map = {
-                    "Domain": 1,
-                    "Inclusion": 2,
-                    "Boundary": 3,
-                }
+            # label_map = {
+            #         "Domain": 1,
+            #         "Inclusion": 2,
+            #         "Boundary": 3,
+            #     }
             
             self.normal = ufl.FacetNormal(self.mesh)
 
