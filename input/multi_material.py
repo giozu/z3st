@@ -12,8 +12,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         self.conditions = conditions
         self.g = conditions["gravitational_acceleration"]
         self.lhr = lhr
-        self.q_third = lhr / self.area
-        print(f"[INFO] q_third = {self.q_third:.2f} W/m³ (LHR = {self.lhr:.2f} W/m, Area = {self.area:.6f} m²)")
 
     def materials(self, **materials):
         self.materials = {}
@@ -109,7 +107,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
         for name, T_func in self.T.items():
             values = T_func.x.array
-            print(f"[INFO] {name}: min={values.min():.2f} K, max={values.max():.2f} K, mean={values.mean():.2f} K")
+            print(f"  [INFO] {name}: min={values.min():.2f} K, max={values.max():.2f} K, mean={values.mean():.2f} K")
 
         # --- Volumetric power ---
         self.q_third = {}
@@ -117,7 +115,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         for name, mat in self.materials.items():
             is_fissile = bool(mat.get("fissile", False))
             self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
-            print(f"[INFO] q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
+            print(f"  [INFO] q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
 
         # --- Displacement ---
         # v_m: Test Function
@@ -148,22 +146,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
         for name, u_func in self.u.items():
             values = u_func.x.array
-            print(f"[INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
-
-    def initialize_geometry(self, atol=1e-6):
-        """
-        Store original node indices for selected surfaces of the cube.
-        """
-        coords = self.mesh.geometry.x
-        x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
-        edge = self.edge
-
-        self.idx_bottom = np.where(np.isclose(z, 0.0, atol=atol))[0]
-        self.idx_top = np.where(np.isclose(z, edge, atol=atol))[0]
-        self.idx_left = np.where(np.isclose(x, 0.0, atol=atol))[0]
-        self.idx_right = np.where(np.isclose(x, edge, atol=atol))[0]
-        self.idx_front = np.where(np.isclose(y, 0.0, atol=atol))[0]
-        self.idx_back = np.where(np.isclose(y, edge, atol=atol))[0]
+            print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
     def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
         
@@ -181,7 +164,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     tag = self.label_map[label]
                     self.assemble_thermal_problem(label, tag)
                     n_iter = self.solve_thermal_problem(label)
-                    print(f"[INFO] Thermal solver for {label}: {n_iter} iterations")
+                    print(f"  [INFO] Thermal solver for {label}: {n_iter} iterations")
                     
             # Solve mechanical problem
             # self.assemble_mechanical_solver()
@@ -197,22 +180,23 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
             for name, delta in dT.items():
                 norm = np.linalg.norm(delta)
-                print(f"[INFO] ΔT[{name}] = {norm:.3e}")
+                print(f"  [INFO] ΔT[{name}] = {norm:.3e}")
 
             norm_dT = np.sqrt(sum(np.sum(delta**2) for delta in dT.values()))
-            print(f"[INFO] Global ||ΔT|| = {norm_dT:.3e}")
+            print(f"  [INFO] Global ||ΔT|| = {norm_dT:.3e}")
 
             # norm_du = np.linalg.norm(du)
             norm_du = 0.0
 
             print(f"Iteration {iteration}: ||Δu|| = {norm_du:.3e}, ||ΔT|| = {norm_dT:.3e}")
 
-        if norm_dT < tol_T:
-            print("[INFO] Thermal problem converged.")
-            break
+            if norm_dT < tol_T:
+                converged = True
+                print("  [INFO] Thermal problem converged.")
+                break
 
         if not converged:
-            print("Warning: Solver did not converge within the maximum number of iterations.")
+            print("  [WARNING]: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
         material_name = "fuel"
