@@ -174,10 +174,17 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             print("  [WARNING]: Solver did not converge within the maximum number of iterations.")
 
     def get_results(self):
-        material_name = "fuel"
-        material = self.materials[material_name]
+        self.strain = {}
+        self.stress = {}
+        
+        for name in self.u:
+            u = self.u[name]
+            T = self.T[name]
+            mat = self.materials[name]
 
-        self.strain = self.epsilon(self.u)
-        self.stress = self.sigma_mech(self.u, material) - self.sigma_th(self.T["fuel"], material)
+            self.strain[name] = self.epsilon(u)
+            self.stress[name] = self.sigma_mech(u, mat) - self.sigma_th(T, mat)
 
-        return self.u, self.strain, self.stress, self.T["fuel"]
+        return self.u, self.strain, self.stress, self.T
+
+

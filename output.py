@@ -52,44 +52,51 @@ def plot3d_displacement(problem):
 
 def plot3d_temperature(problem):
     """
-    Visualize the temperature field on the deformed and original mesh using PyVista.
-    Also exports the solution to an XDMF file.
+    Visualize a single temperature field by summing contributions from all materials.
+    Shows the result on a deformed mesh using PyVista and exports to XDMF.
     """
+    
+    os.makedirs("output", exist_ok=True)
 
-    # Extract mesh data
+    # Extract mesh structure
     topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_t)
 
-    # Deformation field
-    displacement = problem.u.x.array.reshape(geometry.shape)
-    deformed_geometry = geometry + displacement    
+    # Initialize total temperature and displacement
+    temp = np.zeros(geometry.shape[0])
+    displacement = np.zeros_like(geometry)
+
+    for name in problem.T:
+        temp += problem.T[name].x.array.real
+        displacement += problem.u[name].x.array.reshape(geometry.shape)
+
+    # Compute deformed geometry
+    deformed_geometry = geometry + displacement
 
     # Create PyVista grids
     grid_original = pyvista.UnstructuredGrid(topology, cell_types, geometry)
     grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
 
-    # Attach temperature to the deformed grid
-    grid_deformed["T"] = problem.T["fuel"].x.array.real
+    # Attach scalar temperature field to deformed grid
+    grid_deformed["T"] = temp
 
-    # Setup PyVista plot
+    # Plotting
     p = pyvista.Plotter()
     p.add_mesh(grid_original, style="wireframe", color="black")
     p.add_mesh(grid_deformed, scalars="T", cmap="plasma")
     p.show_axes()
 
-    # Show or save plot
     if not pyvista.OFF_SCREEN:
         p.show()
     else:
-        p.screenshot("output/temperature.png")
+        p.screenshot("output/temperature_combined.png")
 
-    # Ensure output directory exists
-    os.makedirs("output", exist_ok=True)
+    # Export combined temperature field to XDMF
+    T_total = dolfinx.fem.Function(problem.V_t, name="Temperature_Total")
+    T_total.x.array[:] = temp
 
-    # Export temperature field to XDMF
-    with dolfinx.io.XDMFFile(problem.mesh.comm, "output/temperature.xdmf", "w") as xdmf:
+    with dolfinx.io.XDMFFile(problem.mesh.comm, "output/temperature_combined.xdmf", "w") as xdmf:
         xdmf.write_mesh(problem.mesh)
-        problem.T["fuel"].name = "T"
-        xdmf.write_function(problem.T["fuel"])
+        xdmf.write_function(T_total)
 
 def plot1d_stress(problem, z_target=0.005, tol=0.0001):
     """
