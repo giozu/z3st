@@ -1,6 +1,5 @@
 name: cube
 edge: 1.0  # meters
-
 labels:
   Bottom: 1
   Face 1: 2

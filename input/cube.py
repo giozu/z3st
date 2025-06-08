@@ -185,7 +185,7 @@ class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         material_name = "fuel"
         material = self.materials[material_name]
 
-        self.strain = self.epsilon(self.v_m)
-        self.stress = self.sigma_mech(self.u_m, material) - self.sigma_th(self.T["fuel"], material)
+        self.strain = self.epsilon(self.u)
+        self.stress = self.sigma_mech(self.u, material) - self.sigma_th(self.T["fuel"], material)
 
         return self.u, self.strain, self.stress, self.T["fuel"]

@@ -186,8 +186,8 @@ results = problem.get_results()
 # ----------------
 plot3d_displacement(problem)
 plot3d_temperature(problem)
-# plot1d_temperature_at_z(problem, z_target=0.5, tol=0.0001)
-# plot1d_stress(problem, z_target=0.5, tol=0.0001)
+plot1d_temperature(problem, z_target=0.5, tol=0.0001)
+plot1d_stress(problem, z_target=0.5, tol=0.0001)
 
 # plot_radial_displacement(problem, z_target=0.005, tol = 0.0001)
 # plot_temperature(temperature, problem)

@@ -209,7 +209,7 @@ def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
     plt.grid()
     plt.show()
     
-def plot1d_temperature_at_z(problem, z_target=0.005, tol=0.0001):
+def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
     """
     Compute and plot the temperature distribution as a function of radius at a specific height z_target.
     
@@ -252,7 +252,7 @@ def plot1d_temperature_at_z(problem, z_target=0.005, tol=0.0001):
     V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))  # Discontinuous Galerkin space
 
     # Interpolate the temperature at cell centers
-    temperature_expr = dolfinx.fem.Expression(problem.T, V_scalar.element.interpolation_points())
+    temperature_expr = dolfinx.fem.Expression(problem.T["fuel"], V_scalar.element.interpolation_points())
     temperature_func = dolfinx.fem.Function(V_scalar)
     temperature_func.interpolate(temperature_expr)
 
@@ -267,6 +267,12 @@ def plot1d_temperature_at_z(problem, z_target=0.005, tol=0.0001):
     plt.legend()
     plt.grid()
     plt.title(f"Temperature distribution at z={z_target:.4f}m")
+    plt.tight_layout()
+    plt.xlim(0, np.max(r) * 1.05)
+    plt.ylim(np.min(temperature_values) * 0.98, np.max(temperature_values) * 1.02)
+    plt.ticklabel_format(style='plain', axis='y')
+    plt.tick_params(axis='both', which='major', labelsize=11)
+    
     plt.show()
 
 def export_fields(problem, step, t=None, lhr=None, output_dir="output"):

@@ -11,11 +11,11 @@ SetFactory("Built-in");
 
 L = 0.2;  // Side 
 H = 1.0;  // Heigth
-n = 20;   // Number of divisions per edge (adjust as needed)
+n = 30;   // Number of divisions per edge (adjust as needed)
 
 // First solid
 
-// Define cube corner points
+// Define corner points
 Point(1) = {0, 0, 0, 1.0};
 Point(2) = {L, 0, 0, 1.0};
 Point(3) = {L, L, 0, 1.0};
@@ -25,7 +25,7 @@ Point(6) = {L, 0, H, 1.0};
 Point(7) = {L, L, H, 1.0};
 Point(8) = {0, L, H, 1.0};
 
-// Define cube edges
+// Define edges
 Line(1) = {1, 2};
 Line(2) = {2, 3};
 Line(3) = {3, 4};
@@ -39,7 +39,7 @@ Line(10) = {6, 7};
 Line(11) = {7, 8};
 Line(12) = {8, 5};
 
-// Define cube faces
+// Define faces
 Line Loop(1) = {1, 2, 3, 4};
 Plane Surface(1) = {1};
 
@@ -58,15 +58,15 @@ Plane Surface(5) = {5};
 Line Loop(6) = {9, 10, 11, 12};
 Plane Surface(6) = {6};
 
-// Define cube volume
+// Define volume
 Surface Loop(1) = {1, 2, 3, 4, 5, 6};
 Volume(1) = {1};
 
 // Second solid
 
-dx = L+0.1;  // offset in x
+dx = L+0.01;  // offset in x
 
-// Points for second cube
+// Define corner points
 Point(9) = {dx + 0, 0, 0, 1.0};
 Point(10) = {dx + L, 0, 0, 1.0};
 Point(11) = {dx + L, L, 0, 1.0};
@@ -76,7 +76,7 @@ Point(14) = {dx + L, 0, H, 1.0};
 Point(15) = {dx + L, L, H, 1.0};
 Point(16) = {dx + 0, L, H, 1.0};
 
-// Edges
+// Define edges
 Line(13) = {9, 10};
 Line(14) = {10, 11};
 Line(15) = {11, 12};
@@ -90,7 +90,7 @@ Line(22) = {14, 15};
 Line(23) = {15, 16};
 Line(24) = {16, 13};
 
-// Faces
+// Define faces
 Line Loop(7) = {13, 14, 15, 16};     // bottom
 Plane Surface(7) = {7};
 
@@ -109,7 +109,7 @@ Plane Surface(11) = {11};
 Line Loop(12) = {21, 22, 23, 24};    // top
 Plane Surface(12) = {12};
 
-// Volume for second cube
+// Define volume
 Surface Loop(2) = {7, 8, 9, 10, 11, 12};
 Volume(2) = {2};
 
@@ -126,13 +126,13 @@ Transfinite Surface {7, 8, 9, 10, 11, 12};
 Transfinite Volume {2};
 
 // Physical groups for boundary conditions (first cube)
-Physical Surface("bottom") = {1};
-Physical Surface("face1")  = {2};
-Physical Surface("face2")  = {3};
-Physical Surface("face3")  = {4};
-Physical Surface("face4")  = {5};
-Physical Surface("top")    = {6};
-Physical Volume("cube1")   = {1};
+Physical Surface("bottom1") = {1};
+Physical Surface("face1_1") = {2};
+Physical Surface("face2_1") = {3};
+Physical Surface("face3_1") = {4};
+Physical Surface("face4_1") = {5};
+Physical Surface("top1")    = {6};
+Physical Volume("cube1")    = {1};
 
 // Physical groups for second cube
 Physical Surface("bottom2") = {7};
@@ -149,3 +149,4 @@ Mesh 3;
 
 // Save mesh
 Save "multi_material.msh";
+Save "multi_material.vtk";
