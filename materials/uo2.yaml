@@ -1,4 +1,5 @@
 name: UO2
+type: fuel
 fissile: True
 
 # Mechanical properties

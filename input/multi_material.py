@@ -30,24 +30,50 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
             
     def boundary_conditions(self):
+
         self.dofs_bottom1 = self.locateDofs(self.label_map["bottom1"])
         self.dofs_bottom2 = self.locateDofs(self.label_map["bottom2"])
+        self.dofs_face2_2 = self.locateDofs(self.label_map["face2_2"])
 
-        self.bcs_mechanical = [
-            self.zero_displacement(self.mesh, self.dofs_bottom1, self.V_m),
-            self.zero_displacement(self.mesh, self.dofs_bottom2, self.V_m)
-        ]
+        print(f"Thermal boundary conditions")
+        self.bcs_thermal = {}
+        for mat_type, mat in self.materials.items():
+            if mat_type == "fuel":
+                dofs = self.dofs_bottom1
+                print(f"  [INFO] Assigning thermal BC to '{mat_type}' using dofs_bottom1")
+            elif mat_type == "cladding":
+                dofs = self.dofs_face2_2
+                print(f"  [INFO] Assigning thermal BC to '{mat_type}' using dofs_face2_2")
+            else:
+                print(f"[WARNING] No thermal boundary condition defined for material type: '{mat_type}'")
+                continue
 
-        self.bcs_thermal = {
-            "fuel": [
-                self.fixed_temperature(self.mesh, self.dofs_bottom1, self.V_t, self.conditions["boundary_temperature"])
-            ],
-            "cladding": [
-                self.fixed_temperature(self.mesh, self.dofs_bottom2, self.V_t, self.conditions["boundary_temperature"])
+            self.bcs_thermal[mat_type] = [
+                self.fixed_temperature(self.mesh, dofs, self.V_t, self.conditions["boundary_temperature"])
             ]
-        }
 
-        self.traction = dolfinx.fem.Constant(self.mesh, self.conditions["coolant_pressure"]) * self.normal
+        print(f"Mechanical boundary conditions")
+        self.bcs_mechanical = {}
+        self.traction = {}
+
+        for mat_type, mat in self.materials.items():
+            if mat_type == "fuel":
+                dofs = self.dofs_bottom1
+                print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom1")
+            elif mat_type == "cladding":
+                dofs = self.dofs_bottom2
+                print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom2")
+            else:
+                print(f"[WARNING] No mechanical boundary condition defined for material type: '{mat_type}'")
+                continue
+
+            self.bcs_mechanical[mat_type] = [
+                self.zero_displacement(self.mesh, dofs, self.V_m)
+            ]
+
+            if mat_type == "cladding":
+                self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, self.conditions["coolant_pressure"]) * self.normal
+                print(f"  [INFO] Assigned traction to '{mat_type}' (coolant pressure = {self.conditions['coolant_pressure']*1e-6} MPa)")
 
     def initialize_fields(self):
         # --- Temperature field ---

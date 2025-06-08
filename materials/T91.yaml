@@ -1,4 +1,5 @@
 name: T91
+type: cladding
 fissile: False
 
 # Mechanical properties
