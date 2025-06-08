@@ -1,6 +1,9 @@
 from mpi4py import MPI
 import dolfinx
 import ufl
+import pyvista
+import matplotlib.cm as cm
+import numpy as np
 
 class Mesh:
     def __init__(self, mesh_file, geometry, rank=0, gdim=3):
@@ -20,6 +23,7 @@ class Mesh:
         self._read_mesh()
         self._setup_function_space()
         self._initialize_functions()
+        self._mesh_plot()
 
     def _read_mesh(self):
         """
@@ -156,3 +160,26 @@ class Mesh:
     #         f.write(f"{'Fuel volume (analytical)':<32}: {self.area_fuel * self.height * 1e9:.3e} mm³\n")
     #         f.write(f"{'Cladding volume (analytical)':<32}: {self.area_cladding * self.height * 1e9:.3e} mm³\n")
     #         f.write(f"{'Relative error':<32}: {rel_error:.3e} %\n\n")
+
+    def _mesh_plot(self):
+
+        topology, cell_types, _ = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
+        surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
+
+        unique_tags = np.unique(self.ft.values)
+        print("[INFO] Face labels present:", unique_tags)
+
+        colors = cm.get_cmap("tab10", len(unique_tags))
+        label_map = {}
+        for i, tag in enumerate(unique_tags):
+            label_name = list(self.label_map.keys())[list(self.label_map.values()).index(tag)]
+            label_map[tag] = (label_name, colors(i)[:3])
+
+        plotter = pyvista.Plotter()
+        for tag, (name, color) in label_map.items():
+            facets = self.ft.find(tag)
+            cells = surface.extract_cells(facets)
+            plotter.add_mesh(cells, color=color, show_edges=True, label=name)
+
+        plotter.add_legend()
+        plotter.show()

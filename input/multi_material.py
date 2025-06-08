@@ -1,5 +1,7 @@
 import dolfinx
+import pyvista
 import numpy as np
+import matplotlib.cm as cm
 from mpi4py import MPI
 from petsc4py import PETSc
 from core.mesh import Mesh
@@ -46,33 +48,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         }
 
         self.traction = dolfinx.fem.Constant(self.mesh, self.conditions["coolant_pressure"]) * self.normal
-
-        # topology, cell_types, _ = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
-        # surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
-
-        # plotter = pyvista.Plotter()
-        # unique_labels = np.unique(self.ft.values)
-
-        # print("Face labels present:", unique_labels)
-        # for label in unique_labels:
-        #     facets = self.ft.find(label)
-        #     print(f"Label {label}: {len(facets)} facets")
-        # label_map = {
-        #         1: ("Bottom", "red"),
-        #         2: ("Face 1", "blue"),
-        #         3: ("Face 2", "green"),
-        #         4: ("Face 3", "orange"),
-        #         5: ("Face 4", "purple"),
-        #         6: ("Top", "black")
-        #     }
-        # for label in np.unique(self.ft.values):
-        #     facets = self.ft.find(label)
-        #     surface_cells = surface.extract_cells(facets)
-        #     name, color = label_map.get(label, (f"Face {label}", "white"))
-        #     plotter.add_mesh(surface_cells, show_edges=True, opacity=1.0, color=color, label=name)
-
-        # plotter.add_legend()
-        # plotter.show()
 
     def initialize_fields(self):
         # --- Temperature field ---

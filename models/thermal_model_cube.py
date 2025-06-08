@@ -62,6 +62,11 @@ class ThermalSolver:
         solver.getPC().setType("jacobi")
         solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
 
+        if self.debug_mode is True:
+            print(f"[DEBUG] Solving thermal problem for {material_label}")
+            print(f"[DEBUG] Initial temperature: min = {self.T[material_label].x.array.min():.2f} K, max = {self.T[material_label].x.array.max():.2f} K")
+            print(f"[DEBUG] Source term: q_third = {self.q_third[material_label]:.2f} W/m³")
+
         solver.solve(b, self.T[material_label].x.petsc_vec)
         self.T[material_label].x.scatter_forward()
 
