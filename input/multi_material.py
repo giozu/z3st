@@ -110,6 +110,8 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             values = T_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} K, max={values.max():.2f} K, mean={values.mean():.2f} K")
 
+        self.thermal_residuals = {}
+
         # --- Volumetric power ---
         self.q_third = {}
 
@@ -160,13 +162,28 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             T_old = {name: T.x.array.copy() for name, T in self.T.items()}
 
             # Solve thermal problem
-            for label in ["fuel", "cladding"]:
+            for label in self.materials:
                 if label in self.label_map:
                     tag = self.label_map[label]
+                    print(f"\n  [INFO] Assembling thermal problem for '{label}' (tag = {tag})")
+
                     self.assemble_thermal_problem(label, tag)
                     n_iter = self.solve_thermal_problem(label)
-                    print(f"  [INFO] Thermal solver for {label}: {n_iter} iterations")
-                    
+
+                    T = self.T[label].x.array
+                    print(f"  [INFO] Thermal solver for '{label}': {n_iter} iterations")
+                    # print(f"  [INFO] {label}: min T = {T.min():.2f} K, max T = {T.max():.2f} K, mean T = {T.mean():.2f} K")
+
+                    # Residual log
+                    residuals = self.thermal_residuals.get(label, [])
+                    for i, r in enumerate(residuals):
+                        print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
+
+                    with open(f"output/residuals_{label}.csv", "w") as f:
+                        f.write("iteration,residual\n")
+                        for i, r in enumerate(residuals):
+                            f.write(f"{i+1},{r}\n")
+
             # Solve mechanical problem
             # self.assemble_mechanical_solver()
             # self.solve_mechanical_problem()

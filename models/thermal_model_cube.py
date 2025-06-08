@@ -35,7 +35,7 @@ class ThermalSolver:
         self.a_thermal = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
         self.L_thermal = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
 
-    def solve_thermal_problem(self, material_label):
+    def solve_thermal_problem(self, material_label, max_iter=1000, tol=1e-8):
 
         if self.debug_mode is True:
             print(f"[DEBUG] self.a_thermal type: {type(self.a_thermal)}")
@@ -58,9 +58,23 @@ class ThermalSolver:
 
         solver = PETSc.KSP().create(self.mesh.comm)
         solver.setOperators(A)
-        solver.setType(PETSc.KSP.Type.GMRES)
-        solver.getPC().setType("jacobi")
-        solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
+        # solver.setType(PETSc.KSP.Type.GMRES)
+        # solver.getPC().setType("jacobi")
+        
+        # solver.setType("lu")
+        
+        solver.setType("gmres")
+        solver.getPC().setType("gamg")
+        # solver.getPC().setType("hypre")
+
+        solver.setTolerances(rtol=tol, atol=tol, max_it=max_iter)
+
+        residuals = []
+
+        def monitor(ksp, its, rnorm):
+            residuals.append(rnorm)
+
+        solver.setMonitor(monitor)
 
         if self.debug_mode is True:
             print(f"[DEBUG] Solving thermal problem for {material_label}")
@@ -69,5 +83,6 @@ class ThermalSolver:
 
         solver.solve(b, self.T[material_label].x.petsc_vec)
         self.T[material_label].x.scatter_forward()
+        self.thermal_residuals[material_label] = residuals
 
         return solver.getIterationNumber()

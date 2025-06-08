@@ -189,6 +189,7 @@ results = problem.get_results()
 # Post-processing
 # ----------------
 # plot3d_displacement(problem)
+plot_residuals()
 plot3d_temperature(problem)
 # plot1d_temperature(problem, z_target=0.5, tol=0.0001)
 # plot1d_stress(problem, z_target=0.5, tol=0.0001)
