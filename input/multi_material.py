@@ -156,17 +156,23 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         self.idx_back = np.where(np.isclose(y, edge, atol=atol))[0]
 
     def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
+        
         converged = False
+        
         for iteration in range(max_iters):
+
             # Store previous states
-            u_old = self.u.x.array.copy()
-            T_old = self.T["fuel"].x.array.copy()
-            # T_old = {name: T.x.array.copy() for name, T in self.T.items()}
+            u_old = {name: u.x.array.copy() for name, u in self.u.items()}
+            T_old = {name: T.x.array.copy() for name, T in self.T.items()}
 
             # Solve thermal problem
-            self.assemble_thermal_problem()
-            self.solve_thermal_problem()
-
+            for label in ["fuel", "cladding"]:
+                if label in self.label_map:
+                    tag = self.label_map[label]
+                    self.assemble_thermal_problem(label, tag)
+                    n_iter = self.solve_thermal_problem(label)
+                    print(f"[INFO] Thermal solver for {label}: {n_iter} iterations")
+                    
             # Solve mechanical problem
             self.assemble_mechanical_solver()
             self.solve_mechanical_problem()
