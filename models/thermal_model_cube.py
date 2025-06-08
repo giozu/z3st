@@ -25,15 +25,15 @@ class ThermalSolver:
 
     def assemble_thermal_problem(self, material_label, material_meshtag):
         k = self.materials[material_label]["k"]
-        dx_local = self.dx(material_meshtag)
         q_third = PETSc.ScalarType(self.q_third[material_label])
+        self.dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])
 
         if self.debug_mode is True:
             print(f"[DEBUG] source type for {material_label}: {type(self.q_third[material_label])}")
             assert isinstance(self.q_third[material_label], (int, float)), "q_third must be a scalar"
 
-        self.a_thermal = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
+        self.a_thermal = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_local
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * self.dx_local
 
     def solve_thermal_problem(self, material_label, max_iter=1000, tol=1e-8):
 

@@ -1,9 +1,6 @@
 import dolfinx
-import pyvista
 import numpy as np
-import matplotlib.cm as cm
 from mpi4py import MPI
-from petsc4py import PETSc
 from core.mesh import Mesh
 from core.finiteElementSetup import FiniteElementSetup
 from models.thermal_model_cube import ThermalSolver
