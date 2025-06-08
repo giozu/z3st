@@ -1,4 +1,5 @@
 name: UO2
+fissile: True
 
 # Mechanical properties
 E: 1.7e11        # Pa

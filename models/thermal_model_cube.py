@@ -26,11 +26,16 @@ class ThermalSolver:
     def assemble_thermal_problem(self, material_label, material_meshtag):
         k = self.materials[material_label]["k"]
         dx_local = self.dx(material_meshtag)
+        q_third = PETSc.ScalarType(self.q_third[material_label])
 
-        self.a_thermal = ufl.dot(k * ufl.grad(self.T[material_label]), ufl.grad(self.v_t)) * dx_local
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * dx_local
+        if self.debug_mode is True:
+            print(f"[DEBUG] source type for {material_label}: {type(self.q_third[material_label])}")
+            assert isinstance(self.q_third[material_label], (int, float)), "q_third must be a scalar"
 
-    def solve_thermal_problem(self, material_name):
+        self.a_thermal = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
+        self.L_thermal = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
+
+    def solve_thermal_problem(self, material_label):
 
         if self.debug_mode is True:
             print(f"[DEBUG] self.a_thermal type: {type(self.a_thermal)}")
@@ -41,15 +46,15 @@ class ThermalSolver:
 
         A = dolfinx.fem.petsc.create_matrix(a_form)
         b = dolfinx.fem.petsc.create_vector(L_form)
-        dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=self.bcs_thermal)
+        dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=self.bcs_thermal[material_label])
         A.assemble()
 
         with b.localForm() as loc:
             loc.set(0.0)
         dolfinx.fem.petsc.assemble_vector(b, L_form)
-        dolfinx.fem.petsc.apply_lifting(b, [a_form], [self.bcs_thermal])
+        dolfinx.fem.petsc.apply_lifting(b, [a_form], [self.bcs_thermal[material_label]])
         b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        dolfinx.fem.petsc.set_bc(b, self.bcs_thermal)
+        dolfinx.fem.petsc.set_bc(b, self.bcs_thermal[material_label])
 
         solver = PETSc.KSP().create(self.mesh.comm)
         solver.setOperators(A)
@@ -57,7 +62,7 @@ class ThermalSolver:
         solver.getPC().setType("jacobi")
         solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
 
-        solver.solve(b, self.T[material_name].x.petsc_vec)
-        self.T[material_name].x.scatter_forward()
+        solver.solve(b, self.T[material_label].x.petsc_vec)
+        self.T[material_label].x.scatter_forward()
 
         return solver.getIterationNumber()

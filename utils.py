@@ -27,7 +27,7 @@ def load(yaml_file):
         data = yaml.safe_load(f)
 
     for key, value in data.items():
-        if key not in {"name", "geometry_type"} and not isinstance(value, dict):
+        if key not in {"name", "geometry_type", "fissile"} and not isinstance(value, dict):
             try:
                 data[key] = float(value)
             except Exception as e:

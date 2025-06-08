@@ -57,7 +57,7 @@ class Mesh:
             self.geometry_type = self.geometry.get("geometry_type", "").lower()
 
             if self.geometry_type == "rect":
-                self.area = self.edge * 2
+                self.area = self.edge ** 2
             else:
                 self.area = self.edge ** 2
             print(f"[INFO] edge = {self.edge} m, height = {self.height} m")
