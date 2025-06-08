@@ -26,13 +26,17 @@ clear_log_file(log_path)
 os.makedirs("output", exist_ok=True)
 
 # --- Simulation frame ---
-from input.cube import Cube
-geometry = load("geometry/cube.yaml")
-problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
+# from input.cube import Cube
+# geometry = load("geometry/cube.yaml")
+# problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
+
+from input.multi_material import MultiMaterial
+geometry = load("geometry/multi_material.yaml")
+problem = MultiMaterial(mesh_file='mesh/multi_material.msh', geometry=geometry)
 
 problem.debug_mode = DEBUG_MODE
 
-problem.volume(geometry["edge"])
+problem.volume()
 # from input.fuel_rod import FuelRod
 
 # Materials
@@ -53,7 +57,7 @@ if DEBUG_MODE:
     for k, v in coolant.items():
         print(f"{k:>8} → {v} ({type(v)})")
 
-problem.materials(fuel=fuel)
+problem.materials(fuel=fuel, cladding=cladding)
 
 # Initial and boundary conditions
 conditions = load("conditions/conditions.yaml")

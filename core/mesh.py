@@ -35,19 +35,39 @@ class Mesh:
             self.mesh.topology.create_connectivity(self.fdim, self.tdim)
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
 
+            print("[INFO] Available volume tags (dx):")
+            tag_values = self.tags.values
+            unique_tags = set(tag_values)
+            for tag in sorted(unique_tags):
+                print(f"  Tag ID: {tag}")
+
+
             # Labels
-            # --- Cube ---
             self.label_map = self.geometry["labels"]
 
-            # --- Cylindrical inclusion ---
-            # label_map = {
-            #         "Domain": 1,
-            #         "Inclusion": 2,
-            #         "Boundary": 3,
-            #     }
+            print("[INFO] Geometry entries:")
+            for k in sorted(self.geometry.keys()):
+                if k == "labels":
+                    continue
+                v = self.geometry[k]
+                print(f"  {k:<15} → {v} ({type(v).__name__})")
+
+            self.edge = self.geometry.get("edge", None)
+            self.height = self.geometry.get("height", None)
+            self.geometry_type = self.geometry.get("geometry_type", "").lower()
+
+            if self.geometry_type == "rect":
+                self.area = self.edge * 2
+            else:
+                self.area = self.edge ** 2
+            print(f"[INFO] edge = {self.edge} m, height = {self.height} m")
+            print(f"[INFO] area = {self.area} m2")
+
+            print("[INFO] Label map:")
+            for label, tag in sorted(self.label_map.items(), key=lambda item: item[1]):
+                print(f"  {label:<12} → {tag}")
             
             self.normal = ufl.FacetNormal(self.mesh)
-
             self.dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
             self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
 
@@ -78,20 +98,41 @@ class Mesh:
     def locateDofs(self, label):
         return dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(label))
     
-    def volume(self, edge, log_path="output/simulation_log.txt"):
-        self.edge = edge
-        self.area = edge**2
-        self.height = edge
+    def volume(self, log_path="output/simulation_log.txt"):
 
-        mesh_volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx))
-        analytical_volume = self.area * self.height
-        rel_error = abs(mesh_volume - analytical_volume) / analytical_volume * 100
+        # Integration measures the domain
+        for label in ["fuel", "cladding"]:
+            if label in self.label_map:
+                tag = self.label_map[label]
+                setattr(self, f"dx_{label}", self.dx(tag))
+                print(f"[INFO] Defined dx_{label} for tag ID {tag}")
 
+        # Compute mesh volumes
+        volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx))
+        volume_1 = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_fuel))
+        volume_2 = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_cladding))
+        
         with open(log_path, "a") as f:
-            f.write("\nVolume Comparison\n")
-            f.write(f"Mesh volume: {mesh_volume:.6e} m3\n")
-            f.write(f"Analytical volume: {analytical_volume:.6e} m3\n")
-            f.write(f"Relative error: {rel_error:.3e} %\n")
+            f.write("Mesh Volumes\n")
+            f.write("──────────────────────────────────────────────\n")
+            f.write(f"{'Volume  (from mesh)':<32}: {volume  *1e9:.3e} mm³\n")
+            f.write(f"{'Volume1 (from mesh)':<32}: {volume_1*1e9:.3e} mm³\n")
+            f.write(f"{'Volume2 (from mesh)':<32}: {volume_2*1e9:.3e} mm³\n")
+
+    # def volume(self, edge, log_path="output/simulation_log.txt"):
+    #     self.edge = edge
+    #     self.area = edge**2
+    #     self.height = edge
+
+    #     mesh_volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx))
+    #     analytical_volume = self.area * self.height
+    #     rel_error = abs(mesh_volume - analytical_volume) / analytical_volume * 100
+
+    #     with open(log_path, "a") as f:
+    #         f.write("\nVolume Comparison\n")
+    #         f.write(f"Mesh volume: {mesh_volume:.6e} m3\n")
+    #         f.write(f"Analytical volume: {analytical_volume:.6e} m3\n")
+    #         f.write(f"Relative error: {rel_error:.3e} %\n")
 
     # def volume(self, fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height, log_path="output/simulation_log.txt"):
     #     # Integration measures the domain

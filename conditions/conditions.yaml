@@ -1,5 +1,3 @@
-# Simulation and boundary conditions
-
 gap_pressure: -2e9                  # Gap pressure (Pa), negative for compression
 gravitational_acceleration: 9.81    # Gravitational acceleration (m/s^2)
 boundary_temperature: 300.0         # Outer boundary (coolant-side) temperature (K)

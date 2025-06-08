@@ -15,6 +15,20 @@ class MechanicalSolver:
     def sigma_th(self, T, material):
         return (3 * material["lmbda"] + 2 * material["mu"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.gdim)
 
+    def zero_displacement(self, mesh, dofs, V):
+        """
+        Returns a DirichletBC with zero displacement vector.
+
+        Parameters:
+            mesh (dolfinx.Mesh): The mesh object.
+            dofs (array-like): Degrees of freedom where BC is applied.
+            V (FunctionSpace): The function space.
+
+        Returns:
+            dolfinx.fem.DirichletBC: The zero displacement boundary condition.
+        """
+        return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, (0.0, 0.0, 0.0)), dofs, V)
+
     def assemble_mechanical_solver(self, material_name="fuel", T_field=None):
         material = self.materials[material_name]
         T = self.T[material_name] if T_field is None else T_field
@@ -29,7 +43,8 @@ class MechanicalSolver:
         self.L_mechanical = (
             ufl.dot(body_force, self.v_m) * self.dx
             + self.sigma_th(T, material)[0, 0] * ufl.div(self.v_m) * self.dx
-            + ufl.dot(self.traction, self.v_m) * self.ds(self.label_map["Top"])
+            + ufl.dot(self.traction, self.v_m) * self.ds(self.label_map["top1"])
+            + ufl.dot(self.traction, self.v_m) * self.ds(self.label_map["top2"])
         )
 
     def solve_mechanical_problem(self):

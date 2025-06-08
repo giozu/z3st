@@ -132,7 +132,7 @@ Physical Surface("face2_1") = {3};
 Physical Surface("face3_1") = {4};
 Physical Surface("face4_1") = {5};
 Physical Surface("top1")    = {6};
-Physical Volume("cube1")    = {1};
+Physical Volume("fuel")    = {1};
 
 // Physical groups for second cube
 Physical Surface("bottom2") = {7};
@@ -141,7 +141,7 @@ Physical Surface("face2_2") = {9};
 Physical Surface("face3_2") = {10};
 Physical Surface("face4_2") = {11};
 Physical Surface("top2")    = {12};
-Physical Volume("cube2")    = {2};
+Physical Volume("cladding")    = {2};
 
 // Generate structured mesh
 Mesh.RecombineAll = 1;

@@ -31,6 +31,7 @@ def write_yaml(labels, output_file):
         "name": "multi_material",
         "edge": "0.2",  # meters
         "height": "1.0", # meters
+        "geometry_type": "rect",
         "labels": labels
     }
     with open(output_file, "w") as f:

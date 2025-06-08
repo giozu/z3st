@@ -1,6 +1,7 @@
 name: multi_material
 edge: '0.2'
 height: '1.0'
+geometry_type: rect
 labels:
   bottom1: 1
   face1_1: 2
@@ -14,5 +15,5 @@ labels:
   face3_2: 11
   face4_2: 12
   top2: 13
-  cube1: 7
-  cube2: 14
+  fuel: 7
+  cladding: 14

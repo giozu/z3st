@@ -6,6 +6,23 @@ class ThermalSolver:
     def __init__(self):
         print(f"ThermalSolver")
 
+    def fixed_temperature(self, mesh, dofs, V, T):
+        """
+        Create a Dirichlet BC with fixed temperature.
+
+        Parameters:
+            mesh (dolfinx.Mesh): The mesh object.
+            dofs (array-like): Degrees of freedom where BC is applied.
+            V (FunctionSpace): The function space.
+            T (float): Temperature value.
+
+        Returns:
+            dolfinx.fem.DirichletBC: Fixed temperature boundary condition.
+        """
+        return dolfinx.fem.dirichletbc(
+            dolfinx.fem.Constant(mesh, PETSc.ScalarType(T)), dofs, V
+        )
+
     def assemble_thermal_problem(self):
         self.a_thermal = ufl.dot(self.materials["fuel"]["k"] * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx
         self.L_thermal = dolfinx.fem.Constant(self.mesh, self.q_third) * self.v_t * self.dx
