@@ -179,7 +179,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             values = u_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
-    def solve(self, max_iters=1, tol_u=1e-6, tol_T=1e-6):
+    def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
         converged = False
         
         for iteration in range(max_iters):
@@ -195,25 +195,35 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     print(f"\n  [INFO] Assembling thermal problem for '{label}' (tag = {tag})")
 
                     self.assemble_thermal_problem(label)
-                    n_iter_th = self.solve_thermal_problem(label)
+                    n_iter_th = self.solve_thermal_problem(label, tol=1e-6)
 
-                    print(f"  [INFO] Thermal solver for '{label}': {n_iter_th} iterations")
+                    print(f"  [INFO] Thermal solver for '{label}': {n_iter_th+1} iterations")
 
                     # Residual log
                     residuals = self.thermal_residuals.get(label, [])
                     for i, r in enumerate(residuals):
                         print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
 
-                    with open(f"output/residuals_{label}.csv", "w") as f:
+                    with open(f"output/residuals_thermal_{label}.csv", "w") as f:
                         f.write("iteration,residual\n")
                         for i, r in enumerate(residuals):
                             f.write(f"{i+1},{r}\n")
 
                     print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
                     self.assemble_mechanical_solver(label)
-                    n_iter_mech = self.solve_mechanical_problem(label)
+                    n_iter_mech = self.solve_mechanical_problem(label, tol=1e-6)
 
-                    print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech} iterations")
+                    print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech+1} iterations")
+
+                    # Residual log
+                    residuals = self.mechanical_residuals.get(label, [])
+                    for i, r in enumerate(residuals):
+                        print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
+
+                    with open(f"output/residuals_mechanical_{label}.csv", "w") as f:
+                        f.write("iteration,residual\n")
+                        for i, r in enumerate(residuals):
+                            f.write(f"{i+1},{r}\n")
 
             # print(f"Max displacement: {np.max(self.u.x.array):2.2f} m")
             # print(f"Max temperature: {np.max(self.T["fuel"].x.array):2.2f} K")
@@ -221,36 +231,45 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
             # --- Norm computation ---
             norm_dT_sq = 0.0
+            norm_du_sq = 0.0
 
-            for name in self.T:
-                dT = self.T[name].x.array - T_old[name]
 
-                tag = self.label_map[name]
-                region_cells = np.where(self.tags.values == tag)[0]
-                self.mesh.topology.create_connectivity(0, self.tdim) # Mapping those vertices back to cells (e.g. when finding DoFs)
-                cell_to_vertex = self.mesh.topology.connectivity(self.tdim, 0)
-                vertex_indices = np.unique(np.hstack([cell_to_vertex.links(i) for i in region_cells]))
-                region_dofs = dolfinx.fem.locate_dofs_topological(self.V_t, 0, vertex_indices)
+            for label in self.materials:
+                if label in self.label_map:
+                    dT = self.T[label].x.array - T_old[label]
+                    du = self.u[label].x.array - u_old[label]
 
-                region_dT = dT[region_dofs]
-                region_norm_sq = np.sum(region_dT**2)
-                norm = np.sqrt(region_norm_sq)
-                print(f"  [INFO] ΔT[{name}] = {norm:.3e}")
+                    tag = self.label_map[label]
+                    region_cells = np.where(self.tags.values == tag)[0]
+                    self.mesh.topology.create_connectivity(0, self.tdim) # Mapping those vertices back to cells (e.g. when finding DoFs)
+                    cell_to_vertex = self.mesh.topology.connectivity(self.tdim, 0)
+                    vertex_indices = np.unique(np.hstack([cell_to_vertex.links(i) for i in region_cells]))
+                    region_dofs = dolfinx.fem.locate_dofs_topological(self.V_t, 0, vertex_indices)
 
-                # Accumulate global squared norm
-                norm_dT_sq += region_norm_sq
+                    region_dT = dT[region_dofs]
+                    region_du = du[region_dofs]
+                    region_norm_sq_dT = np.sum(region_dT**2)
+                    region_norm_sq_du = np.sum(region_du**2)
+                    norm_dT_loc = np.sqrt(region_norm_sq_dT)
+                    norm_du_loc = np.sqrt(region_norm_sq_du)
+
+                    print(f"  [INFO] L2 norm : ΔT[{label}] = {norm_dT_loc:.3e}")
+                    print(f"  [INFO] L2 norm : Δu[{label}] = {norm_du_loc:.3e}")
+
+                    # Accumulate global squared norm
+                    norm_dT_sq += region_norm_sq_dT
+                    norm_du_sq += region_norm_sq_du
+
 
             norm_dT = np.sqrt(norm_dT_sq)
+            norm_du = np.sqrt(norm_du_sq)
+
             print(f"  [INFO] Global ||ΔT|| = {norm_dT:.3e}")
+            print(f"  [INFO] Global ||Δu|| = {norm_du:.3e}")
 
-            # norm_du = np.linalg.norm(du)
-            norm_du = 0.0
-
-            print(f"Iteration {iteration}: ||Δu|| = {norm_du:.3e}, ||ΔT|| = {norm_dT:.3e}\n")
-
-            if norm_dT < tol_T:
+            if norm_dT < tol_T and norm_du < tol_u:
                 converged = True
-                print("  [INFO] Thermal problem converged.")
+                print("  [INFO] Thermal/mechanical problem converged.")
                 break
 
         if not converged:

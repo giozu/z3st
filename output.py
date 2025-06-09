@@ -22,7 +22,7 @@ import pandas as pd
 import glob
 
 def plot_residuals(folder="output"):
-    csv_files = glob.glob(f"{folder}/residuals_*.csv")
+    csv_files = glob.glob(f"{folder}/residuals_thermal_*.csv")
 
     plt.figure(figsize=(8, 6))
 
@@ -38,6 +38,24 @@ def plot_residuals(folder="output"):
     plt.legend()
     plt.tight_layout()
     plt.savefig(f"{folder}/thermal_residuals.png", dpi=300)
+    plt.show()
+
+    csv_files = glob.glob(f"{folder}/residuals_mechanical_*.csv")
+
+    plt.figure(figsize=(8, 6))
+
+    for file in csv_files:
+        label = file.split("_")[-1].split(".")[0]  # Extract 'fuel', 'cladding', etc.
+        df = pd.read_csv(file)
+        plt.semilogy(df["iteration"], df["residual"], label=label)
+
+    plt.xlabel("Iteration")
+    plt.ylabel("Residual (log scale)")
+    plt.title("Mechanical solver residual convergence")
+    plt.grid(True, which="both", linestyle="--", linewidth=0.5)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f"{folder}/mechanical_residuals.png", dpi=300)
     plt.show()
 
 def plot3d_displacement(problem):
