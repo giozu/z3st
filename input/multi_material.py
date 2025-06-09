@@ -57,10 +57,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             ]
 
         print(f"Mechanical boundary conditions")
-        self.bcs_mechanical = {}
-        self.traction = {}
-
-        for mat_type, mat in self.materials.items():
+        for mat_type, _ in self.materials.items():
             if mat_type == "fuel":
                 dofs = self.dofs_bottom1
                 print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom1")
@@ -133,9 +130,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         #     values = T_func.x.array[region_dofs]
         #     print(f"[INFO] {name}: min T over region = {values.min():.2f} K, max = {values.max():.2f} K, mean = {values.mean():.2f} K")
 
-        # --- Volumetric power ---
-        self.q_third = {}
-
         for name, mat in self.materials.items():
             is_fissile = bool(mat.get("fissile", False))
             self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
@@ -204,11 +198,11 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                         for i, r in enumerate(residuals):
                             f.write(f"{i+1},{r}\n")
 
-                    # print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
-                    # self.assemble_mechanical_solver(label)
-                    # n_iter_mech = self.solve_mechanical_problem(label)
+                    print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
+                    self.assemble_mechanical_solver(label)
+                    n_iter_mech = self.solve_mechanical_problem(label)
 
-                    # print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech} iterations")
+                    print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech} iterations")
 
             # print(f"Max displacement: {np.max(self.u.x.array):2.2f} m")
             # print(f"Max temperature: {np.max(self.T["fuel"].x.array):2.2f} K")
@@ -222,7 +216,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
                 tag = self.label_map[name]
                 region_cells = np.where(self.tags.values == tag)[0]
-                self.mesh.topology.create_connectivity(self.tdim, 0) # Getting vertices of your material's cells
                 self.mesh.topology.create_connectivity(0, self.tdim) # Mapping those vertices back to cells (e.g. when finding DoFs)
                 cell_to_vertex = self.mesh.topology.connectivity(self.tdim, 0)
                 vertex_indices = np.unique(np.hstack([cell_to_vertex.links(i) for i in region_cells]))

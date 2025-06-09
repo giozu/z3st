@@ -7,6 +7,7 @@ class MechanicalSolver:
         print("__MechanicalSolver initializer__")
         self.a_mechanical = {}
         self.L_mechanical = {}
+        self.bcs_mechanical = {}
         self.traction = {}
         self.traction_labels = {}
         self.mechanical_residuals = {}
@@ -47,11 +48,11 @@ class MechanicalSolver:
 
         body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -material["rho"] * self.g))
 
-        self.a_mechanical[material_label] = ufl.inner(self.stress, self.strain) * self.dx
+        self.a_mechanical[material_label] = ufl.inner(self.stress, self.strain) * self.dx_local
 
         self.L_mechanical[material_label] = (
-            ufl.dot(body_force, self.v_m) * self.dx
-            + ufl.inner(self.sigma_th(T, material), ufl.sym(ufl.grad(self.v_m))) * self.dx
+            ufl.dot(body_force, self.v_m) * self.dx_local
+            + ufl.inner(self.sigma_th(T, material), ufl.sym(ufl.grad(self.v_m))) * self.dx_local
             + ufl.dot(self.traction[material_label], self.v_m) * self.ds(self.traction_labels[material_label])
         )
  

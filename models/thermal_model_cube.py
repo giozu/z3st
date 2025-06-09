@@ -8,6 +8,7 @@ class ThermalSolver:
         self.a_thermal = {}
         self.L_thermal = {}
         self.thermal_residuals = {}
+        self.q_third = {}
 
     def fixed_temperature(self, mesh, dofs, V, T):
         """
