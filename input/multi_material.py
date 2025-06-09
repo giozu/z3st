@@ -69,23 +69,25 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
         for mat_type, _ in self.materials.items():
             if mat_type == "fuel":
+                # Dirichlet boundary conditions
                 dofs = self.dofs_bottom1
                 print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom1")
 
-                # pressure = self.conditions.get("gap_pressure", 0.0)
-                pressure = 0.0
+                # Neumann boundary conditions
+                pressure = self.conditions.get("gap_pressure", 0.0)
                 self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(pressure)) * self.normal
-                self.traction_labels[mat_type] = self.label_map["top2"]
+                self.traction_label[mat_type] = self.label_map["top1"]
 
                 print(f"  [INFO] Assigned traction to '{mat_type}' (fuel pressure = {pressure*1e-6} MPa)")
             elif mat_type == "cladding":
+                # Dirichlet boundary conditions
                 dofs = self.dofs_bottom2
                 print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom2")
                 
-                # pressure = self.conditions.get("coolant_pressure", 0.0)
-                pressure = 0.0
+                # Neumann boundary conditions
+                pressure = self.conditions.get("coolant_pressure", 0.0)
                 self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(pressure)) * self.normal
-                self.traction_labels[mat_type] = self.label_map["top2"]
+                self.traction_label[mat_type] = self.label_map["top2"]
 
                 print(f"  [INFO] Assigned traction to '{mat_type}' (coolant pressure = {pressure*1e-6} MPa)")
             else:
