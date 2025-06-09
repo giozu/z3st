@@ -24,7 +24,7 @@ class Mesh:
         self.geometry = geometry
         
         self._read_mesh()
-        self._mesh_plot()
+        # self._mesh_plot()
 
     def _read_mesh(self):
         """
@@ -100,9 +100,12 @@ class Mesh:
         except Exception as e:
             raise ValueError(f"Error reading mesh file {self.mesh_file}: {e}")
         
-    def locateDofs(self, label):
-        return dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(label))
+    def locateThermalDofs(self, label):
+        return dolfinx.fem.locate_dofs_topological(self.V_t, self.fdim, self.ft.find(label))
     
+    def locateMechanicalDofs(self, label):
+        return dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(label))
+           
     def volume(self, log_path="output/simulation_log.txt"):
 
         # Integration measures the domain

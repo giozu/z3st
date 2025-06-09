@@ -29,8 +29,8 @@ class Cube(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
             
     def boundary_conditions(self):
-        self.dofs_bottom = self.locateDofs(self.label_map["Bottom"])
-        self.dofs_top = self.locateDofs(self.label_map["Top"])
+        self.dofs_bottom = self.locateThermalDofs(self.label_map["Bottom"])
+        self.dofs_top = self.locateThermalDofs(self.label_map["Top"])
 
         self.bcs_mechanical = [
             dolfinx.fem.dirichletbc(

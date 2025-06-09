@@ -35,12 +35,15 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             
     def boundary_conditions(self):
 
-        self.dofs_bottom1 = self.locateDofs(self.label_map["bottom1"])
-        self.dofs_bottom2 = self.locateDofs(self.label_map["bottom2"])
-        self.dofs_face2_2 = self.locateDofs(self.label_map["face2_2"])
-
         print(f"Thermal boundary conditions")
-        self.bcs_thermal = {}
+
+        self.dofs_bottom1 = self.locateThermalDofs(self.label_map["bottom1"])
+        self.dofs_bottom2 = self.locateThermalDofs(self.label_map["bottom2"])
+        self.dofs_face2_2 = self.locateThermalDofs(self.label_map["face2_2"])
+        
+        facets = self.ft.find(self.label_map["bottom1"])
+        print(f"[DEBUG] Found {len(facets)} facets for 'bottom1'")
+
         for mat_type, mat in self.materials.items():
             if mat_type == "fuel":
                 dofs = self.dofs_bottom1
@@ -57,20 +60,30 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             ]
 
         print(f"Mechanical boundary conditions")
+
+        self.dofs_bottom1 = self.locateMechanicalDofs(self.label_map["bottom1"])
+        self.dofs_bottom2 = self.locateMechanicalDofs(self.label_map["bottom2"])
+
+        facets = self.ft.find(self.label_map["bottom1"])
+        print(f"[DEBUG] Found {len(facets)} facets for 'bottom1'")
+
         for mat_type, _ in self.materials.items():
             if mat_type == "fuel":
                 dofs = self.dofs_bottom1
                 print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom1")
 
-                pressure = self.conditions.get("gap_pressure", 0.0)
+                # pressure = self.conditions.get("gap_pressure", 0.0)
+                pressure = 0.0
                 self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(pressure)) * self.normal
                 self.traction_labels[mat_type] = self.label_map["top2"]
+
                 print(f"  [INFO] Assigned traction to '{mat_type}' (fuel pressure = {pressure*1e-6} MPa)")
             elif mat_type == "cladding":
                 dofs = self.dofs_bottom2
                 print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom2")
                 
-                pressure = self.conditions.get("coolant_pressure", 0.0)
+                # pressure = self.conditions.get("coolant_pressure", 0.0)
+                pressure = 0.0
                 self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(pressure)) * self.normal
                 self.traction_labels[mat_type] = self.label_map["top2"]
 
@@ -166,7 +179,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             values = u_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
-    def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
+    def solve(self, max_iters=1, tol_u=1e-6, tol_T=1e-6):
         converged = False
         
         for iteration in range(max_iters):
@@ -184,9 +197,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     self.assemble_thermal_problem(label)
                     n_iter_th = self.solve_thermal_problem(label)
 
-                    # T = self.T[label].x.array
                     print(f"  [INFO] Thermal solver for '{label}': {n_iter_th} iterations")
-                    # print(f"  [INFO] {label}: min T = {T.min():.2f} K, max T = {T.max():.2f} K, mean T = {T.mean():.2f} K")
 
                     # Residual log
                     residuals = self.thermal_residuals.get(label, [])
