@@ -11,6 +11,7 @@ class MechanicalSolver:
         self.traction = {}
         self.traction_label = {}
         self.mechanical_residuals = {}
+        self.i_mech = {}
 
     def epsilon(self, u):
         return ufl.sym(ufl.grad(u))

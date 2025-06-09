@@ -63,7 +63,7 @@ problem.materials(fuel=fuel, cladding=cladding)
 conditions = load("conditions/conditions.yaml")
 
 t_points = [0]      # s
-lhr_points = [25]    # W/m
+lhr_points = [25000]    # W/m
 
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")

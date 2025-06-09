@@ -10,6 +10,7 @@ class ThermalSolver:
         self.thermal_residuals = {}
         self.q_third = {}
         self.bcs_thermal = {}
+        self.i_th = {}
 
     def fixed_temperature(self, mesh, dofs, V, T):
         """

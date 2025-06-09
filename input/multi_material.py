@@ -1,4 +1,5 @@
 import dolfinx
+import os
 import numpy as np
 from mpi4py import MPI
 from petsc4py import PETSc
@@ -184,6 +185,9 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
     def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
         converged = False
         
+        self.i_th = {name: 0 for name in self.materials}
+        self.i_mech = {name: 0 for name in self.materials}
+        
         for iteration in range(max_iters):
             print(f"--- Iteration {iteration} ---")
 
@@ -206,10 +210,15 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     for i, r in enumerate(residuals):
                         print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
 
-                    with open(f"output/residuals_thermal_{label}.csv", "w") as f:
-                        f.write("iteration,residual\n")
-                        for i, r in enumerate(residuals):
-                            f.write(f"{i+1},{r}\n")
+                    filename = f"output/residuals_thermal_{label}.csv"
+                    file_exists = os.path.isfile(filename)
+
+                    with open(filename, "a") as f:
+                        if not file_exists:
+                            f.write("iteration,residual\n")
+                        for r in residuals:
+                            self.i_th[label] += 1
+                            f.write(f"{self.i_th[label]},{r}\n")
 
                     print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
                     self.assemble_mechanical_solver(label)
@@ -222,11 +231,16 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     for i, r in enumerate(residuals):
                         print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
 
-                    with open(f"output/residuals_mechanical_{label}.csv", "w") as f:
-                        f.write("iteration,residual\n")
-                        for i, r in enumerate(residuals):
-                            f.write(f"{i+1},{r}\n")
+                    filename = f"output/residuals_mechanical_{label}.csv"
+                    file_exists = os.path.isfile(filename)
 
+                    with open(filename, "a") as f:
+                        if not file_exists:
+                            f.write("iteration,residual\n")
+                        for r in residuals:
+                            self.i_mech[label] += 1
+                            f.write(f"{self.i_mech[label]},{r}\n")
+    
             # print(f"Max displacement: {np.max(self.u.x.array):2.2f} m")
             # print(f"Max temperature: {np.max(self.T["fuel"].x.array):2.2f} K")
             # print(f"q_third: {self.q_third:2.2f} W/m3")
@@ -234,7 +248,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             # --- Norm computation ---
             norm_dT_sq = 0.0
             norm_du_sq = 0.0
-
 
             for label in self.materials:
                 if label in self.label_map:
@@ -261,7 +274,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     # Accumulate global squared norm
                     norm_dT_sq += region_norm_sq_dT
                     norm_du_sq += region_norm_sq_du
-
 
             norm_dT = np.sqrt(norm_dT_sq)
             norm_du = np.sqrt(norm_du_sq)
