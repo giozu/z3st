@@ -7,6 +7,7 @@ import numpy as np
 
 class Mesh:
     def __init__(self, mesh_file, geometry, rank=0, gdim=3):
+
         """
         Initialize the class with the mesh file.
 
@@ -15,14 +16,14 @@ class Mesh:
         rank (int): Rank of the process (default is 0).
         gdim (int): Geometric dimension of the mesh (default is 3).
         """
+        print("__Mesh initializer__")
+
         self.mesh_file = mesh_file
         self.rank = rank
         self.gdim = gdim
         self.geometry = geometry
         
         self._read_mesh()
-        self._setup_function_space()
-        self._initialize_functions()
         self._mesh_plot()
 
     def _read_mesh(self):

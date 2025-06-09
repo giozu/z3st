@@ -4,7 +4,10 @@ from petsc4py import PETSc
 
 class ThermalSolver:
     def __init__(self):
-        print(f"ThermalSolver")
+        print("__ThermalSolver initializer__")
+        self.a_thermal = {}
+        self.L_thermal = {}
+        self.thermal_residuals = {}
 
     def fixed_temperature(self, mesh, dofs, V, T):
         """
@@ -23,29 +26,32 @@ class ThermalSolver:
             dolfinx.fem.Constant(mesh, PETSc.ScalarType(T)), dofs, V
         )
 
-    def assemble_thermal_problem(self, material_label, material_meshtag):
+    def assemble_thermal_problem(self, material_label):
         k = self.materials[material_label]["k"]
+
         q_third = PETSc.ScalarType(self.q_third[material_label])
+        
         self.dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])
 
         if self.debug_mode is True:
             print(f"[DEBUG] source type for {material_label}: {type(self.q_third[material_label])}")
             assert isinstance(self.q_third[material_label], (int, float)), "q_third must be a scalar"
 
-        self.a_thermal = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_local
-        self.L_thermal = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * self.dx_local
+        self.a_thermal[material_label] = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * self.dx_local
+        self.L_thermal[material_label] = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * self.dx_local
 
     def solve_thermal_problem(self, material_label, max_iter=1000, tol=1e-8):
 
         if self.debug_mode is True:
-            print(f"[DEBUG] self.a_thermal type: {type(self.a_thermal)}")
-            print(f"[DEBUG] integrands: {self.a_thermal.integrals()}")
+            print(f"[DEBUG] self.a_thermal type: {type(self.a_thermal[material_label])}")
+            print(f"[DEBUG] integrands: {self.a_thermal[material_label].integrals()}")
 
-        a_form = dolfinx.fem.form(self.a_thermal)
-        L_form = dolfinx.fem.form(self.L_thermal)
+        a_form = dolfinx.fem.form(self.a_thermal[material_label])
+        L_form = dolfinx.fem.form(self.L_thermal[material_label])
 
         A = dolfinx.fem.petsc.create_matrix(a_form)
         b = dolfinx.fem.petsc.create_vector(L_form)
+
         dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=self.bcs_thermal[material_label])
         A.assemble()
 

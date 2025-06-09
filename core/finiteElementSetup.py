@@ -7,6 +7,11 @@ from petsc4py import PETSc
 # import numpy as np
 
 class FiniteElementSetup:
+    def __init__(self):
+        print("__FiniteElementSetup initializer__")
+        self._setup_function_space()
+        self._initialize_functions()
+
     def _setup_function_space(self):
         """
         Set up the function space for the problem.

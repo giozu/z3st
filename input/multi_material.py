@@ -1,12 +1,19 @@
 import dolfinx
 import numpy as np
 from mpi4py import MPI
+from petsc4py import PETSc
 from core.mesh import Mesh
 from core.finiteElementSetup import FiniteElementSetup
 from models.thermal_model_cube import ThermalSolver
 from models.mechanical_model_cube import MechanicalSolver
 
 class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
+    def __init__(self, mesh_file, geometry, rank=0, gdim=3):
+        Mesh.__init__(self, mesh_file=mesh_file, geometry=geometry, rank=rank, gdim=gdim)
+        ThermalSolver.__init__(self)
+        MechanicalSolver.__init__(self)
+        FiniteElementSetup.__init__(self)
+
     def parameters(self, conditions, lhr):
         self.conditions = conditions
         self.g = conditions["gravitational_acceleration"]
@@ -57,9 +64,20 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             if mat_type == "fuel":
                 dofs = self.dofs_bottom1
                 print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom1")
+
+                pressure = self.conditions.get("gap_pressure", 0.0)
+                self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(pressure)) * self.normal
+                self.traction_labels[mat_type] = self.label_map["top2"]
+                print(f"  [INFO] Assigned traction to '{mat_type}' (fuel pressure = {pressure*1e-6} MPa)")
             elif mat_type == "cladding":
                 dofs = self.dofs_bottom2
                 print(f"  [INFO] Assigning mechanical BC to '{mat_type}' using dofs_bottom2")
+                
+                pressure = self.conditions.get("coolant_pressure", 0.0)
+                self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(pressure)) * self.normal
+                self.traction_labels[mat_type] = self.label_map["top2"]
+
+                print(f"  [INFO] Assigned traction to '{mat_type}' (coolant pressure = {pressure*1e-6} MPa)")
             else:
                 print(f"[WARNING] No mechanical boundary condition defined for material type: '{mat_type}'")
                 continue
@@ -67,10 +85,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             self.bcs_mechanical[mat_type] = [
                 self.zero_displacement(self.mesh, dofs, self.V_m)
             ]
-
-            if mat_type == "cladding":
-                self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, self.conditions["coolant_pressure"]) * self.normal
-                print(f"  [INFO] Assigned traction to '{mat_type}' (coolant pressure = {self.conditions['coolant_pressure']*1e-6} MPa)")
 
     def initialize_fields(self):
         # --- Temperature field ---
@@ -119,8 +133,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         #     values = T_func.x.array[region_dofs]
         #     print(f"[INFO] {name}: min T over region = {values.min():.2f} K, max = {values.max():.2f} K, mean = {values.mean():.2f} K")
 
-        self.thermal_residuals = {}
-
         # --- Volumetric power ---
         self.q_third = {}
 
@@ -161,7 +173,6 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
     def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
-        
         converged = False
         
         for iteration in range(max_iters):
@@ -171,17 +182,16 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             u_old = {name: u.x.array.copy() for name, u in self.u.items()}
             T_old = {name: T.x.array.copy() for name, T in self.T.items()}
 
-            # Solve thermal problem
             for label in self.materials:
                 if label in self.label_map:
                     tag = self.label_map[label]
                     print(f"\n  [INFO] Assembling thermal problem for '{label}' (tag = {tag})")
 
-                    self.assemble_thermal_problem(label, tag)
-                    n_iter = self.solve_thermal_problem(label)
+                    self.assemble_thermal_problem(label)
+                    n_iter_th = self.solve_thermal_problem(label)
 
                     # T = self.T[label].x.array
-                    print(f"  [INFO] Thermal solver for '{label}': {n_iter} iterations")
+                    print(f"  [INFO] Thermal solver for '{label}': {n_iter_th} iterations")
                     # print(f"  [INFO] {label}: min T = {T.min():.2f} K, max T = {T.max():.2f} K, mean T = {T.mean():.2f} K")
 
                     # Residual log
@@ -193,10 +203,12 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                         f.write("iteration,residual\n")
                         for i, r in enumerate(residuals):
                             f.write(f"{i+1},{r}\n")
-            
-            # Solve mechanical problem
-            self.assemble_mechanical_solver()
-            self.solve_mechanical_problem()
+
+                    # print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
+                    # self.assemble_mechanical_solver(label)
+                    # n_iter_mech = self.solve_mechanical_problem(label)
+
+                    # print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech} iterations")
 
             # print(f"Max displacement: {np.max(self.u.x.array):2.2f} m")
             # print(f"Max temperature: {np.max(self.T["fuel"].x.array):2.2f} K")

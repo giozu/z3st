@@ -4,7 +4,12 @@ from petsc4py import PETSc
 
 class MechanicalSolver:
     def __init__(self):
-        print(f"MechanicalSolver")
+        print("__MechanicalSolver initializer__")
+        self.a_mechanical = {}
+        self.L_mechanical = {}
+        self.traction = {}
+        self.traction_labels = {}
+        self.mechanical_residuals = {}
 
     def epsilon(self, u):
         return ufl.sym(ufl.grad(u))
@@ -29,47 +34,73 @@ class MechanicalSolver:
         """
         return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, (0.0, 0.0, 0.0)), dofs, V)
 
-    def assemble_mechanical_solver(self, material_name="fuel", T_field=None):
-        material = self.materials[material_name]
-        T = self.T[material_name] if T_field is None else T_field
+    def assemble_mechanical_solver(self, material_label):
+
+        material = self.materials[material_label]
+
+        T = self.T[material_label]
+
+        self.dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])
 
         self.strain = self.epsilon(self.v_m)
         self.stress = self.sigma_mech(self.u_m, material)
 
-        self.a_mechanical = ufl.inner(self.stress, self.strain) * self.dx
-
         body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -material["rho"] * self.g))
 
-        self.L_mechanical = (
-            ufl.dot(body_force, self.v_m) * self.dx
-            + self.sigma_th(T, material)[0, 0] * ufl.div(self.v_m) * self.dx
-            + ufl.dot(self.traction, self.v_m) * self.ds(self.label_map["top1"])
-            + ufl.dot(self.traction, self.v_m) * self.ds(self.label_map["top2"])
-        )
+        self.a_mechanical[material_label] = ufl.inner(self.stress, self.strain) * self.dx
 
-    def solve_mechanical_problem(self):
-        a_form = dolfinx.fem.form(self.a_mechanical)
-        L_form = dolfinx.fem.form(self.L_mechanical)
+        self.L_mechanical[material_label] = (
+            ufl.dot(body_force, self.v_m) * self.dx
+            + ufl.inner(self.sigma_th(T, material), ufl.sym(ufl.grad(self.v_m))) * self.dx
+            + ufl.dot(self.traction[material_label], self.v_m) * self.ds(self.traction_labels[material_label])
+        )
+ 
+    def solve_mechanical_problem(self, material_label, max_iter=1000, tol=1e-8):
+
+        a_form = dolfinx.fem.form(self.a_mechanical[material_label])
+        L_form = dolfinx.fem.form(self.L_mechanical[material_label])
 
         A = dolfinx.fem.petsc.create_matrix(a_form)
         b = dolfinx.fem.petsc.create_vector(L_form)
 
-        dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=self.bcs_mechanical)
+        dolfinx.fem.petsc.assemble_matrix(A, a_form, bcs=self.bcs_mechanical[material_label])
         A.assemble()
 
         with b.localForm() as loc:
             loc.set(0.0)
         dolfinx.fem.petsc.assemble_vector(b, L_form)
-        dolfinx.fem.petsc.apply_lifting(b, [a_form], [self.bcs_mechanical])
+        dolfinx.fem.petsc.apply_lifting(b, [a_form], [self.bcs_mechanical[material_label]])
         b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        dolfinx.fem.petsc.set_bc(b, self.bcs_mechanical)
+        dolfinx.fem.petsc.set_bc(b, self.bcs_mechanical[material_label])
 
         solver = PETSc.KSP().create(self.mesh.comm)
         solver.setOperators(A)
-        solver.setType(PETSc.KSP.Type.GMRES)
-        solver.getPC().setType("jacobi")
-        solver.setTolerances(rtol=1e-6, atol=1e-6, max_it=1000)
+        # solver.setType(PETSc.KSP.Type.GMRES)
+        # solver.getPC().setType("jacobi")
+        
+        # solver.setType("lu")
+        
+        solver.setType("gmres")
+        solver.getPC().setType("gamg")
+        # solver.getPC().setType("hypre")
 
-        solver.solve(b, self.u.x.petsc_vec)
-        self.u.x.scatter_forward()
+        solver.setTolerances(rtol=tol, atol=tol, max_it=max_iter)
+
+        residuals = []
+
+        def monitor(ksp, its, rnorm):
+            residuals.append(rnorm)
+
+        solver.setMonitor(monitor)
+
+        if self.debug_mode is True:
+            print(f"[DEBUG] Solving mechanical problem for {material_label}")
+
+        solver.solve(b, self.u[material_label].x.petsc_vec)
+        self.u[material_label].x.scatter_forward()
+        self.mechanical_residuals[material_label] = residuals
+
+        return solver.getIterationNumber()
+
+
     
