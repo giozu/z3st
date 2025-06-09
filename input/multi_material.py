@@ -107,6 +107,18 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             values = T_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} K, max={values.max():.2f} K, mean={values.mean():.2f} K")
 
+        # for name, T_func in self.T.items():
+        #     tag = self.label_map[name]
+        #     region_cells = np.where(self.tags.values == tag)[0]
+        #     self.mesh.topology.create_connectivity(self.mesh.topology.dim, 0)
+        #     cell_to_vertex = self.mesh.topology.connectivity(self.mesh.topology.dim, 0)
+        #     vertex_indices = np.unique(np.hstack([cell_to_vertex.links(i) for i in region_cells]))
+        #     self.mesh.topology.create_connectivity(0, self.mesh.topology.dim)
+        #     region_dofs = dolfinx.fem.locate_dofs_topological(self.V_t, 0, vertex_indices)
+            
+        #     values = T_func.x.array[region_dofs]
+        #     print(f"[INFO] {name}: min T over region = {values.min():.2f} K, max = {values.max():.2f} K, mean = {values.mean():.2f} K")
+
         self.thermal_residuals = {}
 
         # --- Volumetric power ---
@@ -153,6 +165,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
         converged = False
         
         for iteration in range(max_iters):
+            print(f"--- Iteration {iteration} ---")
 
             # Store previous states
             u_old = {name: u.x.array.copy() for name, u in self.u.items()}
@@ -167,7 +180,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     self.assemble_thermal_problem(label, tag)
                     n_iter = self.solve_thermal_problem(label)
 
-                    T = self.T[label].x.array
+                    # T = self.T[label].x.array
                     print(f"  [INFO] Thermal solver for '{label}': {n_iter} iterations")
                     # print(f"  [INFO] {label}: min T = {T.min():.2f} K, max T = {T.max():.2f} K, mean T = {T.mean():.2f} K")
 
@@ -180,30 +193,44 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                         f.write("iteration,residual\n")
                         for i, r in enumerate(residuals):
                             f.write(f"{i+1},{r}\n")
-
+            
             # Solve mechanical problem
-            # self.assemble_mechanical_solver()
-            # self.solve_mechanical_problem()
+            self.assemble_mechanical_solver()
+            self.solve_mechanical_problem()
 
             # print(f"Max displacement: {np.max(self.u.x.array):2.2f} m")
             # print(f"Max temperature: {np.max(self.T["fuel"].x.array):2.2f} K")
             # print(f"q_third: {self.q_third:2.2f} W/m3")
 
-            # Compute increments
-            # du = self.u.x.array - u_old
-            dT = {name: self.T[name].x.array - T_old[name] for name in self.T}
+            # --- Norm computation ---
+            norm_dT_sq = 0.0
 
-            for name, delta in dT.items():
-                norm = np.linalg.norm(delta)
+            for name in self.T:
+                dT = self.T[name].x.array - T_old[name]
+
+                tag = self.label_map[name]
+                region_cells = np.where(self.tags.values == tag)[0]
+                self.mesh.topology.create_connectivity(self.tdim, 0) # Getting vertices of your material's cells
+                self.mesh.topology.create_connectivity(0, self.tdim) # Mapping those vertices back to cells (e.g. when finding DoFs)
+                cell_to_vertex = self.mesh.topology.connectivity(self.tdim, 0)
+                vertex_indices = np.unique(np.hstack([cell_to_vertex.links(i) for i in region_cells]))
+                region_dofs = dolfinx.fem.locate_dofs_topological(self.V_t, 0, vertex_indices)
+
+                region_dT = dT[region_dofs]
+                region_norm_sq = np.sum(region_dT**2)
+                norm = np.sqrt(region_norm_sq)
                 print(f"  [INFO] ΔT[{name}] = {norm:.3e}")
 
-            norm_dT = np.sqrt(sum(np.sum(delta**2) for delta in dT.values()))
+                # Accumulate global squared norm
+                norm_dT_sq += region_norm_sq
+
+            norm_dT = np.sqrt(norm_dT_sq)
             print(f"  [INFO] Global ||ΔT|| = {norm_dT:.3e}")
 
             # norm_du = np.linalg.norm(du)
             norm_du = 0.0
 
-            print(f"Iteration {iteration}: ||Δu|| = {norm_du:.3e}, ||ΔT|| = {norm_dT:.3e}")
+            print(f"Iteration {iteration}: ||Δu|| = {norm_du:.3e}, ||ΔT|| = {norm_dT:.3e}\n")
 
             if norm_dT < tol_T:
                 converged = True
