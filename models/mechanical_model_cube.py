@@ -2,9 +2,9 @@ import dolfinx
 import ufl
 from petsc4py import PETSc
 
-class MechanicalSolver:
+class MechanicalModel:
     def __init__(self):
-        print("__MechanicalSolver initializer__")
+        print("__MechanicalModel initializer__")
         self.a_mechanical = {}
         self.L_mechanical = {}
         self.bcs_mechanical = {}

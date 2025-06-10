@@ -19,6 +19,7 @@ from utils import *
 from output import *
 
 DEBUG_MODE = "--debug" in sys.argv
+MESH_PLOT_MODE = "--mesh_plot" in sys.argv
 
 # --- Output settings ---
 log_path = "output/simulation_log.txt"
@@ -35,6 +36,8 @@ geometry = load("geometry/multi_material.yaml")
 problem = MultiMaterial(mesh_file='mesh/multi_material.msh', geometry=geometry)
 
 problem.debug_mode = DEBUG_MODE
+problem.mesh_plot_mode = MESH_PLOT_MODE
+problem._mesh_plot(MESH_PLOT_MODE)
 
 problem.volume()
 # from input.fuel_rod import FuelRod

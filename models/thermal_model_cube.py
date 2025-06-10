@@ -2,9 +2,9 @@ import dolfinx
 import ufl
 from petsc4py import PETSc
 
-class ThermalSolver:
+class ThermalModel:
     def __init__(self):
-        print("__ThermalSolver initializer__")
+        print("__ThermalModel initializer__")
         self.a_thermal = {}
         self.L_thermal = {}
         self.thermal_residuals = {}
@@ -31,7 +31,7 @@ class ThermalSolver:
 
     def assemble_thermal_problem(self, material_label):
         k = self.materials[material_label]["k"]
-        h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(3))
+        h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(1.0))
         q_third = PETSc.ScalarType(self.q_third[material_label])
         
         dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])

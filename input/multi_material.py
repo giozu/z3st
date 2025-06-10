@@ -1,19 +1,24 @@
+# python modules
 import dolfinx
-import os
-import numpy as np
+import yaml
 from mpi4py import MPI
+import numpy as np
+import os
 from petsc4py import PETSc
+# ZEST modules
 from core.mesh import Mesh
+from core.solver import Solver
 from core.finiteElementSetup import FiniteElementSetup
-from models.thermal_model_cube import ThermalSolver
-from models.mechanical_model_cube import MechanicalSolver
+from models.thermal_model_cube import ThermalModel
+from models.mechanical_model_cube import MechanicalModel
 
-class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
+class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel):
     def __init__(self, mesh_file, geometry, rank=0, gdim=3):
         Mesh.__init__(self, mesh_file=mesh_file, geometry=geometry, rank=rank, gdim=gdim)
-        ThermalSolver.__init__(self)
-        MechanicalSolver.__init__(self)
         FiniteElementSetup.__init__(self)
+        Solver.__init__(self)
+        ThermalModel.__init__(self)
+        MechanicalModel.__init__(self)
 
     def parameters(self, conditions, lhr):
         self.conditions = conditions
@@ -38,35 +43,49 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
         print(f"Thermal boundary conditions")
 
-        self.dofs_bottom1 = self.locateThermalDofs(self.label_map["bottom1"])
-        self.dofs_bottom2 = self.locateThermalDofs(self.label_map["bottom2"])
-        self.dofs_face2_2 = self.locateThermalDofs(self.label_map["face2_2"])
-        
-        facets = self.ft.find(self.label_map["bottom1"])
-        print(f"[DEBUG] Found {len(facets)} facets for 'bottom1'")
+        with open("conditions/boundary_conditions.yaml", "r") as f:
+            self.boundary_conditions = yaml.safe_load(f)
+
+        self.thermal_bcs = self.boundary_conditions.get("thermal_bcs", {})
 
         for mat_type, mat in self.materials.items():
-            if mat_type == "fuel":
-                dofs = self.dofs_bottom1
-                print(f"  [INFO] Assigning thermal BC to '{mat_type}' using dofs_bottom1")
-            elif mat_type == "cladding":
-                dofs = self.dofs_face2_2
-                print(f"  [INFO] Assigning thermal BC to '{mat_type}' using dofs_face2_2")
-            else:
-                print(f"[WARNING] No thermal boundary condition defined for material type: '{mat_type}'")
-                continue
+            bc_info = self.thermal_bcs.get(mat_type, {})
+            region_name = bc_info.get("region")
+            bc_type = bc_info.get("type")
+            temp = bc_info.get("temperature")
 
-            self.bcs_thermal[mat_type] = [
-                self.fixed_temperature(self.mesh, dofs, self.V_t, self.conditions["boundary_temperature"])
-            ]
+            if region_name and bc_type == "Dirichlet":
+                region_id = self.label_map.get(region_name)
+                dofs = self.locateThermalDofs(region_id)
+                temperature = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temp))
+                self.bcs_thermal[mat_type] = [
+                    self.fixed_temperature(self.mesh, dofs, self.V_t, temperature)
+                ]
+                print(f"  [INFO] Dirichlet BC on '{mat_type}' → {temp} K at region '{region_name}'")
+            else:
+                self.bcs_thermal[mat_type] = []
+                print(f"  [INFO] No Dirichlet thermal BC for '{mat_type}'")
+
+        # for mat_type, mat in self.materials.items():
+        #     if mat_type == "fuel":
+        #         # dofs = self.locateThermalDofs(self.label_map["bottom1"])
+        #         dofs = self.locateThermalDofs(self.label_map["face2_1"])
+        #         print(f"  [INFO] Assigning thermal BC to '{mat_type}' using dofs_bottom1")
+        #         self.bcs_thermal[mat_type] = [self.fixed_temperature(self.mesh, dofs, self.V_t, self.conditions["boundary_temperature"])]
+        #         # self.bcs_thermal[mat_type] = []
+        #     elif mat_type == "cladding":
+        #         dofs = self.dofs_face2_2
+        #         print(f"  [INFO] Assigning thermal BC to '{mat_type}' using dofs_face2_2")
+        #         self.bcs_thermal[mat_type] = [self.fixed_temperature(self.mesh, dofs, self.V_t, self.conditions["boundary_temperature"])]
+        #     else:
+        #         print(f"[WARNING] No thermal boundary condition defined for material type: '{mat_type}'")
+        #         continue
+
 
         print(f"Mechanical boundary conditions")
 
         self.dofs_bottom1 = self.locateMechanicalDofs(self.label_map["bottom1"])
         self.dofs_bottom2 = self.locateMechanicalDofs(self.label_map["bottom2"])
-
-        facets = self.ft.find(self.label_map["bottom1"])
-        print(f"[DEBUG] Found {len(facets)} facets for 'bottom1'")
 
         for mat_type, _ in self.materials.items():
             if mat_type == "fuel":
@@ -182,7 +201,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             values = u_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
-    def solve(self, max_iters=20, tol_u=1e-3, tol_T=1e-3):
+    def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2):
         converged = False
         
         self.i_th = {name: 0 for name in self.materials}
@@ -198,12 +217,16 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             for label in self.materials:
                 if label in self.label_map:
                     tag = self.label_map[label]
+
                     print(f"\n  [INFO] Assembling thermal problem for '{label}' (tag = {tag})")
 
                     self.assemble_thermal_problem(label)
-                    n_iter_th = self.solve_thermal_problem(label, tol=1e-4)
+                    n_iter_th = self.solve_thermal_problem(label, tol=1e-6)
 
                     print(f"  [INFO] Thermal solver for '{label}': {n_iter_th+1} iterations")
+
+                    # Relaxation
+                    self.T[label].x.array[:] = self.relax_T * self.T[label].x.array[:] + (1.0 - self.relax_T) * T_old[label]
 
                     # Residual log
                     residuals = self.thermal_residuals.get(label, [])
@@ -221,10 +244,14 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                             f.write(f"{self.i_th[label]},{r}\n")
 
                     print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
+
                     self.assemble_mechanical_solver(label)
-                    n_iter_mech = self.solve_mechanical_problem(label, tol=1e-4)
+                    n_iter_mech = self.solve_mechanical_problem(label, tol=1e-6)
 
                     print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech+1} iterations")
+
+                    # Relaxation
+                    self.u[label].x.array[:] = self.relax_u * self.u[label].x.array[:] + (1.0 - self.relax_u) * u_old[label]
 
                     # Residual log
                     residuals = self.mechanical_residuals.get(label, [])

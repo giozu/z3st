@@ -3,7 +3,6 @@ import ufl
 import numpy as np
 from petsc4py import PETSc
 
-
 class MechanicalSolver:
     def __init__(self, mesh, V_m, dx_fuel, dx_cladding, ds_fo, ds_ci, ds_co,
                  dofs_fuel_bottom, dofs_cladding_bottom,

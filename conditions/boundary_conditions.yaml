@@ -1,0 +1,9 @@
+thermal_bcs:
+  fuel:
+    temperature: 350.0
+    region: face4_1
+    type: Dirichlet
+  cladding:
+    temperature: 290.0
+    region: face2_2
+    type: Dirichlet
