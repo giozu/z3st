@@ -182,7 +182,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
             values = u_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
-    def solve(self, max_iters=20, tol_u=1e-6, tol_T=1e-6):
+    def solve(self, max_iters=20, tol_u=1e-3, tol_T=1e-3):
         converged = False
         
         self.i_th = {name: 0 for name in self.materials}
@@ -201,7 +201,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
                     print(f"\n  [INFO] Assembling thermal problem for '{label}' (tag = {tag})")
 
                     self.assemble_thermal_problem(label)
-                    n_iter_th = self.solve_thermal_problem(label, tol=1e-6)
+                    n_iter_th = self.solve_thermal_problem(label, tol=1e-4)
 
                     print(f"  [INFO] Thermal solver for '{label}': {n_iter_th+1} iterations")
 
@@ -222,7 +222,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, ThermalSolver, MechanicalSolver):
 
                     print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
                     self.assemble_mechanical_solver(label)
-                    n_iter_mech = self.solve_mechanical_problem(label, tol=1e-6)
+                    n_iter_mech = self.solve_mechanical_problem(label, tol=1e-4)
 
                     print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech+1} iterations")
 

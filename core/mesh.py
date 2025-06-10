@@ -24,7 +24,7 @@ class Mesh:
         self.geometry = geometry
         
         self._read_mesh()
-        # self._mesh_plot()
+        self._mesh_plot()
 
     def _read_mesh(self):
         """
@@ -75,6 +75,13 @@ class Mesh:
             self.normal = ufl.FacetNormal(self.mesh)
             self.dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
             self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
+
+            fuel_face_tag = self.label_map["face2_1"]      # fuel side of the interface
+            clad_face_tag = self.label_map["face4_2"]      # cladding side
+
+            # Define measures for each
+            self.ds_fuel_face = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=fuel_face_tag)
+            self.ds_clad_face = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=clad_face_tag)
 
             # self.ds_ci = self.ds(self.cladding_inner_label)
             # self.ds_co = self.ds(self.cladding_outer_label)

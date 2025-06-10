@@ -141,77 +141,66 @@ def plot3d_temperature(problem):
 
 def plot1d_stress(problem, z_target=0.005, tol=0.0001):
     """
-    Compute and plot the radial (σ_rr), hoop (σ_θθ), and axial (σ_zz) stress components
-    as a function of radius at a specific height z_target.
-    
-    Parameters:
-    - problem: The finite element problem containing the mesh and stress field.
-    - z_target: The height (z-value) at which to extract and plot stress components.
-    - tol: Tolerance to select points near the target z-value.
+    Plot radial (σ_rr), hoop (σ_θθ), and axial (σ_zz) stresses at a fixed z level for two materials.
     """
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import dolfinx
 
-    # Compute cell centers (for DG(0) function space)
     cell_centers = compute_midpoints(
-        problem.mesh, problem.mesh.topology.dim, 
+        problem.mesh, problem.mesh.topology.dim,
         np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local)
     )
 
-    # Extract cell center coordinates
-    x = cell_centers[:, 0]
-    y = cell_centers[:, 1]
-    z = cell_centers[:, 2]  # Heights
-    r = np.sqrt(x**2 + y**2)  # Compute the radius
+    x, y, z = cell_centers[:, 0], cell_centers[:, 1], cell_centers[:, 2]
+    r = np.sqrt(x**2 + y**2)
 
-    # Print available z-values in the mesh
-    unique_z_values = np.unique(z)
-    print("Unique z-values in the mesh:", unique_z_values)
+    unique_z = np.unique(z)
+    if np.all(np.abs(unique_z - z_target) > tol):
+        z_target = unique_z[np.argmin(np.abs(unique_z - z_target))]
+        print(f"⚠️ Closest z = {z_target:.6f} used.")
 
-    # Find the closest available z-value
-    if np.all(np.abs(unique_z_values - z_target) > tol):
-        z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]
-        print(f"⚠️ Closest available z-value used instead: {z_target:.6f}")
-
-    # Select only the points close to the chosen z-value
     mask = np.abs(z - z_target) < tol
-    num_points = np.sum(mask)  # Count the number of selected points
-
-    print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
-
-    if num_points == 0:
-        print(f"⚠️ No points found at z = {z_target} within tolerance {tol}. Try increasing `tol`.")
+    if np.sum(mask) == 0:
+        print("⚠️ No points found within tolerance.")
         return
 
-    # Define the function space for stress tensor (DG, 0)
     V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.gdim, problem.gdim)))
+    materials = list(problem.stress.keys())[:2]
 
-    # Interpolate the stress tensor
-    stress_expr = dolfinx.fem.Expression(problem.stress, V_tensor.element.interpolation_points())
-    stress_func = dolfinx.fem.Function(V_tensor)
-    stress_func.interpolate(stress_expr)
+    plt.figure(figsize=(9, 6))
+    for name in materials:
+        stress_expr = dolfinx.fem.Expression(problem.stress[name], V_tensor.element.interpolation_points())
+        stress_func = dolfinx.fem.Function(V_tensor)
+        stress_func.interpolate(stress_expr)
+        stress_vals = stress_func.x.array.reshape(-1, 3, 3)
 
-    # Extract the stress tensor values
-    stress_values = stress_func.x.array.reshape(-1, problem.gdim, problem.gdim)  # Reshape for a 3x3 tensor
+        sigma_rr = stress_vals[mask, 0, 0]
+        sigma_tt = stress_vals[mask, 1, 1]
+        sigma_zz = stress_vals[mask, 2, 2]
 
-    # Compute the stress components for selected points
-    sigma_xx = stress_values[mask, 0, 0]  # σ_xx
-    sigma_xy = stress_values[mask, 0, 1]  # σ_xy
-    sigma_yy = stress_values[mask, 1, 1]  # σ_yy
-    sigma_zz = stress_values[mask, 2, 2]  # σ_zz
+        sigma_xx = stress_vals[mask, 0, 0]
+        
+        material_tag = problem.label_map[name]
+        material_mask = mask & (problem.tags.values == material_tag)
 
-    print("Sample σ_xx:", sigma_xx[:5])
-    print("r values:", x[mask][:5])
-    print("stress_func max:", np.max(stress_func.x.array))
+        # Now apply material_mask directly to the full stress tensor
+        sigma_vals = stress_vals[material_mask, :, :]  # shape (n, 3, 3)
+        sigma_xx = sigma_vals[:, 0, 0]
 
-    # Plot the stress components
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x[mask], sigma_xx, label=f"σ_xx at z={z_target:.4f}m", color="b", marker="o")
+        plt.plot(x[material_mask], sigma_xx, '^', label=f"{name}: σ_xx")
 
-    # Set labels and title
-    plt.xlabel("Edge (m)")
-    plt.ylabel("Stress (Pa)")
+
+        # plt.plot(r[mask], sigma_rr, 'o', label=f"{name}: σ_rr")
+        # plt.plot(r[mask], sigma_tt, '^', label=f"{name}: σ_θθ")
+        # plt.plot(r[mask], sigma_zz, 's', label=f"{name}: σ_zz")
+
+    plt.xlabel("Radius [m]")
+    plt.ylabel("Stress [Pa]")
+    plt.title(f"Stress Components at z={z_target:.4f} m")
+    plt.grid(True)
     plt.legend()
-    plt.grid()
-    plt.title(f"Stress Components at z={z_target:.4f}m")
+    plt.tight_layout()
     plt.show()
 
 def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
@@ -256,71 +245,65 @@ def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
     plt.legend()
     plt.grid()
     plt.show()
-    
+
 def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
     """
-    Compute and plot the temperature distribution as a function of radius at a specific height z_target.
-    
+    Plot temperature distribution as a function of radius at height z_target
+    for the first two materials in the problem.
+
     Parameters:
-    - problem: The finite element problem containing the mesh and temperature field.
-    - z_target: The height (z-value) at which to extract and plot temperature.
-    - tol: Tolerance to select points near the target z-value.
+    - problem: The finite element problem with mesh and temperature fields.
+    - z_target: Target height (z) in meters.
+    - tol: Tolerance in z to select cross-section.
     """
 
-    # Compute cell centers (for DG(0) function space)
-    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim, 
+    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim,
                                      np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
 
-    # Extract cell center coordinates
-    x = cell_centers[:, 0]
-    y = cell_centers[:, 1]
-    z = cell_centers[:, 2]  # Heights
-    r = np.sqrt(x**2 + y**2)  # Compute the radius
+    x, y, z = cell_centers[:, 0], cell_centers[:, 1], cell_centers[:, 2]
 
-    # Print available z-values in the mesh
     unique_z_values = np.unique(z)
     print("Unique z-values in the mesh:", unique_z_values)
 
-    # Find the closest available z-value
     if np.all(np.abs(unique_z_values - z_target) > tol):
         z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]
         print(f"⚠️ Closest available z-value used instead: {z_target:.6f}")
 
-    # Select only the points close to the chosen z-value
     mask = np.abs(z - z_target) < tol
-    num_points = np.sum(mask)  # Count the number of selected points
-
+    num_points = np.sum(mask)
     print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
 
     if num_points == 0:
-        print(f"⚠️ No points found at z = {z_target} within tolerance {tol}. Try increasing `tol`.")
+        print(f"⚠️ No points found at z = {z_target} within tolerance {tol}.")
         return
 
-    # Define the function space for temperature (DG, 0)
-    V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))  # Discontinuous Galerkin space
+    V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
 
-    # Interpolate the temperature at cell centers
-    temperature_expr = dolfinx.fem.Expression(problem.T["fuel"], V_scalar.element.interpolation_points())
-    temperature_func = dolfinx.fem.Function(V_scalar)
-    temperature_func.interpolate(temperature_expr)
-
-    # Extract the interpolated temperature values
-    temperature_values = temperature_func.x.array[mask]
-
-    # Plot the temperature distribution
     plt.figure(figsize=(8, 6))
-    plt.scatter(r[mask], temperature_values, label=f"Temperature at z={z_target:.4f}m", color="r", marker="o")
+    materials = list(problem.T.keys())[:2]  # First two materials
+
+    for name in materials:
+        T_expr = dolfinx.fem.Expression(problem.T[name], V_scalar.element.interpolation_points())
+        T_func = dolfinx.fem.Function(V_scalar)
+        T_func.interpolate(T_expr)
+
+        # Apply material filter
+        cell_tags = problem.tags.values
+        material_tag = problem.label_map[name]
+        material_mask = mask & (cell_tags == material_tag)
+
+        # Plot only relevant cells
+        x_plot = x[material_mask]
+        T_vals = T_func.x.array[material_mask]
+
+        plt.scatter(x_plot, T_vals, label=f"{name.capitalize()} at z={z_target:.4f} m", s=30)
+
     plt.xlabel("Radius [m]")
     plt.ylabel("Temperature [K]")
+    plt.title(f"Radial Temperature Distribution at z={z_target:.4f} m")
+    plt.grid(True)
     plt.legend()
-    plt.grid()
-    plt.title(f"Temperature distribution at z={z_target:.4f}m")
     plt.tight_layout()
-    plt.xlim(0, np.max(r) * 1.05)
-    plt.ylim(np.min(temperature_values) * 0.98, np.max(temperature_values) * 1.02)
-    plt.ticklabel_format(style='plain', axis='y')
-    plt.tick_params(axis='both', which='major', labelsize=11)
-    
     plt.show()
 
 def export_fields(problem, step, t=None, lhr=None, output_dir="output"):
