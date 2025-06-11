@@ -171,6 +171,12 @@ class Mesh:
     #         f.write(f"{'Relative error':<32}: {rel_error:.3e} %\n\n")
 
     def _mesh_plot(self, mesh_plot_mode):
+        # from dolfinx.io import XDMFFile
+        
+        # self.mesh.topology.create_connectivity(self.fdim , self.tdim)
+        # with XDMFFile(self.mesh.comm, "facet_tags.xdmf", "w") as xdmf:
+        #     xdmf.write_mesh(self.mesh)
+        #     xdmf.write_meshtags(self.tags, self.geometry)
 
         if mesh_plot_mode is False:
             return

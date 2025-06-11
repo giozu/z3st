@@ -96,6 +96,11 @@ class ThermalModel:
         h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(0.5))  # gap conductance
         q_third = PETSc.ScalarType(self.q_third[material_label])
 
+        if self.debug_mode is True:
+            print(f"[DEBUG] Thermal conductivity k = {k} W/m/K")
+            print(f"[DEBUG] Gap conductance h_gap = {h_gap.value} W/m²/K")
+            print(f"[DEBUG] Volumetric heat source q_third = {q_third} W/m³")
+
         dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])
 
         a = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
@@ -106,19 +111,22 @@ class ThermalModel:
             L += self.neumann[material_label]
 
         # --- Coupling interface term ---
+        # --- Robin interface weak coupling ---
         if material_label == "fuel":
             T_other = self.T["cladding"]
             subdomain_id = self.label_map.get("face_xx_1_1")
             ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=subdomain_id)
-            a += h_gap * self.u_t * self.v_t * ds_interface
+            a += h_gap * ufl.inner(self.u_t, self.v_t) * ds_interface
             L += h_gap * T_other * self.v_t * ds_interface
+            # L -= h_gap * (self.T["fuel"] - T_other) * self.v_t * ds_interface
         elif material_label == "cladding":
             T_other = self.T["fuel"]
             subdomain_id = self.label_map.get("face_xx_0_2")
             ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=subdomain_id)
-            a -= h_gap * self.u_t * self.v_t * ds_interface
+            a -= h_gap * ufl.inner(self.u_t, self.v_t) * ds_interface
             L -= h_gap * T_other * self.v_t * ds_interface
-        
+            # L -= h_gap * (T_other - self.T["cladding"]) * self.v_t * ds_interface
+
         # Store assembled forms
         self.a_thermal[material_label] = a
         self.L_thermal[material_label] = L

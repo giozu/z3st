@@ -19,11 +19,11 @@ materials:
   # coolant: materials/h2o.yaml
 
 solver_settings:
-  tol_u: 1e-1
-  tol_T: 1e-1
+  tol_u: 1e-3
+  tol_T: 1e-3
   tol_th: 1e-8
   tol_mech: 1e-8
-  n_iter_max: 30
+  n_iter_max: 40
 
 models:
   thermal: True

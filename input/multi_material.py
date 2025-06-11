@@ -74,6 +74,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
         print(f"Initializing temperature fields for: {list(self.materials.keys())}")
         self.T = {}  # dictionary to store temperature functions per material
+        self.T_old = {}
         # T_fuel = self.T["fuel"]
         # T_cladding = self.T["cladding"]
 
@@ -124,6 +125,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
         print(f"Initializing displacement fields for: {list(self.materials.keys())}")
         self.u = {}  # dictionary to store displacement functions per material
+        self.u_old = {}
 
         for name, mat in self.materials.items():
             u_func = dolfinx.fem.Function(self.V_m, name=f"Displacement_{name}")
@@ -151,8 +153,8 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             print(f"--- Iteration {iteration} ---")
 
             # Store previous states
-            u_old = {name: u.x.array.copy() for name, u in self.u.items()}
-            T_old = {name: T.x.array.copy() for name, T in self.T.items()}
+            self.u_old = {name: u.x.array.copy() for name, u in self.u.items()}
+            self.T_old = {name: T.x.array.copy() for name, T in self.T.items()}
 
             for label in self.materials:
                 if label in self.label_map:
@@ -169,7 +171,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
                     print(f"  [INFO] Thermal solver for '{label}': {n_iter_th+1} iterations")
 
                     # Relaxation
-                    self.T[label].x.array[:] = self.relax_T * self.T[label].x.array[:] + (1.0 - self.relax_T) * T_old[label]
+                    self.T[label].x.array[:] = self.relax_T * self.T[label].x.array[:] + (1.0 - self.relax_T) * self.T_old[label]
 
                     # Heat flux calculation
                     k = self.materials[label]["k"]
@@ -212,7 +214,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
                     print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech+1} iterations")
 
                     # Relaxation
-                    self.u[label].x.array[:] = self.relax_u * self.u[label].x.array[:] + (1.0 - self.relax_u) * u_old[label]
+                    self.u[label].x.array[:] = self.relax_u * self.u[label].x.array[:] + (1.0 - self.relax_u) * self.u_old[label]
 
                     # Residual log
                     residuals = self.mechanical_residuals.get(label, [])
@@ -240,8 +242,8 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
             for label in self.materials:
                 if label in self.label_map:
-                    dT = self.T[label].x.array - T_old[label]
-                    du = self.u[label].x.array - u_old[label]
+                    dT = self.T[label].x.array - self.T_old[label]
+                    du = self.u[label].x.array - self.u_old[label]
 
                     tag = self.label_map[label]
                     region_cells = np.where(self.tags.values == tag)[0]
