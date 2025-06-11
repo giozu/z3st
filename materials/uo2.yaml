@@ -1,6 +1,6 @@
 name: UO2
 type: fuel
-fissile: False
+fissile: True
 
 # Mechanical properties
 E: 1.7e11        # Pa
