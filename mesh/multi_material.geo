@@ -127,19 +127,19 @@ Transfinite Volume {2};
 
 // Physical groups for boundary conditions (first cube)
 Physical Surface("bottom1") = {1};
-Physical Surface("face1_1") = {2};
-Physical Surface("face2_1") = {3};
-Physical Surface("face3_1") = {4};
-Physical Surface("face4_1") = {5};
+Physical Surface("face_yy_0_1") = {2};
+Physical Surface("face_xx_1_1") = {3};
+Physical Surface("face_yy_1_1") = {4};
+Physical Surface("face_xx_0_1") = {5};
 Physical Surface("top1")    = {6};
 Physical Volume("fuel")    = {1};
 
 // Physical groups for second cube
 Physical Surface("bottom2") = {7};
-Physical Surface("face1_2") = {8};
-Physical Surface("face2_2") = {9};
-Physical Surface("face3_2") = {10};
-Physical Surface("face4_2") = {11};
+Physical Surface("face_yy_0_2") = {8};
+Physical Surface("face_xx_1_2") = {9};
+Physical Surface("face_yy_1_2") = {10};
+Physical Surface("face_xx_0_2") = {11};
 Physical Surface("top2")    = {12};
 Physical Volume("cladding")    = {2};
 

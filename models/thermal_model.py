@@ -30,8 +30,8 @@ class ThermalModel:
                     continue
 
                 if bc_type == "Dirichlet":
-                    temp = bc_info.get("temperature")
-                    if temp is None:
+                    temperature = bc_info.get("temperature")
+                    if temperature is None:
                         print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no temperature specified.")
                         continue
 
@@ -41,19 +41,16 @@ class ThermalModel:
                         continue
 
                     dofs = self.locateThermalDofs(region_id)
-                    temperature = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temp))
                     self.bcs_thermal[mat_type].append(
-                        self.fixed_temperature(self.mesh, dofs, self.V_t, temperature)
+                        self.fixed_temperature(self.mesh, dofs, self.V_t, dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temp)))
                     )
-                    print(f"  [INFO] Dirichlet BC on '{mat_type}' → {temp} K at region '{region_name}'")
+                    print(f"  [INFO] Dirichlet BC on '{mat_type}' → {temperature} K at region '{region_name}'")
 
                 elif bc_type == "Neumann":
                     print(f"  [INFO] Neumann BC on '{mat_type}' at region '{region_name}' (flux to be handled separately)")
 
                 else:
                     print(f"  [WARNING] Unknown BC type '{bc_type}' for '{mat_type}'")
-
-        
 
     def fixed_temperature(self, mesh, dofs, V, T):
         """
@@ -84,21 +81,21 @@ class ThermalModel:
         L = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
 
         # coupling term: check if both fuel and cladding exist
-        if material_label == "fuel" and "cladding" in self.T:
-            T_other = self.T["cladding"]
-            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
-                                        subdomain_id=self.label_map.get("face2_1", None))
-            if ds_interface is not None:
-                a += h_gap * self.u_t * self.v_t * ds_interface
-                L += h_gap * T_other * self.v_t * ds_interface
+        # if material_label == "fuel" and "cladding" in self.T:
+        #     T_other = self.T["cladding"]
+        #     ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
+        #                                 subdomain_id=self.label_map.get("face_xx_1_1", None))
+        #     if ds_interface is not None:
+        #         a += h_gap * self.u_t * self.v_t * ds_interface
+        #         L += h_gap * T_other * self.v_t * ds_interface
 
-        elif material_label == "cladding" and "fuel" in self.T:
-            T_other = self.T["fuel"]
-            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
-                                        subdomain_id=self.label_map.get("face4_2", None))
-            if ds_interface is not None:
-                a += h_gap * self.u_t * self.v_t * ds_interface
-                L -= h_gap * T_other * self.v_t * ds_interface
+        # elif material_label == "cladding" and "fuel" in self.T:
+        #     T_other = self.T["fuel"]
+        #     ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
+        #                                 subdomain_id=self.label_map.get("face_xx_0_2", None))
+        #     if ds_interface is not None:
+        #         a += h_gap * self.u_t * self.v_t * ds_interface
+        #         L -= h_gap * T_other * self.v_t * ds_interface
 
         # else: pure conduction without coupling
 

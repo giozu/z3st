@@ -4,16 +4,16 @@ height: '1.0'
 geometry_type: rect
 labels:
   bottom1: 1
-  face1_1: 2
-  face2_1: 3
-  face3_1: 4
-  face4_1: 5
+  face_yy_0_1: 2
+  face_xx_1_1: 3
+  face_yy_1_1: 4
+  face_xx_0_1: 5
   top1: 6
   bottom2: 8
-  face1_2: 9
-  face2_2: 10
-  face3_2: 11
-  face4_2: 12
+  face_yy_0_2: 9
+  face_xx_1_2: 10
+  face_yy_1_2: 11
+  face_xx_0_2: 12
   top2: 13
   fuel: 7
   cladding: 14

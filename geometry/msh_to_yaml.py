@@ -1,7 +1,7 @@
 import yaml
 
-msh_file = "../mesh/box.msh"
-yaml_file = "box.yaml"
+msh_file = "../mesh/multi_material.msh"
+yaml_file = "multi_material.yaml"
 
 def extract_physical_names(filename):
     with open(filename, "r") as f:
@@ -28,9 +28,9 @@ def extract_physical_names(filename):
 
 def write_yaml(labels, output_file):
     data = {
-        "name": "box",
-        "edge": "1.0",  # meters
-        "height": "2.0", # meters
+        "name": "multi_material",
+        "edge": "0.2",  # meters
+        "height": "1.0", # meters
         "geometry_type": "rect",
         "labels": labels
     }

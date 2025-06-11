@@ -271,7 +271,7 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
 
     mask = np.abs(z - z_target) < tol
     num_points = np.sum(mask)
-    print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
+    # print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
 
     if num_points == 0:
         print(f"⚠️ No points found at z = {z_target} within tolerance {tol}.")
