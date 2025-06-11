@@ -10,6 +10,8 @@ class ThermalModel:
         self.thermal_residuals = {}
         self.q_third = {}
         self.bcs_thermal = {}
+        self.neumann = {}
+        self.neumann_label = {}
         self.i_th = {}
 
     def set_thermal_boundary_conditions(self):
@@ -42,12 +44,31 @@ class ThermalModel:
 
                     dofs = self.locateThermalDofs(region_id)
                     self.bcs_thermal[mat_type].append(
-                        self.fixed_temperature(self.mesh, dofs, self.V_t, dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temp)))
+                        self.fixed_temperature(self.mesh, dofs, self.V_t, dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature)))
                     )
                     print(f"  [INFO] Dirichlet BC on '{mat_type}' → {temperature} K at region '{region_name}'")
 
                 elif bc_type == "Neumann":
-                    print(f"  [INFO] Neumann BC on '{mat_type}' at region '{region_name}' (flux to be handled separately)")
+                    flux = bc_info.get("flux")
+                    if flux is None:
+                        print(f"[WARNING] Neumann BC on '{mat_type}' but no flux specified.")
+                        continue
+
+                    region_id = self.label_map.get(region_name)
+                    if region_id is None:
+                        print(f"[WARNING] Region '{region_name}' not found in label_map for Neumann.")
+                        continue
+
+                    ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=region_id)
+
+                    flux_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(flux))
+
+                    if mat_type not in self.neumann:
+                        self.neumann[mat_type] = flux_constant * self.v_t * ds_local
+                    else:
+                        self.neumann[mat_type] += flux_constant * self.v_t * ds_local
+
+                    print(f"  [INFO] Neumann BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
 
                 else:
                     print(f"  [WARNING] Unknown BC type '{bc_type}' for '{mat_type}'")
@@ -80,6 +101,9 @@ class ThermalModel:
         a = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
         L = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
 
+        if material_label in self.neumann:
+            L += self.neumann[material_label]
+            
         # coupling term: check if both fuel and cladding exist
         # if material_label == "fuel" and "cladding" in self.T:
         #     T_other = self.T["cladding"]

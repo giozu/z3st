@@ -7,14 +7,16 @@ import os
 from petsc4py import PETSc
 import ufl
 # ZEST modules
+from core.config import Config
 from core.mesh import Mesh
 from core.solver import Solver
 from core.finiteElementSetup import FiniteElementSetup
 from models.thermal_model import ThermalModel
 from models.mechanical_model import MechanicalModel
 
-class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel):
-    def __init__(self, mesh_file, geometry, rank=0, gdim=3):
+class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel):
+    def __init__(self, input_file, mesh_file, geometry, rank=0, gdim=3):
+        Config.__init__(self, input_file)
         Mesh.__init__(self, mesh_file=mesh_file, geometry=geometry, rank=rank, gdim=gdim)
         FiniteElementSetup.__init__(self)
         Solver.__init__(self)
@@ -158,8 +160,11 @@ class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
                     print(f"\n  [INFO] Assembling thermal problem for '{label}' (tag = {tag})")
 
-                    self.assemble_thermal_problem(label)
-                    n_iter_th = self.solve_thermal_problem(label, tol=tol_th)
+                    if self.on["thermal"]:
+                        self.assemble_thermal_problem(label)
+                        n_iter_th = self.solve_thermal_problem(label, tol=tol_th)
+                    else:
+                        n_iter_th = 0
 
                     print(f"  [INFO] Thermal solver for '{label}': {n_iter_th+1} iterations")
 
@@ -198,8 +203,11 @@ class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
                     print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
 
-                    self.assemble_mechanical_solver(label)
-                    n_iter_mech = self.solve_mechanical_problem(label, tol=tol_mech)
+                    if self.on["mechanical"]:
+                        self.assemble_mechanical_solver(label)
+                        n_iter_mech = self.solve_mechanical_problem(label, tol=tol_mech)
+                    else:
+                        n_iter_mech = 0
 
                     print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech+1} iterations")
 

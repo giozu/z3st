@@ -18,11 +18,16 @@ materials:
   # gas: materials/he.yaml
   # coolant: materials/h2o.yaml
 
-settings:
+solver_settings:
   tol_u: 1e-1
   tol_T: 1e-1
   tol_th: 1e-7
   tol_mech: 1e-7
+  n_iter_max: 1
+
+models:
+  mechanical: True
+  thermal: True
 
 lhr_points:
   - 250

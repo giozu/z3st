@@ -240,7 +240,7 @@ def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
 
     # Plot the radial displacement
     plt.scatter(r, u_r, label=f"Displacement at z={z_target:.2f}m")
-    plt.xlabel("Radius (m)")
+    plt.xlabel("Edge (m)")
     plt.ylabel("Radial displacement (m)")
     plt.legend()
     plt.grid()
@@ -298,7 +298,7 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
 
         plt.scatter(x_plot, T_vals, label=f"{name.capitalize()} at z={z_target:.4f} m", s=30)
 
-    plt.xlabel("Radius (m)")
+    plt.xlabel("Edge (m)")
     plt.ylabel("Temperature (K)")
     plt.title(f"Temperature distribution at z={z_target:.4f} m")
     plt.grid(True)

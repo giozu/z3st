@@ -39,7 +39,7 @@ os.makedirs("output", exist_ok=True)
 from input.multi_material import MultiMaterial
 
 geometry = load(input_data["geometry_path"])
-problem = MultiMaterial(mesh_file=input_data["mesh_path"], geometry=geometry)
+problem = MultiMaterial(input_file=input_data, mesh_file=input_data["mesh_path"], geometry=geometry)
 
 problem.debug_mode = DEBUG_MODE
 problem.mesh_plot_mode = MESH_PLOT_MODE
@@ -153,10 +153,11 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
 
     problem.lhr = lhr
     # problem.update_state()
-    problem.solve(tol_u=float(input_data["settings"]["tol_u"]),
-                  tol_T=float(input_data["settings"]["tol_T"]),
-                  tol_mech=float(input_data["settings"]["tol_mech"]),
-                  tol_th=float(input_data["settings"]["tol_th"]))
+    problem.solve(tol_u=float(input_data["solver_settings"]["tol_u"]),
+                  tol_T=float(input_data["solver_settings"]["tol_T"]),
+                  tol_mech=float(input_data["solver_settings"]["tol_mech"]),
+                  tol_th=float(input_data["solver_settings"]["tol_th"]),
+                  max_iters=int(input_data["solver_settings"]["n_iter_max"]))
     
     T_fuel_inner.append(np.max(problem.T["fuel"].x.array))
     # T_fuel_inner.append(np.max(problem.T_fuel.x.array))
