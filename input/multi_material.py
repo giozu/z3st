@@ -10,8 +10,8 @@ import ufl
 from core.mesh import Mesh
 from core.solver import Solver
 from core.finiteElementSetup import FiniteElementSetup
-from models.thermal_model_cube import ThermalModel
-from models.mechanical_model_cube import MechanicalModel
+from models.thermal_model import ThermalModel
+from models.mechanical_model import MechanicalModel
 
 class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel):
     def __init__(self, mesh_file, geometry, rank=0, gdim=3):
@@ -46,85 +46,8 @@ class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
             
     def set_boundary_conditions(self):
 
-        print(f"Thermal boundary conditions")
-        self.thermal_bcs = self.boundary_conditions.get("thermal_bcs", {})
-
-        for mat_type, _ in self.materials.items():
-            bc_list = self.thermal_bcs.get(mat_type, [])
-
-            self.bcs_thermal[mat_type] = []
-
-            for bc_info in bc_list:
-                region_name = bc_info.get("region")
-                bc_type = bc_info.get("type")
-
-                if region_name is None or bc_type is None:
-                    print(f"  [WARNING] Incomplete BC definition for '{mat_type}'")
-                    continue
-
-                if bc_type == "Dirichlet":
-                    temp = bc_info.get("temperature")
-                    if temp is None:
-                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no temperature specified.")
-                        continue
-
-                    region_id = self.label_map.get(region_name)
-                    if region_id is None:
-                        print(f"  [WARNING] Region '{region_name}' not found in label_map for Dirichlet.")
-                        continue
-
-                    dofs = self.locateThermalDofs(region_id)
-                    temperature = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temp))
-                    self.bcs_thermal[mat_type].append(
-                        self.fixed_temperature(self.mesh, dofs, self.V_t, temperature)
-                    )
-                    print(f"  [INFO] Dirichlet BC on '{mat_type}' → {temp} K at region '{region_name}'")
-
-                elif bc_type == "Neumann":
-                    print(f"  [INFO] Neumann BC on '{mat_type}' at region '{region_name}' (flux to be handled separately)")
-
-                else:
-                    print(f"  [WARNING] Unknown BC type '{bc_type}' for '{mat_type}'")
-
-        print(f"Mechanical boundary conditions")
-        self.mechanical_bcs = self.boundary_conditions.get("mechanical_bcs", {})
-
-        for mat_type, _ in self.materials.items():
-            bc_list = self.mechanical_bcs.get(mat_type, [])
-
-            self.bcs_mechanical[mat_type] = []
-
-            for bc_info in bc_list:
-                bc_type = bc_info.get("type")
-                region_name = bc_info.get("region")
-
-                if region_name is None or bc_type is None:
-                    print(f"  [WARNING] Incomplete mechanical BC definition for '{mat_type}'")
-                    continue
-
-                region_id = self.label_map.get(region_name)
-                if region_id is None:
-                    print(f"  [WARNING] Region '{region_name}' not found in label_map for mechanical BC.")
-                    continue
-
-                dofs = self.locateMechanicalDofs(region_id)
-
-                if bc_type == "Dirichlet":
-                    displacement = bc_info.get("displacement")
-                    if displacement is None:
-                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no displacement specified.")
-                        continue
-
-                    if isinstance(displacement, str):
-                        displacement = eval(displacement)
-                    elif isinstance(displacement, list):
-                        displacement = tuple(displacement)
-
-                    self.bcs_mechanical[mat_type].append(
-                        self.fixed_displacement(self.mesh, dofs, self.V_m, displacement)
-                    )
-
-                    print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
+        self.set_thermal_boundary_conditions()
+        self.set_mechanical_boundary_conditions()
 
     def initialize_fields(self):
         # --- Temperature field ---

@@ -45,7 +45,6 @@ class Mesh:
             for tag in sorted(unique_tags):
                 print(f"  Tag ID: {tag}")
 
-
             # Labels
             self.label_map = self.geometry["labels"]
 

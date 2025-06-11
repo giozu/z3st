@@ -73,7 +73,7 @@ Physical Surface("face2") = {3};
 Physical Surface("face3") = {4};
 Physical Surface("face4") = {5};
 Physical Surface("top") = {6};
-Physical Volume("cube") = {1};
+Physical Volume("fuel") = {1};
 
 // Generate structured mesh
 Mesh.RecombineAll = 1;

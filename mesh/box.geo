@@ -74,7 +74,7 @@ Physical Surface("face_xx_1") = {3};
 Physical Surface("face_yy_1") = {4};
 Physical Surface("face_xx_0") = {5};
 Physical Surface("top") = {6};
-Physical Volume("box") = {1};
+Physical Volume("fuel") = {1};
 
 // Generate structured mesh
 Mesh.RecombineAll = 1;

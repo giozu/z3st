@@ -11,3 +11,6 @@ mechanical_bcs:
     - type: Dirichlet
       region: bottom
       displacement: [0.0, 0.0, 0.0]
+    - type: Neumann
+      region: top
+      traction: -1e6  # Pa, negative for compression
