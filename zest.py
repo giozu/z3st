@@ -153,7 +153,10 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
 
     problem.lhr = lhr
     # problem.update_state()
-    problem.solve()
+    problem.solve(tol_u=float(input_data["settings"]["tol_u"]),
+                  tol_T=float(input_data["settings"]["tol_T"]),
+                  tol_mech=float(input_data["settings"]["tol_mech"]),
+                  tol_th=float(input_data["settings"]["tol_th"]))
     
     T_fuel_inner.append(np.max(problem.T["fuel"].x.array))
     # T_fuel_inner.append(np.max(problem.T_fuel.x.array))

@@ -263,7 +263,7 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
     x, y, z = cell_centers[:, 0], cell_centers[:, 1], cell_centers[:, 2]
 
     unique_z_values = np.unique(z)
-    print("Unique z-values in the mesh:", unique_z_values)
+    # print("Unique z-values in the mesh:", unique_z_values)
 
     if np.all(np.abs(unique_z_values - z_target) > tol):
         z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]

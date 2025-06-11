@@ -15,6 +15,11 @@ materials:
   # cladding: materials/T91.yaml
   # gas: materials/he.yaml
   # coolant: materials/h2o.yaml
+settings:
+  tol_u: 1e-1
+  tol_T: 1e-1
+  tol_th: 1e-7
+  tol_mech: 1e-7
 conditions_path: conditions/conditions.yaml
 lhr_points:
   - 250
