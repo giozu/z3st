@@ -36,6 +36,21 @@ class MechanicalModel:
         """
         return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, (0.0, 0.0, 0.0)), dofs, V)
 
+    def fixed_displacement(self, mesh, dofs, V, displacement):
+        """
+        Returns a DirichletBC with a specified displacement vector.
+
+        Parameters:
+            mesh (dolfinx.Mesh): The mesh object.
+            dofs (array-like): Degrees of freedom where BC is applied.
+            V (FunctionSpace): The function space (vector-valued).
+            displacement (tuple or list): The displacement vector (e.g. (0.0, 0.0, 0.0)).
+
+        Returns:
+            dolfinx.fem.DirichletBC: The displacement boundary condition.
+        """
+        return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, displacement), dofs, V)
+
     def assemble_mechanical_solver(self, material_label):
 
         material = self.materials[material_label]

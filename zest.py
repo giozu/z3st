@@ -13,6 +13,7 @@ This project is currently under development.
 # Python modules
 import time
 import sys
+import yaml
 # from geometry.fuel_rod import geometry
 from postprocessing import save_temperature_history
 from utils import *
@@ -20,6 +21,10 @@ from output import *
 
 DEBUG_MODE = "--debug" in sys.argv
 MESH_PLOT_MODE = "--mesh_plot" in sys.argv
+
+# --- Input file ---
+with open("input.yaml", "r") as f:
+    input_data = yaml.safe_load(f)
 
 # --- Output settings ---
 log_path = "output/simulation_log.txt"
@@ -32,43 +37,40 @@ os.makedirs("output", exist_ok=True)
 # problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
 
 from input.multi_material import MultiMaterial
-geometry = load("geometry/multi_material.yaml")
-problem = MultiMaterial(mesh_file='mesh/multi_material.msh', geometry=geometry)
+
+geometry = load(input_data["geometry_path"])
+problem = MultiMaterial(mesh_file=input_data["mesh_path"], geometry=geometry)
 
 problem.debug_mode = DEBUG_MODE
 problem.mesh_plot_mode = MESH_PLOT_MODE
 problem._mesh_plot(MESH_PLOT_MODE)
 
-problem.volume()
+# problem.volume()
 # from input.fuel_rod import FuelRod
 
-# Materials
-fuel = load("materials/uo2.yaml")
-gas = load("materials/he.yaml")
-cladding = load("materials/T91.yaml")
-coolant = load("materials/h2o.yaml")
+# --- Materials ---
+materials_dict = input_data.get("materials", {})
+loaded_materials = {}
+
+for mat_name, mat_path in materials_dict.items():
+    loaded_materials[mat_name] = load(mat_path)
 
 # Debug info
 if DEBUG_MODE:
-    print("[DEBUG] Loaded material:")
-    for k, v in fuel.items():
-        print(f"{k:>8} → {v} ({type(v)})")
-    for k, v in gas.items():
-        print(f"{k:>8} → {v} ({type(v)})")
-    for k, v in cladding.items():
-        print(f"{k:>8} → {v} ({type(v)})")
-    for k, v in coolant.items():
-        print(f"{k:>8} → {v} ({type(v)})")
+    print("[DEBUG] Loaded materials:")
+    for name, data in loaded_materials.items():
+        print(f"  {name}: {data}")
 
-problem.materials(fuel=fuel, cladding=cladding)
+problem.materials(**loaded_materials)
 
 # Initial and boundary conditions
-conditions = load("conditions/conditions.yaml")
+conditions = load(input_data["conditions_path"])
 
-t_points = [0]      # s
-lhr_points = [250]    # W/m
+t_points = input_data["time_points"]
+lhr_points = input_data["lhr_points"]
+n_steps = input_data["n_steps"]
 
-times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=1, filename="power_history.csv")
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=n_steps, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
 
 problem.parameters(
@@ -141,7 +143,7 @@ time_values = []
 #                             coolant_pressure=conditions["coolant_pressure"], 
 #                             temperature=conditions["boundary_temperature"])
 
-problem.boundary_conditions()
+problem.set_boundary_conditions()
 
 problem.initialize_fields()
 # problem.initialize_geometry()

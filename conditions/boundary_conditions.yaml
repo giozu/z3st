@@ -1,9 +1,13 @@
 thermal_bcs:
   fuel:
-    temperature: 350.0
-    region: face4_1
-    type: Dirichlet
-  cladding:
-    temperature: 290.0
-    region: face2_2
-    type: Dirichlet
+    - type: Dirichlet
+      region: face_xx_0
+      temperature: 350.0
+    - type: Neumann
+      region: face_xx_1
+      flux: 0.0
+mechanical_bcs:
+  fuel:
+    - type: Dirichlet
+      region: bottom
+      displacement: [0.0, 0.0, 0.0]
