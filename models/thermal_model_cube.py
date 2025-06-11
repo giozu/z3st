@@ -33,25 +33,26 @@ class ThermalModel:
         k = self.materials[material_label]["k"]
         h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(1.0))
         q_third = PETSc.ScalarType(self.q_third[material_label])
-        
+
         dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])
 
         a = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
         L = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
 
-        # Interface coupling
-        if material_label in ("fuel", "cladding"):
-            other = "cladding" if material_label == "fuel" else "fuel"
-            T_other = self.T[other]
-            T_self = self.T[material_label]
+        if material_label == "fuel":
+            T_other = self.T["cladding"]
+            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
+                                    subdomain_id=self.label_map["face2_1"])
+            a += h_gap * self.u_t * self.v_t * ds_interface
+            L += h_gap * T_other * self.v_t * ds_interface
 
-            if material_label == "fuel":
-                ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face2_1"])
-            else:
-                ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face4_2"])
+        else:
+            T_other = self.T["fuel"]
+            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
+                                    subdomain_id=self.label_map["face4_2"])
+            a += h_gap * self.u_t * self.v_t * ds_interface
+            L -= h_gap * T_other * self.v_t * ds_interface
 
-            sign = -1.0 if material_label == "fuel" else 1.0
-            L += sign * h_gap * (T_self - T_other) * self.v_t * ds_interface
 
         self.a_thermal[material_label] = a
         self.L_thermal[material_label] = L

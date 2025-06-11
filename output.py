@@ -298,12 +298,13 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
 
         plt.scatter(x_plot, T_vals, label=f"{name.capitalize()} at z={z_target:.4f} m", s=30)
 
-    plt.xlabel("Radius [m]")
-    plt.ylabel("Temperature [K]")
-    plt.title(f"Radial Temperature Distribution at z={z_target:.4f} m")
+    plt.xlabel("Radius (m)")
+    plt.ylabel("Temperature (K)")
+    plt.title(f"Temperature distribution at z={z_target:.4f} m")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
+    plt.savefig(f'temperature_r_z_{z_target}.png')
     plt.show()
 
 def export_fields(problem, step, t=None, lhr=None, output_dir="output"):

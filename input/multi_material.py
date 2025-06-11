@@ -5,6 +5,7 @@ from mpi4py import MPI
 import numpy as np
 import os
 from petsc4py import PETSc
+import ufl
 # ZEST modules
 from core.mesh import Mesh
 from core.solver import Solver
@@ -228,10 +229,25 @@ class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                     # Relaxation
                     self.T[label].x.array[:] = self.relax_T * self.T[label].x.array[:] + (1.0 - self.relax_T) * T_old[label]
 
+                    # Heat flux calculation
+                    k = self.materials[label]["k"]
+                    grad_T = ufl.grad(self.T[label])
+                    q_vec = [-k * grad_T[i] for i in range(self.mesh.geometry.dim)]  # [qx, qy, qz]
+
+                    dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[label])
+                    volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx_subdomain))
+
+                    print(f"\nAverage heat flux components in '{label}':")
+                    for i, q_comp in enumerate(q_vec):
+                        integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(q_comp * dx_subdomain))
+                        q_avg = integral / volume
+                        print(f"  q_{'xyz'[i]} = {q_avg:.4e} W/m²")
+
                     # Residual log
                     residuals = self.thermal_residuals.get(label, [])
-                    for i, r in enumerate(residuals):
-                        print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
+                    if self.debug_mode is True:
+                        for i, r in enumerate(residuals):
+                            print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
 
                     filename = f"output/residuals_thermal_{label}.csv"
                     file_exists = os.path.isfile(filename)
@@ -246,7 +262,7 @@ class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                     print(f"\n  [INFO] Assembling mechanical problem for '{label}' (tag = {tag})")
 
                     self.assemble_mechanical_solver(label)
-                    n_iter_mech = self.solve_mechanical_problem(label, tol=1e-6)
+                    n_iter_mech = self.solve_mechanical_problem(label, tol=0.1)
 
                     print(f"  [INFO] Mechanical solver for '{label}': {n_iter_mech+1} iterations")
 
@@ -255,8 +271,9 @@ class MultiMaterial(Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
                     # Residual log
                     residuals = self.mechanical_residuals.get(label, [])
-                    for i, r in enumerate(residuals):
-                        print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
+                    if self.debug_mode is True:
+                        for i, r in enumerate(residuals):
+                            print(f"    [Residual] {label} iter {i+1}: {r:.3e}")
 
                     filename = f"output/residuals_mechanical_{label}.csv"
                     file_exists = os.path.isfile(filename)

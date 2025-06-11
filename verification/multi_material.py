@@ -38,6 +38,8 @@ x2 = np.linspace(L2, L3, 100)
 T1 = A1 * x1 + B1
 T2 = A2 * x2 + B2
 
+print(f"heat flux = {k1 * (T0 - (A1 * L1 + B1)) / L1} W/m2")
+
 # Plotting
 plt.figure()
 plt.plot(x1, T1, label="Region 1", linewidth=2)
