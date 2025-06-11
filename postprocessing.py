@@ -32,7 +32,7 @@ def save_temperature_history(times, temp_fuel_inner, temp_fuel_outer, temp_clad_
         f.write("time (s)\tfuel_inner_T (K)\tfuel_outer_T (K)\tcladding_inner_T (K)\tcladding_outer_T (K)\n")
         for t, T0, T1, T2, T3 in zip(times, temp_fuel_inner, temp_fuel_outer, temp_clad_inner, temp_clad_outer):
             f.write(f"{t:.6e}\t{T0:.2f}\t{T1:.2f}\t{T2:.2f}\t{T3:.2f}\n")
-    print(f"✅ Temperature history saved to {filename}")
+    print(f"Temperature history saved to {filename}")
 
 def plot_temperature_history(filename="temperature_history.tsv"):
     """

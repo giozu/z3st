@@ -142,6 +142,14 @@ gmsh your_geometry.geo -3 -format msh2 -o your_mesh.msh
 * Advanced creep and irradiation models
 * Multiphysics coupling (neutronics, chemistry)
 * Nonlinear mechanical solvers and contact mechanics
+* Cache A matrices for linear problems (avoid redundant assembly)
+* Optimize code to avoid unnecessary assembly when A and b remain constant
+* Implement Aitken relaxation for thermo-mechanical fixed-point
+* Add Anderson acceleration for stiff coupling
+* Reassemble A and b when material properties depend on T or u (gap conductance, k(T), creep, swelling)
+* Prepare framework for full nonlinear coupling (gap, creep, swelling, oxidation, etc.)
+* Use PETSc KSP.setReusePreconditioner(True) to optimize linear solves
+* Keep fixed-point solver as current base implementation
 
 ---
 

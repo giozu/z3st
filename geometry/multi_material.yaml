@@ -1,5 +1,5 @@
 name: multi_material
-edge: '0.2'
+edge: '1.0'
 height: '1.0'
 geometry_type: rect
 labels:

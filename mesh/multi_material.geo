@@ -9,7 +9,7 @@
 // Use built-in kernel instead of OpenCASCADE (important for transfinite meshing)
 SetFactory("Built-in");
 
-L = 0.2;  // Side 
+L = 1.0;  // Side 
 H = 1.0;  // Heigth
 n = 30;   // Number of divisions per edge (adjust as needed)
 

@@ -93,7 +93,7 @@ class ThermalModel:
     def assemble_thermal_problem(self, material_label):
         
         k = self.materials[material_label]["k"]
-        h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(1.0))
+        h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(0.5))  # gap conductance
         q_third = PETSc.ScalarType(self.q_third[material_label])
 
         dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])
@@ -101,28 +101,25 @@ class ThermalModel:
         a = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
         L = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
 
+        # Neumann BCs if present
         if material_label in self.neumann:
             L += self.neumann[material_label]
-            
-        # coupling term: check if both fuel and cladding exist
-        # if material_label == "fuel" and "cladding" in self.T:
-        #     T_other = self.T["cladding"]
-        #     ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
-        #                                 subdomain_id=self.label_map.get("face_xx_1_1", None))
-        #     if ds_interface is not None:
-        #         a += h_gap * self.u_t * self.v_t * ds_interface
-        #         L += h_gap * T_other * self.v_t * ds_interface
 
-        # elif material_label == "cladding" and "fuel" in self.T:
-        #     T_other = self.T["fuel"]
-        #     ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft,
-        #                                 subdomain_id=self.label_map.get("face_xx_0_2", None))
-        #     if ds_interface is not None:
-        #         a += h_gap * self.u_t * self.v_t * ds_interface
-        #         L -= h_gap * T_other * self.v_t * ds_interface
-
-        # else: pure conduction without coupling
-
+        # --- Coupling interface term ---
+        if material_label == "fuel":
+            T_other = self.T["cladding"]
+            subdomain_id = self.label_map.get("face_xx_1_1")
+            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=subdomain_id)
+            a += h_gap * self.u_t * self.v_t * ds_interface
+            L += h_gap * T_other * self.v_t * ds_interface
+        elif material_label == "cladding":
+            T_other = self.T["fuel"]
+            subdomain_id = self.label_map.get("face_xx_0_2")
+            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=subdomain_id)
+            a -= h_gap * self.u_t * self.v_t * ds_interface
+            L -= h_gap * T_other * self.v_t * ds_interface
+        
+        # Store assembled forms
         self.a_thermal[material_label] = a
         self.L_thermal[material_label] = L
 

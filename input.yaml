@@ -21,17 +21,17 @@ materials:
 solver_settings:
   tol_u: 1e-1
   tol_T: 1e-1
-  tol_th: 1e-7
-  tol_mech: 1e-7
-  n_iter_max: 1
+  tol_th: 1e-8
+  tol_mech: 1e-8
+  n_iter_max: 30
 
 models:
-  mechanical: True
   thermal: True
+  mechanical: False
 
-lhr_points:
+lhr:
   - 250
-time_points:
+time:
   - 0
 n_steps: 1
 

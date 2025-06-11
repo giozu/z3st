@@ -23,10 +23,6 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         ThermalModel.__init__(self)
         MechanicalModel.__init__(self)
 
-        with open("conditions/boundary_conditions.yaml", "r") as f:
-            print(f"Loading boundary conditions from 'conditions/boundary_conditions.yaml")
-            self.boundary_conditions = yaml.safe_load(f)
-
     def parameters(self, conditions, lhr):
         self.conditions = conditions
         self.g = conditions["gravitational_acceleration"]
@@ -47,6 +43,10 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
             
     def set_boundary_conditions(self):
+
+        with open("conditions/boundary_conditions.yaml", "r") as f:
+            print(f"Loading boundary conditions from 'conditions/boundary_conditions.yaml")
+            self.boundary_conditions = yaml.safe_load(f)
 
         self.set_thermal_boundary_conditions()
         self.set_mechanical_boundary_conditions()
@@ -272,7 +272,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
             if norm_dT < tol_T and norm_du < tol_u:
                 converged = True
-                print("  [INFO] Thermal/mechanical problem converged.")
+                print(f"  [INFO] Thermal/mechanical problem converged in {iteration+1} iterations.")
                 break
 
         if not converged:

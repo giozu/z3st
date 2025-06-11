@@ -66,8 +66,8 @@ problem.materials(**loaded_materials)
 # Initial and boundary conditions
 conditions = load(input_data["conditions_path"])
 
-t_points = input_data["time_points"]
-lhr_points = input_data["lhr_points"]
+t_points = input_data["time"]
+lhr_points = input_data["lhr"]
 n_steps = input_data["n_steps"]
 
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=n_steps, filename="power_history.csv")

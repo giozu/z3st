@@ -3,16 +3,16 @@ thermal_bcs:
     - type: Dirichlet
       region: face_xx_0_1
       temperature: 350.0
-    - type: Neumann
-      region: face_xx_1_1
-      flux: -100.0 # (negative if exiting the surface)
+    # - type: Neumann
+    #   region: face_xx_1_1
+    #   flux: -100.0 # (negative if exiting the surface)
   cladding:
     - type: Dirichlet
       region: face_xx_1_2
       temperature: 290.0
-    - type: Neumann
-      region: face_xx_0_2
-      flux: 100.0
+    # - type: Neumann
+    #   region: face_xx_0_2
+    #   flux: 100.0
 mechanical_bcs:
   fuel:
     - type: Dirichlet

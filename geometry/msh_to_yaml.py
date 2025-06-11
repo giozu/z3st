@@ -29,7 +29,7 @@ def extract_physical_names(filename):
 def write_yaml(labels, output_file):
     data = {
         "name": "multi_material",
-        "edge": "0.2",  # meters
+        "edge": "1.0",  # meters
         "height": "1.0", # meters
         "geometry_type": "rect",
         "labels": labels
