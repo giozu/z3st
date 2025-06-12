@@ -14,6 +14,7 @@ class Config:
         self.mesh_path = self.config.get("mesh_path", None)
         self.conditions_path = self.config.get("conditions_path", None)
         self.n_steps = self.config.get("n_steps", 10)
+        self.coupling = self.config.get("coupling", "staggered")
 
         print("\n[INFO] Configuration loaded:")
         print(f"  → Geometry file : {self.geometry_path}")

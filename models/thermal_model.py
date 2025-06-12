@@ -103,7 +103,7 @@ class ThermalModel:
 
         dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=self.label_map[material_label])
 
-        a = ufl.dot(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
+        a = ufl.inner(k * ufl.grad(self.u_t), ufl.grad(self.v_t)) * dx_local
         L = dolfinx.fem.Constant(self.mesh, q_third) * self.v_t * dx_local
 
         # Neumann BCs if present

@@ -53,10 +53,10 @@ class MechanicalSolver:
         a_clad = ufl.inner(sigma_clad, self.epsilon(v_t)) * self.dx_cladding
 
         L_clad = (
-            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.cladding["rho"] * self.g)), v_t) * self.dx_cladding +
+            ufl.inner(dolfinx.fem.Constant(self.mesh, (0, 0, -self.cladding["rho"] * self.g)), v_t) * self.dx_cladding +
             (3 * self.cladding["lmbda"] + 2 * self.cladding["mu"]) * self.cladding["alpha"] * (self.T_cladding - self.T_ref) * ufl.div(v_t) * self.dx_cladding +
-            ufl.dot(self.gap_traction, v_t) * self.ds_ci +
-            ufl.dot(self.coolant_traction, v_t) * self.ds_co
+            ufl.inner(self.gap_traction, v_t) * self.ds_ci +
+            ufl.inner(self.coolant_traction, v_t) * self.ds_co
         )
 
         its_clad = self.solve_mechanical_subsystem(a_clad, L_clad, self.u_cladding, self.bc_mech_cladding)
@@ -66,9 +66,9 @@ class MechanicalSolver:
         a_fuel = ufl.inner(sigma_fuel, self.epsilon(v_t)) * self.dx_fuel
 
         L_fuel = (
-            ufl.dot(dolfinx.fem.Constant(self.mesh, (0, 0, -self.fuel["rho"] * self.g)), v_t) * self.dx_fuel +
+            ufl.inner(dolfinx.fem.Constant(self.mesh, (0, 0, -self.fuel["rho"] * self.g)), v_t) * self.dx_fuel +
             (3 * self.fuel["lmbda"] + 2 * self.fuel["mu"]) * self.fuel["alpha"] * (self.T_fuel - self.T_ref) * ufl.div(v_t) * self.dx_fuel +
-            ufl.dot(self.gap_traction, v_t) * self.ds_fo
+            ufl.inner(self.gap_traction, v_t) * self.ds_fo
         )
 
         its_fuel = self.solve_mechanical_subsystem(a_fuel, L_fuel, self.u_fuel, self.bc_mech_fuel)

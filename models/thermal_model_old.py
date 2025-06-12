@@ -64,7 +64,7 @@ class ThermalSolver:
     def assemble_fuel_system(self, u_t, v_t, T_fuel):
         k_fuel_expr = 1.0 / (0.0452 + 2.46e-4 * T_fuel)
 
-        a_fuel = ufl.dot(k_fuel_expr * ufl.grad(u_t), ufl.grad(v_t)) * self.dx_fuel
+        a_fuel = ufl.inner(k_fuel_expr * ufl.grad(u_t), ufl.grad(v_t)) * self.dx_fuel
         q_vol = dolfinx.fem.Constant(self.mesh, self.q_third)
         L_fuel = q_vol * v_t * self.dx_fuel
 
@@ -86,7 +86,7 @@ class ThermalSolver:
 
     def assemble_cladding_system(self, u_t, v_t):
         k_clad = self.cladding["k"]
-        a_clad = ufl.dot(k_clad * ufl.grad(u_t), ufl.grad(v_t)) * self.dx_cladding
+        a_clad = ufl.inner(k_clad * ufl.grad(u_t), ufl.grad(v_t)) * self.dx_cladding
         heat_flux = dolfinx.fem.Constant(self.mesh, self.heat_flux)
         L_clad = heat_flux * v_t * self.ds_ci
         return a_clad, L_clad

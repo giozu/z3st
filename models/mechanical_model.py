@@ -121,9 +121,9 @@ class MechanicalModel:
         self.a_mechanical[material_label] = ufl.inner(self.stress, self.strain) * self.dx_local
 
         self.L_mechanical[material_label] = (
-            ufl.dot(body_force, self.v_m) * self.dx_local
+            ufl.inner(body_force, self.v_m) * self.dx_local
             + ufl.inner(self.sigma_th(T, material), ufl.sym(ufl.grad(self.v_m))) * self.dx_local
-            + ufl.dot(self.traction[material_label], self.v_m) * self.ds(self.traction_label[material_label])
+            + ufl.inner(self.traction[material_label], self.v_m) * self.ds(self.traction_label[material_label])
         )
  
     def solve_mechanical_problem(self, material_label, max_iter=1000, tol=1e-8):
