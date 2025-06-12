@@ -23,13 +23,13 @@ solver_settings:
   tol_T: 1e-3
   tol_th: 1e-8
   tol_mech: 1e-8
-  tol: 1e-8
+  tol: 1e-4
   n_iter_max: 40
   coupling: monolithic # [monolithic, staggered]
 
 models:
-  thermal: True
-  mechanical: False
+  thermal: False
+  mechanical: True
 
 lhr:
   - 250

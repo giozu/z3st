@@ -2,7 +2,7 @@
 
 ## Overview
 
-**ZEST** (Zero-gap Enhanced Simulation Tool) is an open-source thermomechanical fuel performance code written in Python using the **FEniCSx** finite element framework. It supports the simulation of coupled thermal and mechanical behavior of nuclear fuel elements, with special focus on multi-material configurations, flexible geometry definitions, and fully transient boundary conditions.
+**ZEST** is an open-source thermomechanical fuel performance code written in Python using the **FEniCSx** finite element framework. It supports the simulation of coupled thermal and mechanical behavior of nuclear fuel elements, with special focus on multi-material configurations, flexible geometry definitions, and fully transient boundary conditions.
 
 Developed by Giovanni Zullo, ZEST is modular, extensible, and ready to integrate advanced physics models for fuel performance simulations.
 

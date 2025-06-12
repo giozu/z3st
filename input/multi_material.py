@@ -10,7 +10,7 @@ import ufl
 from core.config import Config
 from core.mesh import Mesh
 from core.solver import Solver
-from core.finiteElementSetup import FiniteElementSetup
+from core.finite_element_setup import FiniteElementSetup
 from models.thermal_model import ThermalModel
 from models.mechanical_model import MechanicalModel
 
@@ -41,16 +41,17 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             for k in sorted(mat.keys()):
                 v = mat[k]
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
-            
-    def set_boundary_conditions(self):
 
+    def set_boundary_conditions(self):
         with open("conditions/boundary_conditions.yaml", "r") as f:
-            print(f"Loading boundary conditions from 'conditions/boundary_conditions.yaml")
+            print(f"Loading boundary conditions from 'conditions/boundary_conditions.yaml'")
             self.boundary_conditions = yaml.safe_load(f)
 
-        self.set_thermal_boundary_conditions()
-        self.set_mechanical_boundary_conditions()
+        self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions()
+        self.mechanical_dirichlet_bcs = self.set_mechanical_boundary_conditions()
 
+        self.bcs = self.thermal_dirichlet_bcs + self.mechanical_dirichlet_bcs
+    
     def initialize_fields(self):
         # --- Temperature field ---
         # v_t: Test Function
@@ -73,11 +74,6 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         # 'u_t' and 'v_t' are symbolic and only used to define the variational forms.
 
         print(f"Initializing temperature fields for: {list(self.materials.keys())}")
-        self.T = {}  # dictionary to store temperature functions per material
-        self.T_old = {}
-        # T_fuel = self.T["fuel"]
-        # T_cladding = self.T["cladding"]
-
         for name, mat in self.materials.items():
             T_func = dolfinx.fem.Function(self.V_t, name=f"Temperature_{name}")
             T_func.x.array[:] = mat["T_ref"]
@@ -124,9 +120,6 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         # 'u_m' and 'v_m' are symbolic and used solely to define the variational problem
 
         print(f"Initializing displacement fields for: {list(self.materials.keys())}")
-        self.u = {}  # dictionary to store displacement functions per material
-        self.u_old = {}
-
         for name, mat in self.materials.items():
             u_func = dolfinx.fem.Function(self.V_m, name=f"Displacement_{name}")
             u_func.x.array[:] = 0.0
@@ -136,17 +129,19 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             values = u_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
-    def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
+        # --- Displacement / temperature ---
+        w_sub_T = self.w.sub(0)
+        w_sub_u = self.w.sub(1)
+        w_sub_T.x.array[:] = mat["T_ref"]
+        w_sub_u.x.array[:] = 0.0
+        
+    def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
         print("\n[INFO] Solver settings:")
         print(f"  → Max iterations        : {max_iters}")
-        print(f"  → Global tolerance ΔT   : {tol_T}")
-        print(f"  → Global tolerance Δu   : {tol_u}")
-        print(f"  → Thermal solver tol    : {tol_th}")
-        print(f"  → Mechanical solver tol : {tol_mech}")
         print(f"  → Coupling              : {self.coupling}")
 
         if self.coupling == "monolithic":
-            self.solve_monolithic(tol=1e-8, max_iter=max_iters)
+            self.solve_monolithic(tol=tol, max_iter=max_iters)
 
         elif self.coupling == "staggered":
             self.solve_staggered(max_iter=max_iters, tol_u=tol_u, tol_T=tol_T, tol_mech=tol_mech, tol_th=tol_th)

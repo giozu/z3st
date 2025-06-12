@@ -2,29 +2,29 @@ thermal_bcs:
   fuel:
     - type: Dirichlet
       region: face_xx_0
-      temperature: 350.0
-    - type: Neumann
-      region: bottom
-      temperature: -300.0 # (negative if exiting the surface)
-  cladding:
-    - type: Dirichlet
-      region: face_xx_1_2
-      temperature: 290.0
+      temperature: 300.0
     # - type: Neumann
-    #   region: face_xx_0_2
-    #   flux: 100.0
+    #   region: bottom
+    #   flux: -300.0 # (negative if exiting the surface)
+  # cladding:
+  #   - type: Dirichlet
+  #     region: face_xx_1_2
+  #     temperature: 290.0
+  #   - type: Neumann
+  #     region: face_xx_0_2
+  #     flux: 100.0
 mechanical_bcs:
   fuel:
     - type: Dirichlet
       region: bottom
       displacement: [0.0, 0.0, 0.0]
-    - type: Neumann
-      region: top
-      traction: -1e6  # Pa, negative for compression
-  cladding:
-    - type: Dirichlet
-      region: bottom2
-      displacement: [0.0, 0.0, 0.0]
-    - type: Neumann
-      region: top2
-      traction: -1e6  # Pa, negative for compression
+    # - type: Neumann
+    #   region: top
+    #   traction: -1e6  # Pa, negative for compression
+  # cladding:
+  #   - type: Dirichlet
+  #     region: bottom2
+  #     displacement: [0.0, 0.0, 0.0]
+  #   - type: Neumann
+  #     region: top2
+  #     traction: -1e6  # Pa, negative for compression

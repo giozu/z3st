@@ -1,6 +1,7 @@
 import dolfinx
 import ufl
 from petsc4py import PETSc
+import numpy as np
 
 class MechanicalModel:
     def __init__(self):
@@ -12,69 +13,131 @@ class MechanicalModel:
         self.traction_label = {}
         self.mechanical_residuals = {}
         self.i_mech = {}
+        self.u = {}
+        self.u_old = {}
 
     def set_mechanical_boundary_conditions(self):
-        print(f"Mechanical boundary conditions")
-        self.mechanical_bcs = self.boundary_conditions.get("mechanical_bcs", {})
 
-        for mat_type, _ in self.materials.items():
-            bc_list = self.mechanical_bcs.get(mat_type, [])
+        print(f"Setting Mechanical boundary conditions...")
+        mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
 
-            self.bcs_mechanical[mat_type] = []
-            self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0))
-            self.traction_label[mat_type] = None
+        V_u_sub, _ = self.W.sub(1).collapse()
 
+        dirichlet_bcs_list = []
+        
+        if 'traction' not in self.bcs_info:
+            self.bcs_info['traction'] = []
+        else:
+            self.bcs_info['traction'].clear()
+
+        for mat_type, bc_list in mechanical_bcs_defs.items():
             for bc_info in bc_list:
-                bc_type = bc_info.get("type")
                 region_name = bc_info.get("region")
+                bc_type = bc_info.get("type")
 
                 if region_name is None or bc_type is None:
-                    print(f"  [WARNING] Incomplete mechanical BC definition for '{mat_type}'")
+                    print(f"  [WARNING] Incomplete mechanical BC definition for '{mat_type}'. Skipping.")
                     continue
 
                 region_id = self.label_map.get(region_name)
                 if region_id is None:
-                    print(f"  [WARNING] Region '{region_name}' not found in label_map for mechanical BC.")
+                    print(f"  [WARNING] Region '{region_name}' not found in label_map for mechanical BC. Skipping.")
                     continue
-
-                dofs = self.locateMechanicalDofs(region_id)
 
                 if bc_type == "Dirichlet":
                     displacement = bc_info.get("displacement")
                     if displacement is None:
-                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no displacement specified.")
+                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement. Skipping.")
                         continue
-
-                    if isinstance(displacement, str):
-                        displacement = eval(displacement)
-                    elif isinstance(displacement, list):
-                        displacement = tuple(displacement)
-
-                    self.bcs_mechanical[mat_type].append(
-                        self.fixed_displacement(self.mesh, dofs, self.V_m, displacement)
+                    
+                    dofs = dolfinx.fem.locate_dofs_topological(
+                        (self.W.sub(1), V_u_sub), self.fdim, self.ft.find(region_id)
                     )
 
+                    u_d = dolfinx.fem.Function(V_u_sub)
+                    u_d.interpolate(lambda x: np.array(displacement, dtype=PETSc.ScalarType)[:, np.newaxis]*np.ones((1, x.shape[1])))
+
+                    bc = dolfinx.fem.dirichletbc(u_d, dofs, self.W.sub(1))
+                    dirichlet_bcs_list.append(bc)
                     print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
 
                 elif bc_type == "Neumann":
-                    traction_scalar = bc_info.get("traction")
-                    if traction_scalar is None:
-                        print(f"  [WARNING] Neumann BC on '{mat_type}' but no traction specified.")
+                    traction_val = bc_info.get("traction")
+                    if traction_val is None:
+                        print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no traction. Skipping.")
                         continue
+                    
+                    traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_val))
+                    self.bcs_info['traction'].append({'id': region_id, 'value': traction_constant})
+                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_val} Pa at region '{region_name}'")
+                
+                else:
+                    print(f"  [WARNING] Unknown mechanical BC type '{bc_type}' for '{mat_type}'. Skipping.")
+        
+        return dirichlet_bcs_list
 
-                    self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, float(traction_scalar)) * self.normal
-                    self.traction_label[mat_type] = region_id
+    # def set_mechanical_boundary_conditions(self):
+    #     print(f"Mechanical boundary conditions")
+    #     self.mechanical_bcs = self.boundary_conditions.get("mechanical_bcs", {})
 
-                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_scalar} Pa at region '{region_name}'")
+    #     for mat_type, _ in self.materials.items():
+    #         bc_list = self.mechanical_bcs.get(mat_type, [])
+
+    #         self.bcs_mechanical[mat_type] = []
+    #         self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0))
+    #         self.traction_label[mat_type] = None
+
+    #         for bc_info in bc_list:
+    #             bc_type = bc_info.get("type")
+    #             region_name = bc_info.get("region")
+
+    #             if region_name is None or bc_type is None:
+    #                 print(f"  [WARNING] Incomplete mechanical BC definition for '{mat_type}'")
+    #                 continue
+
+    #             region_id = self.label_map.get(region_name)
+    #             if region_id is None:
+    #                 print(f"  [WARNING] Region '{region_name}' not found in label_map for mechanical BC.")
+    #                 continue
+
+    #             dofs = self.locateMechanicalDofs(region_id)
+
+    #             if bc_type == "Dirichlet":
+    #                 displacement = bc_info.get("displacement")
+    #                 if displacement is None:
+    #                     print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no displacement specified.")
+    #                     continue
+
+    #                 if isinstance(displacement, str):
+    #                     displacement = eval(displacement)
+    #                 elif isinstance(displacement, list):
+    #                     displacement = tuple(displacement)
+
+    #                 self.bcs_mechanical[mat_type].append(
+    #                     self.fixed_displacement(self.mesh, dofs, self.V_m, displacement)
+    #                 )
+
+    #                 print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
+
+    #             elif bc_type == "Neumann":
+    #                 traction_scalar = bc_info.get("traction")
+    #                 if traction_scalar is None:
+    #                     print(f"  [WARNING] Neumann BC on '{mat_type}' but no traction specified.")
+    #                     continue
+
+    #                 self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, float(traction_scalar)) * self.normal
+    #                 self.traction_label[mat_type] = region_id
+
+    #                 print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_scalar} Pa at region '{region_name}'")
 
     def epsilon(self, u):
         return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
-        return material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.gdim) + 2 * material["mu"] * self.epsilon(u)
+        return material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.tdim) + 2 * material["mu"] * self.epsilon(u)
 
     def sigma_th(self, T, material):
-        return (3 * material["lmbda"] + 2 * material["mu"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.gdim)
+        return (3 * material["lmbda"] + 2 * material["mu"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.tdim)
 
     def zero_displacement(self, mesh, dofs, V):
         """

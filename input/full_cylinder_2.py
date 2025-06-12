@@ -6,7 +6,7 @@ from mpi4py import MPI
 from petsc4py import PETSc
 import numpy as np
 
-from core.finiteElementSetup import FiniteElementSetup
+from core.finite_element_setup import FiniteElementSetup
 
 class FullCylinder(FiniteElementSetup):
     def volume(self, outer_radius, inner_radius, height):

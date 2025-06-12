@@ -16,7 +16,7 @@ class Config:
         self.n_steps = self.config.get("n_steps", 10)
         self.coupling = self.config.get("solver_settings", {}).get("coupling", "staggered")
 
-        print("\n[INFO] Configuration loaded:")
+        print("[INFO] Configuration loaded:")
         print(f"  → Geometry file : {self.geometry_path}")
         print(f"  → Mesh file     : {self.mesh_path}")
         print(f"  → Conditions    : {self.conditions_path}")

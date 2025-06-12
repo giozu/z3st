@@ -1,6 +1,7 @@
 import dolfinx
 import ufl
 from petsc4py import PETSc
+import numpy as np
 
 class ThermalModel:
     def __init__(self):
@@ -13,65 +14,160 @@ class ThermalModel:
         self.neumann = {}
         self.neumann_label = {}
         self.i_th = {}
+        self.T = {}
+        self.T_old = {}
+
+    # def set_thermal_boundary_conditions(self):
+    #     print(f"Thermal boundary conditions")
+    #     self.thermal_bcs = self.boundary_conditions.get("thermal_bcs", {})
+
+    #     for mat_type, _ in self.materials.items():
+    #         bc_list = self.thermal_bcs.get(mat_type, [])
+
+    #         self.bcs_thermal[mat_type] = []
+
+    #         for bc_info in bc_list:
+    #             region_name = bc_info.get("region")
+    #             bc_type = bc_info.get("type")
+
+    #             if region_name is None or bc_type is None:
+    #                 print(f"  [WARNING] Incomplete BC definition for '{mat_type}'")
+    #                 continue
+
+    #             if bc_type == "Dirichlet":
+    #                 temperature = bc_info.get("temperature")
+    #                 if temperature is None:
+    #                     print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no temperature specified.")
+    #                     continue
+
+    #                 region_id = self.label_map.get(region_name)
+    #                 if region_id is None:
+    #                     print(f"  [WARNING] Region '{region_name}' not found in label_map for Dirichlet.")
+    #                     continue
+
+    #                 dofs = self.locateThermalDofs(region_id)
+    #                 self.bcs_thermal[mat_type].append(
+    #                     self.fixed_temperature(self.mesh, dofs, self.V_t, dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature)))
+    #                 )
+    #                 print(f"  [INFO] Dirichlet BC on '{mat_type}' → {temperature} K at region '{region_name}'")
+
+    #             elif bc_type == "Neumann":
+    #                 flux = bc_info.get("flux")
+    #                 if flux is None:
+    #                     print(f"  [WARNING] Neumann BC on '{mat_type}' but no flux specified.")
+    #                     continue
+
+    #                 region_id = self.label_map.get(region_name)
+    #                 if region_id is None:
+    #                     print(f"[WARNING] Region '{region_name}' not found in label_map for Neumann.")
+    #                     continue
+
+    #                 ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=region_id)
+
+    #                 flux_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(flux))
+
+    #                 if mat_type not in self.neumann:
+    #                     self.neumann[mat_type] = flux_constant * self.v_t * ds_local
+    #                 else:
+    #                     self.neumann[mat_type] += flux_constant * self.v_t * ds_local
+
+    #                 print(f"  [INFO] Neumann BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
+
+    #             else:
+    #                 print(f"  [WARNING] Unknown BC type '{bc_type}' for '{mat_type}'")
 
     def set_thermal_boundary_conditions(self):
-        print(f"Thermal boundary conditions")
-        self.thermal_bcs = self.boundary_conditions.get("thermal_bcs", {})
 
-        for mat_type, _ in self.materials.items():
-            bc_list = self.thermal_bcs.get(mat_type, [])
+        print(f"Setting Thermal boundary conditions...")
+        thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
+        
+        self.V_t_sub, self.V_t_map = self.W.sub(0).collapse()
 
-            self.bcs_thermal[mat_type] = []
+        dirichlet_bcs_list = []
+        
+        if 'neumann_thermal' not in self.bcs_info:
+            self.bcs_info['neumann_thermal'] = []
+        else:
+            self.bcs_info['neumann_thermal'].clear()
 
+        for mat_type, bc_list in thermal_bcs_defs.items():
             for bc_info in bc_list:
                 region_name = bc_info.get("region")
                 bc_type = bc_info.get("type")
 
                 if region_name is None or bc_type is None:
-                    print(f"  [WARNING] Incomplete BC definition for '{mat_type}'")
+                    print(f"  [WARNING] Incomplete thermal BC definition for '{mat_type}'. Skipping.")
+                    continue
+                
+                region_id = self.label_map.get(region_name)
+                if region_id is None:
+                    print(f"  [WARNING] Region '{region_name}' not found in label_map for thermal BC. Skipping.")
                     continue
 
                 if bc_type == "Dirichlet":
                     temperature = bc_info.get("temperature")
                     if temperature is None:
-                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no temperature specified.")
+                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' for region '{region_name}' has no temperature. Skipping.")
                         continue
 
-                    region_id = self.label_map.get(region_name)
-                    if region_id is None:
-                        print(f"  [WARNING] Region '{region_name}' not found in label_map for Dirichlet.")
-                        continue
+                    T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
+                    # T_d = np.full((self.V_t_sub.dofmap.index_map.size_local,), temperature, dtype=PETSc.ScalarType)
 
-                    dofs = self.locateThermalDofs(region_id)
-                    self.bcs_thermal[mat_type].append(
-                        self.fixed_temperature(self.mesh, dofs, self.V_t, dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature)))
+                    # V_t_sub scalar space from W.sub(0).collapse()
+                    # W.sub(0) subspace of mixed space W
+                    # Dopo locate_dofs_topological
+                    dofs_mixed = dolfinx.fem.locate_dofs_topological(
+                        (self.W.sub(0), self.V_t_sub), self.fdim, self.ft.find(region_id)
                     )
-                    print(f"  [INFO] Dirichlet BC on '{mat_type}' → {temperature} K at region '{region_name}'")
+
+                    print(f"Raw dofs_mixed (before cast): {dofs_mixed}")
+                    print(f"Raw dofs_mixed type: {type(dofs_mixed)}")
+
+                    if not isinstance(dofs_mixed, np.ndarray):
+                        dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
+                        print("Converted dofs_mixed to numpy array")
+
+                    print(f"dofs_mixed shape: {dofs_mixed.shape}")
+                    print(f"dofs_mixed sample values:\n{dofs_mixed}")
+
+                    self.V_t_map = np.array(self.V_t_map, dtype=np.int32)
+                    print(f"V_t_map shape: {self.V_t_map.shape}")
+                    print(f"V_t_map sample values:\n{self.V_t_map}")
+
+                    dofs_collapsed = self.V_t_map[dofs_mixed[:, 1]]
+                    print(f"Computed dofs_collapsed: {dofs_collapsed}")
+                    print(f"dofs_collapsed shape: {dofs_collapsed.shape}")
+
+                    print("Preparing DirichletBC call with:")
+                    print(f"    T_d: {T_d}")
+                    print(f"    dofs_collapsed: {dofs_collapsed}")
+                    print(f"    V_t_sub: {self.V_t_sub}")
+
+                    # Creazione BC
+                    bc = dolfinx.fem.dirichletbc(
+                        T_d,
+                        dofs_collapsed,
+                        self.V_t_sub  # collapsed functionspace
+                    )
+                    print("DirichletBC successfully created")
+
+                    dirichlet_bcs_list.append(bc)
+                    print(f"  [INFO] Dirichlet thermal BC on '{mat_type}' → {temperature} K at region '{region_name}'")
 
                 elif bc_type == "Neumann":
                     flux = bc_info.get("flux")
                     if flux is None:
-                        print(f"  [WARNING] Neumann BC on '{mat_type}' but no flux specified.")
+                        print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no flux. Skipping.")
                         continue
-
-                    region_id = self.label_map.get(region_name)
-                    if region_id is None:
-                        print(f"[WARNING] Region '{region_name}' not found in label_map for Neumann.")
-                        continue
-
-                    ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=region_id)
-
+                    
                     flux_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(flux))
-
-                    if mat_type not in self.neumann:
-                        self.neumann[mat_type] = flux_constant * self.v_t * ds_local
-                    else:
-                        self.neumann[mat_type] += flux_constant * self.v_t * ds_local
-
-                    print(f"  [INFO] Neumann BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
-
+                    self.bcs_info['neumann_thermal'].append({'id': region_id, 'value': flux_constant})
+                    print(f"  [INFO] Neumann thermal BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
+                
                 else:
-                    print(f"  [WARNING] Unknown BC type '{bc_type}' for '{mat_type}'")
+                    print(f"  [WARNING] Unknown thermal BC type '{bc_type}' for '{mat_type}'. Skipping.")
+
+        return dirichlet_bcs_list
 
     def fixed_temperature(self, mesh, dofs, V, T):
         """

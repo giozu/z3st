@@ -139,17 +139,13 @@ time_values = []
 #     T_ref=conditions["reference_temperature"]
 # )
 
-# problem.boundary_conditions(gap_pressure=conditions["gap_pressure"], 
-#                             coolant_pressure=conditions["coolant_pressure"], 
-#                             temperature=conditions["boundary_temperature"])
-
-problem.set_boundary_conditions()
-
 problem.initialize_fields()
 # problem.initialize_geometry()
+problem.set_boundary_conditions()
 
 for step, (t, lhr) in enumerate(zip(times, lhrs)):
     print(f"\nTime step {step+1}/{n_steps} | t = {t/86400:.2f} days | LHR = {lhr/1000:.2f} kW/m")
+
 
     problem.lhr = lhr
     # problem.update_state()
@@ -157,7 +153,8 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
                   tol_T=float(input_data["solver_settings"]["tol_T"]),
                   tol_mech=float(input_data["solver_settings"]["tol_mech"]),
                   tol_th=float(input_data["solver_settings"]["tol_th"]),
-                  max_iters=int(input_data["solver_settings"]["n_iter_max"]))
+                  max_iters=int(input_data["solver_settings"]["n_iter_max"]),
+                  tol=float(input_data["solver_settings"]["tol"]))
     
     T_fuel_inner.append(np.max(problem.T["fuel"].x.array))
     # T_fuel_inner.append(np.max(problem.T_fuel.x.array))
