@@ -2,164 +2,139 @@
 
 ## Overview
 
-**ZEST** is an open-source thermomechanical fuel performance code written in Python using the **FEniCSx** framework. It allows the simulation of coupled thermal and mechanical behavior of nuclear fuel elements, supporting both steady-state and transient scenarios.
+**ZEST** (Zero-gap Enhanced Simulation Tool) is an open-source thermomechanical fuel performance code written in Python using the **FEniCSx** finite element framework. It supports the simulation of coupled thermal and mechanical behavior of nuclear fuel elements, with special focus on multi-material configurations, flexible geometry definitions, and fully transient boundary conditions.
 
-Developed by Giovanni Zullo, ZEST is modular, extensible, and supports coupling with external multiphysics codes (e.g. OpenMC, OFFBEAT).
-
----
-
-## Features
-
-* **Thermal and Mechanical Coupling**: Fully coupled thermoelastic solver for fuel and cladding.
-* **FEM-based with FEniCSx**: Leverages the FEniCSx ecosystem for PDE solution and function space management.
-* **Subdomain-aware**: Handles fuel and cladding regions with different material properties.
-* **Time-dependent power history**: Supports LHR input interpolation from tabulated data.
-* **Material YAML support**: Materials are read from easy-to-edit `.yaml` files.
-* **Mesh I/O**: Structured mesh input from `.msh` files via Gmsh.
-* **Logging and output**: Saves log files and results for post-processing.
-* **Post-processing**: Integrated with PyVista, Matplotlib, and XDMF output for ParaView.
+Developed by Giovanni Zullo, ZEST is modular, extensible, and ready to integrate advanced physics models for fuel performance simulations.
 
 ---
 
-## Structure
+## Main Features
 
-```
+* **Coupled Thermo-Mechanical Solver**: Thermal conduction and linear elasticity solved in a coupled framework with fixed-point iterations.
+* **Multi-material domain**: Support for arbitrary number of materials, each with independent mechanical and thermal properties.
+* **Mesh input via Gmsh**: Import of structured/unstructured meshes in `.msh` format.
+* **Geometry input via YAML**: Geometry and physical tags automatically parsed from mesh files.
+* **Configurable via YAML input files**: All simulation settings, materials and boundary conditions are fully configurable.
+* **Power history generator**: LHR history interpolated from tabulated data.
+* **Time-dependent solver**: Full support for transient time stepping.
+* **Relaxation schemes**: User-configurable relaxation factors for thermo-mechanical coupling.
+* **Post-processing**: Integrated plotting utilities (temperature, displacement, stress, residuals).
+* **Output in XDMF format**: Compatible with ParaView for 3D postprocessing.
+
+---
+
+## Directory Structure
+
+```bash
 ZEST/
- ├── zest.py                    # Main script
- ├── fuel_rod.py               # Core thermo-mechanical class
- ├── geometryManager.py        # Manages geometry update/deformation
- ├── FiniteElementSetups.py  # FEM setup and function spaces
- ├── utils.py                  # Helpers (power history, KSP log)
- ├── materials/
- │    ├── uo2.yaml
- │    ├── T91.yaml
- │    ├── lead.yaml
- │    └── he.yaml
- └── mesh/                    # Mesh files (.msh)
+ ├── zest.py                # Main driver script
+ ├── core/
+ │    ├── config.py         # Input parsing and configuration
+ │    ├── mesh.py           # Mesh import and geometry setup
+ │    ├── solver.py         # Global solver control
+ │    ├── finiteElementSetup.py  # FEM spaces definition
+ ├── models/
+ │    ├── thermal_model.py  # Thermal model
+ │    └── mechanical_model.py # Mechanical model
+ ├── multi_material.py  # Main MultiMaterial class
+ ├── msh_to_yaml.py     # Utility to generate YAML geometry from .msh
+ ├── utils.py           # Power history, YAML I/O, log utilities
+ ├── postprocessing.py  # Postprocessing and plotting
+ ├── output.py          # Plotting 3D and 1D fields
+ ├── materials/         # YAML material files
+ ├── conditions/        # YAML boundary condition files
+ ├── mesh/              # Gmsh meshes
+ └── input.yaml         # Main input file for each simulation
 ```
 
 ---
 
-## Example Usage
-
-```python
-from fuel_rod import FuelRod
-from geometry.fuel_rod import geometry
-from utils import generate_power_history
-from materials.loader import load_material
-
-fuel     = load_material("materials/uo2.yaml")
-cladding = load_material("materials/T91.yaml")
-gas      = load_material("materials/he.yaml")
-
-problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
-problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"],
-               geometry["cladding outer radius"], geometry["height"])
-
-problem.parameters(fuel, cladding, gas,
-                   g=9.81,
-                   lhr=25000,
-                   T_ref=873.0)
-
-problem.boundary_conditions(gap_pressure=1.0e6,
-                            coolant_pressure=1.5e6,
-                            temperature=873.0)
-
-problem.initialize_fields()
-problem.initialize_geometry()
-problem.solve()
-```
-
----
-
-## YAML Material Example
+## Input Example (input.yaml)
 
 ```yaml
-name: UO2
-rho: 10970           # kg/m^3
-E: 1.7e11            # Pa
-nu: 0.3              # -
-k: 2.5               # W/m-K
-cp: 300              # J/kg-K
-alpha: 1.45e-5       # 1/K
+models:
+  thermal: true
+  mechanical: true
+  creep: false
+
+time: [0.0, 5.0e6]
+lhr: [25000.0, 25000.0]
+n_steps: 10
+
+geometry_path: geometry/multi_material.yaml
+mesh_path: mesh/multi_material.msh
+conditions_path: conditions/boundary_conditions.yaml
+
+materials:
+  fuel: materials/uo2.yaml
+  cladding: materials/T91.yaml
+
+solver_settings:
+  tol_u: 1e-2
+  tol_T: 1e-2
+  tol_mech: 1e-6
+  tol_th: 1e-6
+  n_iter_max: 20
+```
+
+## Mesh to YAML helper
+
+You can automatically extract physical tags from your Gmsh mesh:
+
+```bash
+python msh_to_yaml.py
 ```
 
 ---
 
-## Environment Setup (WSL + Conda)
-
-### 1. Create the Conda Environment
+## Example run
 
 ```bash
-conda create -n zest python=3.12.9 -y
-conda activate zest
+python zest.py --debug --mesh_plot
 ```
 
-### 2. Install Required Packages
+---
+
+## Environment Setup
 
 ```bash
-conda install -c conda-forge openmc fenics-dolfinx jupyterlab matplotlib ipywidgets pyvista meshio
+# Create environment
+conda create -n zest python=3.12.9 -y
+conda activate zest
+
+# Install packages
+conda install -c conda-forge fenics-dolfinx pyvista matplotlib meshio openmc
 pip install gmsh pyyaml
 ```
 
-### 3. Test Installation
+---
 
-```python
-import openmc, dolfinx, pyvista, meshio, gmsh, yaml
-print("Everything is working!")
-```
+## Postprocessing Tools
 
-### 4. Export/Import Environment
-
-```bash
-conda env export > zest_environment.yml
-conda env create -f zest_environment.yml
-```
+* `plot3d_temperature(problem)`: 3D temperature field (deformed mesh)
+* `plot1d_temperature(problem, z_target=...)`: 1D radial temperature profiles
+* `plot1d_stress(problem, z_target=...)`: 1D stress profiles
+* `plot_residuals()`: Convergence plots for thermal and mechanical solvers
+* `save_temperature_history()`: Exports temperature evolution in TSV format
 
 ---
 
-## Mesh Generation
+## Next Development Steps
 
-To create a Gmsh mesh:
-
-```bash
-gmsh your_geometry.geo -3 -format msh2 -o your_mesh.msh
-```
-
----
-
-## References and Tutorials
-
-* [FEniCSx official demos](https://docs.fenicsproject.org/dolfinx/main/python/demos/)
-* [J.S. Dokken tutorials](https://jsdokken.com/dolfinx-tutorial/)
-* [OpenMC documentation](https://docs.openmc.org/)
+* Nonlinear creep, swelling, irradiation models
+* Gap conductance updates (h\_gap(T,u))
+* Nonlinear contact mechanics (fuel-clad gap)
+* Material property dependencies with temperature and stress
+* Support for more general geometry inputs
+* Optimization of matrix assembly (reuse A)
+* Integration with neutronics (OpenMC, Serpent)
 
 ---
 
-## Future Work
+## License and author
 
-* Time integration and transient heat transfer
-* Advanced creep and irradiation models
-* Multiphysics coupling (neutronics, chemistry)
-* Nonlinear mechanical solvers and contact mechanics
-* Cache A matrices for linear problems (avoid redundant assembly)
-* Optimize code to avoid unnecessary assembly when A and b remain constant
-* Implement Aitken relaxation for thermo-mechanical fixed-point
-* Add Anderson acceleration for stiff coupling
-* Reassemble A and b when material properties depend on T or u (gap conductance, k(T), creep, swelling)
-* Prepare framework for full nonlinear coupling (gap, creep, swelling, oxidation, etc.)
-* Use PETSc KSP.setReusePreconditioner(True) to optimize linear solves
-* Keep fixed-point solver as current base implementation
-
----
-
-## License and Contributions
-
-ZEST is open-source. Contributions, feedback, and feature requests are welcome!
-
----
+**License**: Apache License, Version 2.0 (see LICENSE file)
 
 **Author**: Giovanni Zullo
 **Institution**: Politecnico di Milano
-**Project**: OperaHPC / SCIANTIX / ZEST
-**Date**: 2025
+**Year**: 2025
