@@ -142,14 +142,14 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         print(f"  → Global tolerance ΔT   : {tol_T}")
         print(f"  → Global tolerance Δu   : {tol_u}")
         print(f"  → Thermal solver tol    : {tol_th}")
-        print(f"  → Mechanical solver tol : {tol_mech}\n")
+        print(f"  → Mechanical solver tol : {tol_mech}")
         print(f"  → Coupling              : {self.coupling}")
 
         if self.coupling == "monolithic":
             self.solve_monolithic(tol=1e-8, max_iter=max_iters)
 
         elif self.coupling == "staggered":
-            self.solve_staggered(max_iters=max_iters, tol_u=tol_u, tol_T=tol_T, tol_mech=tol_mech, tol_th=tol_th)
+            self.solve_staggered(max_iter=max_iters, tol_u=tol_u, tol_T=tol_T, tol_mech=tol_mech, tol_th=tol_th)
 
         else:
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")

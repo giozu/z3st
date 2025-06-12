@@ -1,5 +1,8 @@
-import os, numpy as np
-import dolfinx, ufl
+import dolfinx
+import ufl
+from petsc4py import PETSc
+import numpy as np
+import os
 
 class Solver:
     def __init__(self):
@@ -7,22 +10,41 @@ class Solver:
         self.relax_T = 0.5
         self.relax_u = 0.5
 
-        print("\n[INFO] applied relaxation factor:")
+        print("  [INFO] Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
 
+    def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
+        print("\n[INFO] Solver settings:")
+        print(f"  → Max iterations        : {max_iters}")
+        print(f"  → Coupling              : {self.coupling}")
+
+        if self.coupling == "monolithic":
+            self.solve_monolithic(tol=tol_T, max_iter=max_iters)
+        elif self.coupling == "staggered":
+            self.solve_staggered(max_iters=max_iters, tol_u=tol_u, tol_T=tol_T, tol_mech=tol_mech, tol_th=tol_th)
+        else:
+            raise ValueError(f"Unknown coupling strategy: {self.coupling}")
+
     def solve_monolithic(self, tol=1e-8, max_iter=20):
-        print("\n[INFO] Starting monolithic thermo-mechanical solver")
+        print("\n[INFO] Starting monolithic thermo-mechanical solve")
+        print(f"  → Max iterations        : {max_iter}")
+        print(f"  → Tolerance             : {tol}")
 
         for label in self.materials:
             material = self.materials[label]
             tag = self.label_map[label]
 
-            # Product space
-            W = self.V_t * self.V_m
-            w = dolfinx.fem.Function(W)
+            from basix.ufl import mixed_element
+
+            element_T = self.V_t.ufl_element()
+            element_u = self.V_m.ufl_element()
+
+            mixed = mixed_element([element_T, element_u])
+            w = dolfinx.fem.functionspace(self.mesh, mixed)
+
             (T, u) = ufl.split(w)
-            (v_T, v_u) = ufl.TestFunctions(W)
+            (v_T, v_u) = ufl.TestFunctions(w)
 
             # Measures
             dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
@@ -65,15 +87,20 @@ class Solver:
             self.T[label].x.array[:] = T_sol.x.array
             self.u[label].x.array[:] = u_sol.x.array
 
-    def solve_staggered(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
-            print("\n[INFO] Starting staggered thermo-mechanical solver")
+    def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
+            print("[INFO] Starting staggered thermo-mechanical solver")
+            print(f"  → Max iterations        : {max_iter}")
+            print(f"  → Global tolerance ΔT   : {tol_T}")
+            print(f"  → Global tolerance Δu   : {tol_u}")
+            print(f"  → Thermal solver tol    : {tol_th}")
+            print(f"  → Mechanical solver tol : {tol_mech}")
 
             converged = False
             
             self.i_th = {name: 0 for name in self.materials}
             self.i_mech = {name: 0 for name in self.materials}
             
-            for iteration in range(max_iters):
+            for iteration in range(max_iter):
                 print(f"--- Iteration {iteration} ---")
 
                 # Store previous states
