@@ -54,16 +54,7 @@ class MechanicalModel:
                     facets = self.ft.find(region_id)
                     dofs = dolfinx.fem.locate_dofs_topological(self.V_u_sub, self.fdim, facets)
                     
-                    # 1 option to create a BCs, with a Constant
-                    displacement_array = np.array(displacement, dtype=PETSc.ScalarType) # no new axies, Constant wants a flat array
-                    u_d = np.array(displacement_array, dtype=PETSc.ScalarType)
-                    bc = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, u_d), dofs, self.V_u_sub)
-
-                    # 2 option to create a BCs, with a Function
-                    # displacement_array = np.array(displacement, dtype=PETSc.ScalarType)[:, np.newaxis]
-                    # u_d = dolfinx.fem.Function(self.V_u_sub)
-                    # u_d.interpolate(lambda x: np.tile(displacement_array, (1, x.shape[1])))
-                    # bc = dolfinx.fem.dirichletbc(u_d, dofs)
+                    bc = self.create_dirichlet_bc(self.mesh, self.V_u_sub, dofs, displacement, self.tdim)
 
                     dirichlet_bcs_list.append(bc)
                     print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
@@ -87,6 +78,33 @@ class MechanicalModel:
                     print(f"  [WARNING] Unknown mechanical BC type '{bc_type}' for '{mat_type}'. Skipping.")
         
         return dirichlet_bcs_list
+
+    def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):
+        """
+        DirichletBC on a vectorial space, using Constant or Functiont.
+
+        Parameters:
+            mesh: dolfinx.mesh.Mesh
+            V: dolfinx.fem.FunctionSpace (collapsed)
+            dofs: np.ndarray
+            displacement: list, tuple, np.ndarray
+            tdim: int
+
+        Returns:
+            dolfinx.fem.DirichletBC
+        """
+        displacement = np.array(displacement, dtype=PETSc.ScalarType)
+
+        if displacement.ndim == 1 and displacement.size == tdim:
+            print(f"create_dirichlet_bc with Constant")
+            return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, displacement), dofs, V)
+        elif displacement.ndim == 2 and displacement.shape == (tdim, 1):
+            print(f"  create_dirichlet_bc with Function")
+            u_d = dolfinx.fem.Function(V)
+            u_d.interpolate(lambda x: np.tile(displacement, (1, x.shape[1])))
+            return dolfinx.fem.dirichletbc(u_d, dofs)
+        else:
+            raise ValueError(f"Formato displacement non valido: shape {displacement.shape}")
 
     # def set_mechanical_boundary_conditions(self):
     #     print(f"Mechanical boundary conditions")
