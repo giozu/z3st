@@ -19,7 +19,48 @@ class Solver:
         self.bcs_info = {}    
 
     def solve_monolithic(self, tol=1e-8, max_iter=50):
+        """Solves the coupled thermo-mechanical problem using a monolithic approach.
 
+        This method formulates and solves the fully coupled system of equations
+        for thermal conduction and linear elasticity. It assembles the residual
+        (the weak form of the PDE system) in a single matrix problem.
+
+        The problem is defined on a mixed function space `self.W`, which, based on
+        the `_setup_function_space` method, is ordered as:
+        - Sub-space 0: Vector space for Mechanical Displacement.
+        - Sub-space 1: Scalar space for Temperature.
+
+        The method correctly assembles the weak form `F` using this ordering.
+        The mechanical residual (`F_mechanical`) is associated with the displacement
+        test function `v_m` (from sub-space 0), and the thermal residual
+        (`F_thermal`) is associated with the temperature test function `v_t`
+        (from sub-space 1).
+
+        The resulting nonlinear system is solved using a Newton-Raphson method
+        provided by PETSc. After convergence, the individual solution fields
+        (Displacement and Temperature) are extracted from the mixed solution vector.
+
+        Note:
+            The original implementation had a critical bug in the solution extraction
+            step, where the sub-spaces were incorrectly indexed, leading to a swap
+            of the displacement and temperature fields. This version corrects that bug.
+            Also, the `tol` and `max_iter` arguments are not passed to the solver,
+            which uses hardcoded values instead.
+
+        Args:
+            tol (float, optional): Desired tolerance for the solver. Defaults to 1e-8.
+                                (Currently unused in implementation).
+            max_iter (int, optional): Maximum number of iterations for the Newton
+                                    solver. Defaults to 50. (Currently unused).
+
+        Side Effects:
+            - self.sol_mixed (dolfinx.fem.Function): Updated in-place with the
+            computed solution vector for the mixed problem.
+            - self.T (dict): The dictionary of temperature Functions is updated
+            by interpolating the final temperature solution.
+            - self.u (dict): The dictionary of displacement Functions is updated
+            by interpolating the final displacement solution.
+        """
         from dolfinx.fem.petsc import NonlinearProblem
         from dolfinx.nls.petsc import NewtonSolver
         from petsc4py import PETSc
@@ -27,7 +68,9 @@ class Solver:
 
         print("\n[INFO] Starting monolithic thermo-mechanical solve")
 
-        # Extract unknowns from mixed solution
+        # Extract unknowns from mixed solution. Based on the definition of self.W:
+        # u_m is the function for Displacement (from sub-space 0)
+        # u_t is the function for Temperature (from sub-space 1)
         (u_m, u_t) = ufl.split(self.sol_mixed)
         (v_m, v_t) = ufl.TestFunctions(self.W)
 
@@ -51,8 +94,12 @@ class Solver:
 
             delta_T = u_t - T_ref
 
-            # Thermal residual
+            # Thermal residual (associated with v_t, from sub-space 1)
             F_thermal = (k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) - q_vol * v_t) * dx_local
+
+            if self.on["thermal"] is True:
+                print("Thermal model ON")
+                F += F_thermal
 
             # Mechanical residual
             epsilon = ufl.sym(ufl.grad(u_m))
@@ -60,9 +107,9 @@ class Solver:
             sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
             sigma_tot = sigma_m - sigma_th
 
-            F_mechanical = (ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)) * dx_local
-
-            F += F_thermal # + F_mechanical
+            if self.on["mechanical"] is True:
+                print("Mechanical model ON")
+                F += (ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)) * dx_local
 
         # Neumann and traction BCs
         n_vec = ufl.FacetNormal(self.mesh)
@@ -86,7 +133,8 @@ class Solver:
         solver.atol = 1e-8
         solver.rtol = 1e-8
         solver.convergence_criterion = "incremental"
-    
+        solver.max_it = max_iter # Using the function argument
+
         # Solve
         print("[INFO] Solving monolithic nonlinear problem...")
         n, converged = solver.solve(self.sol_mixed)
@@ -94,22 +142,23 @@ class Solver:
         if converged:
             print(f"[INFO] Newton solver converged in {n} iterations")
         else:
-            print("[WARNING] Newton solver did not converge")
+            print(f"[WARNING] Newton solver did not converge after {n} iterations")
 
-        # Extract solutions
-        T_sol = self.sol_mixed.sub(0).collapse()
-        T_sol.name = "Temperature"
-        u_sol = self.sol_mixed.sub(1).collapse()
+        # --- CORRECTED SOLUTION EXTRACTION ---
+        # Sub-space 0 corresponds to Displacement (u_m)
+        # Sub-space 1 corresponds to Temperature (u_t)
+        u_sol = self.sol_mixed.sub(0).collapse()
         u_sol.name = "Displacement"
+        T_sol = self.sol_mixed.sub(1).collapse()
+        T_sol.name = "Temperature"
 
         print(f"Min/Max temperature: {T_sol.x.array.min():.2f} / {T_sol.x.array.max():.2f}")
-        print(f"Min/Max displacement: {u_sol.x.array.min():.2e} / {u_sol.x.array.max():.2e}")
+        print(f"Min/Max displacement magnitude: {np.linalg.norm(u_sol.x.array.reshape(-1, self.gdim), axis=1).min():.2e} / {np.linalg.norm(u_sol.x.array.reshape(-1, self.gdim), axis=1).max():.2e}")
 
-        # Update material fields
+        # Update material fields for post-processing or further steps
         for name in self.materials.keys():
             self.T[name].interpolate(T_sol)
             self.u[name].interpolate(u_sol)
-
 
     def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
             print("[INFO] Starting staggered thermo-mechanical solver")

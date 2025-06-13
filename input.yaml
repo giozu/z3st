@@ -28,8 +28,8 @@ solver_settings:
   coupling: monolithic # [monolithic, staggered]
 
 models:
-  thermal: False
-  mechanical: False
+  thermal: True
+  mechanical: True
 
 lhr:
   - 250
