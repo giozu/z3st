@@ -11,12 +11,12 @@ output.py contains functions to visualize the results of the ZEST code.
 
 # Import necessary modules
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
 import pyvista
 import dolfinx
 from dolfinx.mesh import compute_midpoints
 import numpy as np
 import os
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import glob
@@ -92,60 +92,41 @@ def plot3d_displacement(problem):
         xdmf.write_function(problem.u)
 
 def plot3d_temperature(problem):
-    """
-    Visualize a single temperature field by summing contributions from all materials.
-    Shows the result on a deformed mesh using PyVista and exports to XDMF.
-    """
-    
+    import dolfinx
+    import pyvista
+    import numpy as np
+    import os
+
     os.makedirs("output", exist_ok=True)
 
-    # Extract mesh structure
-    topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.V_t)
+    # Get mesh info
+    topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.mesh, problem.mesh.topology.dim)
+    grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
-    # Initialize total temperature and displacement
-    temp = np.zeros(geometry.shape[0])
-    displacement = np.zeros_like(geometry)
+    num_cells = problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local
+    temp_cellwise = np.zeros(num_cells)
 
-    for name in problem.T:
-        temp += problem.T[name].x.array.real
-        displacement += problem.u[name].x.array.reshape(geometry.shape)
+    # Evaluate temperature directly at cell centers (robust way)
+    cell_centers = dolfinx.mesh.compute_midpoints(problem.mesh, problem.mesh.topology.dim, np.arange(num_cells))
+    for name in problem.T.keys():
+        material_tag = problem.label_map[name]
+        material_cells = np.where(problem.tags.values == material_tag)[0]
 
-    # Compute deformed geometry
-    deformed_geometry = geometry + displacement
+        T_eval = problem.T[name].eval(cell_centers[material_cells, :], material_cells)
+        temp_cellwise[material_cells] = T_eval[:, 0]  # temperature scalar field
 
-    # Create PyVista grids
-    grid_original = pyvista.UnstructuredGrid(topology, cell_types, geometry)
-    grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
+    # Assign cell data to pyvista
+    grid_deformed.cell_data["Temperature"] = temp_cellwise
 
-    # Attach scalar temperature field to deformed grid
-    grid_deformed["T"] = temp
-
-    # Plotting
     p = pyvista.Plotter()
-    p.add_mesh(grid_original, style="wireframe", color="black")
-    p.add_mesh(grid_deformed, scalars="T", cmap="plasma")
+    p.add_mesh(grid_deformed, scalars="Temperature", cmap="plasma", show_edges=True)
     p.show_axes()
-
-    if not pyvista.OFF_SCREEN:
-        p.show()
-    else:
-        p.screenshot("output/temperature_combined.png")
-
-    # Export combined temperature field to XDMF
-    T_total = dolfinx.fem.Function(problem.V_t, name="Temperature_Total")
-    T_total.x.array[:] = temp
-
-    with dolfinx.io.XDMFFile(problem.mesh.comm, "output/temperature_combined.xdmf", "w") as xdmf:
-        xdmf.write_mesh(problem.mesh)
-        xdmf.write_function(T_total)
+    p.show()
 
 def plot1d_stress(problem, z_target=0.005, tol=0.0001):
     """
-    Plot radial (σ_rr), hoop (σ_θθ), and axial (σ_zz) stresses at a fixed z level for two materials.
+    Plot stress components as function of radius at fixed z.
     """
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import dolfinx
 
     cell_centers = compute_midpoints(
         problem.mesh, problem.mesh.topology.dim,
@@ -166,41 +147,43 @@ def plot1d_stress(problem, z_target=0.005, tol=0.0001):
         return
 
     V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.gdim, problem.gdim)))
-    materials = list(problem.stress.keys())[:2]
+    materials = list(problem.stress.keys())
 
     plt.figure(figsize=(9, 6))
+
     for name in materials:
         stress_expr = dolfinx.fem.Expression(problem.stress[name], V_tensor.element.interpolation_points())
         stress_func = dolfinx.fem.Function(V_tensor)
         stress_func.interpolate(stress_expr)
         stress_vals = stress_func.x.array.reshape(-1, 3, 3)
 
-        sigma_rr = stress_vals[mask, 0, 0]
-        sigma_tt = stress_vals[mask, 1, 1]
-        sigma_zz = stress_vals[mask, 2, 2]
-
-        sigma_xx = stress_vals[mask, 0, 0]
-        
         material_tag = problem.label_map[name]
-        material_mask = mask & (problem.tags.values == material_tag)
+        cell_tags = problem.tags.values
+        material_mask = mask & (cell_tags == material_tag)
 
-        # Now apply material_mask directly to the full stress tensor
-        sigma_vals = stress_vals[material_mask, :, :]  # shape (n, 3, 3)
-        sigma_xx = sigma_vals[:, 0, 0]
+        sigma_xx = stress_vals[material_mask, 0, 0]
+        r_plot = r[material_mask]
 
-        plt.plot(x[material_mask], sigma_xx, '^', label=f"{name}: σ_xx")
+        plt.scatter(r_plot, sigma_xx, label=f"{name}: σ_xx", s=30)
 
-
-        # plt.plot(r[mask], sigma_rr, 'o', label=f"{name}: σ_rr")
-        # plt.plot(r[mask], sigma_tt, '^', label=f"{name}: σ_θθ")
-        # plt.plot(r[mask], sigma_zz, 's', label=f"{name}: σ_zz")
-
-    plt.xlabel("Radius [m]")
-    plt.ylabel("Stress [Pa]")
-    plt.title(f"Stress Components at z={z_target:.4f} m")
+    plt.xlabel("Radius (m)")
+    plt.ylabel("Stress (Pa)")
+    plt.title(f"Stress Components at z={z_target:.3f} m")
     plt.grid(True)
     plt.legend()
-    plt.tight_layout()
+    # plt.tight_layout()
+
+    # Y-axis formatting (scientific clean)
+    # ax = plt.gca()
+    # ax.yaxis.set_major_formatter(ticker.ScalarFormatter(useMathText=True))
+    # ax.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+
+    # Optional: fixed range for stress if you prefer
+    plt.ylim(-1e9, 1e9)
+
+    output_file = f'output/stress_profile_z_{z_target:.3f}.png'
+    plt.savefig(output_file, dpi=300)
+    print(f"Plot saved to: {output_file}")
     plt.show()
 
 def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
@@ -249,21 +232,16 @@ def plot_radial_displacement(problem, z_target=0.5, tol=0.01):
 def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
     """
     Plot temperature distribution as a function of radius at height z_target
-    for the first two materials in the problem.
-
-    Parameters:
-    - problem: The finite element problem with mesh and temperature fields.
-    - z_target: Target height (z) in meters.
-    - tol: Tolerance in z to select cross-section.
+    for all materials in the problem (general version).
     """
 
     cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim,
                                      np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
 
     x, y, z = cell_centers[:, 0], cell_centers[:, 1], cell_centers[:, 2]
+    r = np.sqrt(x**2 + y**2)
 
     unique_z_values = np.unique(z)
-    # print("Unique z-values in the mesh:", unique_z_values)
 
     if np.all(np.abs(unique_z_values - z_target) > tol):
         z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]
@@ -271,7 +249,6 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
 
     mask = np.abs(z - z_target) < tol
     num_points = np.sum(mask)
-    # print(f"Checking z = {z_target:.6f}: Found {num_points} points.")
 
     if num_points == 0:
         print(f"⚠️ No points found at z = {z_target} within tolerance {tol}.")
@@ -280,31 +257,36 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
     V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
 
     plt.figure(figsize=(8, 6))
-    materials = list(problem.T.keys())[:2]  # First two materials
+    materials = list(problem.T.keys())
 
     for name in materials:
         T_expr = dolfinx.fem.Expression(problem.T[name], V_scalar.element.interpolation_points())
         T_func = dolfinx.fem.Function(V_scalar)
         T_func.interpolate(T_expr)
 
-        # Apply material filter
         cell_tags = problem.tags.values
         material_tag = problem.label_map[name]
         material_mask = mask & (cell_tags == material_tag)
 
-        # Plot only relevant cells
+        if np.sum(material_mask) == 0:
+            print(f"⚠️ No cells found for material '{name}' at z={z_target}")
+            continue
+
         x_plot = x[material_mask]
         T_vals = T_func.x.array[material_mask]
 
-        plt.scatter(x_plot, T_vals, label=f"{name.capitalize()} at z={z_target:.4f} m", s=30)
+        plt.scatter(x_plot, T_vals, label=f"{name}", s=30)
 
-    plt.xlabel("Edge (m)")
+    plt.xlabel("Length (m)")
     plt.ylabel("Temperature (K)")
-    plt.title(f"Temperature distribution at z={z_target:.4f} m")
+    plt.title(f"Temperature profile at z={z_target:.3f} m")
     plt.grid(True)
     plt.legend()
-    plt.tight_layout()
-    plt.savefig(f'temperature_r_z_{z_target}.png')
+    plt.ylim(200,2000)
+
+    output_file = f'output/temperature_profile_z_{z_target:.3f}.png'
+    plt.savefig(output_file, dpi=300)
+    print(f"Plot saved to: {output_file}")
     plt.show()
 
 def export_fields(problem, step, t=None, lhr=None, output_dir="output"):
