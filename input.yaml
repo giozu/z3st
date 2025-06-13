@@ -29,10 +29,10 @@ solver_settings:
 
 models:
   thermal: True
-  mechanical: False
+  mechanical: True
 
 lhr:
-  - 0
+  - 250
 time:
   - 0
 n_steps: 1

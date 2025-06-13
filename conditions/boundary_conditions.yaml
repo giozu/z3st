@@ -1,7 +1,7 @@
 thermal_bcs:
   fuel:
     - type: Dirichlet
-      region: face_xx_0
+      region: bottom
       temperature: 300.0
 
     # - type: Neumann
