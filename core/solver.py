@@ -18,40 +18,27 @@ class Solver:
 
         self.bcs_info = {}    
 
-    def solve_monolithic(self, tol=1e-8, max_iter=20):
+    def solve_monolithic(self, tol=1e-8, max_iter=50):
 
-        from dolfinx.fem.petsc import (
-            assemble_matrix_block, assemble_vector_block,
-            apply_lifting, set_bc
-        )
+        from dolfinx.fem.petsc import NonlinearProblem
+        from dolfinx.nls.petsc import NewtonSolver
+        from petsc4py import PETSc
+        import ufl
 
         print("\n[INFO] Starting monolithic thermo-mechanical solve")
-        print(f"  → Solver type: Direct (LU/MUMPS)")
 
-        # --- Estrai i campi di soluzione da self.sol_mixed per usarli nel residuo ---
-        # NOTA: Basandomi su initialize_fields, l'ordine è (Displacement, Temperature)
-        u_sol_field = self.sol_mixed.sub(0)  # Componente simbolica dello Spostamento
-        T_sol_field = self.sol_mixed.sub(1)  # Componente simbolica della Temperatura
-
-        # --- Definisci Trial e Test functions con l'ordine corretto ---
-        # (u_m, u_t) e (v_m, v_t)
-        (u_m, u_t) = ufl.TrialFunctions(self.W)
+        # Extract unknowns from mixed solution
+        (u_m, u_t) = ufl.split(self.sol_mixed)
         (v_m, v_t) = ufl.TestFunctions(self.W)
 
-        # --- Initialize block structures ---
-        # La matrice e il residuo seguiranno l'ordine (u, T)
-        # Blocco 0: Equazione meccanica
-        # Blocco 1: Equazione termica
-        L_blocks = [0, 0] 
-        a_form_blocks = [[0, 0], [0, 0]] 
+        F = 0  # Start assembling residual
 
-        # --- Loop sui materiali per assemblare le forme variazionali ---
         for label in self.materials:
             material = self.materials[label]
             tag = self.label_map[label]
             dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
 
-            # --- Material properties ---
+            # Material properties
             k = dolfinx.fem.Constant(self.mesh, material["k"])
             lmbda = dolfinx.fem.Constant(self.mesh, material["lmbda"])
             mu = dolfinx.fem.Constant(self.mesh, material["mu"])
@@ -62,113 +49,67 @@ class Solver:
             body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
             q_vol = self.q_third[label]
 
-            # --- Residuo Meccanico F_u (Blocco 0) ---
-            sigma_tot = self.sigma_mech(u_sol_field, material) - self.sigma_th(T_sol_field, material)
-            L_mechanical = (ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)) * dx_local
+            delta_T = u_t - T_ref
 
-            # --- Residuo Termico F_T (Blocco 1) ---
-            L_thermal = (k * ufl.inner(ufl.grad(T_sol_field), ufl.grad(v_t)) - q_vol * v_t) * dx_local
+            # Thermal residual
+            F_thermal = (k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) - q_vol * v_t) * dx_local
 
-            # --- Aggiungi i contributi ai residui totali (-F) ---
-            L_blocks[0] -= L_mechanical
-            L_blocks[1] -= L_thermal
+            # Mechanical residual
+            epsilon = ufl.sym(ufl.grad(u_m))
+            sigma_m = lmbda * ufl.tr(epsilon) * ufl.Identity(self.tdim) + 2 * mu * epsilon
+            sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
+            sigma_tot = sigma_m - sigma_th
 
-            # --- Jacobiana (Bilinear forms for the matrix A = J) ---
-            # Ordine della matrice:
-            # | A_uu  A_uT |
-            # | A_Tu  A_TT |
-            
-            # Blocco (0,0): A_uu = d(F_u)/d(u) (meccanico)
-            epsilon_m_trial = ufl.sym(ufl.grad(u_m))
-            sigma_m_trial = lmbda * ufl.tr(epsilon_m_trial) * ufl.Identity(self.tdim) + 2 * mu * epsilon_m_trial
-            a00 = ufl.inner(sigma_m_trial, ufl.sym(ufl.grad(v_m))) * dx_local
-            
-            # Blocco (0,1): A_uT = d(F_u)/d(T) (accoppiamento termo-meccanico)
-            a01 = ufl.inner(-alpha * (3 * lmbda + 2 * mu) * ufl.Identity(self.gdim) * u_t, ufl.sym(ufl.grad(v_m))) * dx_local
+            F_mechanical = (ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)) * dx_local
 
-            # Blocco (1,0): A_Tu = d(F_T)/d(u) (nullo in questa formulazione)
-            a10 = None
-            
-            # Blocco (1,1): A_TT = d(F_T)/d(T) (termico)
-            a11 = k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx_local
-            
-            current_blocks = [[a00, a01], [a10, a11]]
-            for i in range(2):
-                for j in range(2):
-                    if current_blocks[i][j] is not None:
-                        a_form_blocks[i][j] += current_blocks[i][j]
+            F += F_thermal # + F_mechanical
 
-        # --- Boundary conditions ---
+        # Neumann and traction BCs
+        n_vec = ufl.FacetNormal(self.mesh)
+
         if 'neumann_thermal' in self.bcs_info:
             for bc_info in self.bcs_info['neumann_thermal']:
                 ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                L_blocks[1] += bc_info['value'] * v_t * ds_local # Aggiungi a -F_T
+                F -= bc_info['value'] * v_t * ds_local
 
         if 'traction' in self.bcs_info:
             for bc_info in self.bcs_info['traction']:
                 ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                L_blocks[0] += ufl.dot(bc_info['value'], v_m) * ds_local # Aggiungi a -F_u
+                traction_vector = bc_info['value'] * n_vec
+                F -= ufl.dot(traction_vector, v_m) * ds_local
 
-        # --- Assemblaggio e Soluzione ---
-        a_compiled = [[dolfinx.fem.form(a_ij) if a_ij != 0 else None for a_ij in row] for row in a_form_blocks]
-        L_compiled = [dolfinx.fem.form(L_i) for L_i in L_blocks]
-        
-        print("[INFO] Assembling matrix and vector...")
-        A = assemble_matrix_block(a_compiled, bcs=self.bcs)
-        A.assemble()
-        b = assemble_vector_block(L_compiled, a_compiled, bcs=self.bcs)
+        # Define nonlinear problem and solver
+        problem = NonlinearProblem(F, self.sol_mixed, bcs=self.bcs)
+        solver = NewtonSolver(self.mesh.comm, problem)
 
-        for bc in self.bcs:
-            space_index = -1
-            if bc.function_space == self.V_u_sub:
-                space_index = 0  # Mechanical block
-            elif bc.function_space == self.V_t_sub:
-                space_index = 1  # Thermal block
+        # Set Newton solver options
+        solver.atol = 1e-8
+        solver.rtol = 1e-8
+        solver.convergence_criterion = "incremental"
+    
+        # Solve
+        print("[INFO] Solving monolithic nonlinear problem...")
+        n, converged = solver.solve(self.sol_mixed)
 
-            if space_index != -1:
-                dolfinx.fem.petsc.apply_lifting(b, a_compiled[space_index], [bc])
+        if converged:
+            print(f"[INFO] Newton solver converged in {n} iterations")
+        else:
+            print("[WARNING] Newton solver did not converge")
 
-        b.ghostUpdate(addv=PETSc.InsertMode.ADD, mode=PETSc.ScatterMode.REVERSE)
-        dolfinx.fem.petsc.set_bc(b, self.bcs)
+        # Extract solutions
+        T_sol = self.sol_mixed.sub(0).collapse()
+        T_sol.name = "Temperature"
+        u_sol = self.sol_mixed.sub(1).collapse()
+        u_sol.name = "Displacement"
 
-        # A.zeroRows([bc.dof_indices() for bc in self.bcs], diag_val=1.0)
+        print(f"Min/Max temperature: {T_sol.x.array.min():.2f} / {T_sol.x.array.max():.2f}")
+        print(f"Min/Max displacement: {u_sol.x.array.min():.2e} / {u_sol.x.array.max():.2e}")
 
-        ksp = PETSc.KSP().create(self.mesh.comm)
-        ksp.setOperators(A)
-        ksp.setType(PETSc.KSP.Type.PREONLY)
-        pc = ksp.getPC()
-        pc.setType(PETSc.PC.Type.LU)
-        pc.setFactorSolverType("mumps")
-        
-        x = A.createVecRight()
-        print("[INFO] Solving the linear system with a direct solver...")
-        ksp.solve(b, x)
+        # Update material fields
+        for name in self.materials.keys():
+            self.T[name].interpolate(T_sol)
+            self.u[name].interpolate(u_sol)
 
-        # --- Aggiorna la funzione soluzione globale ---
-        self.sol_mixed.x.array[:] = x.array_r
-
-        # --- Estrai i campi per il post-processing ---
-        # Usiamo i nomi che hai già definito nella tua classe, se esistono
-        u_sol_collapsed = self.sol_mixed.sub(0).collapse()
-        T_sol_collapsed = self.sol_mixed.sub(1).collapse()
-        
-        if hasattr(self, 'u_sol'):
-            self.u_sol.interpolate(u_sol_collapsed)
-        if hasattr(self, 'T_sol'):
-            self.T_sol.interpolate(T_sol_collapsed)
-
-        print(f"Min displacement component: {u_sol_collapsed.x.array.min():.4e}")
-        print(f"Max displacement component: {u_sol_collapsed.x.array.max():.4e}")
-        print(f"Min temperature: {T_sol_collapsed.x.array.min():.4e}")
-        print(f"Max temperature: {T_sol_collapsed.x.array.max():.4e}")
-
-        # --- Aggiorna i campi per materiale ---
-        print("[INFO] Updating per-material solution fields...")
-        for name in self.materials.keys():        
-            self.T[name].interpolate(T_sol_collapsed)
-            self.u[name].interpolate(u_sol_collapsed)
-
-        print("[INFO] Global solution fields updated.")
 
     def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
             print("[INFO] Starting staggered thermo-mechanical solver")
