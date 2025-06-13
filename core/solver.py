@@ -11,7 +11,7 @@ class Solver:
     def __init__(self):
         print("__Solver initializer__")
         self.relax_T = 0.7
-        self.relax_u = 0.7
+        self.relax_u = 0.3
 
         print("  [INFO] Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
@@ -201,6 +201,8 @@ class Solver:
         # Create thermal BCs
         bcs_t = self.thermal_dirichlet_bcs
         bcs_m = self.mechanical_dirichlet_bcs
+        # bcs_m.append(self.constrain_point(self.mesh, self.V_m, np.array([0.1, 0.1, 0.5])))
+
         print(f"[INFO] Loaded {len(bcs_t)} thermal and {len(bcs_m)} mechanical Dirichlet BCs for the staggered solver.")
 
         # --- Staggering Loop ---
@@ -239,8 +241,17 @@ class Solver:
                         L_t += dolfinx.fem.Constant(self.mesh, bc_info['value']) * v_t * ds
                 
                 # Define and solve the linear problem
-                petsc_opts = {"ksp_type": "cg", "pc_type": "gamg", "ksp_rtol": tol_th}
-                problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_sol, petsc_options=petsc_opts)
+                petsc_opts_thermal = {
+                    "ksp_type": "cg",
+                    "pc_type": "gamg",
+                    "ksp_rtol": 1e-10,
+                    "pc_gamg_coarse_eq_limit": 500,
+                    "pc_gamg_threshold": 0.05,
+                    # "ksp_monitor_true_residual": None,
+                    # "ksp_converged_reason": None
+                }
+
+                problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_sol, petsc_options=petsc_opts_thermal)
                 problem_t.solve()
                 
                 # Apply relaxation
@@ -278,10 +289,27 @@ class Solver:
                 if 'traction' in self.bcs_info:
                     for bc_info in self.bcs_info['traction']:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                        L_m += ufl.dot(bc_info['value'], v_m) * ds 
+                        L_m += ufl.dot(bc_info['value'], v_m) * ds
 
                 # Define and solve the linear problem
-                petsc_opts_mech = {"ksp_type": "cg", "pc_type": "gamg", "ksp_rtol": tol_mech, "pc_gamg_coarse_eq_limit": 1000}
+                # petsc_opts_mech = {
+                #     "ksp_type": "cg",
+                #     "pc_type": "gamg",
+                #     "ksp_rtol": tol_mech,
+                #     "pc_gamg_coarse_eq_limit": 1000
+                # }
+
+                petsc_opts_mech = {
+                    "ksp_type": "cg",
+                    "pc_type": "gamg",
+                    "ksp_rtol": 1e-8,
+                    "pc_gamg_coarse_eq_limit": 500,
+                    "pc_gamg_threshold": 0.02,
+                    # "pc_gamg_sym_graph": True,
+                    # "ksp_monitor_true_residual": None,
+                    # "ksp_converged_reason": None
+                }
+
                 problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts_mech)
                 problem_m.solve()
 

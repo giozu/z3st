@@ -79,7 +79,7 @@ class MechanicalModel:
                         print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no traction. Skipping.")
                         continue
                     
-                    traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_val))
+                    traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_val)) * self.normal
                     self.bcs_info['traction'].append({'id': region_id, 'value': traction_constant})
                     print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_val} Pa at region '{region_name}'")
 
@@ -115,59 +115,59 @@ class MechanicalModel:
         else:
             raise ValueError(f"Formato displacement non valido: shape {displacement.shape}")
 
-    # def set_mechanical_boundary_conditions(self):
-    #     print(f"Mechanical boundary conditions")
-    #     self.mechanical_bcs = self.boundary_conditions.get("mechanical_bcs", {})
+    def constrain_point(self, mesh: dolfinx.mesh.Mesh, 
+                        V: dolfinx.fem.FunctionSpace, 
+                        point: np.ndarray) -> dolfinx.fem.DirichletBC:
+        """
+        Finds the mesh node closest to a given point and applies a zero
+        Dirichlet boundary condition to it.
 
-    #     for mat_type, _ in self.materials.items():
-    #         bc_list = self.mechanical_bcs.get(mat_type, [])
+        Args:
+            mesh: The dolfinx mesh object.
+            V: The FunctionSpace on which the boundary condition is defined.
+            point: A numpy array of shape (dim,) specifying the target coordinates
+                (e.g., np.array([0.1, 0.2, 0.0])).
 
-    #         self.bcs_mechanical[mat_type] = []
-    #         self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, 0.0))
-    #         self.traction_label[mat_type] = None
+        Returns:
+            A dolfinx.fem.DirichletBC object that constrains the node.
+        """
+        # 1. Get all node coordinates from the mesh geometry.
+        # The shape is (num_nodes, 3) for a 3D mesh.
+        all_coords = mesh.geometry.x
 
-    #         for bc_info in bc_list:
-    #             bc_type = bc_info.get("type")
-    #             region_name = bc_info.get("region")
+        # 2. Ensure the input point has the correct dimension.
+        point = np.asarray(point, dtype=mesh.geometry.x.dtype)
+        if point.shape[0] != mesh.geometry.dim:
+            raise ValueError(f"Point dimension {point.shape[0]} does not match mesh dimension {mesh.geometry.dim}")
 
-    #             if region_name is None or bc_type is None:
-    #                 print(f"  [WARNING] Incomplete mechanical BC definition for '{mat_type}'")
-    #                 continue
+        # 3. Calculate the squared Euclidean distance from every node to the target point.
+        # Using squared distance avoids a costly square root and gives the same minimum.
+        distances_sq = np.sum((all_coords - point)**2, axis=1)
 
-    #             region_id = self.label_map.get(region_name)
-    #             if region_id is None:
-    #                 print(f"  [WARNING] Region '{region_name}' not found in label_map for mechanical BC.")
-    #                 continue
+        # 4. Find the index (and the coordinates) of the node with the minimum distance.
+        closest_node_idx = np.argmin(distances_sq)
+        closest_coord = all_coords[closest_node_idx]
 
-    #             dofs = self.locateMechanicalDofs(region_id)
+        # Optional: Print a message to inform the user which node was selected.
+        # This is very useful for debugging.
+        print(f"\nRequested point: {point}. Constraining closest node at: {closest_coord}\n")
 
-    #             if bc_type == "Dirichlet":
-    #                 displacement = bc_info.get("displacement")
-    #                 if displacement is None:
-    #                     print(f"  [WARNING] Dirichlet BC on '{mat_type}' but no displacement specified.")
-    #                     continue
+        # 5. Find the degrees of freedom (dofs) geometrically located at that specific node.
+        # The lambda function identifies the point(s) that are extremely close to our
+        # `closest_coord`. np.isclose is used for safe floating-point comparison.
+        # The `.all(axis=1)` ensures that all components (x, y, z) of a coordinate match.
+        dofs = dolfinx.fem.locate_dofs_geometrical(
+            V,
+            lambda x: np.isclose(x.T, closest_coord).all(axis=1)
+        )
 
-    #                 if isinstance(displacement, str):
-    #                     displacement = eval(displacement)
-    #                 elif isinstance(displacement, list):
-    #                     displacement = tuple(displacement)
+        # 6. Create the Dirichlet Boundary Condition.
+        # We constrain the located dofs to a zero vector of the appropriate dimension.
+        # The value is wrapped in a dolfinx.fem.Constant.
+        u_bc = dolfinx.fem.Constant(mesh, np.zeros(mesh.geometry.dim, dtype=dolfinx.default_scalar_type))
+        bc = dolfinx.fem.dirichletbc(u_bc, dofs, V)
 
-    #                 self.bcs_mechanical[mat_type].append(
-    #                     self.fixed_displacement(self.mesh, dofs, self.V_m, displacement)
-    #                 )
-
-    #                 print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
-
-    #             elif bc_type == "Neumann":
-    #                 traction_scalar = bc_info.get("traction")
-    #                 if traction_scalar is None:
-    #                     print(f"  [WARNING] Neumann BC on '{mat_type}' but no traction specified.")
-    #                     continue
-
-    #                 self.traction[mat_type] = dolfinx.fem.Constant(self.mesh, float(traction_scalar)) * self.normal
-    #                 self.traction_label[mat_type] = region_id
-
-    #                 print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_scalar} Pa at region '{region_name}'")
+        return bc
 
     def epsilon(self, u):
         return ufl.sym(ufl.grad(u))

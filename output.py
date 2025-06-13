@@ -92,34 +92,95 @@ def plot3d_displacement(problem):
         xdmf.write_function(problem.u)
 
 def plot3d_temperature(problem):
-    import dolfinx
-    import pyvista
-    import numpy as np
-    import os
-
+    """
+    Visualize temperature field in 3D.
+    Plots both undeformed mesh (wireframe) and deformed mesh (colored by temperature).
+    """
     os.makedirs("output", exist_ok=True)
 
-    # Get mesh info
+    # Extract mesh and topology for pyvista
     topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.mesh, problem.mesh.topology.dim)
-    grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
+    # Build undeformed grid
+    grid_original = pyvista.UnstructuredGrid(topology, cell_types, geometry)
+
+    # Evaluate temperature field cell-wise
     num_cells = problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local
     temp_cellwise = np.zeros(num_cells)
 
-    # Evaluate temperature directly at cell centers (robust way)
+    # Compute midpoints for each cell
     cell_centers = dolfinx.mesh.compute_midpoints(problem.mesh, problem.mesh.topology.dim, np.arange(num_cells))
+
     for name in problem.T.keys():
         material_tag = problem.label_map[name]
         material_cells = np.where(problem.tags.values == material_tag)[0]
 
         T_eval = problem.T[name].eval(cell_centers[material_cells, :], material_cells)
-        temp_cellwise[material_cells] = T_eval[:, 0]  # temperature scalar field
+        temp_cellwise[material_cells] = T_eval[:, 0]
 
-    # Assign cell data to pyvista
-    grid_deformed.cell_data["Temperature"] = temp_cellwise
+    # Build deformed mesh geometry
+    u_vector = np.zeros_like(geometry)
+    for name in problem.u.keys():
+        u_vector += problem.u[name].x.array.reshape(geometry.shape)
 
+    scale_factor = 10.0  # amplification for visualization
+    deformed_geometry = geometry + scale_factor * u_vector
+
+    grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
+    grid_deformed.cell_data["Temperature (K)"] = temp_cellwise
+
+    # Plot both meshes
     p = pyvista.Plotter()
-    p.add_mesh(grid_deformed, scalars="Temperature", cmap="plasma", show_edges=True)
+
+    # Original undeformed mesh (wireframe)
+    p.add_mesh(grid_original, color="lightgrey", style="wireframe", line_width=0.5, opacity=0.5)
+
+    # Deformed mesh with temperature field
+    p.add_mesh(grid_deformed, scalars="Temperature (K)", cmap="plasma", show_edges=True)
+
+    p.show_axes()
+    p.show()
+
+def plot3d_displacement(problem):
+    """
+    Visualize displacement field (total displacement norm) in 3D.
+    Works directly with vector field on nodal points.
+    """
+
+    os.makedirs("output", exist_ok=True)
+
+    # Extract mesh and topology for pyvista
+    topology, cell_types, geometry = dolfinx.plot.vtk_mesh(problem.mesh, problem.mesh.topology.dim)
+
+    # Build undeformed grid
+    grid_original = pyvista.UnstructuredGrid(topology, cell_types, geometry)
+
+    # Initialize displacement full field (nodal)
+    u_vector = np.zeros_like(geometry)
+
+    for name in problem.u.keys():
+        u_vector += problem.u[name].x.array.reshape(geometry.shape)
+
+    # Compute displacement magnitude for coloring
+    u_magnitude = np.linalg.norm(u_vector, axis=1)
+
+    # Apply amplification factor for visualization
+    scale_factor = 10.0  # <-- puoi modificarlo per vedere meglio
+    deformed_geometry = geometry + scale_factor * u_vector
+
+    # Build deformed grid
+    grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
+    grid_deformed.point_data["Displacement (m)"] = u_magnitude
+
+    # Plot both meshes
+    p = pyvista.Plotter()
+
+    # Original undeformed mesh in light grey wireframe
+    p.add_mesh(grid_original, color="lightgrey", style="wireframe", line_width=0.5, opacity=0.5)
+
+    # Deformed mesh with colormap
+    p.add_mesh(grid_deformed, scalars="Displacement (m)", cmap="viridis", show_edges=True)
+
     p.show_axes()
     p.show()
 
