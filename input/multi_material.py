@@ -76,6 +76,9 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         # Important: 'T' holds the real temperature solution.
         # 'u_t' and 'v_t' are symbolic and only used to define the variational forms.
 
+        self.sol_mixed = dolfinx.fem.Function(self.W)
+        self.u_sol_mixed, self.T_sol_mixed = self.sol_mixed.split()
+
         print(f"Initializing temperature fields for: {list(self.materials.keys())}")
         for name, mat in self.materials.items():
             T_func = dolfinx.fem.Function(self.V_t, name=f"Temperature_{name}")
@@ -84,7 +87,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
             cells = self.ft.find(self.label_map[name])
             dofs = dolfinx.fem.locate_dofs_topological(self.W.sub(1), self.fdim, cells)
-            self.u_mixed.sub(1).x.array[dofs] = mat["T_ref"]
+            self.sol_mixed.sub(1).x.array[dofs] = mat["T_ref"]
 
         for name, T_func in self.T.items():
             values = T_func.x.array
@@ -134,7 +137,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
             cells = self.ft.find(self.label_map[name])
             dofs = dolfinx.fem.locate_dofs_topological(self.W.sub(0), self.fdim, cells)
-            self.u_mixed.sub(0).x.array[dofs] = 0.0
+            self.sol_mixed.sub(0).x.array[dofs] = 0.0
 
         for name, u_func in self.u.items():
             values = u_func.x.array

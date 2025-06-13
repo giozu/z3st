@@ -49,13 +49,10 @@ class FiniteElementSetup:
         Initialize trial and test functions.
         """
 
-        # Test/Functions in mixed spaces
-        self.v_mixed = ufl.TestFunction(self.W)
-        self.v_m_mixed, self.v_t_mixed = ufl.split(self.v_mixed)
+        # Test/Trial in mixed spaces
+        (self.u_m_mixed, self.u_t_mixed) = ufl.TrialFunction(self.V_m_mixed), ufl.TrialFunction(self.V_t_mixed)
+        (self.v_m_mixed, self.v_t_mixed) = ufl.TestFunction(self.V_m_mixed), ufl.TestFunction(self.V_t_mixed)
         
-        self.u_mixed = dolfinx.fem.Function(self.W)
-        self.u_m_mixed, self.u_t_mixed = self.u_mixed.split()
-
         # Test and trial functions in separate spaces
         # Mechanics
         self.u_m = ufl.TrialFunction(self.V_m)
