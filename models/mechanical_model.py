@@ -16,21 +16,25 @@ class MechanicalModel:
         self.u = {}
         self.u_old = {}
 
-    def set_mechanical_boundary_conditions(self):
+    def set_mechanical_boundary_conditions(self, V_u_sub, V_u_map=None):
+        """
+        Apply mechanical boundary conditions for both staggered and mixed cases.
 
+        If V_u_map is None → staggered (non-mixed spaces).
+        If V_u_map is provided → mixed (collapsed subspace).
+
+        Parameters:
+            V_u_sub: FunctionSpace (collapsed displacement space)
+            V_u_map: DoF map from mixed to collapsed (only in mixed case)
+        """
         print(f"Setting mechanical boundary conditions...")
         mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
 
-        # self.V_u_sub: independent (collapsed) FunctionSpace
-        # self.V_u_map: NumPy array that maps the DoFs from the collapsed space back to the mixed space.
-        self.V_u_sub, self.V_u_map = self.W.sub(0).collapse() # need to .collapse() to define BCs / define Functions from it / interpolate
-        self.V_u_map = np.array(self.V_u_map, dtype=np.int32)
-
         dirichlet_bcs_list = []
-        
-        self.bcs_info.setdefault('neumann_thermal', [])
-        self.bcs_info['neumann_thermal'].clear()
-    
+
+        self.bcs_info.setdefault('traction', [])
+        self.bcs_info['traction'].clear()
+
         for mat_type, bc_list in mechanical_bcs_defs.items():
             for bc_info in bc_list:
                 region_name = bc_info.get("region")
@@ -52,13 +56,21 @@ class MechanicalModel:
                         continue
 
                     facets = self.ft.find(region_id)
-                    dofs = dolfinx.fem.locate_dofs_topological(self.V_u_sub, self.fdim, facets)
-                    
-                    bc = self.create_dirichlet_bc(self.mesh, self.V_u_sub, dofs, displacement, self.tdim)
 
+                    if V_u_map is None:
+                        # staggered mode
+                        dofs = dolfinx.fem.locate_dofs_topological(V_u_sub, self.fdim, facets)
+                    else:
+                        # mixed mode
+                        dofs_mixed = dolfinx.fem.locate_dofs_topological(
+                            (self.W.sub(0), V_u_sub), self.fdim, facets
+                        )
+                        dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
+                        dofs = V_u_map[dofs_mixed[:, 1]]
+
+                    bc = self.create_dirichlet_bc(self.mesh, V_u_sub, dofs, displacement, self.tdim)
                     dirichlet_bcs_list.append(bc)
                     print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
-
                     print("DirichletBC successfully created")
 
                 elif bc_type == "Neumann":
@@ -70,10 +82,10 @@ class MechanicalModel:
                     traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_val))
                     self.bcs_info['traction'].append({'id': region_id, 'value': traction_constant})
                     print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_val} Pa at region '{region_name}'")
-                
+
                 else:
                     print(f"  [WARNING] Unknown mechanical BC type '{bc_type}' for '{mat_type}'. Skipping.")
-        
+
         return dirichlet_bcs_list
 
     def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):

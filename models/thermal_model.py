@@ -76,13 +76,19 @@ class ThermalModel:
     #             else:
     #                 print(f"  [WARNING] Unknown BC type '{bc_type}' for '{mat_type}'")
 
-    def set_thermal_boundary_conditions(self):
+    def set_thermal_boundary_conditions(self, V_t_sub, V_t_map=None):
+        """
+        Apply thermal boundary conditions for both staggered and mixed cases.
 
+        If V_t_map is None → staggered (non-mixed spaces).
+        If V_t_map is provided → mixed (collapsed subspace).
+
+        Parameters:
+            V_t_sub: FunctionSpace (collapsed temperature space)
+            V_t_map: DoF map from mixed to collapsed (only in mixed case)
+        """
         print(f"Setting thermal boundary conditions...")
         thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
-        
-        self.V_t_sub, self.V_t_map = self.W.sub(1).collapse()
-        self.V_t_map = np.array(self.V_t_map, dtype=np.int32)
 
         dirichlet_bcs_list = []
 
@@ -111,15 +117,19 @@ class ThermalModel:
 
                     T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
 
-                    dofs_mixed = dolfinx.fem.locate_dofs_topological(
-                        (self.W.sub(1), self.V_t_sub), self.fdim, self.ft.find(region_id)
-                    )
-                    
-                    dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
+                    # locate dofs differently depending on mixed or staggered
+                    if V_t_map is None:
+                        # staggered mode (standard)
+                        dofs = dolfinx.fem.locate_dofs_topological(V_t_sub, self.fdim, self.ft.find(region_id))
+                    else:
+                        # mixed mode
+                        dofs_mixed = dolfinx.fem.locate_dofs_topological(
+                            (self.W.sub(1), V_t_sub), self.fdim, self.ft.find(region_id)
+                        )
+                        dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
+                        dofs = V_t_map[dofs_mixed[:, 1]]
 
-                    dofs_collapsed = self.V_t_map[dofs_mixed[:, 1]]
-
-                    bc = dolfinx.fem.dirichletbc(T_d, dofs_collapsed, self.V_t_sub)
+                    bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t_sub)
                     dirichlet_bcs_list.append(bc)
 
                     print(f"  [INFO] Dirichlet thermal BC on '{mat_type}' → {temperature} K at region '{region_name}'")

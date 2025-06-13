@@ -32,7 +32,7 @@ models:
   mechanical: False
 
 lhr:
-  - 250
+  - 0
 time:
   - 0
 n_steps: 1

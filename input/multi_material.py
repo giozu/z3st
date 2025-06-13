@@ -47,8 +47,18 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             print(f"Loading boundary conditions from 'conditions/boundary_conditions.yaml'")
             self.boundary_conditions = yaml.safe_load(f)
 
-        self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions()
-        self.mechanical_dirichlet_bcs = self.set_mechanical_boundary_conditions()
+        if self.coupling == "staggered":
+            self.V_t_sub = self.V_t
+            self.V_m_sub = self.V_m
+            self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions(self.V_t_sub)
+            self.mechanical_dirichlet_bcs = self.set_mechanical_boundary_conditions(self.V_m_sub)
+        else:
+            V_t_sub, V_t_map = self.W.sub(1).collapse()
+            V_t_map = np.array(V_t_map, dtype=np.int32)
+            V_u_sub, V_u_map = self.W.sub(0).collapse() # need to .collapse() to define BCs / define Functions from it / interpolate
+            V_u_map = np.array(V_u_map, dtype=np.int32)
+            self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions(V_t_sub, V_t_map)
+            self.mechanical_dirichlet_bcs = self.set_mechanical_boundary_conditions(V_u_sub, V_u_map)
 
         self.bcs = self.thermal_dirichlet_bcs + self.mechanical_dirichlet_bcs
     
