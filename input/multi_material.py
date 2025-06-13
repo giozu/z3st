@@ -143,7 +143,6 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             values = u_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
-
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
         print("\n[INFO] Solver settings:")
         print(f"  → Max iterations        : {max_iters}")

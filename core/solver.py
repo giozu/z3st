@@ -16,7 +16,7 @@ class Solver:
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
 
-        self.bcs_info = {}
+        self.bcs_info = {}    
 
     def solve_monolithic(self, tol=1e-8, max_iter=20):
 
@@ -24,21 +24,31 @@ class Solver:
             assemble_matrix_block, assemble_vector_block,
             apply_lifting, set_bc
         )
-        from petsc4py import PETSc
-        import dolfinx
-        import ufl
 
         print("\n[INFO] Starting monolithic thermo-mechanical solve")
-        print(f"  → Tolerance             : {tol}")
+        print(f"  → Solver type: Direct (LU/MUMPS)")
+
+        # --- Estrai i campi di soluzione da self.sol_mixed per usarli nel residuo ---
+        # NOTA: Basandomi su initialize_fields, l'ordine è (Displacement, Temperature)
+        u_sol_field = self.sol_mixed.sub(0)  # Componente simbolica dello Spostamento
+        T_sol_field = self.sol_mixed.sub(1)  # Componente simbolica della Temperatura
+
+        # --- Definisci Trial e Test functions con l'ordine corretto ---
+        # (u_m, u_t) e (v_m, v_t)
+        (u_m, u_t) = ufl.TrialFunctions(self.W)
+        (v_m, v_t) = ufl.TestFunctions(self.W)
 
         # --- Initialize block structures ---
-        L_blocks = []
-        a_blocks = [[None, None], [None, None]]
+        # La matrice e il residuo seguiranno l'ordine (u, T)
+        # Blocco 0: Equazione meccanica
+        # Blocco 1: Equazione termica
+        L_blocks = [0, 0] 
+        a_form_blocks = [[0, 0], [0, 0]] 
 
+        # --- Loop sui materiali per assemblare le forme variazionali ---
         for label in self.materials:
             material = self.materials[label]
             tag = self.label_map[label]
-
             dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
 
             # --- Material properties ---
@@ -52,108 +62,111 @@ class Solver:
             body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
             q_vol = self.q_third[label]
 
-            # --- Thermal residual ---
-            L_thermal = (k * ufl.inner(ufl.grad(self.u_t_mixed), ufl.grad(self.v_t_mixed))
-                        - q_vol * self.v_t_mixed) * dx_local
-            delta_T = self.u_t_mixed - T_ref
+            # --- Residuo Meccanico F_u (Blocco 0) ---
+            sigma_tot = self.sigma_mech(u_sol_field, material) - self.sigma_th(T_sol_field, material)
+            L_mechanical = (ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)) * dx_local
 
-            # --- Mechanical residual ---
-            epsilon = ufl.sym(ufl.grad(self.u_m_mixed))
-            sigma_m = lmbda * ufl.tr(epsilon) * ufl.Identity(self.tdim) + 2 * mu * epsilon
-            sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
-            sigma_tot = sigma_m - sigma_th
+            # --- Residuo Termico F_T (Blocco 1) ---
+            L_thermal = (k * ufl.inner(ufl.grad(T_sol_field), ufl.grad(v_t)) - q_vol * v_t) * dx_local
 
-            L_mechanical = (ufl.inner(sigma_tot, ufl.sym(ufl.grad(self.v_m_mixed)))
-                            - ufl.dot(body_force, self.v_m_mixed)) * dx_local
+            # --- Aggiungi i contributi ai residui totali (-F) ---
+            L_blocks[0] -= L_mechanical
+            L_blocks[1] -= L_thermal
 
-            # --- Assemble full residuals (sum over materials) ---
-            if not L_blocks:
-                L_blocks = [L_thermal, L_mechanical]
-            else:
-                L_blocks[0] += L_thermal
-                L_blocks[1] += L_mechanical
+            # --- Jacobiana (Bilinear forms for the matrix A = J) ---
+            # Ordine della matrice:
+            # | A_uu  A_uT |
+            # | A_Tu  A_TT |
+            
+            # Blocco (0,0): A_uu = d(F_u)/d(u) (meccanico)
+            epsilon_m_trial = ufl.sym(ufl.grad(u_m))
+            sigma_m_trial = lmbda * ufl.tr(epsilon_m_trial) * ufl.Identity(self.tdim) + 2 * mu * epsilon_m_trial
+            a00 = ufl.inner(sigma_m_trial, ufl.sym(ufl.grad(v_m))) * dx_local
+            
+            # Blocco (0,1): A_uT = d(F_u)/d(T) (accoppiamento termo-meccanico)
+            a01 = ufl.inner(-alpha * (3 * lmbda + 2 * mu) * ufl.Identity(self.gdim) * u_t, ufl.sym(ufl.grad(v_m))) * dx_local
 
-            # --- Bilinear forms ---
+            # Blocco (1,0): A_Tu = d(F_T)/d(u) (nullo in questa formulazione)
+            a10 = None
+            
+            # Blocco (1,1): A_TT = d(F_T)/d(T) (termico)
+            a11 = k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx_local
+            
+            current_blocks = [[a00, a01], [a10, a11]]
+            for i in range(2):
+                for j in range(2):
+                    if current_blocks[i][j] is not None:
+                        a_form_blocks[i][j] += current_blocks[i][j]
 
-            # a_00: thermal self derivative
-            a_blocks[0][0] = (k * ufl.inner(ufl.grad(self.u_t_mixed), ufl.grad(self.v_t_mixed))) * dx_local
-
-            # a_01: no coupling temperature -> mechanics directly
-            a_blocks[0][1] = 0
-
-            # a_10: explicit thermo-mechanical coupling
-            thermal_coupling = -(3 * lmbda + 2 * mu) * alpha * ufl.Identity(self.gdim)
-            a_blocks[1][0] = ufl.inner(thermal_coupling * self.u_t_mixed, ufl.sym(ufl.grad(self.v_m_mixed))) * dx_local
-
-            # a_11: mechanical
-            epsilon_m = ufl.sym(ufl.grad(self.u_m_mixed))
-            sigma_m = lmbda * ufl.tr(epsilon_m) * ufl.Identity(self.tdim) + 2 * mu * epsilon_m
-            a_blocks[1][1] = ufl.inner(sigma_m, ufl.sym(ufl.grad(self.v_m_mixed))) * dx_local
-
-        # --- Neumann boundary conditions (thermal) ---
+        # --- Boundary conditions ---
         if 'neumann_thermal' in self.bcs_info:
             for bc_info in self.bcs_info['neumann_thermal']:
                 ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                L_blocks[0] -= bc_info['value'] * self.v_t_mixed * ds_local
+                L_blocks[1] += bc_info['value'] * v_t * ds_local # Aggiungi a -F_T
 
-        # --- Tractions (mechanical) ---
         if 'traction' in self.bcs_info:
             for bc_info in self.bcs_info['traction']:
                 ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                traction_vector = bc_info['value'] * ufl.FacetNormal(self.mesh)
-                L_blocks[1] -= ufl.dot(traction_vector, self.v_m_mixed) * ds_local
+                L_blocks[0] += ufl.dot(bc_info['value'], v_m) * ds_local # Aggiungi a -F_u
 
-        # --- Assemble block matrix and RHS ---
-        a_blocks = [[dolfinx.fem.form(a_ij) if a_ij is not None else None for a_ij in row] for row in a_blocks]
-        A = assemble_matrix_block(a_blocks, bcs=self.bcs)
+        # --- Assemblaggio e Soluzione ---
+        a_compiled = [[dolfinx.fem.form(a_ij) if a_ij != 0 else None for a_ij in row] for row in a_form_blocks]
+        L_compiled = [dolfinx.fem.form(L_i) for L_i in L_blocks]
+        
+        print("[INFO] Assembling matrix and vector...")
+        A = assemble_matrix_block(a_compiled, bcs=self.bcs)
         A.assemble()
+        b = assemble_vector_block(L_compiled, a_compiled, bcs=self.bcs)
 
-        b = assemble_vector_block(L_blocks, a_blocks, bcs=self.bcs)
-        apply_lifting(b, a_blocks, bcs=self.bcs)
+        for bc in self.bcs:
+            space_index = -1
+            if bc.function_space == self.V_u_sub:
+                space_index = 0  # Mechanical block
+            elif bc.function_space == self.V_t_sub:
+                space_index = 1  # Thermal block
+
+            if space_index != -1:
+                dolfinx.fem.petsc.apply_lifting(b, a_compiled[space_index], [bc])
+
         b.ghostUpdate(addv=PETSc.InsertMode.ADD, mode=PETSc.ScatterMode.REVERSE)
-        set_bc(b, self.bcs)
+        dolfinx.fem.petsc.set_bc(b, self.bcs)
 
-        # --- PETSc solver with FieldSplit ---
+        # A.zeroRows([bc.dof_indices() for bc in self.bcs], diag_val=1.0)
+
         ksp = PETSc.KSP().create(self.mesh.comm)
         ksp.setOperators(A)
-        ksp.setType("gmres")
+        ksp.setType(PETSc.KSP.Type.PREONLY)
         pc = ksp.getPC()
-        pc.setType("fieldsplit")
-        pc.setFieldSplitType(PETSc.PC.CompositeType.SCHUR)
-
-        sub_ksps = pc.getFieldSplitSubKSP()
-
-        # Thermal block
-        sub_ksps[0].setType("preonly")
-        sub_ksps[0].getPC().setType("lu")
-
-        # Mechanical block
-        sub_ksps[1].setType("preonly")
-        sub_ksps[1].getPC().setType("hypre")
-        sub_ksps[1].getPC().setHYPREType("boomeramg")
-
-        # --- Solve ---
+        pc.setType(PETSc.PC.Type.LU)
+        pc.setFactorSolverType("mumps")
+        
         x = A.createVecRight()
+        print("[INFO] Solving the linear system with a direct solver...")
         ksp.solve(b, x)
-        self.w.x.array[:] = x.array_r
 
-        # --- Extract fields ---
-        T_sol = self.w.sub(0).collapse()
-        T_sol.name = "Temperature"
+        # --- Aggiorna la funzione soluzione globale ---
+        self.sol_mixed.x.array[:] = x.array_r
 
-        u_sol = self.w.sub(1).collapse()
-        u_sol.name = "Displacement"
+        # --- Estrai i campi per il post-processing ---
+        # Usiamo i nomi che hai già definito nella tua classe, se esistono
+        u_sol_collapsed = self.sol_mixed.sub(0).collapse()
+        T_sol_collapsed = self.sol_mixed.sub(1).collapse()
+        
+        if hasattr(self, 'u_sol'):
+            self.u_sol.interpolate(u_sol_collapsed)
+        if hasattr(self, 'T_sol'):
+            self.T_sol.interpolate(T_sol_collapsed)
 
-        print(f"Min temperature: {T_sol.x.array.min()}")
-        print(f"Max temperature: {T_sol.x.array.max()}")
+        print(f"Min displacement component: {u_sol_collapsed.x.array.min():.4e}")
+        print(f"Max displacement component: {u_sol_collapsed.x.array.max():.4e}")
+        print(f"Min temperature: {T_sol_collapsed.x.array.min():.4e}")
+        print(f"Max temperature: {T_sol_collapsed.x.array.max():.4e}")
 
-        print(f"Min displacement: {u_sol.x.array.min()}")
-        print(f"Max displacement: {u_sol.x.array.max()}")
-
+        # --- Aggiorna i campi per materiale ---
         print("[INFO] Updating per-material solution fields...")
-        for name in self.materials.keys():
-            self.T[name].interpolate(T_sol)
-            self.u[name].interpolate(u_sol)
+        for name in self.materials.keys():        
+            self.T[name].interpolate(T_sol_collapsed)
+            self.u[name].interpolate(u_sol_collapsed)
 
         print("[INFO] Global solution fields updated.")
 
