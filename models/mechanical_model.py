@@ -61,9 +61,6 @@ class MechanicalModel:
 
                     print("DirichletBC successfully created")
 
-                    dirichlet_bcs_list.append(bc)
-                    print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
-
                 elif bc_type == "Neumann":
                     traction_val = bc_info.get("traction")
                     if traction_val is None:

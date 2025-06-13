@@ -3,6 +3,7 @@ thermal_bcs:
     - type: Dirichlet
       region: face_xx_0
       temperature: 300.0
+
     # - type: Neumann
     #   region: bottom
     #   flux: -300.0 # (negative if exiting the surface)

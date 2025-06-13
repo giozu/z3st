@@ -11,7 +11,7 @@ from dolfinx.la import Norm
 class Solver:
     def __init__(self):
         print("__Solver initializer__")
-        self.relax_T = 0.5
+        self.relax_T = 0.2
         self.relax_u = 0.5
 
         print("  [INFO] Applied relaxation factor:")
@@ -189,7 +189,7 @@ class Solver:
         for name in self.materials.keys():
             self.T[name].interpolate(T_sol)
             self.u[name].interpolate(u_sol)
-
+  
     def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
         print("[INFO] Starting staggered thermo-mechanical solver")
         print(f"  → Max iterations        : {max_iter}")
@@ -198,92 +198,72 @@ class Solver:
         print(f"  → Thermal KSP tolerance   : {tol_th:.1e}")
         print(f"  → Mechanical KSP tolerance: {tol_mech:.1e}")
 
-        # --- Setup Iniziale ---
+        # --- Initial Setup ---
         comm = self.mesh.comm
-        T_sol = self.T['fuel']  # Funzione di riferimento per la soluzione
-        u_sol = self.u['fuel']  # Funzione di riferimento per la soluzione
+        T_sol = self.T['fuel']  # Reference function for the temperature solution
+        u_sol = self.u['fuel']  # Reference function for the displacement solution
 
-        # Funzioni per salvare lo stato precedente
+        # Functions to store the previous state
         T_old = dolfinx.fem.Function(T_sol.function_space)
         u_old = dolfinx.fem.Function(u_sol.function_space)
 
-        # Contatori per il logging dei residui
-        self.i_th = {name: 0 for name in self.materials}
-        self.i_mech = {name: 0 for name in self.materials}
+        # Create thermal BCs
+        bcs_t = self.thermal_dirichlet_bcs
+        bcs_m = self.mechanical_dirichlet_bcs
+        print(f"[INFO] Loaded {len(bcs_t)} thermal and {len(bcs_m)} mechanical Dirichlet BCs for the staggered solver.")
 
-        W_m_sub, W_t_sub = self.W.sub(0), self.W.sub(1) 
-
-        # Estrai le BC per ogni fisica (una sola volta)
-        bcs_t = []
-        bcs_m = []
-        for bc in self.bcs:
-            # bc.function_space è lo spazio su cui la BC è definita (probabilmente self.W)
-            # W_t_sub.collapse() restituisce lo spazio funzionale "collassato" che possiamo confrontare
-            # per vedere se la BC agisce su quella parte del problema misto.
-            if bc.function_space == W_t_sub.collapse()[0]:
-                bcs_t.append(bc)
-            elif bc.function_space == W_m_sub.collapse()[0]:
-                bcs_m.append(bc)
-
-        # --- Ciclo di Staggering ---
+        # --- Staggering Loop ---
         for iteration in range(max_iter):
             print(f"\n--- Staggering Iteration {iteration+1}/{max_iter} ---")
 
-            # Salva lo stato precedente per il controllo di convergenza e il rilassamento
+            # Store previous state for convergence check and relaxation
             T_old.x.array[:] = T_sol.x.array
             u_old.x.array[:] = u_sol.x.array
 
             # =========================================================
-            #  1. RISOLUZIONE DEL PROBLEMA TERMICO (globale)
+            #  1. SOLVE THERMAL SUB-PROBLEM (global)
             # =========================================================
             if self.on["thermal"]:
                 print("[INFO] Assembling and solving GLOBAL thermal problem...")
-                
-                # --- INIZIO MODIFICA ---
                 u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
-                # Inizializza a 0. Le forme verranno popolate nel ciclo.
-                a_t = 0
-                L_t = 0
-                # --- FINE MODIFICA ---
+                a_t, L_t = 0, 0
 
-                # Assembla le forme variazionali su tutti i materiali
                 for label, material in self.materials.items():
+                    if label not in self.label_map:
+                        print(f"[WARNING] Material label '{label}' not found in label_map → skipping.")
+                        continue
+
                     tag = self.label_map[label]
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
                     k = dolfinx.fem.Constant(self.mesh, material["k"])
-                    q_vol = self.q_third[label]
-                    
-                    # Ora usiamo ufl.inner per la sorgente volumetrica
+                    q_vol = dolfinx.fem.Constant(self.mesh, self.q_third[label])  # <-- metti SEMPRE come dolfin Constant
+
                     a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
-                    L_t += ufl.inner(dolfinx.fem.Constant(self.mesh, q_vol), v_t) * dx
+                    L_t += q_vol * v_t * dx
                 
-                # Applica Neumann BC
+                # Apply Neumann BCs
                 if 'neumann_thermal' in self.bcs_info:
                     for bc_info in self.bcs_info['neumann_thermal']:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                        # E anche qui, per coerenza
-                        L_t += ufl.inner(dolfinx.fem.Constant(self.mesh, bc_info['value']), v_t) * ds
+                        L_t += dolfinx.fem.Constant(self.mesh, bc_info['value']) * v_t * ds
                 
-                # Definisci e risolvi il problema lineare
+                # Define and solve the linear problem
                 petsc_opts = {"ksp_type": "cg", "pc_type": "gamg", "ksp_rtol": tol_th}
                 problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_sol, petsc_options=petsc_opts)
                 problem_t.solve()
-            
-            # Applica rilassamento
-            T_sol.x.array[:] = self.relax_T * T_sol.x.array + (1 - self.relax_T) * T_old.x.array
+                
+                # Apply relaxation
+                T_sol.x.array[:] = self.relax_T * T_sol.x.array + (1 - self.relax_T) * T_old.x.array
 
             # =========================================================
-            #  2. RISOLUZIONE DEL PROBLEMA MECCANICO (globale)
+            #  2. SOLVE MECHANICAL SUB-PROBLEM (global)
             # =========================================================
             if self.on["mechanical"]:
                 print("[INFO] Assembling and solving GLOBAL mechanical problem...")
-                # --- INIZIO MODIFICA ---
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
-                # Inizializza a 0
-                a_m = 0
-                L_m = 0
-                # --- FINE MODIFICA ---
-                # Assembla le forme variazionali su tutti i materiali
+                a_m, L_m = 0, 0
+                
+                # Assemble variational forms over all materials
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
@@ -298,83 +278,75 @@ class Solver:
                     epsilon = lambda u: ufl.sym(ufl.grad(u))
                     sigma_m = lambda u: lmbda * ufl.tr(epsilon(u)) * ufl.Identity(self.tdim) + 2 * mu * epsilon(u)
                     
-                    delta_T = T_sol - T_ref # Usa la T appena calcolata
+                    delta_T = T_sol - T_ref # Use the newly computed temperature
                     sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
                     
                     a_m += ufl.inner(sigma_m(u_m), epsilon(v_m)) * dx
                     L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(sigma_th, epsilon(v_m)) * dx
 
-                # Applica Traction BC
+                # Apply Traction BCs
                 if 'traction' in self.bcs_info:
                     for bc_info in self.bcs_info['traction']:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                        L_m += ufl.dot(bc_info['value'], v_m) * ds # Assumendo che 'value' sia già un vettore
+                        # Assuming bc_info['value'] is a vector
+                        L_m += ufl.dot(bc_info['value'], v_m) * ds 
 
-                # Definisci e risolvi il problema lineare
-                petsc_opts = {"ksp_type": "cg", "pc_type": "gamg", "ksp_rtol": tol_mech, "pc_gamg_coarse_eq_limit": 1000}
-                problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts)
+                # Define and solve the linear problem
+                petsc_opts_mech = {"ksp_type": "cg", "pc_type": "gamg", "ksp_rtol": tol_mech, "pc_gamg_coarse_eq_limit": 1000}
+                problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts_mech)
                 problem_m.solve()
 
-                # Applica rilassamento
+                # Apply relaxation
                 u_sol.x.array[:] = self.relax_u * u_sol.x.array + (1 - self.relax_u) * u_old.x.array
-            
+                
             # =========================================================
-            #  3. CONTROLLO CONVERGENZA e LOGGING
+            #  3. CONVERGENCE CHECK and LOGGING
             # =========================================================
-            
-
-            # Sincronizza i dati dai processi ghost prima delle operazioni vettoriali
+            # Synchronize ghost values before vector operations
             T_sol.x.scatter_forward()
             T_old.x.scatter_forward()
             u_sol.x.scatter_forward()
             u_old.x.scatter_forward()
 
-            # Accedi ai vettori PETSc sottostanti
-            vec_T_now = T_sol.x.petsc_vec
-            vec_T_old = T_old.x.petsc_vec
-            vec_u_now = u_sol.x.petsc_vec
-            vec_u_old = u_old.x.petsc_vec
+            # Access the underlying PETSc vectors
+            vec_T_now, vec_T_old = T_sol.x.petsc_vec, T_old.x.petsc_vec
+            vec_u_now, vec_u_old = u_sol.x.petsc_vec, u_old.x.petsc_vec
 
-            # Calcola la differenza: diff = vec_now - vec_old
-            # 1. Crea una copia del vettore attuale
-            diff_T = vec_T_now.copy()
-            diff_u = vec_u_now.copy()
-            
-            # 2. Sottrai il vecchio vettore (diff = 1*diff - 1*vec_old)
-            diff_T.axpy(-1.0, vec_T_old)
-            diff_u.axpy(-1.0, vec_u_old)
+            # Compute the difference: diff = vec_now - vec_old
+            diff_T = vec_T_now.copy(); diff_T.axpy(-1.0, vec_T_old)
+            diff_u = vec_u_now.copy(); diff_u.axpy(-1.0, vec_u_old)
 
-            # Calcola la norma L2 del vettore differenza.
-            # Questo è gestito correttamente in parallelo da PETSc.
+            # Compute the L2 norm of the difference vector
             norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
             norm_du = diff_u.norm(PETSc.NormType.NORM_2)
-            
-            # --- FINE BLOCCO DEFINITIVO ---
             
             print(f"\n[Convergence] Global ||ΔT|| = {norm_dT:.3e} (target: {tol_T:.1e})")
             print(f"[Convergence] Global ||Δu|| = {norm_du:.3e} (target: {tol_u:.1e})")
 
-
             if norm_dT < tol_T and norm_du < tol_u:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
-                # Aggiorna tutti i campi nei dizionari self.T e self.u
+
+                # --- FINAL SOLUTION SUMMARY ---
+                T_sol.x.scatter_forward()
+                u_sol.x.scatter_forward()
+                print("\n--- FINAL SOLUTION SUMMARY ---")
+                print(f"Min/Max temperature: {T_sol.x.array.min():.2f} / {T_sol.x.array.max():.2f} K")
+                u_magnitude = np.sqrt(np.sum(u_sol.x.array.reshape(-1, 3)**2, axis=1))
+                print(f"Min/Max displacement magnitude: {u_magnitude.min():.3e} / {u_magnitude.max():.3e} m")
+                print("----------------------------\n")
+                
+                # Update all fields in the self.T and self.u dictionaries
                 for name in self.materials.keys():
                     self.T[name].interpolate(T_sol)
                     self.u[name].interpolate(u_sol)
-                return True # Ritorna successo
+                return True # Return success
 
-            # Il tuo problema a senso unico dovrebbe convergere qui
-            if iteration == 0:
-                print("[INFO] One-way coupling: convergence should be achieved.")
-                # Puoi decidere se forzare un break qui o lasciare che il ciclo verifichi la tolleranza.
-
-        # Se il ciclo finisce senza convergenza
+        # This part is executed if the for loop finishes without convergence
         print("\n[WARNING] Staggered solver did not converge within the maximum number of iterations.")
-        # Aggiorna comunque i campi con l'ultima soluzione calcolata
         for name in self.materials.keys():
             self.T[name].interpolate(T_sol)
             self.u[name].interpolate(u_sol)
-        return False # Ritorna fallimento
+        return False # Return failure
 
     def solve_staggered_old(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
             print("[INFO] Starting staggered thermo-mechanical solver")

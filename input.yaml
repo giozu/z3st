@@ -29,7 +29,7 @@ solver_settings:
 
 models:
   thermal: True
-  mechanical: True
+  mechanical: False
 
 lhr:
   - 250
