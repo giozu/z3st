@@ -27,17 +27,12 @@ class FiniteElementSetup:
         # print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
         # print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
 
-        # Mixed-function space:
-        # basix.ufl.mixed_element to create a mixed element for the displacement and temperature fields. 
-        # We choose the Taylor-Hood finite element pair for this problem.
-        # element_u = basix.ufl.element(family="Lagrange", cell=self.mesh.basix_cell(), degree=2, shape=(self.mesh.geometry.dim,))
-        # element_t = basix.ufl.element(family="Lagrange", cell=self.mesh.basix_cell(), degree=1)
-        element_t = self.V_t.ufl_element()
-        element_u = self.V_m.ufl_element()
-        
-        mixed_element = basix.ufl.mixed_element([element_t, element_u])
-        
-        self.W = dolfinx.fem.functionspace(self.mesh, mixed_element)
+        # --- Mixed function spaces ---
+        P1_3 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, shape=(self.tdim,), dtype=dolfinx.default_real_type)
+        P1_1 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, dtype=dolfinx.default_real_type)
+
+        self.W = dolfinx.fem.functionspace(self.mesh, basix.ufl.mixed_element([P1_3, P1_1]))
+        self.V_m_mixed, self.V_t_mixed = dolfinx.fem.functionspace(self.mesh, P1_3), dolfinx.fem.functionspace(self.mesh, P1_1)
 
         # In FEniCSx, "CG" is a shorthand for "Lagrange" for scalar fields, but it does not account for vector-valued fields by default. 
         # Hence, "Lagrange" provides more flexibility when specifying vector-valued elements or higher dimensions 
@@ -45,20 +40,21 @@ class FiniteElementSetup:
 
         print("Mechanical function space (V_m):", self.V_m)
         print("Thermal function space (V_t):", self.V_t)
-        print("Mixed-element function space (W):", self.W)
+
+        print("Mechanical function space (V_m_mixed):", self.V_m_mixed)
+        print("Thermal function space (V_t_mixed):", self.V_t_mixed)
 
     def _initialize_functions(self):
         """
         Initialize trial and test functions.
         """
 
-        # Test and trial functions in mixed spaces
-        # Define one trial function and one test function that contain both displacement and temperature:
-        self.w = dolfinx.fem.Function(self.W) # ufl.TrialFunction wrong for NonLinearProblem
-        self.u_t_mixed, self.u_m_mixed = ufl.split(self.w)
-
+        # Test/Functions in mixed spaces
         self.v_mixed = ufl.TestFunction(self.W)
-        self.v_t_mixed, self.v_m_mixed = ufl.split(self.v_mixed)
+        self.v_m_mixed, self.v_t_mixed = ufl.split(self.v_mixed)
+        
+        self.u_mixed = dolfinx.fem.Function(self.W)
+        self.u_m_mixed, self.u_t_mixed = self.u_mixed.split()
 
         # Test and trial functions in separate spaces
         # Mechanics
@@ -74,7 +70,6 @@ class FiniteElementSetup:
 
         # print("Shape of thermal trial function (u_t):", self.u_t.ufl_shape, "- Expected: () for a scalar function space")
         # print("Shape of thermal test function (v_t):", self.v_t.ufl_shape, "- Expected: () for a scalar function space")
-
 
     def parse_matrix_file(self, filename = 'stiffness_matrix.txt'):
         """

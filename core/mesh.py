@@ -105,8 +105,10 @@ class Mesh:
         except Exception as e:
             raise ValueError(f"Error reading mesh file {self.mesh_file}: {e}")
         
-    def locateThermalDofs(self, label):
-        return dolfinx.fem.locate_dofs_topological(self.V_t, self.fdim, self.ft.find(label))
+    def locateThermalDofs(self, label, V_t=None):
+        if V_t is None:
+            V_t = self.V_t
+        return dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.ft.find(label))
     
     def locateMechanicalDofs(self, label):
         return dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(label))

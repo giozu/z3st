@@ -18,18 +18,19 @@ class MechanicalModel:
 
     def set_mechanical_boundary_conditions(self):
 
-        print(f"Setting Mechanical boundary conditions...")
+        print(f"Setting mechanical boundary conditions...")
         mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
 
-        V_u_sub, _ = self.W.sub(1).collapse()
+        # self.V_u_sub: independent (collapsed) FunctionSpace
+        # self.V_u_map: NumPy array that maps the DoFs from the collapsed space back to the mixed space.
+        self.V_u_sub, self.V_u_map = self.W.sub(0).collapse() # need to .collapse() to define BCs / define Functions from it / interpolate
+        self.V_u_map = np.array(self.V_u_map, dtype=np.int32)
 
         dirichlet_bcs_list = []
         
-        if 'traction' not in self.bcs_info:
-            self.bcs_info['traction'] = []
-        else:
-            self.bcs_info['traction'].clear()
-
+        self.bcs_info.setdefault('neumann_thermal', [])
+        self.bcs_info['neumann_thermal'].clear()
+    
         for mat_type, bc_list in mechanical_bcs_defs.items():
             for bc_info in bc_list:
                 region_name = bc_info.get("region")
@@ -49,15 +50,26 @@ class MechanicalModel:
                     if displacement is None:
                         print(f"  [WARNING] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement. Skipping.")
                         continue
+
+                    facets = self.ft.find(region_id)
+                    dofs = dolfinx.fem.locate_dofs_topological(self.V_u_sub, self.fdim, facets)
                     
-                    dofs = dolfinx.fem.locate_dofs_topological(
-                        (self.W.sub(1), V_u_sub), self.fdim, self.ft.find(region_id)
-                    )
+                    # 1 option to create a BCs, with a Constant
+                    displacement_array = np.array(displacement, dtype=PETSc.ScalarType) # no new axies, Constant wants a flat array
+                    u_d = np.array(displacement_array, dtype=PETSc.ScalarType)
+                    bc = dolfinx.fem.dirichletbc(dolfinx.fem.Constant(self.mesh, u_d), dofs, self.V_u_sub)
 
-                    u_d = dolfinx.fem.Function(V_u_sub)
-                    u_d.interpolate(lambda x: np.array(displacement, dtype=PETSc.ScalarType)[:, np.newaxis]*np.ones((1, x.shape[1])))
+                    # 2 option to create a BCs, with a Function
+                    # displacement_array = np.array(displacement, dtype=PETSc.ScalarType)[:, np.newaxis]
+                    # u_d = dolfinx.fem.Function(self.V_u_sub)
+                    # u_d.interpolate(lambda x: np.tile(displacement_array, (1, x.shape[1])))
+                    # bc = dolfinx.fem.dirichletbc(u_d, dofs)
 
-                    bc = dolfinx.fem.dirichletbc(u_d, dofs, self.W.sub(1))
+                    dirichlet_bcs_list.append(bc)
+                    print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
+
+                    print("DirichletBC successfully created")
+
                     dirichlet_bcs_list.append(bc)
                     print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
 

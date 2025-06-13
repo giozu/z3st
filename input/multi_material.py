@@ -53,6 +53,9 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         self.bcs = self.thermal_dirichlet_bcs + self.mechanical_dirichlet_bcs
     
     def initialize_fields(self):
+        print(f"-----------------")
+        print(f"initialize_fields")
+        print(f"-----------------")
         # --- Temperature field ---
         # v_t: Test Function
         # - Symbolic function defined as v_t = TestFunction(V_t)
@@ -78,6 +81,10 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             T_func = dolfinx.fem.Function(self.V_t, name=f"Temperature_{name}")
             T_func.x.array[:] = mat["T_ref"]
             self.T[name] = T_func
+
+            cells = self.ft.find(self.label_map[name])
+            dofs = dolfinx.fem.locate_dofs_topological(self.W.sub(1), self.fdim, cells)
+            self.u_mixed.sub(1).x.array[dofs] = mat["T_ref"]
 
         for name, T_func in self.T.items():
             values = T_func.x.array
@@ -125,16 +132,15 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             u_func.x.array[:] = 0.0
             self.u[name] = u_func
 
+            cells = self.ft.find(self.label_map[name])
+            dofs = dolfinx.fem.locate_dofs_topological(self.W.sub(0), self.fdim, cells)
+            self.u_mixed.sub(0).x.array[dofs] = 0.0
+
         for name, u_func in self.u.items():
             values = u_func.x.array
             print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
-        # --- Displacement / temperature ---
-        w_sub_T = self.w.sub(0)
-        w_sub_u = self.w.sub(1)
-        w_sub_T.x.array[:] = mat["T_ref"]
-        w_sub_u.x.array[:] = 0.0
-        
+
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
         print("\n[INFO] Solver settings:")
         print(f"  → Max iterations        : {max_iters}")

@@ -78,17 +78,16 @@ class ThermalModel:
 
     def set_thermal_boundary_conditions(self):
 
-        print(f"Setting Thermal boundary conditions...")
+        print(f"Setting thermal boundary conditions...")
         thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
         
-        self.V_t_sub, self.V_t_map = self.W.sub(0).collapse()
+        self.V_t_sub, self.V_t_map = self.W.sub(1).collapse()
+        self.V_t_map = np.array(self.V_t_map, dtype=np.int32)
 
         dirichlet_bcs_list = []
-        
-        if 'neumann_thermal' not in self.bcs_info:
-            self.bcs_info['neumann_thermal'] = []
-        else:
-            self.bcs_info['neumann_thermal'].clear()
+
+        self.bcs_info.setdefault('neumann_thermal', [])
+        self.bcs_info['neumann_thermal'].clear()
 
         for mat_type, bc_list in thermal_bcs_defs.items():
             for bc_info in bc_list:
@@ -111,47 +110,18 @@ class ThermalModel:
                         continue
 
                     T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
-                    # T_d = np.full((self.V_t_sub.dofmap.index_map.size_local,), temperature, dtype=PETSc.ScalarType)
 
-                    # V_t_sub scalar space from W.sub(0).collapse()
-                    # W.sub(0) subspace of mixed space W
-                    # Dopo locate_dofs_topological
                     dofs_mixed = dolfinx.fem.locate_dofs_topological(
-                        (self.W.sub(0), self.V_t_sub), self.fdim, self.ft.find(region_id)
+                        (self.W.sub(1), self.V_t_sub), self.fdim, self.ft.find(region_id)
                     )
-
-                    print(f"Raw dofs_mixed (before cast): {dofs_mixed}")
-                    print(f"Raw dofs_mixed type: {type(dofs_mixed)}")
-
-                    if not isinstance(dofs_mixed, np.ndarray):
-                        dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
-                        print("Converted dofs_mixed to numpy array")
-
-                    print(f"dofs_mixed shape: {dofs_mixed.shape}")
-                    print(f"dofs_mixed sample values:\n{dofs_mixed}")
-
-                    self.V_t_map = np.array(self.V_t_map, dtype=np.int32)
-                    print(f"V_t_map shape: {self.V_t_map.shape}")
-                    print(f"V_t_map sample values:\n{self.V_t_map}")
+                    
+                    dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
 
                     dofs_collapsed = self.V_t_map[dofs_mixed[:, 1]]
-                    print(f"Computed dofs_collapsed: {dofs_collapsed}")
-                    print(f"dofs_collapsed shape: {dofs_collapsed.shape}")
 
-                    print("Preparing DirichletBC call with:")
-                    print(f"    T_d: {T_d}")
-                    print(f"    dofs_collapsed: {dofs_collapsed}")
-                    print(f"    V_t_sub: {self.V_t_sub}")
-
-                    # Creazione BC
-                    bc = dolfinx.fem.dirichletbc(
-                        T_d,
-                        dofs_collapsed,
-                        self.V_t_sub  # collapsed functionspace
-                    )
-                    print("DirichletBC successfully created")
-
+                    bc = dolfinx.fem.dirichletbc(T_d, dofs_collapsed, self.V_t_sub)
                     dirichlet_bcs_list.append(bc)
+
                     print(f"  [INFO] Dirichlet thermal BC on '{mat_type}' → {temperature} K at region '{region_name}'")
 
                 elif bc_type == "Neumann":
@@ -159,11 +129,11 @@ class ThermalModel:
                     if flux is None:
                         print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no flux. Skipping.")
                         continue
-                    
+
                     flux_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(flux))
                     self.bcs_info['neumann_thermal'].append({'id': region_id, 'value': flux_constant})
                     print(f"  [INFO] Neumann thermal BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
-                
+
                 else:
                     print(f"  [WARNING] Unknown thermal BC type '{bc_type}' for '{mat_type}'. Skipping.")
 
