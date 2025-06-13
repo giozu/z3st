@@ -24,8 +24,8 @@ solver_settings:
   tol_th: 1e-8
   tol_mech: 1e-8
   tol: 1e-4
-  n_iter_max: 5
-  coupling: monolithic # [monolithic, staggered]
+  n_iter_max: 100
+  coupling: staggered # [monolithic, staggered]
 
 models:
   thermal: True

@@ -5,6 +5,7 @@ import numpy as np
 import os
 from dolfinx import log
 from mpi4py import MPI
+from dolfinx.fem.petsc import LinearProblem
 
 class Solver:
     def __init__(self):
@@ -67,6 +68,7 @@ class Solver:
         import ufl
 
         print("\n[INFO] Starting monolithic thermo-mechanical solve")
+        print(f"  → Tolerance              : {tol}")
 
         # Extract unknowns from mixed solution. Based on the definition of self.W:
         # u_m is the function for Displacement (from sub-space 0)
@@ -129,11 +131,38 @@ class Solver:
         problem = NonlinearProblem(F, self.sol_mixed, bcs=self.bcs)
         solver = NewtonSolver(self.mesh.comm, problem)
 
+        ksp = solver.krylov_solver
+        opts = PETSc.Options()
+        option_prefix = ksp.getOptionsPrefix()
+
+        # Direct solver (LU)
+        print("ksp_type, preonly")
+        opts[f"{option_prefix}ksp_type"] = "preonly"
+        opts[f"{option_prefix}pc_type"] = "lu"
+        opts[f"{option_prefix}pc_factor_mat_solver_type"] = "mumps"
+        opts[f"{option_prefix}ksp_monitor"] = None
+
+        # snes_prefix = solver.getOptionsPrefix()
+        # opts[f"{snes_prefix}snes_linesearch_type"] = "basic"
+        # opts[f"{snes_prefix}snes_monitor"] = None
+
+        # GAMG
+        # print("pc_gamg_type, agg")
+        # opts[f"{option_prefix}pc_gamg_type"] = "agg"
+        # opts[f"{option_prefix}pc_gamg_coarse_eq_limit"] = 1000
+        # opts[f"{option_prefix}mg_levels_ksp_type"] = "chebyshev"
+        # opts[f"{option_prefix}mg_levels_pc_type"] = "sor"
+        # opts[f"{option_prefix}mg_levels_esteig_ksp_type"] = "cg"
+        # opts[f"{option_prefix}mg_levels_ksp_chebyshev_esteig_steps"] = 20
+        # opts[f"{option_prefix}ksp_monitor"] = None
+
+        ksp.setFromOptions()
+
         # Set Newton solver options
-        solver.atol = 1e-8
-        solver.rtol = 1e-8
+        solver.atol = tol
+        solver.rtol = tol
         solver.convergence_criterion = "incremental"
-        solver.max_it = max_iter # Using the function argument
+        solver.max_it = max_iter
 
         # Solve
         print("[INFO] Solving monolithic nonlinear problem...")
@@ -159,8 +188,143 @@ class Solver:
         for name in self.materials.keys():
             self.T[name].interpolate(T_sol)
             self.u[name].interpolate(u_sol)
+    def solve_staggered(self, max_iter=10, tol_u=1e-6, tol_T=1e-6, tol_mech=1e-8, tol_th=1e-8):
+        """
+        Solves the coupled thermo-mechanical problem using a staggered (partitioned)
+        approach with individual tolerances.
 
-    def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
+        Args:
+            max_iter (int): Maximum number of staggering iterations between physics.
+            tol_u (float): Convergence tolerance for the displacement field norm
+                           between staggering iterations.
+            tol_T (float): Convergence tolerance for the temperature field norm
+                           between staggering iterations.
+            tol_mech (float): Relative tolerance for the linear mechanical solver (KSP).
+            tol_th (float): Relative tolerance for the linear thermal solver (KSP).
+        """
+        print("\n[INFO] Starting staggered thermo-mechanical solve")
+
+        # --- 1. Preparazione dei campi e delle BC ---
+        T_sol = self.T['fuel']
+        u_sol = self.u['fuel']
+        
+        T_old = dolfinx.fem.Function(T_sol.function_space)
+        u_old = dolfinx.fem.Function(u_sol.function_space)
+        T_old.x.array[:] = T_sol.x.array
+        u_old.x.array[:] = u_sol.x.array
+        
+        bcs_t = [bc for bc in self.bcs if bc.function_space == self.V_t]
+        bcs_m = [bc for bc in self.bcs if bc.function_space.contains(self.V_m)]
+
+        print(f"[INFO] Found {len(bcs_t)} thermal BCs and {len(bcs_m)} mechanical BCs.")
+        print(f"[INFO] Staggering tolerances: dT={tol_T:.1e}, du={tol_u:.1e}")
+        print(f"[INFO] Linear solver tolerances: thermal={tol_th:.1e}, mechanical={tol_mech:.1e}")
+
+        # --- 2. Ciclo di Staggering ---
+
+        for i in range(max_iter):
+            print(f"--- Staggered Iteration {i+1}/{max_iter} ---")
+
+            # === A) SOTTO-PROBLEMA TERMICO ===
+            print("[INFO] Solving thermal sub-problem...")
+            u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
+            a_t, L_t = 0, 0
+            # ... (assemblaggio di a_t e L_t come prima) ...
+            for label in self.materials:
+                # ... (codice di assemblaggio per materiale) ...
+                material = self.materials[label]
+                tag = self.label_map[label]
+                dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
+                k = dolfinx.fem.Constant(self.mesh, material["k"])
+                q_vol = self.q_third[label]
+                a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx_local
+                L_t += q_vol * v_t * dx_local
+            if 'neumann_thermal' in self.bcs_info:
+                # ... (codice di assemblaggio per Neumann BC) ...
+                for bc_info in self.bcs_info['neumann_thermal']:
+                    ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
+                    L_t += bc_info['value'] * v_t * ds_local
+
+            # Risolvi il problema lineare termico con la tolleranza specificata
+            petsc_options_th = {"ksp_type": "cg", "pc_type": "gamg", "ksp_rtol": tol_th}
+            problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_sol, petsc_options=petsc_options_th)
+            problem_t.solve()
+            
+            # === B) SOTTO-PROBLEMA MECCANICO ===
+            print("[INFO] Solving mechanical sub-problem...")
+            u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
+            a_m, L_m = 0, 0
+            # ... (assemblaggio di a_m e L_m come prima, usando T_sol) ...
+            for label in self.materials:
+                # ... (codice di assemblaggio per materiale) ...
+                material = self.materials[label]
+                tag = self.label_map[label]
+                dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
+                lmbda, mu = dolfinx.fem.Constant(self.mesh, material["lmbda"]), dolfinx.fem.Constant(self.mesh, material["mu"])
+                alpha, T_ref = dolfinx.fem.Constant(self.mesh, material["alpha"]), dolfinx.fem.Constant(self.mesh, material["T_ref"])
+                rho, g = dolfinx.default_scalar_type(material["rho"]), dolfinx.default_scalar_type(self.g)
+                body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
+                epsilon = lambda u: ufl.sym(ufl.grad(u))
+                sigma_m = lambda u: lmbda * ufl.tr(epsilon(u)) * ufl.Identity(self.tdim) + 2 * mu * epsilon(u)
+                delta_T = T_sol - T_ref
+                sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
+                a_m += ufl.inner(sigma_m(u_m), epsilon(v_m)) * dx_local
+                L_m += ufl.dot(body_force, v_m) * dx_local + ufl.inner(sigma_th, epsilon(v_m)) * dx_local
+            if 'traction' in self.bcs_info:
+                 # ... (codice di assemblaggio per Traction BC) ...
+                for bc_info in self.bcs_info['traction']:
+                    ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
+                    traction_vector = bc_info['value'] * ufl.FacetNormal(self.mesh)
+                    L_m += ufl.dot(traction_vector, v_m) * ds_local
+
+            # Risolvi il problema lineare meccanico con la tolleranza specificata
+            petsc_options_mech = {"ksp_type": "cg", "pc_type": "gamg", "ksp_rtol": tol_mech, "pc_gamg_coarse_eq_limit": 1000}
+            problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_options_mech)
+            problem_m.solve()
+            
+            # === C) CONTROLLO CONVERGENZA ===
+            # Calcola l'errore relativo tra le iterazioni
+            # Usiamo dolfinx.la.Norm per calcoli in parallelo corretti
+            comm = self.mesh.comm
+            T_error = Norm.L2(comm, T_sol.x.array - T_old.x.array)
+            T_norm = Norm.L2(comm, T_sol.x.array)
+            u_error = Norm.L2(comm, u_sol.x.array - u_old.x.array)
+            u_norm = Norm.L2(comm, u_sol.x.array)
+            
+            # Evita divisione per zero se la soluzione è nulla
+            T_rel_error = T_error / T_norm if T_norm > 1e-12 else T_error
+            u_rel_error = u_error / u_norm if u_norm > 1e-12 else u_error
+            
+            print(f"  Convergence check: rel_dT = {T_rel_error:.2e}, rel_du = {u_rel_error:.2e}")
+
+            # Aggiorna i campi vecchi
+            T_old.x.array[:] = T_sol.x.array
+            u_old.x.array[:] = u_sol.x.array
+            
+            if T_rel_error < tol_T and u_rel_error < tol_u:
+                print(f"[INFO] Staggered scheme converged in {i+1} iterations.")
+                break
+            
+            # Per il tuo attuale problema a senso unico, questo è comunque vero
+            if i == 0:
+                 print("[INFO] One-way coupling problem: convergence is guaranteed after 1 iteration.")
+                 break
+        else: # Questo blocco viene eseguito se il loop 'for' termina senza 'break'
+            print(f"[WARNING] Staggered scheme did not converge after {max_iter} iterations.")
+            
+        # --- 3. Post-processing ---
+        print(f"\n[INFO] Staggered solve finished.")
+        print(f"Min/Max temperature: {T_sol.x.array.min():.2f} / {T_sol.x.array.max():.2f}")
+        
+        u_magnitude = np.sqrt(np.sum(u_sol.x.array.reshape(-1, self.gdim)**2, axis=1))
+        print(f"Min/Max displacement magnitude: {u_magnitude.min():.2e} / {u_magnitude.max():.2e}")
+        
+        # Aggiorna tutti i campi nei dizionari self.T e self.u
+        for name in self.materials.keys():
+            self.T[name].interpolate(T_sol)
+            self.u[name].interpolate(u_sol)
+
+    def solve_staggered_old(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
             print("[INFO] Starting staggered thermo-mechanical solver")
             print(f"  → Max iterations        : {max_iter}")
             print(f"  → Global tolerance ΔT   : {tol_T}")
