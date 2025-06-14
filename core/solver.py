@@ -292,23 +292,23 @@ class Solver:
                         L_m += ufl.dot(bc_info['value'], v_m) * ds
 
                 # Define and solve the linear problem
-                # petsc_opts_mech = {
-                #     "ksp_type": "cg",
-                #     "pc_type": "gamg",
-                #     "ksp_rtol": tol_mech,
-                #     "pc_gamg_coarse_eq_limit": 1000
-                # }
-
                 petsc_opts_mech = {
                     "ksp_type": "cg",
                     "pc_type": "gamg",
-                    "ksp_rtol": 1e-8,
-                    "pc_gamg_coarse_eq_limit": 500,
-                    "pc_gamg_threshold": 0.02,
-                    # "pc_gamg_sym_graph": True,
-                    # "ksp_monitor_true_residual": None,
-                    # "ksp_converged_reason": None
+                    "ksp_rtol": tol_mech,
+                    "pc_gamg_coarse_eq_limit": 1000
                 }
+
+                # petsc_opts_mech = {
+                #     "ksp_type": "cg",
+                #     "pc_type": "gamg",
+                #     "ksp_rtol": 1e-8,
+                #     "pc_gamg_coarse_eq_limit": 500,
+                #     "pc_gamg_threshold": 0.02,
+                #     # "pc_gamg_sym_graph": True,
+                #     # "ksp_monitor_true_residual": None,
+                #     # "ksp_converged_reason": None
+                # }
 
                 problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts_mech)
                 problem_m.solve()

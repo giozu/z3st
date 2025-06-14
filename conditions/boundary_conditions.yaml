@@ -18,24 +18,20 @@ mechanical_bcs:
     - type: Dirichlet
       region: bottom
       displacement: [0.0, 0.0, 0.0]
-    # - type: Neumann
-    #   region: bottom
-    #   traction: -5e8  # Pa, negative for compression
-    - type: Neumann
+    - type: Clamp_z
       region: top
-      traction: -5e8  # Pa, negative for compression\
     - type: Neumann
       region: face_xx_0
       traction: -5e8  # Pa, negative for compression
     - type: Neumann
       region: face_xx_1
-      traction: -5e8  # Pa, negative for compression
-    - type: Neumann
+      traction: +5e8  # Pa, negative for compression
+    - type: Dirichlet
       region: face_yy_0
-      traction: -5e8  # Pa, negative for compression
-    - type: Neumann
+      displacement: [0.0, 0.0, 0.0]
+    - type: Dirichlet
       region: face_yy_1
-      traction: -5e8  # Pa, negative for compression
+      displacement: [0.0, 0.0, 0.0]
   # cladding:
   #   - type: Dirichlet
   #     region: bottom2

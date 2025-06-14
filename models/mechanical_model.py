@@ -103,7 +103,7 @@ class MechanicalModel:
                             facet_dim,
                             facets
                         )
-                        
+
                         boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
 
                         bc_i = dolfinx.fem.dirichletbc(
@@ -115,25 +115,25 @@ class MechanicalModel:
 
                     print(f"  [INFO] Slip_z mechanical BC on '{mat_type}' →  u_x, u_y fixed at region '{region_name}'")
 
-                elif bc_type == "Slip_xy":
-                    for i in [2]:  # constrain only u_z
-                        V_m_sub = V_u_sub.sub(i)
-                        boundary_dofs = dolfinx.fem.locate_dofs_topological(
-                            (V_u_sub, V_m_sub),
-                            facet_dim,
-                            facets
-                        )
+                # elif bc_type == "Slip_xy":
+                #     for i in [2]:  # constrain only u_z
+                #         V_m_sub = V_u_sub.sub(i)
+                #         boundary_dofs = dolfinx.fem.locate_dofs_topological(
+                #             (V_u_sub, V_m_sub),
+                #             facet_dim,
+                #             facets
+                #         )
 
-                        boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
+                #         boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
 
-                        bc_i = dolfinx.fem.dirichletbc(
-                            dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
-                            boundary_dofs,
-                            V_m_sub
-                        )
-                        dirichlet_bcs_list.append(bc_i)
+                #         bc_i = dolfinx.fem.dirichletbc(
+                #             dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
+                #             boundary_dofs,
+                #             V_m_sub
+                #         )
+                #         dirichlet_bcs_list.append(bc_i)
 
-                    print(f"  [INFO] Slip_xy mechanical BC on '{mat_type}' → u_z fixed at region '{region_name}'")
+                #     print(f"  [INFO] Slip_xy mechanical BC on '{mat_type}' → u_z fixed at region '{region_name}'")
 
                 elif bc_type == "Clamp_x":
                     boundary_dofs_x = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(0), self.fdim, self.ft.find(region_id))
