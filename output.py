@@ -123,7 +123,7 @@ def plot3d_temperature(problem):
     for name in problem.u.keys():
         u_vector += problem.u[name].x.array.reshape(geometry.shape)
 
-    scale_factor = 10.0  # amplification for visualization
+    scale_factor = 1.0  # amplification for visualization
     deformed_geometry = geometry + scale_factor * u_vector
 
     grid_deformed = pyvista.UnstructuredGrid(topology, cell_types, deformed_geometry)
@@ -165,7 +165,7 @@ def plot3d_displacement(problem):
     u_magnitude = np.linalg.norm(u_vector, axis=1)
 
     # Apply amplification factor for visualization
-    scale_factor = 10.0  # <-- puoi modificarlo per vedere meglio
+    scale_factor = 100.0
     deformed_geometry = geometry + scale_factor * u_vector
 
     # Build deformed grid
@@ -184,33 +184,34 @@ def plot3d_displacement(problem):
     p.show_axes()
     p.show()
 
-def plot1d_stress(problem, z_target=0.005, tol=0.0001):
+def plot1d_stress(problem, z_target=0.005, tol=1e-5):
     """
-    Plot stress components as function of radius at fixed z.
+    Plot stress components as function of length at fixed z.
     """
 
-    cell_centers = compute_midpoints(
-        problem.mesh, problem.mesh.topology.dim,
-        np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local)
-    )
+    cell_centers = compute_midpoints(problem.mesh, problem.mesh.topology.dim,
+                                     np.arange(problem.mesh.topology.index_map(problem.mesh.topology.dim).size_local))
 
     x, y, z = cell_centers[:, 0], cell_centers[:, 1], cell_centers[:, 2]
     r = np.sqrt(x**2 + y**2)
 
-    unique_z = np.unique(z)
-    if np.all(np.abs(unique_z - z_target) > tol):
-        z_target = unique_z[np.argmin(np.abs(unique_z - z_target))]
-        print(f"⚠️ Closest z = {z_target:.6f} used.")
+    unique_z_values = np.unique(z)
+
+    if np.all(np.abs(unique_z_values - z_target) > tol):
+        z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]
+        print(f"plot1d_tempearture : closest available z-value used instead: {z_target:.6f}")
 
     mask = np.abs(z - z_target) < tol
-    if np.sum(mask) == 0:
-        print("⚠️ No points found within tolerance.")
+    num_points = np.sum(mask)
+
+    if num_points == 0:
+        print(f"[WARNING] No points found at z = {z_target} within tolerance {tol}.")
         return
 
     V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.gdim, problem.gdim)))
-    materials = list(problem.stress.keys())
 
-    plt.figure(figsize=(9, 6))
+    plt.figure(figsize=(8, 6))
+    materials = list(problem.stress.keys())
 
     for name in materials:
         stress_expr = dolfinx.fem.Expression(problem.stress[name], V_tensor.element.interpolation_points())
@@ -218,16 +219,20 @@ def plot1d_stress(problem, z_target=0.005, tol=0.0001):
         stress_func.interpolate(stress_expr)
         stress_vals = stress_func.x.array.reshape(-1, 3, 3)
 
-        material_tag = problem.label_map[name]
         cell_tags = problem.tags.values
+        material_tag = problem.label_map[name]
         material_mask = mask & (cell_tags == material_tag)
 
+        if np.sum(material_mask) == 0:
+            print(f"No cells found for material '{name}' at z={z_target}")
+            continue
+
+        x_plot = x[material_mask]
         sigma_xx = stress_vals[material_mask, 0, 0]
-        r_plot = r[material_mask]
 
-        plt.scatter(r_plot, sigma_xx, label=f"{name}: σ_xx", s=30)
+        plt.scatter(x_plot, sigma_xx, label=f"{name}: σ_xx", s=30)
 
-    plt.xlabel("Radius (m)")
+    plt.xlabel("Length (m)")
     plt.ylabel("Stress (Pa)")
     plt.title(f"Stress Components at z={z_target:.3f} m")
     plt.grid(True)
@@ -306,13 +311,13 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
 
     if np.all(np.abs(unique_z_values - z_target) > tol):
         z_target = unique_z_values[np.argmin(np.abs(unique_z_values - z_target))]
-        print(f"⚠️ Closest available z-value used instead: {z_target:.6f}")
+        print(f"plot1d_tempearture : closest available z-value used instead: {z_target:.6f}")
 
     mask = np.abs(z - z_target) < tol
     num_points = np.sum(mask)
 
     if num_points == 0:
-        print(f"⚠️ No points found at z = {z_target} within tolerance {tol}.")
+        print(f"[WARNING] No points found at z = {z_target} within tolerance {tol}.")
         return
 
     V_scalar = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
@@ -330,7 +335,7 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
         material_mask = mask & (cell_tags == material_tag)
 
         if np.sum(material_mask) == 0:
-            print(f"⚠️ No cells found for material '{name}' at z={z_target}")
+            print(f"No cells found for material '{name}' at z={z_target}")
             continue
 
         x_plot = x[material_mask]

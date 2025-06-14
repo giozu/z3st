@@ -200,7 +200,7 @@ class Solver:
 
         # Create thermal BCs
         bcs_t = self.thermal_dirichlet_bcs
-        bcs_m = self.mechanical_dirichlet_bcs
+        bcs_m = self.mechanical_bcs
         # bcs_m.append(self.constrain_point(self.mesh, self.V_m, np.array([0.1, 0.1, 0.5])))
 
         print(f"[INFO] Loaded {len(bcs_t)} thermal and {len(bcs_m)} mechanical Dirichlet BCs for the staggered solver.")

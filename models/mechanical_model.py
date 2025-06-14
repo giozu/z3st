@@ -22,16 +22,11 @@ class MechanicalModel:
 
         If V_u_map is None → staggered (non-mixed spaces).
         If V_u_map is provided → mixed (collapsed subspace).
-
-        Parameters:
-            V_u_sub: FunctionSpace (collapsed displacement space)
-            V_u_map: DoF map from mixed to collapsed (only in mixed case)
         """
-        print(f"Setting mechanical boundary conditions...")
+        print("Setting mechanical boundary conditions...")
         mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
 
         dirichlet_bcs_list = []
-
         self.bcs_info.setdefault('traction', [])
         self.bcs_info['traction'].clear()
 
@@ -49,42 +44,121 @@ class MechanicalModel:
                     print(f"  [WARNING] Region '{region_name}' not found in label_map for mechanical BC. Skipping.")
                     continue
 
+                facets = self.ft.find(region_id)
+                facet_dim = self.fdim
+                # -------- Dirichlet (vector full BC) --------
                 if bc_type == "Dirichlet":
                     displacement = bc_info.get("displacement")
                     if displacement is None:
-                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement. Skipping.")
+                        print(f"[WARNING] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement. Skipping.")
                         continue
 
-                    facets = self.ft.find(region_id)
-
-                    if V_u_map is None:
-                        # staggered mode
+                    if V_u_map is None:  # staggered mode
                         dofs = dolfinx.fem.locate_dofs_topological(V_u_sub, self.fdim, facets)
-                    else:
-                        # mixed mode
-                        dofs_mixed = dolfinx.fem.locate_dofs_topological(
-                            (self.W.sub(0), V_u_sub), self.fdim, facets
-                        )
+                    else:  # mixed mode
+                        dofs_mixed = dolfinx.fem.locate_dofs_topological((self.W.sub(0), V_u_sub), self.fdim, facets)
                         dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
                         dofs = V_u_map[dofs_mixed[:, 1]]
 
                     bc = self.create_dirichlet_bc(self.mesh, V_u_sub, dofs, displacement, self.tdim)
                     dirichlet_bcs_list.append(bc)
                     print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")
-                    print("DirichletBC successfully created")
 
+                # -------- Neumann --------
                 elif bc_type == "Neumann":
                     traction_val = bc_info.get("traction")
                     if traction_val is None:
                         print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no traction. Skipping.")
                         continue
-                    
+
                     traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_val)) * self.normal
                     self.bcs_info['traction'].append({'id': region_id, 'value': traction_constant})
                     print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_val} Pa at region '{region_name}'")
 
+                # -------- Generic Slip (component-wise blocking) --------
+                elif bc_type == "Slip_x":
+                    for i in [1, 2]:  # constrain u_y, u_z
+                        V_m_sub = V_u_sub.sub(i)
+                        boundary_dofs = dolfinx.fem.locate_dofs_topological(
+                            (V_u_sub, V_m_sub),
+                            facet_dim,
+                            facets
+                        )
+                        boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
+
+                        bc_i = dolfinx.fem.dirichletbc(
+                            dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
+                            boundary_dofs,
+                            V_m_sub
+                        )
+                        dirichlet_bcs_list.append(bc_i)
+
+                    print(f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_y, u_z fixed at region '{region_name}'")
+
+                elif bc_type == "Slip_z":
+                    for i in [0, 1]:  # constrain u_x, u_y
+                        V_m_sub = V_u_sub.sub(i)
+                        boundary_dofs = dolfinx.fem.locate_dofs_topological(
+                            (V_u_sub, V_m_sub),
+                            facet_dim,
+                            facets
+                        )
+                        
+                        boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
+
+                        bc_i = dolfinx.fem.dirichletbc(
+                            dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
+                            boundary_dofs,
+                            V_m_sub
+                        )
+                        dirichlet_bcs_list.append(bc_i)
+
+                    print(f"  [INFO] Slip_z mechanical BC on '{mat_type}' →  u_x, u_y fixed at region '{region_name}'")
+
+                elif bc_type == "Slip_xy":
+                    for i in [2]:  # constrain only u_z
+                        V_m_sub = V_u_sub.sub(i)
+                        boundary_dofs = dolfinx.fem.locate_dofs_topological(
+                            (V_u_sub, V_m_sub),
+                            facet_dim,
+                            facets
+                        )
+
+                        boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
+
+                        bc_i = dolfinx.fem.dirichletbc(
+                            dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
+                            boundary_dofs,
+                            V_m_sub
+                        )
+                        dirichlet_bcs_list.append(bc_i)
+
+                    print(f"  [INFO] Slip_xy mechanical BC on '{mat_type}' → u_z fixed at region '{region_name}'")
+
+                elif bc_type == "Clamp_x":
+                    boundary_dofs_x = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(0), self.fdim, self.ft.find(region_id))
+                    bcx = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_x, V_u_sub.sub(0))
+
+                    dirichlet_bcs_list.append(bcx)
+                    print(f"  [INFO] Clamp_x mechanical BC on '{mat_type}' → Clamp_x at region '{region_name}'")
+
+                elif bc_type == "Clamp_y":
+                    boundary_dofs_y = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(1), self.fdim, self.ft.find(region_id))
+                    bcx = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_y, V_u_sub.sub(1))
+
+                    dirichlet_bcs_list.append(bcx)
+                    print(f"  [INFO] Clamp_y mechanical BC on '{mat_type}' → Clamp_y at region '{region_name}'")
+
+                elif bc_type == "Clamp_z":
+                    boundary_dofs_z = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(2), self.fdim, self.ft.find(region_id))
+                    bcz = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_z, V_u_sub.sub(2))
+
+                    dirichlet_bcs_list.append(bcz)
+                    print(f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'")
+                    
                 else:
-                    print(f"  [WARNING] Unknown mechanical BC type '{bc_type}' for '{mat_type}'. Skipping.")
+                    print(f"  [WARNING] Unknown mechanical BC type '{bc_type}' for '{mat_type}'.")
+                    print(f"  Available are: Dirichlet, Neumann, Clamp_x/y/z, Slip_xy/z. Skipping.")
 
         return dirichlet_bcs_list
 
@@ -105,10 +179,10 @@ class MechanicalModel:
         displacement = np.array(displacement, dtype=PETSc.ScalarType)
 
         if displacement.ndim == 1 and displacement.size == tdim:
-            print(f"create_dirichlet_bc with Constant")
+            # print(f"  create_dirichlet_bc with Constant")
             return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, displacement), dofs, V)
         elif displacement.ndim == 2 and displacement.shape == (tdim, 1):
-            print(f"  create_dirichlet_bc with Function")
+            # print(f"  create_dirichlet_bc with Function")
             u_d = dolfinx.fem.Function(V)
             u_d.interpolate(lambda x: np.tile(displacement, (1, x.shape[1])))
             return dolfinx.fem.dirichletbc(u_d, dofs)

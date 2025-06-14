@@ -43,6 +43,10 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
 
     def set_boundary_conditions(self):
+        print(f"-----------------")
+        print(f"set_boundary_conditions")
+        print(f"-----------------")
+
         with open("conditions/boundary_conditions.yaml", "r") as f:
             print(f"Loading boundary conditions from 'conditions/boundary_conditions.yaml'")
             self.boundary_conditions = yaml.safe_load(f)
@@ -51,16 +55,16 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             self.V_t_sub = self.V_t
             self.V_m_sub = self.V_m
             self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions(self.V_t_sub)
-            self.mechanical_dirichlet_bcs = self.set_mechanical_boundary_conditions(self.V_m_sub)
+            self.mechanical_bcs = self.set_mechanical_boundary_conditions(self.V_m_sub)
         else:
             V_t_sub, V_t_map = self.W.sub(1).collapse()
             V_t_map = np.array(V_t_map, dtype=np.int32)
             V_u_sub, V_u_map = self.W.sub(0).collapse() # need to .collapse() to define BCs / define Functions from it / interpolate
             V_u_map = np.array(V_u_map, dtype=np.int32)
             self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions(V_t_sub, V_t_map)
-            self.mechanical_dirichlet_bcs = self.set_mechanical_boundary_conditions(V_u_sub, V_u_map)
+            self.mechanical_bcs = self.set_mechanical_boundary_conditions(V_u_sub, V_u_map)
 
-        self.bcs = self.thermal_dirichlet_bcs + self.mechanical_dirichlet_bcs
+        self.bcs = self.thermal_dirichlet_bcs + self.mechanical_bcs
     
     def initialize_fields(self):
         print(f"-----------------")
