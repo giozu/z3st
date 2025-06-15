@@ -1,7 +1,7 @@
 import yaml
 
-msh_file = "../mesh/multi_material.msh"
-yaml_file = "multi_material.yaml"
+msh_file = "../mesh/fuel_rod_structured.msh"
+yaml_file = "fuel_rod_structured.yaml"
 
 def extract_physical_names(filename):
     with open(filename, "r") as f:
@@ -28,10 +28,13 @@ def extract_physical_names(filename):
 
 def write_yaml(labels, output_file):
     data = {
-        "name": "multi_material",
-        "edge": "1.0",  # meters
-        "height": "1.0", # meters
-        "geometry_type": "rect",
+        "name": "fuel_rod_structured",
+        "fuel_inner_radius": "0.0",         # meters
+        "fuel_outer_radius": "0.004",       # meters
+        "cladding_inner_radius": "0.0042",  # meters
+        "cladding_outer_radius": "0.0047",  # meters
+        "height": "0.01",                   # meters
+        "geometry_type": "cyl",
         "labels": labels
     }
     with open(output_file, "w") as f:

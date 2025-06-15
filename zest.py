@@ -15,6 +15,7 @@ import time
 import sys
 import yaml
 # from geometry.fuel_rod import geometry
+from input.multi_material import MultiMaterial
 from postprocessing import save_temperature_history
 from utils import *
 from output import *
@@ -26,27 +27,13 @@ MESH_PLOT_MODE = "--mesh_plot" in sys.argv
 with open("input.yaml", "r") as f:
     input_data = yaml.safe_load(f)
 
-# --- Output settings ---
+# --- Output ---
 log_path = "output/simulation_log.txt"
 clear_log_file(log_path)
 os.makedirs("output", exist_ok=True)
 
-# --- Simulation frame ---
-# from input.cube import Cube
-# geometry = load("geometry/cube.yaml")
-# problem = Cube(mesh_file='mesh/cube.msh', geometry=geometry)
-
-from input.multi_material import MultiMaterial
-
+# --- Geometry ---
 geometry = load(input_data["geometry_path"])
-problem = MultiMaterial(input_file=input_data, mesh_file=input_data["mesh_path"], geometry=geometry)
-
-problem.debug_mode = DEBUG_MODE
-problem.mesh_plot_mode = MESH_PLOT_MODE
-problem._mesh_plot(MESH_PLOT_MODE)
-
-# problem.volume()
-# from input.fuel_rod import FuelRod
 
 # --- Materials ---
 materials_dict = input_data.get("materials", {})
@@ -55,89 +42,29 @@ loaded_materials = {}
 for mat_name, mat_path in materials_dict.items():
     loaded_materials[mat_name] = load(mat_path)
 
-# Debug info
-if DEBUG_MODE:
-    print("[DEBUG] Loaded materials:")
-    for name, data in loaded_materials.items():
-        print(f"  {name}: {data}")
-
+# --- Problem ---
+problem = MultiMaterial(input_file=input_data, mesh_file=input_data["mesh_path"], geometry=geometry)
+problem.debug_mode = DEBUG_MODE
+problem.mesh_plot_mode = MESH_PLOT_MODE
+problem._mesh_plot(MESH_PLOT_MODE)
 problem.materials(**loaded_materials)
+# problem.volume()
 
-# Initial and boundary conditions
-conditions = load(input_data["conditions_path"])
-
+# --- History ---
 t_points = input_data["time"]
 lhr_points = input_data["lhr"]
 n_steps = input_data["n_steps"]
-
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=n_steps, filename="power_history.csv")
 # times, lhrs = read_power_history("power_history.csv")
-
-problem.parameters(
-    conditions=conditions,
-    lhr=lhr_points[0],
-)
+problem.parameters(lhr=lhr_points[0])
 
 start_time = time.time()
-
-# from full_cylinder import FullCylinder
-# from geometry.full_cylinder import geometry
-# problem = FullCylinder(mesh_file='mesh/full_cylinder.msh')
-# problem.volume(geometry["outer radius"], geometry["inner radius"], geometry["height"])
-# problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"], fuel["cp"])
-# problem.boundary_conditions(pressure=conditions["gap pressure"], temperature=conditions["boundary temperature"])
-
-# from full_cylinder_time import FullCylinder_time
-# from geometry.full_cylinder import geometry
-# problem = FullCylinder_time(mesh_file='mesh/full_cylinder.msh')
-# problem.volume(geometry["outer_radius"], geometry["inner_radius"], geometry["height"])
-# problem.parameters(fuel["rho"], conditions["gravitational acceleration"], fuel["E"], fuel["nu"], fuel["k"], conditions["LHR"], fuel["alpha"], conditions["reference temperature"], fuel["cp"])
-# problem.temporal_solver(0,120,3)
-# problem.boundary_conditions(pressure=conditions["gap pressure"], temperature=conditions["boundary temperature"])
-
-# from thick_cylinder import ThickCylinder
-# from geometry.thickWalled_cylinder import geometry
-# problem = ThickCylinder(mesh_file='mesh/cylindrical_shell_structured.msh')
-# problem.volume(geometry["outer radius"], geometry["inner radius"], geometry["height"])
-# problem.parameters(cladding["rho"], conditions["gravitational acceleration"], cladding["E"], cladding["nu"], cladding["k"], conditions["LHR"], cladding["alpha"], conditions["reference temperature"], cladding["cp"])
-# problem.boundary_conditions(inner_pressure=conditions["gap pressure"], outer_pressure=coolant["coolant pressure"], temperature=conditions["boundary temperature"])
-
-# problem = FuelRod(mesh_file='mesh/fuel_cladding_3d_structured.msh')
-
-# problem.volume(geometry["fuel outer radius"], geometry["cladding inner radius"], geometry["cladding outer radius"], geometry["height"])
-
-# temp_path = os.path.join("output", "temperature.xdmf")
-# xtemp = dolfinx.io.XDMFFile(problem.mesh.comm, temp_path, "w")
-# xtemp.write_mesh(problem.mesh)
-
-# disp_path = os.path.join("output", "displacement.xdmf")
-# xdisp = dolfinx.io.XDMFFile(problem.mesh.comm, disp_path, "w")
-# xdisp.write_mesh(problem.mesh)
 
 T_fuel_inner = []
 T_fuel_outer = []
 T_clad_inner = []
 T_clad_outer = []
 time_values = []
-
-# problem.parameters(fuel, 
-#                    cladding, 
-#                    gas, 
-#                    g=conditions["gravitational_acceleration"],
-#                    lhr=lhr_points[0],
-#                    T_ref=conditions["reference_temperature"],
-#                    log_path=log_path)
-
-# problem.parameters(
-#     rho=fuel["rho"],
-#     g=conditions["gravitational_acceleration"],
-#     E=fuel["E"],
-#     poisson=fuel["nu"],
-#     k=fuel["k"],
-#     lhr=lhr_points[0],
-#     alpha=fuel["alpha"],
-#     T_ref=conditions["reference_temperature"]
-# )
 
 problem.initialize_fields()
 # problem.initialize_geometry()

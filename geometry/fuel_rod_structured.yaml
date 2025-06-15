@@ -1,0 +1,17 @@
+name: fuel_rod_structured
+fuel_inner_radius: '0.0'
+fuel_outer_radius: '0.004'
+cladding_inner_radius: '0.0042'
+cladding_outer_radius: '0.0047'
+height: '0.01'
+geometry_type: cyl
+labels:
+  fuel_bottom: 1
+  cladding_bottom: 2
+  fuel_lateral: 3
+  cladding_outer: 4
+  cladding_inner: 5
+  cladding_top: 6
+  fuel_top: 7
+  fuel: 1
+  cladding: 2

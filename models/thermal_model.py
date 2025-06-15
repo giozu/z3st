@@ -140,8 +140,7 @@ class ThermalModel:
                         print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no flux. Skipping.")
                         continue
 
-                    flux_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(flux))
-                    self.bcs_info['neumann_thermal'].append({'id': region_id, 'value': flux_constant})
+                    self.bcs_info['neumann_thermal'].append({'id': region_id, 'value': float(flux)})
                     print(f"  [INFO] Neumann thermal BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
 
                 else:

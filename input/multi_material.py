@@ -23,9 +23,8 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         ThermalModel.__init__(self)
         MechanicalModel.__init__(self)
 
-    def parameters(self, conditions, lhr):
-        self.conditions = conditions
-        self.g = conditions["gravitational_acceleration"]
+    def parameters(self, lhr):
+        self.g = 9.81 # m/s2
         self.lhr = lhr
 
     def materials(self, **materials):
@@ -47,8 +46,8 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         print(f"set_boundary_conditions")
         print(f"-----------------")
 
-        with open("conditions/boundary_conditions.yaml", "r") as f:
-            print(f"Loading boundary conditions from 'conditions/boundary_conditions.yaml'")
+        with open(self.config["boundary_conditions_path"], "r") as f:
+            print(f"Loading boundary conditions from '{self.config["boundary_conditions_path"]}'")
             self.boundary_conditions = yaml.safe_load(f)
 
         if self.coupling == "staggered":

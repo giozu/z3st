@@ -165,7 +165,7 @@ def plot3d_displacement(problem):
     u_magnitude = np.linalg.norm(u_vector, axis=1)
 
     # Apply amplification factor for visualization
-    scale_factor = 100.0
+    scale_factor = 1.0
     deformed_geometry = geometry + scale_factor * u_vector
 
     # Build deformed grid
@@ -348,7 +348,7 @@ def plot1d_temperature(problem, z_target=0.005, tol=0.0001):
     plt.title(f"Temperature profile at z={z_target:.3f} m")
     plt.grid(True)
     plt.legend()
-    plt.ylim(200,2000)
+    # plt.ylim(200,2000)
 
     output_file = f'output/temperature_profile_z_{z_target:.3f}.png'
     plt.savefig(output_file, dpi=300)

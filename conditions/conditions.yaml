@@ -1,3 +1,0 @@
-gap_pressure: -2e6                  # Gap pressure (Pa), negative for compression
-gravitational_acceleration: 9.81    # Gravitational acceleration (m/s^2)
-coolant_pressure: -15.5e6           # Coolant pressure (Pa), negative for compression

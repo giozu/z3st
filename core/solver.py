@@ -17,7 +17,86 @@ class Solver:
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
 
-        self.bcs_info = {}    
+        self.thermal_solver = self.config.get("solver_settings", {}).get("thermal_solver", "default")
+        self.mechanical_solver = self.config.get("solver_settings", {}).get("mechanical_solver", "default")
+
+        self.bcs_info = {}
+
+    def get_solver_options(self, solver_type="default", physics="thermal", rtol=1e-10):
+        """
+        Returns PETSc options for the linear solver depending on physics.
+
+        Parameters:
+            solver_type (str): Type of solver to use. Supported:
+                - "default"
+                - "direct"
+                - "gmres"
+                - "minres"
+                - "chebyshev"
+                - "hypre"
+            physics (str): "thermal" or "mechanical"
+            rtol (float): Relative tolerance for KSP.
+
+        Returns:
+            dict: PETSc options dictionary.
+        """
+
+        if physics not in ["thermal", "mechanical"]:
+            raise ValueError(f"Unknown physics '{physics}'. Must be 'thermal' or 'mechanical'.")
+
+        # Default coarse eq limit slightly higher for mechanical due to higher conditioning issues
+        coarse_eq_limit = 500 if physics == "thermal" else 1000
+        gamg_threshold = 0.05 if physics == "thermal" else 0.02
+
+        if solver_type == "default":
+            return {
+                "ksp_type": "cg",
+                "pc_type": "gamg",
+                "ksp_rtol": rtol,
+                "pc_gamg_coarse_eq_limit": coarse_eq_limit,
+                "pc_gamg_threshold": gamg_threshold
+            }
+
+        elif solver_type == "direct":
+            return {
+                "ksp_type": "preonly",
+                "pc_type": "lu",
+                "pc_factor_mat_solver_type": "mumps"
+            }
+
+        elif solver_type == "gmres":
+            return {
+                "ksp_type": "gmres",
+                "pc_type": "gamg",
+                "ksp_rtol": rtol
+            }
+
+        elif solver_type == "minres":
+            return {
+                "ksp_type": "minres",
+                "pc_type": "gamg",
+                "ksp_rtol": rtol
+            }
+
+        elif solver_type == "chebyshev":
+            return {
+                "ksp_type": "cg",
+                "pc_type": "gamg",
+                "mg_levels_ksp_type": "chebyshev",
+                "mg_levels_pc_type": "jacobi",
+                "ksp_rtol": rtol
+            }
+
+        elif solver_type == "hypre":
+            return {
+                "ksp_type": "cg",
+                "pc_type": "hypre",
+                "pc_hypre_type": "boomeramg",
+                "ksp_rtol": rtol
+            }
+
+        else:
+            raise ValueError(f"Unknown solver_type '{solver_type}'. Available options: default, direct, gmres, minres, chebyshev, hypre.")
 
     def solve_monolithic(self, tol=1e-8, max_iter=50):
         """Solves the coupled thermo-mechanical problem using a monolithic approach.
@@ -238,18 +317,14 @@ class Solver:
                 if 'neumann_thermal' in self.bcs_info:
                     for bc_info in self.bcs_info['neumann_thermal']:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                        L_t += dolfinx.fem.Constant(self.mesh, bc_info['value']) * v_t * ds
+                        L_t += bc_info['value'] * v_t * ds
                 
                 # Define and solve the linear problem
-                petsc_opts_thermal = {
-                    "ksp_type": "cg",
-                    "pc_type": "gamg",
-                    "ksp_rtol": 1e-10,
-                    "pc_gamg_coarse_eq_limit": 500,
-                    "pc_gamg_threshold": 0.05,
-                    # "ksp_monitor_true_residual": None,
-                    # "ksp_converged_reason": None
-                }
+                petsc_opts_thermal = self.get_solver_options(
+                    solver_type=self.thermal_solver,
+                    physics="thermal",
+                    rtol=tol_th
+                )
 
                 problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_sol, petsc_options=petsc_opts_thermal)
                 problem_t.solve()
@@ -292,23 +367,11 @@ class Solver:
                         L_m += ufl.dot(bc_info['value'], v_m) * ds
 
                 # Define and solve the linear problem
-                petsc_opts_mech = {
-                    "ksp_type": "cg",
-                    "pc_type": "gamg",
-                    "ksp_rtol": tol_mech,
-                    "pc_gamg_coarse_eq_limit": 1000
-                }
-
-                # petsc_opts_mech = {
-                #     "ksp_type": "cg",
-                #     "pc_type": "gamg",
-                #     "ksp_rtol": 1e-8,
-                #     "pc_gamg_coarse_eq_limit": 500,
-                #     "pc_gamg_threshold": 0.02,
-                #     # "pc_gamg_sym_graph": True,
-                #     # "ksp_monitor_true_residual": None,
-                #     # "ksp_converged_reason": None
-                # }
+                petsc_opts_mech = self.get_solver_options(
+                    solver_type=self.mechanical_solver,
+                    physics="mechanical",
+                    rtol=tol_mech
+                )
 
                 problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts_mech)
                 problem_m.solve()

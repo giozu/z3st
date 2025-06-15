@@ -1,6 +1,6 @@
-name: multi_material
-edge: '0.2'
-height: '1.0'
+name: box
+edge: '1.0'
+height: '2.0'
 geometry_type: rect
 labels:
   bottom: 1

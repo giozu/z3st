@@ -1,41 +1,46 @@
 thermal_bcs:
   fuel:
+    - type: Neumann
+      region: fuel_bottom
+      flux: 0.0
     - type: Dirichlet
-      region: bottom
-      temperature: 300.0
-    # - type: Neumann
-    #   region: bottom
-    #   flux: -300.0 # (negative if exiting the surface)
-  # cladding:
-  #   - type: Dirichlet
-  #     region: bottom2
-  #     temperature: 500.0
-  #   - type: Neumann
-  #     region: face_xx_0_2
-  #     flux: 100.0
+      region: fuel_lateral
+      temperature: 500
+    - type: Neumann
+      region: fuel_top
+      flux: 0.0
+  cladding:
+    - type: Neumann
+      region: cladding_bottom
+      flux: 0.0
+    - type: Dirichlet
+      region: cladding_inner
+      temperature: 310
+    - type: Dirichlet
+      region: cladding_outer
+      temperature: 300
+    - type: Neumann
+      region: cladding_top
+      flux: 0.0
 mechanical_bcs:
   fuel:
     - type: Dirichlet
-      region: bottom
+      region: fuel_bottom
       displacement: [0.0, 0.0, 0.0]
+    - type: Neumann
+      region: fuel_lateral
+      traction: -2e6
     - type: Clamp_z
-      region: top
-    - type: Neumann
-      region: face_xx_0
-      traction: -5e8  # Pa, negative for compression
-    - type: Neumann
-      region: face_xx_1
-      traction: +5e8  # Pa, negative for compression
+      region: fuel_top
+  cladding:
     - type: Dirichlet
-      region: face_yy_0
+      region: cladding_bottom
       displacement: [0.0, 0.0, 0.0]
-    - type: Dirichlet
-      region: face_yy_1
-      displacement: [0.0, 0.0, 0.0]
-  # cladding:
-  #   - type: Dirichlet
-  #     region: bottom2
-  #     displacement: [0.0, 0.0, 0.0]
-  #   - type: Neumann
-  #     region: top2
-  #     traction: -1e12  # Pa, negative for compression
+    - type: Neumann
+      region: cladding_inner
+      traction: -2e6
+    - type: Neumann
+      region: cladding_outer
+      traction: -15.5e6
+    - type: Clamp_z
+      region: cladding_top
