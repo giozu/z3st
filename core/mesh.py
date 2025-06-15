@@ -39,7 +39,7 @@ class Mesh:
             self.mesh.topology.create_connectivity(self.fdim, self.tdim)
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
 
-            print("[INFO] Available volume tags (dx):")
+            print("Available volume tags (dx):")
             tag_values = self.tags.values
             unique_tags = set(tag_values)
             for tag in sorted(unique_tags):
@@ -48,7 +48,7 @@ class Mesh:
             # Labels
             self.label_map = self.geometry["labels"]
 
-            print("[INFO] Geometry entries:")
+            print("Geometry entries:")
             for k in sorted(self.geometry.keys()):
                 if k == "labels":
                     continue
@@ -58,26 +58,26 @@ class Mesh:
             self.geometry_type = self.geometry.get("geometry_type", "").lower()
 
             self.height = self.geometry.get("height", None)
-            print(f"[INFO] height = {self.height:.2e} m")
+            print(f"  height = {self.height:.2e} m")
 
             if self.geometry_type == "rect":
                 self.edge = self.geometry.get("edge", None)
                 self.area = self.edge ** 2
-                print(f"[INFO] edge = {self.edge:.2f} m, height = {self.height:.2f} m")
+                print(f"  edge = {self.edge:.2f} m, height = {self.height:.2f} m")
             elif self.geometry_type == "cyl":
                 self.fuel_inner_radius = self.geometry.get("fuel_inner_radius", None)
                 self.fuel_outer_radius = self.geometry.get("fuel_outer_radius", None)
                 self.cladding_inner_radius = self.geometry.get("cladding_inner_radius", None)
                 self.cladding_outer_radius = self.geometry.get("cladding_outer_radius", None)
                 self.area = np.pi * (self.fuel_outer_radius**2 - self.fuel_inner_radius**2)
-                print(f"[INFO] fuel_inner_radius = {self.fuel_inner_radius:.2e} m")
-                print(f"[INFO] fuel_outer_radius = {self.fuel_outer_radius:.2e} m")
-                print(f"[INFO] cladding_inner_radius = {self.cladding_inner_radius:.2e} m")
-                print(f"[INFO] cladding_outer_radius = {self.cladding_outer_radius:.2e} m")
+                print(f"  fuel_inner_radius = {self.fuel_inner_radius:.2e} m")
+                print(f"  fuel_outer_radius = {self.fuel_outer_radius:.2e} m")
+                print(f"  cladding_inner_radius = {self.cladding_inner_radius:.2e} m")
+                print(f"  cladding_outer_radius = {self.cladding_outer_radius:.2e} m")
             
-            print(f"[INFO] area = {self.area:.2e} m2")
+            print(f"  area = {self.area:.2e} m2")
 
-            print("[INFO] Label map:")
+            print("Label map:")
             for label, tag in sorted(self.label_map.items(), key=lambda item: item[1]):
                 print(f"  {label:<12} → {tag}")
             

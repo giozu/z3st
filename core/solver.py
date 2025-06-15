@@ -10,17 +10,17 @@ from dolfinx.nls.petsc import NewtonSolver
 class Solver:
     def __init__(self):
         print("__Solver initializer__")
-        self.relax_T = 0.7
-        self.relax_u = 0.3
+        solver_settings = self.config.get("solver_settings", {})
 
-        print("  [INFO] Applied relaxation factor:")
+        self.relax_T = float(solver_settings.get("relax_T", 0.2))
+        self.relax_u = float(solver_settings.get("relax_u", 0.5))
+
+        self.thermal_solver = solver_settings.get("thermal_solver", "default")
+        self.mechanical_solver = solver_settings.get("mechanical_solver", "default")
+
+        print("  Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
-
-        self.thermal_solver = self.config.get("solver_settings", {}).get("thermal_solver", "default")
-        self.mechanical_solver = self.config.get("solver_settings", {}).get("mechanical_solver", "default")
-
-        self.bcs_info = {}
 
     def get_solver_options(self, solver_type="default", physics="thermal", rtol=1e-10):
         """
@@ -261,7 +261,6 @@ class Solver:
             self.u[name].interpolate(u_sol)
   
     def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
-        print("[INFO] Starting staggered thermo-mechanical solver")
         print(f"  → Max iterations        : {max_iter}")
         print(f"  → Staggering tolerance |ΔT| : {tol_T:.1e}")
         print(f"  → Staggering tolerance |Δu| : {tol_u:.1e}")

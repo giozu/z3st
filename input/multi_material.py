@@ -42,9 +42,11 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
 
     def set_boundary_conditions(self):
-        print(f"-----------------")
+        print(f"-----------------------")
         print(f"set_boundary_conditions")
-        print(f"-----------------")
+        print(f"-----------------------")
+
+        self.bcs_info = {}
 
         with open(self.config["boundary_conditions_path"], "r") as f:
             print(f"Loading boundary conditions from '{self.config["boundary_conditions_path"]}'")
@@ -104,7 +106,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
         for name, T_func in self.T.items():
             values = T_func.x.array
-            print(f"  [INFO] {name}: min={values.min():.2f} K, max={values.max():.2f} K, mean={values.mean():.2f} K")
+            print(f"  {name}: min={values.min():.2f} K, max={values.max():.2f} K, mean={values.mean():.2f} K")
 
         # for name, T_func in self.T.items():
         #     tag = self.label_map[name]
@@ -121,7 +123,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         for name, mat in self.materials.items():
             is_fissile = bool(mat.get("fissile", False))
             self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
-            print(f"  [INFO] q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
+            print(f"  q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
 
         # --- Displacement ---
         # v_m: Test Function
@@ -154,11 +156,10 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
         for name, u_func in self.u.items():
             values = u_func.x.array
-            print(f"  [INFO] {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
+            print(f"  {name}: min={values.min():.2f} m, max={values.max():.2f} m, mean={values.mean():.2f} m")
 
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
-        print("\n[INFO] Solver settings:")
-        print(f"  → Max iterations        : {max_iters}")
+        print("\nSolver settings:")
         print(f"  → Coupling              : {self.coupling}")
 
         if self.coupling == "monolithic":
