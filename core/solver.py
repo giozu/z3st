@@ -6,6 +6,7 @@ from mpi4py import MPI
 from dolfinx.fem.petsc import LinearProblem
 from dolfinx.fem.petsc import NonlinearProblem
 from dolfinx.nls.petsc import NewtonSolver
+from core.diagnostic import *
 
 class Solver:
     def __init__(self):
@@ -22,82 +23,63 @@ class Solver:
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
 
-    def get_solver_options(self, solver_type="default", physics="thermal", rtol=1e-10):
+    def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
         """
-        Returns PETSc options for the linear solver depending on physics.
+        Returns PETSc options for the linear solver based on the physics.
 
         Parameters:
-            solver_type (str): Type of solver to use. Supported:
-                - "default"
-                - "direct"
-                - "gmres"
-                - "minres"
-                - "chebyshev"
-                - "hypre"
-            physics (str): "thermal" or "mechanical"
+            physics (str): "thermal" or "mechanical". This primarily determines
+                        if a symmetric (CG) or non-symmetric (GMRES) solver is used.
+            solver_type (str): Type of solver/preconditioner strategy. Supported:
+                - "direct_mumps": Robust but memory-intensive direct solver.
+                - "iterative_amg": Default iterative solver with Algebraic Multigrid (PETSc GAMG).
+                - "iterative_hypre": Iterative solver with HYPRE's BoomerAMG preconditioner.
             rtol (float): Relative tolerance for KSP.
 
         Returns:
             dict: PETSc options dictionary.
         """
-
         if physics not in ["thermal", "mechanical"]:
             raise ValueError(f"Unknown physics '{physics}'. Must be 'thermal' or 'mechanical'.")
 
-        # Default coarse eq limit slightly higher for mechanical due to higher conditioning issues
-        coarse_eq_limit = 500 if physics == "thermal" else 1000
-        gamg_threshold = 0.05 if physics == "thermal" else 0.02
-
-        if solver_type == "default":
+        # 1. Choose KSP type based on matrix symmetry
+        if physics == "thermal":
+            ksp_type = "cg"  # Symmetric Positive Definite matrix
+        elif physics == "mechanical":
+            ksp_type = "gmres" # Non-symmetric matrix
+        
+        # 2. Choose preconditioner based on solver_type
+        if solver_type == "direct_mumps":
             return {
-                "ksp_type": "cg",
+                "ksp_type": "preonly", # We only use the preconditioner
+                "pc_type": "lu",
+                "pc_factor_mat_solver_type": "mumps" # MUMPS is a great direct solver
+            }
+
+        elif solver_type == "iterative_amg":
+            # PETSc's built-in Algebraic Multigrid (GAMG)
+            coarse_eq_limit = 500 if physics == "thermal" else 1000
+            return {
+                "ksp_type": ksp_type,
                 "pc_type": "gamg",
                 "ksp_rtol": rtol,
                 "pc_gamg_coarse_eq_limit": coarse_eq_limit,
-                "pc_gamg_threshold": gamg_threshold
+                # Restart for GMRES can be useful for memory
+                # "ksp_gmres_restart": 30 
             }
 
-        elif solver_type == "direct":
+        elif solver_type == "iterative_hypre":
+            # HYPRE's BoomerAMG, often more robust than GAMG
             return {
-                "ksp_type": "preonly",
-                "pc_type": "lu",
-                "pc_factor_mat_solver_type": "mumps"
-            }
-
-        elif solver_type == "gmres":
-            return {
-                "ksp_type": "gmres",
-                "pc_type": "gamg",
-                "ksp_rtol": rtol
-            }
-
-        elif solver_type == "minres":
-            return {
-                "ksp_type": "minres",
-                "pc_type": "gamg",
-                "ksp_rtol": rtol
-            }
-
-        elif solver_type == "chebyshev":
-            return {
-                "ksp_type": "cg",
-                "pc_type": "gamg",
-                "mg_levels_ksp_type": "chebyshev",
-                "mg_levels_pc_type": "jacobi",
-                "ksp_rtol": rtol
-            }
-
-        elif solver_type == "hypre":
-            return {
-                "ksp_type": "cg",
+                "ksp_type": ksp_type,
                 "pc_type": "hypre",
                 "pc_hypre_type": "boomeramg",
                 "ksp_rtol": rtol
             }
-
+        
         else:
-            raise ValueError(f"Unknown solver_type '{solver_type}'. Available options: default, direct, gmres, minres, chebyshev, hypre.")
-
+            raise ValueError(f"Unknown solver_type '{solver_type}'.")
+        
     def solve_monolithic(self, tol=1e-8, max_iter=50):
         """Solves the coupled thermo-mechanical problem using a monolithic approach.
 
@@ -268,7 +250,6 @@ class Solver:
         print(f"  → Mechanical KSP tolerance: {tol_mech:.1e}")
 
         # --- Initial Setup ---
-        comm = self.mesh.comm
         T_sol = self.T['fuel']  # Reference function for the temperature solution
         u_sol = self.u['fuel']  # Reference function for the displacement solution
 
@@ -318,6 +299,9 @@ class Solver:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t += bc_info['value'] * v_t * ds
                 
+                # Sparsity pattern
+                assemble_and_analyze_matrix(a_t, L_t, title="Thermal Stiffness Matrix")
+
                 # Define and solve the linear problem
                 petsc_opts_thermal = self.get_solver_options(
                     solver_type=self.thermal_solver,
@@ -371,6 +355,9 @@ class Solver:
                     physics="mechanical",
                     rtol=tol_mech
                 )
+
+                # Sparsity pattern
+                assemble_and_analyze_matrix(a_m, L_m, title="Mechanical Stiffness Matrix")
 
                 problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts_mech)
                 problem_m.solve()

@@ -20,8 +20,8 @@ materials:
 
 solver_settings:
   coupling: staggered
-  thermal_solver: gmres
-  mechanical_solver: chebyshev
+  thermal_solver: iterative_amg
+  mechanical_solver: iterative_amg
   tol: 1e-2
   tol_T: 1e-2
   tol_u: 1e-2

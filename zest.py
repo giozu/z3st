@@ -18,7 +18,7 @@ import yaml
 from input.multi_material import MultiMaterial
 from postprocessing import save_temperature_history
 from utils import *
-from output import *
+from output.output import *
 
 DEBUG_MODE = "--debug" in sys.argv
 MESH_PLOT_MODE = "--mesh_plot" in sys.argv
@@ -108,15 +108,6 @@ print(f"Elapsed time: {elapsed_time:.4f} s")
 # Results
 # -------
 results = problem.get_results()
-
-# ----------------
-# Stiffness matrix
-# ----------------
-# rows, cols, values = problem.parse_matrix_file("thermal_stiffness_matrix.txt")
-# problem.plot_sparsity_pattern(rows, cols, "thermal_sparisity_pattern.png")
-
-# rows, cols, values = problem.parse_matrix_file("mech_stiffness_matrix.txt")
-# problem.plot_sparsity_pattern(rows, cols, "mech_sparisity_pattern")
 
 # ----------------
 # Post-processing
