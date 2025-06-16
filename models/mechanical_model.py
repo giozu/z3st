@@ -13,8 +13,6 @@ class MechanicalModel:
         self.traction_label = {}
         self.mechanical_residuals = {}
         self.i_mech = {}
-        self.u = {}
-        self.u_old = {}
 
     def set_mechanical_boundary_conditions(self, V_u_sub, V_u_map=None):
         """

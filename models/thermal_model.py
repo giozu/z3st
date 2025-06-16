@@ -14,8 +14,6 @@ class ThermalModel:
         self.neumann = {}
         self.neumann_label = {}
         self.i_th = {}
-        self.T = {}
-        self.T_old = {}
 
     def set_thermal_boundary_conditions(self, V_t_sub, V_t_map=None):
         """
