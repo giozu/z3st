@@ -293,25 +293,25 @@ class Solver:
                     a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t += q_vol * v_t * dx
 
-                if "fuel" in self.materials and "cladding" in self.materials:
-                    fuel_face_tag_name = "face_xx_1_1"
-                    clad_face_tag_name = "face_xx_0_2"
-                    fuel_face_id = self.label_map.get(fuel_face_tag_name)
-                    clad_face_id = self.label_map.get(clad_face_tag_name)
+                # if "fuel" in self.materials and "cladding" in self.materials:
+                #     fuel_face_tag_name = "face_xx_1_1"
+                #     clad_face_tag_name = "face_xx_0_2"
+                #     fuel_face_id = self.label_map.get(fuel_face_tag_name)
+                #     clad_face_id = self.label_map.get(clad_face_tag_name)
 
-                    if fuel_face_id is not None and clad_face_id is not None:
-                        print(f"[INFO] Applying non-conformal thermal coupling between '{fuel_face_tag_name}' (ID: {fuel_face_id}) and '{clad_face_tag_name}' (ID: {clad_face_id}).")
-                        ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=fuel_face_id)
-                        ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=clad_face_id)
-                        h_gap = dolfinx.fem.Constant(self.mesh, 2e3)
+                #     if fuel_face_id is not None and clad_face_id is not None:
+                #         print(f"[INFO] Applying non-conformal thermal coupling between '{fuel_face_tag_name}' (ID: {fuel_face_id}) and '{clad_face_tag_name}' (ID: {clad_face_id}).")
+                #         ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=fuel_face_id)
+                #         ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=clad_face_id)
+                #         h_gap = dolfinx.fem.Constant(self.mesh, 2e3)
                         
-                        a_t += h_gap * ufl.inner(u_t, v_t) * (ds_fuel_interface + ds_clad_interface)
-                        L_t += h_gap * T_old * v_t * (ds_fuel_interface + ds_clad_interface)
+                #         a_t += h_gap * ufl.inner(u_t, v_t) * (ds_fuel_interface + ds_clad_interface)
+                #         L_t += h_gap * T_old * v_t * (ds_fuel_interface + ds_clad_interface)
 
-                    else:
-                        if fuel_face_id is None: print(f"[WARNING] Fuel interface tag '{fuel_face_tag_name}' not found.")
-                        if clad_face_id is None: print(f"[WARNING] Cladding interface tag '{clad_face_tag_name}' not found.")
-                        print("[WARNING] Skipping thermal coupling.")
+                #     else:
+                #         if fuel_face_id is None: print(f"[WARNING] Fuel interface tag '{fuel_face_tag_name}' not found.")
+                #         if clad_face_id is None: print(f"[WARNING] Cladding interface tag '{clad_face_tag_name}' not found.")
+                #         print("[WARNING] Skipping thermal coupling.")
 
                 # Apply Neumann BCs
                 if 'neumann_thermal' in self.bcs_info:

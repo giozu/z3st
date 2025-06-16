@@ -20,14 +20,14 @@ materials:
 
 solver_settings:
   coupling: staggered
-  thermal_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
+  thermal_solver: iterative_amg # direct_mumps, iterative_amg, iterative_hypre
   mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2
   tol_T: 1e-2
   tol_u: 1e-2
   tol_mech: 1e-6
   tol_th: 1e-6
-  relax_T: 0.4
+  relax_T: 0.7
   relax_u: 0.4
   n_iter_max: 30
 
