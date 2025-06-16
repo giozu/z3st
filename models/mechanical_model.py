@@ -116,15 +116,15 @@ class MechanicalModel:
                     boundary_dofs_x = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(0), self.fdim, self.ft.find(region_id))
                     bcx = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_x, V_u_sub.sub(0))
 
-                    self.dirichlet_mechanical[mat_type].append(bc_i)
+                    self.dirichlet_mechanical[mat_type].append(bcx)
                     
                     print(f"  [INFO] Clamp_x mechanical BC on '{mat_type}' → Clamp_x at region '{region_name}'")
 
                 elif bc_type == "Clamp_y":
                     boundary_dofs_y = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(1), self.fdim, self.ft.find(region_id))
-                    bcx = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_y, V_u_sub.sub(1))
+                    bcy = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_y, V_u_sub.sub(1))
 
-                    self.dirichlet_mechanical[mat_type].append(bc_i)
+                    self.dirichlet_mechanical[mat_type].append(bcy)
 
                     print(f"  [INFO] Clamp_y mechanical BC on '{mat_type}' → Clamp_y at region '{region_name}'")
 
@@ -132,7 +132,7 @@ class MechanicalModel:
                     boundary_dofs_z = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(2), self.fdim, self.ft.find(region_id))
                     bcz = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_z, V_u_sub.sub(2))
 
-                    self.dirichlet_mechanical[mat_type].append(bc_i)
+                    self.dirichlet_mechanical[mat_type].append(bcz)
 
                     print(f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'")
                     

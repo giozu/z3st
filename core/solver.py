@@ -310,25 +310,21 @@ class Solver:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t[label] += bc_info['value'] * v_t * ds
 
-                    # if "fuel" in self.materials and "cladding" in self.materials:
-                    #     fuel_face_tag_name = "face_xx_1_1"
-                    #     clad_face_tag_name = "face_xx_0_2"
-                    #     fuel_face_id = self.label_map.get(fuel_face_tag_name)
-                    #     clad_face_id = self.label_map.get(clad_face_tag_name)
+                    # Thermal coupling fuel-cladding interface
+                    h_gap_value = 10.0
+                    h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
 
-                    #     if fuel_face_id is not None and clad_face_id is not None:
-                    #         print(f"[INFO] Applying non-conformal thermal coupling between '{fuel_face_tag_name}' (ID: {fuel_face_id}) and '{clad_face_tag_name}' (ID: {clad_face_id}).")
-                    #         ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=fuel_face_id)
-                    #         ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=clad_face_id)
-                    #         h_gap = dolfinx.fem.Constant(self.mesh, 2e3)
-                            
-                    #         a_t += h_gap * ufl.inner(u_t, v_t) * (ds_fuel_interface + ds_clad_interface)
-                    #         L_t += h_gap * T_old * v_t * (ds_fuel_interface + ds_clad_interface)
+                    # Fuel contribution
+                    if "fuel" in self.materials and label == "fuel":
+                        ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_1_1"])
+                        a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_fuel_interface
+                        L_t[label] += h_gap * self.T["cladding"] * v_t * ds_fuel_interface
 
-                    #     else:
-                    #         if fuel_face_id is None: print(f"[WARNING] Fuel interface tag '{fuel_face_tag_name}' not found.")
-                    #         if clad_face_id is None: print(f"[WARNING] Cladding interface tag '{clad_face_tag_name}' not found.")
-                    #         print("[WARNING] Skipping thermal coupling.")
+                    # Cladding contribution
+                    if "cladding" in self.materials and label == "cladding":
+                        ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_0_2"])
+                        a_t[label] -= h_gap * ufl.inner(u_t, v_t) * ds_clad_interface
+                        L_t[label] -= h_gap * self.T["fuel"] * v_t * ds_clad_interface
 
                     # Sparsity pattern
                     # assemble_and_analyze_matrix(a_t[label], L_t[label], title=f"Thermal stiffness matrix - {label}")

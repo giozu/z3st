@@ -10,7 +10,7 @@
 
 mesh_path: mesh/multi_material.msh
 geometry_path: geometry/multi_material.yaml
-boundary_conditions_path: conditions/boundary_conditions.yaml
+boundary_conditions_path: conditions/boundary_conditions_multi_material.yaml
 
 materials:
   fuel: materials/uo2.yaml
@@ -36,7 +36,7 @@ models:
   mechanical: False
 
 lhr:
-  - 1000
+  - 10000
 time:
   - 0
 n_steps: 1
