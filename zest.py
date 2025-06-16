@@ -83,7 +83,7 @@ for step, (t, lhr) in enumerate(zip(times, lhrs)):
                   max_iters=int(input_data["solver_settings"]["n_iter_max"]),
                   tol=float(input_data["solver_settings"]["tol"]))
     
-    T_fuel_inner.append(np.max(problem.T["fuel"].x.array))
+    # T_fuel_inner.append(np.max(problem.T["fuel"].x.array))
     # T_fuel_inner.append(np.max(problem.T_fuel.x.array))
     # T_fuel_outer.append(np.mean(problem.T_fuel.x.array[problem.dofs_fuel_outer]))
     # T_clad_inner.append(np.mean(problem.T_cladding.x.array[problem.dofs_cladding_inner]))

@@ -247,8 +247,8 @@ class Solver:
         print(f"  → Mechanical KSP tolerance: {tol_mech:.1e}")
 
         # --- Initial Setup ---
-        T_sol = self.T['fuel']  # Reference function for the temperature solution
-        u_sol = self.u['fuel']  # Reference function for the displacement solution
+        T_sol = self.T  # Reference function for the temperature solution
+        u_sol = self.u  # Reference function for the displacement solution
 
         # Functions to store the previous state
         T_old = dolfinx.fem.Function(T_sol.function_space)
@@ -422,15 +422,13 @@ class Solver:
                 print("----------------------------\n")
                 
                 # Update all fields in the self.T and self.u dictionaries
-                for name in self.materials.keys():
-                    self.T[name].interpolate(T_sol)
-                    self.u[name].interpolate(u_sol)
+                self.T.interpolate(T_sol)
+                self.u.interpolate(u_sol)
+                
                 return True
 
-        # This part is executed if the for loop finishes without convergence
         print("\n[WARNING] Staggered solver did not converge within the maximum number of iterations.")
-        for name in self.materials.keys():
-            self.T[name].interpolate(T_sol)
-            self.u[name].interpolate(u_sol)
+        self.T.interpolate(T_sol)
+        self.u.interpolate(u_sol)
 
         return False
