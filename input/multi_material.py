@@ -46,111 +46,47 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         print(f"set_boundary_conditions")
         print(f"-----------------------")
 
-        self.bcs_info = {}
-
         with open(self.config["boundary_conditions_path"], "r") as f:
             print(f"Loading boundary conditions from '{self.config["boundary_conditions_path"]}'")
             self.boundary_conditions = yaml.safe_load(f)
 
         if self.coupling == "staggered":
-            self.V_t_sub = self.V_t
-            self.V_m_sub = self.V_m
-            self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions(self.V_t_sub)
-            self.mechanical_bcs = self.set_mechanical_boundary_conditions(self.V_m_sub)
+            self.set_thermal_boundary_conditions(self.V_t)
+            self.set_mechanical_boundary_conditions(self.V_m)
         else:
             V_t_sub, V_t_map = self.W.sub(1).collapse()
             V_t_map = np.array(V_t_map, dtype=np.int32)
             V_u_sub, V_u_map = self.W.sub(0).collapse() # need to .collapse() to define BCs / define Functions from it / interpolate
             V_u_map = np.array(V_u_map, dtype=np.int32)
-            self.thermal_dirichlet_bcs = self.set_thermal_boundary_conditions(V_t_sub, V_t_map)
-            self.mechanical_bcs = self.set_mechanical_boundary_conditions(V_u_sub, V_u_map)
-
-        self.bcs = self.thermal_dirichlet_bcs + self.mechanical_bcs
+            self.set_thermal_boundary_conditions(V_t_sub, V_t_map)
+            self.set_mechanical_boundary_conditions(V_u_sub, V_u_map)
     
     def initialize_fields(self):
         print(f"-----------------")
         print(f"initialize_fields")
         print(f"-----------------")
 
-        # --- Temperature field ---
-        # v_t: Test Function
-        # - Symbolic function defined as v_t = TestFunction(V_t)
-        # - Represents virtual temperature variations in the weak form
-        # - Used in assembling the thermal right-hand side
-        # - Does not hold any actual values
-        # u_t: Trial Function
-        # - Symbolic unknown defined as u_t = TrialFunction(V_t)
-        # - Represents the temperature field being solved for
-        # - Used to assemble the thermal stiffness matrix
-        # - Not used directly for numerical evaluation
-        # T: Function
-        # - Created with T = Function(V_t, name="Temperature")
-        # - Contains the actual computed temperature field
-        # - Updated by the solver during the thermal solution process
-        # - Access values via T.x.array
-        # - This is the field to use for output, visualization, or coupling to mechanics
-        # Important: 'T' holds the real temperature solution.
-        # 'u_t' and 'v_t' are symbolic and only used to define the variational forms.
+        # --- Temperature fields ---
+        self.T = {}
 
-        # self.sol_mixed = dolfinx.fem.Function(self.W)
-        # self.u_sol_mixed, self.T_sol_mixed = self.sol_mixed.split()
+        for name, mat in self.materials.items():
+            T_func = dolfinx.fem.Function(self.V_t, name=f"Temperature_{name}")
+            T_func.x.array[:] = mat["T_ref"]
+            values = T_func.x.array
+            print(f"  {name}: T min={values.min():.2f} K, T max={values.max():.2f} K, T mean={values.mean():.2f} K")
+            self.T[name] = T_func
 
-        # print(f"Initializing temperature fields for: {list(self.materials.keys())}")
-        # for name, mat in self.materials.items():
-        #     T_func = dolfinx.fem.Function(self.V_t, name=f"Temperature_{name}")
-        #     T_func.x.array[:] = mat["T_ref"]
-        #     self.T[name] = T_func
-        #     cells = self.ft.find(self.label_map[name])
-        #     dofs = dolfinx.fem.locate_dofs_topological(self.W.sub(1), self.fdim, cells)
-        #     self.sol_mixed.sub(1).x.array[dofs] = mat["T_ref"]
-        # for name, T_func in self.T.items():
-        #     values = T_func.x.array
-        #     print(f"  {name}: min={values.min():.2f} K, max={values.max():.2f} K, mean={values.mean():.2f} K")
-
-        # --- Displacement ---
-        # v_m: Test Function
-        # - Defined symbolically using v_m = TestFunction(V_m)
-        # - Represents virtual displacements in the weak form
-        # - Used when assembling the right-hand side of the variational equation
-        # - Does not contain solution data
-        # u_m: Trial Function
-        # - Defined symbolically using u_m = TrialFunction(V_m)
-        # - Represents the unknown displacement field in the variational problem
-        # - Used in assembling the system matrix (stiffness matrix)
-        # - Not assigned or modified during solution
-        # u: Function
-        # - Created with u = Function(V_m, name="Displacement")
-        # - Stores the actual numerical solution of the displacement field
-        # - Values are updated during solve(): solver.solve(b, u.x.petsc_vec)
-        # - This is the field to use in postprocessing (e.g., stress evaluation)
-        # Important: Only 'u' contains the computed displacement.
-        # 'u_m' and 'v_m' are symbolic and used solely to define the variational problem
-        # print(f"Initializing displacement fields for: {list(self.materials.keys())}")
-        # for name, mat in self.materials.items():
-        #     u_func = dolfinx.fem.Function(self.V_m, name=f"Displacement_{name}")
-        #     u_func.x.array[:] = 0.0
-        #     self.u[name] = u_func
-        #     cells = self.ft.find(self.label_map[name])
-        #     dofs = dolfinx.fem.locate_dofs_topological(self.W.sub(0), self.fdim, cells)
-        #     self.sol_mixed.sub(0).x.array[dofs] = 0.0
-
-        print(f"Initializing temperature fields")
-        T_func = dolfinx.fem.Function(self.V_t, name=f"Temperature")
-        T_func.x.array[:] = self.materials["fuel"]["T_ref"]
-        values = T_func.x.array
-        print(f"  T min={values.min():.2f} K, T max={values.max():.2f} K, T mean={values.mean():.2f} K")
-        self.T = T_func
-
+        # --- Heat source ---
+        self.q_third = {}
         for name, mat in self.materials.items():
             is_fissile = bool(mat.get("fissile", False))
             self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
             print(f"  q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
 
-        print(f"Initializing displacement fields")
-        u_func = dolfinx.fem.Function(self.V_m, name=f"Displacement")
-        u_func.x.array[:] = 0.0
-        self.u = u_func
-        values = u_func.x.array
+        # --- Displacement field ---
+        self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
+        self.u.x.array[:] = 0.0
+        values = self.u.x.array
         print(f"  u min={values.min():.2f} m, u max={values.max():.2f} m, u mean={values.mean():.2f} m")
 
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
@@ -171,12 +107,11 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         self.stress = {}
         
         u = self.u
-        T = self.T
 
         for name in self.materials:
             mat = self.materials[name]
             self.strain[name] = self.epsilon(u)
-            self.stress[name] = self.sigma_mech(u, mat) - self.sigma_th(T, mat)
+            self.stress[name] = self.sigma_mech(u, mat) - self.sigma_th(self.T[name], mat)
 
         return self.u, self.strain, self.stress, self.T
 

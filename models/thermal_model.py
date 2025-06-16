@@ -10,12 +10,10 @@ class ThermalModel:
         self.L_thermal = {}
         self.thermal_residuals = {}
         self.q_third = {}
-        self.bcs_thermal = {}
-        self.neumann = {}
-        self.neumann_label = {}
-        self.i_th = {}
-
-    def set_thermal_boundary_conditions(self, V_t_sub, V_t_map=None):
+        self.neumann_thermal = {}
+        self.dirichlet_thermal = {}
+     
+    def set_thermal_boundary_conditions(self, V_t, V_t_map=None):
         """
         Apply thermal boundary conditions for both staggered and mixed cases.
 
@@ -29,10 +27,9 @@ class ThermalModel:
         print(f"Setting thermal boundary conditions...")
         thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
 
-        dirichlet_bcs_list = []
-
-        self.bcs_info.setdefault('neumann_thermal', [])
-        self.bcs_info['neumann_thermal'].clear()
+        for name in self.materials:
+            self.neumann_thermal[name] = []
+            self.dirichlet_thermal[name] = []
 
         for mat_type, bc_list in thermal_bcs_defs.items():
             for bc_info in bc_list:
@@ -59,19 +56,21 @@ class ThermalModel:
                     # locate dofs differently depending on mixed or staggered
                     if V_t_map is None:
                         # staggered mode (standard)
-                        dofs = dolfinx.fem.locate_dofs_topological(V_t_sub, self.fdim, self.ft.find(region_id))
+                        dofs = dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.ft.find(region_id))
                     else:
                         # mixed mode
                         dofs_mixed = dolfinx.fem.locate_dofs_topological(
-                            (self.W.sub(1), V_t_sub), self.fdim, self.ft.find(region_id)
+                            (self.W.sub(1), V_t), self.fdim, self.ft.find(region_id)
                         )
                         dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
                         dofs = V_t_map[dofs_mixed[:, 1]]
 
-                    bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t_sub)
-                    dirichlet_bcs_list.append(bc)
+                    bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t)
+                    self.dirichlet_thermal[mat_type].append(bc)
 
                     print(f"  [INFO] Dirichlet thermal BC on '{mat_type}' → {temperature} K at region '{region_name}'")
+                    # print(f"  {type(bc)}")
+                    # print("  Applied dofs:", bc.dof_indices)
 
                 elif bc_type == "Neumann":
                     flux = bc_info.get("flux")
@@ -79,13 +78,11 @@ class ThermalModel:
                         print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no flux. Skipping.")
                         continue
 
-                    self.bcs_info['neumann_thermal'].append({'id': region_id, 'value': float(flux)})
+                    self.neumann_thermal[mat_type].append({'id': region_id, 'value': float(flux)})
                     print(f"  [INFO] Neumann thermal BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
 
                 else:
                     print(f"  [WARNING] Unknown thermal BC type '{bc_type}' for '{mat_type}'. Skipping.")
-
-        return dirichlet_bcs_list
 
     def fixed_temperature(self, mesh, dofs, V, T):
         """
