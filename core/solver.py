@@ -51,29 +51,26 @@ class Solver:
         # 2. Choose preconditioner based on solver_type
         if solver_type == "direct_mumps":
             return {
-                "ksp_type": "preonly", # We only use the preconditioner
+                "ksp_type": "preonly",
                 "pc_type": "lu",
-                "pc_factor_mat_solver_type": "mumps" # MUMPS is a great direct solver
+                "pc_factor_mat_solver_type": "mumps" # MUMPS, direct solver
             }
 
         elif solver_type == "iterative_amg":
-            # PETSc's built-in Algebraic Multigrid (GAMG)
             coarse_eq_limit = 500 if physics == "thermal" else 1000
             return {
                 "ksp_type": ksp_type,
-                "pc_type": "gamg",
+                "pc_type": "gamg", # PETSc's built-in Algebraic Multigrid (GAMG)
                 "ksp_rtol": rtol,
                 "pc_gamg_coarse_eq_limit": coarse_eq_limit,
-                # Restart for GMRES can be useful for memory
-                # "ksp_gmres_restart": 30 
+                # "ksp_gmres_restart": 30 # Restart for GMRES can be useful for memory
             }
 
         elif solver_type == "iterative_hypre":
-            # HYPRE's BoomerAMG, often more robust than GAMG
             return {
                 "ksp_type": ksp_type,
                 "pc_type": "hypre",
-                "pc_hypre_type": "boomeramg",
+                "pc_hypre_type": "boomeramg", # HYPRE's BoomerAMG, often more robust than GAMG
                 "ksp_rtol": rtol
             }
         
@@ -280,6 +277,7 @@ class Solver:
                 u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
                 a_t, L_t = 0, 0
 
+                # --- Assemblaggio dei termini di dominio (conduzione e sorgente) ---
                 for label, material in self.materials.items():
                     if label not in self.label_map:
                         print(f"[WARNING] Material label '{label}' not found in label_map → skipping.")
@@ -287,20 +285,42 @@ class Solver:
 
                     tag = self.label_map[label]
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
+                    
+                    # Usare dolfinx.fem.Constant è una buona pratica
                     k = dolfinx.fem.Constant(self.mesh, material["k"])
-                    q_vol = dolfinx.fem.Constant(self.mesh, self.q_third[label])  # <-- metti SEMPRE come dolfin Constant
+                    q_vol = dolfinx.fem.Constant(self.mesh, self.q_third[label])
 
                     a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t += q_vol * v_t * dx
-                
+
+                if "fuel" in self.materials and "cladding" in self.materials:
+                    fuel_face_tag_name = "face_xx_1_1"
+                    clad_face_tag_name = "face_xx_0_2"
+                    fuel_face_id = self.label_map.get(fuel_face_tag_name)
+                    clad_face_id = self.label_map.get(clad_face_tag_name)
+
+                    if fuel_face_id is not None and clad_face_id is not None:
+                        print(f"[INFO] Applying non-conformal thermal coupling between '{fuel_face_tag_name}' (ID: {fuel_face_id}) and '{clad_face_tag_name}' (ID: {clad_face_id}).")
+                        ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=fuel_face_id)
+                        ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=clad_face_id)
+                        h_gap = dolfinx.fem.Constant(self.mesh, 2e3)
+                        
+                        a_t += h_gap * ufl.inner(u_t, v_t) * (ds_fuel_interface + ds_clad_interface)
+                        L_t += h_gap * T_old * v_t * (ds_fuel_interface + ds_clad_interface)
+
+                    else:
+                        if fuel_face_id is None: print(f"[WARNING] Fuel interface tag '{fuel_face_tag_name}' not found.")
+                        if clad_face_id is None: print(f"[WARNING] Cladding interface tag '{clad_face_tag_name}' not found.")
+                        print("[WARNING] Skipping thermal coupling.")
+
                 # Apply Neumann BCs
                 if 'neumann_thermal' in self.bcs_info:
                     for bc_info in self.bcs_info['neumann_thermal']:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t += bc_info['value'] * v_t * ds
-                
+               
                 # Sparsity pattern
-                assemble_and_analyze_matrix(a_t, L_t, title="Thermal Stiffness Matrix")
+                # assemble_and_analyze_matrix(a_t, L_t, title="Thermal Stiffness Matrix")
 
                 # Define and solve the linear problem
                 petsc_opts_thermal = self.get_solver_options(
@@ -314,7 +334,7 @@ class Solver:
                 
                 # Apply relaxation
                 T_sol.x.array[:] = self.relax_T * T_sol.x.array + (1 - self.relax_T) * T_old.x.array
-
+                
             # =========================================================
             #  2. SOLVE MECHANICAL SUB-PROBLEM (global)
             # =========================================================
@@ -349,15 +369,15 @@ class Solver:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_m += ufl.dot(bc_info['value'], v_m) * ds
 
+                # Sparsity pattern
+                # assemble_and_analyze_matrix(a_m, L_m, title="Mechanical Stiffness Matrix")
+
                 # Define and solve the linear problem
                 petsc_opts_mech = self.get_solver_options(
                     solver_type=self.mechanical_solver,
                     physics="mechanical",
                     rtol=tol_mech
                 )
-
-                # Sparsity pattern
-                assemble_and_analyze_matrix(a_m, L_m, title="Mechanical Stiffness Matrix")
 
                 problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts_mech)
                 problem_m.solve()
@@ -412,4 +432,5 @@ class Solver:
         for name in self.materials.keys():
             self.T[name].interpolate(T_sol)
             self.u[name].interpolate(u_sol)
+
         return False

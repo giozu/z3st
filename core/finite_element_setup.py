@@ -5,9 +5,6 @@ from mpi4py import MPI
 from petsc4py import PETSc
 import basix
 
-# import meshio
-# import numpy as np
-
 class FiniteElementSetup:
     def __init__(self):
         print("__FiniteElementSetup initializer__")
@@ -33,10 +30,6 @@ class FiniteElementSetup:
 
         self.W = dolfinx.fem.functionspace(self.mesh, basix.ufl.mixed_element([P1_3, P1_1]))
         self.V_m_mixed, self.V_t_mixed = dolfinx.fem.functionspace(self.mesh, P1_3), dolfinx.fem.functionspace(self.mesh, P1_1)
-
-        # In FEniCSx, "CG" is a shorthand for "Lagrange" for scalar fields, but it does not account for vector-valued fields by default. 
-        # Hence, "Lagrange" provides more flexibility when specifying vector-valued elements or higher dimensions 
-        # self.V_m = dolfinx.fem.functionspace(self.mesh, ("CG", 1))  # Continuous Galerkin space for displacement (does not work)
 
         print("Mechanical function space (V_m):", self.V_m)
         print("Thermal function space (V_t):", self.V_t)

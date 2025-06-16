@@ -121,7 +121,9 @@ class Mesh:
             V_t = self.V_t
         return dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.ft.find(label))
     
-    def locateMechanicalDofs(self, label):
+    def locateMechanicalDofs(self, label, V_m=None):
+        if V_m is None:
+            V_m = self.V_m
         return dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(label))
            
     def volume(self, log_path="output/simulation_log.txt"):

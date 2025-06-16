@@ -3,7 +3,6 @@ import numpy as np
 import dolfinx
 import ufl
 import scipy.sparse
-# It's good practice to have all imports at the top
 
 def assemble_and_analyze_matrix(a, L=None, bcs=None, title="Matrix", max_dense_size=5000):
     """
@@ -89,16 +88,12 @@ def analyze_matrix(A, title="Matrix", max_dense_size=5000, plot = False):
         # For large matrices, avoid creating a dense version
         print(f"Matrix is too large for dense analysis (>{max_dense_size} DOFs).")
         try:
-            # FIX: A more robust way to get the number of non-zero entries is to
-            # retrieve the CSR data and check the length of the values array.
-            # This is more reliable than A.getInfo().
             _, _, av = A.getValuesCSR()
             nnz = len(av)
             density = nnz / (size * size)
-            print(f"Non-zero entries: {nnz:,}") # Use comma for thousands separator
+            print(f"Non-zero entries: {nnz:,}")
             print(f"Sparsity density: {density:.2e}")
         except Exception as e:
-            # Fallback if CSR data isn't available for some reason
             print(f"Could not retrieve number of non-zero entries. Reason: {e}")
 
     # 3. Symmetry check (works for both dense and sparse)
