@@ -60,9 +60,11 @@ class Mesh:
             self.height = self.geometry.get("height", None)
             print(f"  height = {self.height:.2e} m")
 
+            # DEVO CORREGGERE, GENERALIZZARRE AREA = EDGE * WIDTH
             if self.geometry_type == "rect":
                 self.edge = self.geometry.get("edge", None)
-                self.area = self.edge ** 2
+                self.width = self.geometry.get("width", None)
+                self.area = self.edge * self.width
                 print(f"  edge = {self.edge:.2f} m, height = {self.height:.2f} m")
             elif self.geometry_type == "cyl":
                 self.fuel_inner_radius = self.geometry.get("fuel_inner_radius", None)

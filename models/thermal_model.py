@@ -8,7 +8,6 @@ class ThermalModel:
         self.a_thermal = {}
         self.L_thermal = {}
         self.thermal_residuals = {}
-        self.q_third = {}
         self.neumann_thermal = {}
         self.dirichlet_thermal = {}
      

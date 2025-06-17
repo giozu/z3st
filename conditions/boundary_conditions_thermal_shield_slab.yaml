@@ -1,0 +1,11 @@
+thermal_bcs:
+  steel:
+    - type: Dirichlet
+      region: face_xx_1
+      temperature: 590.0
+
+mechanical_bcs:
+  steel:
+    - type: Dirichlet
+      region: bottom
+      displacement: [0.0, 0.0, 0.0]

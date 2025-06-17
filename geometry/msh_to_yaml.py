@@ -1,7 +1,7 @@
 import yaml
 
-msh_file = "../mesh/fuel_rod_structured.msh"
-yaml_file = "fuel_rod_structured.yaml"
+msh_file = "../mesh/thermal_shield_slab.msh"
+yaml_file = "thermal_shield_slab.yaml"
 
 def extract_physical_names(filename):
     with open(filename, "r") as f:
@@ -28,13 +28,11 @@ def extract_physical_names(filename):
 
 def write_yaml(labels, output_file):
     data = {
-        "name": "fuel_rod_structured",
-        "fuel_inner_radius": "0.0",         # meters
-        "fuel_outer_radius": "0.004",       # meters
-        "cladding_inner_radius": "0.0042",  # meters
-        "cladding_outer_radius": "0.0047",  # meters
-        "height": "0.01",                   # meters
-        "geometry_type": "cyl",
+        "name": "thermal_shield_slab",
+        "edge": "0.23",                     # meters
+        "width": "0.5",                     # meters
+        "height": "1.0",                    # meters
+        "geometry_type": "rect",
         "labels": labels
     }
     with open(output_file, "w") as f:

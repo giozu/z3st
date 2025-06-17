@@ -1,0 +1,13 @@
+name: thermal_shield_slab
+edge: '0.23'
+width: '0.5'
+height: '1.0'
+geometry_type: rect
+labels:
+  bottom: 1
+  face_yy_0: 2
+  face_xx_1: 3
+  face_yy_1: 4
+  face_xx_0: 5
+  top: 6
+  steel: 7

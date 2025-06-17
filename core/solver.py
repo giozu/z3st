@@ -300,7 +300,11 @@ class Solver:
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
 
                     k = dolfinx.fem.Constant(self.mesh, material["k"])
-                    q_vol = dolfinx.fem.Constant(self.mesh, self.q_third[label])
+
+                    if isinstance(self.q_third[label], dolfinx.fem.Function):
+                        q_vol = self.q_third[label]
+                    else:
+                        q_vol = dolfinx.fem.Constant(self.mesh, self.q_third[label])
 
                     a_t[label] += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t[label] += q_vol * v_t * dx
