@@ -1,7 +1,6 @@
-import dolfinx
-import ufl
+import sys, numpy as np
+import dolfinx, ufl
 from petsc4py import PETSc
-import numpy as np
 
 class MechanicalModel:
     def __init__(self):
@@ -31,13 +30,13 @@ class MechanicalModel:
                 bc_type = bc_info.get("type")
 
                 if region_name is None or bc_type is None:
-                    print(f"  [WARNING] Incomplete mechanical BC definition for '{mat_type}'. Skipping.")
-                    continue
+                    print(f"  [ERROR] Incomplete mechanical BC definition for '{mat_type}'.")
+                    sys.exit(1)
 
                 region_id = self.label_map.get(region_name)
                 if region_id is None:
-                    print(f"  [WARNING] Region '{region_name}' not found in label_map for mechanical BC. Skipping.")
-                    continue
+                    print(f"  [ERROR] Region '{region_name}' not found in label_map for mechanical BC.")
+                    sys.exit(1)
 
                 facets = self.ft.find(region_id)
                 facet_dim = self.fdim
@@ -46,8 +45,8 @@ class MechanicalModel:
                 if bc_type == "Dirichlet":
                     displacement = bc_info.get("displacement")
                     if displacement is None:
-                        print(f"[WARNING] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement. Skipping.")
-                        continue
+                        print(f"[ERROR] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement.")
+                        sys.exit(1)
 
                     if V_u_map is None:  # staggered mode
                         dofs = dolfinx.fem.locate_dofs_topological(V_u_sub, self.fdim, facets)
@@ -62,14 +61,14 @@ class MechanicalModel:
 
                 # -------- Neumann --------
                 elif bc_type == "Neumann":
-                    traction_val = bc_info.get("traction")
-                    if traction_val is None:
-                        print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no traction. Skipping.")
-                        continue
+                    traction_value = bc_info.get("traction")
+                    if traction_value is None:
+                        print(f"  [ERROR] Neumann BC on '{mat_type}' for region '{region_name}' has no traction.")
+                        sys.exit(1)
 
-                    traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_val)) * self.normal
+                    traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_value)) * self.normal
                     self.traction[mat_type].append({'id': region_id, 'value': traction_constant})
-                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_val} Pa at region '{region_name}'")
+                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_value} Pa at region '{region_name}'")
 
                 # -------- Generic Slip (component-wise blocking) --------
                 elif bc_type == "Slip_x":
@@ -81,7 +80,6 @@ class MechanicalModel:
                             facets
                         )
                         boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
-
                         bc_i = dolfinx.fem.dirichletbc(
                             dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
                             boundary_dofs,
@@ -99,15 +97,12 @@ class MechanicalModel:
                             facet_dim,
                             facets
                         )
-
                         boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
-
                         bc_i = dolfinx.fem.dirichletbc(
                             dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
                             boundary_dofs,
                             V_m_sub
                         )
-
                         self.dirichlet_mechanical[mat_type].append(bc_i)
 
                     print(f"  [INFO] Slip_z mechanical BC on '{mat_type}' →  u_x, u_y fixed at region '{region_name}'")
@@ -137,8 +132,9 @@ class MechanicalModel:
                     print(f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'")
                     
                 else:
-                    print(f"  [WARNING] Unknown mechanical BC type '{bc_type}' for '{mat_type}'.")
-                    print(f"  Available are: Dirichlet, Neumann, Clamp_x/y/z, Slip_xy/z. Skipping.")
+                    print(f"  [ERROR] Unknown mechanical BC type '{bc_type}' for '{mat_type}'.")
+                    print(f"  Available are: Dirichlet, Neumann, Clamp_x/y/z, Slip_z.")
+                    sys.exit(1)
 
     def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):
         """

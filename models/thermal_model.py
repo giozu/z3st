@@ -1,7 +1,6 @@
-import dolfinx
-import ufl
+import sys, numpy as np
+import dolfinx, ufl
 from petsc4py import PETSc
-import numpy as np
 
 class ThermalModel:
     def __init__(self):
@@ -37,19 +36,19 @@ class ThermalModel:
                 bc_type = bc_info.get("type")
 
                 if region_name is None or bc_type is None:
-                    print(f"  [WARNING] Incomplete thermal BC definition for '{mat_type}'. Skipping.")
-                    continue
+                    print(f"  [ERROR] Incomplete thermal BC definition for '{mat_type}'.")
+                    sys.exit(1)
                 
                 region_id = self.label_map.get(region_name)
                 if region_id is None:
-                    print(f"  [WARNING] Region '{region_name}' not found in label_map for thermal BC. Skipping.")
-                    continue
+                    print(f"  [ERROR] Region '{region_name}' not found in label_map for thermal BC.")
+                    sys.exit(1)
 
                 if bc_type == "Dirichlet":
                     temperature = bc_info.get("temperature")
                     if temperature is None:
-                        print(f"  [WARNING] Dirichlet BC on '{mat_type}' for region '{region_name}' has no temperature. Skipping.")
-                        continue
+                        print(f"  [ERROR] Dirichlet BC on '{mat_type}' for region '{region_name}' has no temperature.")
+                        sys.exit(1)
 
                     T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
 
@@ -75,14 +74,16 @@ class ThermalModel:
                 elif bc_type == "Neumann":
                     flux = bc_info.get("flux")
                     if flux is None:
-                        print(f"  [WARNING] Neumann BC on '{mat_type}' for region '{region_name}' has no flux. Skipping.")
-                        continue
+                        print(f"  [ERROR] Neumann BC on '{mat_type}' for region '{region_name}' has no flux.")
+                        sys.exit(1)
 
                     self.neumann_thermal[mat_type].append({'id': region_id, 'value': float(flux)})
                     print(f"  [INFO] Neumann thermal BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
 
                 else:
-                    print(f"  [WARNING] Unknown thermal BC type '{bc_type}' for '{mat_type}'. Skipping.")
+                    print(f"  [ERROR] Unknown thermal BC type '{bc_type}' for '{mat_type}'.")
+                    print(f"  Available are: Dirichlet, Neumann.")
+                    sys.exit(1)
 
     def fixed_temperature(self, mesh, dofs, V, T):
         """
