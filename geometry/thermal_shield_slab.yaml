@@ -1,5 +1,5 @@
 name: thermal_shield_slab
-edge: '0.23'
+edge: '0.045'
 width: '0.5'
 height: '1.0'
 geometry_type: rect

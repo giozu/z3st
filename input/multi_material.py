@@ -83,26 +83,23 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
             print(f"  q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
 
-        L_decay = 27 # (1/m) attenuation coefficient / macroscopic cross section of gamma rays in steels
+        mu = 24 # (1/m) attenuation coefficient / macroscopic cross section of gamma rays in steels
         q_func = dolfinx.fem.Function(self.V_t)
         def f(x):
-            return 90e3 * np.exp(-x[0] / L_decay)
+            q0 = 3.46e6 # W/m3
+            return q0 * np.exp(-x[0] / mu)
         q_func.interpolate(f)
-        self.q_third["cladding"] = q_func
+        self.q_third["steel"] = q_func
 
+        # plot q_third(x)
         import pyvista
-
         V = self.V_t
-
         cells, types, x = dolfinx.plot.vtk_mesh(V)
-        
         grid = pyvista.UnstructuredGrid(cells, types, x)
         grid.point_data["q"] = q_func.x.array.reshape((x.shape[0], 1))
-
         grid.set_active_scalars("q")
         subplotter = pyvista.Plotter(shape=(1, 1))
         subplotter.subplot(0, 0)
-        subplotter.add_text("Scalar contour field", font_size=14, color="black", position="upper_edge")
         subplotter.add_mesh(grid, show_edges=True, show_scalar_bar=True)
         subplotter.view_xy()
         subplotter.show()

@@ -29,7 +29,7 @@ def extract_physical_names(filename):
 def write_yaml(labels, output_file):
     data = {
         "name": "thermal_shield_slab",
-        "edge": "0.23",                     # meters
+        "edge": "0.045",                    # meters
         "width": "0.5",                     # meters
         "height": "1.0",                    # meters
         "geometry_type": "rect",
