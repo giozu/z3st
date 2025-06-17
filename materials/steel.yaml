@@ -1,11 +1,11 @@
 name: steel
 
-E: 1.7e11            # Young's modulus (Pa)
+E: 1.77e11           # Young's modulus (Pa)
 nu: 0.3              # Poisson's ratio (-)
 
-k: 10                # Thermal conductivity (W/m·K)
+k: 48.1              # Thermal conductivity (W/m·K)
 cp: 200              # Specific heat capacity (J/kg·K)
-alpha: 1.2e-5        # Thermal expansion coefficient (1/K)
+alpha: 1.7e-5        # Thermal expansion coefficient (1/K)
 
 rho: 7750            # Density (kg/m³)
 T_ref: 300           # Reference temperature (K)

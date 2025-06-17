@@ -16,6 +16,9 @@ class MechanicalModel:
 
         If V_u_map is None → staggered (non-mixed spaces).
         If V_u_map is provided → mixed (collapsed subspace).
+
+        To do:
+        - ERROR if a region is assigned more than once
         """
         print("Setting mechanical boundary conditions...")
         mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})

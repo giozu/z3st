@@ -10,8 +10,8 @@
 SetFactory("Built-in");
 
 W = 0.045; // Edge
-L = 0.50;  // Width
-H = 1.00;  // Height
+L = 0.10;  // Width
+H = 0.10;  // Height
 n = 20;    // Number of divisions per edge (adjust as needed)
 
 // Corner points

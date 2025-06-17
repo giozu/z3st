@@ -92,17 +92,17 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         self.q_third["steel"] = q_func
 
         # plot q_third(x)
-        import pyvista
-        V = self.V_t
-        cells, types, x = dolfinx.plot.vtk_mesh(V)
-        grid = pyvista.UnstructuredGrid(cells, types, x)
-        grid.point_data["q"] = q_func.x.array.reshape((x.shape[0], 1))
-        grid.set_active_scalars("q")
-        subplotter = pyvista.Plotter(shape=(1, 1))
-        subplotter.subplot(0, 0)
-        subplotter.add_mesh(grid, show_edges=True, show_scalar_bar=True)
-        subplotter.view_xy()
-        subplotter.show()
+        # import pyvista
+        # V = self.V_t
+        # cells, types, x = dolfinx.plot.vtk_mesh(V)
+        # grid = pyvista.UnstructuredGrid(cells, types, x)
+        # grid.point_data["q"] = q_func.x.array.reshape((x.shape[0], 1))
+        # grid.set_active_scalars("q")
+        # subplotter = pyvista.Plotter(shape=(1, 1))
+        # subplotter.subplot(0, 0)
+        # subplotter.add_mesh(grid, show_edges=True, show_scalar_bar=True)
+        # subplotter.view_xy()
+        # subplotter.show()
 
         # --- Displacement field ---
         self.u = dolfinx.fem.Function(self.V_m, name="Displacement")

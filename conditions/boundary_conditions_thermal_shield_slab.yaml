@@ -1,11 +1,20 @@
 thermal_bcs:
   steel:
     - type: Dirichlet
+      region: face_xx_0
+      temperature: 494.0
+    - type: Dirichlet
       region: face_xx_1
-      temperature: 590.0
+      temperature: 491.0
 
 mechanical_bcs:
   steel:
     - type: Dirichlet
       region: bottom
       displacement: [0.0, 0.0, 0.0]
+    - type: Neumann
+      region: face_xx_0
+      traction: -7.5e-6
+    - type: Neumann
+      region: face_xx_1
+      traction: -7.5e-6

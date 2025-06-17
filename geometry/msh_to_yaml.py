@@ -30,8 +30,8 @@ def write_yaml(labels, output_file):
     data = {
         "name": "thermal_shield_slab",
         "edge": "0.045",                    # meters
-        "width": "0.5",                     # meters
-        "height": "1.0",                    # meters
+        "width": "0.1",                     # meters
+        "height": "0.1",                    # meters
         "geometry_type": "rect",
         "labels": labels
     }
