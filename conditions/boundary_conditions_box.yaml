@@ -6,6 +6,5 @@ thermal_bcs:
 
 mechanical_bcs:
   fuel:
-    - type: Dirichlet
-      region: bottom1
-      displacement: [0.0, 0.0, 0.0]
+    - type: Clamp_z
+      region: bottom

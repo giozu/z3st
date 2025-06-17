@@ -8,13 +8,13 @@
 # Zest is a thermomechanical fuel performance code written in Python.
 # This project is currently under development.
 
-mesh_path: mesh/fuel_rod_structured.msh
-geometry_path: geometry/fuel_rod_structured.yaml
-boundary_conditions_path: conditions/boundary_conditions_fuel_rod.yaml
+mesh_path: mesh/box.msh
+geometry_path: geometry/box.yaml
+boundary_conditions_path: conditions/boundary_conditions_box.yaml
 
 materials:
   fuel: materials/uo2.yaml
-  cladding: materials/T91.yaml
+  # cladding: materials/T91.yaml
   # gas: materials/he.yaml
   # coolant: materials/h2o.yaml
 
