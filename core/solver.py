@@ -311,20 +311,20 @@ class Solver:
                         L_t[label] += bc_info['value'] * v_t * ds
 
                     # Thermal coupling fuel-cladding interface
-                    h_gap_value = 10.0
+                    h_gap_value = 100.0
                     h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
 
                     # Fuel contribution
                     if "fuel" in self.materials and label == "fuel":
-                        ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_1_1"])
+                        ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["fuel_lateral"])
                         a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_fuel_interface
                         L_t[label] += h_gap * self.T["cladding"] * v_t * ds_fuel_interface
 
                     # Cladding contribution
                     if "cladding" in self.materials and label == "cladding":
-                        ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_0_2"])
-                        a_t[label] -= h_gap * ufl.inner(u_t, v_t) * ds_clad_interface
-                        L_t[label] -= h_gap * self.T["fuel"] * v_t * ds_clad_interface
+                        ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["cladding_inner"])
+                        a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_clad_interface
+                        L_t[label] += h_gap * self.T["fuel"] * v_t * ds_clad_interface
 
                     # Sparsity pattern
                     # assemble_and_analyze_matrix(a_t[label], L_t[label], title=f"Thermal stiffness matrix - {label}")
