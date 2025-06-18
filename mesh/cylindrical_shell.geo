@@ -9,12 +9,12 @@
 SetFactory("OpenCASCADE");
 
 // Inner and outer radii
-ri = 0.0042;
-ro = 0.0047;
+ri = 2.5;
+ro = 3.0;
 n_r = 20;
 n_h = 20;
 
-h = 0.01; // Height of the 3D extrusion
+h = 1.0; // Height of the 3D extrusion
 
 // --------
 // 2D slice
@@ -81,13 +81,13 @@ Extrude {0, 0, h} {
 }
 
 // Define physical surfaces
-Physical Surface("cladding_bottom") = {1, 2, 3, 4};
-Physical Surface("cladding_inner_lateral") = {5, 10, 14, 18};
-Physical Surface("cladding_outer_lateral") = {7, 12, 16, 19};
-Physical Surface("cladding_top") = {9, 13, 17, 20};
+Physical Surface("bottom") = {1, 2, 3, 4};
+Physical Surface("inner_radius") = {5, 10, 14, 18};
+Physical Surface("outer_radius") = {7, 12, 16, 19};
+Physical Surface("top") = {9, 13, 17, 20};
 
 // Define physical volume
-Physical Volume("cladding") = {1, 2, 3, 4};
+Physical Volume("steel") = {1, 2, 3, 4};
 
 // Mesh
 Mesh.ElementOrder = 1;
@@ -98,4 +98,4 @@ Mesh.MeshSizeExtendFromBoundary = 0.5;
 Mesh 3;
 
 // Save the mesh
-Save "cylindrical_shell_structured.msh";
+Save "cylindrical_shell.msh";

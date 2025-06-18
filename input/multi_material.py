@@ -83,13 +83,17 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
             print(f"  q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
 
-        mu = 24 # (1/m) attenuation coefficient / macroscopic cross section of gamma rays in steels
-        q_func = dolfinx.fem.Function(self.V_t)
-        def f(x):
-            q0 = 3.46e6 # W/m3
-            return q0 * np.exp(-x[0] / mu)
-        q_func.interpolate(f)
-        self.q_third["steel"] = q_func
+            # --- Gamma heating ---
+            mu_gamma = self.materials["steel"]["mu_gamma"]
+            q0 = self.materials["steel"]["gamma_heating"]
+            if q0 > 0.0:
+                q_func = dolfinx.fem.Function(self.V_t)
+                def f(x):
+                    return q0 * np.exp(-x[0] * mu_gamma)
+                q_func.interpolate(f)
+                self.q_third[name] = q_func
+                print(f"  gamma heating - q_third_0[{name}] = {q0:.3e} W/m³, attenuation: {mu_gamma} 1/m)")
+
 
         # plot q_third(x)
         # import pyvista

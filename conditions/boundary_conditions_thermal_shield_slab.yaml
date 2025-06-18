@@ -6,7 +6,10 @@ thermal_bcs:
     - type: Dirichlet
       region: face_xx_1
       temperature: 491.0
-
+    # - type: Neumann
+    #   region: face_xx_1
+    #   flux: 0.0
+      
 mechanical_bcs:
   steel:
     - type: Dirichlet

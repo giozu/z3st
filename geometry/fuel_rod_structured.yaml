@@ -4,7 +4,7 @@ fuel_outer_radius: '0.004'
 cladding_inner_radius: '0.0042'
 cladding_outer_radius: '0.0047'
 height: '0.01'
-geometry_type: cyl
+geometry_type: cyl-cyl
 labels:
   fuel_bottom: 1
   cladding_bottom: 2
