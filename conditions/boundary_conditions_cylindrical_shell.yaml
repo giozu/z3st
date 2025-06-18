@@ -2,7 +2,7 @@ thermal_bcs:
   steel:
     - type: Dirichlet
       region: inner_radius
-      temperature: 494.0
+      temperature: 573
     - type: Neumann
       region: outer_radius
       flux: 0.0
