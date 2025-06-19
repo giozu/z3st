@@ -130,14 +130,15 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
     def get_results(self):
         self.strain = {}
         self.stress = {}
-        
+        self.stress_mech = {}
+        self.stress_th = {}
+
         u = self.u
 
         for name in self.materials:
             mat = self.materials[name]
             self.strain[name] = self.epsilon(u)
             self.stress[name] = self.sigma_mech(u, mat) - self.sigma_th(self.T[name], mat)
-
-        return self.u, self.strain, self.stress, self.T
-
+            self.stress_mech[name] = self.sigma_mech(u, mat)
+            self.stress_th[name] = - self.sigma_th(self.T[name], mat)
 
