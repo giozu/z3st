@@ -19,10 +19,10 @@ T = T_ref + (q_prime / (4 * k)) * (R_outer**2 - r**2)
 
 # Lame parameters
 lmbda = E * nu / ((1 + nu) * (1 - 2 * nu))
-mu = E / (2 * (1 + nu))
+G = E / (2 * (1 + nu))
 
 # Thermal stress sigma_theta (hoop stress)
-sigma_theta = (3 * lmbda + 2 * mu) * alpha * ((T[0] + T[-1])/2 - T)
+sigma_theta = (3 * lmbda + 2 * G) * alpha * ((T[0] + T[-1])/2 - T)
 
 # Plot results
 plt.figure(figsize=(8, 5))
