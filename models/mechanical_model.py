@@ -127,13 +127,14 @@ class MechanicalModel:
                     print(f"  [INFO] Clamp_y mechanical BC on '{mat_type}' → Clamp_y at region '{region_name}'")
 
                 elif bc_type == "Clamp_z":
-                    boundary_dofs_z = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(2), self.fdim, self.ft.find(region_id))
-                    bcz = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_z, V_u_sub.sub(2))
+                    val = bc_info.get("value", 0.0)
 
+                    boundary_dofs_z = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(2), self.fdim, self.ft.find(region_id))
+                    bcz = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(val), boundary_dofs_z, V_u_sub.sub(2))
                     self.dirichlet_mechanical[mat_type].append(bcz)
 
-                    print(f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'")
-                    
+                    print(f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → u_z = {val} at region '{region_name}'")
+
                 else:
                     print(f"  [ERROR] Unknown mechanical BC type '{bc_type}' for '{mat_type}'.")
                     print(f"  Available are: Dirichlet, Neumann, Clamp_x/y/z, Slip_z.")
@@ -224,10 +225,32 @@ class MechanicalModel:
         return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
-        return material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.tdim) + 2 * material["mu"] * self.epsilon(u)
+
+        stress_tensor = material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.tdim) + 2 * material["G"] * self.epsilon(u)
+
+        if self.regime == "plane_stress":
+            """
+            Modified constitutive model for 3D mesh under plane stress assumption in x-y plane.
+            The component σ_zz is set to zero by modifying the strain tensor appropriately.
+            """
+
+            s_xx = stress_tensor[0,0]
+            s_xy = stress_tensor[0,1]
+            s_yy = stress_tensor[1,1]
+
+            stress_tensor_plane_stress = ufl.as_tensor([
+                [s_xx, s_xy, 0.0],
+                [s_xy, s_yy, 0.0],
+                [0.0,  0.0,  0.0]
+            ])
+
+            return stress_tensor_plane_stress
+        
+        else:
+            return stress_tensor
 
     def sigma_th(self, T, material):
-        return (3 * material["lmbda"] + 2 * material["mu"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.tdim)
+        return (3 * material["lmbda"] + 2 * material["G"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.tdim)
 
     def zero_displacement(self, mesh, dofs, V):
         """

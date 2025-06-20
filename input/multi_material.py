@@ -32,7 +32,7 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
 
         for name, mat in materials.items():
             mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
-            mat["mu"] = mat["E"] / (2 * (1 + mat["nu"]))
+            mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
             mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
             self.materials[name] = mat
 
