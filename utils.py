@@ -73,12 +73,13 @@ def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_his
     lhrs = np.interp(times, t_points, lhr_points)
 
     # Write to TSV file
-    with open(filename, mode="w") as file:
-        file.write("time (s)\tLHR (W/m)\n")
-        for t, lhr in zip(times, lhrs):
-            file.write(f"{t:.6e}\t{lhr:.6e}\n")
+    if filename is not None:
+        with open(filename, mode="w") as file:
+            file.write("time (s)\tLHR (W/m)\n")
+            for t, lhr in zip(times, lhrs):
+                file.write(f"{t:.6e}\t{lhr:.6e}\n")
 
-    print(f"Power history saved to {filename} with {len(times)} steps")
+        print(f"Power history saved to {filename} with {len(times)} steps")
 
     return times, lhrs, len(times)
 

@@ -28,8 +28,8 @@ with open("input.yaml", "r") as f:
     input_data = yaml.safe_load(f)
 
 # --- Output ---
-log_path = "output/simulation_log.txt"
-clear_log_file(log_path)
+# log_path = "output/simulation_log.txt"
+# clear_log_file(log_path)
 os.makedirs("output", exist_ok=True)
 
 # --- Geometry ---
@@ -53,7 +53,7 @@ problem.materials(**loaded_materials)
 t_points = input_data["time"]
 lhr_points = input_data["lhr"]
 n_steps = input_data["n_steps"]
-times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=n_steps, filename="power_history.csv")
+times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=n_steps, filename=None)
 problem.parameters(lhr=lhr_points[0])
 
 time_values = []

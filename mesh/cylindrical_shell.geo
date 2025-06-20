@@ -14,7 +14,7 @@ ro = 3.0;
 n_r = 20;
 n_h = 20;
 
-h = 8.0; // Height of the 3D extrusion
+h = 10.0; // Height of the 3D extrusion
 
 // --------
 // 2D slice
