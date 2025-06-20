@@ -140,7 +140,7 @@ class Solver:
             # Material properties
             k = dolfinx.fem.Constant(self.mesh, material["k"])
             lmbda = dolfinx.fem.Constant(self.mesh, material["lmbda"])
-            mu = dolfinx.fem.Constant(self.mesh, material["mu"])
+            G = dolfinx.fem.Constant(self.mesh, material["G"])
             alpha = dolfinx.fem.Constant(self.mesh, material["alpha"])
             T_ref = dolfinx.fem.Constant(self.mesh, material["T_ref"])
             rho = dolfinx.default_scalar_type(material["rho"])
@@ -148,7 +148,7 @@ class Solver:
             body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
             q_vol = self.q_third[label]
 
-            delta_T = u_t - T_ref
+            # delta_T = u_t - T_ref
 
             # Thermal residual (associated with v_t, from sub-space 1)
             F_thermal = (k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) - q_vol * v_t) * dx_local
@@ -159,8 +159,10 @@ class Solver:
 
             # Mechanical residual
             epsilon = ufl.sym(ufl.grad(u_m))
-            sigma_m = lmbda * ufl.tr(epsilon) * ufl.Identity(self.tdim) + 2 * mu * epsilon
-            sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
+            # sigma_m = lmbda * ufl.tr(epsilon) * ufl.Identity(self.tdim) + 2 * G * epsilon
+            # sigma_th = (3 * lmbda + 2 * G) * alpha * delta_T * ufl.Identity(self.gdim)
+            sigma_m = self.sigma_mech(u_m, material)
+            sigma_th = self.sigma_th(u_t, material)
             sigma_tot = sigma_m - sigma_th
 
             if self.on["mechanical"] is True:
@@ -364,7 +366,7 @@ class Solver:
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
 
                     lmbda = dolfinx.fem.Constant(self.mesh, material["lmbda"])
-                    mu = dolfinx.fem.Constant(self.mesh, material["mu"])
+                    G = dolfinx.fem.Constant(self.mesh, material["G"])
                     alpha = dolfinx.fem.Constant(self.mesh, material["alpha"])
                     T_ref = dolfinx.fem.Constant(self.mesh, material["T_ref"])
                     rho = dolfinx.default_scalar_type(material["rho"])
@@ -372,11 +374,11 @@ class Solver:
                     body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
 
                     epsilon = lambda u: ufl.sym(ufl.grad(u))
-                    sigma_m = lambda u: lmbda * ufl.tr(epsilon(u)) * ufl.Identity(self.tdim) + 2 * mu * epsilon(u)
+                    # sigma_m = lambda u: lmbda * ufl.tr(epsilon(u)) * ufl.Identity(self.tdim) + 2 * G * epsilon(u)
 
-                    sigma_th = (3 * lmbda + 2 * mu) * alpha * (T_sol[label] - T_ref) * ufl.Identity(self.gdim)
+                    sigma_th = (3 * lmbda + 2 * G) * alpha * (T_sol[label] - T_ref) * ufl.Identity(self.gdim)
 
-                    a_m += ufl.inner(sigma_m(u_m), epsilon(v_m)) * dx
+                    a_m += ufl.inner(self.sigma_mech(u_m, material), epsilon(v_m)) * dx
                     L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(sigma_th, epsilon(v_m)) * dx
 
                     for bc_info in self.traction[label]:

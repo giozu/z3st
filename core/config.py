@@ -15,6 +15,7 @@ class Config:
         self.boundary_conditions_path = self.config.get("boundary_conditions_path", None)
         self.n_steps = self.config.get("n_steps", 10)
         self.coupling = self.config.get("solver_settings", {}).get("coupling", "staggered")
+        self.regime = self.config.get("mechanical_regime", "3D")
 
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")
@@ -23,3 +24,4 @@ class Config:
         print(f"  → Models active       :")
         for model, active in self.on.items():
             print(f"      {model:<10} → {'ON' if active else 'OFF'}")
+        print(f"  → Mechanical regime   : {self.regime}")
