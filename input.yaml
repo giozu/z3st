@@ -25,16 +25,18 @@ solver_settings:
   mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2
   tol_T: 1e-2
-  tol_u: 5e-3
-  tol_mech: 1e-7
+  tol_u: 1e-2
+  tol_mech: 1e-6
   tol_th: 1e-6
   relax_T: 0.7
-  relax_u: 0.7
+  relax_u: 0.8
   n_iter_max: 30
 
 models:
   thermal: False
   mechanical: True
+
+mechanical_regime: "3D" # 3D, plane_stress
 
 lhr:
   - 0
