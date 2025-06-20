@@ -80,20 +80,25 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         self.q_third = {}
         for name, mat in self.materials.items():
             is_fissile = bool(mat.get("fissile", False))
-            self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
-            print(f"  q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
-
-            # --- Gamma heating ---
             mu_gamma = self.materials["steel"]["mu_gamma"]
             q0 = self.materials["steel"]["gamma_heating"]
-            if q0 > 0.0:
+
+            # --- Fissile ---
+            if is_fissile:
+                self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
+                print(f"  q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
+
+            # --- Gamma heating ---
+            elif q0 > 0.0:
                 q_func = dolfinx.fem.Function(self.V_t)
                 def f(x):
                     return q0 * np.exp(-x[0] * mu_gamma)
                 q_func.interpolate(f)
                 self.q_third[name] = q_func
                 print(f"  gamma heating - q_third_0[{name}] = {q0:.3e} W/m³, attenuation: {mu_gamma} 1/m)")
-
+            else:
+                self.q_third[name] = 0.0
+                print(f"  q_third_0[{name}] = 0.0 W/m³")
 
         # plot q_third(x)
         # import pyvista

@@ -11,10 +11,10 @@ SetFactory("OpenCASCADE");
 // Inner and outer radii
 ri = 2.5;
 ro = 3.0;
-n_r = 40;
+n_r = 20;
 n_h = 20;
 
-h = 1.0; // Height of the 3D extrusion
+h = 8.0; // Height of the 3D extrusion
 
 // --------
 // 2D slice

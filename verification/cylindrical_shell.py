@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Define problem parameters
-a = 0.5  # Inner radius (m)
-b = 1.0  # Outer radius (m)
+a = 2.5  # Inner radius (m)
+b = 3.0  # Outer radius (m)
 pi = 1e6  # Inner pressure (Pa)
 po = 0  # Outer pressure (Pa)
 
@@ -29,13 +29,13 @@ sigma_z = 2 * nu * A
 plt.figure(figsize=(10, 6))
 
 # Normalized radial stress plot
-plt.plot(r, sigma_r, label='Radial stress $\sigma_r$', color='blue')
+plt.plot(r, sigma_r, label='Radial stress s_r', color='blue')
 
 # Normalized hoop stress plot
-plt.plot(r, sigma_theta, label='Hoop stress $\sigma_t$', color='red')
+plt.plot(r, sigma_theta, label='Hoop stress s_t', color='red')
 
 # Normalized axial stress plot
-plt.axhline(sigma_z, label='Axial stress $\sigma_z$', color='green', linestyle='--')
+plt.axhline(sigma_z, label='Axial stress s_z', color='green', linestyle='--')
 
 # Add labels and legend
 plt.title('Stress distribution in a thick-walled cylinder', fontsize=14)

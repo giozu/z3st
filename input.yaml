@@ -8,9 +8,9 @@
 # Zest is a thermomechanical fuel performance code written in Python.
 # This project is currently under development.
 
-mesh_path: mesh/thermal_shield_slab.msh
-geometry_path: geometry/thermal_shield_slab.yaml
-boundary_conditions_path: conditions/boundary_conditions_thermal_shield_slab.yaml
+mesh_path: mesh/cylindrical_shell.msh
+geometry_path: geometry/cylindrical_shell.yaml
+boundary_conditions_path: conditions/boundary_conditions_cylindrical_shell.yaml
 
 materials:
   # fuel: materials/uo2.yaml
@@ -22,7 +22,7 @@ materials:
 solver_settings:
   coupling: staggered
   thermal_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
-  mechanical_solver: iterative_amg # direct_mumps, iterative_amg, iterative_hypre
+  mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2
   tol_T: 1e-2
   tol_u: 1e-2
@@ -33,11 +33,11 @@ solver_settings:
   n_iter_max: 30
 
 models:
-  thermal: True
+  thermal: False
   mechanical: True
 
 lhr:
-  - 1000
+  - 0
 time:
   - 0
 n_steps: 1

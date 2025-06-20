@@ -16,7 +16,7 @@ import sys
 import yaml
 # zest modules
 from input.multi_material import MultiMaterial
-from postprocessing import save_temperature_history
+from output.postprocessing import save_temperature_history
 from utils import *
 from output.output import *
 
@@ -87,9 +87,9 @@ results = problem.get_results()
 # ----------------
 # Post-processing
 # ----------------
-plot3d_temperature(problem)
-plot3d_displacement(problem)
+# plot3d_temperature(problem)
+# plot3d_displacement(problem)
 # plot_scalar(problem)
-plot1d_temperature(problem, y_target=0.05, z_target=0.05, tol=0.0001)
-plot1d_stress(problem, y_target=0.05, z_target=0.05, tol=0.0001)
+# plot1d_temperature(problem, y_target=0.0, z_target=0.75, tol=0.0001)
+plot1d_stress(problem, y_target=0.0, z_target=4.0, tol=0.001)
 export_for_paraview(problem)
