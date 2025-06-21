@@ -80,8 +80,8 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
         self.q_third = {}
         for name, mat in self.materials.items():
             is_fissile = bool(mat.get("fissile", False))
-            mu_gamma = self.materials["steel"]["mu_gamma"]
-            q0 = self.materials["steel"]["gamma_heating"]
+            mu_gamma = self.materials[name]["mu_gamma"]
+            q0 = self.materials[name]["gamma_heating"]
 
             # --- Fissile ---
             if is_fissile:

@@ -108,4 +108,4 @@ Mesh.MeshSizeExtendFromBoundary = 0.5;
 Mesh 3;
 
 // Save the mesh
-Save "full_cylinder.msh";
+Save "full_cylinder_0.msh";

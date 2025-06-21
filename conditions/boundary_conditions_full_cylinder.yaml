@@ -1,0 +1,20 @@
+thermal_bcs:
+  fuel:
+    - type: Dirichlet
+      region: lateral
+      temperature: 573
+      
+mechanical_bcs:
+  fuel:
+    # - type: Dirichlet
+    #   region: bottom
+    #   displacement: [0.0, 0.0, 0.0]
+    - type: Clamp_z
+      region: bottom
+      value: 0.0
+    - type: Clamp_z
+      region: top
+      value: 0.0
+    - type: Neumann
+      region: lateral
+      traction: -1e6

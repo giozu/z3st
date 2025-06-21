@@ -66,6 +66,12 @@ class Mesh:
                 self.width = self.geometry.get("width", None)
                 self.area = self.edge * self.width
                 print(f"  edge = {self.edge:.3f} m")
+            elif self.geometry_type == "cyl":
+                self.inner_radius = self.geometry.get("inner_radius", None)
+                self.outer_radius = self.geometry.get("outer_radius", None)
+                self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
+                print(f"  inner_radius = {self.inner_radius:.2e} m")
+                print(f"  outer_radius = {self.outer_radius:.2e} m")
             elif self.geometry_type == "cyl-cyl":
                 self.fuel_inner_radius = self.geometry.get("fuel_inner_radius", None)
                 self.fuel_outer_radius = self.geometry.get("fuel_outer_radius", None)
@@ -76,14 +82,8 @@ class Mesh:
                 print(f"  fuel_outer_radius = {self.fuel_outer_radius:.2e} m")
                 print(f"  cladding_inner_radius = {self.cladding_inner_radius:.2e} m")
                 print(f"  cladding_outer_radius = {self.cladding_outer_radius:.2e} m")
-            elif self.geometry_type == "cyl":
-                self.inner_radius = self.geometry.get("inner_radius", None)
-                self.outer_radius = self.geometry.get("outer_radius", None)
-                self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
-                print(f"  inner_radius = {self.inner_radius:.2e} m")
-                print(f"  outer_radius = {self.outer_radius:.2e} m")
 
-            print(f"  area = {self.area:.2e} m2")
+            print(f"  area = {self.area:.3e} m2")
             print(f"Label map from '{self.config["geometry_path"]}'")
             for label, tag in sorted(self.label_map.items(), key=lambda item: item[1]):
                 print(f"  {label:<12} → {tag}")

@@ -1,0 +1,12 @@
+name: full_cylinder
+
+inner_radius: 0.0
+outer_radius: 0.004
+height: 0.01
+
+geometry_type: cyl
+labels:
+  bottom: 1
+  top: 2
+  lateral: 3
+  fuel: 4

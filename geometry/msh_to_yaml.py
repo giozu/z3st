@@ -1,7 +1,7 @@
 import yaml
 
-msh_file = "../mesh/cylindrical_shell.msh"
-yaml_file = "cylindrical_shell.yaml"
+msh_file = "../mesh/full_cylinder_2.msh"
+yaml_file = "full_cylinder.yaml"
 
 def extract_physical_names(filename):
     with open(filename, "r") as f:
@@ -28,10 +28,9 @@ def extract_physical_names(filename):
 
 def write_yaml(labels, output_file):
     data = {
-        "name": "cylindrical_shell",
-        "inner_radius": "2.5",              # meters
-        "outer_radius": "3.0",              # meters
-        "height": "1.0",                    # meters
+        "name": "full_cylinder",
+        "radius": "0.004",              # meters
+        "height": "0.01",               # meters
         "geometry_type": "cyl",
         "labels": labels
     }

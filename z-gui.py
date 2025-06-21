@@ -1,6 +1,7 @@
 import pyvista as pv
 import numpy as np
 import dolfinx
+import matplotlib.pyplot as plt
 
 def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True, show_tensor_field=None):
     """
@@ -14,6 +15,10 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
     """
     print(f"Loading file: {filename}")
     grid = pv.read(filename)
+
+    tensor_fields = [k for k in grid.cell_data.keys() if k.startswith("Stress") or k.startswith("Strain")]
+    print("Tensor fields available:", tensor_fields)
+
 
     plotter = pv.Plotter()
 
@@ -49,26 +54,38 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
     plotter.show()
 
     if show_tensor_field and show_tensor_field in grid.cell_data:
+        
+        # Coordinates
+        centers = grid.cell_centers().points
+        x = centers[:, 0]
+        y = centers[:, 1]
+        z = centers[:, 2]
+        r = np.sqrt(x**2 + y**2)
+        theta = np.arctan2(y, x)
 
-        # sigma_xx = tensor[:, 0, 0]
-        # sigma_yy = tensor[:, 1, 1]
-        sigma_zz = tensor[:, 2, 2]
+        # Tensor components
+        s_xx = tensor[:, 0, 0]
+        s_yy = tensor[:, 1, 1]
+        s_xy = tensor[:, 0, 1]
+        s_zz = tensor[:, 2, 2]
 
-        z_coords = grid.cell_centers().points[:, 2]
+        # Cylindrical components
+        sigma_rr = s_xx * np.cos(theta)**2 + s_yy * np.sin(theta)**2 + 2 * s_xy * np.sin(theta) * np.cos(theta)
+        sigma_tt = s_xx * np.sin(theta)**2 + s_yy * np.cos(theta)**2 - 2 * s_xy * np.sin(theta) * np.cos(theta)
 
-        import matplotlib.pyplot as plt
+        # Plot vs r
         plt.figure(figsize=(6, 4))
-        # plt.scatter(z_coords, sigma_xx, s=8, c='blue', label="σ_xx")
-        # plt.scatter(z_coords, sigma_yy, s=8, c='red', label="σ_yy")
-        plt.scatter(z_coords, sigma_zz, s=8, c='green', label="σ_zz")
-        plt.xlabel("z (m)")
-        plt.ylabel("σ_zz (Pa)")
-        plt.title(f"{show_tensor_field} - σ_zz along z")
+        plt.scatter(r, sigma_rr, s=8, c='purple', label="σ_rr (radial)")
+        plt.scatter(r, sigma_tt, s=8, c='orange', label="σ_θθ (hoop)")
+        plt.scatter(r, s_zz, s=8, c='blue', label="σ_θθ (hoop)")
+        plt.xlabel("r (m)")
+        plt.ylabel("Stress (Pa)")
+        plt.title(f"{show_tensor_field} - σ_rr and σ_θθ vs r")
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
-        plt.savefig("output/sigma_zz_vs_z.png", dpi=300)
-        print("σ_zz vs z plot saved to output/sigma_zz_vs_z.png")
+        plt.savefig("output/sigma_rr_tt_vs_r.png", dpi=300)
+        print("σ_rr / σ_θθ vs r plot saved to output/sigma_rr_tt_vs_r.png")
         plt.show()
 
     if "Displacement" in grid.point_data:
@@ -90,11 +107,10 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         print("u_z vs z plot saved to output/u_z_vs_z.png")
         plt.show()
 
-
 if __name__ == "__main__":
     view_vtu(
         filename="output/fields.vtu",
-        show_warp=False,
-        show_temperature=False,
-        show_tensor_field="Stress_steel"
+        show_warp=True,
+        show_temperature=True,
+        show_tensor_field="Stress_fuel"
     )
