@@ -13,7 +13,7 @@ SetFactory("OpenCASCADE");
 h = 0.01;         // Height of the cylinder
 r = 0.004;        // Radius of the cylinder
 
-n_theta = 128;     // Number of divisions along the circumference (use a multiple of 4)
+n_theta = 64;     // Number of divisions along the circumference (use a multiple of 4)
 n_z = 20;         // Number of divisions along the height
 
 // Calculate divisions for each quarter-circle arc.
@@ -40,7 +40,7 @@ Plane Surface(1) = {1};
 Transfinite Curve {1, 2, 3, 4} = n_theta_quarter + 1;
 
 // Make the surface transfinite, providing the 4 boundary corners and the center point.
-Transfinite Surface {1} = {1, 2, 3, 4, 0};
+Transfinite Surface {1} = {1, 2, 3, 4};
 Recombine Surface {1};
 
 // --- 3D Extrusion ---
