@@ -102,7 +102,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
 
         # Filter by z
         print("Available z-coordinates in the mesh (cell centers):", np.unique(np.round(z, 6)))
-        z_target = 0.00525
+        z_target = 0.00025
         tol = 1e-4
         mask = np.abs(z - z_target) < tol
 
@@ -136,9 +136,9 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         plt.scatter(r[mask], sigma_tt[mask], s=8, c='orange', label="σ_θθ (hoop)")
         plt.scatter(r[mask], s_zz[mask], s=8, c='blue', label="σ_zz (axial)")
 
-        plt.plot(r[mask], sigma_r_analytical, ':', label="σ_rr (analytical)")
-        plt.plot(r[mask], sigma_t_analytical, ':', label="σ_tt (analytical)")
-        plt.plot(r[mask], sigma_z_analytical, ':', label="σ_zz (analytical)")
+        plt.plot(r[mask], sigma_r_analytical, ':', c='purple', label="σ_rr (analytical)")
+        plt.plot(r[mask], sigma_t_analytical, ':', c='orange', label="σ_tt (analytical)")
+        plt.plot(r[mask], sigma_z_analytical, ':', c='blue', label="σ_zz (analytical)")
 
         plt.xlabel("r (m)")
         plt.ylabel("Stress (Pa)")
@@ -147,8 +147,22 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         plt.legend()
         plt.tight_layout()
         plt.savefig("output/sigma_rr_tt_vs_r.png", dpi=300)
-        # print("σ_rr / σ_θθ vs r plot saved to output/sigma_rr_tt_vs_r.png")
+        print("σ_rr / σ_θθ vs r plot saved to output/sigma_rr_tt_vs_r.png")
         plt.show()
+
+        # Plot 2D (z)
+        # idx = np.argsort(z)
+        # plt.figure(figsize=(6, 4))
+        # plt.scatter(z[idx], s_zz[idx], s=8, c='green', label="σ_zz")
+        # plt.xlabel("z (m)")
+        # plt.ylabel("σ_zz (Pa)")
+        # plt.title(f"{show_tensor_field} — σ_zz vs z")
+        # plt.grid(True)
+        # plt.legend()
+        # plt.tight_layout()
+        # plt.savefig("output/sigma_zz_vs_z.png", dpi=300)
+        # print("σ_zz vs z plot saved to output/sigma_zz_vs_z.png")
+        # plt.show()
 
     if "Displacement" in grid.point_data:
         disp = grid["Displacement"]

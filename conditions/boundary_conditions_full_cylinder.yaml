@@ -17,7 +17,7 @@ mechanical_bcs:
       value: 0.0
     # - type: Clamp_z
     #   region: top
-    #   value: 0.0
+    #   value: 0.01
     # - type: Neumann
     #   region: lateral
     #   traction: -1e6
