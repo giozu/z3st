@@ -1,13 +1,14 @@
 print("""
-Zest: A FEniCSx module for fuel performance modeling
-=====================================================
+ZEST: A FEniCSx Framework for Thermo-Mechanical Analysis
+========================================================
 Author: Giovanni Zullo
 Date: 16/01/2025
 
 Description:
 ------------
-Zest is a thermomechanical fuel performance code written in Python.
-This project is currently under development.
+ZEST is an open-source code for the coupled thermo-mechanical analysis 
+of multi-material domains. Built on FEniCSx, it supports transient simulations, 
+complex geometries, and user-defined boundary conditions.
 """)
 
 # Python modules

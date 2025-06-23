@@ -1,25 +1,27 @@
-# ZEST: A FEniCSx Framework for Fuel Performance Modeling
+# ZEST: A FEniCSx Framework for Thermo-Mechanical Analysis
 
 ## Overview
 
-**ZEST** is an open-source thermomechanical fuel performance code written in Python using the **FEniCSx** finite element framework. It supports the simulation of coupled thermal and mechanical behavior of nuclear fuel elements, with special focus on multi-material configurations, flexible geometry definitions, and fully transient boundary conditions.
+**ZEST** is an open-source thermo-mechanical analysis code built on the **FEniCSx** finite element library. It supports simulation of coupled thermal and mechanical behavior in multi-material domains, with flexibility in geometry, time-dependent loading, and boundary conditions.
 
-Developed by Giovanni Zullo, ZEST is modular, extensible, and ready to integrate advanced physics models for fuel performance simulations.
+Developed by Giovanni Zullo, ZEST is modular, extensible, and designed to incorporate advanced physics-based models for nuclear fuel and structural materials.
 
 ---
 
-## Main Features
+## Key Features
 
-* **Coupled Thermo-Mechanical Solver**: Thermal conduction and linear elasticity solved in a coupled framework with fixed-point iterations.
-* **Multi-material domain**: Support for arbitrary number of materials, each with independent mechanical and thermal properties.
-* **Mesh input via Gmsh**: Import of structured/unstructured meshes in `.msh` format.
-* **Geometry input via YAML**: Geometry and physical tags automatically parsed from mesh files.
-* **Configurable via YAML input files**: All simulation settings, materials and boundary conditions are fully configurable.
-* **Power history generator**: LHR history interpolated from tabulated data.
-* **Time-dependent solver**: Full support for transient time stepping.
-* **Relaxation schemes**: User-configurable relaxation factors for thermo-mechanical coupling.
-* **Post-processing**: Integrated plotting utilities (temperature, displacement, stress, residuals).
-* **Output in XDMF format**: Compatible with ParaView for 3D postprocessing.
+* **Coupled Thermo-Mechanical Solver**: Thermal conduction and linear elasticity solved in a coupled framework (staggered) with fixed-point iterations
+* **Transient support**: Fully time-dependent solver with LHR history interpolated from tabulated input
+* **Multi-material domain**: Arbitrary number of materials, each with independent mechanical and thermal properties
+* **Volumetric heating**: Includes fission and gamma heating sources with exponential attenuation
+* **Flexible boundary conditions**: Dirichlet, Neumann, clamp, and slip conditions defined via YAML
+* **Geometry input via YAML**: Automatic parsing of physical tags from `.msh` mesh files
+* **Mesh input via Gmsh**: Support for structured and unstructured `.msh` files (2D/3D)
+* **Configurable via YAML**: All simulation parameters, materials, and boundary conditions are user-configurable
+* **Relaxation schemes**: Customizable relaxation factors for temperature and displacement
+* **Post-processing**: Integrated 1D/3D plotting tools (temperature, stress, displacement, residuals)
+* **Output in VTU/XDMF format**: Compatible with ParaView and PyVista for full-field visualization
+* **Residual tracking**: Thermal and mechanical convergence plots for every time step
 
 ---
 
@@ -27,29 +29,48 @@ Developed by Giovanni Zullo, ZEST is modular, extensible, and ready to integrate
 
 ```bash
 ZEST/
- ├── zest.py                # Main driver script
- ├── core/
- │    ├── config.py         # Input parsing and configuration
- │    ├── mesh.py           # Mesh import and geometry setup
- │    ├── solver.py         # Global solver control
- │    ├── finiteElementSetup.py  # FEM spaces definition
- ├── models/
- │    ├── thermal_model.py  # Thermal model
- │    └── mechanical_model.py # Mechanical model
- ├── multi_material.py  # Main MultiMaterial class
- ├── msh_to_yaml.py     # Utility to generate YAML geometry from .msh
- ├── utils.py           # Power history, YAML I/O, log utilities
- ├── postprocessing.py  # Postprocessing and plotting
- ├── output.py          # Plotting 3D and 1D fields
- ├── materials/         # YAML material files
- ├── conditions/        # YAML boundary condition files
- ├── mesh/              # Gmsh meshes
- └── input.yaml         # Main input file for each simulation
+├── zest.py              # Main driver
+├── z-gui.py             # VTU visualizer
+├── input.yaml           # Simulation input
+├── README.md / LICENSE
+├── Allrun / Allclean
+│
+├── core/                # FEM setup & solver
+│   ├── config.py
+│   ├── mesh.py
+│   ├── solver.py
+│   └── ...
+│
+├── models/              # Physics models
+│   ├── thermal_model.py
+│   └── mechanical_model.py
+│
+├── output/              # Plots, exports, ParaView
+│   ├── output.py
+│   ├── *.pvsm
+│   └── ...
+│
+├── geometry/            # YAML + Gmsh converter
+│   ├── *.yaml
+│   └── msh_to_yaml.py
+│
+├── mesh/                # Gmsh geometries
+│   ├── *.geo / *.msh
+│   └── generators (*.py)
+│
+├── materials/           # Material properties (YAML)
+│   ├── *.yaml
+│   └── *.ipynb
+│
+├── conditions/          # Boundary conditions (YAML)
+├── verification/        # Benchmarks and tests
+├── zest-api/            # Render web API
+└── input/               # Example runs
 ```
 
 ---
 
-## Input Example (input.yaml)
+## Sample Input File
 
 ```yaml
 models:
@@ -61,9 +82,9 @@ time: [0.0, 5.0e6]
 lhr: [25000.0, 25000.0]
 n_steps: 10
 
-geometry_path: geometry/multi_material.yaml
-mesh_path: mesh/multi_material.msh
-conditions_path: conditions/boundary_conditions.yaml
+geometry_path: geometry/full_cylinder.yaml
+mesh_path: mesh/full_cylinder.msh
+boundary_conditions_path: conditions/boundary_conditions_full_cylinder.yaml
 
 materials:
   fuel: materials/uo2.yaml
@@ -77,17 +98,9 @@ solver_settings:
   n_iter_max: 20
 ```
 
-## Mesh to YAML helper
-
-You can automatically extract physical tags from your Gmsh mesh:
-
-```bash
-python msh_to_yaml.py
-```
-
 ---
 
-## Example run
+## How to Run
 
 ```bash
 python zest.py --debug --mesh_plot
@@ -95,46 +108,44 @@ python zest.py --debug --mesh_plot
 
 ---
 
+## Postprocessing Tools
+
+* `z-gui.py`: interactive 3D viewer with PyVista
+* `plot1d_temperature(...)`: 1D temperature profiles
+* `plot1d_stress(...)`: Stress components in cylindrical or Cartesian form
+* `plot_residuals()`: Solver residuals over iterations
+* `export_vtu()` / `export_xdmf()`: Export fields for ParaView
+
+---
+
 ## Environment Setup
 
 ```bash
-# Create environment
 conda create -n zest python=3.12.9 -y
 conda activate zest
 
-# Install packages
 conda install -c conda-forge fenics-dolfinx pyvista matplotlib meshio openmc
 pip install gmsh pyyaml
 ```
 
 ---
 
-## Postprocessing Tools
+## Development Roadmap
 
-* `plot3d_temperature(problem)`: 3D temperature field (deformed mesh)
-* `plot1d_temperature(problem, z_target=...)`: 1D radial temperature profiles
-* `plot1d_stress(problem, z_target=...)`: 1D stress profiles
-* `plot_residuals()`: Convergence plots for thermal and mechanical solvers
-* `save_temperature_history()`: Exports temperature evolution in TSV format
-
----
-
-## Next Development Steps
-
-* Nonlinear creep, swelling, irradiation models
-* Gap conductance updates (h\_gap(T,u))
-* Nonlinear contact mechanics (fuel-clad gap)
-* Material property dependencies with temperature and stress
-* Support for more general geometry inputs
-* Optimization of matrix assembly (reuse A)
-* Integration with neutronics (OpenMC, Serpent)
+* [ ] Monolithic coupled thermo-mechanical solver
+* [ ] Nonlinear effects: creep, swelling, densification
+* [ ] Temperature- and stress-dependent material models
+* [ ] Contact mechanics for fuel-clad gap
+* [ ] Advanced gap conductance models
+* [ ] Coupling with OpenMC or Serpent
+* [ ] Thermochemistry modules
+* [ ] ROM-based model acceleration
 
 ---
 
-## License and author
-
-**License**: Apache License, Version 2.0 (see LICENSE file)
+## License and Author
 
 **Author**: Giovanni Zullo
 **Institution**: Politecnico di Milano
 **Year**: 2025
+**License**: Apache License 2.0
