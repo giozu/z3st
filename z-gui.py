@@ -116,11 +116,30 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         sigma_rr = s_xx * np.cos(theta)**2 + s_yy * np.sin(theta)**2 + 2 * s_xy * np.sin(theta) * np.cos(theta)
         sigma_tt = s_xx * np.sin(theta)**2 + s_yy * np.cos(theta)**2 - 2 * s_xy * np.sin(theta) * np.cos(theta)
 
+        # Analytical
+        alpha = 1.45e-5
+        E = 170e9
+        delta_T = (1050.63 - 573)
+        nu = 0.3
+        thermal_stress_term =  alpha * E * delta_T / (4*(1 - nu))
+        R_s = 0.004
+
+        sigma_r_analytical = thermal_stress_term * (r[mask] ** 2 / (R_s)**2 - 1)
+        sigma_t_analytical = thermal_stress_term * (3*r[mask] ** 2 / (R_s)**2 - 1)
+        sigma_z_analytical = sigma_r_analytical + sigma_t_analytical
+
+        print(f"Thermal stress term: {thermal_stress_term*1e-6:.2f} MPa")
+
         # Plot vs r
         plt.figure(figsize=(6, 4))
         plt.scatter(r[mask], sigma_rr[mask], s=8, c='purple', label="σ_rr (radial)")
         plt.scatter(r[mask], sigma_tt[mask], s=8, c='orange', label="σ_θθ (hoop)")
         plt.scatter(r[mask], s_zz[mask], s=8, c='blue', label="σ_zz (axial)")
+
+        plt.plot(r[mask], sigma_r_analytical, ':', label="σ_rr (analytical)")
+        plt.plot(r[mask], sigma_t_analytical, ':', label="σ_tt (analytical)")
+        plt.plot(r[mask], sigma_z_analytical, ':', label="σ_zz (analytical)")
+
         plt.xlabel("r (m)")
         plt.ylabel("Stress (Pa)")
         plt.title(f"{show_tensor_field} - σ_rr and σ_θθ vs r")
