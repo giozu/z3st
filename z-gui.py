@@ -1,7 +1,7 @@
 import pyvista as pv
 import numpy as np
-import dolfinx
 import matplotlib.pyplot as plt
+from verification.analyitcal_cases import lame_solutions, thermal_stresses
 
 def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True, show_tensor_field=None):
     """
@@ -13,45 +13,92 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         show_temperature (bool): Whether to show temperature scalar field.
         show_tensor_field (str): Optional tensor field name (e.g., "Stress_steel", "Strain_steel").
     """
+
     print(f"Loading file: {filename}")
     grid = pv.read(filename)
 
-    tensor_fields = [k for k in grid.cell_data.keys() if k.startswith("Stress") or k.startswith("Strain")]
-    tensor = grid.cell_data[show_tensor_field]
-    tensor = tensor.reshape((-1, 3, 3)) 
+    # --- Auto-select tensor field if not explicitly set ---
+    available_stresses = [k for k in grid.cell_data.keys() if "Stress" in k]
+    available_strains = [k for k in grid.cell_data.keys() if "Strain" in k]
+    tensor_fields = available_stresses + available_strains
 
-    plotter = pv.Plotter()
+    print("Available stress fields:", available_stresses)
+    print("Available strain fields:", available_strains)
+    print("Tensor fields available:", tensor_fields)
+
+    if show_tensor_field is None:
+        if len(tensor_fields) == 1:
+            show_tensor_field = tensor_fields[0]
+            print(f"[INFO] Automatically selected tensor field: {show_tensor_field}")
+        elif len(available_stresses) == 1:
+            show_tensor_field = available_stresses[0]
+            print(f"[INFO] Defaulting to stress field: {show_tensor_field}")
+        elif len(available_strains) == 1:
+            show_tensor_field = available_strains[0]
+            print(f"[INFO] Defaulting to strain field: {show_tensor_field}")
+        else:
+            print("[WARNING] Multiple tensor fields found. Please specify `show_tensor_field`.")
+
+    print("\n")
 
     # Check available fields
-    print("Tensor fields available:", tensor_fields)
     print("Available point data:", list(grid.point_data.keys()))
     print("Available cell data :", list(grid.cell_data.keys()))
 
-    # Warp geometry by displacement if available
-    # if show_warp and "Displacement" in grid.point_data:
-    #     warped = grid.warp_by_vector("Displacement", factor=1.0)
-    #     scalars = None
+    tensor = grid.cell_data[tensor_fields[1]]
+    tensor = tensor.reshape((-1, 3, 3)) 
 
-    #     if show_temperature and "Temperature" in grid.point_data:
-    #         scalars = "Temperature"
-    #         print("Coloring by Temperature")
+    # 1. Plot Temperature on warped mesh
+    if show_temperature and "Temperature" in grid.point_data:
+        if show_warp and "Displacement" in grid.point_data:
+            warped = grid.warp_by_vector("Displacement", factor=1.0)
+            plotter = pv.Plotter()
+            plotter.add_mesh(warped, scalars="Temperature", cmap="plasma", show_edges=False)
+            plotter.add_text("Temperature (warped)", position="upper_left")
+            plotter.add_axes()
+            plotter.show()
+        else:
+            plotter = pv.Plotter()
+            plotter.add_mesh(grid, scalars="Temperature", cmap="plasma", show_edges=True)
+            plotter.add_text("Temperature", position="upper_left")
+            plotter.add_axes()
+            plotter.show()
 
-    #     plotter.add_mesh(warped, scalars=scalars, cmap="plasma", show_edges=False)
-    #     plotter.add_text("Warped by Displacement", position="upper_left")
-    # else:
-    #     plotter.add_mesh(grid, show_edges=True)
+    # 2. 3D Displacement norm
+    if "Displacement" in grid.point_data:
+        disp = grid["Displacement"]
+        disp_norm = np.linalg.norm(disp, axis=1)
+        grid.point_data["Displacement_norm"] = disp_norm
 
-    # 3D plot of the magnitutde of the tensor field, cell-wise
-    # if show_tensor_field and show_tensor_field in grid.cell_data:
+        plotter = pv.Plotter()
+        plotter.add_mesh(grid, scalars="Displacement_norm", cmap="viridis", show_edges=True)
+        plotter.add_text("Displacement (norm)", position="upper_left")
+        plotter.add_axes()
+        plotter.show()
 
-    #     norm = np.linalg.norm(tensor, axis=(1, 2))  # Frobenius norm per cell
-    #     grid.cell_data[f"{show_tensor_field}_norm"] = norm
+    # 3. 3D Stress field (norm)
+    for stress_field in available_stresses:
+        tensor = grid.cell_data[stress_field].reshape((-1, 3, 3))
+        norm = np.linalg.norm(tensor, axis=(1, 2))
+        grid.cell_data[f"{stress_field}_norm"] = norm
 
-    #     plotter.add_mesh(grid, scalars=f"{show_tensor_field}_norm", show_edges=True, cmap="viridis")
-    #     plotter.add_text(f"{show_tensor_field} (norm)", position="lower_left")
+        plotter = pv.Plotter()
+        plotter.add_mesh(grid, scalars=f"{stress_field}_norm", cmap="viridis", show_edges=True)
+        plotter.add_text(f"{stress_field} (norm)", position="upper_left")
+        plotter.add_axes()
+        plotter.show()
 
-    # plotter.add_axes()
-    # plotter.show()
+    # 4. 3D Strain field (norm)
+    for strain_field in available_strains:
+        tensor = grid.cell_data[strain_field].reshape((-1, 3, 3))
+        norm = np.linalg.norm(tensor, axis=(1, 2))
+        grid.cell_data[f"{strain_field}_norm"] = norm
+
+        plotter = pv.Plotter()
+        plotter.add_mesh(grid, scalars=f"{strain_field}_norm", cmap="plasma", show_edges=True)
+        plotter.add_text(f"{strain_field} (norm)", position="upper_left")
+        plotter.add_axes()
+        plotter.show()
 
     # 2D plot of the temperature field
     if show_temperature and "Temperature" in grid.point_data:
@@ -102,7 +149,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
 
         # Filter by z
         print("Available z-coordinates in the mesh (cell centers):", np.unique(np.round(z, 6)))
-        z_target = 0.00025
+        z_target = 5.25
         tol = 1e-4
         mask = np.abs(z - z_target) < tol
 
@@ -116,19 +163,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         sigma_rr = s_xx * np.cos(theta)**2 + s_yy * np.sin(theta)**2 + 2 * s_xy * np.sin(theta) * np.cos(theta)
         sigma_tt = s_xx * np.sin(theta)**2 + s_yy * np.cos(theta)**2 - 2 * s_xy * np.sin(theta) * np.cos(theta)
 
-        # Analytical
-        alpha = 1.45e-5
-        E = 170e9
-        delta_T = (1050.63 - 573)
-        nu = 0.3
-        thermal_stress_term =  alpha * E * delta_T / (4*(1 - nu))
-        R_s = 0.004
-
-        sigma_r_analytical = thermal_stress_term * (r[mask] ** 2 / (R_s)**2 - 1)
-        sigma_t_analytical = thermal_stress_term * (3*r[mask] ** 2 / (R_s)**2 - 1)
-        sigma_z_analytical = sigma_r_analytical + sigma_t_analytical
-
-        print(f"Thermal stress term: {thermal_stress_term*1e-6:.2f} MPa")
+        sigma_r_analytical, sigma_t_analytical, sigma_z_analytical, _ = lame_solutions(r[mask])
 
         # Plot vs r
         plt.figure(figsize=(6, 4))
@@ -184,9 +219,10 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         plt.show()
 
 if __name__ == "__main__":
+
     view_vtu(
         filename="output/fields.vtu",
         show_warp=True,
         show_temperature=True,
-        show_tensor_field="Stress_fuel"
+        show_tensor_field=None
     )

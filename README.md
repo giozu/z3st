@@ -1,8 +1,8 @@
-# ZEST: A FEniCSx Framework for Thermo-Mechanical Analysis
+# ZEST: An Open-Source Framework for Thermo-Mechanical Analysis
 
 ## Overview
 
-**ZEST** is an open-source thermo-mechanical analysis code built on the **FEniCSx** finite element library. It supports simulation of coupled thermal and mechanical behavior in multi-material domains, with flexibility in geometry, time-dependent loading, and boundary conditions.
+**ZEST** is an open-source thermo-mechanical analysis code built on the **FEniCSx** finite element python library. It supports simulation of coupled thermal and mechanical behavior in multi-material domains, with flexibility in geometry, time-dependent loading, and boundary conditions.
 
 Developed by Giovanni Zullo, ZEST is modular, extensible, and designed to incorporate advanced physics-based models for nuclear fuel and structural materials.
 

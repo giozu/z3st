@@ -17,7 +17,7 @@ import sys
 import yaml
 # zest modules
 from input.multi_material import MultiMaterial
-from output.postprocessing import save_temperature_history
+# from output.postprocessing import save_temperature_history
 from utils import *
 from output.output import *
 
@@ -85,9 +85,7 @@ print(f"Elapsed time: {elapsed_time:.4f} s")
 
 results = problem.get_results()
 
-# ----------------
-# Post-processing
-# ----------------
+# --- Post-processing ---
 # plot3d_temperature(problem)
 # plot3d_displacement(problem)
 # plot_scalar(problem)
