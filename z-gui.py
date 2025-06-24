@@ -46,13 +46,8 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         plotter.add_axes()
         plotter.show()
 
-    if "Displacement" in grid.point_data:
-        disp = grid["Displacement"]
-        disp_norm = np.linalg.norm(disp, axis=1)
-        grid.point_data["Displacement_norm"] = disp_norm
-
-        # Create a slice plane perpendicular to z-axis
-        z_target = 5.0  # or whatever value you want
+        # Slice plane perpendicular to z-axis
+        z_target = 5.0
         plane = pv.Plane(center=(0, 0, z_target), direction=(0, 0, 1))
 
         sliced = grid.slice(normal='z', origin=(0, 0, z_target))
