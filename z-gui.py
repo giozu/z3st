@@ -2,7 +2,7 @@ import pyvista as pv
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from verification.analytical_cases import lame_solutions, thermal_stresses
+from verification.analytical_cases import *
 
 def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True, show_tensor_field=None):
     print(f"Loading file: {filename}")
@@ -47,7 +47,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         plotter.show()
 
         # Slice plane perpendicular to z-axis
-        z_target = 5.0
+        z_target = 0.05
         plane = pv.Plane(center=(0, 0, z_target), direction=(0, 0, 1))
 
         sliced = grid.slice(normal='z', origin=(0, 0, z_target))
@@ -164,16 +164,21 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
     # 2D temperature vs r
     if show_temperature and "Temperature" in grid.point_data:
         points = grid.points
-        r_nodes = np.sqrt(points[:, 0]**2 + points[:, 1]**2)
+        r_nodes = points[:, 0]
         z_nodes = points[:, 2]
-        z_target = 5.0
+        r_array = np.linspace(min(r_nodes), max(r_nodes))
+
+        print("Available z-coordinates in the mesh (temperature nodes):", np.unique(np.round(z_nodes, 6)))
+
+        z_target = 0.052632
         tol = 1e-4
         mask = np.abs(z_nodes - z_target) < tol
         if np.sum(mask) > 0:
             T_vals = grid.point_data["Temperature"][mask]
             plt.figure(figsize=(6, 4))
-            plt.scatter(r_nodes[mask], T_vals, c='red', label="T(r)")
-            plt.xlabel("r (m)")
+            plt.scatter(r_nodes[mask], T_vals, c='red', label="Calculated")
+            plt.plot(r_array, thermal_shield_slab_analytical_temperature(r_array), label="Analytical")
+            plt.xlabel("x (m)")
             plt.ylabel("Temperature (K)")
             plt.grid(True)
             plt.legend()

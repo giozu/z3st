@@ -54,3 +54,31 @@ def thermal_stresses(r, alpha=1.45e-5, E=170e9, T_hot=1050.63, T_cold=573, nu=0.
     print(f"[INFO] Thermal stress term: {thermal_stress_term*1e-6:.2f} MPa")
 
     return sigma_r, sigma_theta, sigma_z
+
+def thermal_shield_slab_analytical_temperature(x):
+    """
+    Analytical temperature profile in a slab with volumetric heat generation
+    and exponential attenuation (e.g., thermal shield or gamma heating).
+
+    Parameters:
+        x (array-like): Position along the slab thickness (m)
+
+    Returns:
+        np.ndarray: Temperature distribution T(x) (K)
+    """
+    Ti = 494         # Inner surface temperature (K)
+    T0 = 491         # Outer surface temperature (K)
+    q0 = 3.46e6      # Volumetric heat generation (W/m^3)
+    mu = 24.0        # Attenuation coefficient (1/m)
+    K = 48.1         # Thermal conductivity (W/m·K)
+    L = 0.045        # Slab thickness (m)
+
+    x = np.asarray(x)
+
+    term1 = Ti + (T0 - Ti) * x / L
+    term2 = (q0 / (mu**2 * K)) * (
+        (x / L) * (np.exp(-mu * L) - 1) - (np.exp(-mu * x) - 1)
+    )
+
+    return term1 + term2
+
