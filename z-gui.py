@@ -10,10 +10,11 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
 
     available_stresses = [k for k in grid.cell_data if "Stress" in k]
     available_strains = [k for k in grid.cell_data if "Strain" in k]
-    tensor_fields = available_stresses + available_strains
+    # tensor_fields = available_stresses + available_strains
+    tensor_fields = available_stresses
 
     print("Available stress fields:", available_stresses)
-    print("Available strain fields:", available_strains)
+    # print("Available strain fields:", available_strains)
 
     if show_tensor_field is None:
         if len(tensor_fields) == 1:
@@ -28,36 +29,36 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
             return
 
     # Optional: warp + temperature
-    if show_temperature and "Temperature" in grid.point_data:
-        mesh = grid.warp_by_vector("Displacement", factor=1.0) if show_warp and "Displacement" in grid.point_data else grid
-        plotter = pv.Plotter()
-        plotter.add_mesh(mesh, scalars="Temperature", cmap="plasma")
-        plotter.show()
+    # if show_temperature and "Temperature" in grid.point_data:
+    #     mesh = grid.warp_by_vector("Displacement", factor=1.0) if show_warp and "Displacement" in grid.point_data else grid
+    #     plotter = pv.Plotter()
+    #     plotter.add_mesh(mesh, scalars="Temperature", cmap="plasma")
+    #     plotter.show()
 
     # Optional: displacement norm
-    if "Displacement" in grid.point_data:
-        disp = grid["Displacement"]
-        disp_norm = np.linalg.norm(disp, axis=1)
-        grid.point_data["Displacement_norm"] = disp_norm
+    # if "Displacement" in grid.point_data:
+    #     disp = grid["Displacement"]
+    #     disp_norm = np.linalg.norm(disp, axis=1)
+    #     grid.point_data["Displacement_norm"] = disp_norm
 
-        plotter = pv.Plotter()
-        plotter.add_mesh(grid, scalars="Displacement_norm", cmap="viridis", show_edges=True)
-        plotter.add_text("Displacement (norm)", position="upper_left")
-        plotter.add_axes()
-        plotter.show()
+    #     plotter = pv.Plotter()
+    #     plotter.add_mesh(grid, scalars="Displacement_norm", cmap="viridis", show_edges=True)
+    #     plotter.add_text("Displacement (norm)", position="upper_left")
+    #     plotter.add_axes()
+    #     plotter.show()
 
-        # Slice plane perpendicular to z-axis
-        z_target = 0.05
-        plane = pv.Plane(center=(0, 0, z_target), direction=(0, 0, 1))
+    #     # Slice plane perpendicular to z-axis
+    #     z_target = 0.005
+    #     plane = pv.Plane(center=(0, 0, z_target), direction=(0, 0, 1))
 
-        sliced = grid.slice(normal='z', origin=(0, 0, z_target))
+    #     sliced = grid.slice(normal='z', origin=(0, 0, z_target))
 
-        plotter = pv.Plotter()
-        plotter.add_mesh(grid, scalars="Displacement_norm", cmap="viridis", show_edges=False, opacity=0.2)
-        plotter.add_mesh(sliced, scalars="Displacement_norm", cmap="viridis", show_edges=True)
-        plotter.add_text(f"Displacement (norm) — slice at z = {z_target}", position="upper_left")
-        plotter.add_axes()
-        plotter.show()
+    #     plotter = pv.Plotter()
+    #     plotter.add_mesh(grid, scalars="Displacement_norm", cmap="viridis", show_edges=False, opacity=0.2)
+    #     plotter.add_mesh(sliced, scalars="Displacement_norm", cmap="viridis", show_edges=True)
+    #     plotter.add_text(f"Displacement (norm) — slice at z = {z_target}", position="upper_left")
+    #     plotter.add_axes()
+    #     plotter.show()
 
     # 3D stress/strain norms
     for field in available_stresses + available_strains:
@@ -75,9 +76,11 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         r = np.sqrt(x**2 + y**2)
         theta = np.arctan2(y, x)
 
-        z_target = 5
-        tol = 0.5
+        z_target = 0.00025
+        tol = 0.0001
         mask = np.abs(z - z_target) < tol
+
+        print("Available z-coordinates in cell centers:", np.unique(np.round(z, 6)))
 
         if np.sum(mask) == 0:
             print(f"[WARNING] No cells found at z = {z_target} ± {tol}")
@@ -99,7 +102,9 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
 
             # Analytical solution
             r_th = r[mask]
-            σ_rr_th, σ_tt_th, σ_zz_th, _ = lame_solutions(r_th)
+            # σ_rr_th, σ_tt_th, σ_zz_th, _ = lame_solutions(r_th)
+            σ_rr_th, σ_tt_th, σ_zz_th = thermal_stresses(r_th)
+
             plt.plot(r_th, σ_rr_th, '--', c='purple', label="σ_rr (analytical)")
             plt.plot(r_th, σ_tt_th, '--', c='orange', label="σ_tt (analytical)")
             plt.plot(r_th, σ_zz_th, '--', c='blue', label="σ_zz (analytical)")
@@ -142,16 +147,17 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
             σ_rr_u = grouped["σ_rr"].values
             σ_tt_u = grouped["σ_tt"].values
             σ_zz_u = grouped["σ_zz"].values
-            σ_rr_lame, σ_tt_lame, σ_zz_lame, _ = lame_solutions(r_u)
+            # σ_rr_lame, σ_tt_lame, σ_zz_lame, _ = lame_solutions(r_u)
+            σ_rr_th, σ_tt_th, σ_zz_th = thermal_stresses(r_u)
 
             plt.figure(figsize=(6, 4))
             plt.plot(r_u, σ_rr_u, 'o-', c='purple', label="σ_rr (avg)")
             plt.plot(r_u, σ_tt_u, 'o-', c='orange', label="σ_tt (avg)")
             plt.plot(r_u, σ_zz_u, 'o-', c='blue', label="σ_zz (avg)")
-            plt.plot(r_u, σ_rr_lame, '--', c='purple', label="σ_rr (analytical)")
-            plt.plot(r_u, σ_tt_lame, '--', c='orange', label="σ_tt (analytical)")
-            plt.plot(r_u, σ_zz_lame, '--', c='blue', label="σ_zz (plane strain)")
-            plt.plot(r_u, np.zeros_like(r_u), '--', c='blue', label="σ_zz (plane stress)") # plane stress
+            plt.plot(r_u, σ_rr_th, '--', c='purple', label="σ_rr (analytical)")
+            plt.plot(r_u, σ_tt_th, '--', c='orange', label="σ_tt (analytical)")
+            plt.plot(r_u, σ_zz_th, '--', c='blue', label="σ_zz (analytical)")
+            # plt.plot(r_u, np.zeros_like(r_u), '--', c='blue', label="σ_zz (plane stress)") # plane stress
             plt.xlabel("r (m)")
             plt.ylabel("Stress (Pa)")
             plt.title(f"{show_tensor_field} – averaged components @ z = {z_target}")
@@ -164,21 +170,21 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
     # 2D temperature vs r
     if show_temperature and "Temperature" in grid.point_data:
         points = grid.points
-        r_nodes = points[:, 0]
+        r_nodes = np.sqrt(points[:, 0]**2 + points[:, 1]**2)
         z_nodes = points[:, 2]
         r_array = np.linspace(min(r_nodes), max(r_nodes))
 
         print("Available z-coordinates in the mesh (temperature nodes):", np.unique(np.round(z_nodes, 6)))
 
-        z_target = 0.052632
+        z_target = 0.0005
         tol = 1e-4
         mask = np.abs(z_nodes - z_target) < tol
         if np.sum(mask) > 0:
             T_vals = grid.point_data["Temperature"][mask]
             plt.figure(figsize=(6, 4))
             plt.scatter(r_nodes[mask], T_vals, c='red', label="Calculated")
-            plt.plot(r_array, thermal_shield_slab_analytical_temperature(r_array), label="Analytical")
-            plt.xlabel("x (m)")
+            # plt.plot(r_array, thermal_shield_slab_analytical_temperature(r_array), label="Analytical")
+            plt.xlabel("r (m)")
             plt.ylabel("Temperature (K)")
             plt.grid(True)
             plt.legend()
