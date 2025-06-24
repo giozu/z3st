@@ -15,9 +15,9 @@ mechanical_bcs:
     - type: Clamp_z
       region: bottom
       value: 0.0
-    - type: Clamp_z
-      region: top
-      value: -0.001
+    # - type: Clamp_z
+    #   region: top
+    #   value: -0.001
     - type: Neumann
       region: inner_radius
       traction: -1e6
