@@ -1,5 +1,6 @@
 name: multi_material
 edge: '1.0'
+width: '1.0'
 height: '1.0'
 geometry_type: rect
 labels:
