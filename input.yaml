@@ -34,12 +34,12 @@ solver_settings:
 
 models:
   thermal: True
-  mechanical: True
+  mechanical: False
 
 mechanical_regime: "3D" # 3D, plane_stress
 
 lhr:
-  - 15000
+  - 1000
 time:
   - 0
 n_steps: 1
