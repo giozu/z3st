@@ -29,13 +29,13 @@ class ThermalModel:
             self.neumann_thermal[name] = []
             self.dirichlet_thermal[name] = []
 
-        for mat_type, bc_list in thermal_bcs_defs.items():
+        for label, bc_list in thermal_bcs_defs.items():
             for bc_info in bc_list:
                 region_name = bc_info.get("region")
                 bc_type = bc_info.get("type")
 
                 if region_name is None or bc_type is None:
-                    print(f"  [ERROR] Incomplete thermal BC definition for '{mat_type}'.")
+                    print(f"  [ERROR] Incomplete thermal BC definition for '{label}'.")
                     sys.exit(1)
                 
                 region_id = self.label_map.get(region_name)
@@ -46,7 +46,7 @@ class ThermalModel:
                 if bc_type == "Dirichlet":
                     temperature = bc_info.get("temperature")
                     if temperature is None:
-                        print(f"  [ERROR] Dirichlet BC on '{mat_type}' for region '{region_name}' has no temperature.")
+                        print(f"  [ERROR] Dirichlet BC on '{label}' for region '{region_name}' has no temperature.")
                         sys.exit(1)
 
                     T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
@@ -64,23 +64,23 @@ class ThermalModel:
                         dofs = V_t_map[dofs_mixed[:, 1]]
 
                     bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t)
-                    self.dirichlet_thermal[mat_type].append(bc)
+                    self.dirichlet_thermal[label].append(bc)
 
-                    print(f"  [INFO] Dirichlet thermal BC on '{mat_type}' → {temperature} K at region '{region_name}'")
+                    print(f"  [INFO] Dirichlet thermal BC on '{label}' → {temperature} K at region '{region_name}'")
                     # print(f"  {type(bc)}")
                     # print("  Applied dofs:", bc.dof_indices)
 
                 elif bc_type == "Neumann":
                     flux = bc_info.get("flux")
                     if flux is None:
-                        print(f"  [ERROR] Neumann BC on '{mat_type}' for region '{region_name}' has no flux.")
+                        print(f"  [ERROR] Neumann BC on '{label}' for region '{region_name}' has no flux.")
                         sys.exit(1)
 
-                    self.neumann_thermal[mat_type].append({'id': region_id, 'value': float(flux)})
-                    print(f"  [INFO] Neumann thermal BC on '{mat_type}' → {flux} W/m² at region '{region_name}'")
+                    self.neumann_thermal[label].append({'id': region_id, 'value': float(flux)})
+                    print(f"  [INFO] Neumann thermal BC on '{label}' → {flux} W/m² at region '{region_name}'")
 
                 else:
-                    print(f"  [ERROR] Unknown thermal BC type '{bc_type}' for '{mat_type}'.")
+                    print(f"  [ERROR] Unknown thermal BC type '{bc_type}' for '{label}'.")
                     print(f"  Available are: Dirichlet, Neumann.")
                     sys.exit(1)
 

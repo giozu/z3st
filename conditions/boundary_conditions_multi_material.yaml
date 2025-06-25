@@ -2,7 +2,7 @@ thermal_bcs:
   fuel:
     - type: Neumann
       region: face_xx_0_1
-      value: 0.0
+      flux: 0.0
 
   cladding:
     - type: Dirichlet

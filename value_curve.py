@@ -3,28 +3,22 @@ import numpy as np
 
 # Features
 features = [
-    "Language",
-    "Thermo-mechanical model",
-    "Multi-material support",
+    "Programming language",
     "Arbitrary geometries",
     "Computational time",
-    "Integrated post-processing",
-    "Flexible input",
-    "Modularity/extensibility",
-    "Coupling frameworks", 
-    "Conventional applications",
+    "Pre/post-processing",
+    "Couplings", 
+    "Applications",
     "License"
 ]
 
 # Scores
 scores = {
-    "ZEST":         [5, 4, 5, 5, 2, 4, 5, 5, 5, 2, 5],
-    "BISON":        [2, 2, 2, 2, 5, 2, 3, 2, 2, 4, 2],
-    "TRANSURANUS":  [1, 2, 2, 1, 5, 2, 1, 3, 2, 5, 1],
-    # "ABAQUS":       [2, 4, 5, 5, 5, 5, 2, 2, 2, 3, 1],
-    "FAST":         [1, 1, 1, 1, 5, 2, 1, 1, 1, 5, 1],
-    "OFFBEAT":      [2, 2, 3, 3, 3, 1, 1, 3, 3, 4, 5],
-    # "FALCON":       [1, 3, 2, 3, 5, 2, 1, 2, 2, 5, 1]
+    "ZEST":         [5, 4, 5, 5, 2, 4, 5],
+    "BISON":        [2, 2, 2, 2, 5, 2, 3],
+    "TRANSURANUS":  [1, 2, 2, 1, 5, 2, 1],
+    "FAST":         [1, 1, 1, 1, 5, 2, 1],
+    "OFFBEAT":      [2, 2, 3, 3, 3, 1, 1]
 }
 
 x = np.arange(len(features))

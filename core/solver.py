@@ -312,13 +312,13 @@ class Solver:
                     L_t[label] += q_vol * v_t * dx
 
                     # Apply Neumann BCs
-                    for bc_info in self.neumann_thermal[label]:
-                        ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                        L_t[label] += bc_info['value'] * v_t * ds
+                    # for bc_info in self.neumann_thermal[label]:
+                    #     ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
+                    #     L_t[label] += bc_info['value'] * v_t * ds
 
                     # Thermal coupling fuel-cladding interface
-                    h_gap_value = 100.0
-                    h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
+                    # h_gap_value = 100.0
+                    # h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
 
                     # Fuel contribution
                     # if "fuel" in self.materials and label == "fuel":
@@ -336,6 +336,8 @@ class Solver:
                     # assemble_and_analyze_matrix(a_t[label], L_t[label], title=f"Thermal stiffness matrix - {label}")
 
                 for label, material in self.materials.items():
+
+                    print(f"Solver options from petsc_opts_thermal, for {label} material")
                     
                     petsc_opts_thermal = self.get_solver_options(
                         solver_type=self.thermal_solver,
@@ -343,10 +345,13 @@ class Solver:
                         rtol=tol_th
                     )
 
-                    problem_t = LinearProblem(a_t[label], L_t[label],
-                                            bcs=self.dirichlet_thermal[label],
-                                            u=self.T[label],
-                                            petsc_options=petsc_opts_thermal)
+                    problem_t = LinearProblem(
+                        a_t[label], L_t[label],
+                        bcs=self.dirichlet_thermal[label],
+                        u=self.T[label],
+                        petsc_options=petsc_opts_thermal
+                    )
+                    
                     problem_t.solve()
 
                 # Apply relaxation
