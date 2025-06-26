@@ -13,7 +13,7 @@ geometry_path: geometry/cylindrical_shell.yaml
 boundary_conditions_path: conditions/boundary_conditions_cylindrical_shell.yaml
 
 materials:
-  steel: materials/plastic.yaml
+  steel: materials/T91.yaml
 
 solver_settings:
   coupling: staggered

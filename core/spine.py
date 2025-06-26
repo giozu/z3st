@@ -24,7 +24,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         MechanicalModel.__init__(self)
 
     def parameters(self, lhr):
-        self.g = 9.81 # m/s2
+        self.g = 0.0 # m/s2
         self.lhr = lhr
 
     def materials(self, **materials):

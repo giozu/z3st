@@ -3,7 +3,7 @@ type: structural
 fissile: False
 
 # Mechanical properties
-E: 8.0e7           # Young's modulus (Pa)
+E: 8.0e8           # Young's modulus (Pa)
 nu: 0.45           # Poisson's ratio (-)
 sigma_y: 2.5e6     # Yield stress (Pa)
 plastic: true      # Plastic behaviour (elasto-perfectly plastic)

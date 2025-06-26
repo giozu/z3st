@@ -5,7 +5,7 @@ height: '10.0'
 geometry_type: cyl
 labels:
   bottom: 1
-  inner_radius: 2
-  outer_radius: 3
-  top: 4
+  top: 2
+  inner_radius: 3
+  outer_radius: 4
   steel: 5
