@@ -29,7 +29,7 @@ materials:
 
 solver_settings:
   coupling: staggered
-  thermal_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
+  thermal_solver: iterative_amg # direct_mumps, iterative_amg, iterative_hypre
   mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2
   tol_T: 1e-2
@@ -42,12 +42,12 @@ solver_settings:
 
 models:
   thermal: True
-  mechanical: False
+  mechanical: True
 
 mechanical_regime: "3D" # 3D, plane_stress
 
 lhr:
-  - 1000
+  - 10000
 time:
   - 0
 n_steps: 1

@@ -148,7 +148,7 @@ class Solver:
             body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
             q_vol = self.q_third[label]
 
-            # delta_T = u_t - T_ref
+            delta_T = u_t - T_ref
 
             # Thermal residual (associated with v_t, from sub-space 1)
             F_thermal = (k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) - q_vol * v_t) * dx_local
@@ -159,10 +159,8 @@ class Solver:
 
             # Mechanical residual
             epsilon = ufl.sym(ufl.grad(u_m))
-            # sigma_m = lmbda * ufl.tr(epsilon) * ufl.Identity(self.tdim) + 2 * G * epsilon
-            # sigma_th = (3 * lmbda + 2 * G) * alpha * delta_T * ufl.Identity(self.gdim)
-            sigma_m = self.sigma_mech(u_m, material)
-            sigma_th = self.sigma_th(u_t, material)
+            sigma_m = lmbda * ufl.tr(epsilon) * ufl.Identity(self.tdim) + 2 * mu * epsilon
+            sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
             sigma_tot = sigma_m - sigma_th
 
             if self.on["mechanical"] is True:
@@ -302,56 +300,47 @@ class Solver:
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
 
                     k = dolfinx.fem.Constant(self.mesh, material["k"])
-
-                    if isinstance(self.q_third[label], dolfinx.fem.Function):
-                        q_vol = self.q_third[label]
-                    else:
-                        q_vol = dolfinx.fem.Constant(self.mesh, self.q_third[label])
+                    q_vol = dolfinx.fem.Constant(self.mesh, self.q_third[label])
 
                     a_t[label] += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t[label] += q_vol * v_t * dx
 
                     # Apply Neumann BCs
-                    # for bc_info in self.neumann_thermal[label]:
-                    #     ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                    #     L_t[label] += bc_info['value'] * v_t * ds
+                    for bc_info in self.neumann_thermal[label]:
+                        ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
+                        L_t[label] += bc_info['value'] * v_t * ds
 
                     # Thermal coupling fuel-cladding interface
-                    # h_gap_value = 100.0
-                    # h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
+                    h_gap_value = 10.0
+                    h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
 
                     # Fuel contribution
-                    # if "fuel" in self.materials and label == "fuel":
-                    #     ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["fuel_lateral"])
-                    #     a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_fuel_interface
-                    #     L_t[label] += h_gap * self.T["cladding"] * v_t * ds_fuel_interface
+                    if "fuel" in self.materials and label == "fuel":
+                        ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_1_1"])
+                        a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_fuel_interface
+                        L_t[label] += h_gap * self.T["cladding"] * v_t * ds_fuel_interface
 
-                    # # Cladding contribution
-                    # if "cladding" in self.materials and label == "cladding":
-                    #     ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["cladding_inner"])
-                    #     a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_clad_interface
-                    #     L_t[label] += h_gap * self.T["fuel"] * v_t * ds_clad_interface
+                    # Cladding contribution
+                    if "cladding" in self.materials and label == "cladding":
+                        ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_0_2"])
+                        a_t[label] -= h_gap * ufl.inner(u_t, v_t) * ds_clad_interface
+                        L_t[label] -= h_gap * self.T["fuel"] * v_t * ds_clad_interface
 
                     # Sparsity pattern
                     # assemble_and_analyze_matrix(a_t[label], L_t[label], title=f"Thermal stiffness matrix - {label}")
 
                 for label, material in self.materials.items():
 
-                    print(f"Solver options from petsc_opts_thermal, for {label} material")
-                    
                     petsc_opts_thermal = self.get_solver_options(
                         solver_type=self.thermal_solver,
                         physics="thermal",
                         rtol=tol_th
                     )
 
-                    problem_t = LinearProblem(
-                        a_t[label], L_t[label],
+                    problem_t = LinearProblem(a_t[label], L_t[label],
                         bcs=self.dirichlet_thermal[label],
                         u=self.T[label],
-                        petsc_options=petsc_opts_thermal
-                    )
-                    
+                                            petsc_options=petsc_opts_thermal)
                     problem_t.solve()
 
                 # Apply relaxation
@@ -379,11 +368,11 @@ class Solver:
                     body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
 
                     epsilon = lambda u: ufl.sym(ufl.grad(u))
-                    # sigma_m = lambda u: lmbda * ufl.tr(epsilon(u)) * ufl.Identity(self.tdim) + 2 * G * epsilon(u)
+                    sigma_m = lambda u: lmbda * ufl.tr(epsilon(u)) * ufl.Identity(self.tdim) + 2 * G * epsilon(u)
 
                     sigma_th = (3 * lmbda + 2 * G) * alpha * (T_sol[label] - T_ref) * ufl.Identity(self.gdim)
 
-                    a_m += ufl.inner(self.sigma_mech(u_m, material), epsilon(v_m)) * dx
+                    a_m += ufl.inner(sigma_m(u_m), epsilon(v_m)) * dx
                     L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(sigma_th, epsilon(v_m)) * dx
 
                     for bc_info in self.traction[label]:
