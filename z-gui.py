@@ -76,7 +76,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         r = np.sqrt(x**2 + y**2)
         theta = np.arctan2(y, x)
 
-        z_target = 5.25
+        z_target = 5.0
         tol = 0.00001
         mask = np.abs(z - z_target) < tol
 

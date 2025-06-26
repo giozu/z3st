@@ -82,7 +82,6 @@ def thermal_shield_slab_analytical_temperature(x):
 
     return term1 + term2
 
-
 def full_cylinder_analytical_temperature(x):
     """
     Analytical temperature profile in a cylindrical element with volumetric heat generation
