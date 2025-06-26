@@ -1,0 +1,42 @@
+# Zest: A FEniCSx module for fuel performance modeling
+# =====================================================
+# Author: Giovanni Zullo
+# Date: 16/01/2025
+
+# Description:
+# ------------
+# Zest is a thermomechanical fuel performance code written in Python.
+# This project is currently under development.
+
+mesh_path: mesh/full_cylinder.msh
+geometry_path: geometry/full_cylinder.yaml
+boundary_conditions_path: conditions/boundary_conditions_full_cylinder.yaml
+
+materials:
+  fuel: materials/uo2.yaml
+
+solver_settings:
+  coupling: staggered
+  thermal_solver: iterative_amg # direct_mumps, iterative_amg, iterative_hypre
+  mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
+  tol: 1e-2
+  tol_T: 1e-2
+  tol_u: 1e-2
+  tol_mech: 1e-4
+  tol_th: 1e-4
+  relax_T: 0.7
+  relax_u: 0.7
+  n_iter_max: 30
+
+models:
+  thermal: True
+  mechanical: True
+
+mechanical_regime: "3D" # 3D, plane_stress
+
+lhr:
+  - 10000
+time:
+  - 0
+n_steps: 1
+

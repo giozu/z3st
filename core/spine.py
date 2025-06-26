@@ -85,9 +85,11 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
             # --- Fissile ---
             if is_fissile:
-                self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
-                print(f"  q_third[{name}] = {self.q_third[name]:.3e} W/m³ (fissile: {is_fissile})")
+                q_val = self.lhr / self.area if is_fissile else 0.0
+                print(f"  q_third[{name}] = {q_val:.3e} W/m³ (fissile: {is_fissile})")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2 ")
+
+                self.q_third[name] = dolfinx.fem.Constant(self.mesh, q_val)
 
             # --- Gamma heating ---
             elif q0 > 0.0:
@@ -95,13 +97,18 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                 def f(x):
                     return q0 * np.exp(-x[0] * mu_gamma)
                 q_func.interpolate(f)
-                self.q_third[name] = q_func
+                q_val = q_func
                 print(f"  gamma heating - q_third_0[{name}] = {q0:.3e} W/m³, attenuation: {mu_gamma} 1/m)")
             
+                self.q_third[name] = q_func
+
             # --- No heat source ---
             else:
-                self.q_third[name] = 0.0
+                q_val = 0.0
                 print(f"  q_third_0[{name}] = 0.0 W/m³")
+
+                self.q_third[name] = dolfinx.fem.Constant(self.mesh, q_val)
+
 
         # plot q_third(x)
         # import pyvista

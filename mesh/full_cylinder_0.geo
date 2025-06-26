@@ -12,7 +12,7 @@
 SetFactory("OpenCASCADE");
 
 r = 0.004;  // outer radius of the cylinder
-l = 0.002; // edge of the inner square
+l = 0.001; // edge of the inner square
 h = 0.010;  // height of the cylinder
 
 n = 18; // number of elements on the square edge

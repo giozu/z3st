@@ -76,7 +76,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         r = np.sqrt(x**2 + y**2)
         theta = np.arctan2(y, x)
 
-        z_target = 0.00525
+        z_target = 5.25
         tol = 0.00001
         mask = np.abs(z - z_target) < tol
 
@@ -96,14 +96,14 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
 
             # Scatter plot
             plt.figure(figsize=(6, 4))
-            plt.scatter(r[mask], σ_rr[mask], s=8, c='purple', label="σ_rr")
-            plt.scatter(r[mask], σ_tt[mask], s=8, c='orange', label="σ_tt")
-            plt.scatter(r[mask], σ_zz[mask], s=8, c='blue', label="σ_zz")
+            plt.scatter(r[mask], σ_rr[mask], s=8, c='purple', label="σ_rr (calculated)")
+            plt.scatter(r[mask], σ_tt[mask], s=8, c='orange', label="σ_tt (calculated)")
+            plt.scatter(r[mask], σ_zz[mask], s=8, c='blue', label="σ_zz (calculated)")
 
             # Analytical solution
             r_th = r[mask]
-            # σ_rr_th, σ_tt_th, σ_zz_th, _ = lame_solutions(r_th)
-            σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_th)
+            σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_th)
+            # σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_th)
 
             plt.plot(r_th, σ_rr_an, '--', c='purple', label="σ_rr (analytical)")
             plt.plot(r_th, σ_tt_an, '--', c='orange', label="σ_tt (analytical)")
@@ -147,8 +147,8 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
             σ_rr_u = grouped["σ_rr"].values
             σ_tt_u = grouped["σ_tt"].values
             σ_zz_u = grouped["σ_zz"].values
-            # σ_rr_lame, σ_tt_lame, σ_zz_lame, _ = lame_solutions(r_u)
-            σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_u)
+            σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_u)
+            # σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_u)
 
             plt.figure(figsize=(6, 4))
             plt.plot(r_u, σ_rr_u, 'o-', c='purple', label="σ_rr (avg)")
