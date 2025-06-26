@@ -1,0 +1,21 @@
+name: HDPE
+type: structural
+fissile: False
+
+# Mechanical properties
+E: 8.0e7           # Young's modulus (Pa)
+nu: 0.45           # Poisson's ratio (-)
+sigma_y: 2.5e6     # Yield stress (Pa)
+plastic: true      # Plastic behaviour (elasto-perfectly plastic)
+
+# Thermal properties
+k: 0.45            # Thermal conductivity (W/m·K)
+cp: 2300           # Specific heat capacity (J/kg·K)
+alpha: 1.8e-4      # Thermal expansion coefficient (1/K)
+T_ref: 300         # Reference temperature (K)
+
+# Physical properties
+rho: 950           # Density (kg/m³)
+
+mu_gamma: 0.0           # Negligible gamma attenuation
+gamma_heating: 0.0      # No gamma heating
