@@ -85,11 +85,11 @@ def view_vtu(filename="output/fields.vtu",
 
     # --- 2D Profile Analysis vs. Analytical Solutions ---
 
-    print("\n--- Starting 2D Profile Verification ---")
+    print("\n--- Starting 2D profile verification ---")
     available_z_cells = np.unique(np.round(grid.cell_centers().points[:, 2], 6))
     available_z_nodes = np.unique(np.round(grid.points[:, 2], 6))
-    print(f"Available Z-coordinates (cell centers): {available_z_cells}")
-    print(f"Available Z-coordinates (nodes): {available_z_nodes}")
+    print(f"Available Z-coordinates (cell centers):\n{available_z_cells}")
+    print(f"Available Z-coordinates (nodes):\n{available_z_nodes}")
 
     # --- STRESS PROFILE ANALYSIS ---
     if stress_field_name and stress_field_name in grid.cell_data:
@@ -211,7 +211,7 @@ def view_vtu(filename="output/fields.vtu",
 
     # --- TEMPERATURE PROFILE ANALYSIS ---
     if show_temperature and "Temperature" in grid.point_data:
-        print(f"\nAnalyzing Temperature Profile at z = {z_target_temp}")
+        print(f"\nAnalyzing temperature profile at node z = {z_target_temp}")
         points = grid.points
         mask = np.abs(points[:, 2] - z_target_temp) < tol
         
@@ -222,23 +222,24 @@ def view_vtu(filename="output/fields.vtu",
             T_vals = grid.point_data["Temperature"][mask]
             
             r_analytical = np.linspace(np.min(r_nodes), np.max(r_nodes), 200)
-            T_analytical = full_cylinder_analytical_temperature(r_analytical)
+            # T_analytical = full_cylinder_analytical_temperature(r_analytical)
 
             plt.figure(figsize=(8, 6))
             plt.plot(r_nodes, T_vals, 'o', c='red', markersize=4, label="FEM")
-            plt.plot(r_analytical, T_analytical, '--', c='black', label="Analytical")
+            # plt.plot(r_analytical, T_analytical, '--', c='black', label="Analytical")
             plt.xlabel("Radius r (m)")
             plt.ylabel("Temperature (K)")
-            plt.title(f"Temperature vs. Radius at z = {z_target_temp}")
+            plt.title(f"Temperature vs. radius at node z = {z_target_temp}")
             plt.grid(True, linestyle=':')
             plt.legend()
+            plt.ylim(200, 400)
             plt.tight_layout()
             plt.savefig("output/temperature_vs_radius.png", dpi=300)
             plt.show()
 
     # --- RADIAL DISPLACEMENT PROFILE ---
     if "Displacement" in grid.point_data:
-        print(f"\nAnalyzing Radial Displacement Profile at z = {z_target_disp}")
+        print(f"\nAnalyzing radial displacement profile at node z = {z_target_disp}")
         points = grid.points
         mask = np.abs(points[:, 2] - z_target_disp) < tol
 
@@ -267,23 +268,21 @@ def view_vtu(filename="output/fields.vtu",
             plt.plot(grouped["r"], grouped["u_r"], 'o-', c='green', markersize=4, label="u_r (FEM, avg)")
             plt.plot(r_analytical, u_r_analytical, '--', c='black', label="u_r (Analytical)")
             plt.xlabel("Radius r (m)")
-            plt.ylabel("Radial Displacement u_r (m)")
-            plt.title(f"Radial Displacement vs. Radius at z = {z_target_disp}")
+            plt.ylabel("Radial displacement u_r (m)")
+            plt.title(f"Radial displacement vs. radius at z = {z_target_disp}")
             plt.grid(True, linestyle=':')
             plt.legend()
             plt.tight_layout()
             plt.savefig("output/u_r_vs_radius.png", dpi=300)
             plt.show()
 
-
 if __name__ == "__main__":
-    # Example of how to call the refined function
     view_vtu(
         filename="output/fields.vtu",
         analytical_case='lame',
-        z_target_stress=5.0,  # Z-level for stress/strain plots
-        z_target_disp=5.0,    # Z-level for displacement plot
-        z_target_temp=0.005,  # Z-level for temperature plot
-        z_slice_3d_vis=5.0,   # Z-level for the 3D cut-plane view
+        z_target_stress=5.0,        # Z-level for stress/strain plots
+        z_target_disp=5.454545,     # Z-level for displacement plot
+        z_target_temp=5.454545,     # Z-level for temperature plot
+        z_slice_3d_vis=5.0,         # Z-level for the 3D cut-plane view
         tol=1e-4
     )
