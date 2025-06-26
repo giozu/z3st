@@ -2,256 +2,288 @@ import pyvista as pv
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from verification.analytical_cases import *
+from verification.analytical_cases import * # Assumes this module contains the analytical solutions
 
-def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True, show_tensor_field=None):
+def view_vtu(filename="output/fields.vtu",
+             show_warp=True,
+             show_temperature=True,
+             stress_field_name=None,
+             strain_field_name=None,
+             analytical_case="lame",
+             z_target_stress=5.0,
+             z_target_temp=0.005,
+             z_target_disp=5.0,
+             z_slice_3d_vis=0.005,
+             tol=1e-5):
+    """
+    Loads and visualizes a .vtu file, performing 3D visualization and 2D
+    verification plots against analytical solutions.
+
+    Args:
+        filename (str): Path to the .vtu file.
+        show_warp (bool): If True, shows the mesh warped by the displacement vector.
+        show_temperature (bool): If True, generates plots for the temperature field.
+        stress_field_name (str, optional): Name of the stress tensor field to analyze.
+                                            If None, it's auto-detected. Defaults to None.
+        strain_field_name (str, optional): Name of the strain tensor field to analyze.
+                                            If None, it's auto-detected. Defaults to None.
+        analytical_case (str): The analytical case to compare against.
+                               Supported: 'lame', 'thermal'. Defaults to 'lame'.
+        z_target_stress (float): Z-coordinate for the stress/strain profile analysis.
+        z_target_temp (float): Z-coordinate for the temperature profile analysis.
+        z_target_disp (float): Z-coordinate for the displacement profile analysis.
+        z_slice_3d_vis (float): Z-coordinate for the 3D slice visualization.
+        tol (float): Tolerance for finding nodes/cells at the target z-coordinate.
+    """
     print(f"Loading file: {filename}")
     grid = pv.read(filename)
 
+    # --- Auto-detect fields if not specified ---
     available_stresses = [k for k in grid.cell_data if "Stress" in k]
     available_strains = [k for k in grid.cell_data if "Strain" in k]
-    # tensor_fields = available_stresses + available_strains
-    tensor_fields = available_stresses
-
     print("Available stress fields:", available_stresses)
-    # print("Available strain fields:", available_strains)
+    print("Available strain fields:", available_strains)
 
-    if show_tensor_field is None:
-        if len(tensor_fields) == 1:
-            show_tensor_field = tensor_fields[0]
-            print(f"[INFO] Automatically selected tensor field: {show_tensor_field}")
-        elif len(available_stresses) == 1:
-            show_tensor_field = available_stresses[0]
-        elif len(available_strains) == 1:
-            show_tensor_field = available_strains[0]
-        else:
-            print("[WARNING] Multiple tensor fields found. Please specify `show_tensor_field`.")
-            return
+    if stress_field_name is None and available_stresses:
+        stress_field_name = available_stresses[0]
+        print(f"[INFO] Automatically selected stress field: {stress_field_name}")
 
-    # Optional: warp + temperature
+    if strain_field_name is None and available_strains:
+        strain_field_name = available_strains[0]
+        print(f"[INFO] Automatically selected strain field: {strain_field_name}")
+
+    # --- 3D Visualizations (PyVista) ---
+
+    # Optional: Warp by displacement and show temperature
     if show_temperature and "Temperature" in grid.point_data:
-        mesh = grid.warp_by_vector("Displacement", factor=1.0) if show_warp and "Displacement" in grid.point_data else grid
-        plotter = pv.Plotter()
-        plotter.add_mesh(mesh, scalars="Temperature", cmap="plasma")
+        mesh_to_plot = grid.warp_by_vector("Displacement", factor=1.0) if show_warp and "Displacement" in grid.point_data else grid
+        plotter = pv.Plotter(window_size=[800, 800])
+        plotter.add_mesh(mesh_to_plot, scalars="Temperature", cmap="plasma", show_edges=True)
+        plotter.add_text("Temperature on Deformed Shape" if show_warp else "Temperature", position="upper_left")
+        plotter.add_axes()
         plotter.show()
 
-    # Optional: displacement norm
+    # Optional: Displacement norm and slice view
     if "Displacement" in grid.point_data:
-        disp = grid["Displacement"]
-        disp_norm = np.linalg.norm(disp, axis=1)
-        grid.point_data["Displacement_norm"] = disp_norm
-
-        plotter = pv.Plotter()
-        plotter.add_mesh(grid, scalars="Displacement_norm", cmap="viridis", show_edges=True)
-        plotter.add_text("Displacement (norm)", position="upper_left")
+        grid.point_data["Displacement_Norm"] = np.linalg.norm(grid["Displacement"], axis=1)
+        
+        # Plot full displacement norm
+        plotter = pv.Plotter(window_size=[800, 800])
+        plotter.add_mesh(grid, scalars="Displacement_Norm", cmap="viridis", show_edges=True)
+        plotter.add_text("Displacement (Norm)", position="upper_left")
+        plotter.add_axes()
+        plotter.show()
+        
+        # Plot slice
+        sliced = grid.slice(normal='z', origin=(0, 0, z_slice_3d_vis))
+        plotter = pv.Plotter(window_size=[800, 800])
+        plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.1)
+        plotter.add_mesh(sliced, scalars="Displacement_Norm", cmap="viridis")
+        plotter.add_text(f"Displacement (Norm) — Slice at z = {z_slice_3d_vis}", position="upper_left")
         plotter.add_axes()
         plotter.show()
 
-        # Slice plane perpendicular to z-axis
-        z_target = 0.005
-        plane = pv.Plane(center=(0, 0, z_target), direction=(0, 0, 1))
+    # --- 2D Profile Analysis vs. Analytical Solutions ---
 
-        sliced = grid.slice(normal='z', origin=(0, 0, z_target))
+    print("\n--- Starting 2D Profile Verification ---")
+    available_z_cells = np.unique(np.round(grid.cell_centers().points[:, 2], 6))
+    available_z_nodes = np.unique(np.round(grid.points[:, 2], 6))
+    print(f"Available Z-coordinates (cell centers): {available_z_cells}")
+    print(f"Available Z-coordinates (nodes): {available_z_nodes}")
 
-        plotter = pv.Plotter()
-        plotter.add_mesh(grid, scalars="Displacement_norm", cmap="viridis", show_edges=False, opacity=0.2)
-        plotter.add_mesh(sliced, scalars="Displacement_norm", cmap="viridis", show_edges=True)
-        plotter.add_text(f"Displacement (norm) — slice at z = {z_target}", position="upper_left")
-        plotter.add_axes()
-        plotter.show()
-
-    # 3D stress/strain norms
-    for field in available_stresses + available_strains:
-        tensor = grid.cell_data[field].reshape((-1, 3, 3))
-        grid.cell_data[f"{field}_norm"] = np.linalg.norm(tensor, axis=(1, 2))
-        plotter = pv.Plotter()
-        plotter.add_mesh(grid, scalars=f"{field}_norm", cmap="viridis" if "Stress" in field else "plasma")
-        plotter.show()
-
-    # --- 2D stress profile at z = target ---
-    if show_tensor_field in grid.cell_data:
-        tensor = grid.cell_data[show_tensor_field].reshape((-1, 3, 3))
+    # --- STRESS PROFILE ANALYSIS ---
+    if stress_field_name and stress_field_name in grid.cell_data:
+        print(f"\nAnalyzing Stress Profile for '{stress_field_name}' at z = {z_target_stress}")
         centers = grid.cell_centers().points
-        x, y, z = centers[:, 0], centers[:, 1], centers[:, 2]
-        r = np.sqrt(x**2 + y**2)
-        theta = np.arctan2(y, x)
+        mask = np.abs(centers[:, 2] - z_target_stress) < tol
 
-        z_target = 5.0
-        tol = 0.00001
-        mask = np.abs(z - z_target) < tol
-
-        print("Available z-coordinates in cell centers:", np.unique(np.round(z, 6)))
-
-        if np.sum(mask) == 0:
-            print(f"[WARNING] No cells found at z = {z_target} ± {tol}")
+        if not np.any(mask):
+            print(f"[WARNING] No cells found for stress analysis at z = {z_target_stress} ± {tol}")
         else:
-            s_xx = tensor[:, 0, 0]
-            s_yy = tensor[:, 1, 1]
-            s_xy = tensor[:, 0, 1]
-            s_zz = tensor[:, 2, 2]
+            # Get cartesian stresses and coordinates
+            s_tensor = grid.cell_data[stress_field_name].reshape((-1, 3, 3))[mask]
+            x, y = centers[mask, 0], centers[mask, 1]
+            r = np.sqrt(x**2 + y**2)
+            theta = np.arctan2(y, x)
 
-            σ_rr = s_xx * np.cos(theta)**2 + s_yy * np.sin(theta)**2 + 2 * s_xy * np.sin(theta) * np.cos(theta)
-            σ_tt = s_xx * np.sin(theta)**2 + s_yy * np.cos(theta)**2 - 2 * s_xy * np.sin(theta) * np.cos(theta)
+            # Transform to cylindrical coordinates
+            c, s = np.cos(theta), np.sin(theta)
+            c2, s2, sc = c**2, s**2, s*c
+            s_xx, s_yy, s_zz, s_xy = s_tensor[:,0,0], s_tensor[:,1,1], s_tensor[:,2,2], s_tensor[:,0,1]
+            
+            σ_rr = s_xx * c2 + s_yy * s2 + 2 * s_xy * sc
+            σ_tt = s_xx * s2 + s_yy * c2 - 2 * s_xy * sc
             σ_zz = s_zz
-
-            # Scatter plot
-            plt.figure(figsize=(6, 4))
-
-            plt.scatter(r[mask], σ_rr[mask], s=8, c='purple', label="σ_rr (calculated)")
-            plt.scatter(r[mask], σ_tt[mask], s=8, c='orange', label="σ_tt (calculated)")
-            plt.scatter(r[mask], σ_zz[mask], s=8, c='blue', label="σ_zz (calculated)")
-
-            # Analytical solution
-            r_th = r[mask]
-            σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_th)
-            # σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_th)
-
-            plt.plot(r_th, σ_rr_an, '--', c='purple', label="σ_rr (analytical)")
-            plt.plot(r_th, σ_tt_an, '--', c='orange', label="σ_tt (analytical)")
-            plt.plot(r_th, σ_zz_an, '--', c='blue', label="σ_zz (analytical)")
-
-            plt.xlabel("r (m)")
-            plt.ylabel("Stress (Pa)")
-            plt.title(f"{show_tensor_field} @ z = {z_target}")
-            plt.grid(True)
-            plt.legend()
-            plt.tight_layout()
-            plt.savefig("output/sigma_rr_tt_vs_r.png", dpi=300)
-            plt.show()
-
-            # Average-by-radius
-            # Note:
-            # When using the GAMG solver (algebraic multigrid), small numerical asymmetries 
-            # can arise even in geometrically symmetric problems. This results in slightly 
-            # different stress values at the same radial coordinate r but different angular 
-            # positions θ (i.e., a loss of perfect axial symmetry).
-            #
-            # This effect appears as "vertical scatter" in σ_rr or σ_θθ vs r plots, where 
-            # multiple values are associated with a single radius.
-            #
-            # In contrast, the HYPRE BoomerAMG solver tends to preserve axial symmetry more 
-            # accurately in cylindrical domains, producing smoother and cleaner stress profiles.
-            #
-            # To suppress numerical noise and recover a clean comparison with analytical solutions,
-            # we compute the average stress over all cells sharing the same radius r.
-
-            import pandas as pd
-            df = pd.DataFrame({
-                "r": np.round(r[mask], 6),
-                "σ_rr": σ_rr[mask],
-                "σ_tt": σ_tt[mask],
-                "σ_zz": σ_zz[mask]
-            })
+            
+            # Note on numerical asymmetries:
+            # Some iterative solvers (like GAMG) can introduce minor numerical asymmetries in
+            # geometrically symmetric problems. This leads to slight variations in stress values
+            # for cells at the same radius but different angles, causing "scatter" in the plots.
+            # Averaging values at the same radius helps to filter this noise and allows for a
+            # cleaner comparison with the 1D analytical solution.
+            df = pd.DataFrame({"r": np.round(r, 6), "σ_rr": σ_rr, "σ_tt": σ_tt, "σ_zz": σ_zz})
             grouped = df.groupby("r").mean().reset_index()
+            r_avg = grouped["r"].values
+            
+            # Get analytical solution
+            if analytical_case == 'lame':
+                σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_avg)
+            elif analytical_case == 'thermal':
+                σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_avg)
+            else:
+                raise ValueError(f"Unknown analytical_case: {analytical_case}")
 
-            r_u = grouped["r"].values
-            σ_rr_u = grouped["σ_rr"].values
-            σ_tt_u = grouped["σ_tt"].values
-            σ_zz_u = grouped["σ_zz"].values
-            σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_u)
-            # σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_u)
-
-
-            plt.scatter(r_u, σ_rr_u, c='purple', label="σ_rr (avg)")
-            plt.scatter(r_u, σ_tt_u, c='orange', label="σ_tt (avg)")
-            plt.scatter(r_u, σ_zz_u, c='blue', label="σ_zz (avg)")
-
-            plt.plot(r_u, σ_rr_an, '--', c='purple', label="σ_rr (analytical)")
-            plt.plot(r_u, σ_tt_an, '--', c='orange', label="σ_tt (analytical)")
-            plt.plot(r_u, σ_zz_an, '--', c='blue', label="σ_zz (analytical)")
-            # plt.plot(r_u, np.zeros_like(r_u), '--', c='blue', label="σ_zz (plane stress)") # plane stress
-            plt.xlabel("r (m)")
+            # Plotting
+            plt.figure(figsize=(8, 6))
+            plt.plot(r_avg, grouped["σ_rr"], 'o', c='purple', markersize=4, label="σ_rr (FEM, avg)")
+            plt.plot(r_avg, grouped["σ_tt"], 's', c='orange', markersize=4, label="σ_tt (FEM, avg)")
+            plt.plot(r_avg, grouped["σ_zz"], '^', c='blue', markersize=4, label="σ_zz (FEM, avg)")
+            plt.plot(r_avg, σ_rr_an, '--', c='purple', label="σ_rr (Analytical)")
+            plt.plot(r_avg, σ_tt_an, '--', c='orange', label="σ_tt (Analytical)")
+            plt.plot(r_avg, σ_zz_an, '--', c='blue', label="σ_zz (Analytical)")
+            plt.xlabel("Radius r (m)")
             plt.ylabel("Stress (Pa)")
-            plt.title(f"{show_tensor_field} – averaged components @ z = {z_target}")
-            plt.grid(True)
+            plt.title(f"Stress Components vs. Radius at z = {z_target_stress}")
+            plt.grid(True, linestyle=':')
             plt.legend()
             plt.tight_layout()
-            plt.savefig("output/sigma_rr_tt_vs_r_avg.png", dpi=300)
+            plt.savefig("output/stress_vs_radius.png", dpi=300)
             plt.show()
 
-    # 2D temperature vs r
+    # --- STRAIN PROFILE ANALYSIS ---
+    if strain_field_name and strain_field_name in grid.cell_data:
+        print(f"\nAnalyzing Strain Profile for '{strain_field_name}' at z = {z_target_stress}")
+        centers = grid.cell_centers().points
+        mask = np.abs(centers[:, 2] - z_target_stress) < tol
+
+        if not np.any(mask):
+            print(f"[WARNING] No cells found for strain analysis at z = {z_target_stress} ± {tol}")
+        else:
+            # Get cartesian strains and coordinates
+            e_tensor = grid.cell_data[strain_field_name].reshape((-1, 3, 3))[mask]
+            x, y = centers[mask, 0], centers[mask, 1]
+            r = np.sqrt(x**2 + y**2)
+            theta = np.arctan2(y, x)
+
+            # Transform to cylindrical coordinates
+            c, s = np.cos(theta), np.sin(theta)
+            c2, s2, sc = c**2, s**2, s*c
+            e_xx, e_yy, e_xy, e_zz = e_tensor[:,0,0], e_tensor[:,1,1], e_tensor[:,0,1], e_tensor[:,2,2]
+            
+            ε_rr = e_xx * c2 + e_yy * s2 + 2 * e_xy * sc
+            ε_tt = e_xx * s2 + e_yy * c2 - 2 * e_xy * sc
+            ε_zz = e_zz
+
+            # Average by radius to filter numerical noise
+            df = pd.DataFrame({"r": np.round(r, 6), 
+                               "ε_rr": ε_rr, 
+                               "ε_tt": ε_tt, 
+                               "ε_zz": ε_zz})
+            
+            grouped = df.groupby("r").mean().reset_index()
+            r_avg = grouped["r"].values
+            
+            # Get analytical solution for strains (derived from radial displacement)
+            # Hoop Strain: ε_θθ = u_r / r
+            # Radial Strain: ε_rr = du_r / dr
+            u_r_an = radial_displacement(r_avg)
+
+            ε_tt_an = u_r_an / r_avg
+            ε_rr_an = radial_strain(r_avg)
+
+            # Plotting
+            plt.figure(figsize=(8, 6))
+            plt.plot(r_avg, grouped["ε_rr"], 'o', c='darkgreen', markersize=4, label="ε_rr (Radial) (FEM, avg)")
+            plt.plot(r_avg, grouped["ε_tt"], 's', c='crimson',   markersize=4, label="ε_tt (Hoop) (FEM, avg)")
+            plt.plot(r_avg, grouped["ε_zz"], 'x', c='lightblue',   markersize=4, label="ε_zz (Axial) (FEM, avg)")
+
+            plt.plot(r_avg, ε_rr_an, '--', c='darkgreen', label="ε_rr (Analytical)")
+            plt.plot(r_avg, ε_tt_an, '--', c='crimson', label="ε_tt (Hoop) (Analytical)")
+
+            plt.xlabel("Radius r (m)")
+            plt.ylabel("Strain ε (-)")
+            plt.title(f"Strain components vs. radius at z = {z_target_stress}")
+            plt.grid(True, linestyle=':')
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig("output/strain_vs_radius.png", dpi=300)
+            plt.show()
+
+    # --- TEMPERATURE PROFILE ANALYSIS ---
     if show_temperature and "Temperature" in grid.point_data:
+        print(f"\nAnalyzing Temperature Profile at z = {z_target_temp}")
         points = grid.points
-        r_nodes = np.sqrt(points[:, 0]**2 + points[:, 1]**2)
-        z_nodes = points[:, 2]
-        r_array = np.linspace(min(r_nodes), max(r_nodes))
-
-        print("Available z-coordinates in the mesh (temperature nodes):", np.unique(np.round(z_nodes, 6)))
-
-        z_target = 0.0005
-        tol = 1e-4
-        mask = np.abs(z_nodes - z_target) < tol
-
-        if np.sum(mask) > 0:
+        mask = np.abs(points[:, 2] - z_target_temp) < tol
+        
+        if not np.any(mask):
+            print(f"[WARNING] No nodes found for temperature analysis at z = {z_target_temp} ± {tol}")
+        else:
+            r_nodes = np.sqrt(points[mask, 0]**2 + points[mask, 1]**2)
             T_vals = grid.point_data["Temperature"][mask]
-            plt.figure(figsize=(6, 4))
-            plt.scatter(r_nodes[mask], T_vals, c='red', label="Calculated")
-            plt.plot(r_array, full_cylinder_analytical_temperature(r_array), label="Analytical")
-            # plt.plot(r_array, thermal_shield_slab_analytical_temperature(r_array), label="Analytical")
-            plt.xlabel("r (m)")
+            
+            r_analytical = np.linspace(np.min(r_nodes), np.max(r_nodes), 200)
+            T_analytical = full_cylinder_analytical_temperature(r_analytical)
+
+            plt.figure(figsize=(8, 6))
+            plt.plot(r_nodes, T_vals, 'o', c='red', markersize=4, label="FEM")
+            plt.plot(r_analytical, T_analytical, '--', c='black', label="Analytical")
+            plt.xlabel("Radius r (m)")
             plt.ylabel("Temperature (K)")
-            plt.grid(True)
+            plt.title(f"Temperature vs. Radius at z = {z_target_temp}")
+            plt.grid(True, linestyle=':')
             plt.legend()
             plt.tight_layout()
-            plt.savefig("output/temperature_vs_r.png", dpi=300)
+            plt.savefig("output/temperature_vs_radius.png", dpi=300)
             plt.show()
 
-    # Radial displacement u_r vs r at z = z_target
+    # --- RADIAL DISPLACEMENT PROFILE ---
     if "Displacement" in grid.point_data:
+        print(f"\nAnalyzing Radial Displacement Profile at z = {z_target_disp}")
+        points = grid.points
+        mask = np.abs(points[:, 2] - z_target_disp) < tol
 
-        ux = grid["Displacement"][:, 0]
-        uy = grid["Displacement"][:, 1]
-        ur = - np.sqrt(ux**2 + uy**2)
+        if not np.any(mask):
+            print(f"[WARNING] No nodes found for displacement analysis at z = {z_target_disp} ± {tol}")
+        else:
+            x, y = points[mask, 0], points[mask, 1]
+            ux, uy = grid["Displacement"][mask, 0], grid["Displacement"][mask, 1]
+            
+            # Correct calculation of radial displacement component
+            theta = np.arctan2(y, x)
+            u_r_fem = ux * np.cos(theta) + uy * np.sin(theta)
+            
+            r_nodes = np.sqrt(x**2 + y**2)
+            
+            # Average by radius
+            df = pd.DataFrame({"r": np.round(r_nodes, 6), "u_r": u_r_fem})
+            grouped = df.groupby("r").mean().reset_index()
+            r_avg = grouped["r"].values
+            
+            # Analytical solution
+            r_analytical = np.linspace(r_avg.min(), r_avg.max(), 200)
+            u_r_analytical = radial_displacement(r_analytical)
+            
+            plt.figure(figsize=(8, 6))
+            plt.plot(grouped["r"], grouped["u_r"], 'o-', c='green', markersize=4, label="u_r (FEM, avg)")
+            plt.plot(r_analytical, u_r_analytical, '--', c='black', label="u_r (Analytical)")
+            plt.xlabel("Radius r (m)")
+            plt.ylabel("Radial Displacement u_r (m)")
+            plt.title(f"Radial Displacement vs. Radius at z = {z_target_disp}")
+            plt.grid(True, linestyle=':')
+            plt.legend()
+            plt.tight_layout()
+            plt.savefig("output/u_r_vs_radius.png", dpi=300)
+            plt.show()
 
-        x = grid.points[:, 0]
-        y = grid.points[:, 1]
-        z = grid.points[:, 2]
-
-        r = np.sqrt(x**2 + y**2)
-
-        z_target = 5.454545
-        tol = 1e-5
-        mask = np.abs(z - z_target) < tol
-
-        df = pd.DataFrame({
-            "r": np.round(r[mask], 6),
-            "u_r": ur[mask]
-        })
-        grouped = df.groupby("r").mean().reset_index()
-
-        r_vals = grouped["r"].values
-        r_sorted = np.linspace(r_vals.min(), r_vals.max(), 300)
-        ur_analytical = radial_displacement(r_sorted)
-
-        plt.figure(figsize=(6, 4))
-        plt.plot(r_sorted, ur_analytical, '--', c='black', label="u_r (analytical)")
-        plt.plot(r_vals, grouped["u_r"], 'o-', color='green', label="u_r (avg)")
-        plt.xlabel("r (m)")
-        plt.ylabel("u_r (m)")
-        plt.grid(True)
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig("output/u_r_vs_r_avg.png", dpi=300)
-        plt.show()
-
-        # uz = grid["Displacement"][:, 2]
-        # z_vals = grid.points[:, 2]
-        # idx = np.argsort(z_vals)
-        # plt.figure(figsize=(6, 4))
-        # plt.plot(z_vals[idx], uz[idx], label="u_z")
-        # plt.xlabel("z (m)")
-        # plt.ylabel("u_z (m)")
-        # plt.grid(True)
-        # plt.legend()
-        # plt.tight_layout()
-        # plt.savefig("output/u_z_vs_z.png", dpi=300)
-        # plt.show()
 
 if __name__ == "__main__":
-
+    # Example of how to call the refined function
     view_vtu(
         filename="output/fields.vtu",
-        show_warp=True,
-        show_temperature=True,
-        show_tensor_field=None
+        analytical_case='lame',
+        z_target_stress=5.0,  # Z-level for stress/strain plots
+        z_target_disp=5.0,    # Z-level for displacement plot
+        z_target_temp=0.005,  # Z-level for temperature plot
+        z_slice_3d_vis=5.0,   # Z-level for the 3D cut-plane view
+        tol=1e-4
     )

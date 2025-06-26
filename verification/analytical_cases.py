@@ -35,6 +35,14 @@ def radial_displacement(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3, E=2e11):
 
     return u_r
 
+def radial_strain(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3, E=2e11):
+
+    r = np.asarray(r)
+    K = (-po*b**2 + pi*a**2) / (b**2 - a**2)
+    strain_r = (1 + nu) / E * (- (a/r)**2 * (pi + K) + K * (1- 2*nu))
+
+    return strain_r
+
 def thermal_stresses(r, alpha=1.45e-5, E=170e9, T_hot=891.45, T_cold=573, nu=0.3, R_s=0.004):
     """
     Analytical solution for thermal stress in a cylinder with radial temperature gradient.
