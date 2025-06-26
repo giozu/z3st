@@ -15,17 +15,25 @@ def lame_solutions(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3):
     Returns:
         tuple: (sigma_r, sigma_theta, sigma_z_plane_strain, sigma_z_plane_stress)
     """
-    r = np.asarray(r)
-    A = (pi * a**2 - po * b**2) / (b**2 - a**2)
-    B = (po - pi) * (a * b)**2 / (b**2 - a**2)
 
-    sigma_r = A + B / r**2
-    sigma_theta = A - B / r**2
-    sigma_z_plane_strain = 2 * nu * A * np.ones_like(r)
+    r = np.asarray(r)
+
+    K = (-po*b**2 + pi*a**2) / (b**2 - a**2)
+
+    sigma_r = -pi * (a/r)**2 + K * (1 - (a/r)**2) 
+    sigma_theta = +pi * (a/r)**2 + K * (1 + (a/r)**2) 
+    sigma_z_plane_strain = 2 * nu * K * np.ones_like(r)
     sigma_z_plane_stress = np.zeros_like(r)
 
     return sigma_r, sigma_theta, sigma_z_plane_strain, sigma_z_plane_stress
 
+def radial_displacement(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3, E=2e11):
+
+    r = np.asarray(r)
+    K = (-po*b**2 + pi*a**2) / (b**2 - a**2)
+    u_r = (1 + nu) / E * ((a/r)**2 * (pi + K) + K * (1- 2*nu)) * r
+
+    return u_r
 
 def thermal_stresses(r, alpha=1.45e-5, E=170e9, T_hot=891.45, T_cold=573, nu=0.3, R_s=0.004):
     """

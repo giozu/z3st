@@ -96,6 +96,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
 
             # Scatter plot
             plt.figure(figsize=(6, 4))
+
             plt.scatter(r[mask], σ_rr[mask], s=8, c='purple', label="σ_rr (calculated)")
             plt.scatter(r[mask], σ_tt[mask], s=8, c='orange', label="σ_tt (calculated)")
             plt.scatter(r[mask], σ_zz[mask], s=8, c='blue', label="σ_zz (calculated)")
@@ -150,10 +151,11 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
             σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_u)
             # σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_u)
 
-            plt.figure(figsize=(6, 4))
-            plt.plot(r_u, σ_rr_u, 'o-', c='purple', label="σ_rr (avg)")
-            plt.plot(r_u, σ_tt_u, 'o-', c='orange', label="σ_tt (avg)")
-            plt.plot(r_u, σ_zz_u, 'o-', c='blue', label="σ_zz (avg)")
+
+            plt.scatter(r_u, σ_rr_u, c='purple', label="σ_rr (avg)")
+            plt.scatter(r_u, σ_tt_u, c='orange', label="σ_tt (avg)")
+            plt.scatter(r_u, σ_zz_u, c='blue', label="σ_zz (avg)")
+
             plt.plot(r_u, σ_rr_an, '--', c='purple', label="σ_rr (analytical)")
             plt.plot(r_u, σ_tt_an, '--', c='orange', label="σ_tt (analytical)")
             plt.plot(r_u, σ_zz_an, '--', c='blue', label="σ_zz (analytical)")
@@ -179,6 +181,7 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
         z_target = 0.0005
         tol = 1e-4
         mask = np.abs(z_nodes - z_target) < tol
+
         if np.sum(mask) > 0:
             T_vals = grid.point_data["Temperature"][mask]
             plt.figure(figsize=(6, 4))
@@ -193,20 +196,56 @@ def view_vtu(filename="output/fields.vtu", show_warp=True, show_temperature=True
             plt.savefig("output/temperature_vs_r.png", dpi=300)
             plt.show()
 
-    # Axial displacement
+    # Radial displacement u_r vs r at z = z_target
     if "Displacement" in grid.point_data:
-        uz = grid["Displacement"][:, 2]
-        z_vals = grid.points[:, 2]
-        idx = np.argsort(z_vals)
+
+        ux = grid["Displacement"][:, 0]
+        uy = grid["Displacement"][:, 1]
+        ur = - np.sqrt(ux**2 + uy**2)
+
+        x = grid.points[:, 0]
+        y = grid.points[:, 1]
+        z = grid.points[:, 2]
+
+        r = np.sqrt(x**2 + y**2)
+
+        z_target = 5.454545
+        tol = 1e-5
+        mask = np.abs(z - z_target) < tol
+
+        df = pd.DataFrame({
+            "r": np.round(r[mask], 6),
+            "u_r": ur[mask]
+        })
+        grouped = df.groupby("r").mean().reset_index()
+
+        r_vals = grouped["r"].values
+        r_sorted = np.linspace(r_vals.min(), r_vals.max(), 300)
+        ur_analytical = radial_displacement(r_sorted)
+
         plt.figure(figsize=(6, 4))
-        plt.plot(z_vals[idx], uz[idx], label="u_z")
-        plt.xlabel("z (m)")
-        plt.ylabel("u_z (m)")
+        plt.plot(r_sorted, ur_analytical, '--', c='black', label="u_r (analytical)")
+        plt.plot(r_vals, grouped["u_r"], 'o-', color='green', label="u_r (avg)")
+        plt.xlabel("r (m)")
+        plt.ylabel("u_r (m)")
         plt.grid(True)
         plt.legend()
         plt.tight_layout()
-        plt.savefig("output/u_z_vs_z.png", dpi=300)
+        plt.savefig("output/u_r_vs_r_avg.png", dpi=300)
         plt.show()
+
+        # uz = grid["Displacement"][:, 2]
+        # z_vals = grid.points[:, 2]
+        # idx = np.argsort(z_vals)
+        # plt.figure(figsize=(6, 4))
+        # plt.plot(z_vals[idx], uz[idx], label="u_z")
+        # plt.xlabel("z (m)")
+        # plt.ylabel("u_z (m)")
+        # plt.grid(True)
+        # plt.legend()
+        # plt.tight_layout()
+        # plt.savefig("output/u_z_vs_z.png", dpi=300)
+        # plt.show()
 
 if __name__ == "__main__":
 
