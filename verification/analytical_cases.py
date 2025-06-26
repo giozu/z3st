@@ -27,7 +27,7 @@ def lame_solutions(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3):
     return sigma_r, sigma_theta, sigma_z_plane_strain, sigma_z_plane_stress
 
 
-def thermal_stresses(r, alpha=1.45e-5, E=170e9, T_hot=1050.63, T_cold=573, nu=0.3, R_s=0.004):
+def thermal_stresses(r, alpha=1.45e-5, E=170e9, T_hot=891.45, T_cold=573, nu=0.3, R_s=0.004):
     """
     Analytical solution for thermal stress in a cylinder with radial temperature gradient.
 
@@ -82,3 +82,22 @@ def thermal_shield_slab_analytical_temperature(x):
 
     return term1 + term2
 
+
+def full_cylinder_analytical_temperature(x):
+    """
+    Analytical temperature profile in a cylindrical element with volumetric heat generation
+
+    Parameters:
+        x (array-like): Position along the slab thickness (m)
+
+    Returns:
+        np.ndarray: Temperature distribution T(x) (K)
+    """
+    T0 = 573         # Outer surface temperature (K)
+    K = 2.5          # Thermal conductivity (W/m·K)
+    R = 0.004        # Slab thickness (m)
+    LHR = 1e4
+
+    x = np.asarray(x)
+
+    return LHR / (4 * np.pi * K) * (- x**2 / R**2 + 1) + T0

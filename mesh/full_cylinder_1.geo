@@ -90,4 +90,4 @@ Mesh 3;
 Mesh.SaveAll = 0;
 
 // Save the mesh file (uncomment to use)
-Save "full_cylinder_1.msh";
+Save "full_cylinder.msh";

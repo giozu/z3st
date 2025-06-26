@@ -1,4 +1,4 @@
-# python modules
+# --- Python modules ---
 import dolfinx
 import yaml
 from mpi4py import MPI
@@ -6,7 +6,7 @@ import numpy as np
 import os
 from petsc4py import PETSc
 import ufl
-# ZEST modules
+# --- ZEST modules ---
 from core.config import Config
 from core.mesh import Mesh
 from core.solver import Solver
@@ -14,7 +14,7 @@ from core.finite_element_setup import FiniteElementSetup
 from models.thermal_model import ThermalModel
 from models.mechanical_model import MechanicalModel
 
-class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel):
+class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel):
     def __init__(self, input_file, mesh_file, geometry, rank=0, gdim=3):
         Config.__init__(self, input_file)
         Mesh.__init__(self, mesh_file=mesh_file, geometry=geometry, rank=rank, gdim=gdim)
@@ -86,7 +86,8 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
             # --- Fissile ---
             if is_fissile:
                 self.q_third[name] = self.lhr / self.area if is_fissile else 0.0
-                print(f"  q_third[{name}] = {self.q_third[name]:.2f} W/m³ (fissile: {is_fissile})")
+                print(f"  q_third[{name}] = {self.q_third[name]:.3e} W/m³ (fissile: {is_fissile})")
+                print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2 ")
 
             # --- Gamma heating ---
             elif q0 > 0.0:
@@ -96,6 +97,8 @@ class MultiMaterial(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, Mech
                 q_func.interpolate(f)
                 self.q_third[name] = q_func
                 print(f"  gamma heating - q_third_0[{name}] = {q0:.3e} W/m³, attenuation: {mu_gamma} 1/m)")
+            
+            # --- No heat source ---
             else:
                 self.q_third[name] = 0.0
                 print(f"  q_third_0[{name}] = 0.0 W/m³")

@@ -6,9 +6,7 @@ thermal_bcs:
     - type: Neumann
       region: fuel_top
       flux: 0.0
-    - type: Dirichlet
-      region: fuel_lateral
-      temperature: 300
+
   cladding:
     - type: Neumann
       region: cladding_bottom
@@ -30,6 +28,7 @@ mechanical_bcs:
       traction: -2e6
     - type: Clamp_z
       region: fuel_top
+      
   cladding:
     - type: Dirichlet
       region: cladding_bottom

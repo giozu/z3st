@@ -60,7 +60,6 @@ class Mesh:
             self.height = self.geometry.get("height", None)
             print(f"  height = {self.height:.2f} m")
 
-            # DEVO CORREGGERE, GENERALIZZARRE AREA = EDGE * WIDTH
             if self.geometry_type == "rect":
                 self.edge = self.geometry.get("edge", None)
                 self.width = self.geometry.get("width", None)
@@ -69,6 +68,7 @@ class Mesh:
             elif self.geometry_type == "cyl":
                 self.inner_radius = self.geometry.get("inner_radius", None)
                 self.outer_radius = self.geometry.get("outer_radius", None)
+                self.perimeter = 2. * np.pi * self.outer_radius
                 self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
                 print(f"  inner_radius = {self.inner_radius:.2e} m")
                 print(f"  outer_radius = {self.outer_radius:.2e} m")
@@ -77,6 +77,7 @@ class Mesh:
                 self.fuel_outer_radius = self.geometry.get("fuel_outer_radius", None)
                 self.cladding_inner_radius = self.geometry.get("cladding_inner_radius", None)
                 self.cladding_outer_radius = self.geometry.get("cladding_outer_radius", None)
+                self.perimeter = 2. * np.pi * self.fuel_outer_radius
                 self.area = np.pi * (self.fuel_outer_radius**2 - self.fuel_inner_radius**2)
                 print(f"  fuel_inner_radius = {self.fuel_inner_radius:.2e} m")
                 print(f"  fuel_outer_radius = {self.fuel_outer_radius:.2e} m")

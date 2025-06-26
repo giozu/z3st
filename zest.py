@@ -1,5 +1,5 @@
 print("""
-ZEST: A FEniCSx Framework for Thermo-Mechanical Analysis
+ZEST: A FEniCSx framework for thermo-mechanical analysis
 ========================================================
 Author: Giovanni Zullo
 Date: 16/01/2025
@@ -11,13 +11,13 @@ of multi-material domains. Built on FEniCSx, it supports transient simulations,
 complex geometries, and user-defined boundary conditions.
 """)
 
-# Python modules
+# --- Python modules ---
 import time
 import sys
 import yaml
-# zest modules
-from input.multi_material import MultiMaterial
-# from output.postprocessing import save_temperature_history
+
+# --- ZEST modules ---  
+from core.spine import Spine
 from utils import *
 from output.output import *
 
@@ -29,8 +29,6 @@ with open("input.yaml", "r") as f:
     input_data = yaml.safe_load(f)
 
 # --- Output ---
-# log_path = "output/simulation_log.txt"
-# clear_log_file(log_path)
 os.makedirs("output", exist_ok=True)
 
 # --- Geometry ---
@@ -44,7 +42,7 @@ for mat_name, mat_path in materials_dict.items():
     loaded_materials[mat_name] = load(mat_path)
 
 # --- Problem ---
-problem = MultiMaterial(input_file=input_data, mesh_file=input_data["mesh_path"], geometry=geometry)
+problem = Spine(input_file=input_data, mesh_file=input_data["mesh_path"], geometry=geometry)
 problem.debug_mode = DEBUG_MODE
 problem.mesh_plot_mode = MESH_PLOT_MODE
 problem._mesh_plot(MESH_PLOT_MODE)
@@ -86,9 +84,4 @@ print(f"Elapsed time: {elapsed_time:.4f} s")
 results = problem.get_results()
 
 # --- Post-processing ---
-# plot3d_temperature(problem)
-# plot3d_displacement(problem)
-# plot_scalar(problem)
-# plot1d_temperature(problem, y_target=0.0, z_target=0.75, tol=0.0001)
-# plot1d_stress(problem, y_target=0.0, z_target=0.005, tol=0.0001)
 export_vtu(problem)

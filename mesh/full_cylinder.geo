@@ -13,7 +13,7 @@ SetFactory("OpenCASCADE");
 h = 0.01;         // Height of the cylinder
 r = 0.004;        // Radius of the cylinder
 
-n_theta = 64;     // Number of divisions along the circumference (use a multiple of 4)
+n_theta = 64;    // Number of divisions along the circumference (use a multiple of 4)
 n_z = 20;         // Number of divisions along the height
 
 // Calculate divisions for each quarter-circle arc.
