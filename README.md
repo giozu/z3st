@@ -125,7 +125,7 @@ python zest.py --debug --mesh_plot
 conda create -n zest python=3.12.9 -y
 conda activate zest
 
-conda install -c conda-forge fenics-dolfinx pyvista matplotlib meshio openmc
+conda install -c conda-forge fenics-dolfinx pyvista matplotlib meshio openmc jupyterlab ipywidgets pandas numpy
 pip install gmsh pyyaml
 ```
 
