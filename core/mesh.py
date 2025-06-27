@@ -63,6 +63,7 @@ class Mesh:
             if self.geometry_type == "rect":
                 self.edge = self.geometry.get("edge", None)
                 self.width = self.geometry.get("width", None)
+                self.perimeter = self.edge * self.width
                 self.area = self.edge * self.width
                 print(f"  edge = {self.edge:.3f} m")
             elif self.geometry_type == "cyl":

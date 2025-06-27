@@ -1,5 +1,6 @@
 name: box
 edge: '1.0'
+width: '1.0'
 height: '2.0'
 geometry_type: rect
 labels:

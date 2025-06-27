@@ -10,18 +10,19 @@
 SetFactory("Built-in");
 
 L = 1.0;  // Edge
-H = 2.0;  // Height
+W = 1.2;  // Width
+H = 1.4;  // Height
 n = 20;   // Number of divisions per edge (adjust as needed)
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
 Point(2) = {L, 0, 0, 1.0};
-Point(3) = {L, L, 0, 1.0};
-Point(4) = {0, L, 0, 1.0};
+Point(3) = {L, W, 0, 1.0};
+Point(4) = {0, W, 0, 1.0};
 Point(5) = {0, 0, H, 1.0};
 Point(6) = {L, 0, H, 1.0};
-Point(7) = {L, L, H, 1.0};
-Point(8) = {0, L, H, 1.0};
+Point(7) = {L, W, H, 1.0};
+Point(8) = {0, W, H, 1.0};
 
 // Eedges
 Line(1) = {1, 2};
