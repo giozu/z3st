@@ -16,9 +16,9 @@ h = 10.0; // Height
 // Mesh Discretization
 // Note: Gmsh's Transfinite command uses the number of *points*, not elements.
 // Number of elements will be (num_points - 1).
-num_points_radial = 21;      // Number of points in the radial direction
-num_points_circ_qtr = 20;    // Number of points on each 90-degree arc
-num_layers_height = 21;      // Number of element layers along the height
+num_points_radial = 11;      // Number of points in the radial direction
+num_points_circ_qtr = 16;    // Number of points on each 90-degree arc
+num_layers_height = 11;      // Number of element layers along the height
 
 // --------
 // 2D slice

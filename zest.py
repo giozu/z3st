@@ -12,14 +12,12 @@ complex geometries, and user-defined boundary conditions.
 """)
 
 # --- Python modules ---
-import time
-import sys
-import yaml
+import time, sys, yaml, os
 
 # --- ZEST modules ---  
 from core.spine import Spine
+from output.export_vtu import export_vtu
 from utils import *
-from output.output import *
 
 DEBUG_MODE = "--debug" in sys.argv
 MESH_PLOT_MODE = "--mesh_plot" in sys.argv
