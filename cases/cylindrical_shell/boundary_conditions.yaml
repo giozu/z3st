@@ -12,6 +12,9 @@ mechanical_bcs:
     - type: Dirichlet
       region: bottom
       displacement: [0.0, 0.0, 0.0]
+    - type: Dirichlet
+      region: top
+      displacement: [0.0, 0.0, 0.0]
     # - type: Clamp_z
     #   region: bottom
     #   value: 0.0
