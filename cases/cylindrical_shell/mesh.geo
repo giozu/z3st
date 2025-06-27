@@ -117,4 +117,4 @@ Mesh.Optimize = 1;          // Improve mesh quality
 Mesh 3;
 
 // Save the mesh
-Save "cylindrical_shell.msh";
+Save "mesh.msh";

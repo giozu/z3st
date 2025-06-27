@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//  Gmsh GEO for a cube LxLxL with a structured mesh
+//  Gmsh GEO for a box LxLxH with a structured mesh
 //
 //  Author: Giovanni Zullo
 //
@@ -81,4 +81,4 @@ Mesh.RecombineAll = 1;
 Mesh 3; // gmsh box.geo -3 -format msh2
 
 // Save mesh file
-Save "box.msh";
+Save "mesh.msh";
