@@ -10,7 +10,7 @@
 SetFactory("Built-in");
 
 L = 1.0;  // Side 
-H = 1.0;  // Heigth
+H = 1.0;  // Height
 n = 20;   // Number of divisions per edge (adjust as needed)
 
 // First solid
