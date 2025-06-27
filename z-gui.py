@@ -11,9 +11,8 @@ def view_vtu(filename="output/fields.vtu",
              stress_field_name=None,
              strain_field_name=None,
              analytical_case="lame",
-             z_target_stress=5.0,
-             z_target_temp=0.005,
-             z_target_disp=5.0,
+             z_target_node=5.0,
+             z_target_cell=0.005,
              z_slice_3d_vis=0.005,
              tol=1e-5):
     """
@@ -28,9 +27,9 @@ def view_vtu(filename="output/fields.vtu",
         stress_field_name (str, optional): Name of the stress tensor field to analyze.
         strain_field_name (str, optional): Name of the strain tensor field to analyze.
         analytical_case (str): The analytical case to compare against.
-        z_target_stress (float): Z-coordinate for the stress/strain profile analysis.
-        z_target_temp (float): Z-coordinate for the temperature profile analysis.
-        z_target_disp (float): Z-coordinate for the displacement profile analysis.
+        z_target_cell (float): Z-coordinate for the stress/strain profile analysis.
+        z_target_node (float): Z-coordinate for the temperature profile analysis.
+        z_target_node (float): Z-coordinate for the displacement profile analysis.
         z_slice_3d_vis (float): Z-coordinate for the 3D slice visualization.
         tol (float): Tolerance for finding nodes/cells at the target z-coordinate.
     """
@@ -49,6 +48,11 @@ def view_vtu(filename="output/fields.vtu",
     if strain_field_name is None and available_strains:
         strain_field_name = available_strains[0]
         print(f"[INFO] Automatically selected strain field: {strain_field_name}")
+
+    available_z_cells = np.unique(np.round(grid.cell_centers().points[:, 2], 6))
+    available_z_nodes = np.unique(np.round(grid.points[:, 2], 6))
+    print(f"Available Z-coordinates (cell centers):\n{available_z_cells}")
+    print(f"Available Z-coordinates (nodes):\n{available_z_nodes}")
 
     # --- 3D Visualizations (PyVista) ---
 
@@ -95,19 +99,15 @@ def view_vtu(filename="output/fields.vtu",
 
     # --- 2D Profile Analysis vs. Analytical Solutions ---
     print("\n--- Starting 2D profile verification ---")
-    available_z_cells = np.unique(np.round(grid.cell_centers().points[:, 2], 6))
-    available_z_nodes = np.unique(np.round(grid.points[:, 2], 6))
-    print(f"Available Z-coordinates (cell centers):\n{available_z_cells}")
-    print(f"Available Z-coordinates (nodes):\n{available_z_nodes}")
 
     # --- STRESS PROFILE ANALYSIS ---
     if stress_field_name and stress_field_name in grid.cell_data:
-        print(f"\nAnalyzing stress profile for '{stress_field_name}' at z = {z_target_stress}")
+        print(f"Analyzing stress profile for '{stress_field_name}' at z = {z_target_cell}")
         centers = grid.cell_centers().points
-        mask = np.abs(centers[:, 2] - z_target_stress) < tol
+        mask = np.abs(centers[:, 2] - z_target_cell) < tol
 
         if not np.any(mask):
-            print(f"[WARNING] No cells found for stress analysis at z = {z_target_stress} ± {tol}")
+            print(f"[WARNING] No cells found for stress analysis at z = {z_target_cell} ± {tol}")
         else:
             s_tensor = grid.cell_data[stress_field_name].reshape((-1, 3, 3))[mask]
             x, y = centers[mask, 0], centers[mask, 1]
@@ -130,6 +130,8 @@ def view_vtu(filename="output/fields.vtu",
                 σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_avg)
             elif analytical_case == 'thermal':
                 σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_avg)
+            elif analytical_case is None:
+                σ_rr_an, σ_tt_an, σ_zz_an = np.zeros_like(r_avg), np.zeros_like(r_avg), np.zeros_like(r_avg)
             else:
                 raise ValueError(f"Unknown analytical_case: {analytical_case}")
 
@@ -142,7 +144,7 @@ def view_vtu(filename="output/fields.vtu",
             plt.plot(r_avg, σ_zz_an, '--', c='blue', label="σ_zz (Analytical)")
             plt.xlabel("Radius r (m)")
             plt.ylabel("Stress (Pa)")
-            plt.title(f"Stress components vs. radius at z = {z_target_stress}")
+            plt.title(f"Stress components vs. radius at z = {z_target_cell}")
             plt.grid(True, linestyle=':')
             plt.legend()
             plt.tight_layout()
@@ -151,12 +153,12 @@ def view_vtu(filename="output/fields.vtu",
 
     # --- STRAIN PROFILE ANALYSIS ---
     if strain_field_name and strain_field_name in grid.cell_data:
-        print(f"\nAnalyzing Strain Profile for '{strain_field_name}' at z = {z_target_stress}")
+        print(f"Analyzing Strain Profile for '{strain_field_name}' at z = {z_target_cell}")
         centers = grid.cell_centers().points
-        mask = np.abs(centers[:, 2] - z_target_stress) < tol
+        mask = np.abs(centers[:, 2] - z_target_cell) < tol
 
         if not np.any(mask):
-            print(f"[WARNING] No cells found for strain analysis at z = {z_target_stress} ± {tol}")
+            print(f"[WARNING] No cells found for strain analysis at z = {z_target_cell} ± {tol}")
         else:
             e_tensor = grid.cell_data[strain_field_name].reshape((-1, 3, 3))[mask]
             x, y = centers[mask, 0], centers[mask, 1]
@@ -174,10 +176,13 @@ def view_vtu(filename="output/fields.vtu",
             df = pd.DataFrame({"r": np.round(r, 6), "ε_rr": ε_rr, "ε_tt": ε_tt, "ε_zz": ε_zz})
             grouped = df.groupby("r").mean().reset_index()
             r_avg = grouped["r"].values
-            
-            u_r_an = radial_displacement(r_avg)
-            ε_tt_an = u_r_an / r_avg
-            ε_rr_an = radial_strain(r_avg)
+
+            if analytical_case is None:
+                ε_tt_an, ε_rr_an = np.zeros_like(r_avg), np.zeros_like(r_avg)
+            else:
+                u_r_an = radial_displacement(r_avg)
+                ε_tt_an = u_r_an / r_avg
+                ε_rr_an = radial_strain(r_avg)
 
             plt.figure(figsize=(8, 6))
             plt.plot(r_avg, grouped["ε_rr"], 'o', c='darkgreen', markersize=4, label="ε_rr (Radial) (FEM, avg)")
@@ -187,7 +192,7 @@ def view_vtu(filename="output/fields.vtu",
             plt.plot(r_avg, ε_tt_an, '--', c='crimson', label="ε_tt (Hoop) (Analytical)")
             plt.xlabel("Radius r (m)")
             plt.ylabel("Strain ε (-)")
-            plt.title(f"Strain components vs. radius at z = {z_target_stress}")
+            plt.title(f"Strain components vs. radius at z = {z_target_cell}")
             plt.grid(True, linestyle=':')
             plt.legend()
             plt.tight_layout()
@@ -196,12 +201,12 @@ def view_vtu(filename="output/fields.vtu",
 
     # --- TEMPERATURE PROFILE ANALYSIS ---
     if show_temperature and "Temperature" in grid.point_data:
-        print(f"\nAnalyzing temperature profile at node z = {z_target_temp}")
+        print(f"\nAnalyzing temperature profile at node z = {z_target_node}")
         points = grid.points
-        mask = np.abs(points[:, 2] - z_target_temp) < tol
+        mask = np.abs(points[:, 2] - z_target_node) < tol
         
         if not np.any(mask):
-            print(f"[WARNING] No nodes found for temperature analysis at z = {z_target_temp} ± {tol}")
+            print(f"[WARNING] No nodes found for temperature analysis at z = {z_target_node} ± {tol}")
         else:
             r_nodes = np.sqrt(points[mask, 0]**2 + points[mask, 1]**2)
             T_vals = grid.point_data["Temperature"][mask]
@@ -214,22 +219,22 @@ def view_vtu(filename="output/fields.vtu",
             # plt.plot(r_analytical, T_analytical, '--', c='black', label="Analytical")
             plt.xlabel("Radius r (m)")
             plt.ylabel("Temperature (K)")
-            plt.title(f"Temperature vs. radius at node z = {z_target_temp}")
+            plt.title(f"Temperature vs. radius at node z = {z_target_node}")
             plt.grid(True, linestyle=':')
             plt.legend()
-            plt.ylim(200, 400)
+            # plt.ylim(200, 400)
             plt.tight_layout()
             plt.savefig("output/temperature_vs_radius.png", dpi=300)
             plt.show()
 
     # --- RADIAL DISPLACEMENT PROFILE ---
     if has_displacement:
-        print(f"\nAnalyzing radial displacement profile at node z = {z_target_disp}")
+        print(f"\nAnalyzing radial displacement profile at node z = {z_target_node}")
         points = grid.points
-        mask = np.abs(points[:, 2] - z_target_disp) < tol
+        mask = np.abs(points[:, 2] - z_target_node) < tol
 
         if not np.any(mask):
-            print(f"[WARNING] No nodes found for displacement analysis at z = {z_target_disp} ± {tol}")
+            print(f"[WARNING] No nodes found for displacement analysis at z = {z_target_node} ± {tol}")
         else:
             x, y = points[mask, 0], points[mask, 1]
             ux, uy = grid["Displacement"][mask, 0], grid["Displacement"][mask, 1]
@@ -241,16 +246,19 @@ def view_vtu(filename="output/fields.vtu",
             df = pd.DataFrame({"r": np.round(r_nodes, 6), "u_r": u_r_fem})
             grouped = df.groupby("r").mean().reset_index()
             r_avg = grouped["r"].values
-            
-            r_analytical = np.linspace(r_avg.min(), r_avg.max(), 200)
-            u_r_analytical = radial_displacement(r_analytical)
+
+            if analytical_case is None:
+                r_analytical, u_r_analytical = np.zeros_like(r_avg), np.zeros_like(r_avg)
+            else:
+                r_analytical = np.linspace(r_avg.min(), r_avg.max(), 200)
+                u_r_analytical = radial_displacement(r_analytical)
             
             plt.figure(figsize=(8, 6))
             plt.plot(grouped["r"], grouped["u_r"], 'o-', c='green', markersize=4, label="u_r (FEM, avg)")
             plt.plot(r_analytical, u_r_analytical, '--', c='black', label="u_r (Analytical)")
             plt.xlabel("Radius r (m)")
             plt.ylabel("Radial displacement u_r (m)")
-            plt.title(f"Radial displacement vs. radius at z = {z_target_disp}")
+            plt.title(f"Radial displacement vs. radius at z = {z_target_node}")
             plt.grid(True, linestyle=':')
             plt.legend()
             plt.tight_layout()
@@ -260,12 +268,11 @@ def view_vtu(filename="output/fields.vtu",
 if __name__ == "__main__":
     view_vtu(
         filename="output/fields.vtu",
-        analytical_case='lame',
+        analytical_case=None,
         show_warp=True,
         warp_factor=1.0,
-        z_target_stress=5.0,
-        z_target_disp=5.454545,
-        z_target_temp=5.454545,
-        z_slice_3d_vis=5.0,
-        tol=1e-4
+        z_target_node=1.4,
+        z_target_cell=0.7,
+        z_slice_3d_vis=1.0,
+        tol=1e-2
     )
