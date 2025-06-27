@@ -3,7 +3,6 @@ import numpy as np
 def lame_solutions(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3):
     """
     Analytical Lamé solution for a thick-walled cylindrical shell under internal and external pressure.
-    The formulas are preserved from the original implementation.
 
     Args:
         r (array-like): Radial positions (m).
@@ -18,16 +17,41 @@ def lame_solutions(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3):
     """
     r = np.asarray(r)
 
-    # Original formula for the constant K
     K = (-po*b**2 + pi*a**2) / (b**2 - a**2)
 
-    # Original formulas for stresses
     sigma_r = -pi * (a/r)**2 + K * (1 - (a/r)**2)
     sigma_theta = +pi * (a/r)**2 + K * (1 + (a/r)**2)
     sigma_z_plane_strain = 2 * nu * K * np.ones_like(r) # Plane strain (epsilon_z = 0)
     sigma_z_plane_stress = np.zeros_like(r)
 
     return sigma_r, sigma_theta, sigma_z_plane_strain, sigma_z_plane_stress
+
+def mariotte_solutions(r, a=2.5, b=3.0, pi=1e6):
+    """
+    Analytical Mariotte solution for a thin-walled cylindrical shell under internal pressure.
+
+    Args:
+        r (array-like): Radial positions (m).
+        a (float): Inner radius (m).
+        b (float): Outer radius (m).
+        pi (float): Inner pressure (Pa).
+
+    Returns:
+        tuple: (sigma_r, sigma_theta, sigma_z_plane_strain, sigma_z_plane_stress).
+    """
+    r = np.asarray(r)
+
+    t = b-a
+    R = (b+a)/2
+
+    print(f"thin tube? t/R = {t/R:.2f}")
+
+    # Original formulas for stresses
+    sigma_r = - pi / 2 * np.ones_like(r)
+    sigma_theta = pi * R / t * np.ones_like(r)
+    sigma_z = pi * R / (2 * t) * np.ones_like(r)
+
+    return sigma_r, sigma_theta, sigma_z
 
 def radial_displacement(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3, E=2e11):
     """

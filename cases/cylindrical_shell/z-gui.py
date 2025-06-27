@@ -12,11 +12,9 @@ def view_vtu(filename="output/fields.vtu",
              show_strain=True,
              stress_field_name=None,
              strain_field_name=None,
-             analytical_case="lame",
-             z_target_node=5.0,
-             z_target_cell=0.005,
              z_slice_3d_vis=0.005,
              tol=1e-5):
+    
     """Loads and visualizes a .vtu file, performing 3D visualization and 2D verification plots.
 
     This function serves as a comprehensive post-processing tool. It uses PyVista
@@ -185,184 +183,13 @@ def view_vtu(filename="output/fields.vtu",
         plotter.view_isometric()
         plotter.show()
 
-    # --- 2D Profile Analysis vs. Analytical Solutions ---
-    print("\n--- Starting 2D profile verification ---")
-
-    # --- STRESS PROFILE ANALYSIS ---
-    if stress_field_name and stress_field_name in grid.cell_data:
-        print(f"Analyzing stress profile for '{stress_field_name}' at z = {z_target_cell}")
-        centers = grid.cell_centers().points
-        mask = np.abs(centers[:, 2] - z_target_cell) < tol
-
-        if not np.any(mask):
-            print(f"[WARNING] No cells found for stress analysis at z = {z_target_cell} ± {tol}")
-        else:
-            s_tensor = grid.cell_data[stress_field_name].reshape((-1, 3, 3))[mask]
-            x, y = centers[mask, 0], centers[mask, 1]
-            r = np.sqrt(x**2 + y**2)
-            theta = np.arctan2(y, x)
-
-            c, s = np.cos(theta), np.sin(theta)
-            c2, s2, sc = c**2, s**2, s*c
-            s_xx, s_yy, s_zz, s_xy = s_tensor[:,0,0], s_tensor[:,1,1], s_tensor[:,2,2], s_tensor[:,0,1]
-            
-            σ_rr = s_xx * c2 + s_yy * s2 + 2 * s_xy * sc
-            σ_tt = s_xx * s2 + s_yy * c2 - 2 * s_xy * sc
-            σ_zz = s_zz
-            
-            df = pd.DataFrame({"r": np.round(r, 6), "σ_rr": σ_rr, "σ_tt": σ_tt, "σ_zz": σ_zz})
-            grouped = df.groupby("r").mean().reset_index()
-            r_avg = grouped["r"].values
-            
-            if analytical_case == 'lame':
-                σ_rr_an, σ_tt_an, σ_zz_an, _ = lame_solutions(r_avg)
-            elif analytical_case == 'thermal':
-                σ_rr_an, σ_tt_an, σ_zz_an = thermal_stresses(r_avg)
-            elif analytical_case is None:
-                σ_rr_an, σ_tt_an, σ_zz_an = np.zeros_like(r_avg), np.zeros_like(r_avg), np.zeros_like(r_avg)
-            else:
-                raise ValueError(f"Unknown analytical_case: {analytical_case}")
-
-            plt.figure(figsize=(8, 6))
-            plt.plot(r_avg, grouped["σ_rr"], 'o', c='purple', markersize=4, label="σ_rr (FEM, avg)")
-            plt.plot(r_avg, grouped["σ_tt"], 's', c='orange', markersize=4, label="σ_tt (FEM, avg)")
-            plt.plot(r_avg, grouped["σ_zz"], '^', c='blue', markersize=4, label="σ_zz (FEM, avg)")
-            plt.plot(r_avg, σ_rr_an, '--', c='purple', label="σ_rr (Analytical)")
-            plt.plot(r_avg, σ_tt_an, '--', c='orange', label="σ_tt (Analytical)")
-            plt.plot(r_avg, σ_zz_an, '--', c='blue', label="σ_zz (Analytical)")
-            plt.xlabel("Radius r (m)")
-            plt.ylabel("Stress (Pa)")
-            plt.title(f"Stress components vs. radius at z = {z_target_cell}")
-            plt.grid(True, linestyle=':')
-            plt.legend()
-            plt.tight_layout()
-            plt.savefig("output/stress_vs_radius.png", dpi=300)
-            plt.show()
-
-    # --- STRAIN PROFILE ANALYSIS ---
-    if strain_field_name and strain_field_name in grid.cell_data:
-        print(f"Analyzing Strain Profile for '{strain_field_name}' at z = {z_target_cell}")
-        centers = grid.cell_centers().points
-        mask = np.abs(centers[:, 2] - z_target_cell) < tol
-
-        if not np.any(mask):
-            print(f"[WARNING] No cells found for strain analysis at z = {z_target_cell} ± {tol}")
-        else:
-            e_tensor = grid.cell_data[strain_field_name].reshape((-1, 3, 3))[mask]
-            x, y = centers[mask, 0], centers[mask, 1]
-            r = np.sqrt(x**2 + y**2)
-            theta = np.arctan2(y, x)
-            
-            c, s = np.cos(theta), np.sin(theta)
-            c2, s2, sc = c**2, s**2, s*c
-            e_xx, e_yy, e_xy, e_zz = e_tensor[:,0,0], e_tensor[:,1,1], e_tensor[:,0,1], e_tensor[:,2,2]
-            
-            ε_rr = e_xx * c2 + e_yy * s2 + 2 * e_xy * sc
-            ε_tt = e_xx * s2 + e_yy * c2 - 2 * e_xy * sc
-            ε_zz = e_zz
-            
-            df = pd.DataFrame({"r": np.round(r, 6), "ε_rr": ε_rr, "ε_tt": ε_tt, "ε_zz": ε_zz})
-            grouped = df.groupby("r").mean().reset_index()
-            r_avg = grouped["r"].values
-
-            if analytical_case is None:
-                ε_tt_an, ε_rr_an = np.zeros_like(r_avg), np.zeros_like(r_avg)
-            else:
-                u_r_an = radial_displacement(r_avg)
-                ε_tt_an = u_r_an / r_avg
-                ε_rr_an = radial_strain(r_avg)
-
-            plt.figure(figsize=(8, 6))
-            plt.plot(r_avg, grouped["ε_rr"], 'o', c='darkgreen', markersize=4, label="ε_rr (Radial) (FEM, avg)")
-            plt.plot(r_avg, grouped["ε_tt"], 's', c='crimson',   markersize=4, label="ε_tt (Hoop) (FEM, avg)")
-            plt.plot(r_avg, grouped["ε_zz"], 'x', c='lightblue',   markersize=4, label="ε_zz (Axial) (FEM, avg)")
-            plt.plot(r_avg, ε_rr_an, '--', c='darkgreen', label="ε_rr (Analytical)")
-            plt.plot(r_avg, ε_tt_an, '--', c='crimson', label="ε_tt (Hoop) (Analytical)")
-            plt.xlabel("Radius r (m)")
-            plt.ylabel("Strain ε (-)")
-            plt.title(f"Strain components vs. radius at z = {z_target_cell}")
-            plt.grid(True, linestyle=':')
-            plt.legend()
-            plt.tight_layout()
-            plt.savefig("output/strain_vs_radius.png", dpi=300)
-            plt.show()
-
-    # --- TEMPERATURE PROFILE ANALYSIS ---
-    if show_temperature and "Temperature" in grid.point_data:
-        print(f"\nAnalyzing temperature profile at node z = {z_target_node}")
-        points = grid.points
-        mask = np.abs(points[:, 2] - z_target_node) < tol
-        
-        if not np.any(mask):
-            print(f"[WARNING] No nodes found for temperature analysis at z = {z_target_node} ± {tol}")
-        else:
-            r_nodes = np.sqrt(points[mask, 0]**2 + points[mask, 1]**2)
-            T_vals = grid.point_data["Temperature"][mask]
-            
-            # r_analytical = np.linspace(np.min(r_nodes), np.max(r_nodes), 200)
-            # T_analytical = full_cylinder_analytical_temperature(r_analytical)
-
-            plt.figure(figsize=(8, 6))
-            plt.plot(r_nodes, T_vals, 'o', c='red', markersize=4, label="FEM")
-            # plt.plot(r_analytical, T_analytical, '--', c='black', label="Analytical")
-            plt.xlabel("Radius r (m)")
-            plt.ylabel("Temperature (K)")
-            plt.title(f"Temperature vs. radius at node z = {z_target_node}")
-            plt.grid(True, linestyle=':')
-            plt.legend()
-            # plt.ylim(200, 400)
-            plt.tight_layout()
-            plt.savefig("output/temperature_vs_radius.png", dpi=300)
-            plt.show()
-
-    # --- RADIAL DISPLACEMENT PROFILE ---
-    if has_displacement:
-        print(f"\nAnalyzing radial displacement profile at node z = {z_target_node}")
-        points = grid.points
-        mask = np.abs(points[:, 2] - z_target_node) < tol
-
-        if not np.any(mask):
-            print(f"[WARNING] No nodes found for displacement analysis at z = {z_target_node} ± {tol}")
-        else:
-            x, y = points[mask, 0], points[mask, 1]
-            ux, uy = grid["Displacement"][mask, 0], grid["Displacement"][mask, 1]
-            
-            theta = np.arctan2(y, x)
-            u_r_fem = ux * np.cos(theta) + uy * np.sin(theta)
-            r_nodes = np.sqrt(x**2 + y**2)
-            
-            df = pd.DataFrame({"r": np.round(r_nodes, 6), "u_r": u_r_fem})
-            grouped = df.groupby("r").mean().reset_index()
-            r_avg = grouped["r"].values
-
-            if analytical_case is None:
-                r_analytical, u_r_analytical = np.zeros_like(r_avg), np.zeros_like(r_avg)
-            else:
-                r_analytical = np.linspace(r_avg.min(), r_avg.max(), 200)
-                u_r_analytical = radial_displacement(r_analytical)
-            
-            plt.figure(figsize=(8, 6))
-            plt.plot(grouped["r"], grouped["u_r"], 'o-', c='green', markersize=4, label="u_r (FEM, avg)")
-            plt.plot(r_analytical, u_r_analytical, '--', c='black', label="u_r (Analytical)")
-            plt.xlabel("Radius r (m)")
-            plt.ylabel("Radial displacement u_r (m)")
-            plt.title(f"Radial displacement vs. radius at z = {z_target_node}")
-            plt.grid(True, linestyle=':')
-            plt.legend()
-            plt.tight_layout()
-            plt.savefig("output/u_r_vs_radius.png", dpi=300)
-            plt.show()
-
 if __name__ == "__main__":
     view_vtu(
         filename="output/fields.vtu",
-        analytical_case="lame",
         show_warp=True,
         show_stress=True,
         show_strain=True,
         warp_factor=1.0,
-        z_target_node=10.0,
-        z_target_cell=9.545455,
         z_slice_3d_vis=10.0,
         tol=1e-4
     )

@@ -1,5 +1,5 @@
 name: cylindrical_shell
-inner_radius: '2.5'
+inner_radius: '2.9'
 outer_radius: '3.0'
 height: '10.0'
 geometry_type: cyl
