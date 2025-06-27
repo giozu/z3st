@@ -268,11 +268,11 @@ def view_vtu(filename="output/fields.vtu",
 if __name__ == "__main__":
     view_vtu(
         filename="output/fields.vtu",
-        analytical_case=None,
+        analytical_case="thermal",
         show_warp=True,
         warp_factor=1.0,
-        z_target_node=1.4,
-        z_target_cell=0.7,
-        z_slice_3d_vis=1.0,
-        tol=1e-2
+        z_target_node=0.001,
+        z_target_cell=0.00025,
+        z_slice_3d_vis=0.005,
+        tol=1e-4
     )

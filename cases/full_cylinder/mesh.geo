@@ -61,4 +61,4 @@ Mesh.ElementOrder = 1;
 Mesh 3;
 
 // Save the mesh file in the same directory as this .geo script.
-Save "full_cylinder.msh";
+Save "mesh.msh";

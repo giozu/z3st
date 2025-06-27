@@ -103,4 +103,4 @@ Physical Volume ("cladding", 2) = {2, 3, 4, 5};
 Mesh.ElementOrder = 1;
 Mesh 3;
 
-Save "fuel_rod.msh";
+Save "mesh.msh";

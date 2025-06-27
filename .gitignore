@@ -11,7 +11,7 @@ log.*
 *.vtu
 *.pvd
 *.pvtu
-# *.pvsm
+*.pvsm
 
 # gmsh files
 *.msh

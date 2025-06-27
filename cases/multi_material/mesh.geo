@@ -148,5 +148,4 @@ Mesh.RecombineAll = 1;
 Mesh 3;
 
 // Save mesh
-Save "multi_material.msh";
-Save "multi_material.vtk";
+Save "mesh.msh";
