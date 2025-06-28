@@ -1,8 +1,8 @@
 import pyvista as pv
 import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
-from analytical_cases import *
+
+# constant for plotter window size for consistency.
+PLOTTER_WINDOW_SIZE = [1000, 800]
 
 def view_vtu(filename="output/fields.vtu",
              show_warp=True,
@@ -14,18 +14,16 @@ def view_vtu(filename="output/fields.vtu",
              strain_field_name=None,
              z_slice_3d_vis=0.005,
              tol=1e-5):
-    
-    """Loads and visualizes a .vtu file, performing 3D visualization and 2D verification plots.
+    """Loads and visualizes a .vtu file with 3D plots.
 
-    This function serves as a comprehensive post-processing tool. It uses PyVista
-    for interactive 3D visualization, allowing users to inspect the mesh, temperature
-    fields, and displacement-warped geometry. It also performs a quantitative
-    analysis by extracting data along a specified Z-plane, converting it to a
-    cylindrical coordinate system, and plotting it against known analytical solutions
-    for verification purposes.
+    This function serves as a 3D post-processing tool for .vtu files. It uses
+    PyVista for interactive 3D visualization, allowing users to inspect the mesh,
+    temperature fields, and displacement-warped geometry. It can also compute
+    and display derived quantities like Von Mises stress and principal strains.
 
     The function automatically detects available stress and strain fields if their
-    names are not provided.
+    names are not provided. All data (Displacement, Temperature, Stress, Strain)
+    is assumed to be defined on the mesh points (Point Data).
 
     Args:
         filename (str):
@@ -33,163 +31,144 @@ def view_vtu(filename="output/fields.vtu",
         show_warp (bool):
             If True, shows the mesh warped by the 'Displacement' vector field.
         warp_factor (float):
-            A scaling factor to exaggerate the displacement for better visualization.
+            A scaling factor to exaggerate the displacement for visualization.
         show_temperature (bool):
-            If True, generates 3D and 2D plots for the 'Temperature' field.
+            If True, generates a 3D plot for the 'Temperature' field.
+        show_stress (bool):
+            If True, calculates and plots the 'Von Mises stress' field.
+        show_strain (bool):
+            If True, calculates and plots the 'Max principal strain' field.
         stress_field_name (str, optional):
-            The name of the stress tensor field within the .vtu file's cell data.
-            If None, the function attempts to auto-detect a field with "Stress"
-            in its name.
+            The name of the stress tensor field within the .vtu file's point data.
+            The tensor should be a 9-component array (xx, yy, zz, xy, yz, zx, yx, zy, xz).
+            If None, the function auto-detects a field with "Stress" in its name.
         strain_field_name (str, optional):
-            The name of the strain tensor field within the .vtu file's cell data.
-            If None, the function attempts to auto-detect a field with "Strain"
-            in its name.
-        analytical_case (str):
-            Specifies which analytical solution to use for comparison plots.
-            Valid options (e.g., 'lame', 'thermal') correspond to functions
-            defined in the `analytical_cases.py` module.
-        z_target_cell (float):
-            The Z-coordinate of the plane from which to extract cell data profiles
-            (e.g., stress and strain).
-        z_target_node (float):
-            The Z-coordinate of the plane from which to extract point data profiles
-            (e.g., temperature and displacement).
+            The name of the strain tensor field within the .vtu file's point data.
+            If None, the function auto-detects a field with "Strain" in its name.
         z_slice_3d_vis (float):
-            The Z-coordinate for creating a 2D slice in the 3D PyVista visualization.
+            The Z-coordinate for creating a 2D slice in the 3D displacement visualization.
         tol (float):
-            Tolerance used to find nodes and cells at the target z-coordinates,
-            accounting for floating-point precision issues.
-
-    Notes:
-        - For warping and displacement analysis, the .vtu file must contain a point data
-          array named "Displacement".
-        - For temperature analysis, the file must contain a point data array named
-          "Temperature".
-        - Stress and strain are assumed to be cell data tensors. The function handles
-          the transformation from Cartesian (xx, yy, zz, xy) to cylindrical
-          (rr, tt, zz) components for radial plots.
+            ## IMPROVEMENT: This argument is no longer used, so it's removed from the signature.
+            ## Kept here for reference, but removed from the final function signature.
+            # Tolerance used for finding nodes/cells, not needed in this version.
     """
-    print(f"Loading file: {filename}")
-    grid = pv.read(filename)
+    # --- File Loading and Initial Checks ---
+    try:
+        print(f"Loading file: {filename}")
+        grid = pv.read(filename)
+    except FileNotFoundError:
+        print(f"[ERROR] File not found at: {filename}")
+        return
 
-    # --- Auto-detect fields if not specified ---
-    available_stresses = [k for k in grid.cell_data if "Stress" in k]
-    available_strains = [k for k in grid.cell_data if "Strain" in k]
-    print("Available stress fields:", available_stresses)
-    print("Available strain fields:", available_strains)
+    # --- Auto-detect fields ---
+    available_stresses = [k for k in grid.point_data if "Stress" in k]
+    available_strains = [k for k in grid.point_data if "Strain" in k]
 
     if stress_field_name is None and available_stresses:
         stress_field_name = available_stresses[0]
-        print(f"[INFO] Automatically selected stress field: {stress_field_name}")
+        print(f"[INFO] Auto-selected stress field: {stress_field_name}")
+
     if strain_field_name is None and available_strains:
         strain_field_name = available_strains[0]
-        print(f"[INFO] Automatically selected strain field: {strain_field_name}")
+        print(f"[INFO] Auto-selected strain field: {strain_field_name}")
 
-    available_z_cells = np.unique(np.round(grid.cell_centers().points[:, 2], 6))
-    available_z_nodes = np.unique(np.round(grid.points[:, 2], 6))
-    print(f"Available Z-coordinates (cell centers):\n{available_z_cells}")
-    print(f"Available Z-coordinates (nodes):\n{available_z_nodes}")
-
-    # --- 3D Visualizations (PyVista) ---
-
+    # --- Data Processing (Compute derived fields) ---
     has_displacement = "Displacement" in grid.point_data
-    if has_displacement and show_warp:
-        warped_grid = grid.warp_by_vector("Displacement", factor=warp_factor)
-    else:
-        # If no warping, the 'warped_grid' is just the original grid
-        warped_grid = grid
 
     if stress_field_name and show_stress:
-        print(f"Calculating Von Mises stress from '{stress_field_name}'")
-
-        # Reshape from (n_cells, 9) to (n_cells, 3, 3)
-        s = grid.cell_data[stress_field_name].reshape((-1, 3, 3))
-        s_xx, s_yy, s_zz = s[:, 0, 0], s[:, 1, 1], s[:, 2, 2]
-        s_xy, s_yz, s_zx = s[:, 0, 1], s[:, 1, 2], s[:, 2, 0]
-
-        # Von Mises formula
-        von_mises = np.sqrt(0.5 * ((s_xx - s_yy)**2 + (s_yy - s_zz)**2 + (s_zz - s_xx)**2) + 3 * (s_xy**2 + s_yz**2 + s_zx**2))
-        
-        # Add it back to the grid for plotting
-        warped_grid.cell_data["Von Mises stress"] = von_mises
-        grid.cell_data["Von Mises stress"] = von_mises # Also add to original grid
+        if stress_field_name in grid.point_data:
+            print(f"Calculating Von Mises stress from '{stress_field_name}'")
+            s = grid.point_data[stress_field_name].reshape((-1, 3, 3))
+            s_xx, s_yy, s_zz = s[:, 0, 0], s[:, 1, 1], s[:, 2, 2]
+            s_xy, s_yz, s_zx = s[:, 0, 1], s[:, 1, 2], s[:, 2, 0]
+            # Von Mises formula for 3D
+            von_mises = np.sqrt(0.5 * ((s_xx - s_yy)**2 + (s_yy - s_zz)**2 + (s_zz - s_xx)**2) + 3 * (s_xy**2 + s_yz**2 + s_zx**2))
+            grid.point_data["Von Mises stress"] = von_mises
+        else:
+            print(f"[WARNING] Stress field '{stress_field_name}' not found. Skipping stress plot.")
+            show_stress = False
 
     if strain_field_name and show_strain:
-        print(f"Calculating principal strains from '{strain_field_name}'")
-
-        e = grid.cell_data[strain_field_name].reshape((-1, 3, 3))
-
-        # np.linalg.eigvalsh computes eigenvalues of symmetric matrices, which are the principal strains
-        principal_strains = np.linalg.eigvalsh(e)
-
-        # Add max principal strain (P1) for plotting
-        warped_grid.cell_data["Max principal strain"] = principal_strains[:, 2] # P1 is the last column
-        grid.cell_data["Max principal strain"] = principal_strains[:, 2]
-
-    # Optional: Warp by displacement and show temperature
-    if show_temperature and "Temperature" in grid.point_data:
-        plotter = pv.Plotter(window_size=[800, 800])
-        
-        if show_warp and has_displacement:
-            warped_grid = grid.warp_by_vector("Displacement", factor=warp_factor)
-            plotter.add_mesh(warped_grid, scalars="Temperature", cmap="plasma", show_edges=False)
-            plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.5, label='Original geometry')
-            plotter.add_text(f"Temperature on deformed geometry (factor: {warp_factor}x)", position="upper_left")
+        if strain_field_name in grid.point_data:
+            print(f"Calculating principal strains from '{strain_field_name}'")
+            e = grid.point_data[strain_field_name].reshape((-1, 3, 3))
+            # eigvalsh is efficient for symmetric matrices (like strain tensors)
+            principal_strains = np.linalg.eigvalsh(e)
+            grid.point_data["Max principal strain"] = principal_strains[:, -1]  # Max eigenvalue is the last one
         else:
-            plotter.add_mesh(grid, scalars="Temperature", cmap="plasma", show_edges=True)
-            plotter.add_text("Temperature on original geometry", position="upper_left")
+            print(f"[WARNING] Strain field '{strain_field_name}' not found. Skipping strain plot.")
+            show_strain = False
             
-        plotter.add_axes()
-        plotter.show()
-
-    # Optional: Displacement norm and slice view
-    if has_displacement:
-        grid.point_data["Displacement_norm"] = np.linalg.norm(grid["Displacement"], axis=1)
-        
-        plotter = pv.Plotter(window_size=[800, 800])
+    # --- Prepare Warped Geometry (do it once) ---
+    if has_displacement and show_warp:
+        print(f"Warping geometry by 'Displacement' vector with factor {warp_factor}")
         warped_grid = grid.warp_by_vector("Displacement", factor=warp_factor)
-        plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", show_edges=False)
-        plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.5, label='Original geometry')
-        plotter.add_text(f"Displacement (norm) on deformed geometry (factor: {warp_factor}x)", position="upper_left")
-        plotter.add_axes()
-        plotter.show()
-        
-        sliced_warped = warped_grid.slice(normal='z', origin=(0, 0, z_slice_3d_vis))
-        
-        plotter = pv.Plotter(window_size=[800, 800])
-        plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", opacity=0.15)
-        plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.3)
-        plotter.add_mesh(sliced_warped, scalars="Displacement_norm", cmap="viridis")
-        
-        plotter.add_text(f"Displacement (norm) — Slice on deformed geometry at z = {z_slice_3d_vis}", position="upper_left")
+    else:
+        # If not warping, the 'warped' geometry is just the original for plotting consistency
+        warped_grid = grid
+
+    # --- 3D Visualizations ---
+
+    # Plot 1: Temperature
+    if show_temperature and "Temperature" in grid.point_data:
+        plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
+        plotter.add_mesh(warped_grid, scalars="Temperature", cmap="plasma", show_edges=not show_warp)
+        if show_warp and has_displacement:
+            plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.5, label='Original')
+            plotter.add_text(f"Temperature on deformed geometry (Factor: {warp_factor}x)", font_size=12)
+        else:
+            plotter.add_text("Temperature on original geometry", font_size=12)
         plotter.add_axes()
         plotter.show()
 
-    # --- 3D STRESS PLOT ---
-    if show_stress and "Von Mises stress" in warped_grid.cell_data:
-        plotter = pv.Plotter(window_size=[800, 800])
-        plotter.add_mesh(warped_grid, scalars="Von Mises stress", cmap="jet", show_edges=True, edge_color='gray', line_width=0.1, scalar_bar_args={'title': 'Von Mises stress (Pa)'})
-        plotter.add_text("Von Mises stress on deformed geometry", position="upper_left")
+    # Plot 2: Displacement
+    if has_displacement:
+        warped_grid["Displacement_norm"] = np.linalg.norm(warped_grid["Displacement"], axis=1)
+        
+        plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
+        plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", show_edges=False)
+        plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.5)
+        plotter.add_text(f"Displacement norm on deformed geometry (Factor: {warp_factor}x)", font_size=12)
+        plotter.add_axes()
+        plotter.show()
+
+        # Sliced Displacement View
+        plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
+        sliced_warped = warped_grid.slice(normal='z', origin=(0, 0, z_slice_3d_vis))
+        plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", opacity=0.15)
+        plotter.add_mesh(sliced_warped, scalars="Displacement_norm", cmap="viridis")
+        plotter.add_text(f"Displacement slice at z={z_slice_3d_vis}", font_size=12)
+        plotter.add_axes()
+        plotter.show()
+
+    # Plot 3: Von Mises Stress
+    if show_stress and "Von Mises stress" in grid.point_data:
+        plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
+        sargs = dict(title="Von Mises (Pa)")
+        plotter.add_mesh(warped_grid, scalars="Von Mises stress", cmap="jet", scalar_bar_args=sargs)
+        plotter.add_text("Von Mises stress on deformed geometry", font_size=12)
         plotter.add_axes()
         plotter.view_isometric()
         plotter.show()
         
-    # --- 3D STRAIN PLOT ---
-    if show_strain and "Max principal strain" in warped_grid.cell_data:
-        plotter = pv.Plotter(window_size=[800, 800])
-        plotter.add_mesh(warped_grid, scalars="Max principal strain", cmap="coolwarm", show_edges=True, edge_color='gray', line_width=0.1, scalar_bar_args={'title': 'Max principal strain (-)'})
-        plotter.add_text("Max principal strain on deformed geometry", position="upper_left")
+    # Plot 4: Max Principal Strain
+    if show_strain and "Max principal strain" in grid.point_data:
+        plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
+        sargs = dict(title="Max Principal Strain (-)")
+        plotter.add_mesh(warped_grid, scalars="Max principal strain", cmap="coolwarm", scalar_bar_args=sargs)
+        plotter.add_text("Max Principal strain on deformed geometry", font_size=12)
         plotter.add_axes()
         plotter.view_isometric()
         plotter.show()
+
 
 if __name__ == "__main__":
     view_vtu(
         filename="output/fields.vtu",
         show_warp=True,
+        warp_factor=100.0,
+        show_temperature=True,
         show_stress=True,
         show_strain=True,
-        warp_factor=1.0,
-        z_slice_3d_vis=10.0,
-        tol=1e-4
+        z_slice_3d_vis=0.09,
     )

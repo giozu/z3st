@@ -26,7 +26,7 @@ def lame_solutions(r, a=2.5, b=3.0, pi=1e6, po=1e7, nu=0.3):
 
     return sigma_r, sigma_theta, sigma_z_plane_strain, sigma_z_plane_stress
 
-def mariotte_solutions(r, a=2.5, b=3.0, pi=1e6):
+def mariotte_solutions(r, geometry, pi=1e6):
     """
     Analytical Mariotte solution for a thin-walled cylindrical shell under internal pressure.
 
@@ -41,9 +41,15 @@ def mariotte_solutions(r, a=2.5, b=3.0, pi=1e6):
     """
     r = np.asarray(r)
 
+    a = float(geometry["inner_radius"])
+    b = float(geometry["outer_radius"])
+    
     t = b-a
     R = (b+a)/2
 
+    print(f"Mariotte analytical solutions:")
+    print(f"Inner radius = {a} m, outer radius = {b} m")
+    print(f"Inner pressure = {pi} Pa")
     print(f"thin tube? t/R = {t/R:.2f}")
 
     # Original formulas for stresses

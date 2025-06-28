@@ -24,10 +24,16 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         MechanicalModel.__init__(self)
 
     def parameters(self, lhr):
+        print(f"----------")
+        print(f"parameters")
+        print(f"----------")
         self.g = 0.0 # m/s2
         self.lhr = lhr
 
     def materials(self, **materials):
+        print(f"---------")
+        print(f"materials")
+        print(f"---------")
         self.materials = {}
 
         for name, mat in materials.items():
