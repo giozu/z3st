@@ -13,7 +13,8 @@ def view_vtu(filename="output/fields.vtu",
              stress_field_name=None,
              strain_field_name=None,
              z_slice_3d_vis=0.005,
-             tol=1e-5):
+             tol=1e-5, 
+            material=None):
     """Loads and visualizes a .vtu file with 3D plots.
 
     This function serves as a 3D post-processing tool for .vtu files. It uses
