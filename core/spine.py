@@ -130,10 +130,14 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         # subplotter.show()
 
         # --- Displacement field ---
-        self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
-        self.u.x.array[:] = 0.0
-        values = self.u.x.array
-        print(f"  u min={values.min():.2f} m, u max={values.max():.2f} m, u mean={values.mean():.2f} m")
+        self.u = {}
+
+        for name, mat in self.materials.items():
+            u_func = dolfinx.fem.Function(self.V_m, name=f"Displacement_{name}")
+            u_func.x.array[:] = 0.0
+            values = u_func.x.array
+            print(f"  {name}: u min={values.min():.2f} m, u max={values.max():.2f} m, u mean={values.mean():.2f} m")
+            self.u[name] = u_func
 
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
         print("\nSolver settings:")
@@ -154,12 +158,11 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         self.stress_mech = {}
         self.stress_th = {}
 
-        u = self.u
-
         for name in self.materials:
             mat = self.materials[name]
-            self.strain[name] = self.epsilon(u)
-            self.stress[name] = self.sigma_mech(u, mat) - self.sigma_th(self.T[name], mat)
-            self.stress_mech[name] = self.sigma_mech(u, mat)
-            self.stress_th[name] = - self.sigma_th(self.T[name], mat)
+            u_local = self.u[name]
 
+            self.strain[name] = self.epsilon(u_local)
+            self.stress[name] = self.sigma_mech(u_local, mat) - self.sigma_th(self.T[name], mat)
+            self.stress_mech[name] = self.sigma_mech(u_local, mat)
+            self.stress_th[name] = - self.sigma_th(self.T[name], mat)

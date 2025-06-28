@@ -254,7 +254,10 @@ class Solver:
         T_old = {}
         for label, T_func in self.T.items():
             T_old[label] = dolfinx.fem.Function(T_func.function_space)
-        u_old = dolfinx.fem.Function(u_sol.function_space)
+        
+        u_old = {}
+        for label, u_func in self.u.items():
+            u_old[label] = dolfinx.fem.Function(u_func.function_space)
 
         # Assemble all Dirichlet BCs from per-material dictionaries
         bcs_t = []
@@ -276,7 +279,8 @@ class Solver:
             for label in self.T:
                 T_old[label].x.array[:] = T_sol[label].x.array
 
-            u_old.x.array[:] = u_sol.x.array
+            for label in self.u:
+                u_old[label].x.array[:] = u_sol[label].x.array
 
             # =========================================================
             #  1. SOLVE THERMAL SUB-PROBLEM
@@ -293,14 +297,15 @@ class Solver:
                     if label not in self.label_map:
                         print(f"[WARNING] Material label '{label}' not found in label_map → skipping.")
                         continue
-
+                    
                     a_t[label], L_t[label] = 0, 0
-
                     tag = self.label_map[label]
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
 
+                    # Material properties
                     k = dolfinx.fem.Constant(self.mesh, material["k"])
 
+                    # Assembling
                     a_t[label] += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t[label] += self.q_third[label] * v_t * dx
 
@@ -309,25 +314,25 @@ class Solver:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t[label] += bc_info['value'] * v_t * ds
 
-                    # Thermal coupling fuel-cladding interface
-                    h_gap_value = 1000.0
-                    h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
+                    # # Thermal coupling fuel-cladding interface
+                    # h_gap_value = 1000.0
+                    # h_gap = dolfinx.fem.Constant(self.mesh, h_gap_value)
 
-                    # Fuel contribution
-                    if "fuel" in self.materials and label == "fuel":
-                        # ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_1_1"]) # multi-material
-                        ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["fuel_lateral"]) # fuel rod
+                    # # Fuel contribution
+                    # if "fuel" in self.materials and label == "fuel":
+                    #     # ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_1_1"]) # multi-material
+                    #     ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["fuel_lateral"]) # fuel rod
 
-                        a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_fuel_interface
-                        L_t[label] += h_gap * self.T["cladding"] * v_t * ds_fuel_interface
+                    #     a_t[label] += h_gap * ufl.inner(u_t, v_t) * ds_fuel_interface
+                    #     L_t[label] += h_gap * self.T["cladding"] * v_t * ds_fuel_interface
 
-                    # Cladding contribution
-                    if "cladding" in self.materials and label == "cladding":
-                        # ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_0_2"]) # multi-material
-                        ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["cladding_inner"]) # fuel rod
+                    # # Cladding contribution
+                    # if "cladding" in self.materials and label == "cladding":
+                    #     # ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_0_2"]) # multi-material
+                    #     ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["cladding_inner"]) # fuel rod
 
-                        a_t[label] -= h_gap * ufl.inner(u_t, v_t) * ds_clad_interface
-                        L_t[label] -= h_gap * self.T["fuel"] * v_t * ds_clad_interface
+                    #     a_t[label] -= h_gap * ufl.inner(u_t, v_t) * ds_clad_interface
+                    #     L_t[label] -= h_gap * self.T["fuel"] * v_t * ds_clad_interface
 
                     # Sparsity pattern
                     # assemble_and_analyze_matrix(a_t[label], L_t[label], title=f"Thermal stiffness matrix - {label}")
@@ -340,9 +345,10 @@ class Solver:
                         rtol=tol_th
                     )
 
-                    problem_t = LinearProblem(a_t[label], L_t[label],
+                    problem_t = LinearProblem(
+                        a_t[label], L_t[label],
                         bcs=self.dirichlet_thermal[label],
-                        u=self.T[label],
+                        u=T_sol[label],
                         petsc_options=petsc_opts_thermal
                     )
 
@@ -356,14 +362,24 @@ class Solver:
             #  2. SOLVE MECHANICAL SUB-PROBLEM (global)
             # =========================================================
             if self.on["mechanical"]:
-                print("[INFO] Assembling and solving GLOBAL mechanical problem...")
+
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
-                a_m, L_m = 0, 0
+                a_m = {}
+                L_m = {}
 
                 for label, material in self.materials.items():
+
+                    print(f"[INFO] Assembling mechanical problem for material: {label}")
+
+                    if label not in self.label_map:
+                        print(f"[WARNING] Material label '{label}' not found in label_map → skipping.")
+                        continue
+
+                    a_m[label], L_m[label] = 0, 0
                     tag = self.label_map[label]
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
 
+                    # Material properties
                     lmbda = dolfinx.fem.Constant(self.mesh, material["lmbda"])
                     G = dolfinx.fem.Constant(self.mesh, material["G"])
                     alpha = dolfinx.fem.Constant(self.mesh, material["alpha"])
@@ -374,18 +390,21 @@ class Solver:
 
                     epsilon = lambda u: ufl.sym(ufl.grad(u))
                     sigma_m = lambda u: lmbda * ufl.tr(epsilon(u)) * ufl.Identity(self.tdim) + 2 * G * epsilon(u)
-
                     sigma_th = (3 * lmbda + 2 * G) * alpha * (T_sol[label] - T_ref) * ufl.Identity(self.gdim)
 
-                    a_m += ufl.inner(sigma_m(u_m), epsilon(v_m)) * dx
-                    L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(sigma_th, epsilon(v_m)) * dx
+                    # Assembling
+                    a_m[label] += ufl.inner(sigma_m(u_m), epsilon(v_m)) * dx
+                    L_m[label] += ufl.dot(body_force, v_m) * dx + ufl.inner(sigma_th, epsilon(v_m)) * dx
 
+                    # Apply Neumann BCs
                     for bc_info in self.traction[label]:
                         ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                        L_m += ufl.dot(bc_info['value'], v_m) * ds
+                        L_m[label] += ufl.dot(bc_info['value'], v_m) * ds
 
                 # Sparsity pattern
                 # assemble_and_analyze_matrix(a_m, L_m, title=f"Mechanical stiffness matrix")
+
+            for label, material in self.materials.items():
 
                 petsc_opts_mech = self.get_solver_options(
                     solver_type=self.mechanical_solver,
@@ -393,10 +412,18 @@ class Solver:
                     rtol=tol_mech
                 )
 
-                problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_sol, petsc_options=petsc_opts_mech)
+                problem_m = LinearProblem(
+                    a_m[label], L_m[label],
+                    bcs=self.dirichlet_mechanical[label], 
+                    u=u_sol[label], 
+                    petsc_options=petsc_opts_mech
+                )
+
                 problem_m.solve()
 
-                u_sol.x.array[:] = self.relax_u * u_sol.x.array + (1 - self.relax_u) * u_old.x.array
+            # Apply relaxation
+            for label in self.T:
+                u_sol[label].x.array[:] = self.relax_u * u_sol[label].x.array + (1 - self.relax_u) * u_old[label].x.array
                 
             # =========================================================
             #  3. CONVERGENCE CHECK and LOGGING
@@ -406,13 +433,14 @@ class Solver:
                 T_sol[label].x.scatter_forward()
                 T_old[label].x.scatter_forward()
 
-            u_sol.x.scatter_forward()
-            u_old.x.scatter_forward()
+            for label in self.u:
+                u_sol[label].x.scatter_forward()
+                u_old[label].x.scatter_forward()
 
             norm_dT_total = 0.0
 
             for label in self.T:
-                vec_T_now = self.T[label].x.petsc_vec
+                vec_T_now = T_sol[label].x.petsc_vec
                 vec_T_old = T_old[label].x.petsc_vec
 
                 diff_T = vec_T_now.copy()
@@ -423,9 +451,19 @@ class Solver:
 
             norm_dT = norm_dT_total**0.5
 
-            vec_u_now, vec_u_old = u_sol.x.petsc_vec, u_old.x.petsc_vec
-            diff_u = vec_u_now.copy(); diff_u.axpy(-1.0, vec_u_old)
-            norm_du = diff_u.norm(PETSc.NormType.NORM_2)
+            norm_du_total = 0.0
+
+            for label in self.u:
+                vec_u_now = u_sol[label].x.petsc_vec
+                vec_u_old = u_old[label].x.petsc_vec
+
+                diff_u = vec_u_now.copy()
+                diff_u.axpy(-1.0, vec_u_old)
+
+                norm_du_local = diff_u.norm(PETSc.NormType.NORM_2)
+                norm_du_total += norm_du_local**2
+
+            norm_du = norm_du_total**0.5
 
             print(f"||ΔT|| = {norm_dT:.3e} | ||Δu|| = {norm_du:.3e}")
 
@@ -437,16 +475,23 @@ class Solver:
                     T_max = self.T[label].x.array.max()
                     print(f"Material {label}: Min/Max temperature: {T_min:.2f} / {T_max:.2f} K")
 
-                u_magnitude = np.sqrt(np.sum(u_sol.x.array.reshape(-1, 3)**2, axis=1))
-                print(f"Min/Max displacement magnitude: {u_magnitude.min():.3e} / {u_magnitude.max():.3e} m")
-                print("----------------------------\n")
+                for label in self.u:
+                    u_vec = u_sol[label].x.array.reshape(-1, self.gdim)
+                    u_magnitude = np.linalg.norm(u_vec, axis=1)
+                    u_min = u_magnitude.min()
+                    u_max = u_magnitude.max()
+                    print(f"Material {label}: Min/Max displacement: {u_min:.2e} / {u_max:.2e} m")
 
                 # Update all fields in the self.T and self.u dictionaries
-                self.u.interpolate(u_sol)
-
+                for name in self.materials:
+                    self.T[name].interpolate(T_sol[name])
+                    self.u[name].interpolate(u_sol[name])
+        
                 return True
 
         print("\n[WARNING] Staggered solver did not converge within the maximum number of iterations.")
-        self.u.interpolate(u_sol)
+        for name in self.materials:
+            self.T[name].interpolate(T_sol[name])
+            self.u[name].interpolate(u_sol[name])
 
         return False
