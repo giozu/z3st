@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//  Gmsh GEO for a cube LxLxL with a structured mesh
+//  Gmsh GEO for two boxes LxLxH with a structured mesh
 //
 //  Author: Giovanni Zullo
 //

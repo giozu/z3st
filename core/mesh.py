@@ -37,6 +37,7 @@ class Mesh:
             print(f"Info    : Mesh topology dimension d={self.tdim}")
             self.fdim = self.tdim - 1
             self.mesh.topology.create_connectivity(self.fdim, self.tdim)
+            self.mesh.topology.create_connectivity(self.tdim, self.tdim) 
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
 
             print("Available volume tags (dx):")
@@ -47,6 +48,11 @@ class Mesh:
 
             # Labels
             self.label_map = self.geometry["labels"]
+
+            # print("\n--- Verifying facet tags ---")
+            # unique_tags = np.unique(self.ft.values)
+            # print(f"Unique tags found in mesh facet data (self.ft): {unique_tags}")
+            # print(f"Interface tags from label_map: fuel_side={self.label_map['face_xx_1_1']}, clad_side={self.label_map['face_xx_0_2']}")
 
             print("Geometry entries:")
             for k in sorted(self.geometry.keys()):
