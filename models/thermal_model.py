@@ -25,6 +25,19 @@ class ThermalModel:
         print(f"Setting thermal boundary conditions...")
         thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
 
+        seen_regions = {}
+
+        for label, bc_list in thermal_bcs_defs.items():
+            for bc_info in bc_list:
+                region_name = bc_info.get("region")
+                bc_type = bc_info.get("type")
+
+                key = (region_name, bc_type)
+                if key in seen_regions:
+                    print(f"[WARNING] Duplicate thermal BC of type '{bc_type}' defined for region '{region_name}' (previously in '{seen_regions[key]}', now in '{label}').")
+                else:
+                    seen_regions[key] = label
+
         for name in self.materials:
             self.neumann_thermal[name] = []
             self.dirichlet_thermal[name] = []

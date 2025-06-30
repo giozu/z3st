@@ -23,6 +23,19 @@ class MechanicalModel:
         print("Setting mechanical boundary conditions...")
         mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
         
+        seen_regions = {}
+
+        for mat_type, bc_list in mechanical_bcs_defs.items():
+            for bc_info in bc_list:
+                region_name = bc_info.get("region")
+                bc_type = bc_info.get("type")
+
+                key = (region_name, bc_type)
+                if key in seen_regions:
+                    print(f"[WARNING] Duplicate mechanical BC of type '{bc_type}' defined for region '{region_name}' (previously in '{seen_regions[key]}', now in '{mat_type}').")
+                else:
+                    seen_regions[key] = mat_type
+
         for name in self.materials:
             self.traction[name] = []
             self.dirichlet_mechanical[name] = []

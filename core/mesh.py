@@ -131,16 +131,70 @@ class Mesh:
         except Exception as e:
             raise ValueError(f"Error reading mesh file {self.mesh_file}: {e}")
         
-    def locateThermalDofs(self, label, V_t=None):
-        if V_t is None:
-            V_t = self.V_t
-        return dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.ft.find(label))
-    
-    def locateMechanicalDofs(self, label, V_m=None):
-        if V_m is None:
-            V_m = self.V_m
-        return dolfinx.fem.locate_dofs_topological(self.V_m, self.fdim, self.ft.find(label))
-           
+    def locateFacetDofs(self, label: int, V: dolfinx.fem.functionspace) -> np.ndarray:
+        """Locate degrees of freedom (DoFs) on a specific facet boundary.
+
+        This is a convenience function for finding all DoFs associated with
+        a boundary marked by a specific integer label. It's commonly used
+        to apply boundary conditions (e.g., DirichletBC).
+
+        Args:
+            label: The integer marker for the desired facet set (e.g., a
+                   specific boundary like an "inlet" or "wall"). This label must
+                   exist in the mesh's facet tags.
+            V: The function space from which to extract the DoFs.
+
+        Returns:
+            A 1D numpy array of DoF indices that are located on the
+            specified facets.
+        """
+        # Find the indices of all facets (e.g., edges in 2D, faces in 3D)
+        # that are marked with the given integer 'label'.
+        # self.ft is the MeshTags object for facets.
+        facets = self.ft.find(label)
+
+        # Locate the DoFs that are topologically associated with these facets.
+        # - V: The function space defines the DoFs.
+        # - self.fdim: The topological dimension of the entities to search on (dim-1).
+        # - facets: The list of entity indices to search.
+        return dolfinx.fem.locate_dofs_topological(V, self.fdim, facets)
+
+    def locateDomainDofs(self, label_map: dict, material_label: str, V: dolfinx.fem.functionspace) -> np.ndarray:
+        """Locate degrees of freedom (DoFs) within a specific subdomain.
+
+        This function identifies all DoFs that belong to cells of a certain
+        type (e.g., a specific material). It is useful for defining
+        material-dependent properties, source terms, or for subdomain-specific
+        post-processing.
+
+        Args:
+            label_map: A dictionary mapping human-readable material labels
+                       (e.g., "water", "steel") to their corresponding integer
+                       tags in the mesh's cell data.
+            material_label: The human-readable key (e.g., "water") to look
+                            up the integer tag in `label_map`.
+            V: The function space from which to extract the DoFs.
+
+        Returns:
+            A 1D numpy array of DoF indices located within the cells of the
+            specified subdomain.
+        """
+        # Use the map to get the integer tag corresponding to the material label.
+        # This decouples the physics definition from the mesh generation details.
+        domain_tag = label_map[material_label]
+
+        # Find the indices of all cells (e.g., triangles in 2D, tetrahedra in 3D)
+        # that are marked with that integer domain tag.
+        # self.tags is the MeshTags object for cells.
+        cells = self.tags.find(domain_tag)
+
+        # Locate the DoFs that are topologically associated with these cells.
+        # - V: The function space defines the DoFs.
+        # - self.tdim: The topological dimension of the entities (the cells themselves).
+        # - cells: The list of cell indices to search.
+        dofs = dolfinx.fem.locate_dofs_topological(V, self.tdim, cells)
+        return dofs
+
     def volume(self, log_path="output/simulation_log.txt"):
 
         # Integration measures the domain
