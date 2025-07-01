@@ -314,8 +314,12 @@ class Solver:
                 # Cladding on interface
                 ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_0_2"])
                 a_t += h_gap * u_t * v_t * ds_clad_interface
-                L_t += h_gap * T_n * v_t * ds_clad_interface
-                
+                L_t += h_gap * T_old * v_t * ds_clad_interface
+
+                q_expr = h_gap * (self.T - T_old)
+                q_flux = dolfinx.fem.Function(self.V_t, name="q_interface")
+                q_flux.interpolate(dolfinx.fem.Expression(q_expr, self.V_t.element.interpolation_points()))
+
                 # --- Solve the Global System ---
                 petsc_opts_thermal = self.get_solver_options(
                     solver_type=self.thermal_solver, physics="thermal", rtol=tol_th
