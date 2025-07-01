@@ -321,6 +321,10 @@ class Solver:
                 dofs_fuel = self.locateFacetDofs(self.label_map["fuel_interface"], self.V_t)
                 dofs_clad = self.locateFacetDofs(self.label_map["clad_interface"], self.V_t)
 
+                print(f"[DEBUG] fuel dofs = {dofs_fuel.shape}")
+                print(f"[DEBUG] clad dofs = {dofs_clad.shape}")
+                # print(f"[DEBUG] diff = {np.setdiff1d(dofs_fuel, dofs_clad)}")
+
                 T_fuel.x.array[dofs_fuel] = T_n.x.array[dofs_fuel]
                 T_clad.x.array[dofs_clad] = T_n.x.array[dofs_clad]
 
