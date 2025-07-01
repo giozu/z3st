@@ -235,9 +235,12 @@ class MechanicalModel:
         return bc
 
     def epsilon(self, u):
+        # return 0.5 * (ufl.grad(u) + ufl.transpose(ufl.grad(u)))
         return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
+
+        # print(f"  Mechanical stress for {self.regime} regime")
 
         stress_tensor = material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.tdim) + 2 * material["G"] * self.epsilon(u)
 

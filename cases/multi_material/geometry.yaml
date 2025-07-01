@@ -6,14 +6,14 @@ geometry_type: rect
 labels:
   bottom1: 1
   face_yy_0_1: 2
-  face_xx_1_1: 3
+  fuel_interface: 3
   face_yy_1_1: 4
   face_xx_0_1: 5
   top1: 6
   bottom2: 8
   face_yy_0_2: 9
   face_xx_1_2: 10
-  face_yy_1_2: 11
+  clad_interface: 11
   face_xx_0_2: 12
   top2: 13
   fuel: 7

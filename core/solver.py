@@ -135,7 +135,7 @@ class Solver:
         for label in self.materials:
             material = self.materials[label]
             tag = self.label_map[label]
-            dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
+            dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
 
             # Material properties
             k = dolfinx.fem.Constant(self.mesh, material["k"])
@@ -281,44 +281,59 @@ class Solver:
             #  1. SOLVE THERMAL SUB-PROBLEM (Globally assembled)
             # =========================================================
             if self.on["thermal"]:
-                print("[INFO] Assembling global thermal problem...")
+                print("\n[INFO] Assembling global thermal problem...")
                 u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
                 a_t = 0
                 L_t = 0
 
                 # --- Volume integrals ---
                 for label, material in self.materials.items():
-                    tag = self.label_map[label]
-                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
+                    tag = self.label_map[label] # in this case, volume tag
+                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag) # volume integral
+
+                    print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+
                     k = dolfinx.fem.Constant(self.mesh, material["k"])
                     a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t += self.q_third * v_t * dx
 
+                    # q_third value in the volume "label" / "tag"
+                    dofs = self.locateDomainDofs(self.label_map, label, self.V_t)
+                    q_vals = self.q_third.x.array[dofs]
+                    print(f"  → q_third[{label}] min = {q_vals.min():.2e}, max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}")
+
                 # --- Neumann BCs ---
                 for label in self.materials:
                     for bc_info in self.neumann_thermal[label]:
+                        print(f"  Applying thermal Neumann BC on subdomain id = {bc_info['id']}")
                         ds_neumann = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t += bc_info['value'] * v_t * ds_neumann
 
-                # --- Interface Coupling (Robin-Robin) ---
-                # Note: T_n contains the solution from the *previous* staggered iteration.
-                # This is the standard "explicit" or Gauss-Seidel coupling.
-                h_gap_val = 100.0
-                h_gap = dolfinx.fem.Constant(self.mesh, h_gap_val)
+                # --- Thermal coupling, gap interface ---
+                fuel_tag = self.label_map["fuel_interface"]
+                clad_tag = self.label_map["clad_interface"]
+
+                ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
                 
-                # Fuel on interface
-                ds_fuel_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_1_1"])
-                a_t += h_gap * u_t * v_t * ds_fuel_interface
-                L_t += h_gap * T_n * v_t * ds_fuel_interface
+                T_fuel = dolfinx.fem.Function(self.V_t)
+                T_clad = dolfinx.fem.Function(self.V_t)
 
-                # Cladding on interface
-                ds_clad_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=self.label_map["face_xx_0_2"])
-                a_t += h_gap * u_t * v_t * ds_clad_interface
-                L_t += h_gap * T_old * v_t * ds_clad_interface
+                dofs_fuel = self.locateFacetDofs(self.label_map["fuel_interface"], self.V_t)
+                dofs_clad = self.locateFacetDofs(self.label_map["clad_interface"], self.V_t)
 
-                q_expr = h_gap * (self.T - T_old)
-                q_flux = dolfinx.fem.Function(self.V_t, name="q_interface")
-                q_flux.interpolate(dolfinx.fem.Expression(q_expr, self.V_t.element.interpolation_points()))
+                T_fuel.x.array[dofs_fuel] = T_n.x.array[dofs_fuel]
+                T_clad.x.array[dofs_clad] = T_n.x.array[dofs_clad]
+
+                h_gap_val = 100.0
+                h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
+                
+                # Lato fuel
+                a_t += h_gap * u_t * v_t * ds(fuel_tag)
+                L_t += h_gap * T_clad * v_t * ds(fuel_tag)
+
+                # Lato clad
+                a_t -= h_gap * u_t * v_t * ds(clad_tag)
+                L_t -= h_gap * T_fuel * v_t * ds(clad_tag)
 
                 # --- Solve the Global System ---
                 petsc_opts_thermal = self.get_solver_options(
@@ -334,38 +349,33 @@ class Solver:
             #  2. SOLVE MECHANICAL SUB-PROBLEM (Globally assembled)
             # =========================================================
             if self.on["mechanical"]:
-                print("[INFO] Assembling global mechanical problem...")
+                print("\n[INFO] Assembling global mechanical problem...")
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
                 a_m = 0
                 L_m = 0
                 
-                epsilon = lambda u: ufl.sym(ufl.grad(u))
-                
+                # helper function
+                epsilon = lambda s: ufl.sym(ufl.grad(s))
+
                 # --- Volume integrals ---
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
-                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags, subdomain_id=tag)
+                    print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
 
-                    # Material properties
-                    lmbda = dolfinx.fem.Constant(self.mesh, material["lmbda"])
-                    G = dolfinx.fem.Constant(self.mesh, material["G"])
-                    alpha = dolfinx.fem.Constant(self.mesh, material["alpha"])
-                    T_ref = dolfinx.fem.Constant(self.mesh, material["T_ref"])
+                    # Body force
                     rho = dolfinx.default_scalar_type(material["rho"])
                     g = dolfinx.default_scalar_type(self.g)
                     body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
 
-                    # Stress definitions
-                    sigma_m = lmbda * ufl.tr(epsilon(u_m)) * ufl.Identity(self.gdim) + 2 * G * epsilon(u_m)
-                    sigma_th = (3 * lmbda + 2 * G) * alpha * (T_n - T_ref) * ufl.Identity(self.gdim)
-
                     # Add contributions to global forms
-                    a_m += ufl.inner(sigma_m, epsilon(v_m)) * dx
-                    L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(sigma_th, epsilon(v_m)) * dx
+                    a_m += ufl.inner(self.sigma_mech(u_m, material), epsilon(v_m)) * dx
+                    L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(self.sigma_th(T_n, material), epsilon(v_m)) * dx # dot (vectors, scalar product) inner (tensors, double contraction)
                     
                 # --- Neumann BCs (Traction) ---
                 for label in self.materials:
                     for bc_info in self.traction[label]:
+                        print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
                         ds_traction = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
 
@@ -382,6 +392,7 @@ class Solver:
             # =========================================================
             #  3. CONVERGENCE CHECK and LOGGING
             # =========================================================
+            print(f"\nConvergence check")
             # Synchronize ghost values before vector operations
             T_n.x.scatter_forward()
             T_old.x.scatter_forward()
@@ -390,33 +401,34 @@ class Solver:
 
             # --- Temperature convergence ---
             # Get the PETSc vectors from the function's data layout '.x'
-            vec_T_now = T_n.x.petsc_vec
+            vec_T_new = T_n.x.petsc_vec
             vec_T_old = T_old.x.petsc_vec
 
             # Compute difference vector: diff_T = T_now - T_old
-            diff_T = vec_T_now.copy()
+            diff_T = vec_T_new.copy()
             diff_T.axpy(-1.0, vec_T_old) 
 
             # Compute norms
             norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
-            norm_T = vec_T_now.norm(PETSc.NormType.NORM_2)
+            norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
             rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
 
             # --- Displacement convergence ---
             # Get the PETSc vectors
-            vec_u_now = u_n.x.petsc_vec
+            vec_u_new = u_n.x.petsc_vec
             vec_u_old = u_old.x.petsc_vec
 
             # Compute difference vector: diff_u = u_now - u_old
-            diff_u = vec_u_now.copy()
+            diff_u = vec_u_new.copy()
             diff_u.axpy(-1.0, vec_u_old)
 
             # Compute norms
             norm_du = diff_u.norm(PETSc.NormType.NORM_2)
-            norm_u = vec_u_now.norm(PETSc.NormType.NORM_2)
+            norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
             rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
 
-            print(f"||ΔT||/||T|| = {rel_norm_dT:.3e} | ||Δu||/||u|| = {rel_norm_du:.3e}")
+            print(f"  ||ΔT|| = {norm_dT:.3e}, ||Δu|| = {norm_du:.3e}")
+            print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}")
 
             if rel_norm_dT < tol_T and rel_norm_du < tol_u:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")

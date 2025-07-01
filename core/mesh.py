@@ -32,7 +32,7 @@ class Mesh:
         print(f"Reading mesh file {self.mesh_file}")
 
         try:
-            self.mesh, self.tags, self.ft = dolfinx.io.gmshio.read_from_msh(self.mesh_file, MPI.COMM_WORLD, rank=self.rank, gdim=self.gdim)
+            self.mesh, self.volume_tags, self.ft = dolfinx.io.gmshio.read_from_msh(self.mesh_file, MPI.COMM_WORLD, rank=self.rank, gdim=self.gdim)
             self.tdim = self.mesh.topology.dim
             print(f"Info    : Mesh topology dimension d={self.tdim}")
             self.fdim = self.tdim - 1
@@ -41,7 +41,7 @@ class Mesh:
             self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
 
             print("Available volume tags (dx):")
-            tag_values = self.tags.values
+            tag_values = self.volume_tags.values
             unique_tags = set(tag_values)
             for tag in sorted(unique_tags):
                 print(f"  Tag ID: {tag}")
@@ -97,8 +97,6 @@ class Mesh:
                 print(f"  {label:<12} → {tag}")
             
             self.normal = ufl.FacetNormal(self.mesh)
-            self.dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
-            self.ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
 
             # fuel_face_tag = self.label_map["face2_1"]      # fuel side of the interface
             # clad_face_tag = self.label_map["face4_2"]      # cladding side
@@ -113,7 +111,7 @@ class Mesh:
 
             # msh = meshio.read(self.mesh_file)
 
-            # facet_tags = self.tags
+            # facet_tags = self.volume_tags
             # boundary_facets = np.where(facet_tags.values > 0)[0]
             # boundary_values = facet_tags.values[boundary_facets]
 
@@ -185,8 +183,8 @@ class Mesh:
 
         # Find the indices of all cells (e.g., triangles in 2D, tetrahedra in 3D)
         # that are marked with that integer domain tag.
-        # self.tags is the MeshTags object for cells.
-        cells = self.tags.find(domain_tag)
+        # self.volume_tags is the MeshTags object for cells.
+        cells = self.volume_tags.find(domain_tag)
 
         # Locate the DoFs that are topologically associated with these cells.
         # - V: The function space defines the DoFs.
@@ -233,7 +231,7 @@ class Mesh:
 
     # def volume(self, fuel_outer_radius, cladding_inner_radius, cladding_outer_radius, height, log_path="output/simulation_log.txt"):
     #     # Integration measures the domain
-    #     dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.tags)
+    #     dx_subdomain = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags)
     #     self.dx_fuel = dx_subdomain(1)      # Marker ID for fuel region
     #     self.dx_cladding = dx_subdomain(2)  # Marker ID for cladding region
 
@@ -260,7 +258,7 @@ class Mesh:
         # self.mesh.topology.create_connectivity(self.fdim , self.tdim)
         # with XDMFFile(self.mesh.comm, "facet_tags.xdmf", "w") as xdmf:
         #     xdmf.write_mesh(self.mesh)
-        #     xdmf.write_meshtags(self.tags, self.geometry)
+        #     xdmf.write_meshtags(self.volume_tags, self.geometry)
 
         if mesh_plot_mode is False:
             return

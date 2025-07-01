@@ -128,7 +128,7 @@ Transfinite Volume {2};
 // Physical groups for boundary conditions (first cube)
 Physical Surface("bottom1") = {1};
 Physical Surface("face_yy_0_1") = {2};
-Physical Surface("face_xx_1_1") = {3};
+Physical Surface("fuel_interface") = {3};
 Physical Surface("face_yy_1_1") = {4};
 Physical Surface("face_xx_0_1") = {5};
 Physical Surface("top1")    = {6};
@@ -139,9 +139,11 @@ Physical Surface("bottom2") = {7};
 Physical Surface("face_yy_0_2") = {8};
 Physical Surface("face_xx_1_2") = {9};
 Physical Surface("face_yy_1_2") = {10};
-Physical Surface("face_xx_0_2") = {11};
+Physical Surface("clad_interface") = {11};
 Physical Surface("top2")    = {12};
 Physical Volume("cladding")    = {2};
+
+// Physical Surface("gap_interface") = {3, 11};
 
 // Generate structured mesh
 Mesh.RecombineAll = 1;
