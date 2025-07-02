@@ -101,14 +101,14 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
         self.T.x.scatter_forward()
         T_vals = self.T.x.array
-        print(f"Global initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K")
+        print(f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K")
 
         print("\nInitializing global displacement field...")
         self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
         self.u.x.array[:] = 0.0
         self.u.x.scatter_forward()
         u_vals = self.u.x.array
-        print(f"Global initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m")
+        print(f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m")
 
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
         print("\nSolver settings:")

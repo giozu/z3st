@@ -267,8 +267,6 @@ class Solver:
         for bc_list in self.dirichlet_mechanical.values():
             bcs_m.extend(bc_list)
 
-        print(f"[INFO] Loaded {len(bcs_t)} thermal and {len(bcs_m)} mechanical Dirichlet BCs.")
-
         # --- Staggering loop ---
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
@@ -281,7 +279,7 @@ class Solver:
             #  1. SOLVE THERMAL SUB-PROBLEM (Globally assembled)
             # =========================================================
             if self.on["thermal"]:
-                print("\n[INFO] Assembling global thermal problem...")
+                print("\n[INFO] Assembling thermal problem...")
                 u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
                 a_t = 0
                 L_t = 0
@@ -309,25 +307,40 @@ class Solver:
                         ds_neumann = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t += bc_info['value'] * v_t * ds_neumann
 
-                # --- Thermal coupling, gap interface ---
-                fuel_tag = self.label_map["fuel_interface"]
-                clad_tag = self.label_map["clad_interface"]
+                # --- Robin BCs ---
+                if self.gap_model == "Fixed":
+                    print(f"\n[INFO] Applying fixed gap conductance (h_gap = {self.h_gap_value} W/m²K) via Robin BCs")
+                    h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.h_gap_value))
 
-                ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
-                
-                # Opzione 1
-                # T_fuel = dolfinx.fem.Function(self.V_t)
-                # T_clad = dolfinx.fem.Function(self.V_t)
+                    for label in self.materials:
+                        for bc_info in self.robin_thermal[label]:
+                            region_id = bc_info["id"] # e.g., fuel_interface
+                            pair_region = bc_info["pair"] # e.g., clad_interface
+
+                            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=region_id) # e.g., fuel_interface surface
+
+                            T_other = dolfinx.fem.Function(self.V_t) # e.g., T_clad
+                            dofs_here = self.locateFacetDofs(region_id, self.V_t) # e.g., dofs of fuel_interface
+                            dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t) # e.g., dofs of clad_interface
+
+                            T_other.x.array[dofs_here] = T_n.x.array[dofs_other] # e.g., T_clad projected on fuel_interface dofs
+
+                            # T_clad = T_n.x.array[dofs_clad].mean()
+                            # T_fuel = T_n.x.array[dofs_fuel].mean()
+
+                            a_t += h_gap * u_t * v_t * ds_interface
+                            L_t += h_gap * T_other * v_t * ds_interface
+
+                            print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
+
+                # # T_clad.x.array[1:100] += 10
 
                 # dofs_fuel = self.locateFacetDofs(self.label_map["fuel_interface"], self.V_t)
                 # dofs_clad = self.locateFacetDofs(self.label_map["clad_interface"], self.V_t)
 
-                # T_clad.x.array[dofs_fuel] = T_n.x.array[dofs_clad]
-                # T_fuel.x.array[dofs_clad] = T_n.x.array[dofs_fuel]
 
-                # T_clad.x.array[1:100] += 10
 
-                # h_gap_val = 100.0
+                # h_gap_val = 1000.0
                 # h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
                 
                 # # Lato fuel
@@ -338,23 +351,46 @@ class Solver:
                 # a_t += h_gap * u_t * v_t * ds(clad_tag)
                 # L_t += h_gap * T_fuel * v_t * ds(clad_tag)
 
-                # Opzione 2
-                dofs_fuel = self.locateFacetDofs(self.label_map["fuel_interface"], self.V_t)
-                dofs_clad = self.locateFacetDofs(self.label_map["clad_interface"], self.V_t)
+                # --- Compute average heat flux magnitude per material ---
+                print("\n--- Average heat flux magnitude per material ---")
+                for label, material in self.materials.items():
+                    tag = self.label_map[label]
+                    
+                    # Measure for integration over the specific material's subdomain
+                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
 
-                T_clad = T_n.x.array[dofs_clad].mean()
-                T_fuel = T_n.x.array[dofs_fuel].mean()
+                    k = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(material["k"]))
 
-                h_gap_val = 1000.0
-                h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
-                
-                # Lato fuel
-                a_t += h_gap * u_t * v_t * ds(fuel_tag)
-                L_t += h_gap * T_clad * v_t * ds(fuel_tag)
+                    grad_T = ufl.grad(T_n)
 
-                # Lato clad
-                a_t += h_gap * u_t * v_t * ds(clad_tag)
-                L_t += h_gap * T_fuel * v_t * ds(clad_tag)
+                    q_vec = - k * grad_T
+
+                    qx = q_vec[0]
+                    qy = q_vec[1]
+                    qz = q_vec[2]
+
+                    q_mag = ufl.sqrt(ufl.dot(q_vec, q_vec))
+
+                    # Directly assemble the integral of the UFL expression over the subdomain
+                    total_q_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(q_mag * dx))
+                    qx_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qx * dx))
+                    qy_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qy * dx))
+                    qz_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qz * dx))
+
+                    # Assemble the volume (or area in 2D) of the subdomain
+                    volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx))
+
+                    # Compute the average
+                    q_avg = total_q_integral / volume if volume > 0 else 0.0
+                    qx_avg = qx_integral / volume if volume > 0 else 0.0
+                    qy_avg = qy_integral / volume if volume > 0 else 0.0
+                    qz_avg = qz_integral / volume if volume > 0 else 0.0
+
+                    print(f"[INFO] Average heat flux magnitude in {label:<10}: {q_avg:.2f} W/m²")
+
+                    print(f"[INFO] Average heat flux -x in {label:<10}: {qx_avg:.2f} W/m²")
+                    print(f"[INFO] Average heat flux -y in {label:<10}: {qy_avg:.2f} W/m²")
+                    print(f"[INFO] Average heat flux -z in {label:<10}: {qz_avg:.2f} W/m²")
 
                 # --- Solve the Global System ---
                 petsc_opts_thermal = self.get_solver_options(
@@ -370,7 +406,7 @@ class Solver:
             #  2. SOLVE MECHANICAL SUB-PROBLEM (Globally assembled)
             # =========================================================
             if self.on["mechanical"]:
-                print("\n[INFO] Assembling global mechanical problem...")
+                print("\n[INFO] Assembling mechanical problem...")
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
                 a_m = 0
                 L_m = 0

@@ -9,7 +9,11 @@ class Config:
             "mechanical": models.get("mechanical", True),
             "creep": models.get("creep", False)
         }
-        
+
+        gap_config = self.config.get("models", {}).get("gap_conductance", {})
+        self.gap_model = gap_config.get("type", None)
+        self.h_gap_value = gap_config.get("value", 0.0)
+
         self.geometry_path = self.config.get("geometry_path", None)
         self.mesh_path = self.config.get("mesh_path", None)
         self.boundary_conditions_path = self.config.get("boundary_conditions_path", None)
@@ -24,4 +28,6 @@ class Config:
         print(f"  → Models active       :")
         for model, active in self.on.items():
             print(f"      {model:<10} → {'ON' if active else 'OFF'}")
+        print(f"  → Gap conductance     : {self.gap_model}")
+        print(f"    Value = {self.h_gap_value} W/m2-K")
         print(f"  → Mechanical regime   : {self.regime}")

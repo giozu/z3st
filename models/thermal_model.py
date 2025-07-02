@@ -10,6 +10,7 @@ class ThermalModel:
         self.thermal_residuals = {}
         self.neumann_thermal = {}
         self.dirichlet_thermal = {}
+        self.robin_thermal = {}
      
     def set_thermal_boundary_conditions(self, V_t, V_t_map=None):
         """
@@ -22,7 +23,7 @@ class ThermalModel:
             V_t_sub: FunctionSpace (collapsed temperature space)
             V_t_map: DoF map from mixed to collapsed (only in mixed case)
         """
-        print(f"Setting thermal boundary conditions...")
+        print(f"\nSetting thermal boundary conditions...")
         thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
 
         seen_regions = {}
@@ -38,9 +39,10 @@ class ThermalModel:
                 else:
                     seen_regions[key] = label
 
-        for name in self.materials:
-            self.neumann_thermal[name] = []
-            self.dirichlet_thermal[name] = []
+        for label in self.materials:
+            self.neumann_thermal[label] = []
+            self.dirichlet_thermal[label] = []
+            self.robin_thermal[label] = []
 
         for label, bc_list in thermal_bcs_defs.items():
             for bc_info in bc_list:
@@ -91,6 +93,16 @@ class ThermalModel:
 
                     self.neumann_thermal[label].append({'id': region_id, 'value': float(flux)})
                     print(f"  [INFO] Neumann thermal BC on '{label}' → {flux} W/m² at region '{region_name}'")
+
+                elif bc_type == "Robin":
+
+                    pair = bc_info.get("pair")
+                    if pair is None:
+                        print(f"  [ERROR] Robin BC on '{label}' is missing 'pair'")
+                        sys.exit(1)
+                    self.robin_thermal[label].append({'id': region_id, 'pair': pair})
+
+                    print(f"  [INFO] Robin thermal BC on '{label}' at region '{region_name}' coupled with '{pair}'")
 
                 else:
                     print(f"  [ERROR] Unknown thermal BC type '{bc_type}' for '{label}'.")
