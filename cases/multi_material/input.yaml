@@ -21,13 +21,13 @@ solver_settings:
   thermal_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2
-  tol_T: 1e-5
-  tol_u: 1e-5
-  tol_mech: 1e-10
-  tol_th: 1e-10
+  tol_T: 1e-2
+  tol_u: 1e-2
+  tol_mech: 1e-8
+  tol_th: 1e-8
   relax_T: 0.7
   relax_u: 0.8
-  n_iter_max: 50
+  n_iter_max: 30
 
 models:
   thermal: True

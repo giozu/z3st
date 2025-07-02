@@ -315,18 +315,33 @@ class Solver:
 
                 ds = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft)
                 
-                T_fuel = dolfinx.fem.Function(self.V_t)
-                T_clad = dolfinx.fem.Function(self.V_t)
+                # Opzione 1
+                # T_fuel = dolfinx.fem.Function(self.V_t)
+                # T_clad = dolfinx.fem.Function(self.V_t)
 
+                # dofs_fuel = self.locateFacetDofs(self.label_map["fuel_interface"], self.V_t)
+                # dofs_clad = self.locateFacetDofs(self.label_map["clad_interface"], self.V_t)
+
+                # T_clad.x.array[dofs_fuel] = T_n.x.array[dofs_clad]
+                # T_fuel.x.array[dofs_clad] = T_n.x.array[dofs_fuel]
+
+                # h_gap_val = 100.0
+                # h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
+                
+                # # Lato fuel
+                # a_t += h_gap * u_t * v_t * ds(fuel_tag)
+                # L_t += h_gap * T_clad * v_t * ds(fuel_tag)
+
+                # # Lato clad
+                # a_t += h_gap * u_t * v_t * ds(clad_tag)
+                # L_t += h_gap * T_fuel * v_t * ds(clad_tag)
+
+                # Opzione 2
                 dofs_fuel = self.locateFacetDofs(self.label_map["fuel_interface"], self.V_t)
                 dofs_clad = self.locateFacetDofs(self.label_map["clad_interface"], self.V_t)
 
-                print(f"[DEBUG] fuel dofs = {dofs_fuel.shape}")
-                print(f"[DEBUG] clad dofs = {dofs_clad.shape}")
-                # print(f"[DEBUG] diff = {np.setdiff1d(dofs_fuel, dofs_clad)}")
-
-                T_fuel.x.array[dofs_fuel] = T_n.x.array[dofs_fuel]
-                T_clad.x.array[dofs_clad] = T_n.x.array[dofs_clad]
+                T_clad = T_n.x.array[dofs_clad].mean()
+                T_fuel = T_n.x.array[dofs_fuel].mean()
 
                 h_gap_val = 100.0
                 h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
@@ -336,8 +351,8 @@ class Solver:
                 L_t += h_gap * T_clad * v_t * ds(fuel_tag)
 
                 # Lato clad
-                a_t -= h_gap * u_t * v_t * ds(clad_tag)
-                L_t -= h_gap * T_fuel * v_t * ds(clad_tag)
+                a_t += h_gap * u_t * v_t * ds(clad_tag)
+                L_t += h_gap * T_fuel * v_t * ds(clad_tag)
 
                 # --- Solve the Global System ---
                 petsc_opts_thermal = self.get_solver_options(

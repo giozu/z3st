@@ -2,7 +2,7 @@ thermal_bcs:
   fuel:
     - type: Dirichlet
       region: face_xx_0_1
-      temperature: 400
+      temperature: 500
 
   cladding:
 
