@@ -325,6 +325,8 @@ class Solver:
                 # T_clad.x.array[dofs_fuel] = T_n.x.array[dofs_clad]
                 # T_fuel.x.array[dofs_clad] = T_n.x.array[dofs_fuel]
 
+                # T_clad.x.array[1:100] += 10
+
                 # h_gap_val = 100.0
                 # h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
                 
@@ -343,7 +345,7 @@ class Solver:
                 T_clad = T_n.x.array[dofs_clad].mean()
                 T_fuel = T_n.x.array[dofs_fuel].mean()
 
-                h_gap_val = 100.0
+                h_gap_val = 1000.0
                 h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
                 
                 # Lato fuel
