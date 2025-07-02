@@ -325,31 +325,14 @@ class Solver:
 
                             T_other.x.array[dofs_here] = T_n.x.array[dofs_other] # e.g., T_clad projected on fuel_interface dofs
 
-                            # T_clad = T_n.x.array[dofs_clad].mean()
-                            # T_fuel = T_n.x.array[dofs_fuel].mean()
+                            # T_other = T_n.x.array[dofs_other].mean()
 
                             a_t += h_gap * u_t * v_t * ds_interface
                             L_t += h_gap * T_other * v_t * ds_interface
 
                             print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
 
-                # # T_clad.x.array[1:100] += 10
-
-                # dofs_fuel = self.locateFacetDofs(self.label_map["fuel_interface"], self.V_t)
-                # dofs_clad = self.locateFacetDofs(self.label_map["clad_interface"], self.V_t)
-
-
-
-                # h_gap_val = 1000.0
-                # h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_val))
-                
-                # # Lato fuel
-                # a_t += h_gap * u_t * v_t * ds(fuel_tag)
-                # L_t += h_gap * T_clad * v_t * ds(fuel_tag)
-
-                # # Lato clad
-                # a_t += h_gap * u_t * v_t * ds(clad_tag)
-                # L_t += h_gap * T_fuel * v_t * ds(clad_tag)
+                # T_clad.x.array[1:100] += 10
 
                 # --- Compute average heat flux magnitude per material ---
                 print("\n--- Average heat flux magnitude per material ---")

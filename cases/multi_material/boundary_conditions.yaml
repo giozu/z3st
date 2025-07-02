@@ -8,10 +8,26 @@ thermal_bcs:
       region: fuel_interface
       pair: clad_interface
 
+    - type: Neumann
+      region: face_yy_0_1
+      flux: 0.0
+
+    - type: Neumann
+      region: face_yy_1_1
+      flux: 0.0
+
   cladding:
     - type: Dirichlet
       region: face_xx_1_2
       temperature: 300
+
+    - type: Neumann
+      region: face_yy_0_2
+      flux: 0.0
+
+    - type: Neumann
+      region: face_yy_1_2
+      flux: 0.0
 
     - type: Robin
       region: clad_interface

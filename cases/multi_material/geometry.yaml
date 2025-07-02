@@ -13,8 +13,8 @@ labels:
   bottom2: 8
   face_yy_0_2: 9
   face_xx_1_2: 10
-  clad_interface: 11
-  face_xx_0_2: 12
+  face_yy_1_2: 11
+  clad_interface: 12
   top2: 13
   fuel: 7
   cladding: 14
