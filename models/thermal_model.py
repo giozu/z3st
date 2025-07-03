@@ -109,19 +109,47 @@ class ThermalModel:
                     print(f"  Available are: Dirichlet, Neumann.")
                     sys.exit(1)
 
-    def fixed_temperature(self, mesh, dofs, V, T):
+    def heat_flux(self, T):
         """
-        Create a Dirichlet BC with fixed temperature.
+        Compute average heat flux (magnitude and x-y-z components) per materials
 
-        Parameters:
-            mesh (dolfinx.Mesh): The mesh object.
-            dofs (array-like): Degrees of freedom where BC is applied.
-            V (FunctionSpace): The function space.
-            T (float): Temperature value.
-
-        Returns:
-            dolfinx.fem.DirichletBC: Fixed temperature boundary condition.
         """
-        return dolfinx.fem.dirichletbc(
-            dolfinx.fem.Constant(mesh, PETSc.ScalarType(T)), dofs, V
-        )
+        print("\n--- Average heat flux magnitude per material ---")
+        for label, material in self.materials.items():
+            tag = self.label_map[label]
+            
+            # Measure for integration over the specific material's subdomain
+            dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
+
+            k = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(material["k"]))
+
+            grad_T = ufl.grad(T)
+
+            q_vec = - k * grad_T
+
+            qx = q_vec[0]
+            qy = q_vec[1]
+            qz = q_vec[2]
+
+            q_mag = ufl.sqrt(ufl.dot(q_vec, q_vec))
+
+            # Directly assemble the integral of the UFL expression over the subdomain
+            q_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(q_mag * dx))
+            qx_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qx * dx))
+            qy_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qy * dx))
+            qz_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qz * dx))
+
+            # Assemble the volume (or area in 2D) of the subdomain
+            volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx))
+
+            # Compute the average
+            q_avg  = q_integral  / volume if volume > 0 else 0.0
+            qx_avg = qx_integral / volume if volume > 0 else 0.0
+            qy_avg = qy_integral / volume if volume > 0 else 0.0
+            qz_avg = qz_integral / volume if volume > 0 else 0.0
+
+            print(f"[INFO] Average heat flux magnitude in {label:<10}: {q_avg:.2f} W/m²")
+
+            print(f"[INFO] Average heat flux -x in {label:<10}: {qx_avg:.2f} W/m²")
+            print(f"[INFO] Average heat flux -y in {label:<10}: {qy_avg:.2f} W/m²")
+            print(f"[INFO] Average heat flux -z in {label:<10}: {qz_avg:.2f} W/m²")

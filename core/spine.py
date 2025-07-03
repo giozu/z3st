@@ -132,28 +132,17 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         if self.coupling == "staggered":
             print("Computing symbolic result fields (strain and stress)...")
 
-            def sigma_mech(v, mat):
-                lmbda = dolfinx.fem.Constant(self.mesh, mat["lmbda"])
-                G = dolfinx.fem.Constant(self.mesh, mat["G"])
-                return lmbda * ufl.tr(self.epsilon(v)) * ufl.Identity(self.gdim) + 2 * G * self.epsilon(v)
-
-            def sigma_th(T, mat):
-                lmbda = dolfinx.fem.Constant(self.mesh, mat["lmbda"])
-                G = dolfinx.fem.Constant(self.mesh, mat["G"])
-                alpha = dolfinx.fem.Constant(self.mesh, mat["alpha"])
-                T_ref = dolfinx.fem.Constant(self.mesh, mat["T_ref"])
-                return (3 * lmbda + 2 * G) * alpha * (T - T_ref) * ufl.Identity(self.gdim)
-
             self.stress = {}
             self.stress_mech = {}
             self.stress_th = {}
-            self.strain = ufl.sym(ufl.grad(self.u))
+
+            self.strain = self.epsilon(self.u)
 
             for name, mat in self.materials.items():
                 print(f"  → Generating expressions for material: '{name}'")
                 
-                mech_stress_expr = sigma_mech(self.u, mat)
-                th_stress_expr = sigma_th(self.T, mat)
+                mech_stress_expr = self.sigma_mech(self.u, mat)
+                th_stress_expr = self.sigma_th(self.T, mat)
 
                 self.stress[name] = mech_stress_expr - th_stress_expr
                 self.stress_mech[name] = mech_stress_expr

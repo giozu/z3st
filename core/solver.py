@@ -327,53 +327,14 @@ class Solver:
 
                             # T_other = T_n.x.array[dofs_other].mean()
 
+                            # if label == 'fuel':
+                            #     print(f"Biasing cladding temperature")
+                            #     T_other.x.array[dofs_here[:200]] += 500
+
                             a_t += h_gap * u_t * v_t * ds_interface
                             L_t += h_gap * T_other * v_t * ds_interface
 
                             print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
-
-                # T_clad.x.array[1:100] += 10
-
-                # --- Compute average heat flux magnitude per material ---
-                print("\n--- Average heat flux magnitude per material ---")
-                for label, material in self.materials.items():
-                    tag = self.label_map[label]
-                    
-                    # Measure for integration over the specific material's subdomain
-                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
-
-                    k = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(material["k"]))
-
-                    grad_T = ufl.grad(T_n)
-
-                    q_vec = - k * grad_T
-
-                    qx = q_vec[0]
-                    qy = q_vec[1]
-                    qz = q_vec[2]
-
-                    q_mag = ufl.sqrt(ufl.dot(q_vec, q_vec))
-
-                    # Directly assemble the integral of the UFL expression over the subdomain
-                    total_q_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(q_mag * dx))
-                    qx_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qx * dx))
-                    qy_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qy * dx))
-                    qz_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qz * dx))
-
-                    # Assemble the volume (or area in 2D) of the subdomain
-                    volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx))
-
-                    # Compute the average
-                    q_avg = total_q_integral / volume if volume > 0 else 0.0
-                    qx_avg = qx_integral / volume if volume > 0 else 0.0
-                    qy_avg = qy_integral / volume if volume > 0 else 0.0
-                    qz_avg = qz_integral / volume if volume > 0 else 0.0
-
-                    print(f"[INFO] Average heat flux magnitude in {label:<10}: {q_avg:.2f} W/m²")
-
-                    print(f"[INFO] Average heat flux -x in {label:<10}: {qx_avg:.2f} W/m²")
-                    print(f"[INFO] Average heat flux -y in {label:<10}: {qy_avg:.2f} W/m²")
-                    print(f"[INFO] Average heat flux -z in {label:<10}: {qz_avg:.2f} W/m²")
 
                 # --- Solve the Global System ---
                 petsc_opts_thermal = self.get_solver_options(
@@ -384,6 +345,9 @@ class Solver:
 
                 # Apply relaxation
                 T_n.x.array[:] = self.relax_T * T_n.x.array + (1 - self.relax_T) * T_old.x.array
+
+                # Print heat flux
+                # self.heat_flux(T_n)
             
             # =========================================================
             #  2. SOLVE MECHANICAL SUB-PROBLEM (Globally assembled)
