@@ -158,9 +158,8 @@ class Solver:
                 F += F_thermal
 
             # Mechanical residual
-            epsilon = ufl.sym(ufl.grad(u_m))
-            sigma_m = lmbda * ufl.tr(epsilon) * ufl.Identity(self.tdim) + 2 * mu * epsilon
-            sigma_th = (3 * lmbda + 2 * mu) * alpha * delta_T * ufl.Identity(self.gdim)
+            sigma_m = lmbda * ufl.tr(self.epsilon(u_m)) * ufl.Identity(self.tdim) + 2 * G * self.epsilon(u_m)
+            sigma_th = (3 * lmbda + 2 * G) * alpha * delta_T * ufl.Identity(self.gdim)
             sigma_tot = sigma_m - sigma_th
 
             if self.on["mechanical"] is True:
@@ -358,9 +357,6 @@ class Solver:
                 a_m = 0
                 L_m = 0
                 
-                # helper function
-                epsilon = lambda s: ufl.sym(ufl.grad(s))
-
                 # --- Volume integrals ---
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
@@ -373,8 +369,8 @@ class Solver:
                     body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
 
                     # Add contributions to global forms
-                    a_m += ufl.inner(self.sigma_mech(u_m, material), epsilon(v_m)) * dx
-                    L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(self.sigma_th(T_n, material), epsilon(v_m)) * dx # dot (vectors, scalar product) inner (tensors, double contraction)
+                    a_m += ufl.inner(self.sigma_mech(u_m, material), self.epsilon(v_m)) * dx
+                    L_m += ufl.dot(body_force, v_m) * dx + ufl.inner(self.sigma_th(T_n, material), self.epsilon(v_m)) * dx # dot (vectors, scalar product) inner (tensors, double contraction)
                     
                 # --- Neumann BCs (Traction) ---
                 for label in self.materials:
@@ -383,7 +379,7 @@ class Solver:
                         ds_traction = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
 
-                # --- Solve the Global System ---
+                # --- Solve the global system ---
                 petsc_opts_mech = self.get_solver_options(
                     solver_type=self.mechanical_solver, physics="mechanical", rtol=tol_mech
                 )
@@ -397,6 +393,7 @@ class Solver:
             #  3. CONVERGENCE CHECK and LOGGING
             # =========================================================
             print(f"\nConvergence check")
+            
             # Synchronize ghost values before vector operations
             T_n.x.scatter_forward()
             T_old.x.scatter_forward()

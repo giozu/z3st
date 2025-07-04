@@ -1,6 +1,10 @@
 thermal_bcs:
   fuel:
     - type: Dirichlet
+      region: face_xx_0
+      temperature: 300.0
+
+    - type: Dirichlet
       region: face_xx_1
       temperature: 300.0
 
