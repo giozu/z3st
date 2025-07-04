@@ -3,9 +3,6 @@ thermal_bcs:
     - type: Dirichlet
       region: inner_radius
       temperature: 300
-    - type: Neumann
-      region: outer_radius
-      flux: 0.0
       
 mechanical_bcs:
   steel:
