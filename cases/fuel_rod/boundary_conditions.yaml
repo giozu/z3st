@@ -6,6 +6,9 @@ thermal_bcs:
     - type: Neumann
       region: fuel_top
       flux: 0.0
+    - type: Robin
+      region: fuel_lateral
+      pair: cladding_inner
 
   cladding:
     - type: Neumann
@@ -17,6 +20,9 @@ thermal_bcs:
     - type: Neumann
       region: cladding_top
       flux: 0.0
+    - type: Robin
+      region: cladding_inner
+      pair: fuel_lateral
 
 mechanical_bcs:
   fuel:
