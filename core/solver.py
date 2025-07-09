@@ -289,9 +289,29 @@ class Solver:
                     tag = self.label_map[label] # in this case, volume tag
                     dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag) # volume integral
 
-                    print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+                    print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
 
-                    k = dolfinx.fem.Constant(self.mesh, material["k"])
+                    k_func = material.get("_k_func", None)
+                    if k_func is not None:
+                        k = k_func(T_n)
+                    else:
+                        k = material["k"]
+
+                    if isinstance(k, (int, float)):
+                        k_avg = k
+                    else:
+                        V0 = dolfinx.fem.functionspace(self.mesh, ("CG", 1))
+                        k_func = dolfinx.fem.Function(V0, name=f"k_{label}")
+                        expr = dolfinx.fem.Expression(k, V0.element.interpolation_points())
+                        k_func.interpolate(expr)
+
+                        num = dolfinx.fem.assemble_scalar(dolfinx.fem.form(k_func * dx))
+                        den = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
+                        k_avg = num / den
+
+                    print(f"  Average conductivity for {label} = {k_avg:.3f} W/m·K")
+
+                    # k = dolfinx.fem.Constant(self.mesh, material["k"])
                     a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t += self.q_third * v_t * dx
 
@@ -303,12 +323,14 @@ class Solver:
                 # --- Neumann BCs ---
                 for label in self.materials:
                     for bc_info in self.neumann_thermal[label]:
-                        print(f"  Applying thermal Neumann BC on subdomain id = {bc_info['id']}")
+                        print(f"\n  Applying thermal Neumann BC on subdomain id = {bc_info['id']}")
                         ds_neumann = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t += bc_info['value'] * v_t * ds_neumann
 
                 for label in self.materials:
                     for bc_info in self.robin_thermal[label]:
+                        print(f"\n  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
+
                         region_id = bc_info["id"]
                         pair_region = bc_info["pair"]
 

@@ -6,6 +6,8 @@ import numpy as np
 import os
 from petsc4py import PETSc
 import ufl
+import importlib
+
 # --- ZEST modules ---
 from core.config import Config
 from core.mesh import Mesh
@@ -16,6 +18,7 @@ from models.mechanical_model import MechanicalModel
 from models.gap_model import GapModel
 
 class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
+
     def __init__(self, input_file, mesh_file, geometry, rank=0, gdim=3):
         Config.__init__(self, input_file)
         Mesh.__init__(self, mesh_file=mesh_file, geometry=geometry, rank=rank, gdim=gdim)
@@ -32,6 +35,11 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         self.g = 0.0 # m/s2
         self.lhr = lhr
 
+    def resolve_function(self, path: str):
+        module_path, func_name = path.rsplit(".", 1)
+        mod = importlib.import_module(module_path)
+        return getattr(mod, func_name)
+
     def materials(self, **materials):
         print(f"---------")
         print(f"materials")
@@ -42,9 +50,18 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
             print(f"{name.capitalize()} material loaded:")
 
             if "E" in mat and "nu" in mat:
+                mat["E"] = float(mat["E"])
+                mat["nu"] = float(mat["nu"])
+
                 mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
                 mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
                 mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
+
+                k_value = mat.get("k")
+                if isinstance(k_value, str):
+                    k_func = self.resolve_function(k_value)
+                    mat["_k_func"] = k_func
+
             else:
                 print(f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties.")
 
@@ -118,6 +135,11 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         self.u.x.scatter_forward()
         u_vals = self.u.x.array
         print(f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m")
+
+        for name, mat in self.materials.items():
+            if "_k_func" in mat:
+                mat["k"] = mat["_k_func"](self.T)
+                print("\nk expression for", name, "→", mat["k"])
 
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
         print("\nSolver settings:")

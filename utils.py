@@ -26,12 +26,12 @@ def load(yaml_file):
     with open(yaml_file, "r") as f:
         data = yaml.safe_load(f)
 
-    for key, value in data.items():
-        if key not in {"name", "geometry_type", "fissile", "type"} and not isinstance(value, dict):
-            try:
-                data[key] = float(value)
-            except Exception as e:
-                raise ValueError(f"Key '{key}' could not be converted to float: {value}") from e
+    # for key, value in data.items():
+    #     if key not in {"name", "geometry_type", "fissile", "type"} and not isinstance(value, dict):
+    #         try:
+    #             data[key] = float(value)
+    #         except Exception as e:
+    #             raise ValueError(f"Key '{key}' could not be converted to float: {value}") from e
 
     return data
 

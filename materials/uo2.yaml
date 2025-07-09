@@ -7,7 +7,8 @@ E: 1.7e11        # Pa
 nu: 0.3          # -
 
 # Thermal properties
-k: 2.5           # W/m-K
+k: materials.uo2.k # W/m-K
+
 cp: 300          # J/kg-K
 alpha: 1.45e-5   # 1/K
 T_ref: 300       # K

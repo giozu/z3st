@@ -19,6 +19,8 @@ from core.spine import Spine
 from output.export_vtu import export_vtu
 from utils import *
 
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
 DEBUG_MODE = "--debug" in sys.argv
 MESH_PLOT_MODE = "--mesh_plot" in sys.argv
 
