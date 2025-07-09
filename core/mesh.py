@@ -63,12 +63,12 @@ class Mesh:
 
             self.geometry_type = self.geometry.get("geometry_type", "").lower()
 
-            self.height = self.geometry.get("height", None)
+            self.height = float(self.geometry.get("height", None))
             print(f"  height = {self.height:.2f} m")
 
             if self.geometry_type == "rect":
-                self.edge = self.geometry.get("edge", None)
-                self.width = self.geometry.get("width", None)
+                self.edge = float(self.geometry.get("edge", None))
+                self.width = float(self.geometry.get("width", None))
                 self.perimeter = self.edge * self.width
                 self.area = self.edge * self.width
                 print(f"  edge = {self.edge:.3f} m")
