@@ -28,6 +28,11 @@ class Config:
         print(f"  → Models active       :")
         for model, active in self.on.items():
             print(f"      {model:<10} → {'ON' if active else 'OFF'}")
+
         print(f"  → Gap conductance     : {self.gap_model}")
-        print(f"    Value = {self.h_gap_value} W/m2-K")
+        if self.gap_model == "Fixed":
+            print(f"    Value = {self.h_gap_value} W/m2-K")
+        else:
+            print(f"    Value = {self.h_gap_value}")
+        
         print(f"  → Mechanical regime   : {self.regime}")

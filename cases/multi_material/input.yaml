@@ -33,8 +33,8 @@ models:
   mechanical: True
   thermal: True
   gap_conductance:
-    type: Fixed
-    value: 10.0
+    type: Fixed # Fixed, Gas
+    value: 15.8 # value, value
 
 mechanical_regime: "3D" # 3D, plane_stress
 

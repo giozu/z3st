@@ -13,8 +13,9 @@ from core.solver import Solver
 from core.finite_element_setup import FiniteElementSetup
 from models.thermal_model import ThermalModel
 from models.mechanical_model import MechanicalModel
+from models.gap_model import GapModel
 
-class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel):
+class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
     def __init__(self, input_file, mesh_file, geometry, rank=0, gdim=3):
         Config.__init__(self, input_file)
         Mesh.__init__(self, mesh_file=mesh_file, geometry=geometry, rank=rank, gdim=gdim)
@@ -22,6 +23,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         Solver.__init__(self)
         ThermalModel.__init__(self)
         MechanicalModel.__init__(self)
+        GapModel.__init__(self)
 
     def parameters(self, lhr):
         print(f"----------")
@@ -37,15 +39,22 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         self.materials = {}
 
         for name, mat in materials.items():
-            mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
-            mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
-            mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
+            print(f"{name.capitalize()} material loaded:")
+
+            if "E" in mat and "nu" in mat:
+                mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
+                mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
+                mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
+            else:
+                print(f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties.")
+
             self.materials[name] = mat
 
-            print(f"\n{name.capitalize()} material loaded:")
             for k in sorted(mat.keys()):
                 v = mat[k]
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
+
+            print("\n")
 
     def set_boundary_conditions(self):
         print(f"-----------------------")

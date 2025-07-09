@@ -275,8 +275,9 @@ class Solver:
             u_old.x.array[:] = u_n.x.array
 
             # =========================================================
-            #  1. SOLVE THERMAL SUB-PROBLEM (Globally assembled)
+            #  1. SOLVE THERMAL SUB-PROBLEM
             # =========================================================
+
             if self.on["thermal"]:
                 print("\n[INFO] Assembling thermal problem...")
                 u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
@@ -306,36 +307,54 @@ class Solver:
                         ds_neumann = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t += bc_info['value'] * v_t * ds_neumann
 
+                for label in self.materials:
+                    for bc_info in self.robin_thermal[label]:
+                        region_id = bc_info["id"]
+                        pair_region = bc_info["pair"]
+
+                        dofs_here = self.locateFacetDofs(region_id, self.V_t)
+                        dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t)
+
+                        T_here = T_n.x.array[dofs_here]
+                        T_other = T_n.x.array[dofs_other]
+                        self.gap_temperature = 0.5 * (T_here.mean() + T_other.mean())
+
+                        print(f"Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K")
+
+                        break
+                    break
+
+                h_gap = self.set_gap_conductance()                
+
                 # --- Robin BCs ---
-                if self.gap_model == "Fixed":
-                    print(f"\n[INFO] Applying fixed gap conductance (h_gap = {self.h_gap_value} W/m²K) via Robin BCs")
-                    h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.h_gap_value))
+                for label in self.materials:
+                    for bc_info in self.robin_thermal[label]:
+                        region_id = bc_info["id"] # e.g., fuel_interface
+                        pair_region = bc_info["pair"] # e.g., clad_interface
 
-                    for label in self.materials:
-                        for bc_info in self.robin_thermal[label]:
-                            region_id = bc_info["id"] # e.g., fuel_interface
-                            pair_region = bc_info["pair"] # e.g., clad_interface
+                        ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=region_id) # e.g., fuel_interface surface
 
-                            ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=region_id) # e.g., fuel_interface surface
+                        # 1) project
+                        T_other = dolfinx.fem.Function(self.V_t) # e.g., T_clad
+                        dofs_here = self.locateFacetDofs(region_id, self.V_t) # e.g., dofs of fuel_interface
+                        dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t) # e.g., dofs of clad_interface
 
-                            T_other = dolfinx.fem.Function(self.V_t) # e.g., T_clad
-                            dofs_here = self.locateFacetDofs(region_id, self.V_t) # e.g., dofs of fuel_interface
-                            dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t) # e.g., dofs of clad_interface
+                        T_other.x.array[dofs_here] = T_n.x.array[dofs_other] # e.g., T_clad projected on fuel_interface dofs
 
-                            T_other.x.array[dofs_here] = T_n.x.array[dofs_other] # e.g., T_clad projected on fuel_interface dofs
+                        # 2) mean
+                        # T_other = T_n.x.array[dofs_other].mean()
 
-                            # T_other = T_n.x.array[dofs_other].mean()
+                        # -) bias
+                        # if label == 'fuel':
+                        #     print(f"Biasing cladding temperature")
+                        #     T_other.x.array[dofs_here[:200]] += 500
 
-                            # if label == 'fuel':
-                            #     print(f"Biasing cladding temperature")
-                            #     T_other.x.array[dofs_here[:200]] += 500
+                        a_t += h_gap * u_t * v_t * ds_interface
+                        L_t += h_gap * T_other * v_t * ds_interface
 
-                            a_t += h_gap * u_t * v_t * ds_interface
-                            L_t += h_gap * T_other * v_t * ds_interface
+                        print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
 
-                            print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
-
-                # --- Solve the Global System ---
+                # --- Solve the system ---
                 petsc_opts_thermal = self.get_solver_options(
                     solver_type=self.thermal_solver, physics="thermal", rtol=tol_th
                 )
@@ -349,8 +368,9 @@ class Solver:
                 # self.heat_flux(T_n)
             
             # =========================================================
-            #  2. SOLVE MECHANICAL SUB-PROBLEM (Globally assembled)
+            #  2. SOLVE MECHANICAL SUB-PROBLEM
             # =========================================================
+
             if self.on["mechanical"]:
                 print("\n[INFO] Assembling mechanical problem...")
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
@@ -379,7 +399,7 @@ class Solver:
                         ds_traction = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
 
-                # --- Solve the global system ---
+                # --- Solve the system ---
                 petsc_opts_mech = self.get_solver_options(
                     solver_type=self.mechanical_solver, physics="mechanical", rtol=tol_mech
                 )
@@ -392,6 +412,7 @@ class Solver:
             # =========================================================
             #  3. CONVERGENCE CHECK and LOGGING
             # =========================================================
+
             print(f"\nConvergence check")
             
             # Synchronize ghost values before vector operations
