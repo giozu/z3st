@@ -17,11 +17,15 @@ class GapModel:
             gas_thermal_conductivity = self.h_gap_value * 1e-4 * self.gap_temperature**0.79 # (W/m-K)
 
             gap_size = self.average_gap_distance(self.mesh, self.ft,
-                                    label_a=self.label_map["fuel_interface"],
-                                    label_b=self.label_map["clad_interface"])
+                                    label_a=self.label_map["fuel_lateral"],
+                                    label_b=self.label_map["cladding_inner"])
 
             h_gap_value = gas_thermal_conductivity / gap_size # (W/m2-K)
-            print(f"\n[INFO] Applying gas gap conductance (h_gap = {h_gap_value:.2f} W/m²K)")
+
+            print(f"  → T_avg       = {self.gap_temperature:.2f} K")
+            print(f"  → k_gas       = {gas_thermal_conductivity:.2f} W/m·K")
+            print(f"  → gap_size    = {gap_size*1e3:.3f} mm")
+            print(f"  → h_gap       = {h_gap_value:.2f} W/m²K")
 
         else:
             h_gap_value = 0.0
@@ -57,8 +61,14 @@ class GapModel:
         centroids_b = facet_centroids(facets_b)
 
         min_len = min(len(centroids_a), len(centroids_b))
-        distances = np.linalg.norm(centroids_a[:min_len] - centroids_b[:min_len], axis=1)
 
-        print(f"Average distance fuel-cladding: {distances.mean()*1e3:.3e} mm")
+        # distances = np.linalg.norm(centroids_a[:min_len] - centroids_b[:min_len], axis=1)
+
+        from scipy.spatial import cKDTree
+
+        tree_b = cKDTree(centroids_b)
+        distances, _ = tree_b.query(centroids_a, k=1)
+
+        # print(f"Average distance fuel-cladding: {distances.mean()*1e3:.3e} mm")
 
         return distances.mean()

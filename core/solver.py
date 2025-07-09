@@ -319,12 +319,12 @@ class Solver:
                         T_other = T_n.x.array[dofs_other]
                         self.gap_temperature = 0.5 * (T_here.mean() + T_other.mean())
 
-                        print(f"Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K")
+                        # print(f"Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K")
 
                         break
                     break
 
-                h_gap = self.set_gap_conductance()                
+                h_gap = self.set_gap_conductance()     
 
                 # --- Robin BCs ---
                 for label in self.materials:
