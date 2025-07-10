@@ -8,8 +8,9 @@ nu: 0.3          # -
 
 # Thermal properties
 k: materials.uo2.k # W/m-K
+# k: 3.7 # W/m-K
 
-cp: 300          # J/kg-K
+cp: 330          # J/kg-K
 alpha: 1.45e-5   # 1/K
 T_ref: 300       # K
 

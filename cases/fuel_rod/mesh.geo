@@ -16,9 +16,9 @@ n_f = 30;
 Point(100) = {0, 0, 0};       // Center of the bottom face
 Point(101) = {0, 0, h};       // Center of the top face
 
-r_fuel_o = 0.004;    // Outer radius of the fuel
-r_clad_i = 0.0042;    // Inner radius of the cladding
-r_clad_o = 0.0047;    // Outer radius of the cladding
+r_fuel_o = 0.005;      // Outer radius of the fuel
+r_clad_i = 0.00503;    // Inner radius of the cladding
+r_clad_o = 0.00563;    // Outer radius of the cladding
 
 // Fuel boundary points
 Point(1) = {r_fuel_o, 0, 0};

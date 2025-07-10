@@ -14,7 +14,7 @@ boundary_conditions_path: boundary_conditions.yaml
 
 materials:
   fuel: ../../materials/uo2.yaml
-  cladding: ../../materials/T91.yaml
+  cladding: ../../materials/zircaloy.yaml
 
 solver_settings:
   coupling: staggered
@@ -39,7 +39,7 @@ models:
 mechanical_regime: "3D" # 3D, plane_stress
 
 lhr:
-  - 10000
+  - 20000
 time:
   - 0
 n_steps: 1

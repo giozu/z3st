@@ -323,34 +323,17 @@ class Solver:
                 # --- Neumann BCs ---
                 for label in self.materials:
                     for bc_info in self.neumann_thermal[label]:
-                        print(f"\n  Applying thermal Neumann BC on subdomain id = {bc_info['id']}")
+                        print(f"  Applying thermal Neumann BC on subdomain id = {bc_info['id']}")
                         ds_neumann = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_t += bc_info['value'] * v_t * ds_neumann
 
-                for label in self.materials:
-                    for bc_info in self.robin_thermal[label]:
-                        print(f"\n  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
-
-                        region_id = bc_info["id"]
-                        pair_region = bc_info["pair"]
-
-                        dofs_here = self.locateFacetDofs(region_id, self.V_t)
-                        dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t)
-
-                        T_here = T_n.x.array[dofs_here]
-                        T_other = T_n.x.array[dofs_other]
-                        self.gap_temperature = 0.5 * (T_here.mean() + T_other.mean())
-
-                        # print(f"Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K")
-
-                        break
-                    break
-
-                h_gap = self.set_gap_conductance()     
+                h_gap = self.set_gap_conductance(T_n)
 
                 # --- Robin BCs ---
                 for label in self.materials:
                     for bc_info in self.robin_thermal[label]:
+                        print(f"  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
+
                         region_id = bc_info["id"] # e.g., fuel_interface
                         pair_region = bc_info["pair"] # e.g., clad_interface
 

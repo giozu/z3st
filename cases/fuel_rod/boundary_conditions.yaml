@@ -16,7 +16,7 @@ thermal_bcs:
       flux: 0.0
     - type: Dirichlet
       region: cladding_outer
-      temperature: 300
+      temperature: 601 # (K)
     - type: Neumann
       region: cladding_top
       flux: 0.0

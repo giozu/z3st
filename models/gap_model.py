@@ -6,7 +6,7 @@ class GapModel:
     def __init__(self):
         print("__GapModel initializer__")
 
-    def set_gap_conductance(self):
+    def set_gap_conductance(self, T_n):
 
         # Gap condutance
         if self.gap_model == "Fixed":
@@ -14,6 +14,9 @@ class GapModel:
             print(f"\n[INFO] Applying fixed gap conductance (h_gap = {h_gap_value:.2f} W/m²K)")
 
         elif self.gap_model == "Gas":
+
+            self.set_gap_temperature(T_n)
+
             gas_thermal_conductivity = self.h_gap_value * 1e-4 * self.gap_temperature**0.79 # (W/m-K)
 
             gap_size = self.average_gap_distance(self.mesh, self.ft,
@@ -22,7 +25,6 @@ class GapModel:
 
             h_gap_value = gas_thermal_conductivity / gap_size # (W/m2-K)
 
-            print(f"  → T_avg       = {self.gap_temperature:.2f} K")
             print(f"  → k_gas       = {gas_thermal_conductivity:.2f} W/m·K")
             print(f"  → gap_size    = {gap_size*1e3:.3f} mm")
             print(f"  → h_gap       = {h_gap_value:.2f} W/m²K")
@@ -34,9 +36,27 @@ class GapModel:
 
         return h_gap
     
-    def set_gap_temperature(self):
-        self.gap_temperature = 10
-    
+    def set_gap_temperature(self, T_n):
+
+        for label in self.materials:
+            for bc_info in self.robin_thermal[label]:
+                region_id = bc_info["id"]
+                pair_region = bc_info["pair"]
+
+                dofs_here = self.locateFacetDofs(region_id, self.V_t)
+                dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t)
+
+                T_here = T_n.x.array[dofs_here]
+                T_other = T_n.x.array[dofs_other]
+
+                self.gap_temperature = 0.5 * (T_here.mean() + T_other.mean())
+
+                print(f"  → Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K")
+
+                break
+            break
+
+
     def average_gap_distance(self, mesh, ft, label_a, label_b):
 
         facets_a = ft.find(label_a) # e.g., facets of fuel_interface
