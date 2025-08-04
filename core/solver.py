@@ -366,6 +366,11 @@ class Solver:
                 problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_n, petsc_options=petsc_opts_thermal)
                 problem_t.solve()
 
+                # Check T_fo
+                dofs = self.locateFacetDofs(self.label_map["lateral"], self.V_t)
+                T = T_n.x.array[dofs].mean()
+                print(f"  T_lateral = {T:.2f} K")
+
                 # Apply relaxation
                 T_n.x.array[:] = self.relax_T * T_n.x.array + (1 - self.relax_T) * T_old.x.array
 

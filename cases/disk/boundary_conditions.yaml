@@ -1,0 +1,19 @@
+thermal_bcs:
+  fuel:
+    - type: Dirichlet
+      region: lateral
+      temperature: 573
+      
+    - type: Dirichlet
+      region: top
+      temperature: 573
+
+    - type: Dirichlet
+      region: bottom
+      temperature: 573
+
+mechanical_bcs:
+  fuel:
+    - type: Dirichlet
+      region: bottom
+      displacement: [0.0, 0.0, 0.0]
