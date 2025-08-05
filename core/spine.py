@@ -57,10 +57,18 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                 mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
                 mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
 
-                k_value = mat.get("k")
-                if isinstance(k_value, str):
-                    k_func = self.resolve_function(k_value)
-                    mat["_k_func"] = k_func
+                # Thermal conductivity
+                if "k" in mat:
+                    if isinstance(mat["k"], str):
+                        print(f"  → k defined as symbolic function: {mat['k']}")
+                        k_func = self.resolve_function(mat["k"])
+                        bu = mat.get("burnup", 0.0)
+                        gad = mat.get("gadolinia", 0.0)
+                        mat["_k_func"] = (k_func, bu, gad)
+                    else:
+                        print(f"  → k defined as constant: {mat['k']}")
+                else:
+                    print(f"  → k not defined for {name}")
 
             else:
                 print(f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties.")
@@ -136,9 +144,11 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         u_vals = self.u.x.array
         print(f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m")
 
+        # Thermal conductivity
         for name, mat in self.materials.items():
             if "_k_func" in mat:
-                mat["k"] = mat["_k_func"](self.T)
+                k_func, bu, gad = mat["_k_func"]
+                mat["k"] = k_func(self.T, bu=bu, gad=gad)
                 print("\nk expression for", name, "→", mat["k"])
 
     def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):

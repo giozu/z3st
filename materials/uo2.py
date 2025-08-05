@@ -35,11 +35,12 @@ def k(T, bu=0.0, gad=0.0):
     """
 
     # Constants
+    Q = 6380.0       # K
     A = 0.0452       # m·K/W
     B = 2.46e-4      # m·K/W/K
     C = 3.5e9        # W·K/m
-    Q = 6380.0       # K
     D = 16361.0      # K
+    alpha = 1.1599
 
     # Sub-functions
     f_bu = 0.00187 * bu
@@ -47,5 +48,6 @@ def k(T, bu=0.0, gad=0.0):
     h_T = (T**2 / D) * ufl.exp(1 / (1 + 396 * ufl.exp(Q / T)))
 
     # Conductivity formula
-    denominator = A + B * T
-    return 1.0 / denominator
+    denominator = A + alpha * gad + B * T + f_bu + (1 - 0.9 * ufl.exp(-0.04*bu)) * g_bu * h_T
+
+    return 1.0 / denominator + C * T**(-2)  * ufl.exp(-D/T)

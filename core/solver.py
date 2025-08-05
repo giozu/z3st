@@ -291,11 +291,8 @@ class Solver:
 
                     print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
 
-                    k_func = material.get("_k_func", None)
-                    if k_func is not None:
-                        k = k_func(T_n)
-                    else:
-                        k = material["k"]
+                    # Thermal conductivity
+                    k = material["k"]
 
                     if isinstance(k, (int, float)):
                         k_avg = k
@@ -367,9 +364,9 @@ class Solver:
                 problem_t.solve()
 
                 # Check T_fo
-                dofs = self.locateFacetDofs(self.label_map["lateral"], self.V_t)
-                T = T_n.x.array[dofs].mean()
-                print(f"  T_lateral = {T:.2f} K")
+                # dofs = self.locateFacetDofs(self.label_map["lateral"], self.V_t)
+                # T = T_n.x.array[dofs].mean()
+                # print(f"  T_lateral = {T:.2f} K")
 
                 # Apply relaxation
                 T_n.x.array[:] = self.relax_T * T_n.x.array + (1 - self.relax_T) * T_old.x.array
