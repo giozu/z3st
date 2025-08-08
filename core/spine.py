@@ -111,19 +111,22 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
         for name, mat in self.materials.items():
             dofs = self.locateDomainDofs(self.label_map, name, self.V_t)
+
             if mat.get("fissile", False): # if mat["fissile"] == True.. if "fissile" is not there, False is given, block skipped
+                print(f"Fissile material")
                 q_val = self.lhr / self.area
                 self.q_third.x.array[dofs] = q_val
                 print(f"  q_third = {q_val:.3e} W/m³ (fissile: {mat.get("fissile", False)})")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2 ")
             
-            elif mat["gamma_heating"] > 0.0:
+            if float(mat["gamma_heating"]) > 0.0:
+                q_third_0 = float(mat["gamma_heating"])
                 def f(x):
-                    return mat["gamma_heating"] * np.exp(-x[0] * mat["mu_gamma"])
+                    return q_third_0 * np.exp(-x[0] * mat["mu_gamma"])
                 f_func = dolfinx.fem.Function(self.V_t)
                 f_func.interpolate(f)
                 self.q_third.x.array[dofs] = f_func.x.array[dofs]
-                print(f"  gamma heating - q_third_0 = {mat["gamma_heating"]:.3e} W/m³, attenuation: {mat["mu_gamma"]} 1/m)")
+                print(f"  gamma heating - q_third_0 = {q_third_0:.3e} W/m³, attenuation coefficient: {mat["mu_gamma"]} 1/m")
 
         print("\nInitializing global temperature field...")
         self.T = dolfinx.fem.Function(self.V_t, name="Temperature")

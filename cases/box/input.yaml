@@ -13,7 +13,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  fuel: ../../materials/uo2.yaml
+  steel: ../../materials/steel.yaml
 
 solver_settings:
   coupling: staggered
@@ -29,13 +29,13 @@ solver_settings:
   n_iter_max: 30
 
 models:
-  thermal: True
+  thermal: False
   mechanical: True
 
-mechanical_regime: "3D" # 3D, plane_stress
+mechanical_regime: "plane_stress" # 3D, plane_stress
 
 lhr:
-  - 1000
+  - 0
 time:
   - 0
 n_steps: 1

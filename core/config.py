@@ -36,3 +36,4 @@ class Config:
             print(f"    Value = {self.h_gap_value}")
         
         print(f"  → Mechanical regime   : {self.regime}")
+        print("\n")

@@ -1,7 +1,7 @@
 name: box
-edge: '1.0'
-width: '1.0'
-height: '2.0'
+edge: '0.1'
+width: '0.1'
+height: '0.004'
 geometry_type: rect
 labels:
   bottom: 1
@@ -10,4 +10,4 @@ labels:
   face_yy_1: 4
   face_xx_0: 5
   top: 6
-  fuel: 7
+  steel: 7

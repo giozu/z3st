@@ -1,13 +1,11 @@
 name: steel
 
-E: 1.77e11            # Young's modulus (Pa)
+E: 2.00e11            # Young's modulus (Pa)
 nu: 0.3               # Poisson's ratio (-)
-
 k: 48.1               # Thermal conductivity (W/m·K)
 cp: 200               # Specific heat capacity (J/kg·K)
-alpha: 1.7e-5         # Thermal expansion coefficient (1/K)
-
-rho: 7750             # Density (kg/m³)
+alpha: 1.2e-5         # Thermal expansion coefficient (1/K)
+rho: 7850             # Density (kg/m³)
 T_ref: 300            # Reference temperature (K)
 mu_gamma: 24          # Linear attenuation coefficient / macroscopic cross section of gamma rays in steels (1/m)
-gamma_heating: 3.46e6 # Volumetric source due to gamma heating (W/m³)
+gamma_heating: 0.0    # Volumetric source due to gamma heating (W/m³)

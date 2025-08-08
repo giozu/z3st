@@ -64,7 +64,7 @@ class Mesh:
             self.geometry_type = self.geometry.get("geometry_type", "").lower()
 
             self.height = float(self.geometry.get("height", None))
-            print(f"  height = {self.height:.2f} m")
+            print(f"  height = {self.height:.3f} m")
 
             if self.geometry_type == "rect":
                 self.edge = float(self.geometry.get("edge", None))

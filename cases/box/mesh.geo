@@ -9,10 +9,11 @@
 // Use built-in kernel instead of OpenCASCADE (important for transfinite meshing)
 SetFactory("Built-in");
 
-L = 1.0;  // Edge
-W = 1.2;  // Width
-H = 1.4;  // Height
-n = 20;   // Number of divisions per edge (adjust as needed)
+L = 0.1;       // Edge (x-direction)
+W = 0.1;       // Width (y-direction)
+H = 0.004;     // Height (z-direction)
+nxy = 21;      // Number of divisions per edge (adjust as needed)
+nz = 11;       // Number of divisions per edge (adjust as needed)
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
@@ -62,8 +63,8 @@ Surface Loop(1) = {1, 2, 3, 4, 5, 6};
 Volume(1) = {1};
 
 // Transfinite structure: ensure structured meshing
-Transfinite Curve {1, 2, 3, 4, 9, 10, 11, 12} = n Using Progression 1;
-Transfinite Curve {5, 6, 7, 8} = n Using Progression 1;
+Transfinite Curve {1, 2, 3, 4, 9, 10, 11, 12} = nxy Using Progression 1;
+Transfinite Curve {5, 6, 7, 8} = nz Using Progression 1;
 Transfinite Surface {1, 2, 3, 4, 5, 6};
 Recombine Surface {1, 2, 3, 4, 5, 6};
 Transfinite Volume {1};
