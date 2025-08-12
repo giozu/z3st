@@ -161,6 +161,9 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         if self.coupling == "monolithic":
             self.solve_monolithic(tol=tol, max_iter=max_iters)
 
+        # if self.coupling == "monolithic":
+        #     raise NotImplementedError("Monolithic coupling is not yet supported; use 'staggered'.")
+
         elif self.coupling == "staggered":
             self.solve_staggered(max_iter=max_iters, tol_u=tol_u, tol_T=tol_T, tol_mech=tol_mech, tol_th=tol_th)
 

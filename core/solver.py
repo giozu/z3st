@@ -78,166 +78,230 @@ class Solver:
             raise ValueError(f"Unknown solver_type '{solver_type}'.")
         
     def solve_monolithic(self, tol=1e-8, max_iter=50):
-        """Solves the coupled thermo-mechanical problem using a monolithic approach.
+        """
+        Monolithic thermo-mechanical solve (MVP, Phase 1):
 
-        This method formulates and solves the fully coupled system of equations
-        for thermal conduction and linear elasticity. It assembles the residual
-        (the weak form of the PDE system) in a single matrix problem.
+        Supported features:
+        - Dirichlet/Neumann boundary conditions for both thermal and mechanical problems
+        (including Clamp_x/y/z constraints).
+        - Material thermal conductivity `k` can be constant or UFL symbolic expression
+        (already stored in self.materials[*]["k"]).
 
-        The problem is defined on a mixed function space `self.W`, which, based on
-        the `_setup_function_space` method, is ordered as:
-        - Sub-space 0: Vector space for Mechanical Displacement.
-        - Sub-space 1: Scalar space for Temperature.
+        Not included in this phase:
+        - Robin-type gap conduction
+        - Interface projection operators
+        - "Gas" gap conductance h_gap
 
-        The method correctly assembles the weak form `F` using this ordering.
-        The mechanical residual (`F_mechanical`) is associated with the displacement
-        test function `v_m` (from sub-space 0), and the thermal residual
-        (`F_thermal`) is associated with the temperature test function `v_t`
-        (from sub-space 1).
-
-        The resulting nonlinear system is solved using a Newton-Raphson method
-        provided by PETSc. After convergence, the individual solution fields
-        (Displacement and Temperature) are extracted from the mixed solution vector.
-
-        Note:
-            The original implementation had a critical bug in the solution extraction
-            step, where the sub-spaces were incorrectly indexed, leading to a swap
-            of the displacement and temperature fields. This version corrects that bug.
-            Also, the `tol` and `max_iter` arguments are not passed to the solver,
-            which uses hardcoded values instead.
-
-        Args:
-            tol (float, optional): Desired tolerance for the solver. Defaults to 1e-8.
-                                (Currently unused in implementation).
-            max_iter (int, optional): Maximum number of iterations for the Newton
-                                    solver. Defaults to 50. (Currently unused).
-
-        Side Effects:
-            - self.sol_mixed (dolfinx.fem.Function): Updated in-place with the
-            computed solution vector for the mixed problem.
-            - self.T (dict): The dictionary of temperature Functions is updated
-            by interpolating the final temperature solution.
-            - self.u (dict): The dictionary of displacement Functions is updated
-            by interpolating the final displacement solution.
+        NOTE:
+        - Slip_* boundary conditions and Robin conditions are not yet implemented here.
+        - Dirichlet BCs are reconstructed on the mixed space W (W.sub(1) = temperature, W.sub(0) = displacement).
         """
 
-        print("\n[INFO] Starting monolithic thermo-mechanical solve")
-        print(f"  → Tolerance              : {tol}")
+        print("\n[INFO] Starting monolithic thermo-mechanical solve (Phase 1)")
+        print(f"  → Tolerance (Newton)     : {tol}")
+        print(f"  → Max iterations (Newton): {max_iter}")
 
-        # Extract unknowns from mixed solution. Based on the definition of self.W:
-        # u_m is the function for Displacement (from sub-space 0)
-        # u_t is the function for Temperature (from sub-space 1)
+        if not hasattr(self, "W"):
+            raise RuntimeError("Mixed space W is not initialized.")
+
+        # Create the mixed solution function if it doesn't exist yet
+        if not hasattr(self, "sol_mixed"):
+            self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
+            try:
+                # Initialize with the current state (displacement and temperature fields)
+                self.sol_mixed.sub(0).interpolate(self.u)  # displacement
+                self.sol_mixed.sub(1).interpolate(self.T)  # temperature
+            except Exception:
+                # Fallback: zero initialization, Newton will start from zero
+                self.sol_mixed.x.array[:] = 0.0
+
+        # Split mixed unknowns into mechanical (u_m) and thermal (u_t) parts
         (u_m, u_t) = ufl.split(self.sol_mixed)
         (v_m, v_t) = ufl.TestFunctions(self.W)
 
-        F = 0  # Start assembling residual
+        # Initialize total residual
+        F = 0
 
-        for label in self.materials:
-            material = self.materials[label]
+        # ===== VOLUME CONTRIBUTIONS: loop over materials =====
+        for label, material in self.materials.items():
             tag = self.label_map[label]
             dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
 
-            # Material properties
-            k = dolfinx.fem.Constant(self.mesh, material["k"])
-            lmbda = dolfinx.fem.Constant(self.mesh, material["lmbda"])
-            G = dolfinx.fem.Constant(self.mesh, material["G"])
-            alpha = dolfinx.fem.Constant(self.mesh, material["alpha"])
-            T_ref = dolfinx.fem.Constant(self.mesh, material["T_ref"])
+            # Material properties (may be constants or UFL expressions consistent with self.T)
+            k = material["k"]
+
             rho = dolfinx.default_scalar_type(material["rho"])
             g = dolfinx.default_scalar_type(self.g)
-            body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
-            q_vol = self.q_third[label]
+            body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
 
-            delta_T = u_t - T_ref
+            # Volumetric heat source: global Function self.q_third
+            q_vol = self.q_third
 
-            # Thermal residual (associated with v_t, from sub-space 1)
+            # Thermal contribution
             F_thermal = (k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) - q_vol * v_t) * dx_local
-
-            if self.on["thermal"] is True:
-                print("Thermal model ON")
+            if self.on["thermal"]:
                 F += F_thermal
 
-            # Mechanical residual
-            sigma_m = lmbda * ufl.tr(self.epsilon(u_m)) * ufl.Identity(self.tdim) + 2 * G * self.epsilon(u_m)
-            sigma_th = (3 * lmbda + 2 * G) * alpha * delta_T * ufl.Identity(self.gdim)
-            sigma_tot = sigma_m - sigma_th
+            # Mechanical stress contributions (mechanical + thermal)
+            sigma_m = self.sigma_mech(u_m, material)
+            if self.on["thermal"]:
+                sigma_th = self.sigma_th(u_t, material)
+                sigma_tot = sigma_m - sigma_th
+            else:
+                sigma_tot = sigma_m
 
-            if self.on["mechanical"] is True:
-                print("Mechanical model ON")
+            if self.on["mechanical"]:
                 F += (ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)) * dx_local
 
-        # Neumann and traction BCs
+        # ===== BOUNDARY CONTRIBUTIONS =====
         n_vec = ufl.FacetNormal(self.mesh)
 
-        if 'neumann_thermal' in self.bcs_info:
-            for bc_info in self.bcs_info['neumann_thermal']:
-                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                F -= bc_info['value'] * v_t * ds_local
+        # Thermal Neumann BCs (heat flux) — reuse lists from set_thermal_boundary_conditions
+        for label in self.materials:
+            for bc_info in self.neumann_thermal.get(label, []):
+                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info["id"])
+                F -= bc_info["value"] * v_t * ds_local  # outward heat flux term
 
-        if 'traction' in self.bcs_info:
-            for bc_info in self.bcs_info['traction']:
-                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                traction_vector = bc_info['value'] * n_vec
-                F -= ufl.dot(traction_vector, v_m) * ds_local
+        # Mechanical traction BCs — reuse lists from set_mechanical_boundary_conditions
+        for label in self.materials:
+            for bc_info in self.traction.get(label, []):
+                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info["id"])
+                # bc_info["value"] is already a traction vector (Constant * n), use directly
+                F -= ufl.dot(bc_info["value"], v_m) * ds_local
 
-        # Define nonlinear problem and solver
-        problem = NonlinearProblem(F, self.sol_mixed, bcs=self.bcs)
+        # ===== DIRICHLET CONDITIONS on mixed space W.sub(1) (T) and W.sub(0) (u) =====
+        bcs_mixed = []
+
+        # Helper: locate DOFs on a subspace for a given facet region
+        def locate_dofs_on_sub(subspace, region_id):
+            facets = self.ft.find(region_id)
+            return dolfinx.fem.locate_dofs_topological(subspace, self.fdim, facets)
+
+        # Thermal Dirichlet BCs reconstructed on W.sub(1)
+        thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
+        for mat, bc_list in thermal_bcs_defs.items():
+            for bc in bc_list:
+                if bc.get("type") != "Dirichlet":
+                    continue
+                region = bc.get("region")
+                Tval = bc.get("temperature", None)
+                if region is None or Tval is None:
+                    continue
+                region_id = self.label_map.get(region)
+                if region_id is None:
+                    continue
+                dofs_T = locate_dofs_on_sub(self.W.sub(1), region_id)
+                T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(Tval))
+                bcs_mixed.append(dolfinx.fem.dirichletbc(T_d, dofs_T, self.W.sub(1)))
+
+        # Mechanical Dirichlet BCs: full vector displacement or single-component clamps
+        mech_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
+        for mat, bc_list in mech_bcs_defs.items():
+            for bc in bc_list:
+                bc_type = bc.get("type")
+                region = bc.get("region")
+                if region is None or bc_type is None:
+                    continue
+                region_id = self.label_map.get(region)
+                if region_id is None:
+                    continue
+
+                if bc_type == "Dirichlet":
+                    disp = bc.get("displacement", None)
+                    if disp is None:
+                        continue
+                    # Collapse vector subspace (u) to a full FunctionSpace
+                    V_u_sub, _ = self.W.sub(0).collapse()
+                    # Create constant displacement Function
+                    vec = np.asarray(disp, dtype=dolfinx.default_scalar_type).reshape(self.gdim)
+                    u_d_fun = dolfinx.fem.Function(V_u_sub, name="u_dirichlet_const")
+                    u_d_fun.interpolate(lambda x, v=vec: np.tile(v.reshape(self.gdim, 1), (1, x.shape[1])))
+                    # Locate DOFs mapping mixed space → collapsed space
+                    facets = self.ft.find(region_id)
+                    dofs_mixed = dolfinx.fem.locate_dofs_topological((self.W.sub(0), V_u_sub), self.fdim, facets)
+                    bcs_mixed.append(dolfinx.fem.dirichletbc(u_d_fun, dofs_mixed, self.W.sub(0)))
+
+                elif bc_type == "Clamp_x":
+                    dofs_x = locate_dofs_on_sub(self.W.sub(0).sub(0), region_id)
+                    bcs_mixed.append(dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0.0), dofs_x, self.W.sub(0).sub(0)))
+
+                elif bc_type == "Clamp_y":
+                    dofs_y = locate_dofs_on_sub(self.W.sub(0).sub(1), region_id)
+                    bcs_mixed.append(dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0.0), dofs_y, self.W.sub(0).sub(1)))
+
+                elif bc_type == "Clamp_z":
+                    val = float(bc.get("value", 0.0))
+                    dofs_z = locate_dofs_on_sub(self.W.sub(0).sub(2), region_id)
+                    bcs_mixed.append(dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(val), dofs_z, self.W.sub(0).sub(2)))
+
+        # ===== NONLINEAR PROBLEM & NEWTON SOLVER =====
+        problem = NonlinearProblem(F, self.sol_mixed, bcs=bcs_mixed)
         solver = NewtonSolver(self.mesh.comm, problem)
 
+        # PETSc KSP options for GAMG, similar to staggered solver settings
         ksp = solver.krylov_solver
         opts = PETSc.Options()
-        option_prefix = ksp.getOptionsPrefix()
-
-        # Direct solver (LU)
-        # print("ksp_type, preonly")
-        # opts[f"{option_prefix}ksp_type"] = "preonly"
-        # opts[f"{option_prefix}pc_type"] = "lu"
-        # opts[f"{option_prefix}pc_factor_mat_solver_type"] = "mumps"
-        # opts[f"{option_prefix}ksp_monitor"] = None
-
-        # GAMG
-        print("pc_gamg_type, agg")
-        opts[f"{option_prefix}pc_gamg_type"] = "agg"
-        opts[f"{option_prefix}pc_gamg_coarse_eq_limit"] = 1000
-        opts[f"{option_prefix}mg_levels_ksp_type"] = "chebyshev"
-        opts[f"{option_prefix}mg_levels_pc_type"] = "sor"
-        opts[f"{option_prefix}mg_levels_esteig_ksp_type"] = "cg"
-        opts[f"{option_prefix}mg_levels_ksp_chebyshev_esteig_steps"] = 20
-        opts[f"{option_prefix}ksp_monitor"] = None
-
+        pref = ksp.getOptionsPrefix()
+        opts[f"{pref}pc_gamg_type"] = "agg"
+        opts[f"{pref}pc_gamg_coarse_eq_limit"] = 1000
+        opts[f"{pref}mg_levels_ksp_type"] = "chebyshev"
+        opts[f"{pref}mg_levels_pc_type"] = "sor"
+        opts[f"{pref}mg_levels_esteig_ksp_type"] = "cg"
+        opts[f"{pref}mg_levels_ksp_chebyshev_esteig_steps"] = 20
+        opts[f"{pref}ksp_monitor"] = None
+        opts["options_left"] = "0"
         ksp.setFromOptions()
 
-        # Set Newton solver options
         solver.atol = tol
         solver.rtol = tol
         solver.convergence_criterion = "incremental"
         solver.max_it = max_iter
 
-        # Solve
         print("[INFO] Solving monolithic nonlinear problem...")
-        n, converged = solver.solve(self.sol_mixed)
+        iters, converged = solver.solve(self.sol_mixed)
 
         if converged:
-            print(f"[INFO] Newton solver converged in {n} iterations")
+            print(f"[INFO] Newton solver converged in {iters} iterations")
         else:
-            print(f"[WARNING] Newton solver did not converge after {n} iterations")
+            print(f"[WARNING] Newton solver did not converge after {iters} iterations")
 
-        # --- CORRECTED SOLUTION EXTRACTION ---
-        # Sub-space 0 corresponds to Displacement (u_m)
-        # Sub-space 1 corresponds to Temperature (u_t)
+        # ===== UPDATE GLOBAL STATE FIELDS =====
         u_sol = self.sol_mixed.sub(0).collapse()
         u_sol.name = "Displacement"
         T_sol = self.sol_mixed.sub(1).collapse()
         T_sol.name = "Temperature"
 
-        print(f"Min/Max temperature: {T_sol.x.array.min():.2f} / {T_sol.x.array.max():.2f}")
-        print(f"Min/Max displacement magnitude: {np.linalg.norm(u_sol.x.array.reshape(-1, self.gdim), axis=1).min():.2e} / {np.linalg.norm(u_sol.x.array.reshape(-1, self.gdim), axis=1).max():.2e}")
+        # Copy results back into global Functions self.u / self.T
+        try:
+            self.u.interpolate(u_sol)
+        except Exception:
+            self.u.x.array[:] = u_sol.x.array
+        try:
+            self.T.interpolate(T_sol)
+        except Exception:
+            self.T.x.array[:] = T_sol.x.array
 
-        # Update material fields for post-processing or further steps
-        for name in self.materials.keys():
-            self.T[name].interpolate(T_sol)
-            self.u[name].interpolate(u_sol)
-        
+        print(f"Min/Max temperature: {self.T.x.array.min():.2f} / {self.T.x.array.max():.2f} K")
+        u_vec = self.u.x.array.reshape(-1, self.gdim)
+        umag = np.linalg.norm(u_vec, axis=1)
+        print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")
+
+        # ===== GENERATE SYMBOLIC RESULT FIELDS (strain & stress) =====
+        print("Computing symbolic result fields (strain and stress)...")
+
+        self.stress = {}
+        self.stress_mech = {}
+        self.stress_th = {}
+
+        self.strain = self.epsilon(self.u)
+
+        for name, mat in self.materials.items():
+            mech_stress_expr = self.sigma_mech(self.u, mat)
+            th_stress_expr   = self.sigma_th(self.T, mat) if self.on["thermal"] else 0*ufl.Identity(self.tdim)
+            self.stress[name]      = mech_stress_expr - th_stress_expr
+            self.stress_mech[name] = mech_stress_expr
+            self.stress_th[name]   = -th_stress_expr
+
     def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
         print(f"  → Max iterations        : {max_iter}")
         print(f"  → Staggering tolerance |ΔT| : {tol_T:.1e}")

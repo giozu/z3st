@@ -16,7 +16,7 @@ materials:
   steel: ../../materials/steel.yaml
 
 solver_settings:
-  coupling: staggered
+  coupling: monolithic
   thermal_solver: iterative_amg # direct_mumps, iterative_amg, iterative_hypre
   mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2
@@ -29,10 +29,10 @@ solver_settings:
   n_iter_max: 30
 
 models:
-  thermal: False
+  thermal: True
   mechanical: True
 
-mechanical_regime: "plane_stress" # 3D, plane_stress
+mechanical_regime: "3D" # 3D, plane_stress
 
 lhr:
   - 0
