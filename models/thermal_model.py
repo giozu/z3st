@@ -66,18 +66,8 @@ class ThermalModel:
 
                     T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
 
-                    # locate dofs differently depending on mixed or staggered
-                    if V_t_map is None:
-                        # staggered mode (standard)
-                        dofs = dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.ft.find(region_id))
-                    else:
-                        # mixed mode
-                        dofs_mixed = dolfinx.fem.locate_dofs_topological(
-                            (self.W.sub(1), V_t), self.fdim, self.ft.find(region_id)
-                        )
-                        dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
-                        dofs = V_t_map[dofs_mixed[:, 1]]
-
+                    # locate dofs
+                    dofs = dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.ft.find(region_id))
                     bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t)
                     self.dirichlet_thermal[label].append(bc)
 

@@ -64,13 +64,8 @@ class MechanicalModel:
                         print(f"[ERROR] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement.")
                         sys.exit(1)
 
-                    if V_u_map is None:  # staggered mode
-                        dofs = dolfinx.fem.locate_dofs_topological(V_u_sub, self.fdim, facets)
-                    else:  # mixed mode
-                        dofs_mixed = dolfinx.fem.locate_dofs_topological((self.W.sub(0), V_u_sub), self.fdim, facets)
-                        dofs_mixed = np.array(dofs_mixed, dtype=np.int32)
-                        dofs = V_u_map[dofs_mixed[:, 1]]
-
+                    # locate dofs
+                    dofs = dolfinx.fem.locate_dofs_topological(V_u_sub, self.fdim, facets)
                     bc = self.create_dirichlet_bc(self.mesh, V_u_sub, dofs, displacement, self.tdim)
                     self.dirichlet_mechanical[mat_type].append(bc)
                     print(f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'")

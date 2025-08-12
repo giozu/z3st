@@ -6,6 +6,7 @@ import numpy as np
 import os
 from petsc4py import PETSc
 import ufl
+import sys
 import importlib
 
 # --- ZEST modules ---
@@ -93,6 +94,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         if self.coupling == "staggered":
             self.set_thermal_boundary_conditions(self.V_t)
             self.set_mechanical_boundary_conditions(self.V_m)
+
         else:
             V_t_sub, V_t_map = self.W.sub(1).collapse()
             V_t_map = np.array(V_t_map, dtype=np.int32)
