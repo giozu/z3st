@@ -108,6 +108,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         print(f"initialize_fields")
         print(f"-----------------")
 
+        # --- Volumetric power, q_third ---
         self.q_third = dolfinx.fem.Function(self.V_t, name="q_third")
         self.q_third.x.array[:] = 0.0
 
@@ -130,7 +131,8 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                 self.q_third.x.array[dofs] = f_func.x.array[dofs]
                 print(f"  gamma heating - q_third_0 = {q_third_0:.3e} W/m³, attenuation coefficient: {mat["mu_gamma"]} 1/m")
 
-        print("\nInitializing global temperature field...")
+        # --- Temperature ---
+        print("\nInitializing the temperature field...")
         self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
         for name, mat in self.materials.items():
             print(f"  → Setting initial temperature for material: '{name}'")
@@ -142,12 +144,36 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         T_vals = self.T.x.array
         print(f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K")
 
-        print("\nInitializing global displacement field...")
+        # --- Displacement ---
+        print("\nInitializing the displacement field...")
         self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
         self.u.x.array[:] = 0.0
         self.u.x.scatter_forward()
         u_vals = self.u.x.array
         print(f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m")
+        print("\n")
+
+        # --- Initialize the mixed solution function from W, mixed space ---
+        if not hasattr(self, "W"):
+            raise RuntimeError("Mixed space self.W is not initialized. Check finite_element_setup.py.")
+
+        if not hasattr(self, "sol_mixed"):
+            print("Initializing self.sol_mixed")
+            self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
+            try:
+                # Initialize with the current state (displacement and temperature fields)
+                print("Initialize with the current state (displacement and temperature fields)")
+                self.sol_mixed.sub(0).interpolate(self.u)  # displacement
+                self.sol_mixed.sub(1).interpolate(self.T)  # temperature
+            except Exception:
+                # Fallback: zero initialization, the Newton solver in solver.py will start from zero
+                self.sol_mixed.x.array[:] = 0.0
+
+        print("\nComparing solution function spaces:")
+        print(f"  Displacement space (self.u):         {self.u.function_space.ufl_element()}")
+        print(f"  Mixed-space displacement (W.sub(0)): {self.W.sub(0).ufl_element()}")
+        print(f"  Temperature space (self.T):          {self.T.function_space.ufl_element()}")
+        print(f"  Mixed-space temperature (W.sub(1)):  {self.W.sub(1).ufl_element()}")
 
         # Thermal conductivity
         for name, mat in self.materials.items():
@@ -178,25 +204,19 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         The results are stored in dictionaries keyed by material name.
         """
 
-        if self.coupling == "staggered":
-            print("Computing symbolic result fields (strain and stress)...")
+        print("Computing symbolic result fields (strain and stress)...")
 
-            self.stress = {}
-            self.stress_mech = {}
-            self.stress_th = {}
+        self.stress = {}
+        self.stress_mech = {}
+        self.stress_th = {}
 
-            self.strain = self.epsilon(self.u)
+        self.strain = self.epsilon(self.u)
 
-            for name, mat in self.materials.items():
-                print(f"  → Generating expressions for material: '{name}'")
-                
-                mech_stress_expr = self.sigma_mech(self.u, mat)
-                th_stress_expr = self.sigma_th(self.T, mat)
-
-                self.stress[name] = mech_stress_expr - th_stress_expr
-                self.stress_mech[name] = mech_stress_expr
-                self.stress_th[name] = -th_stress_expr
-
-            print("Symbolic result fields generated successfully.")
+        for name, mat in self.materials.items():
+            mech_stress_expr = self.sigma_mech(self.u, mat)
+            th_stress_expr   = self.sigma_th(self.T, mat) if self.on["thermal"] else 0*ufl.Identity(self.tdim)
+            self.stress[name]      = mech_stress_expr - th_stress_expr
+            self.stress_mech[name] = mech_stress_expr
+            self.stress_th[name]   = -th_stress_expr
         
         return True

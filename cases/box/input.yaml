@@ -16,7 +16,7 @@ materials:
   steel: ../../materials/steel.yaml
 
 solver_settings:
-  coupling: staggered # monolithic
+  coupling: monolithic # monolithic, staggered
   thermal_solver: iterative_amg # direct_mumps, iterative_amg, iterative_hypre
   mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2

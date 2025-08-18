@@ -260,8 +260,77 @@ class MechanicalModel:
         else:
             return stress_tensor
 
+    def sigma_mech_tensor(self, u, material):
+        """
+        Compute the mechanical stress tensor σ from the strain tensor ε(u)
+        using the 4th-order elasticity tensor in Voigt notation (6x6 matrix).
+
+        Parameters
+        ----------
+        u : dolfinx.fem.Function
+            Displacement field.
+        material : dict
+            Material properties dictionary containing "lmbda" and "G".
+
+        Returns
+        -------
+        sigma_mech : ufl.Tensor
+            Second-order symmetric stress tensor σ_ij.
+        """
+
+        # --- Compute small-strain tensor (symmetric gradient of displacement) ---
+        eps = self.epsilon(u)
+
+        # --- Convert strain tensor to Voigt notation (6x1 vector) ---
+        # Voigt order: [ε_xx, ε_yy, ε_zz, ε_yz, ε_xz, ε_xy]
+        eps_voigt = ufl.as_vector([
+            eps[0, 0],
+            eps[1, 1],
+            eps[2, 2],
+            eps[1, 2],
+            eps[0, 2],
+            eps[0, 1]
+        ])
+
+        # --- Build isotropic elasticity matrix C (6x6) in Voigt notation ---
+        lmbda = material["lmbda"]
+        G     = material["G"]
+
+        C = ufl.as_matrix([
+            [lmbda + 2*G, lmbda,       lmbda,       0,     0,     0],
+            [lmbda,       lmbda+2*G,   lmbda,       0,     0,     0],
+            [lmbda,       lmbda,       lmbda+2*G,   0,     0,     0],
+            [0,           0,           0,         2*G,     0,     0],
+            [0,           0,           0,           0,   2*G,     0],
+            [0,           0,           0,           0,     0,   2*G]
+        ])
+
+        # --- Compute stress in Voigt form (σ = C · ε) ---
+        sigma_voigt = C * eps_voigt
+
+        # --- Map Voigt vector back to full 3x3 stress tensor ---
+        sigma_mech = ufl.as_tensor([
+            [sigma_voigt[0], sigma_voigt[5], sigma_voigt[4]],
+            [sigma_voigt[5], sigma_voigt[1], sigma_voigt[3]],
+            [sigma_voigt[4], sigma_voigt[3], sigma_voigt[2]]
+        ])
+
+        return sigma_mech
+
     def sigma_th(self, T, material):
         return (3 * material["lmbda"] + 2 * material["G"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.tdim)
+
+    def elastic_energy_density(self, u, material):
+        """
+        Elastic strain energy density (small strain linear elasticity).
+        Uses w = 1/2 * sigma_mech(u) : epsilon(u).
+        Works also with self.regime == 'plane_stress' because sigma_mech() already handles it.
+        """
+
+        sigma = self.sigma_mech(u, material)
+        eps   = self.epsilon(u)
+        
+        return 0.5 * ufl.inner(sigma, eps)
 
     def zero_displacement(self, mesh, dofs, V):
         """

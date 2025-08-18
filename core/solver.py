@@ -83,9 +83,9 @@ class Solver:
 
         Supported features:
         - Dirichlet/Neumann boundary conditions for both thermal and mechanical problems
-        (including Clamp_x/y/z constraints).
+          (including Clamp_x/y/z constraints).
         - Material thermal conductivity `k` can be constant or UFL symbolic expression
-        (already stored in self.materials[*]["k"]).
+          (already stored in self.materials[*]["k"]).
 
         Not included in this phase:
         - Robin-type gap conduction
@@ -101,21 +101,7 @@ class Solver:
         print(f"  → Tolerance (Newton)     : {tol}")
         print(f"  → Max iterations (Newton): {max_iter}")
 
-        if not hasattr(self, "W"):
-            raise RuntimeError("Mixed space W is not initialized.")
-
-        # Create the mixed solution function if it doesn't exist yet
-        if not hasattr(self, "sol_mixed"):
-            self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
-            try:
-                # Initialize with the current state (displacement and temperature fields)
-                self.sol_mixed.sub(0).interpolate(self.u)  # displacement
-                self.sol_mixed.sub(1).interpolate(self.T)  # temperature
-            except Exception:
-                # Fallback: zero initialization, Newton will start from zero
-                self.sol_mixed.x.array[:] = 0.0
-
-        # Split mixed unknowns into mechanical (u_m) and thermal (u_t) parts
+        # Split (initialized) mixed unknowns into mechanical (u_m) and thermal (u_t) parts
         (u_m, u_t) = ufl.split(self.sol_mixed)
         (v_m, v_t) = ufl.TestFunctions(self.W)
 
@@ -285,22 +271,6 @@ class Solver:
         u_vec = self.u.x.array.reshape(-1, self.gdim)
         umag = np.linalg.norm(u_vec, axis=1)
         print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")
-
-        # ===== GENERATE SYMBOLIC RESULT FIELDS (strain & stress) =====
-        print("Computing symbolic result fields (strain and stress)...")
-
-        self.stress = {}
-        self.stress_mech = {}
-        self.stress_th = {}
-
-        self.strain = self.epsilon(self.u)
-
-        for name, mat in self.materials.items():
-            mech_stress_expr = self.sigma_mech(self.u, mat)
-            th_stress_expr   = self.sigma_th(self.T, mat) if self.on["thermal"] else 0*ufl.Identity(self.tdim)
-            self.stress[name]      = mech_stress_expr - th_stress_expr
-            self.stress_mech[name] = mech_stress_expr
-            self.stress_th[name]   = -th_stress_expr
 
     def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6):
         print(f"  → Max iterations        : {max_iter}")
