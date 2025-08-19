@@ -119,8 +119,8 @@ def main():
                     help="Path to the baseline JSON file.")
     ap.add_argument("--write-baseline", action="store_true",
                     help="Write/update the baseline with current metrics.")
-    ap.add_argument("--rtol", type=float, default=1e-2, help="Relative tolerance.")
-    ap.add_argument("--atol", type=float, default=1e-2, help="Absolute tolerance.")
+    ap.add_argument("--rtol", type=float, default=1e-3, help="Relative tolerance.")
+    ap.add_argument("--atol", type=float, default=1e-3, help="Absolute tolerance.")
     ap.add_argument("--fields", nargs="*", default=None,
                     help="Optional list of fields to consider (overrides default).")
     args = ap.parse_args()

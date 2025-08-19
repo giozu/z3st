@@ -1,5 +1,16 @@
 name: steel
 
+# constitutive: voigt
+# C_matrix can be omitted, the code creates:
+# C_matrix:
+#   - [2.70e11, 1.10e11, 1.00e11, 0.0,    0.0,    0.0   ]
+#   - [1.10e11, 2.60e11, 1.05e11, 0.0,    0.0,    0.0   ]
+#   - [1.00e11, 1.05e11, 2.50e11, 0.0,    0.0,    0.0   ]
+#   - [0.0,     0.0,     0.0,     1.60e11,0.0,    0.0   ]   # yz
+#   - [0.0,     0.0,     0.0,     0.0,    1.55e11,0.0   ]   # xz
+#   - [0.0,     0.0,     0.0,     0.0,    0.0,    1.50e11]  # xy
+# ordered as: [xx, yy, zz, yz, xz, xy]
+
 E: 2.00e11            # Young's modulus (Pa)
 nu: 0.3               # Poisson's ratio (-)
 k: 48.1               # Thermal conductivity (W/m·K)

@@ -234,88 +234,91 @@ class MechanicalModel:
         return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
+        """
+        Mechanical Cauchy stress σ(u) with two selectable constitutive routes:
 
-        # print(f"  Mechanical stress for {self.regime} regime")
+        Mode selection (by material dict):
+        - material["constitutive"] == "voigt":
+            σ = C_voigt · ε_voigt   (6x6 · 6x1)  → mapped back to 3x3.
+            * If material["C_matrix"] (6x6) is provided, use it (anisotropy allowed).
+            * Else build isotropic C from (λ, G) with shear blocks = 2G.
+            Voigt order used here: [xx, yy, zz, yz, xz, xy] with NO factor-2 on shear strains.
+        - else (default "lame"):
+            σ = λ tr(ε) I + 2 G ε
 
-        stress_tensor = material["lmbda"] * ufl.tr(self.epsilon(u)) * ufl.Identity(self.tdim) + 2 * material["G"] * self.epsilon(u)
+        Plane-stress handling:
+        If self.regime == "plane_stress", the returned tensor is modified to enforce σ_zz = 0
+        in an x–y plane-stress sense (same behaviour you had).
 
-        if self.regime == "plane_stress":
-            """
-            Modified constitutive model for 3D mesh under plane stress assumption in x-y plane.
-            The component σ_zz is set to zero by modifying the strain tensor appropriately.
-            """
+        Notes
+        -----
+        * Assumes 3D (tdim == 3). For 2D, adapt Voigt packing/unpacking.
+        * ε = sym(∇u) is small strain.
+        """
+        mode = material["constitutive_mode"]
 
-            s_xx = stress_tensor[0,0]
-            s_xy = stress_tensor[0,1]
-            s_yy = stress_tensor[1,1]
+        if mode == "voigt":
+            # small strain
+            eps = self.epsilon(u)
 
-            stress_tensor_plane_stress = ufl.as_tensor([
-                [s_xx, s_xy, 0.0],
-                [s_xy, s_yy, 0.0],
-                [0.0,  0.0,  0.0]
+            # ε in Voigt (6x1), order: [xx, yy, zz, yz, xz, xy]
+            eps_voigt = ufl.as_vector([
+                eps[0, 0],
+                eps[1, 1],
+                eps[2, 2],
+                eps[1, 2],  # yz
+                eps[0, 2],  # xz
+                eps[0, 1],  # xy
             ])
 
-            return stress_tensor_plane_stress
-        
+            # Elasticity matrix C (6x6)
+            if "C_matrix" in material and material["C_matrix"] is not None:
+                C_user = material.get("C_matrix", None)
+                if C_user is not None:
+                    C_np = np.asarray(C_user, dtype=dolfinx.default_scalar_type)
+                    if C_np.shape != (6, 6):
+                        raise ValueError(f"C_matrix must be 6x6, got {C_np.shape}")
+                    C = ufl.as_matrix(C_np.tolist())
+
+            else:
+                lmbda = material["lmbda"]
+                G     = material["G"]
+
+                # isotropic, homogeneous
+                C = ufl.as_matrix([
+                    [lmbda+2*G, lmbda,     lmbda,     0,   0,   0],
+                    [lmbda,     lmbda+2*G, lmbda,     0,   0,   0],
+                    [lmbda,     lmbda,     lmbda+2*G, 0,   0,   0],
+                    [0,         0,         0,       2*G,  0,   0],  # yz
+                    [0,         0,         0,         0, 2*G,   0], # xz
+                    [0,         0,         0,         0,   0, 2*G]  # xy
+                ])
+
+            # σ in Voigt, then map back to 3x3
+            sigma_voigt = C * eps_voigt
+            sigma = ufl.as_tensor([
+                [sigma_voigt[0], sigma_voigt[5], sigma_voigt[4]],
+                [sigma_voigt[5], sigma_voigt[1], sigma_voigt[3]],
+                [sigma_voigt[4], sigma_voigt[3], sigma_voigt[2]]
+            ])
+
         else:
-            return stress_tensor
+            # Default isotropic Lamé
+            eps = self.epsilon(u)
+            sigma = material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
 
-    def sigma_mech_tensor(self, u, material):
-        """
-        Compute the mechanical stress tensor σ from the strain tensor ε(u)
-        using the 4th-order elasticity tensor in Voigt notation (6x6 matrix).
+        # Optional plane-stress reduction (x–y plane)
+        if getattr(self, "regime", "3D") == "plane_stress":
+            s_xx = sigma[0, 0]
+            s_xy = sigma[0, 1]
+            s_yy = sigma[1, 1]
+            return ufl.as_tensor([
+                [s_xx, s_xy, 0.0],
+                [s_xy, s_yy, 0.0],
+                [0.0,  0.0,  0.0],
+            ])
 
-        Parameters
-        ----------
-        u : dolfinx.fem.Function
-            Displacement field.
-        material : dict
-            Material properties dictionary containing "lmbda" and "G".
-
-        Returns
-        -------
-        sigma_mech : ufl.Tensor
-            Second-order symmetric stress tensor σ_ij.
-        """
-
-        # --- Compute small-strain tensor (symmetric gradient of displacement) ---
-        eps = self.epsilon(u)
-
-        # --- Convert strain tensor to Voigt notation (6x1 vector) ---
-        # Voigt order: [ε_xx, ε_yy, ε_zz, ε_yz, ε_xz, ε_xy]
-        eps_voigt = ufl.as_vector([
-            eps[0, 0],
-            eps[1, 1],
-            eps[2, 2],
-            eps[1, 2],
-            eps[0, 2],
-            eps[0, 1]
-        ])
-
-        # --- Build isotropic elasticity matrix C (6x6) in Voigt notation ---
-        lmbda = material["lmbda"]
-        G     = material["G"]
-
-        C = ufl.as_matrix([
-            [lmbda + 2*G, lmbda,       lmbda,       0,     0,     0],
-            [lmbda,       lmbda+2*G,   lmbda,       0,     0,     0],
-            [lmbda,       lmbda,       lmbda+2*G,   0,     0,     0],
-            [0,           0,           0,         2*G,     0,     0],
-            [0,           0,           0,           0,   2*G,     0],
-            [0,           0,           0,           0,     0,   2*G]
-        ])
-
-        # --- Compute stress in Voigt form (σ = C · ε) ---
-        sigma_voigt = C * eps_voigt
-
-        # --- Map Voigt vector back to full 3x3 stress tensor ---
-        sigma_mech = ufl.as_tensor([
-            [sigma_voigt[0], sigma_voigt[5], sigma_voigt[4]],
-            [sigma_voigt[5], sigma_voigt[1], sigma_voigt[3]],
-            [sigma_voigt[4], sigma_voigt[3], sigma_voigt[2]]
-        ])
-
-        return sigma_mech
+        return sigma
 
     def sigma_th(self, T, material):
         return (3 * material["lmbda"] + 2 * material["G"]) * material["alpha"] * (T - material["T_ref"]) * ufl.Identity(self.tdim)

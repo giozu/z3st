@@ -42,45 +42,75 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         return getattr(mod, func_name)
 
     def materials(self, **materials):
-        print(f"---------")
-        print(f"materials")
-        print(f"---------")
+        """
+        Load material definitions into the simulation.
+
+        Each material can contain:
+        - Elasticity parameters: "E" (Young's modulus), "nu" (Poisson's ratio).
+        - Thermal conductivity "k" (either a constant or a symbolic function string).
+        - Optional fields like "burnup" and "gadolinia" for symbolic conductivity functions.
+        - Constitutive model: defaults to "lame" unless otherwise specified.
+        - User-provided stiffness matrix "C_matrix" if constitutive == "voigt".
+
+        The function:
+        1. Converts input values to floats where needed.
+        2. Computes derived mechanical properties (λ, G, bulk modulus).
+        3. Handles thermal conductivity (constant or symbolic).
+        4. Stores everything in `self.materials` for later use.
+        """
+
+        print("---------")
+        print("materials")
+        print("---------")
+
         self.materials = {}
 
         for name, mat in materials.items():
             print(f"{name.capitalize()} material loaded:")
 
+            # --- Elasticity parameters ---
             if "E" in mat and "nu" in mat:
                 mat["E"] = float(mat["E"])
                 mat["nu"] = float(mat["nu"])
 
+                # Compute Lamé constants, shear modulus, and bulk modulus
                 mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
                 mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
                 mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
-
-                # Thermal conductivity
-                if "k" in mat:
-                    if isinstance(mat["k"], str):
-                        print(f"  → k defined as symbolic function: {mat['k']}")
-                        k_func = self.resolve_function(mat["k"])
-                        bu = mat.get("burnup", 0.0)
-                        gad = mat.get("gadolinia", 0.0)
-                        mat["_k_func"] = (k_func, bu, gad)
-                    else:
-                        print(f"  → k defined as constant: {mat['k']}")
-                else:
-                    print(f"  → k not defined for {name}")
-
             else:
                 print(f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties.")
 
+            # --- Thermal conductivity ---
+            if "k" in mat:
+                if isinstance(mat["k"], str):
+                    # k is defined as a symbolic function
+                    print(f"  → k defined as symbolic function: {mat['k']}")
+                    k_func = self.resolve_function(mat["k"])
+                    bu = mat.get("burnup", 0.0)
+                    gad = mat.get("gadolinia", 0.0)
+                    mat["_k_func"] = (k_func, bu, gad)
+                else:
+                    # k is a constant
+                    print(f"  → k defined as constant: {mat['k']}")
+            else:
+                print(f"  → k not defined for {name}")
+
+            # --- Constitutive model ---
+            constitutive_mode = mat.get("constitutive", "lame").lower()
+            mat["constitutive_mode"] = constitutive_mode
+            print(f"  → constitutive model: {constitutive_mode}")
+            if constitutive_mode == "voigt" and mat.get("C_matrix") is not None:
+                print("    using user-provided C_matrix (6x6)")
+
+            # Store the material definition
             self.materials[name] = mat
 
+            # Print all stored keys for debugging
             for k in sorted(mat.keys()):
                 v = mat[k]
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
 
-            print("\n")
+            print()
 
     def set_boundary_conditions(self):
         print(f"-----------------------")
