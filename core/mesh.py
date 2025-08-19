@@ -55,14 +55,14 @@ class Mesh:
             # print(f"Interface tags from label_map: fuel_side={self.label_map['face_xx_1_1']}, clad_side={self.label_map['face_xx_0_2']}")
 
             print("Geometry entries:")
-            for k in sorted(self.geometry.keys()):
-                if k == "labels":
-                    continue
-                v = self.geometry[k]
-                print(f"  {k:<15} → {v} ({type(v).__name__})")
-
+            # for k in sorted(self.geometry.keys()):
+            #     if k == "labels":
+            #         continue
+            #     v = self.geometry[k]
+            #     print(f"  {k:<15} → {v} ({type(v).__name__})")
+            print(f"  name = {self.geometry["name"]}")
             self.geometry_type = self.geometry.get("geometry_type", "").lower()
-
+            print(f"  geometry_type = {self.geometry_type}")
             self.height = float(self.geometry.get("height", None))
             print(f"  height = {self.height:.3f} m")
 
@@ -72,6 +72,7 @@ class Mesh:
                 self.perimeter = self.edge * self.width
                 self.area = self.edge * self.width
                 print(f"  edge = {self.edge:.3f} m")
+                print(f"  width = {self.width:.3f} m")
             elif self.geometry_type == "cyl":
                 self.inner_radius = self.geometry.get("inner_radius", None)
                 self.outer_radius = self.geometry.get("outer_radius", None)

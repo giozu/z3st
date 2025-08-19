@@ -255,7 +255,9 @@ class MechanicalModel:
         * Assumes 3D (tdim == 3). For 2D, adapt Voigt packing/unpacking.
         * ε = sym(∇u) is small strain.
         """
-        mode = material["constitutive_mode"]
+        
+        # mode = material["constitutive_mode"]
+        mode = material.get("constitutive_mode","lame")
 
         if mode == "voigt":
             # small strain
