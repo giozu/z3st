@@ -239,6 +239,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         self.stress = {}
         self.stress_mech = {}
         self.stress_th = {}
+        self.energy_density = {}
 
         self.strain = self.epsilon(self.u)
 
@@ -248,5 +249,6 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
             self.stress[name]      = mech_stress_expr - th_stress_expr
             self.stress_mech[name] = mech_stress_expr
             self.stress_th[name]   = -th_stress_expr
+            self.energy_density[name] = 0.5 * ufl.inner(self.strain, self.stress_mech[name])
         
         return True
