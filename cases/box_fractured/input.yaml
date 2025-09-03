@@ -32,6 +32,7 @@ models:
   thermal: False
   mechanical: True
   fracture: True
+  # gap_conductance
 
 fracture:
   model: AT2

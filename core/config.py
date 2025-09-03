@@ -1,16 +1,16 @@
 class Config:
     def __init__(self, input_file):
         print("__Config initializer__")
+
         self.config = input_file
         
         models = self.config.get("models", {})
         self.on = {
             "thermal": models.get("thermal", True),
             "mechanical": models.get("mechanical", True),
-            # "creep": models.get("creep", False),
+            "creep": models.get("creep", False),
             "fracture": models.get("fracture", False)
         }
-
         gap_config = self.config.get("models", {}).get("gap_conductance", {})
         self.gap_model = gap_config.get("type", None)
         self.h_gap_value = gap_config.get("value", 0.0)

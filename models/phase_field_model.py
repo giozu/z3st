@@ -56,7 +56,6 @@ class PhaseFieldModel:
         self.H_threshold = 0.5 * self.sigma_c**2 * self.ell/ self.Gc
         print(f"  Damage threshold energy H_threshold = {self.H_threshold:.2e}")
 
-
         # FE containers
         self.V_d = None
         self.d   = None           # damage field
