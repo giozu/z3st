@@ -17,8 +17,9 @@ from core.finite_element_setup import FiniteElementSetup
 from models.thermal_model import ThermalModel
 from models.mechanical_model import MechanicalModel
 from models.gap_model import GapModel
+from models.phase_field_model import PhaseFieldModel
 
-class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
+class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, PhaseFieldModel):
 
     def __init__(self, input_file, mesh_file, geometry, rank=0, gdim=3):
         Config.__init__(self, input_file)
@@ -28,6 +29,10 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         ThermalModel.__init__(self)
         MechanicalModel.__init__(self)
         GapModel.__init__(self)
+        PhaseFieldModel.__init__(self)
+
+        if self.on.get("fracture", False):
+            self.setup_phasefield_space()
 
     def parameters(self, lhr):
         print(f"----------")
@@ -230,25 +235,42 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
     def get_results(self):
         """
-        Computes symbolic strain and stress expressions for each material.
-        The results are stored in dictionaries keyed by material name.
+        Build symbolic strain, stress (mechanical/thermal/total) and energy density.
+        If fracture is ON, use degraded constitutive law (phase-field).
         """
+        print("Computing symbolic result fields (strain, stress, energy)...")
 
-        print("Computing symbolic result fields (strain and stress)...")
-
-        self.stress = {}
-        self.stress_mech = {}
-        self.stress_th = {}
+        self.stress         = {}
+        self.stress_mech    = {}
+        self.stress_th      = {}
         self.energy_density = {}
 
+        # small-strain tensor
         self.strain = self.epsilon(self.u)
 
+        thermal_on = self.on.get("thermal", False)
+        fracture_on = self.on.get("fracture", False)
+
         for name, mat in self.materials.items():
-            mech_stress_expr = self.sigma_mech(self.u, mat)
-            th_stress_expr   = self.sigma_th(self.T, mat) if self.on["thermal"] else 0*ufl.Identity(self.tdim)
-            self.stress[name]      = mech_stress_expr - th_stress_expr
-            self.stress_mech[name] = mech_stress_expr
-            self.stress_th[name]   = -th_stress_expr
-            self.energy_density[name] = 0.5 * ufl.inner(self.strain, self.stress_mech[name])
-        
+            # --- mechanical stress (possibly degraded) ---
+            if fracture_on:
+                # σ_elastic (degradato) = σ_damage(u, d)
+                sig_el = self.sigma_damage(self.u, self.d, mat)
+                # energy density = g(d) ψ+ + ψ-
+                psi_plus, psi_minus = self.psi_split(self.u, mat)
+                self.energy_density[name] = self.g(self.d) * psi_plus + psi_minus
+            else:
+                # elastico standard
+                sig_el = self.sigma_mech(self.u, mat)
+                self.energy_density[name] = self.elastic_energy_density(self.u, mat)
+
+            self.stress_mech[name] = sig_el
+
+            # --- thermal stress (if any) ---
+            sig_th = self.sigma_th(self.T, mat) if thermal_on else 0 * ufl.Identity(self.gdim)
+            self.stress_th[name] = -sig_th   # convenzione "contributo termico sottratto"
+
+            # --- total stress ---
+            self.stress[name] = sig_el - sig_th
+
         return True
