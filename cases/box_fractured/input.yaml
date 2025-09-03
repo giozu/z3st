@@ -31,11 +31,12 @@ solver_settings:
 models:
   thermal: False
   mechanical: True
-  fracture: False
+  fracture: True
 
 fracture:
   model: AT2
-  Gc: 2000.0        # N/mm  (per test; vedi nota 5 per tuning)
+  Gc: 10         # N/m  (per test; vedi nota 5 per tuning)
+  sigma_c: 1.0e+8   # Pa
   ell: 0.5e-3    # m     (≈ 0.5 mm: scegli ~ h/2 nella zona di crack)
   kappa: 1.0e-8
   split: amor_dev_vol

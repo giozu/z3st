@@ -29,8 +29,8 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         ThermalModel.__init__(self)
         MechanicalModel.__init__(self)
         GapModel.__init__(self)
-        PhaseFieldModel.__init__(self)
 
+        PhaseFieldModel.__init__(self)
         if self.on.get("fracture", False):
             self.setup_phasefield_space()
 
@@ -255,10 +255,12 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
             # --- mechanical stress (possibly degraded) ---
             if fracture_on:
                 # σ_elastic (degradato) = σ_damage(u, d)
-                sig_el = self.sigma_damage(self.u, self.d, mat)
-                # energy density = g(d) ψ+ + ψ-
+                sig_el = self.sigma_damage_linear(self.u, self.d, mat)
+
+                # energy density = g_d(d) ψ+ + ψ-
                 psi_plus, psi_minus = self.psi_split(self.u, mat)
-                self.energy_density[name] = self.g(self.d) * psi_plus + psi_minus
+                self.energy_density[name] = self.g_d(self.d) * psi_plus + psi_minus
+
             else:
                 # elastico standard
                 sig_el = self.sigma_mech(self.u, mat)

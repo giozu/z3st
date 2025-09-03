@@ -16,4 +16,4 @@ mechanical_bcs:
       
     - type: Neumann
       region: face_xx_1
-      traction: 125e6
+      traction: 125e10

@@ -312,6 +312,7 @@ class Solver:
             u_old.x.array[:] = u_n.x.array
             if self.on.get("fracture", False):
                 d_old.x.array[:] = self.d.x.array
+                self.d.x.array[:] = np.maximum(self.d.x.array, self.d_n.x.array)
 
             # 1) THERMAL
             if self.on.get("thermal", False):
@@ -416,6 +417,8 @@ class Solver:
                 self.update_history(u_n)      # H(u_n) irreversibilità
                 self.build_damage_forms()     # forme AT-2 con H aggiornato
                 self.assemble_solve_damage()  # solve per d (con clamp [0,1])
+                np.maximum(self.d.x.array, self.d_n.x.array, out=self.d.x.array)
+                self.d_n.x.array[:] = self.d.x.array
 
             # 3) MECHANICAL SUB-PROBLEM
             if self.on.get("mechanical", False):
@@ -455,6 +458,9 @@ class Solver:
                         print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
                         ds_traction = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
+
+                if self.on.get("fracture", False):
+                    self.update_split_indicator(u_n)
 
                 # --- Solve the system ---
                 petsc_opts_mech = self.get_solver_options(
@@ -511,6 +517,8 @@ class Solver:
 
             print(f"  ||ΔT|| = {norm_dT:.3e}, ||Δu|| = {norm_du:.3e}, ||Δd||_inf = {d_diff_inf:.3e}")
             print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}  (tol_T={tol_T:.1e}, tol_u={tol_u:.1e}, tol_d={tol_d:.1e})")
+            print(f"Damage d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
+            print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
 
             if (rel_norm_dT < tol_T or not self.on.get("thermal", False)) \
             and (rel_norm_du < tol_u or not self.on.get("mechanical", False)) \
@@ -542,6 +550,8 @@ class Solver:
         # Update the main state with the last (non-converged) result
         self.T.x.array[:] = T_n.x.array
         self.u.x.array[:] = u_n.x.array
+
         if self.on.get("fracture", False):
             self.d_n.x.array[:] = self.d.x.array
+
         return False
