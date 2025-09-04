@@ -32,7 +32,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
         PhaseFieldModel.__init__(self)
         if self.on.get("fracture", False):
-            self.setup_phasefield_space()
+            self.setup()
 
     def parameters(self, lhr):
         print(f"----------")

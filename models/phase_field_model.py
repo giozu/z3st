@@ -1,34 +1,38 @@
 # models/phase_field_model.py
 import numpy as np
-import ufl, dolfinx
+import ufl
+import dolfinx
 from petsc4py import PETSc
 import yaml
 
 class PhaseFieldModel:
     """
-    Phase-field fracture (AT-2) with traction/compression split (Amor) and
+    Phase-field fracture (AT-2 type formulation) based on the paper,
+    with volumetric-deviatoric split (Amor et al.) and
     irreversibility enforced via a history field H(x) = max_tau Psi_e^+(tau).
 
-    Strong form implemented (with s ≡ d, damage):
-        2*ell * Δd + (1 - d)/(2*ell) = (∂g/∂d)(d) * Psi_e^+ / Gc,
-    with g_d(d) = (1 - d)^2  →  ∂g/∂d = -2(1 - d).
-
-    Equivalent weak form used here (standard AT-2 scaling):
-        ∫ [ (Gc/ell) d w + Gc*ell ∇d·∇w + 2 H d w ] dx  =  ∫ 2 H w dx
+    Energy functional (paper's (2.2) with H+ and g(s)=s^2+eta):
+        E_l(u, s) = ∫_Omega (g(s) H+ + Psi_el.0^-(epsilon(u))) dOmega + Gc ∫_Omega ((1-s)^2/(4l) + l |∇s|^2) dOmega
+    
+    The weak form for the phase-field problem (s-problem) is derived by taking the
+    variational derivative of the energy functional (2.2) with respect to s,
+    using g(s) = s^2 + eta:
+        ∫_Omega ( (2s * H+ - Gc/(2l) * (1-s)) * q + Gc * l * ∇s ⋅ ∇q ) dOmega = 0
+    where q is the test function for s.
 
     PUBLIC API used by the solver:
       - setup_phasefield_space()
       - update_history(u)           # updates H from current u
-      - build_damage_forms()        # builds a_d_form, L_d_form
-      - assemble_solve_damage()     # solves for d with CG+AMG
-      - sigma_damage_linear(u_trial, d, material) # degraded, linear in u_trial
+      - build_damage_forms()        # builds the non-linear residual F_s
+      - assemble_solve_damage()     # solves for s with NewtonSolver
+      - sigma_degraded(u_trial, s_field, material) # degraded stress tensor (paper's (2.7))
+      - _material_constants(E, nu) # Helper to get kappa, mu from E, nu
     """
 
     # -------- init & parameters --------
-    def __init__(self):
+    def __init__(self, input_file="input.yaml"):
         print("__PhaseFieldModel initializer__")
 
-        input_file = "input.yaml"
         with open(input_file, "r") as f:
             data = yaml.safe_load(f)
 
@@ -36,228 +40,193 @@ class PhaseFieldModel:
         if not pf:
             raise ValueError("[PhaseFieldModel] 'fracture' missing in input.yaml.")
 
-        self.model = pf.get("model", "AT2")
-        self.Gc = pf.get("Gc", 1000.0)
-        self.ell = pf.get("ell", 0.01)
-        self.kappa = pf.get("kappa", 1e-8)
-        self.split = pf.get("split", "none")
-        self.irreversibility = pf.get("irreversibility", "none")
-        self.sigma_c = pf.get("sigma_c", 10.0)
+        self.Gc = pf.get("Gc", 0.01) # N/mm
+        self.ell = pf.get("ell", 0.6241) # mm
+        self.eta = pf.get("eta", 1e-8) # Small parameter for g(s) to avoid division by zero
 
         print("\n[PhaseFieldModel] parameters loaded from input.yaml:")
-        print(f"  model            : {self.model}")
-        print(f"  Gc               : {self.Gc}")
-        print(f"  ell              : {self.ell}")
-        print(f"  kappa            : {self.kappa}")
-        print(f"  split            : {self.split}")
-        print(f"  irreversibility  : {self.irreversibility}\n")
-        print(f"  sigma_c          : {self.sigma_c}")
-
-        self.H_threshold = 0.5 * self.sigma_c**2 * self.ell/ self.Gc
-        print(f"  Damage threshold energy H_threshold = {self.H_threshold:.2e}")
+        print(f"  Gc               : {self.Gc} N/mm")
+        print(f"  ell              : {self.ell} mm")
+        print(f"  eta              : {self.eta} (small regularization parameter)\n")
 
         # FE containers
-        self.V_d = None
-        self.d   = None           # damage field
-        self.d_n = None           # previous damage (optional)
-        self.H   = None           # history field (Psi_e^+ max-in-time)
-        self.d_trial = None       # TrialFunction(d)
-        self.w_test  = None       # TestFunction(w)
-
-        self.dirichlet_damage = []   # optional Dirichlet BCs on d
-        self.a_d_form = None
-        self.L_d_form = None
+        self.dirichlet_s = []     # optional Dirichlet BCs on s
+        self.F_s_residual = None  # Non-linear residual for s-problem
 
     # -------- helpers --------
     def _I(self): return ufl.Identity(self.gdim)
 
-    @staticmethod
-    def _pos(x):  # <x>_+
-        return (x + ufl.sqrt(x*x)) / 2.0
+    def _pos(self, x):  # <x>_+ = max(x, 0)
+        return ufl.max_value(x, 0.0)
+
+    def _neg(self, x):  # <x>_- = min(x, 0)
+        return ufl.min_value(x, 0.0)
 
     def _dev(self, eps):
-        return eps - (ufl.tr(eps)/3.0) * self._I()
+        return eps - (ufl.tr(eps)/self.gdim) * self._I()
 
-    def g_d(self, d):
-        """Degradation function with small residual stiffness."""
-        return (1.0 - d)**2 + self.kappa
+    # def g_s(self, s_val):
+    #     """Degradation function for phase-field, g(s) = s^2 + eta (paper Eq. 2.5)."""
+    #     return s_val**2 + self.eta
 
-    # -------- function spaces & fields --------
-    def setup_phasefield_space(self):
-        """Create P1 scalar space for d and H and initialize to zero."""
-        self.V_d = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
+    def g_s(self, s_val):
+        return s_val**2 + self.eta
 
-        self.d   = dolfinx.fem.Function(self.V_d, name="Damage")
-        self.d.x.array[:] = 0.0
+    def g_prime(self, s_val):
+        """Derivative of degradation function, g'(s) = 2s."""
+        return 2 * s_val
 
-        self.d_n = dolfinx.fem.Function(self.V_d, name="Damage_n")
-        self.d_n.x.array[:] = 0.0
+    def setup(self):
+        self.s   = dolfinx.fem.Function(self.V_s, name="PhaseField")
+        self.s.x.array[:] = 0.0
 
-        self.H   = dolfinx.fem.Function(self.V_d, name="History")
+        self.s_n = dolfinx.fem.Function(self.V_s, name="PhaseField_n") # For irreversibility
+        self.s_n.x.array[:] = 0.0
+
+        self.H   = dolfinx.fem.Function(self.V_s, name="History")
         self.H.x.array[:] = 0.0
 
-        self.d_trial = ufl.TrialFunction(self.V_d)
-        self.w_test  = ufl.TestFunction(self.V_d)
+        self.tr_eps_pos_n = dolfinx.fem.Function(self.V_s, name="TrEpsPos_n")
+        self.tr_eps_pos_n.x.array[:] = 0.0
 
-    # -------- elastic split (Amor) --------
-    def psi_plus(self, u, material):
+        self.tr_eps_neg_n = dolfinx.fem.Function(self.V_s, name="TrEpsNeg_n")
+        self.tr_eps_neg_n.x.array[:] = 0.0
+
+    # -------- elastic split (Amor et al.) --------
+    def psi_positive_elastic_energy(self, u, material):
         """
-        Psi_e^+(u) = 0.5*K*<tr ε>_+^2 + G * ||dev ε||^2  (Amor dev/vol split)
+        Psi_el.0^+(epsilon(u)) = 0.5 * K * (tr_eps)_+^2 + G * ||eps_dev||^2 (paper Eq. 2.4)
         """
-        eps = self.epsilon(u)            # from MechanicalModel mixin
-        tr  = ufl.tr(eps)
-        dev = self._dev(eps)
+        eps = ufl.sym(ufl.grad(u))
+        tr_eps = ufl.tr(eps)
+        eps_dev = self._dev(eps)
 
-        lam = material["lmbda"]
-        G   = material["G"]
-        K   = lam + 2.0*G/3.0
+        kappa = material["bulk_modulus"]
+        G = material["G"]
 
-        tr_p = self._pos(tr)
-        return 0.5*K*(tr_p*tr_p) + G*ufl.inner(dev, dev)
+        tr_eps_pos = self._pos(tr_eps)
+        return 0.5 * kappa * tr_eps_pos**2 + G * ufl.inner(eps_dev, eps_dev)
 
-    # Indicator chi_vol to freeze tension/compression split for linearized mech step
-    def update_split_indicator(self, u_ref):
-        tr_prev = ufl.tr(self.epsilon(u_ref))
-        expr = dolfinx.fem.Expression(tr_prev, self.V_d.element.interpolation_points())
-        tmp  = dolfinx.fem.Function(self.V_d)
-        tmp.interpolate(expr)
-
-        if not hasattr(self, "chi_vol"):
-            self.chi_vol = dolfinx.fem.Function(self.V_d, name="ChiVol")
-        self.chi_vol.x.array[:] = (tmp.x.array >= 0.0).astype(self.chi_vol.x.array.dtype)
-
-    def sigma_damage_linear(self, u_trial, d, material):
-        eps = self.epsilon(u_trial)
-        tr  = ufl.tr(eps)
-        dev = self._dev(eps)
-
-        lam = material["lmbda"]
-        G   = material["G"]
-        K   = lam + 2.0*G/3.0
-        chi = self.chi_vol  # Function(V_d), frozen
-
-        gdeg = (1.0 - d)**2 + self.kappa  # <-- qui
-        return gdeg * (K * chi * tr * self._I() + 2.0 * G * dev) \
-            + (1.0 - chi) * K * tr * self._I()
-
-    def psi_split(self, u, material):
+    def psi_negative_elastic_energy(self, u, material):
         """
-        Compute the positive and negative parts of the elastic energy.
-
-        Parameters:
-            u : displacement field
-            material : material object or dictionary
-
-        Returns:
-            psi_plus : positive part (drives damage)
-            psi_minus : negative part (ignored in damage evolution)
+        Psi_el.0^-(epsilon(u)) = 0.5 * K * (tr_eps)_-^2 (paper Eq. 2.4)
         """
-        eps   = ufl.sym(ufl.grad(u))
-        lam   = material["lmbda"]
-        G     = material["G"]
+        eps = ufl.sym(ufl.grad(u))
+        tr_eps = ufl.tr(eps)
 
-        tr_eps  = ufl.tr(eps)
-        dev_eps = eps - tr_eps / 3.0 * self._I()
+        kappa = material["bulk_modulus"]
 
-        tr_p = ufl.max_value(tr_eps, 0.0)
-        tr_m = ufl.min_value(tr_eps, 0.0)
+        tr_eps_neg = self._neg(tr_eps)
+        return 0.5 * kappa * tr_eps_neg**2
 
-        psi_pos = 0.5 * (lam + 2.0*G/3.0) * (tr_p*tr_p) + G * ufl.inner(dev_eps, dev_eps)
-        psi_neg = 0.5 * (lam + 2.0*G/3.0) * (tr_m*tr_m)
-
-        return psi_pos, psi_neg
-
+    def sigma_degraded(self, u, s, material):
+        g = self.g_s(s)
+        sigma = self.sigma_mech(u, material)
+        return g * sigma
 
     def update_history(self, u):
         """
-        H(x) := max( H(x), Psi_e^+(u)(x) ) su tutti i DOF P1,
-        ma solo nelle celle del materiale corrente (mascherate).
+        H(x) := max( H(x), Psi_e^+(u)(x) ) over all P1 DOFs.
+        Assumes self.materials is set up (e.g., in main solver class).
         """
-        V0 = dolfinx.fem.functionspace(self.mesh, ("DG", 0))      # cell-wise
-        V1 = self.V_d                                            # P1
+        V1 = self.V_s # P1 space for interpolation
 
         H_new = dolfinx.fem.Function(V1)
-        H_new.x.array[:] = self.H.x.array
+        H_new.x.array[:] = self.H.x.array # Start with current history field
 
-        for name, mat in self.materials.items():
-            tag = self.label_map[name]
-            cells = self.volume_tags.find(tag)
+        # If multiple materials are defined, update H for each region.
+        # Otherwise, assume a single material covering the entire domain.
+        if self.materials and self.volume_tags:
+            for name, mat_params in self.materials.items():
+                tag = self.label_map[name] # Assuming label_map is also set (e.g., in main)
+                cells = self.volume_tags.find(tag)
 
-            # 1) indicatore cell-wise
-            chi0 = dolfinx.fem.Function(V0)
-            chi0.x.array[:] = 0.0
-            chi0.x.array[cells] = 1.0
+                # Create a cell-wise indicator function
+                chi0 = dolfinx.fem.Function(dolfinx.fem.functionspace(self.mesh, ("DG", 0)))
+                chi0.x.array[:] = 0.0
+                chi0.x.array[cells] = 1.0
 
-            # 2) portiamo la maschera su P1 (interpolazione ai punti di interpolazione di V1)
-            chi1 = dolfinx.fem.Function(V1)
-            chi1.interpolate(dolfinx.fem.Expression(chi0, V1.element.interpolation_points()))
+                # Interpolate the indicator to P1 nodes
+                chi1 = dolfinx.fem.Function(V1)
+                chi1.interpolate(dolfinx.fem.Expression(chi0, V1.element.interpolation_points()))
 
-            # 3) ψ⁺ su P1
-            psi_p = self.psi_plus(u, mat)  # <-- usa proprio psi_plus
+                # Compute Psi_e^+ on P1 nodes within this material region
+                psi_p = self.psi_positive_elastic_energy(u, mat_params)
+                psi1  = dolfinx.fem.Function(V1)
+                psi1.interpolate(dolfinx.fem.Expression(psi_p, V1.element.interpolation_points()))
+
+                # Update H using the mask
+                mask = (chi1.x.array > 0.5)
+                H_arr   = H_new.x.array
+                psi_arr = psi1.x.array
+                np.maximum(H_arr[mask], psi_arr[mask], out=H_arr[mask])
+        else: # Single material case
+            # Assumes self.materials has one entry, or default material params are used directly
+            # For this example, we need *some* material_params, let's use the first one if available
+            # or default to a dummy one.
+            if self.materials:
+                mat_params = list(self.materials.values())[0] # Use first material if defined
+            else:
+                # Fallback: create dummy material params if not set up externally
+                kappa, mu = self._material_constants(18.0e3, 0.2) # Example values from paper Table 2
+                mat_params = {"kappa": kappa, "mu": mu}
+
+            psi_p = self.psi_positive_elastic_energy(u, mat_params)
             psi1  = dolfinx.fem.Function(V1)
             psi1.interpolate(dolfinx.fem.Expression(psi_p, V1.element.interpolation_points()))
+            np.maximum(self.H.x.array, psi1.x.array, out=self.H.x.array) # Update directly
 
-            # 4) update con maschera
-            mask = (chi1.x.array > 0.5)
-            H_arr   = H_new.x.array
-            psi_arr = psi1.x.array
-            np.maximum(H_arr[mask], psi_arr[mask], out=H_arr[mask])
+        self.H.x.array[:] = H_new.x.array if (self.materials and self.volume_tags) else self.H.x.array
+        # Ensure H is not NaN if any part of the domain has zero elastic energy (e.g. initial state)
+        # This isn't strictly necessary with np.maximum, but good for robustness
+        self.H.x.array[np.isnan(self.H.x.array)] = 0.0 
 
-
-        self.H.x.array[:] = H_new.x.array
-
-    # -------- damage forms --------
+    # -------- damage forms (for non-linear solve) --------
     def build_damage_forms(self):
         """
-        Build bilinear and linear forms of the AT-2 damage subproblem:
-          a(d,w) = ∫ [ (Gc/ell) d w + Gc*ell ∇d·∇w + 2 H d w ] dx
-          L(w)   = ∫ 2 H w dx
+        Build the non-linear residual form for the s-problem (phase-field).
+        F_s = ∫_Omega ( (g'(s) H - Gc/(2l) * (1-s)) * q + Gc * l * ∇s ⋅ ∇q ) dOmega = 0
         """
         dx = ufl.Measure("dx", domain=self.mesh)
 
-        a_bulk = (self.Gc/self.ell) * self.d_trial * self.w_test \
-                 + (self.Gc*self.ell) * ufl.dot(ufl.grad(self.d_trial), ufl.grad(self.w_test))
+        # Residual from variational derivative of Energy Functional (2.2) wrt s
+        # using g(s) = s^2 + eta, so g'(s) = 2s
+        F_s = (self.g_prime(self.s) * self.H - (self.Gc / (2 * self.ell)) * (1 - self.s)) * self.q_test * dx \
+              + self.Gc * self.ell * ufl.inner(ufl.grad(self.s), ufl.grad(self.q_test)) * dx
+        
+        self.F_s_residual = F_s
+        print("[PF] Non-linear phase-field residual form built.")
 
-        a_hist = 2.0 * self.H * self.d_trial * self.w_test
-
-        self.a_d_form = dolfinx.fem.form((a_bulk + a_hist) * dx)
-
-        H_eff = ufl.max_value(self.H - self.H_threshold, 0.0)
-        self.L_d_form = dolfinx.fem.form((2.0 * H_eff * self.w_test) * dx)
-
-        print("[PF] damage forms built.")
-
-    # -------- linear solve for d --------
+    # -------- non-linear solve for s --------
     def assemble_solve_damage(self):
         """
-        Solve the linear system for d with (optional) Dirichlet BCs in self.dirichlet_damage.
+        Solve the non-linear system for s using a NewtonSolver.
+        Applies (optional) Dirichlet BCs in self.dirichlet_s and enforces irreversibility.
         """
-        from dolfinx.fem import petsc as fem_petsc
+        from dolfinx.fem.petsc import NonlinearProblem
+        from dolfinx.nls.petsc import NewtonSolver
 
-        A = fem_petsc.assemble_matrix(self.a_d_form, bcs=self.dirichlet_damage)
-        A.assemble()
-        b = fem_petsc.assemble_vector(self.L_d_form)
-        fem_petsc.apply_lifting(b, [self.a_d_form], [self.dirichlet_damage])
-        b.ghostUpdate(addv=PETSc.InsertMode.ADD_VALUES, mode=PETSc.ScatterMode.REVERSE)
-        fem_petsc.set_bc(b, self.dirichlet_damage)
+        problem_s = NonlinearProblem(self.F_s_residual, self.s, bcs=self.dirichlet_s)
+        solver_s = NewtonSolver(self.mesh.comm, problem_s)
+        solver_s.convergence_criterion = "incremental" # Use "incremental" for delta_u norm
+        solver_s.rtol = 1e-6
+        solver_s.atol = 1e-8
+        solver_s.max_it = 20
+        solver_s.report = False
+        
+        # solver_s.view() # Uncomment to see solver options
 
-        # KSP: symmetric SPD → CG with AMG preconditioner
-        ksp = PETSc.KSP().create(self.mesh.comm)
-        ksp.setOperators(A)
-        ksp.setType("cg")
-        pc = ksp.getPC()
-        pc.setType("hypre")  # or "gamg"
-        ksp.setFromOptions()
+        num_iters, converged = solver_s.solve(self.s)
+        if not converged:
+            print(f"WARNING: s-solver did not converge in {num_iters} iterations.")
+            # Depending on robustness needs, might raise an error or try a smaller step
 
-        d_sol = dolfinx.fem.Function(self.V_d, name="Damage_tmp")
-        ksp.solve(b, d_sol.x.petsc_vec)
-        d_sol.x.scatter_forward()
-        np.clip(d_sol.x.array, 0.0, 1.0, out=d_sol.x.array)
+        # Enforce physical constraints: 0 <= s <= 1
+        np.clip(self.s.x.array, 0.0, 1.0, out=self.s.x.array)
 
-        # irreversibility: d >= d_n
-        if self.d_n is not None:
-            np.maximum(d_sol.x.array, self.d_n.x.array, out=d_sol.x.array)
+        # Enforce irreversibility: s >= s_n
+        if self.s_n is not None:
+            np.maximum(self.s.x.array, self.s_n.x.array, out=self.s.x.array)
+            self.s_n.x.array[:] = self.s.x.array # Update s_n for the next step
 
-        self.d.x.array[:] = d_sol.x.array
-        if self.d_n is not None:
-            self.d_n.x.array[:] = self.d.x.array
+        return num_iters, converged

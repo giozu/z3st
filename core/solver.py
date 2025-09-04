@@ -272,11 +272,11 @@ class Solver:
         umag = np.linalg.norm(u_vec, axis=1)
         print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")
 
-    def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol_d=1e-3):
+    def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol_s=1e-3):
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {tol_T:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {tol_u:.1e}")
-        print(f"  → Staggering tolerance |Δd|   : {tol_d:.1e}")
+        print(f"  → Staggering tolerance |Δs|   : {tol_s:.1e}")
         print(f"  → Thermal KSP tolerance       : {tol_th:.1e}")
         print(f"  → Mechanical KSP tolerance    : {tol_mech:.1e}")
 
@@ -292,12 +292,12 @@ class Solver:
         T_old = dolfinx.fem.Function(self.V_t)
         u_old = dolfinx.fem.Function(self.V_m)
 
-        # d (damage)
+        # Phase-field (s)
         if self.on.get("fracture", False):
-            d_old = dolfinx.fem.Function(self.V_d)
-            d_old.x.array[:] = self.d.x.array
+            s_old = dolfinx.fem.Function(self.V_s)
+            s_old.x.array[:] = self.s.x.array # self.s declared in phase_field_model.setup
         else:
-            d_old = None
+            s_old = None
 
         # Assemble all Dirichlet BCs
         bcs_t = [];  [bcs_t.extend(bc_list) for bc_list in self.dirichlet_thermal.values()]
@@ -311,8 +311,7 @@ class Solver:
             T_old.x.array[:] = T_n.x.array
             u_old.x.array[:] = u_n.x.array
             if self.on.get("fracture", False):
-                d_old.x.array[:] = self.d.x.array
-                self.d.x.array[:] = np.maximum(self.d.x.array, self.d_n.x.array)
+                s_old.x.array[:] = self.s.x.array
 
             # 1) THERMAL
             if self.on.get("thermal", False):
@@ -415,17 +414,19 @@ class Solver:
             if self.on.get("fracture", False):
                 print("\n[INFO] Assembling phase-field (damage) problem...")
                 self.update_history(u_n)      # H(u_n) irreversibilità
-                self.build_damage_forms()     # forme AT-2 con H aggiornato
-                self.assemble_solve_damage()  # solve per d (con clamp [0,1])
-                np.maximum(self.d.x.array, self.d_n.x.array, out=self.d.x.array)
-                self.d_n.x.array[:] = self.d.x.array
+                self.build_damage_forms()     # forme non-lineari AT-2 con H aggiornato
+                num_s_iters, converged_s = self.assemble_solve_damage()
+                
+                # [PF_CHANGE] These lines are now handled internally by assemble_solve_damage()
+                # np.maximum(self.s.x.array, self.s_n.x.array, out=self.s.x.array)
+                # self.s_n.x.array[:] = self.s.x.array
+                if not converged_s:
+                    print(f"WARNING: Phase-field solver did not converge in {num_s_iters} iterations.")
+
 
             # 3) MECHANICAL SUB-PROBLEM
             if self.on.get("mechanical", False):
                 print("\n[INFO] Assembling mechanical problem...")
-
-                if self.on.get("fracture", False):
-                    self.update_split_indicator(u_n)
 
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
                 a_m = 0
@@ -444,7 +445,15 @@ class Solver:
 
                     # Mechanical stress, linearized, degradated
                     if self.on.get("fracture", False):
-                        sigma_el = self.sigma_damage_linear(u_m, self.d, material)
+                        eps_u_n = self.epsilon(u_n)
+                        tr_eps_u_n = ufl.tr(eps_u_n)
+                        
+                        tr_eps_pos_expr = self._pos(tr_eps_u_n)
+                        tr_eps_neg_expr = self._neg(tr_eps_u_n)    
+                                                
+                        s_expr = ufl.as_ufl(self.s)
+                        sigma_el = self.sigma_degraded(u_m, s_expr, material)
+
                     else:
                         sigma_el = self.sigma_mech(u_m, material)
 
@@ -459,8 +468,8 @@ class Solver:
                         ds_traction = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
                         L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
 
-                if self.on.get("fracture", False):
-                    self.update_split_indicator(u_n)
+                print("[DEBUG] a_m arguments:", a_m.arguments())
+                print("[DEBUG] L_m arguments:", L_m.arguments())
 
                 # --- Solve the system ---
                 petsc_opts_mech = self.get_solver_options(
@@ -481,7 +490,8 @@ class Solver:
             u_n.x.scatter_forward()
             u_old.x.scatter_forward()
             if self.on.get("fracture", False):
-                self.d.x.scatter_forward(); d_old.x.scatter_forward()
+                self.s.x.scatter_forward()
+                s_old.x.scatter_forward()
 
             vec_T_new = T_n.x.petsc_vec
             vec_T_old = T_old.x.petsc_vec
@@ -509,27 +519,27 @@ class Solver:
             norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
             rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
 
-            conv_d = True
-            d_diff_inf = 0.0
+            conv_s = True # [PF_CHANGE] conv_d -> conv_s
+            s_diff_inf = 0.0 # [PF_CHANGE] d_diff_inf -> s_diff_inf
             if self.on.get("fracture", False):
-                d_diff_inf = np.linalg.norm(self.d.x.array - d_old.x.array, ord=np.inf)
-                conv_d = d_diff_inf < tol_d
+                s_diff_inf = np.linalg.norm(self.s.x.array - s_old.x.array, ord=np.inf) # [PF_CHANGE] self.d -> self.s, d_old -> s_old
+                conv_s = s_diff_inf < tol_s # [PF_CHANGE] conv_d -> conv_s, tol_d -> tol_s
 
-            print(f"  ||ΔT|| = {norm_dT:.3e}, ||Δu|| = {norm_du:.3e}, ||Δd||_inf = {d_diff_inf:.3e}")
-            print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}  (tol_T={tol_T:.1e}, tol_u={tol_u:.1e}, tol_d={tol_d:.1e})")
+            print(f"  ||ΔT|| = {norm_dT:.3e}, ||Δu|| = {norm_du:.3e}, ||Δs||_inf = {s_diff_inf:.3e}") # [PF_CHANGE] ||Δd|| -> ||Δs||
+            print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}  (tol_T={tol_T:.1e}, tol_u={tol_u:.1e}, tol_s={tol_s:.1e})") # [PF_CHANGE] tol_d -> tol_s
             if self.on.get("fracture", False):
-                print(f"Damage d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
-                print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
+                print(f"Phase-field s: min={self.s.x.array.min():.3e}, max={self.s.x.array.max():.3e}") # [PF_CHANGE] Damage d -> Phase-field s
+                print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}") # [PF_CHANGE] Access H via phase_field_model
 
             if (rel_norm_dT < tol_T or not self.on.get("thermal", False)) \
             and (rel_norm_du < tol_u or not self.on.get("mechanical", False)) \
-            and conv_d:
+            and conv_s: # [PF_CHANGE] conv_d -> conv_s
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
                 self.T.x.array[:] = T_n.x.array
                 self.u.x.array[:] = u_n.x.array
                 if self.on.get("fracture", False):
-                    self.d.x.array[:] = self.d.x.array
-                    self.d_n.x.array[:] = self.d.x.array
+                    self.s.x.array[:] = self.s.x.array # [PF_CHANGE] self.d -> self.s
+                    self.s_n.x.array[:] = self.s.x.array # [PF_CHANGE] self.d_n -> self.s_n
 
                 T_min, T_max = self.T.x.array.min(), self.T.x.array.max()
                 print(f"Global min/max temperature: {T_min:.2f} / {T_max:.2f} K")
@@ -553,6 +563,6 @@ class Solver:
         self.u.x.array[:] = u_n.x.array
 
         if self.on.get("fracture", False):
-            self.d_n.x.array[:] = self.d.x.array
+            self.s_n.x.array[:] = self.s.x.array # [PF_CHANGE] self.d_n -> self.s_n
 
         return False

@@ -20,12 +20,14 @@ class FiniteElementSetup:
         self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))  # scalar function space (temperature)
         self.V_m = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (self.mesh.topology.dim,)))  # vector function space (displacement)
         self.Q   = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
+        self.V_s = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1)) # P1 scalar space for s (phase-field variable)
 
         # print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
         # print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
 
         print("Mechanical function space (V_m):", self.V_m)
         print("Thermal function space (V_t):", self.V_t)
+        print("Scalar function space (V_s):", self.V_s)
 
         # --- Mixed function spaces ---
         # P1_3 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, shape=(self.tdim,), dtype=dolfinx.default_real_type)
@@ -58,6 +60,10 @@ class FiniteElementSetup:
         # Thermal
         self.u_t = ufl.TrialFunction(self.V_t)
         self.v_t = ufl.TestFunction(self.V_t)
+
+        # Phase-field
+        self.s_trial = ufl.TrialFunction(self.V_s)
+        self.q_test  = ufl.TestFunction(self.V_s)
         
         # print("Shape of mechanical trial function (u_m):", self.u_m.ufl_shape, "- Expected: (dim,) for a vector function space")
         # print("Shape of mechanical test function (v_m):", self.v_m.ufl_shape, "- Expected: (dim,) for a vector function space")
