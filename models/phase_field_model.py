@@ -22,7 +22,6 @@ class PhaseFieldModel:
 
     PUBLIC API used by the solver:
       - setup_phasefield_space()
-      - update_history(u)           # updates H from current u
       - build_damage_forms()        # builds the non-linear residual F_s
       - assemble_solve_damage()     # solves for s with NewtonSolver
       - sigma_degraded(u_trial, s_field, material) # degraded stress tensor (paper's (2.7))
@@ -64,32 +63,29 @@ class PhaseFieldModel:
 
     def _dev(self, eps):
         return eps - (ufl.tr(eps)/self.gdim) * self._I()
+    
+    def g_s(self, dmg):
+        """Degradation function for phase-field"""
+        return dmg**2 + self.eta
 
-    # def g_s(self, s_val):
-    #     """Degradation function for phase-field, g(s) = s^2 + eta (paper Eq. 2.5)."""
-    #     return s_val**2 + self.eta
-
-    def g_s(self, s_val):
-        return s_val**2 + self.eta
-
-    def g_prime(self, s_val):
-        """Derivative of degradation function, g'(s) = 2s."""
-        return 2 * s_val
+    def g_prime(self, dmg):
+        """Derivative of degradation function"""
+        return 2 * dmg
 
     def setup(self):
-        self.s   = dolfinx.fem.Function(self.V_s, name="PhaseField")
+        self.s   = dolfinx.fem.Function(self.V_pf, name="PhaseField")
         self.s.x.array[:] = 0.0
 
-        self.s_n = dolfinx.fem.Function(self.V_s, name="PhaseField_n") # For irreversibility
+        self.s_n = dolfinx.fem.Function(self.V_pf, name="PhaseField_n") # For irreversibility
         self.s_n.x.array[:] = 0.0
 
-        self.H   = dolfinx.fem.Function(self.V_s, name="History")
+        self.H   = dolfinx.fem.Function(self.V_pf, name="History")
         self.H.x.array[:] = 0.0
 
-        self.tr_eps_pos_n = dolfinx.fem.Function(self.V_s, name="TrEpsPos_n")
+        self.tr_eps_pos_n = dolfinx.fem.Function(self.V_pf, name="TrEpsPos_n")
         self.tr_eps_pos_n.x.array[:] = 0.0
 
-        self.tr_eps_neg_n = dolfinx.fem.Function(self.V_s, name="TrEpsNeg_n")
+        self.tr_eps_neg_n = dolfinx.fem.Function(self.V_pf, name="TrEpsNeg_n")
         self.tr_eps_neg_n.x.array[:] = 0.0
 
     # -------- elastic split (Amor et al.) --------
@@ -123,79 +119,34 @@ class PhaseFieldModel:
         g = self.g_s(s)
         sigma = self.sigma_mech(u, material)
         return g * sigma
+    
+    def sigma_pos(self, s, u, material):
 
-    def update_history(self, u):
-        """
-        H(x) := max( H(x), Psi_e^+(u)(x) ) over all P1 DOFs.
-        Assumes self.materials is set up (e.g., in main solver class).
-        """
-        V1 = self.V_s # P1 space for interpolation
+        K = material["bulk_modulus"]
+        G = material["G"]
 
-        H_new = dolfinx.fem.Function(V1)
-        H_new.x.array[:] = self.H.x.array # Start with current history field
+        return self.g_s(s) * (2*G*self._dev(self.epsilon(u))) + K*self._pos(ufl.tr(self.epsilon(u)))*self._I
 
-        # If multiple materials are defined, update H for each region.
-        # Otherwise, assume a single material covering the entire domain.
-        if self.materials and self.volume_tags:
-            for name, mat_params in self.materials.items():
-                tag = self.label_map[name] # Assuming label_map is also set (e.g., in main)
-                cells = self.volume_tags.find(tag)
+    def sigma_neg(self, s, u, material):
 
-                # Create a cell-wise indicator function
-                chi0 = dolfinx.fem.Function(dolfinx.fem.functionspace(self.mesh, ("DG", 0)))
-                chi0.x.array[:] = 0.0
-                chi0.x.array[cells] = 1.0
+        K = material["bulk_modulus"]
 
-                # Interpolate the indicator to P1 nodes
-                chi1 = dolfinx.fem.Function(V1)
-                chi1.interpolate(dolfinx.fem.Expression(chi0, V1.element.interpolation_points()))
+        return K*self._neg(ufl.tr(self.epsilon(u)))*self._I
 
-                # Compute Psi_e^+ on P1 nodes within this material region
-                psi_p = self.psi_positive_elastic_energy(u, mat_params)
-                psi1  = dolfinx.fem.Function(V1)
-                psi1.interpolate(dolfinx.fem.Expression(psi_p, V1.element.interpolation_points()))
-
-                # Update H using the mask
-                mask = (chi1.x.array > 0.5)
-                H_arr   = H_new.x.array
-                psi_arr = psi1.x.array
-                np.maximum(H_arr[mask], psi_arr[mask], out=H_arr[mask])
-        else: # Single material case
-            # Assumes self.materials has one entry, or default material params are used directly
-            # For this example, we need *some* material_params, let's use the first one if available
-            # or default to a dummy one.
-            if self.materials:
-                mat_params = list(self.materials.values())[0] # Use first material if defined
-            else:
-                # Fallback: create dummy material params if not set up externally
-                kappa, mu = self._material_constants(18.0e3, 0.2) # Example values from paper Table 2
-                mat_params = {"kappa": kappa, "mu": mu}
-
-            psi_p = self.psi_positive_elastic_energy(u, mat_params)
-            psi1  = dolfinx.fem.Function(V1)
-            psi1.interpolate(dolfinx.fem.Expression(psi_p, V1.element.interpolation_points()))
-            np.maximum(self.H.x.array, psi1.x.array, out=self.H.x.array) # Update directly
-
-        self.H.x.array[:] = H_new.x.array if (self.materials and self.volume_tags) else self.H.x.array
-        # Ensure H is not NaN if any part of the domain has zero elastic energy (e.g. initial state)
-        # This isn't strictly necessary with np.maximum, but good for robustness
-        self.H.x.array[np.isnan(self.H.x.array)] = 0.0 
-
-    # -------- damage forms (for non-linear solve) --------
-    def build_damage_forms(self):
-        """
-        Build the non-linear residual form for the s-problem (phase-field).
-        F_s = ∫_Omega ( (g'(s) H - Gc/(2l) * (1-s)) * q + Gc * l * ∇s ⋅ ∇q ) dOmega = 0
-        """
-        dx = ufl.Measure("dx", domain=self.mesh)
-
-        # Residual from variational derivative of Energy Functional (2.2) wrt s
-        # using g(s) = s^2 + eta, so g'(s) = 2s
-        F_s = (self.g_prime(self.s) * self.H - (self.Gc / (2 * self.ell)) * (1 - self.s)) * self.q_test * dx \
-              + self.Gc * self.ell * ufl.inner(ufl.grad(self.s), ufl.grad(self.q_test)) * dx
+    def psi_split(self, u, material):
+        tr_eps = ufl.tr(ufl.sym(ufl.grad(u)))
+        eps_dev = self._dev(ufl.sym(ufl.grad(u)))
         
-        self.F_s_residual = F_s
-        print("[PF] Non-linear phase-field residual form built.")
+        kappa = material["bulk_modulus"]
+        G = material["G"]
+
+        tr_eps_pos = self._pos(tr_eps)
+        tr_eps_neg = self._neg(tr_eps)
+
+        psi_plus  = 0.5 * kappa * tr_eps_pos**2 + G * ufl.inner(eps_dev, eps_dev)
+        psi_minus = 0.5 * kappa * tr_eps_neg**2
+        return psi_plus, psi_minus
+
 
     # -------- non-linear solve for s --------
     def assemble_solve_damage(self):

@@ -36,12 +36,13 @@ models:
 
 fracture:
   model: AT2
-  Gc: 10         # N/m  (per test; vedi nota 5 per tuning)
   sigma_c: 1.0e+8   # Pa
-  ell: 0.5e-3    # m     (≈ 0.5 mm: scegli ~ h/2 nella zona di crack)
   kappa: 1.0e-8
   split: amor_dev_vol
   irreversibility: history
+  Gc: 10000.0   # J/m^2 (o N/m)
+  ell: 5.0e-7  # m
+  eta: 1.0e-8
 
 mechanical_regime: "3D" # 3D, plane_stress
 

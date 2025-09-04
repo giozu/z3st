@@ -255,11 +255,11 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
             # --- mechanical stress (possibly degraded) ---
             if fracture_on:
                 # σ_elastic (degradato) = σ_damage(u, d)
-                sig_el = self.sigma_damage_linear(self.u, self.d, mat)
+                sig_el = self.sigma_degraded(self.u, self.s, mat)
 
                 # energy density = g_d(d) ψ+ + ψ-
                 psi_plus, psi_minus = self.psi_split(self.u, mat)
-                self.energy_density[name] = self.g_d(self.d) * psi_plus + psi_minus
+                self.energy_density[name] = self.g_s(self.s) * psi_plus + psi_minus
 
             else:
                 # elastico standard

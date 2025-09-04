@@ -294,7 +294,7 @@ class Solver:
 
         # Phase-field (s)
         if self.on.get("fracture", False):
-            s_old = dolfinx.fem.Function(self.V_s)
+            s_old = dolfinx.fem.Function(self.V_pf)
             s_old.x.array[:] = self.s.x.array # self.s declared in phase_field_model.setup
         else:
             s_old = None
@@ -412,16 +412,30 @@ class Solver:
 
             # 2) PHASE FIELD (damage)
             if self.on.get("fracture", False):
+                """
+                Build the non-linear residual form for the s-problem (phase-field).
+                F_s = ∫_Omega ( (g'(s) H - Gc/(2l) * (1-s)) * q + Gc * l * ∇s ⋅ ∇q ) dOmega = 0
+                """
+
                 print("\n[INFO] Assembling phase-field (damage) problem...")
-                self.update_history(u_n)      # H(u_n) irreversibilità
-                self.build_damage_forms()     # forme non-lineari AT-2 con H aggiornato
-                num_s_iters, converged_s = self.assemble_solve_damage()
-                
-                # [PF_CHANGE] These lines are now handled internally by assemble_solve_damage()
-                # np.maximum(self.s.x.array, self.s_n.x.array, out=self.s.x.array)
-                # self.s_n.x.array[:] = self.s.x.array
-                if not converged_s:
-                    print(f"WARNING: Phase-field solver did not converge in {num_s_iters} iterations.")
+
+                u_pf, v_pf = ufl.TrialFunction(self.V_pf), ufl.TestFunction(self.V_pf)
+                a_pf = 0
+                L_pf = 0
+
+                # --- Volume integrals ---
+                for label, material in self.materials.items():
+                    tag = self.label_map[label]
+                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
+
+                    F_s = (self.g_prime(self.s) * self.H - (self.Gc / (2 * self.ell)) * (1 - self.s)) * self.q_test * dx + self.Gc * self.ell * ufl.inner(ufl.grad(self.s), ufl.grad(self.q_test)) * dx
+                    
+                    self.F_s_residual = F_s
+
+                    num_s_iters, converged_s = self.assemble_solve_damage()
+                    
+                    if not converged_s:
+                        print(f"WARNING: Phase-field solver did not converge in {num_s_iters} iterations.")
 
 
             # 3) MECHANICAL SUB-PROBLEM
