@@ -1,7 +1,12 @@
 // -----------------------------------------------------------------------------
-// Structured HEX mesh for box LxWxH with a rectangular notch at x = 0
-// Multi-block 2D (5 rectangles) + extrude to 3D with Nz layers -> hexahedra
+//
+//  Structured mesh for box LxWxH with a rectangular notch at x = 0
+//  Multi-block 2D (5 rectangles) + extrude to 3D with Nz layers -> hexahedra
+//
+//  Author: Giovanni Zullo
+//
 // -----------------------------------------------------------------------------
+
 SetFactory("Built-in");
 
 // ---------------- Parameters ----------------
@@ -10,20 +15,22 @@ W  = 0.1;      // width   (y)
 H  = 0.004;    // height  (z)
 
 // Notch (carved out from x in [0,a], y in [y1,y2])
-a  = 0.02;     // notch depth along x
-b  = 0.02;     // notch width  along y
+a  = 0.005;     // notch depth along x
+b  = 0.002;     // notch width along y
+
 y1 = (W - b)/2;
 y2 = y1 + b;
 
-// ---------------- Structured counts (EDIT ME) ----------------
 // Number of points along each direction per block (points, not elements)
 // Ensure all are >= 2
-NxA = 9;        // along x on [0, a]
-NxB = 12;       // along x on [a, L]   (total along x ~ NxA + NxB - 1 when joined)
+NxA = 11;       // along x on [0, a]
+NxB = 31;       // along x on [a, L]
+
 // Split y into three bands: [0,y1], [y1,y2], [y2,W]
-Ny0 = 7;        // along y on [0,  y1]
-Ny1 = 8;        // along y on [y1, y2] (the notch band)
-Ny2 = 7;        // along y on [y2, W]
+Ny0 = 21;        // along y on [0,  y1]
+Ny1 = 9;        // along y on [y1, y2] (the notch band)
+Ny2 = 21;        // along y on [y2, W]
+
 Nz  = 11;       // along z on [0,  H]
 
 // Basic checks to avoid invalid settings
@@ -40,7 +47,7 @@ EndIf
 //  C2: [a,L] x [y2,W]
 
 // --- Points ---
-// Lower band [0, y1]
+// Lower band
 Point(1)  = {0,  0,  0};
 Point(2)  = {a,  0,  0};
 Point(3)  = {L,  0,  0};
@@ -48,17 +55,17 @@ Point(4)  = {0,  y1, 0};
 Point(5)  = {a,  y1, 0};
 Point(6)  = {L,  y1, 0};
 
-// Middle band [y1, y2]
+// Middle band
 Point(7)  = {0,  y2, 0};
 Point(8)  = {a,  y2, 0};
 Point(9)  = {L,  y2, 0};
 
-// Upper band [y2, W]
+// Upper band
 Point(10) = {0,  W,  0};
 Point(11) = {a,  W,  0};
 Point(12) = {L,  W,  0};
 
-// --- Rectangles (A, C0) on lower band ---
+// --- Rectangles A, C0 on lower band ---
 // A: [0,a] x [0,y1]
 Line(1) = {1, 2};
 Line(2) = {2, 5};
@@ -133,13 +140,6 @@ outB[]  = Extrude {0, 0, H} { Surface{13}; Layers{Nz}; Recombine; };
 outC2[] = Extrude {0, 0, H} { Surface{14}; Layers{Nz}; Recombine; };
 
 // ---------------- Physical groups ----------------
-// Capture extruded entities.
-// outX[0] = Top surface
-// outX[1] = Volume
-// outX[2 to 2+N-1] = Side surfaces (N is number of lines in base surface)
-// The order of side surfaces in outX[] corresponds to the order of lines
-// in the Line Loop of the base surface.
-
 // Volumes
 Physical Volume("fuel") = {outA[1], outC0[1], outC1[1], outB[1], outC2[1]};
 
@@ -147,59 +147,24 @@ Physical Volume("fuel") = {outA[1], outC0[1], outC1[1], outB[1], outC2[1]};
 Physical Surface("bottom") = {10, 11, 12, 13, 14}; // Original 2D surfaces are the bottom
 Physical Surface("top")    = {outA[0], outC0[0], outC1[0], outB[0], outC2[0]};
 
-// Side surfaces
-// A: Line Loop(10) = {1, 2, 3, 4} -> {P1-P2, P2-P5, P5-P4, P4-P1}
-// C0: Line Loop(11) = {5, 6, 7, 8} -> {P2-P3, P3-P6, P6-P5, P5-P2}
-// C1: Line Loop(12) = {9, 10, 11, 12} -> {P5-P8, P8-P9, P9-P6, P6-P5}
-// B: Line Loop(13) = {13, 14, 15, 16} -> {P7-P8, P8-P11, P11-P10, P10-P7}
-// C2: Line Loop(14) = {17, 18, 19, 20} -> {P8-P9, P9-P12, P12-P11, P11-P8}
-
 // x faces
 // face_xx_0 (x=0 plane)
-// This comes from Line 4 (P4-P1) of surface 10 (A) and Line 16 (P10-P7) of surface 13 (B)
 Physical Surface("face_xx_0") = {outA[5], outB[5]};
 
 // face_xx_1 (x=L plane)
-// This comes from Line 6 (P3-P6) of surface 11 (C0), Line 11 (P9-P6) of surface 12 (C1),
-// and Line 18 (P9-P12) of surface 14 (C2)
 Physical Surface("face_xx_1") = {outC0[3], outC1[4], outC2[3]};
 
 // y faces
 // face_yy_0 (y=0 plane)
-// This comes from Line 1 (P1-P2) of surface 10 (A) and Line 5 (P2-P3) of surface 11 (C0)
 Physical Surface("face_yy_0") = {outA[2], outC0[2]};
 
 // face_yy_1 (y=W plane)
-// This comes from Line 15 (P11-P10) of surface 13 (B) and Line 19 (P12-P11) of surface 14 (C2)
 Physical Surface("face_yy_1") = {outB[4], outC2[4]};
 
 // Notch faces (optional groups)
-// Back wall at x=a (y in [y1,y2]) - this is the "back" of the notch, facing +x
-// This surface is generated from Line 9 (P5-P8) of surface 12 (C1) AND Line 14 (P8-P11) of surface 13 (B)
-Physical Surface("notch") = {outC1[2], outB[3]}; // (outC1[2] for L9, outB[3] for L14 - assuming the line order in loop for B is L13,L14,L15,L16)
-
-// Side walls at y=y1 and y=y2 for x in [0,a]
-// y=y1 for x in [0,a]:
-// This is the interior boundary between A and C0 (Line 3: P5-P4, Line 8: P5-P2, reverse direction)
-// More accurately, it's the extruded surfaces from Line 3 of surface 10 and Line 12 of surface 12.
-Physical Surface("notch_sides") = {outA[4], outC1[5]}; // outA[4] for line 3 (P5-P4), outC1[5] for line 12 (P6-P5)
-
-// y=y2 for x in [0,a]:
-// This is the interior boundary between B and C1 (Line 13: P7-P8, Line 9: P5-P8, reverse direction)
-// More accurately, it's the extruded surfaces from Line 13 of surface 13 and Line 9 of surface 12.
-Physical Surface("notch_sides") += {outB[2], outC1[2]}; // outB[2] for line 13 (P7-P8), outC1[2] for line 9 (P5-P8) - Note: L9 is also used for the "notch" back wall, so be careful.
-                                                      // This one is tricky - Line 9 is shared between B and C1. When extruded it forms two distinct surfaces.
-                                                      // The "notch" surface from Line 9 is outC1[2] (part of the x=a plane).
-                                                      // The "side wall" at y=y2 is the extruded surface from Line 13 (P7-P8) of surface B.
-
-// Let's refine the "notch_sides" carefully based on the definitions:
-// "Side walls at y=y1 and y=y2 for x in [0,a]"
-// The definition "x in [0,a]" is critical.
-// At y=y1, x in [0,a]: This is the extruded surface from Line 3 (P5-P4) of sA.
-// At y=y2, x in [0,a]: This is the extruded surface from Line 13 (P7-P8) of sB.
+Physical Surface("notch") = {outC1[2]};
 Physical Surface("notch_sides_y1") = {outA[4]};
 Physical Surface("notch_sides_y2") = {outB[2]};
-
 
 // Save
 Mesh.MshFileVersion = 2.2;

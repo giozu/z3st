@@ -13,7 +13,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../materials/steel.yaml
+  fuel: ../../materials/uo2.yaml
 
 solver_settings:
   coupling: staggered # monolithic, staggered

@@ -517,8 +517,9 @@ class Solver:
 
             print(f"  ||ΔT|| = {norm_dT:.3e}, ||Δu|| = {norm_du:.3e}, ||Δd||_inf = {d_diff_inf:.3e}")
             print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}  (tol_T={tol_T:.1e}, tol_u={tol_u:.1e}, tol_d={tol_d:.1e})")
-            print(f"Damage d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
-            print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
+            if self.on.get("fracture", False):
+                print(f"Damage d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
+                print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
 
             if (rel_norm_dT < tol_T or not self.on.get("thermal", False)) \
             and (rel_norm_du < tol_u or not self.on.get("mechanical", False)) \

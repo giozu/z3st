@@ -1,5 +1,5 @@
 thermal_bcs:
-  steel:
+  fuel:
     - type: Dirichlet
       region: face_xx_0
       temperature: 300.0
@@ -9,11 +9,11 @@ thermal_bcs:
       temperature: 300.0
 
 mechanical_bcs:
-  steel:
+  fuel:
     - type: Dirichlet
-      region: face_xx_0
+      region: face_yy_0
       displacement: [0.0, 0.0, 0.0]
       
     - type: Neumann
-      region: face_xx_1
-      traction: 125e10
+      region: face_yy_1
+      traction: 125e8
