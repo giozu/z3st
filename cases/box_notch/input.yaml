@@ -31,7 +31,7 @@ solver_settings:
 models:
   thermal: False
   mechanical: True
-  fracture: False
+  fracture: True
   # gap_conductance
 
 fracture:

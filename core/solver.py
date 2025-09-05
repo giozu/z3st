@@ -486,9 +486,13 @@ class Solver:
                 newton = NewtonSolver(self.mesh.comm, problem_nl)
 
                 newton.krylov_solver.setType("gmres")
-                # newton.krylov_solver.getPC().setType("hypre")
-                newton.krylov_solver.getPC().setType("gamg")
-                newton.krylov_solver.setTolerances(rtol=1e-6, atol=1e-10)
+                newton.krylov_solver.setTolerances(rtol=1e-8, atol=0.0, max_it=200)
+                pc = newton.krylov_solver.getPC()
+                pc.setType("gamg")
+
+                from petsc4py import PETSc
+                PETSc.Options().setValue("mg_levels_ksp_type", "chebyshev")
+                PETSc.Options().setValue("mg_levels_pc_type",  "jacobi")
 
                 newton.atol = float(tol_mech)
                 newton.rtol = 0.0
