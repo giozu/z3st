@@ -6,9 +6,8 @@ class Config:
         
         models = self.config.get("models", {})
         self.on = {
-            "thermal": models.get("thermal", True),
-            "mechanical": models.get("mechanical", True),
-            "creep": models.get("creep", False),
+            "thermal": models.get("thermal", False),
+            "mechanical": models.get("mechanical", False),
             "fracture": models.get("fracture", False)
         }
         gap_config = self.config.get("models", {}).get("gap_conductance", {})

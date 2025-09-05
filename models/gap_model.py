@@ -6,7 +6,7 @@ class GapModel:
     def __init__(self):
         print("__GapModel initializer__")
 
-    def set_gap_conductance(self, T_n):
+    def set_gap_conductance(self, T_i):
 
         # Gap condutance
         if self.gap_model == "Fixed":
@@ -15,7 +15,7 @@ class GapModel:
 
         elif self.gap_model == "Gas":
 
-            self.set_gap_temperature(T_n)
+            self.set_gap_temperature(T_i)
 
             gas_thermal_conductivity = self.h_gap_value * 1e-4 * self.gap_temperature**0.79 # (W/m-K)
 
@@ -36,7 +36,7 @@ class GapModel:
 
         return h_gap
     
-    def set_gap_temperature(self, T_n):
+    def set_gap_temperature(self, T_i):
 
         for label in self.materials:
             for bc_info in self.robin_thermal[label]:
@@ -46,8 +46,8 @@ class GapModel:
                 dofs_here = self.locateFacetDofs(region_id, self.V_t)
                 dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t)
 
-                T_here = T_n.x.array[dofs_here]
-                T_other = T_n.x.array[dofs_other]
+                T_here = T_i.x.array[dofs_here]
+                T_other = T_i.x.array[dofs_other]
 
                 self.gap_temperature = 0.5 * (T_here.mean() + T_other.mean())
 

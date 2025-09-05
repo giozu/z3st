@@ -272,49 +272,54 @@ class Solver:
         umag = np.linalg.norm(u_vec, axis=1)
         print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")
 
-    def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol_s=1e-3):
+    def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol_d=1e-3):
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {tol_T:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {tol_u:.1e}")
-        print(f"  → Staggering tolerance |Δs|   : {tol_s:.1e}")
+        print(f"  → Staggering tolerance |Δs|   : {tol_d:.1e}")
         print(f"  → Thermal KSP tolerance       : {tol_th:.1e}")
         print(f"  → Mechanical KSP tolerance    : {tol_mech:.1e}")
 
-        # --- Initial setup ---
-        # Use temporary functions for the current iteration's solution
-        T_n = dolfinx.fem.Function(self.V_t)
-        T_n.x.array[:] = self.T.x.array # Start with the initial/previous converged state
+        if self.on.get("thermal", False):
+            T_i = dolfinx.fem.Function(self.V_t)
+            T_i.x.array[:] = self.T.x.array # Start with the initial/previous converged state
+            T_old = dolfinx.fem.Function(self.V_t) # Functions to store the previous state for convergence check
+            
+            bcs_t = [];  [bcs_t.extend(bc_list) for bc_list in self.dirichlet_thermal.values()]
 
-        u_n = dolfinx.fem.Function(self.V_m)
-        u_n.x.array[:] = self.u.x.array
+        if self.on.get("mechanical", False):
+            u_i = dolfinx.fem.Function(self.V_m)
+            u_i.x.array[:] = self.u.x.array
+            u_old = dolfinx.fem.Function(self.V_m)
 
-        # Functions to store the previous state for convergence check
-        T_old = dolfinx.fem.Function(self.V_t)
-        u_old = dolfinx.fem.Function(self.V_m)
+            bcs_m = [];  [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
 
-        # Phase-field (s)
         if self.on.get("fracture", False):
-            s_old = dolfinx.fem.Function(self.V_pf)
-            s_old.x.array[:] = self.s.x.array # self.s declared in phase_field_model.setup
-        else:
-            s_old = None
+            d_i = dolfinx.fem.Function(self.V_pf)
+            d_i.x.array[:] = self.d.x.array
+            d_old = dolfinx.fem.Function(self.V_pf)
 
-        # Assemble all Dirichlet BCs
-        bcs_t = [];  [bcs_t.extend(bc_list) for bc_list in self.dirichlet_thermal.values()]
-        bcs_m = [];  [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
+        self.dx_tags = {tag: ufl.Measure("dx", domain=self.mesh,
+                                        subdomain_data=self.volume_tags,
+                                        subdomain_id=tag)
+                        for tag in np.unique(self.volume_tags.values)}
+
+        self.ds_tags = {id_: ufl.Measure("ds", domain=self.mesh,
+                                        subdomain_data=self.ft,
+                                        subdomain_id=id_)
+                        for id_ in np.unique(self.ft.values)}
 
         # --- Staggering loop ---
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
 
-            # Store previous state for convergence check
-            T_old.x.array[:] = T_n.x.array
-            u_old.x.array[:] = u_n.x.array
             if self.on.get("fracture", False):
-                s_old.x.array[:] = self.s.x.array
+                d_i.x.array[:] = self.d.x.array
 
             # 1) THERMAL
             if self.on.get("thermal", False):
+                T_old.x.array[:] = T_i.x.array
+
                 print("\n[INFO] Assembling thermal problem...")
                 u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
                 a_t = 0
@@ -322,28 +327,28 @@ class Solver:
 
                 # --- Volume integrals ---
                 for label, material in self.materials.items():
-                    tag = self.label_map[label] # in this case, volume tag
-                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag) # volume integral
+                    tag = self.label_map[label]
+                    dx = self.dx_tags[tag]
 
                     print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
 
                     # Thermal conductivity
                     k = material["k"]
 
-                    # Output the value of the average thermal conductivity
-                    if isinstance(k, (int, float)):
-                        k_avg = k
-                    else:
-                        V0 = dolfinx.fem.functionspace(self.mesh, ("CG", 1))
-                        k_func = dolfinx.fem.Function(V0, name=f"k_{label}")
-                        expr = dolfinx.fem.Expression(k, V0.element.interpolation_points())
-                        k_func.interpolate(expr)
+                    # Output the average value of the thermal conductivity
+                    # if isinstance(k, (int, float)):
+                    #     k_avg = k
+                    # else:
+                    #     V0 = dolfinx.fem.functionspace(self.mesh, ("CG", 1))
+                    #     k_func = dolfinx.fem.Function(V0, name=f"k_{label}")
+                    #     expr = dolfinx.fem.Expression(k, V0.element.interpolation_points())
+                    #     k_func.interpolate(expr)
 
-                        num = dolfinx.fem.assemble_scalar(dolfinx.fem.form(k_func * dx))
-                        den = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
-                        k_avg = num / den
+                    #     num = dolfinx.fem.assemble_scalar(dolfinx.fem.form(k_func * dx))
+                    #     den = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
+                    #     k_avg = num / den
 
-                    print(f"  Average conductivity for {label} = {k_avg:.3f} W/m·K")
+                    # print(f"  Average conductivity for {label} = {k_avg:.3f} W/m·K")
 
                     a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
                     L_t += self.q_third * v_t * dx
@@ -357,11 +362,11 @@ class Solver:
                 for label in self.materials:
                     for bc_info in self.neumann_thermal[label]:
                         print(f"  Applying thermal Neumann BC on subdomain id = {bc_info['id']}")
-                        ds_neumann = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
+                        ds_neumann  = self.ds_tags[bc_info['id']]
                         L_t += bc_info['value'] * v_t * ds_neumann
 
                 # Gap (Robin)
-                h_gap = self.set_gap_conductance(T_n)
+                h_gap = self.set_gap_conductance(T_i)
 
                 for label in self.materials:
                     for bc_info in self.robin_thermal[label]:
@@ -370,17 +375,17 @@ class Solver:
                         region_id = bc_info["id"] # e.g., fuel_interface
                         pair_region = bc_info["pair"] # e.g., clad_interface
 
-                        ds_interface = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=region_id) # e.g., fuel_interface surface
+                        ds_interface = self.ds_tags[region_id]  # e.g., fuel_interface surface
 
                         # 1) project
                         T_other = dolfinx.fem.Function(self.V_t) # e.g., T_clad
                         dofs_here = self.locateFacetDofs(region_id, self.V_t) # e.g., dofs of fuel_interface
                         dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t) # e.g., dofs of clad_interface
 
-                        T_other.x.array[dofs_here] = T_n.x.array[dofs_other] # e.g., T_clad projected on fuel_interface dofs
+                        T_other.x.array[dofs_here] = T_i.x.array[dofs_other] # e.g., T_clad projected on fuel_interface dofs
 
                         # 2) mean
-                        # T_other = T_n.x.array[dofs_other].mean()
+                        # T_other = T_i.x.array[dofs_other].mean()
 
                         # -) bias
                         # if label == 'fuel':
@@ -396,61 +401,36 @@ class Solver:
                 petsc_opts_thermal = self.get_solver_options(
                     solver_type=self.thermal_solver, physics="thermal", rtol=tol_th
                 )
-                problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_n, petsc_options=petsc_opts_thermal)
+                problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_i, petsc_options=petsc_opts_thermal)
                 problem_t.solve()
 
                 # Check T_fo
                 # dofs = self.locateFacetDofs(self.label_map["lateral"], self.V_t)
-                # T = T_n.x.array[dofs].mean()
+                # T = T_i.x.array[dofs].mean()
                 # print(f"  T_lateral = {T:.2f} K")
 
                 # Apply relaxation
-                T_n.x.array[:] = self.relax_T * T_n.x.array + (1 - self.relax_T) * T_old.x.array
+                T_i.x.array[:] = self.relax_T * T_i.x.array + (1 - self.relax_T) * T_old.x.array
 
                 # Print heat flux
-                # self.heat_flux(T_n)
+                # self.heat_flux(T_i)
 
-            # 2) PHASE FIELD (damage)
-            if self.on.get("fracture", False):
-                """
-                Build the non-linear residual form for the s-problem (phase-field).
-                F_s = ∫_Omega ( (g'(s) H - Gc/(2l) * (1-s)) * q + Gc * l * ∇s ⋅ ∇q ) dOmega = 0
-                """
-
-                print("\n[INFO] Assembling phase-field (damage) problem...")
-
-                u_pf, v_pf = ufl.TrialFunction(self.V_pf), ufl.TestFunction(self.V_pf)
-                a_pf = 0
-                L_pf = 0
-
-                # --- Volume integrals ---
-                for label, material in self.materials.items():
-                    tag = self.label_map[label]
-                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
-
-                    F_s = (self.g_prime(self.s) * self.H - (self.Gc / (2 * self.ell)) * (1 - self.s)) * self.q_test * dx + self.Gc * self.ell * ufl.inner(ufl.grad(self.s), ufl.grad(self.q_test)) * dx
-                    
-                    self.F_s_residual = F_s
-
-                    num_s_iters, converged_s = self.assemble_solve_damage()
-                    
-                    if not converged_s:
-                        print(f"WARNING: Phase-field solver did not converge in {num_s_iters} iterations.")
-
-
-            # 3) MECHANICAL SUB-PROBLEM
+            # 2) MECHANICAL SUB-PROBLEM
             if self.on.get("mechanical", False):
+                u_old.x.array[:] = u_i.x.array
+
                 print("\n[INFO] Assembling mechanical problem...")
 
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
-                a_m = 0
-                L_m = 0
+                # a_m = 0
+                # L_m = 0
+                F_m = 0
 
                 # --- Volume integrals ---
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
                     print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
-                    dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
+                    dx = self.dx_tags[tag]
 
                     # Body force
                     rho = dolfinx.default_scalar_type(material["rho"])
@@ -459,124 +439,225 @@ class Solver:
 
                     # Mechanical stress, linearized, degradated
                     if self.on.get("fracture", False):
-                        eps_u_n = self.epsilon(u_n)
-                        tr_eps_u_n = ufl.tr(eps_u_n)
-                        
-                        tr_eps_pos_expr = self._pos(tr_eps_u_n)
-                        tr_eps_neg_expr = self._neg(tr_eps_u_n)    
-                                                
-                        s_expr = ufl.as_ufl(self.s)
-                        sigma_el = self.sigma_degraded(u_m, s_expr, material)
+                        dmg = ufl.as_ufl(d_i)
+                        stress_tensor = self.sigma_degraded(u_i, dmg, material)
 
                     else:
-                        sigma_el = self.sigma_mech(u_m, material)
+                        stress_tensor = self.sigma_mech(u_i, material)
 
-                    a_m += ufl.inner(sigma_el, self.epsilon(v_m)) * dx
-                    L_m += ufl.dot(body_force, v_m) * dx
-                    L_m += ufl.inner(self.sigma_th(T_n, material), self.epsilon(v_m)) * dx
+                    # a_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
+                    # L_m += ufl.dot(body_force, v_m) * dx
+                    # L_m += ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
+
+                    if self.on.get("thermal", False):
+                        F_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx \
+                            - ufl.dot(body_force, v_m) * dx \
+                            - ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
+                    else:
+                        F_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx \
+                            - ufl.dot(body_force, v_m) * dx
                     
                 # --- Neumann BCs (Traction) ---
                 for label in self.materials:
                     for bc_info in self.traction[label]:
                         print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
-                        ds_traction = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info['id'])
-                        L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
+                        ds_traction = self.ds_tags[bc_info['id']]
+                        F_m -= ufl.dot(bc_info['value'], v_m) * ds_traction
+                        # L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
 
-                print("[DEBUG] a_m arguments:", a_m.arguments())
-                print("[DEBUG] L_m arguments:", L_m.arguments())
+                # F_m += a_m - L_m
+                J_m = ufl.derivative(F_m, u_i, u_m)
+
+                # print("[DEBUG] a_m arguments:", a_m.arguments())
+                # print("[DEBUG] L_m arguments:", L_m.arguments())
 
                 # --- Solve the system ---
-                petsc_opts_mech = self.get_solver_options(
-                    solver_type=self.mechanical_solver, physics="mechanical", rtol=tol_mech
-                )
-                problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_n, petsc_options=petsc_opts_mech)
-                problem_m.solve()
+                # petsc_opts_mech = self.get_solver_options(
+                #     solver_type=self.mechanical_solver, physics="mechanical", rtol=tol_mech
+                # )
+                # problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_i, petsc_options=petsc_opts_mech)
+                # problem_m.solve()
+
+                from dolfinx.fem.petsc import NonlinearProblem
+                from dolfinx.nls.petsc import NewtonSolver
+
+                jit_opts = {"timeout": 1200}
+                problem_nl = NonlinearProblem(F_m, u_i, bcs=bcs_m, J=J_m, jit_options=jit_opts)
+                newton = NewtonSolver(self.mesh.comm, problem_nl)
+
+                newton.krylov_solver.setType("gmres")
+                # newton.krylov_solver.getPC().setType("hypre")
+                newton.krylov_solver.getPC().setType("gamg")
+                newton.krylov_solver.setTolerances(rtol=1e-6, atol=1e-10)
+
+                newton.atol = float(tol_mech)
+                newton.rtol = 0.0
+                newton.max_it = max_iter
+                newton.convergence_criterion = "incremental"
+                newton.report = True
+                # newton.line_search = "bt"  # backtracking
+                newton.line_search = "cp" # cubic
+                newton.report = True
+
+                n_it, converged = newton.solve(u_i)
+                if not converged:
+                    raise RuntimeError(f"[mechanical] newton failed after {n_it} iters")
 
                 # Apply relaxation
-                u_n.x.array[:] = self.relax_u * u_n.x.array + (1 - self.relax_u) * u_old.x.array
+                u_i.x.array[:] = self.relax_u * u_i.x.array + (1 - self.relax_u) * u_old.x.array
+
+            # --- UPDATE HISTORY: H <- max(H, psi_el^+(u_i)) ---
+            if self.on.get("fracture", False):
+                # L2-projection of psi^+ onto V_pf
+                sH = ufl.TrialFunction(self.V_pf); qH = ufl.TestFunction(self.V_pf)
+                aH = sH*qH*ufl.dx
+                LH = 0
+                def psi_pos(u, K, G):
+                    e = self.epsilon(u)
+                    trp = ufl.max_value(ufl.tr(e), 0.0)
+                    dev = e - (ufl.tr(e)/self.gdim)*ufl.Identity(self.gdim)
+                    return 0.5*K*trp**2 + G*ufl.inner(dev, dev)
+                for label, material in self.materials.items():
+                    tag = self.label_map[label]
+                    dx_tag = self.dx_tags[tag]
+                    LH += psi_pos(u_i, material["bulk_modulus"], material["G"]) * qH * dx_tag
+                H_new = dolfinx.fem.Function(self.V_pf, name="H_new")
+                from dolfinx.fem.petsc import LinearProblem
+                LinearProblem(aH, LH, u=H_new, petsc_options={"ksp_type": "cg", "pc_type": "jacobi"}).solve()
+                np.maximum(self.H.x.array, H_new.x.array, out=self.H.x.array)
+
+            # 3) PHASE FIELD (damage)
+            if self.on.get("fracture", False):
+                d_old.x.array[:] = d_i.x.array
+
+                print("\n[INFO] Assembling phase-field (damage) problem...")
+
+                u_pf, v_pf = ufl.TrialFunction(self.V_pf), ufl.TestFunction(self.V_pf)
+                F_s = 0
+
+                for label, material in self.materials.items():
+                    tag = self.label_map[label]
+                    dx = self.dx_tags[tag]
+
+                    F_s += (
+                        2.0*self.Gc*self.ell * ufl.dot(ufl.grad(d_i), ufl.grad(v_pf))
+                        - (self.Gc/(2.0*self.ell)) * (1.0 - d_i) * v_pf
+                        + self.g_prime(d_i) * self.H * v_pf
+                    ) * dx
+
+                J_s = ufl.derivative(F_s, d_i, u_pf)
+
+                from dolfinx.fem.petsc import NonlinearProblem
+                from dolfinx.nls.petsc import NewtonSolver
+
+                problem_s = NonlinearProblem(F_s, d_i, J=J_s, jit_options={"timeout": 1200})
+                ns = NewtonSolver(self.mesh.comm, problem_s)
+
+                ns.atol = float(tol_d)          # phase-field
+                ns.rtol = 0.0
+                ns.max_it = max_iter
+
+                ns.convergence_criterion = "incremental"
+                ns.report = True
+                ns.line_search = "bt"
+
+                its, ok = ns.solve(d_i)
+                if not ok:
+                    print(f"WARNING: phase-field newton did not converge in {its} iterations.")
+                np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
+
+                self.d.x.array[:] = d_i.x.array
 
             # 4) CONVERGENCE CHECK and LOGGING
             print(f"\nConvergence check")
             
+            rel_norm_dT = 0.0
+            rel_norm_du = 0.0
+            conv_s = True
+
             # Synchronize ghost values before vector operations
-            T_n.x.scatter_forward()
-            T_old.x.scatter_forward()
-            u_n.x.scatter_forward()
-            u_old.x.scatter_forward()
+            if self.on.get("thermal", False):
+                T_i.x.scatter_forward()
+                T_old.x.scatter_forward()
+
+                vec_T_new = T_i.x.petsc_vec
+                vec_T_old = T_old.x.petsc_vec
+
+                # Compute difference vector: diff_T = T_now - T_old
+                diff_T = vec_T_new.copy()
+                diff_T.axpy(-1.0, vec_T_old) 
+
+                # Compute norms
+                norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
+                norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
+                rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
+
+                print(f"  ||ΔT|| = {norm_dT:.3e}, ||ΔT||/||T|| = {rel_norm_dT:.3e}")
+
+            if self.on.get("mechanical", False):
+                u_i.x.scatter_forward()
+                u_old.x.scatter_forward()
+
+                # --- Displacement convergence ---
+                # Get the PETSc vectors
+                vec_u_new = u_i.x.petsc_vec
+                vec_u_old = u_old.x.petsc_vec
+
+                # Compute difference vector: diff_u = u_now - u_old
+                diff_u = vec_u_new.copy()
+                diff_u.axpy(-1.0, vec_u_old)
+
+                # Compute norms
+                norm_du = diff_u.norm(PETSc.NormType.NORM_2)
+                norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
+                rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
+
+                print(f"  ||Δu|| = {norm_du:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}")
+                
             if self.on.get("fracture", False):
-                self.s.x.scatter_forward()
-                s_old.x.scatter_forward()
+                self.d.x.scatter_forward()
+                d_i.x.scatter_forward()
 
-            vec_T_new = T_n.x.petsc_vec
-            vec_T_old = T_old.x.petsc_vec
+                conv_s = True
+                d_diff_inf = 0.0
 
-            # Compute difference vector: diff_T = T_now - T_old
-            diff_T = vec_T_new.copy()
-            diff_T.axpy(-1.0, vec_T_old) 
+                d_diff_inf = np.linalg.norm(d_i.x.array - d_old.x.array, ord=np.inf)
+                conv_s = d_diff_inf < tol_d
 
-            # Compute norms
-            norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
-            norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
-            rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
+                print(f"  ||Δd||_inf = {d_diff_inf:.3e}, tol_d={tol_d:.1e}")
 
-            # --- Displacement convergence ---
-            # Get the PETSc vectors
-            vec_u_new = u_n.x.petsc_vec
-            vec_u_old = u_old.x.petsc_vec
-
-            # Compute difference vector: diff_u = u_now - u_old
-            diff_u = vec_u_new.copy()
-            diff_u.axpy(-1.0, vec_u_old)
-
-            # Compute norms
-            norm_du = diff_u.norm(PETSc.NormType.NORM_2)
-            norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
-            rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
-
-            conv_s = True # [PF_CHANGE] conv_d -> conv_s
-            s_diff_inf = 0.0 # [PF_CHANGE] d_diff_inf -> s_diff_inf
-            if self.on.get("fracture", False):
-                s_diff_inf = np.linalg.norm(self.s.x.array - s_old.x.array, ord=np.inf) # [PF_CHANGE] self.d -> self.s, d_old -> s_old
-                conv_s = s_diff_inf < tol_s # [PF_CHANGE] conv_d -> conv_s, tol_d -> tol_s
-
-            print(f"  ||ΔT|| = {norm_dT:.3e}, ||Δu|| = {norm_du:.3e}, ||Δs||_inf = {s_diff_inf:.3e}") # [PF_CHANGE] ||Δd|| -> ||Δs||
-            print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}  (tol_T={tol_T:.1e}, tol_u={tol_u:.1e}, tol_s={tol_s:.1e})") # [PF_CHANGE] tol_d -> tol_s
-            if self.on.get("fracture", False):
-                print(f"Phase-field s: min={self.s.x.array.min():.3e}, max={self.s.x.array.max():.3e}") # [PF_CHANGE] Damage d -> Phase-field s
-                print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}") # [PF_CHANGE] Access H via phase_field_model
+                print(f"Phase-field d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
+                print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
 
             if (rel_norm_dT < tol_T or not self.on.get("thermal", False)) \
             and (rel_norm_du < tol_u or not self.on.get("mechanical", False)) \
-            and conv_s: # [PF_CHANGE] conv_d -> conv_s
+            and conv_s:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
-                self.T.x.array[:] = T_n.x.array
-                self.u.x.array[:] = u_n.x.array
+                if self.on.get("thermal", False):
+                    self.T.x.array[:] = T_i.x.array
+                    T_min, T_max = self.T.x.array.min(), self.T.x.array.max()
+                    print(f"Global min/max temperature: {T_min:.2f} / {T_max:.2f} K")
+
+                if self.on.get("mechanical", False):
+                    self.u.x.array[:] = u_i.x.array
+
+                    # # Get the raw data from the displacement solution vector
+                    # u_array = u_i.x.array
+                    # u_vectors = u_array.reshape(-1, self.gdim)
+                    # magnitude_values = np.sqrt(np.sum(u_vectors**2, axis=1))
+                    # u_min = magnitude_values.min()
+                    # u_max = magnitude_values.max()
+                    # print(f"Global min/max displacement magnitude: {u_min:.2e} / {u_max:.2e} m")
+
+                    u_vec = u_i.x.array.reshape(-1, self.gdim)
+                    umag = np.sqrt((u_vec**2).sum(axis=1))
+                    print(f"Global min/max displacement magnitude: {umag.min():.2e} / {umag.max():.2e} m")
+                    
                 if self.on.get("fracture", False):
-                    self.s.x.array[:] = self.s.x.array # [PF_CHANGE] self.d -> self.s
-                    self.s_n.x.array[:] = self.s.x.array # [PF_CHANGE] self.d_n -> self.s_n
+                    self.d.x.array[:] = d_i.x.array
 
-                T_min, T_max = self.T.x.array.min(), self.T.x.array.max()
-                print(f"Global min/max temperature: {T_min:.2f} / {T_max:.2f} K")
-
-                # # Get the raw data from the displacement solution vector
-                # u_array = u_n.x.array
-                # u_vectors = u_array.reshape(-1, self.gdim)
-                # magnitude_values = np.sqrt(np.sum(u_vectors**2, axis=1))
-                # u_min = magnitude_values.min()
-                # u_max = magnitude_values.max()
-                # print(f"Global min/max displacement magnitude: {u_min:.2e} / {u_max:.2e} m")
-
-                u_vec = u_n.x.array.reshape(-1, self.gdim)
-                umag = np.sqrt((u_vec**2).sum(axis=1))
-                print(f"Global min/max displacement magnitude: {umag.min():.2e} / {umag.max():.2e} m")
                 return True
 
         print("\n[WARNING] Staggered solver did not converge. Using last iteration state.")
-        # Update the main state with the last (non-converged) result
-        self.T.x.array[:] = T_n.x.array
-        self.u.x.array[:] = u_n.x.array
-
-        if self.on.get("fracture", False):
-            self.s_n.x.array[:] = self.s.x.array # [PF_CHANGE] self.d_n -> self.s_n
 
         return False
