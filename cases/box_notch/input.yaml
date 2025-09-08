@@ -18,7 +18,6 @@ materials:
 solver_settings:
   coupling: staggered # monolithic, staggered
   thermal_solver: iterative_amg # direct_mumps, iterative_amg, iterative_hypre
-  mechanical_solver: iterative_hypre # direct_mumps, iterative_amg, iterative_hypre
   tol: 1e-2
   tol_T: 1e-2
   tol_u: 1e-2
@@ -31,8 +30,15 @@ solver_settings:
 models:
   thermal: False
   mechanical: True
-  fracture: True
+  fracture: False
   # gap_conductance
+
+mechanical:
+  solver: linear           # linear | nonlinear
+  linear_solver: iterative_hypre   # direct_mumps | iterative_amg | iterative_hypre
+  # solver: nonlinear
+  # nonlinear_solver: newton
+  # nonlinear_line_search: cp   # cp | bt
 
 fracture:
   model: AT2

@@ -44,8 +44,8 @@ class PhaseFieldModel:
         self.eta = pf.get("eta", 1e-8) # Small parameter for g(s) to avoid division by zero
 
         print("\n[PhaseFieldModel] parameters loaded from input.yaml:")
-        print(f"  Gc               : {self.Gc} N/mm")
-        print(f"  ell              : {self.ell} mm")
+        print(f"  Gc               : {self.Gc} N/m")
+        print(f"  ell              : {self.ell} m")
         print(f"  eta              : {self.eta} (small regularization parameter)\n")
 
         # FE containers
@@ -55,13 +55,13 @@ class PhaseFieldModel:
     # -------- helpers --------
     def _I(self): return ufl.Identity(self.gdim)
 
-    def _pos(self, x):
-        # <x>_+ = max(x, 0)
-        return ufl.max_value(x, 0.0)
+    def _pos(self, f):
+        # f_+ = f if f>0
+        return ufl.max_value(f, 0.0)
 
-    def _neg(self, x):
-        # <x>_- = min(x, 0)
-        return ufl.min_value(x, 0.0)
+    def _neg(self, f):
+        # f_- = -f if f<0
+        return ufl.min_value(f, 0.0)
 
     def _dev(self, eps):
         return eps - (ufl.tr(eps)/self.gdim) * self._I()

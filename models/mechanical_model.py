@@ -4,12 +4,22 @@ from petsc4py import PETSc
 
 class MechanicalModel:
     def __init__(self):
-        print("__MechanicalModel initializer__")
-        self.a_mechanical = {}
-        self.L_mechanical = {}
+        print("[MechanicalModel] initializer")
         self.traction = {}
         self.dirichlet_mechanical = {}
 
+        import yaml
+        with open("input.yaml", "r") as f:
+            data = yaml.safe_load(f)
+
+        self.mech_options = data.get("mechanical", {}) # parsing
+        if not self.mech_options:
+            raise ValueError("[MechanicalModel] 'mechanical' missing in input.yaml.")
+
+        print("[MechanicalModel] options loaded from input.yaml:")
+        for key, value in self.mech_options.items():
+            print(f"  {key:<20}: {value}")
+            
     def set_mechanical_boundary_conditions(self, V_u_sub, V_u_map=None):
         """
         Apply mechanical boundary conditions for both staggered and mixed cases.

@@ -17,7 +17,6 @@ class Solver:
         self.relax_u = float(solver_settings.get("relax_u", 0.5))
 
         self.thermal_solver = solver_settings.get("thermal_solver", "default")
-        self.mechanical_solver = solver_settings.get("mechanical_solver", "default")
 
         print("  Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
@@ -422,9 +421,8 @@ class Solver:
                 print("\n[INFO] Assembling mechanical problem...")
 
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
-                # a_m = 0
-                # L_m = 0
-                F_m = 0
+                a_m = 0; L_m = 0 # linear solver
+                F_m = 0 # non-linear solver
 
                 # --- Volume integrals ---
                 for label, material in self.materials.items():
@@ -438,74 +436,118 @@ class Solver:
                     body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
 
                     # Mechanical stress, linearized, degradated
-                    if self.on.get("fracture", False):
-                        dmg = ufl.as_ufl(d_i)
-                        stress_tensor = self.sigma_degraded(u_i, dmg, material)
+                    if self.mech_options.get("solver") == "linear":
+                        if self.on.get("fracture", False):
+                            dmg = ufl.as_ufl(d_i)
+                            stress_tensor = self.sigma_degraded(u_m, dmg, material)
 
-                    else:
-                        stress_tensor = self.sigma_mech(u_i, material)
+                        else:
+                            stress_tensor = self.sigma_mech(u_m, material)
 
-                    # a_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
-                    # L_m += ufl.dot(body_force, v_m) * dx
-                    # L_m += ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
+                    elif self.mech_options.get("solver") == "non-linear":
+                        if self.on.get("fracture", False):
+                            dmg = ufl.as_ufl(d_i)
+                            stress_tensor = self.sigma_degraded(u_i, dmg, material)
 
-                    if self.on.get("thermal", False):
-                        F_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx \
-                            - ufl.dot(body_force, v_m) * dx \
-                            - ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
-                    else:
-                        F_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx \
-                            - ufl.dot(body_force, v_m) * dx
+                        else:
+                            stress_tensor = self.sigma_mech(u_i, material)
+                    
+                        # d = len(u_i)
+                        # I = ufl.variable(ufl.Identity(d))
+                        # F = ufl.variable(I + ufl.grad(u_i)) # deformation gradient
+                        # C = ufl.variable(F.T * F) # Right Cauchy-Green tensor
+                        # Ic = ufl.variable(ufl.tr(C)) # Invariants of deformation tensors
+                        # J = ufl.variable(ufl.det(F))
+
+                        # mu = material["G"]
+                        # lmbda = material["lmbda"]
+                        # psi = (mu / 2) * (Ic - 3) - mu * ufl.ln(J) + (lmbda / 2) * (ufl.ln(J))**2
+
+                        # Stress
+                        # Hyper-elasticity
+                        # P = ufl.diff(psi, F)
+                        # Linear elasticity
+                        # stress_tensor = 2.0 * mu * ufl.sym(ufl.grad(u)) + lmbda * ufl.tr(ufl.sym(ufl.grad(u))) * I
+
+                    if self.mech_options.get("solver") == "linear":
+                        if self.on.get("thermal", False):
+                            # F_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx \
+                            #     - ufl.dot(body_force, v_m) * dx \
+                            #     - ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
+                            
+                            # For the linear solver
+                            a_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
+                            L_m += ufl.dot(body_force, v_m) * dx
+                            L_m += ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
+
+                        else:                       
+                            # For the linear solver
+                            a_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
+                            L_m += ufl.dot(body_force, v_m) * dx
+
+                            # F_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx - ufl.dot(body_force, v_m) * dx
                     
                 # --- Neumann BCs (Traction) ---
                 for label in self.materials:
                     for bc_info in self.traction[label]:
                         print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
                         ds_traction = self.ds_tags[bc_info['id']]
-                        F_m -= ufl.dot(bc_info['value'], v_m) * ds_traction
-                        # L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
+                        # F_m -= ufl.dot(bc_info['value'], v_m) * ds_traction
+                        if self.mech_options.get("solver") == "linear":
+                            L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
 
                 # F_m += a_m - L_m
-                J_m = ufl.derivative(F_m, u_i, u_m)
+                # J_m = ufl.derivative(F_m, u_i, u_m)
 
                 # print("[DEBUG] a_m arguments:", a_m.arguments())
                 # print("[DEBUG] L_m arguments:", L_m.arguments())
 
                 # --- Solve the system ---
-                # petsc_opts_mech = self.get_solver_options(
-                #     solver_type=self.mechanical_solver, physics="mechanical", rtol=tol_mech
-                # )
-                # problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_i, petsc_options=petsc_opts_mech)
-                # problem_m.solve()
+                if self.mech_options.get("solver") == "linear":
+                    petsc_opts_mech = self.get_solver_options(
+                        solver_type=self.mech_options.get("linear_solver", None), 
+                        physics="mechanical",
+                        rtol=tol_mech
+                    )
 
-                from dolfinx.fem.petsc import NonlinearProblem
-                from dolfinx.nls.petsc import NewtonSolver
+                problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_i, petsc_options=petsc_opts_mech)
+                problem_m.solve()
 
-                jit_opts = {"timeout": 1200}
-                problem_nl = NonlinearProblem(F_m, u_i, bcs=bcs_m, J=J_m, jit_options=jit_opts)
-                newton = NewtonSolver(self.mesh.comm, problem_nl)
+                # jit_opts = {"timeout": 1200}
+                # problem_nl = NonlinearProblem(F_m, u_i, bcs=bcs_m, J=J_m, jit_options=jit_opts)
+                # newton = NewtonSolver(self.mesh.comm, problem_nl)
 
-                newton.krylov_solver.setType("gmres")
-                newton.krylov_solver.setTolerances(rtol=1e-8, atol=0.0, max_it=200)
-                pc = newton.krylov_solver.getPC()
-                pc.setType("gamg")
+                # newton.krylov_solver.setType("cg")
+                # pc = newton.krylov_solver.getPC()
+                # pc.setType("hypre")
 
-                from petsc4py import PETSc
-                PETSc.Options().setValue("mg_levels_ksp_type", "chebyshev")
-                PETSc.Options().setValue("mg_levels_pc_type",  "jacobi")
+                # from petsc4py import PETSc
+                # PETSc.Options().setValue("pc_hypre_boomeramg_strong_threshold", "0.25")
+                # PETSc.Options().setValue("pc_hypre_boomeramg_max_levels", "25")
+                # PETSc.Options().setValue("ksp_rtol", "1e-6")
+                # PETSc.Options().setValue("ksp_max_it", "200")
 
-                newton.atol = float(tol_mech)
-                newton.rtol = 0.0
-                newton.max_it = max_iter
-                newton.convergence_criterion = "incremental"
-                newton.report = True
-                # newton.line_search = "bt"  # backtracking
-                newton.line_search = "cp" # cubic
-                newton.report = True
+                # newton.krylov_solver.setType("gmres")
+                # newton.krylov_solver.setTolerances(rtol=1e-8, atol=0.0, max_it=200)
+                # pc = newton.krylov_solver.getPC()
+                # pc.setType("gamg")
 
-                n_it, converged = newton.solve(u_i)
-                if not converged:
-                    raise RuntimeError(f"[mechanical] newton failed after {n_it} iters")
+                # from petsc4py import PETSc
+                # PETSc.Options().setValue("mg_levels_ksp_type", "chebyshev")
+                # PETSc.Options().setValue("mg_levels_pc_type",  "jacobi")
+
+                # newton.atol = float(tol_mech)
+                # newton.rtol = 0.0
+                # newton.max_it = max_iter
+                # newton.convergence_criterion = "incremental"
+                # newton.report = True
+                # # newton.line_search = "bt"  # backtracking
+                # newton.line_search = "cp" # cubic
+                # newton.report = True
+
+                # n_it, converged = newton.solve(u_i)
+                # if not converged:
+                #     raise RuntimeError(f"[mechanical] newton failed after {n_it} iters")
 
                 # Apply relaxation
                 u_i.x.array[:] = self.relax_u * u_i.x.array + (1 - self.relax_u) * u_old.x.array
@@ -526,7 +568,7 @@ class Solver:
                     dx_tag = self.dx_tags[tag]
                     LH += psi_pos(u_i, material["bulk_modulus"], material["G"]) * qH * dx_tag
                 H_new = dolfinx.fem.Function(self.V_pf, name="H_new")
-                from dolfinx.fem.petsc import LinearProblem
+
                 LinearProblem(aH, LH, u=H_new, petsc_options={"ksp_type": "cg", "pc_type": "jacobi"}).solve()
                 np.maximum(self.H.x.array, H_new.x.array, out=self.H.x.array)
 
@@ -550,9 +592,6 @@ class Solver:
                     ) * dx
 
                 J_s = ufl.derivative(F_s, d_i, u_pf)
-
-                from dolfinx.fem.petsc import NonlinearProblem
-                from dolfinx.nls.petsc import NewtonSolver
 
                 problem_s = NonlinearProblem(F_s, d_i, J=J_s, jit_options={"timeout": 1200})
                 ns = NewtonSolver(self.mesh.comm, problem_s)
