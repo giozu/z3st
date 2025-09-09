@@ -68,13 +68,13 @@ class PhaseFieldModel:
     
     def g_s(self, dmg):
         """Degradation function for phase-field"""
-        return (1.0 - self.eta) * dmg**2 + self.eta
-        # return dmg**2 + self.eta
+        # return (1.0 - self.eta) * dmg**2 + self.eta
+        return dmg**2 + self.eta
 
     def g_prime(self, dmg):
         """Derivative of degradation function"""
-        return  (1.0 - self.eta) * 2 * dmg
-        # return  2 * dmg
+        # return  (1.0 - self.eta) * 2 * dmg
+        return  2 * dmg
 
     def setup(self):
         
@@ -121,5 +121,22 @@ class PhaseFieldModel:
         tr_neg = self._neg(ufl.tr(self.epsilon(u)))
         return K * tr_neg * self._I()
 
+    # def sigma_degraded(self, u, s, material):
+    #     return self.sigma_pos(u, s, material) + self.sigma_neg(u, material)
+    
     def sigma_degraded(self, u, s, material):
-        return self.sigma_pos(u, s, material) + self.sigma_neg(u, material)
+        lmbda = material["lmbda"]
+        mu = material["mu"]
+        eps = self.epsilon(u)                # sym(grad(u))
+        tr_eps = ufl.tr(eps)
+
+        # split volumetric strain
+        tr_pos = (tr_eps + ufl.abs(tr_eps)) / 2
+        tr_neg = (tr_eps - ufl.abs(tr_eps)) / 2
+
+        dev = eps - (1.0/3.0)*tr_eps*ufl.Identity(self.gdim)
+
+        return (
+            ( (1-s)**2 + self.eta ) * (2.0*mu*dev + lmbda*tr_pos*ufl.Identity(self.gdim))
+            + lmbda*tr_neg*ufl.Identity(self.gdim)
+        )

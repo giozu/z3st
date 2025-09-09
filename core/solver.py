@@ -312,9 +312,6 @@ class Solver:
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
 
-            if self.on.get("fracture", False):
-                d_i.x.array[:] = self.d.x.array
-
             # 1) THERMAL
             if self.on.get("thermal", False):
                 T_old.x.array[:] = T_i.x.array
