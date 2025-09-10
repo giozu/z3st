@@ -121,22 +121,30 @@ class PhaseFieldModel:
         tr_neg = self._neg(ufl.tr(self.epsilon(u)))
         return K * tr_neg * self._I()
 
+    def sigma_degraded(self, u, s, material):
+        eps = self.epsilon(u)
+        return ((1-s)**2 + self.eta) * (
+            material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.gdim)
+            + 2.0 * material["G"] * eps
+        )
+
     # def sigma_degraded(self, u, s, material):
     #     return self.sigma_pos(u, s, material) + self.sigma_neg(u, material)
     
-    def sigma_degraded(self, u, s, material):
-        lmbda = material["lmbda"]
-        mu = material["mu"]
-        eps = self.epsilon(u)                # sym(grad(u))
-        tr_eps = ufl.tr(eps)
+    # se uso questa, non lineare...
+    # def sigma_degraded(self, u, s, material):
+    #     lmbda = material["lmbda"]
+    #     mu = material["G"]
+    #     eps = self.epsilon(u)                # sym(grad(u))
+    #     tr_eps = ufl.tr(eps)
 
-        # split volumetric strain
-        tr_pos = (tr_eps + ufl.abs(tr_eps)) / 2
-        tr_neg = (tr_eps - ufl.abs(tr_eps)) / 2
+    #     # split volumetric strain
+    #     tr_pos = ufl.max_value(tr_eps, 0.0)
+    #     tr_neg = ufl.min_value(tr_eps, 0.0)
 
-        dev = eps - (1.0/3.0)*tr_eps*ufl.Identity(self.gdim)
+    #     dev = eps - (1.0/3.0)*tr_eps*ufl.Identity(self.gdim)
 
-        return (
-            ( (1-s)**2 + self.eta ) * (2.0*mu*dev + lmbda*tr_pos*ufl.Identity(self.gdim))
-            + lmbda*tr_neg*ufl.Identity(self.gdim)
-        )
+    #     return (
+    #         ( (1-s)**2 + self.eta ) * (2.0*mu*dev + lmbda*tr_pos*ufl.Identity(self.gdim))
+    #         + lmbda*tr_neg*ufl.Identity(self.gdim)
+    #     )

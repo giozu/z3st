@@ -576,36 +576,47 @@ class Solver:
                 print("\n[INFO] Assembling phase-field (damage) problem...")
 
                 u_pf, v_pf = ufl.TrialFunction(self.V_pf), ufl.TestFunction(self.V_pf)
-                F_s = 0
+                # F_d = 0
+                a_d = 0; L_d = 0 # linear if g' = 2*d
 
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
                     dx = self.dx_tags[tag]
 
-                    F_s += (
-                        2.0*self.Gc*self.ell * ufl.dot(ufl.grad(d_i), ufl.grad(v_pf))
-                        - (self.Gc/(2.0*self.ell)) * (1.0 - d_i) * v_pf
-                        + self.g_prime(d_i) * self.H * v_pf
-                    ) * dx
+                    a_d += (2.0*self.Gc*self.ell * ufl.dot(ufl.grad(u_pf), ufl.grad(v_pf))
+                            + (self.Gc/(2.0*self.ell)) * u_pf * v_pf
+                            + self.g_prime(u_pf) * self.H * v_pf) * dx
+                    
+                    L_d += self.Gc/(2.0*self.ell) * v_pf * dx
 
-                J_s = ufl.derivative(F_s, d_i, u_pf)
+                    # F_d += (
+                    #     2.0*self.Gc*self.ell * ufl.dot(ufl.grad(d_i), ufl.grad(v_pf))
+                    #     - (self.Gc/(2.0*self.ell)) * (1.0 - d_i) * v_pf
+                    #     + self.g_prime(d_i) * self.H * v_pf
+                    # ) * dx
 
-                problem_s = NonlinearProblem(F_s, d_i, J=J_s, jit_options={"timeout": 1200})
-                ns = NewtonSolver(self.mesh.comm, problem_s)
+                # J_d = ufl.derivative(F_d, d_i, u_pf)
 
-                ns.atol = float(tol_d)          # phase-field
-                ns.rtol = 0.0
-                ns.max_it = max_iter
+                # problem_s = NonlinearProblem(F_d, d_i, J=J_d, jit_options={"timeout": 1200})
+                # ns = NewtonSolver(self.mesh.comm, problem_s)
 
-                ns.convergence_criterion = "incremental"
-                ns.report = True
-                ns.line_search = "bt"
+                # ns.atol = float(tol_d)          # phase-field
+                # ns.rtol = 0.0
+                # ns.max_it = max_iter
 
-                its, ok = ns.solve(d_i)
-                if not ok:
-                    print(f"WARNING: phase-field newton did not converge in {its} iterations.")
+                # ns.convergence_criterion = "incremental"
+                # ns.report = True
+                # ns.line_search = "bt"
+
+                # its, ok = ns.solve(d_i)
+                # if not ok:
+                #     print(f"WARNING: phase-field newton did not converge in {its} iterations.")
+                # np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
+
+                problem_d = LinearProblem(a_d, L_d, u=d_i, petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
+                problem_d.solve()
+
                 np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
-
                 self.d.x.array[:] = d_i.x.array
 
             # 4) CONVERGENCE CHECK and LOGGING
