@@ -258,8 +258,8 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                 sig_el = self.sigma_degraded(self.u, self.d, mat)
 
                 # energy density = g_d(d) ψ+ + ψ-
-                psi_plus = self.elastic_energy_pos(self.u, mat)
-                psi_minus = self.elastic_energy_neg(self.u, mat)
+                psi_plus = self.psi_pos(self.u, mat)
+                psi_minus = self.psi_neg(self.u, mat)
                 self.energy_density[name] = self.g_s(self.d) * psi_plus + psi_minus
 
             else:

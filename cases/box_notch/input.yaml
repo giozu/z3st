@@ -34,20 +34,15 @@ models:
   # gap_conductance
 
 mechanical:
-  solver: linear           # linear | nonlinear
+  solver: non-linear           # linear | non-linear
   linear_solver: iterative_hypre   # direct_mumps | iterative_amg | iterative_hypre
   # solver: nonlinear
   # nonlinear_solver: newton
   # nonlinear_line_search: cp   # cp | bt
 
 fracture:
-  model: AT2
-  sigma_c: 1.0e+8   # Pa
-  kappa: 1.0e-8
-  split: amor_dev_vol
-  irreversibility: history
   Gc: 10000.0   # J/m^2 (o N/m)
-  ell: 5.0e-7  # m
+  ell: 1.59e-6  # m
   eta: 1.0e-8
 
 mechanical_regime: "3D" # 3D, plane_stress

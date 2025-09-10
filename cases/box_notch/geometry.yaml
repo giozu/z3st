@@ -4,13 +4,10 @@ width: '0.1'
 height: '0.004'
 geometry_type: rect
 labels:
-  bottom: 2
-  top: 3
-  face_xx_0: 4
-  face_xx_1: 5
-  face_yy_0: 6
-  face_yy_1: 7
-  notch: 8
-  notch_sides_y1: 9
-  notch_sides_y2: 10
-  fuel: 1
+  bottom: 1
+  face_yy_0: 2
+  face_xx_1: 3
+  face_yy_1: 4
+  face_xx_0: 5
+  top: 6
+  fuel: 7

@@ -84,21 +84,14 @@ class PhaseFieldModel:
         self.H   = dolfinx.fem.Function(self.V_pf, name="History")
         self.H.x.array[:] = 0.0
 
-    def elastic_energy_pos(self, u, material):
-        """
-        Psi_el.0^+(epsilon(u)) = 0.5 * K * (tr_eps)_+^2 + G * ||eps_dev||^2
-        """
-        eps = ufl.sym(ufl.grad(u))
+    def psi_pos(self, u, material):
+        eps = self.epsilon(u)
         tr_eps = ufl.tr(eps)
-        eps_dev = self._dev(eps)
+        tr_pos = ufl.max_value(tr_eps, 0.0)
+        dev = eps - (tr_eps/self.gdim)*ufl.Identity(self.gdim)
+        return 0.5*material["bulk_modulus"]*tr_pos**2 + material["G"]*ufl.inner(dev, dev)
 
-        kappa = material["bulk_modulus"]
-        G = material["G"]
-
-        tr_eps_pos = self._pos(tr_eps)
-        return 0.5 * kappa * tr_eps_pos**2 + G * ufl.inner(eps_dev, eps_dev)
-
-    def elastic_energy_neg(self, u, material):
+    def psi_neg(self, u, material):
         """
         Psi_el.0^-(epsilon(u)) = 0.5 * K * (tr_eps)_-^2
         """
@@ -121,12 +114,12 @@ class PhaseFieldModel:
         tr_neg = self._neg(ufl.tr(self.epsilon(u)))
         return K * tr_neg * self._I()
 
-    def sigma_degraded(self, u, s, material):
-        eps = self.epsilon(u)
-        return ((1-s)**2 + self.eta) * (
-            material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.gdim)
-            + 2.0 * material["G"] * eps
-        )
+    # def sigma_degraded(self, u, s, material):
+    #     eps = self.epsilon(u)
+    #     return ((1-s)**2 + self.eta) * (
+    #         material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.gdim)
+    #         + 2.0 * material["G"] * eps
+    #     )
 
     # def sigma_degraded(self, u, s, material):
     #     return self.sigma_pos(u, s, material) + self.sigma_neg(u, material)
@@ -148,3 +141,17 @@ class PhaseFieldModel:
     #         ( (1-s)**2 + self.eta ) * (2.0*mu*dev + lmbda*tr_pos*ufl.Identity(self.gdim))
     #         + lmbda*tr_neg*ufl.Identity(self.gdim)
     #     )
+
+    def sigma_degraded(self, u, d, material):
+        eps = self.epsilon(u)
+        tr_eps = ufl.tr(eps)
+        tr_pos = ufl.max_value(tr_eps, 0.0)
+        tr_neg = ufl.min_value(tr_eps, 0.0)
+        dev = eps - (tr_eps/self.gdim)*ufl.Identity(self.gdim)
+        K = material["bulk_modulus"]
+        G = material["G"]
+
+        return (
+            ( (1-d)**2 + self.eta ) * (2*G*dev + K*tr_pos*ufl.Identity(self.gdim))
+            + K*tr_neg*ufl.Identity(self.gdim)
+        )
