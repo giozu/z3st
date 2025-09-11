@@ -23,8 +23,8 @@ solver_settings:
   tol_u: 1e-2
   tol_mech: 1e-6
   tol_th: 1e-6
-  relax_T: 0.7
-  relax_u: 0.3
+  relax_T: 0.9
+  relax_u: 0.9
   n_iter_max: 50
 
 models:
@@ -34,16 +34,13 @@ models:
   # gap_conductance
 
 mechanical:
-  solver: non-linear           # linear | non-linear
-  linear_solver: iterative_hypre   # direct_mumps | iterative_amg | iterative_hypre
-  # solver: nonlinear
-  # nonlinear_solver: newton
-  # nonlinear_line_search: cp   # cp | bt
+  solver: non-linear
+  linear_solver: iterative_hypre
 
 fracture:
   Gc: 10000.0   # J/m^2 (o N/m)
   ell: 1.59e-6  # m
-  eta: 1.0e-8
+  eta: 1.0e-5
 
 mechanical_regime: "3D" # 3D, plane_stress
 

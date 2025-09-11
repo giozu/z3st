@@ -418,8 +418,8 @@ class Solver:
                 print("\n[INFO] Assembling mechanical problem...")
 
                 u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
-                a_m = 0; L_m = 0
-                F_m = 0
+                a_m, L_m = 0, 0 # linear formulation a(u,v) = F(v)
+                F_m = 0 # non-linear formulation F(u,v) = 0
 
                 # --- Volume integrals ---
                 for label, material in self.materials.items():
@@ -427,48 +427,44 @@ class Solver:
                     print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
                     dx = self.dx_tags[tag]
 
-                    # Body force
                     rho = dolfinx.default_scalar_type(material["rho"])
                     g = dolfinx.default_scalar_type(self.g)
-                    body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
+                    body_force = dolfinx.fem.Constant(self.mesh, (0, 0, - rho * g))
 
                     if self.mech_options.get("solver") == "linear":
-                        # Linear stress (no split)
                         if self.on.get("fracture", False):
                             dmg = ufl.as_ufl(d_i)
-                            stress_tensor = self.sigma_degraded(u_m, dmg, material)
+                            stress_tensor = self.sigma_degraded(u_m, dmg, material) # in phase_field_model
                         else:
-                            stress_tensor = self.sigma_mech(u_m, material)
+                            stress_tensor = self.sigma_mech(u_m, material) # in mechanical_model
 
-                        # Assembla forma lineare
                         a_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
                         L_m += ufl.dot(body_force, v_m) * dx
                         if self.on.get("thermal", False):
                             L_m += ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
 
                     elif self.mech_options.get("solver") == "non-linear":
-                        # Nonlinear stress (split volumetrico + deviatorico)
                         if self.on.get("fracture", False):
                             dmg = ufl.as_ufl(d_i)
                             stress_tensor = self.sigma_degraded(u_i, dmg, material)
                         else:
                             stress_tensor = self.sigma_mech(u_i, material)
 
-                        # Residuo non lineare
                         F_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx - ufl.dot(body_force, v_m) * dx
 
-                # --- Neumann BCs (Traction) ---
+                # --- Neumann BCs (traction) ---
                 for label in self.materials:
                     for bc_info in self.traction[label]:
                         print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
-                        ds_traction = self.ds_tags[bc_info['id']]
+                        ds = self.ds_tags[bc_info['id']]
                         if self.mech_options.get("solver") == "linear":
-                            L_m += ufl.dot(bc_info['value'], v_m) * ds_traction
+                            L_m += ufl.dot(bc_info['value'], v_m) * ds
                         elif self.mech_options.get("solver") == "non-linear":
-                            F_m -= ufl.dot(bc_info['value'], v_m) * ds_traction
+                            F_m -= ufl.dot(bc_info['value'], v_m) * ds
 
                 # --- Solve the system ---
                 if self.mech_options.get("solver") == "linear":
+                    print(f"  Linear solver")
                     petsc_opts_mech = self.get_solver_options(
                         solver_type=self.mech_options.get("linear_solver", None),
                         physics="mechanical",
@@ -478,26 +474,20 @@ class Solver:
                     problem_m.solve()
 
                 elif self.mech_options.get("solver") == "non-linear":
-                    J_m = ufl.derivative(F_m, u_i, u_m)
-                    problem_m = NonlinearProblem(F_m, u_i, bcs=bcs_m, J=J_m)
-                    newton = NewtonSolver(self.mesh.comm, problem_m)
+                    print(f"  Non-linear solver")
 
-                    newton.atol = float(tol_mech)
-                    newton.rtol = 0.0
-                    newton.max_it = max_iter
-                    newton.convergence_criterion = "incremental"
-                    newton.report = True
-                    # newton.line_search = "bt"  # backtracking
-                    newton.line_search = "cp"  # cubic
+                    problem_m = NonlinearProblem(F_m, u_i, bcs=bcs_m)
+                    solver = NewtonSolver(self.mesh.comm, problem_m)
 
-                    ksp = newton.krylov_solver
-                    ksp.setType("gmres")
-                    pc = ksp.getPC()
-                    pc.setType("gamg")
+                    solver.atol = 1e-8
+                    solver.rtol = 1e-8
+                    solver.convergence_criterion = "incremental"
 
-                    n_it, converged = newton.solve(u_i)
+                    n_it, converged = solver.solve(u_i)
+                    assert (converged)
+
                     if not converged:
-                        raise RuntimeError(f"[mechanical] Newton solver failed after {n_it} iterations")
+                        raise RuntimeError(f"[mechanical] NewtonSolver failed after {n_it} iterations")
 
                 # Apply relaxation
                 u_i.x.array[:] = self.relax_u * u_i.x.array + (1 - self.relax_u) * u_old.x.array
@@ -527,22 +517,20 @@ class Solver:
 
                 print("\n[INFO] Assembling phase-field (damage) problem...")
 
-                u_pf, v_pf = ufl.TrialFunction(self.V_pf), ufl.TestFunction(self.V_pf)
+                d, w = ufl.TrialFunction(self.V_pf), ufl.TestFunction(self.V_pf)
                 a_d = 0; L_d = 0
 
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
                     dx = self.dx_tags[tag]
 
-                    # Wu AT-2: g'(d) = 2*d
-                    a_d += (2.0 * self.H * u_pf * v_pf
-                            + (self.Gc / (2.0 * self.ell)) * u_pf * v_pf
-                            + self.Gc * self.ell * ufl.dot(ufl.grad(u_pf), ufl.grad(v_pf))) * dx
+                    a_d += self.Gc / self.ell * d * w * dx
+                    + self.Gc * self.ell * ufl.dot(ufl.grad(d), ufl.grad(w)) * dx
+                    + 2.0 * d * self.H * w * dx 
 
-                    L_d += (self.Gc / (2.0 * self.ell)) * v_pf * dx
+                    L_d += 2.0 * self.H * w * dx 
 
-                problem_d = LinearProblem(a_d, L_d, u=d_i,
-                                        petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
+                problem_d = LinearProblem(a_d, L_d, u=d_i, petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
                 problem_d.solve()
 
                 np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)

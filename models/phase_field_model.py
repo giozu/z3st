@@ -6,17 +6,11 @@ import yaml
 
 class PhaseFieldModel:
     """
-    Phase-field fracture (AT-2, Wu et al. 2017) with volumetric/deviatoric split (Amor et al.).
+    Phase-field fracture
 
     Convention:
         d = 0 → intact material
         d = 1 → fully broken
-
-    Degradation function (Wu AT-2):
-        g(d) = d^2 + eta
-
-    Stress split:
-        σ(u,d) = g(d) * [2G dev(ε(u)) + K <tr(ε)>+ I] + K <tr(ε)>- I
     """
 
     def __init__(self, input_file="input.yaml"):
@@ -51,13 +45,13 @@ class PhaseFieldModel:
     def _dev(self, eps):
         return eps - (ufl.tr(eps)/self.gdim) * self._I()
 
-    def g_s(self, d):
-        """Degradation function (Wu AT-2)"""
-        return d**2 + self.eta
+    def g_d(self, d):
+        """Degradation function"""
+        return (1.0 - d)**2 + self.eta
 
-    def g_prime(self, d):
-        """Derivative of g(d)"""
-        return 2*d
+    def g_d_prime(self, d):
+        """dg(d)/dd"""
+        return -2.0*(1.0-d)
 
     def setup(self):
         """Initialize PF variables"""
@@ -66,7 +60,6 @@ class PhaseFieldModel:
         self.H = dolfinx.fem.Function(self.V_pf, name="History")
         self.H.x.array[:] = 0.0
 
-    # --- energies ---
     def psi_pos(self, u, material):
         """Positive elastic energy (tensile)"""
         eps = self.epsilon(u)
@@ -85,18 +78,9 @@ class PhaseFieldModel:
         K = material["bulk_modulus"]
         return 0.5*K*tr_neg**2
 
-    # --- stress ---
     def sigma_degraded(self, u, d, material):
-        """Degraded stress tensor (Wu AT-2)"""
-        eps = self.epsilon(u)
-        tr_eps = ufl.tr(eps)
-        tr_pos = self._pos(tr_eps)
-        tr_neg = self._neg(tr_eps)
-        dev = self._dev(eps)
-        K = material["bulk_modulus"]
-        G = material["G"]
-
-        return (
-            (d**2 + self.eta) * (2*G*dev + K*tr_pos*self._I()) +
-            K*tr_neg*self._I()
-        )
+        eps = ufl.variable(self.epsilon(u))
+        psi_pos = self.psi_pos(u, material)
+        psi_neg = self.psi_neg(u, material)
+        sigma = self.g_d(d) * ufl.diff(psi_pos, eps) + ufl.diff(psi_neg, eps)
+        return sigma
