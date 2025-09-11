@@ -479,8 +479,7 @@ class Solver:
 
                 elif self.mech_options.get("solver") == "non-linear":
                     J_m = ufl.derivative(F_m, u_i, u_m)
-                    problem_m = NonlinearProblem(F_m, u_i, bcs=bcs_m, J=J_m,
-                                                jit_options={"timeout": 2400})
+                    problem_m = NonlinearProblem(F_m, u_i, bcs=bcs_m, J=J_m)
                     newton = NewtonSolver(self.mesh.comm, problem_m)
 
                     newton.atol = float(tol_mech)
@@ -488,7 +487,13 @@ class Solver:
                     newton.max_it = max_iter
                     newton.convergence_criterion = "incremental"
                     newton.report = True
-                    newton.line_search = "bt"  # backtracking
+                    # newton.line_search = "bt"  # backtracking
+                    newton.line_search = "cp"  # cubic
+
+                    ksp = newton.krylov_solver
+                    ksp.setType("gmres")
+                    pc = ksp.getPC()
+                    pc.setType("gamg")
 
                     n_it, converged = newton.solve(u_i)
                     if not converged:
@@ -496,19 +501,24 @@ class Solver:
 
                 # Apply relaxation
                 u_i.x.array[:] = self.relax_u * u_i.x.array + (1 - self.relax_u) * u_old.x.array
+
             # --- UPDATE HISTORY: H <- max(H, psi_el^+(u_i)) ---
             if self.on.get("fracture", False):
                 sH = ufl.TrialFunction(self.V_pf)
                 qH = ufl.TestFunction(self.V_pf)
-                aH = sH*qH*ufl.dx
+                aH = sH * qH * ufl.dx
                 LH = 0
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
                     dx_tag = self.dx_tags[tag]
+                    # Positive elastic energy density ψ⁺(u)
                     LH += self.psi_pos(u_i, material) * qH * dx_tag
+
                 H_new = dolfinx.fem.Function(self.V_pf, name="H_new")
                 LinearProblem(aH, LH, u=H_new,
                             petsc_options={"ksp_type": "cg", "pc_type": "jacobi"}).solve()
+
+                # Enforce irreversibility: H(x) = max(H_old, H_new)
                 np.maximum(self.H.x.array, H_new.x.array, out=self.H.x.array)
 
             # 3) PHASE FIELD (damage)
@@ -518,42 +528,25 @@ class Solver:
                 print("\n[INFO] Assembling phase-field (damage) problem...")
 
                 u_pf, v_pf = ufl.TrialFunction(self.V_pf), ufl.TestFunction(self.V_pf)
-                # F_d = 0
-                a_d = 0; L_d = 0 # linear if g' = 2*d
+                a_d = 0; L_d = 0
 
                 for label, material in self.materials.items():
                     tag = self.label_map[label]
                     dx = self.dx_tags[tag]
 
-                    a_d += (2.0*self.Gc*self.ell * ufl.dot(ufl.grad(u_pf), ufl.grad(v_pf))
-                            + (self.Gc/(2.0*self.ell)) * u_pf * v_pf
-                            + 2.0*self.H * u_pf * v_pf) * dx
+                    # Wu AT-2: g'(d) = 2*d
+                    a_d += (2.0 * self.H * u_pf * v_pf
+                            + (self.Gc / (2.0 * self.ell)) * u_pf * v_pf
+                            + self.Gc * self.ell * ufl.dot(ufl.grad(u_pf), ufl.grad(v_pf))) * dx
 
-                    L_d += (self.Gc/(2.0*self.ell)) * v_pf * dx
+                    L_d += (self.Gc / (2.0 * self.ell)) * v_pf * dx
 
-                    # F_d += (
-                    #     2.0*self.Gc*self.ell * ufl.dot(ufl.grad(d_i), ufl.grad(v_pf))
-                    #     - (self.Gc/(2.0*self.ell)) * (1.0 - d_i) * v_pf
-                    #     + self.g_prime(d_i) * self.H * v_pf
-                    # ) * dx
+                problem_d = LinearProblem(a_d, L_d, u=d_i,
+                                        petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
+                problem_d.solve()
 
-                # J_d = ufl.derivative(F_d, d_i, u_pf)
-
-                # problem_s = NonlinearProblem(F_d, d_i, J=J_d, jit_options={"timeout": 1200})
-                # ns = NewtonSolver(self.mesh.comm, problem_s)
-
-                # ns.atol = float(tol_d)          # phase-field
-                # ns.rtol = 0.0
-                # ns.max_it = max_iter
-
-                # ns.convergence_criterion = "incremental"
-                # ns.report = True
-                # ns.line_search = "bt"
-
-                # its, ok = ns.solve(d_i)
-                # if not ok:
-                #     print(f"WARNING: phase-field newton did not converge in {its} iterations.")
-                # np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
+                np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
+                self.d.x.array[:] = d_i.x.array
 
                 problem_d = LinearProblem(a_d, L_d, u=d_i, petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
                 problem_d.solve()

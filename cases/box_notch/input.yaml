@@ -21,11 +21,11 @@ solver_settings:
   tol: 1e-2
   tol_T: 1e-2
   tol_u: 1e-2
-  tol_mech: 1e-4
+  tol_mech: 1e-6
   tol_th: 1e-6
   relax_T: 0.7
-  relax_u: 0.7
-  n_iter_max: 30
+  relax_u: 0.3
+  n_iter_max: 50
 
 models:
   thermal: False
