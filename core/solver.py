@@ -535,8 +535,18 @@ class Solver:
                 problem_d = LinearProblem(a_d, L_d, u=d_i, petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
                 problem_d.solve()
 
+                # Enforce irreversibility of the damage variable:
+                #   dⁿ ≥ dⁿ⁻¹ (damage can only grow, never heal).
+                #   This takes the maximum between the old field (d_old) and the newly solved one (d_i).
                 np.maximum(d_old.x.array, d_i.x.array, out=d_i.x.array)
+
+                # Numerical safeguard: project all values of d into the admissible interval [0, 1].
+                #   - Avoids negative values due to numerical noise.
+                #   - Ensures fully broken state is capped at d = 1.
                 np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
+
+                # Update the global damage field (self.d) with the clipped, irreversible values.
+                #   This is the field that will be exported and used in the next staggered iteration.
                 self.d.x.array[:] = d_i.x.array
 
             # 4) CONVERGENCE CHECK and LOGGING

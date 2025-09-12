@@ -86,18 +86,35 @@ class PhaseFieldModel:
         return sigma
     
     def sigma_degraded(self, u, d, material):
+        # 1) Define the strain tensor as a UFL variable
+        #    → 'ufl.variable' tells UFL: "this quantity is differentiable"
+        #      so it will be treated as an independent variable when
+        #      computing the automatic Jacobian.
         eps = ufl.variable(self.epsilon(u))
 
+        # 2) Split the strain into volumetric and deviatoric parts
+        #    - tr_eps = trace of strain (volumetric deformation)
+        #    - dev    = deviatoric (shear deformation)
         tr_eps = ufl.tr(eps)
-        tr_pos = self._pos(tr_eps)
-        tr_neg = self._neg(tr_eps)
-        dev = self._dev(eps)
+        tr_pos = self._pos(tr_eps)   # positive part → tension
+        tr_neg = self._neg(tr_eps)   # negative part → compression
+        dev    = self._dev(eps)
 
-        K = material["bulk_modulus"]
-        G = material["G"]
+        # 3) Material parameters
+        K = material["bulk_modulus"]  # bulk modulus
+        G = material["G"]             # shear modulus
 
-        psi_pos = 0.5*K*tr_pos**2 + G*ufl.inner(dev, dev)
-        psi_neg = 0.5*K*tr_neg**2
+        # 4) Elastic energies (split formulation)
+        #    - psi_pos: tensile energy (degraded by damage)
+        #    - psi_neg: compressive energy (not degraded)
+        psi_pos = 0.5 * K * tr_pos**2 + G * ufl.inner(dev, dev)
+        psi_neg = 0.5 * K * tr_neg**2
 
+        # 5) Stress definition from energy derivatives
+        #    - diff(psi_pos, eps): tensile stress
+        #    - diff(psi_neg, eps): compressive stress
+        #    - g_d(d): degradation function → reduces only the tensile part
         sigma = self.g_d(d) * ufl.diff(psi_pos, eps) + ufl.diff(psi_neg, eps)
+
         return sigma
+
