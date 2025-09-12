@@ -260,7 +260,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                 # energy density = g_d(d) ψ+ + ψ-
                 psi_plus = self.psi_pos(self.u, mat)
                 psi_minus = self.psi_neg(self.u, mat)
-                self.energy_density[name] = self.g_s(self.d) * psi_plus + psi_minus
+                self.energy_density[name] = self.g_d(self.d) * psi_plus + psi_minus
 
             else:
                 # elastico standard

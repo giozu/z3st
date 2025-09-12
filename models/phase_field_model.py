@@ -57,8 +57,8 @@ class PhaseFieldModel:
         """Initialize PF variables"""
         self.d = dolfinx.fem.Function(self.V_pf, name="PhaseField")
         self.d.x.array[:] = 0.0
-        self.H = dolfinx.fem.Function(self.V_pf, name="History")
-        self.H.x.array[:] = 0.0
+        # self.H = dolfinx.fem.Function(self.V_pf, name="History")
+        # self.H.x.array[:] = 0.0
 
     def psi_pos(self, u, material):
         """Positive elastic energy (tensile)"""
@@ -82,5 +82,22 @@ class PhaseFieldModel:
         eps = ufl.variable(self.epsilon(u))
         psi_pos = self.psi_pos(u, material)
         psi_neg = self.psi_neg(u, material)
+        sigma = self.g_d(d) * ufl.diff(psi_pos, eps) + ufl.diff(psi_neg, eps)
+        return sigma
+    
+    def sigma_degraded(self, u, d, material):
+        eps = ufl.variable(self.epsilon(u))
+
+        tr_eps = ufl.tr(eps)
+        tr_pos = self._pos(tr_eps)
+        tr_neg = self._neg(tr_eps)
+        dev = self._dev(eps)
+
+        K = material["bulk_modulus"]
+        G = material["G"]
+
+        psi_pos = 0.5*K*tr_pos**2 + G*ufl.inner(dev, dev)
+        psi_neg = 0.5*K*tr_neg**2
+
         sigma = self.g_d(d) * ufl.diff(psi_pos, eps) + ufl.diff(psi_neg, eps)
         return sigma

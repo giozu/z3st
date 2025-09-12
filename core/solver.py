@@ -493,23 +493,23 @@ class Solver:
                 u_i.x.array[:] = self.relax_u * u_i.x.array + (1 - self.relax_u) * u_old.x.array
 
             # --- UPDATE HISTORY: H <- max(H, psi_el^+(u_i)) ---
-            if self.on.get("fracture", False):
-                sH = ufl.TrialFunction(self.V_pf)
-                qH = ufl.TestFunction(self.V_pf)
-                aH = sH * qH * ufl.dx
-                LH = 0
-                for label, material in self.materials.items():
-                    tag = self.label_map[label]
-                    dx_tag = self.dx_tags[tag]
-                    # Positive elastic energy density ψ⁺(u)
-                    LH += self.psi_pos(u_i, material) * qH * dx_tag
+            # if self.on.get("fracture", False):
+            #     sH = ufl.TrialFunction(self.V_pf)
+            #     qH = ufl.TestFunction(self.V_pf)
+            #     aH = sH * qH * ufl.dx
+            #     LH = 0
+            #     for label, material in self.materials.items():
+            #         tag = self.label_map[label]
+            #         dx_tag = self.dx_tags[tag]
+            #         # Positive elastic energy density ψ⁺(u)
+            #         LH += self.psi_pos(u_i, material) * qH * dx_tag
 
-                H_new = dolfinx.fem.Function(self.V_pf, name="H_new")
-                LinearProblem(aH, LH, u=H_new,
-                            petsc_options={"ksp_type": "cg", "pc_type": "jacobi"}).solve()
+            #     H_new = dolfinx.fem.Function(self.V_pf, name="H_new")
+            #     LinearProblem(aH, LH, u=H_new,
+            #                 petsc_options={"ksp_type": "cg", "pc_type": "jacobi"}).solve()
 
-                # Enforce irreversibility: H(x) = max(H_old, H_new)
-                np.maximum(self.H.x.array, H_new.x.array, out=self.H.x.array)
+            #     # Enforce irreversibility: H(x) = max(H_old, H_new)
+            #     np.maximum(self.H.x.array, H_new.x.array, out=self.H.x.array)
 
             # 3) PHASE FIELD (damage)
             if self.on.get("fracture", False):
@@ -524,21 +524,18 @@ class Solver:
                     tag = self.label_map[label]
                     dx = self.dx_tags[tag]
 
-                    a_d += self.Gc / self.ell * d * w * dx
-                    + self.Gc * self.ell * ufl.dot(ufl.grad(d), ufl.grad(w)) * dx
-                    + 2.0 * d * self.H * w * dx 
+                    psi_plus = self.psi_pos(u_i, material)
 
-                    L_d += 2.0 * self.H * w * dx 
+                    a_d += (self.Gc / self.ell) * d * w * dx \
+                        + self.Gc * self.ell * ufl.dot(ufl.grad(d), ufl.grad(w)) * dx \
+                        + 2.0 * psi_plus * d * w * dx
 
-                problem_d = LinearProblem(a_d, L_d, u=d_i, petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
-                problem_d.solve()
-
-                np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
-                self.d.x.array[:] = d_i.x.array
+                    L_d += 2.0 * psi_plus * w * dx
 
                 problem_d = LinearProblem(a_d, L_d, u=d_i, petsc_options={"ksp_type": "cg", "pc_type": "hypre"})
                 problem_d.solve()
 
+                np.maximum(d_old.x.array, d_i.x.array, out=d_i.x.array)
                 np.clip(d_i.x.array, 0.0, 1.0, out=d_i.x.array)
                 self.d.x.array[:] = d_i.x.array
 
@@ -601,7 +598,7 @@ class Solver:
                 print(f"  ||Δd||_inf = {d_diff_inf:.3e}, tol_d={tol_d:.1e}")
 
                 print(f"Phase-field d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
-                print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
+                # print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
 
             if (rel_norm_dT < tol_T or not self.on.get("thermal", False)) \
             and (rel_norm_du < tol_u or not self.on.get("mechanical", False)) \
