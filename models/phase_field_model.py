@@ -77,13 +77,6 @@ class PhaseFieldModel:
         tr_neg = self._neg(tr_eps)
         K = material["bulk_modulus"]
         return 0.5*K*tr_neg**2
-
-    def sigma_degraded(self, u, d, material):
-        eps = ufl.variable(self.epsilon(u))
-        psi_pos = self.psi_pos(u, material)
-        psi_neg = self.psi_neg(u, material)
-        sigma = self.g_d(d) * ufl.diff(psi_pos, eps) + ufl.diff(psi_neg, eps)
-        return sigma
     
     def sigma_degraded(self, u, d, material):
         # 1) Define the strain tensor as a UFL variable

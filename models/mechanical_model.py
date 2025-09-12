@@ -87,8 +87,19 @@ class MechanicalModel:
                         print(f"  [ERROR] Neumann BC on '{mat_type}' for region '{region_name}' has no traction.")
                         sys.exit(1)
 
-                    traction_constant = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_value)) * self.normal
-                    self.traction[mat_type].append({'id': region_id, 'value': traction_constant})
+                    # Create a mutable Constant that stores the scalar traction magnitude
+                    traction_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(traction_value))
+
+                    # Build the traction expression as (Constant * normal)
+                    traction_expr = traction_const * self.normal
+
+                    # Store both: the expression (used in forms) and the Constant (for updates)
+                    self.traction[mat_type].append({
+                        'id': region_id,
+                        'value': traction_expr,   # UFL expression used in weak form
+                        'const': traction_const   # PETSc Constant (mutable in incremental loop)
+                    })
+
                     print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_value} Pa at region '{region_name}'")
 
                 # -------- Generic Slip (component-wise blocking) --------

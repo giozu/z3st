@@ -44,9 +44,6 @@ fracture:
 
 mechanical_regime: "3D" # 3D, plane_stress
 
-lhr:
-  - 0
-time:
-  - 0
-n_steps: 1
-
+time: [0, 1]
+lhr: [0, 1]
+n_steps: 20
