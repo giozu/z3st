@@ -2,7 +2,6 @@
 import numpy as np
 import ufl
 import dolfinx
-import yaml
 
 class PhaseFieldModel:
     """
@@ -13,11 +12,10 @@ class PhaseFieldModel:
         d = 1 → fully broken
     """
 
-    def __init__(self, input_file="input.yaml"):
+    def __init__(self):
         print("__PhaseFieldModel initializer__")
 
-        with open(input_file, "r") as f:
-            data = yaml.safe_load(f)
+        data = self.input_file
 
         pf = data.get("fracture", {})
         if not pf:

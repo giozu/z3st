@@ -8,9 +8,7 @@ class MechanicalModel:
         self.traction = {}
         self.dirichlet_mechanical = {}
 
-        import yaml
-        with open("input.yaml", "r") as f:
-            data = yaml.safe_load(f)
+        data = self.input_file
 
         self.mech_options = data.get("mechanical", {}) # parsing
         if not self.mech_options:

@@ -93,7 +93,7 @@ class Mesh:
                 print(f"  cladding_outer_radius = {self.cladding_outer_radius:.2e} m")
 
             print(f"  area = {self.area:.3e} m2")
-            print(f"Label map from '{self.config["geometry_path"]}'")
+            print(f"Label map from '{self.input_file["geometry_path"]}'")
             for label, tag in sorted(self.label_map.items(), key=lambda item: item[1]):
                 print(f"  {label:<12} → {tag}")
             

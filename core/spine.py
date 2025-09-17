@@ -46,7 +46,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         mod = importlib.import_module(module_path)
         return getattr(mod, func_name)
 
-    def materials(self, **materials):
+    def load_materials(self, **materials):
         """
         Load material definitions into the simulation.
 
@@ -122,8 +122,8 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
         print(f"set_boundary_conditions")
         print(f"-----------------------")
 
-        with open(self.config["boundary_conditions_path"], "r") as f:
-            print(f"Loading boundary conditions from '{self.config["boundary_conditions_path"]}'")
+        with open(self.input_file["boundary_conditions_path"], "r") as f:
+            print(f"Loading boundary conditions from '{self.input_file["boundary_conditions_path"]}'")
             self.boundary_conditions = yaml.safe_load(f)
 
         if self.coupling == "staggered":

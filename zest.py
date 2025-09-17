@@ -30,32 +30,32 @@ MESH_PLOT_MODE = "--mesh_plot" in sys.argv
 
 # --- Input file ---
 with open("input.yaml", "r") as f:
-    input_data = yaml.safe_load(f)
+    input_file = yaml.safe_load(f)
 
 # --- Output ---
 os.makedirs("output", exist_ok=True)
 
 # --- Geometry ---
-geometry = load(input_data["geometry_path"])
+geometry = load(input_file["geometry_path"])
 
 # --- Materials ---
-materials_dict = input_data.get("materials", {})
+materials_dict = input_file.get("materials", {})
 loaded_materials = {}
 
 for mat_name, mat_path in materials_dict.items():
     loaded_materials[mat_name] = load(mat_path)
 
 # --- Problem ---
-problem = Spine(input_file=input_data, mesh_file=input_data["mesh_path"], geometry=geometry)
+problem = Spine(input_file=input_file, mesh_file=input_file["mesh_path"], geometry=geometry)
 problem.debug_mode = DEBUG_MODE
 problem.mesh_plot_mode = MESH_PLOT_MODE
 problem._mesh_plot(MESH_PLOT_MODE)
-problem.materials(**loaded_materials)
+problem.load_materials(**loaded_materials)
 
 # --- History ---
-t_points = input_data["time"]
-lhr_points = input_data["lhr"]
-n_increments = input_data["n_steps"]
+t_points = input_file["time"]
+lhr_points = input_file["lhr"]
+n_increments = input_file["n_steps"]
 times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=n_increments, filename=None)
 problem.parameters(lhr=lhr_points[0])
 
@@ -81,12 +81,12 @@ for step in range(n_increments):
 
     print(f"\nIncrement {step+1}/{n_increments} → traction = {traction_val:.2e} Pa")
 
-    problem.solve(tol_u=float(input_data["solver_settings"]["tol_u"]),
-                  tol_T=float(input_data["solver_settings"]["tol_T"]),
-                  tol_mech=float(input_data["solver_settings"]["tol_mech"]),
-                  tol_th=float(input_data["solver_settings"]["tol_th"]),
-                  max_iters=int(input_data["solver_settings"]["n_iter_max"]),
-                  tol=float(input_data["solver_settings"]["tol"]))
+    problem.solve(tol_u=float(input_file["solver_settings"]["tol_u"]),
+                  tol_T=float(input_file["solver_settings"]["tol_T"]),
+                  tol_mech=float(input_file["solver_settings"]["tol_mech"]),
+                  tol_th=float(input_file["solver_settings"]["tol_th"]),
+                  max_iters=int(input_file["solver_settings"]["n_iter_max"]),
+                  tol=float(input_file["solver_settings"]["tol"]))
     
     results = problem.get_results()
 

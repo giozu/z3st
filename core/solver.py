@@ -11,7 +11,7 @@ from core.diagnostic import *
 class Solver:
     def __init__(self):
         print("__Solver initializer__")
-        solver_settings = self.config.get("solver_settings", {})
+        solver_settings = self.input_file.get("solver_settings", {})
 
         self.relax_T = float(solver_settings.get("relax_T", 0.2))
         self.relax_u = float(solver_settings.get("relax_u", 0.5))
