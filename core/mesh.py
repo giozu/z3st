@@ -68,17 +68,17 @@ class Mesh:
         # Labels
         self.label_map = self.geometry["labels"]
 
-        # print("\n--- Verifying facet tags ---")
-        # unique_tags = np.unique(self.ft.values)
-        # print(f"Unique tags found in mesh facet data (self.ft): {unique_tags}")
+        print("\n--- Verifying facet tags ---")
+        unique_tags = np.unique(self.ft.values)
+        print(f"Unique tags found in mesh facet data (self.ft): {unique_tags}")
         # print(f"Interface tags from label_map: fuel_side={self.label_map['face_xx_1_1']}, clad_side={self.label_map['face_xx_0_2']}")
 
         print("Geometry entries:")
-        # for k in sorted(self.geometry.keys()):
-        #     if k == "labels":
-        #         continue
-        #     v = self.geometry[k]
-        #     print(f"  {k:<15} → {v} ({type(v).__name__})")
+        for k in sorted(self.geometry.keys()):
+            if k == "labels":
+                continue
+            v = self.geometry[k]
+            print(f"  {k:<15} → {v} ({type(v).__name__})")
         print(f"  name = {self.geometry["name"]}")
         self.geometry_type = self.geometry.get("geometry_type", "").lower()
         print(f"  geometry_type = {self.geometry_type}")

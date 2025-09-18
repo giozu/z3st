@@ -4,6 +4,10 @@ thermal_bcs:
       region: xmin
       temperature: 300.0
 
+    - type: Dirichlet
+      region: xmax
+      temperature: 300.0
+
 mechanical_bcs:
   solid:
     - type: Dirichlet

@@ -23,7 +23,7 @@ FACET_LABELS = {
     ZMAX: "zmax",
 }
 
-def build_mesh(L=1.0, a=0.1, h_box=0.10, h_sphere=0.03,
+def build_mesh(L=1.0, a=0.1, h_box=0.05, h_sphere=0.01,
                                     order=1, comm=MPI.COMM_WORLD,
                                     save=False, basename="box_bubble"):
     """
@@ -70,7 +70,7 @@ def build_mesh(L=1.0, a=0.1, h_box=0.10, h_sphere=0.03,
     gmsh.model.addPhysicalGroup(2, [inner_surf], tag=INNER_SPHERE, name="inner_sphere")
 
     # Bounding boxes for other facets
-    eps = 1e-9
+    eps = 1e-6 # tolerance (decrease if labels are not found)
     tags_map = {
         XMIN: (-half-eps, -half-eps, -half-eps, -half+eps,  half+eps,  half+eps),
         XMAX: ( half-eps, -half-eps, -half-eps,  half+eps,  half+eps,  half+eps),
