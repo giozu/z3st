@@ -2,7 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load CSV
-df = pd.read_csv("output/load_disp.csv")
+# df = pd.read_csv("output/load_disp_elastic.csv")
+df = pd.read_csv("output/load_disp_fractured.csv")
 
 # Plot vertical reaction force (Ry) vs. avg displacement
 plt.figure(figsize=(7,5))
