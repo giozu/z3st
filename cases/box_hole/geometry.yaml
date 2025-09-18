@@ -1,0 +1,15 @@
+name: box
+edge: '1.0'
+height: '1.0'
+width: '1.0'
+radius: '0.2'
+geometry_type: rect
+labels:
+  inner_sphere: 1
+  xmin: 11
+  xmax: 12
+  ymin: 13
+  ymax: 14
+  zmin: 15
+  zmax: 16
+  solid: 100
