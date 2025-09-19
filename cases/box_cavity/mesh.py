@@ -1,4 +1,3 @@
-# mesh_bubble.py
 import gmsh
 import numpy as np
 from mpi4py import MPI
@@ -149,6 +148,6 @@ def plot_mesh(mesh, cell_tags=None, facet_tags=None, show_facets=True):
     plotter.add_axes()
     plotter.show()
 
-# if __name__ == "__main__":
-#     msh, cell_tags, facet_tags = build_mesh(L=1.0, a=0.2, save=True)
-    # plot_mesh(msh, cell_tags=cell_tags, facet_tags=facet_tags)
+if __name__ == "__main__":
+    msh, cell_tags, facet_tags = build_mesh(L=1.0, a=0.2, save=True)
+    plot_mesh(msh, cell_tags=cell_tags, facet_tags=facet_tags)
