@@ -1,9 +1,13 @@
-name: box
-edge: '1.0'
-height: '1.0'
-width: '1.0'
-radius: '0.2'
+name: box_with_cavity
 geometry_type: rect
+Lx: 1.0            # box length in x (m)
+Ly: 2.0            # box length in y (m)
+Lz: 0.5            # box length in z (m)
+a: 0.2             # sphere radius (m)
+h_box: 0.05        # target mesh size in box (m)
+h_sphere: 0.01     # target mesh size near sphere (m)
+order: 1           # element order
+
 labels:
   inner_sphere: 1
   xmin: 11
