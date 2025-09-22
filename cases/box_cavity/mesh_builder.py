@@ -7,20 +7,20 @@ import pyvista
 import yaml
 
 # Facet markers (now defined in geometry.yaml)
-# INNER_SPHERE = 1
-# XMIN, XMAX = 11, 12
-# YMIN, YMAX = 13, 14
-# ZMIN, ZMAX = 15, 16
+INNER_SPHERE = 1
+XMIN, XMAX = 11, 12
+YMIN, YMAX = 13, 14
+ZMIN, ZMAX = 15, 16
 
-# FACET_LABELS = {
-#     INNER_SPHERE: "inner_sphere",
-#     XMIN: "xmin",
-#     XMAX: "xmax",
-#     YMIN: "ymin",
-#     YMAX: "ymax",
-#     ZMIN: "zmin",
-#     ZMAX: "zmax",
-# }
+FACET_LABELS = {
+    INNER_SPHERE: "inner_sphere",
+    XMIN: "xmin",
+    XMAX: "xmax",
+    YMIN: "ymin",
+    YMAX: "ymax",
+    ZMIN: "zmin",
+    ZMAX: "zmax",
+}
 
 class MeshBuilder:
     def __init__(self, geometry_file: str, comm=MPI.COMM_WORLD):
@@ -114,11 +114,16 @@ class MeshBuilder:
                                             name=[k for k, v in self.label_map.items() if v == tag][0])
 
         gmsh.model.mesh.setOrder(self.order)
+
+        # gmsh.option.setNumber("Mesh.RecombineAll", 1)
+        gmsh.option.setNumber("Mesh.RecombineAll", 0)
+        # gmsh.option.setNumber("Mesh.Algorithm3D", 4)
+        
         gmsh.model.mesh.generate(3)
 
         self.mesh, self.cell_tags, self.facet_tags = gmshio.model_to_mesh(
-            gmsh.model, self.comm, 0, gdim=3
-        )
+            gmsh.model, self.comm, 0, gdim=3)
+
         return self.mesh, self.cell_tags, self.facet_tags
 
     def save(self, basename="mesh", export_msh=True, export_xdmf=True):

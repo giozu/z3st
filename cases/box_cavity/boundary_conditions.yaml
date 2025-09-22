@@ -24,4 +24,4 @@ mechanical_bcs:
       
     - type: Neumann
       region: inner_sphere
-      traction: -1e10
+      traction: -1e8
