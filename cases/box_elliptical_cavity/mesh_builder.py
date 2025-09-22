@@ -57,9 +57,17 @@ class MeshBuilder:
         # Box centered at origin
         box = gmsh.model.occ.addBox(-self.Lx/2, -self.Ly/2, -self.Lz/2,
                                     self.Lx, self.Ly, self.Lz)
-        sph = gmsh.model.occ.addSphere(0, 0, 0, self.a)
 
-        # subtract sphere from box
+        # Sezione: cavità (sfera o ellissoide)
+        self.ax = float(self.geometry.get("ax", self.a))
+        self.ay = float(self.geometry.get("ay", self.a))
+        self.az = float(self.geometry.get("az", self.a))
+
+        # Creo sfera unitaria e la dilato
+        sph = gmsh.model.occ.addSphere(0, 0, 0, 1.0)
+        gmsh.model.occ.dilate([(3, sph)], 0, 0, 0, self.ax, self.ay, self.az)
+
+        # Cut: box - ellissoide
         vol, _ = gmsh.model.occ.cut([(3, box)], [(3, sph)],
                                     removeObject=True, removeTool=False)
         gmsh.model.occ.synchronize()
@@ -70,21 +78,20 @@ class MeshBuilder:
         # Mesh size
         gmsh.model.mesh.setSize(gmsh.model.getEntities(dim=0), self.h_box)
         gmsh.model.mesh.setSize(
-            gmsh.model.getEntitiesInBoundingBox(-self.a, -self.a, -self.a,
-                                                self.a, self.a, self.a, dim=0),
+            gmsh.model.getEntitiesInBoundingBox(-self.ax, -self.ay, -self.az,
+                                                self.ax, self.ay, self.az, dim=0),
             self.h_sphere
         )
 
-        # Identify spherical surface
         inner_surf = None
         for (dim, s) in gmsh.model.getEntities(dim=2):
             xmin, ymin, zmin, xmax, ymax, zmax = gmsh.model.getBoundingBox(dim, s)
-            if (abs((xmax - xmin) - 2 * self.a) < 1e-3 and
-                abs((ymax - ymin) - 2 * self.a) < 1e-3 and
-                abs((zmax - zmin) - 2 * self.a) < 1e-3):
+            if xmin < 0 and xmax > 0 and ymin < 0 and ymax > 0 and zmin < 0 and zmax > 0:
                 inner_surf = s
                 break
-        assert inner_surf is not None, "Inner spherical surface not found."
+
+        assert inner_surf is not None, "Inner ellipsoidal surface not found."
+
         gmsh.model.addPhysicalGroup(2, [inner_surf],
                                     tag=self.label_map["inner_sphere"],
                                     name="inner_sphere")
@@ -93,17 +100,17 @@ class MeshBuilder:
         eps = 1e-6
         tags_map = {
             self.label_map["xmin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                     -self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                    -self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["xmax"]: ( self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                    self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["ymin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps, -self.Ly/2+eps,  self.Lz/2+eps),
+                                    self.Lx/2+eps, -self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["ymax"]: (-self.Lx/2-eps,  self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                    self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["zmin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps, -self.Lz/2+eps),
+                                    self.Lx/2+eps,  self.Ly/2+eps, -self.Lz/2+eps),
             self.label_map["zmax"]: (-self.Lx/2-eps, -self.Ly/2-eps,  self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                    self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
         }
 
         for tag, bbox in tags_map.items():
@@ -114,11 +121,6 @@ class MeshBuilder:
                                             name=[k for k, v in self.label_map.items() if v == tag][0])
 
         gmsh.model.mesh.setOrder(self.order)
-
-        # gmsh.option.setNumber("Mesh.RecombineAll", 1)
-        gmsh.option.setNumber("Mesh.RecombineAll", 0)
-        # gmsh.option.setNumber("Mesh.Algorithm3D", 4)
-        
         gmsh.model.mesh.generate(3)
 
         self.mesh, self.cell_tags, self.facet_tags = gmshio.model_to_mesh(
