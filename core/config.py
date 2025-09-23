@@ -25,7 +25,6 @@ class Config:
 
         # --- Coupling regime ---
         self.coupling = self.input_file.get("solver_settings", {}).get("coupling", "staggered")
-        self.regime = self.input_file.get("mechanical_regime", "3D")
 
         # --- Mechanical solver options ---
         mech_cfg = self.input_file.get("mechanical", {})
@@ -33,6 +32,7 @@ class Config:
         self.mech_linear_solver = mech_cfg.get("linear_solver", "iterative_amg")
         self.rtol_mech = float(mech_cfg.get("rtol", 1e-6))
         self.stag_tol_mech = float(mech_cfg.get("stag_tol", 1e-8))
+        self.mech_regime = mech_cfg.get("mechanical_regime", "3D")
 
         # --- Thermal solver options ---
         th_cfg = self.input_file.get("thermal", {})
@@ -53,7 +53,7 @@ class Config:
             print(f"      {model:<10} → {'ON' if active else 'OFF'}")
 
         print(f"  → Gap conductance     : {self.gap_model} (value = {self.h_gap_value})")
-        print(f"  → Mechanical regime   : {self.regime}")
+        print(f"  → Mechanical    : {self.mech_regime}")
         print(f"  → Mechanical solver   : {self.mech_solver_type} ({self.mech_linear_solver})")
         print(f"     tolerances         : rtol={self.rtol_mech}, stag_tol={self.stag_tol_mech}")
         print(f"  → Thermal tolerances  : rtol={self.rtol_th}, stag_tol={self.stag_tol_th}")

@@ -266,7 +266,7 @@ class MechanicalModel:
             σ = λ tr(ε) I + 2 G ε
 
         Plane-stress handling:
-        If self.regime == "plane_stress", the returned tensor is modified to enforce σ_zz = 0
+        If self.mech_regime == "plane_stress", the returned tensor is modified to enforce σ_zz = 0
         in an x–y plane-stress sense (same behaviour you had).
 
         Notes
@@ -329,7 +329,7 @@ class MechanicalModel:
             sigma = material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
 
         # Optional plane-stress reduction (x–y plane)
-        if getattr(self, "regime", "3D") == "plane_stress":
+        if getattr(self, "mech_regime", "3D") == "plane_stress":
             s_xx = sigma[0, 0]
             s_xy = sigma[0, 1]
             s_yy = sigma[1, 1]
@@ -348,7 +348,7 @@ class MechanicalModel:
         """
         Elastic strain energy density (small strain linear elasticity).
         Uses w = 1/2 * sigma_mech(u) : epsilon(u).
-        Works also with self.regime == 'plane_stress' because sigma_mech() already handles it.
+        Works also with self.mech_regime == 'plane_stress' because sigma_mech() already handles it.
         """
 
         sigma = self.sigma_mech(u, material)
