@@ -80,13 +80,8 @@ for step in range(n_increments):
 
     # print(f"\nIncrement {step+1}/{n_increments} → traction = {traction_val:.2e} Pa")
 
-    problem.solve(tol_u=float(input_file["solver_settings"]["tol_u"]),
-                  tol_T=float(input_file["solver_settings"]["tol_T"]),
-                  tol_mech=float(input_file["solver_settings"]["tol_mech"]),
-                  tol_th=float(input_file["solver_settings"]["tol_th"]),
-                  max_iters=int(input_file["solver_settings"]["n_iter_max"]),
-                  tol=float(input_file["solver_settings"]["tol"]))
-    
+    problem.solve(max_iters=int(input_file["solver_settings"]["max_iters"]))
+
     results = problem.get_results()
 
     # --- Reaction force on the clamped face ("face_yy_0") ---

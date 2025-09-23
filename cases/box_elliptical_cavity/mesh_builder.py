@@ -6,26 +6,10 @@ import dolfinx
 import pyvista
 import yaml
 
-# Facet markers (now defined in geometry.yaml)
-INNER_SPHERE = 1
-XMIN, XMAX = 11, 12
-YMIN, YMAX = 13, 14
-ZMIN, ZMAX = 15, 16
-
-FACET_LABELS = {
-    INNER_SPHERE: "inner_sphere",
-    XMIN: "xmin",
-    XMAX: "xmax",
-    YMIN: "ymin",
-    YMAX: "ymax",
-    ZMIN: "zmin",
-    ZMAX: "zmax",
-}
-
 class MeshBuilder:
     def __init__(self, geometry_file: str, comm=MPI.COMM_WORLD):
         """
-        Build a box with spherical cavity from YAML description.
+        Build a box with spherical or ellipsoidal cavity from YAML description.
         """
         with open(geometry_file, "r") as f:
             self.geometry = yaml.safe_load(f)
@@ -36,7 +20,12 @@ class MeshBuilder:
         self.Lx = float(self.geometry.get("Lx", 1.0))
         self.Ly = float(self.geometry.get("Ly", 1.0))
         self.Lz = float(self.geometry.get("Lz", 1.0))
+
+        # Cavità (sfera di default, ellissoide se ax, ay, az specificati)
         self.a = float(self.geometry.get("a", 0.1))
+        self.ax = float(self.geometry.get("ax", self.a))
+        self.ay = float(self.geometry.get("ay", self.a))
+        self.az = float(self.geometry.get("az", self.a))
 
         # Mesh params
         self.h_box = float(self.geometry.get("h_box", 0.05))
@@ -45,25 +34,24 @@ class MeshBuilder:
 
         # Labels
         self.label_map = self.geometry.get("labels", {})
+        self.inv_label_map = {v: k for k, v in self.label_map.items()}
 
+        # Containers
         self.mesh = None
         self.cell_tags = None
         self.facet_tags = None
 
     def build(self):
         gmsh.initialize()
-        gmsh.model.add("box_bubble")
+        gmsh.model.add("box_cavity")
 
-        # Box centered at origin
-        box = gmsh.model.occ.addBox(-self.Lx/2, -self.Ly/2, -self.Lz/2,
-                                    self.Lx, self.Ly, self.Lz)
+        # Box centrato all'origine
+        box = gmsh.model.occ.addBox(
+            -self.Lx/2, -self.Ly/2, -self.Lz/2,
+             self.Lx,   self.Ly,   self.Lz
+        )
 
-        # Sezione: cavità (sfera o ellissoide)
-        self.ax = float(self.geometry.get("ax", self.a))
-        self.ay = float(self.geometry.get("ay", self.a))
-        self.az = float(self.geometry.get("az", self.a))
-
-        # Creo sfera unitaria e la dilato
+        # Creo sfera unitaria e la dilato in ellissoide
         sph = gmsh.model.occ.addSphere(0, 0, 0, 1.0)
         gmsh.model.occ.dilate([(3, sph)], 0, 0, 0, self.ax, self.ay, self.az)
 
@@ -72,45 +60,44 @@ class MeshBuilder:
                                     removeObject=True, removeTool=False)
         gmsh.model.occ.synchronize()
 
+        # Volume solido
         gmsh.model.addPhysicalGroup(3, [vol[0][1]],
-                                    tag=self.label_map["solid"], name="solid")
+                                    tag=self.label_map["solid"],
+                                    name="solid")
 
         # Mesh size
         gmsh.model.mesh.setSize(gmsh.model.getEntities(dim=0), self.h_box)
         gmsh.model.mesh.setSize(
-            gmsh.model.getEntitiesInBoundingBox(-self.ax, -self.ay, -self.az,
-                                                self.ax, self.ay, self.az, dim=0),
+            gmsh.model.getEntitiesInBoundingBox(
+                -self.ax, -self.ay, -self.az,
+                 self.ax,  self.ay,  self.az, dim=0),
             self.h_sphere
         )
 
-        inner_surf = None
-        for (dim, s) in gmsh.model.getEntities(dim=2):
-            xmin, ymin, zmin, xmax, ymax, zmax = gmsh.model.getBoundingBox(dim, s)
-            if xmin < 0 and xmax > 0 and ymin < 0 and ymax > 0 and zmin < 0 and zmax > 0:
-                inner_surf = s
-                break
+        # Cavità: prendo le superfici dal tag dell’ellissoide
+        cavity_surfaces = gmsh.model.getBoundary([(3, sph)], oriented=False, recursive=False)
+        cavity_surface_tags = [s for (dim, s) in cavity_surfaces if dim == 2]
+        assert cavity_surface_tags, "Ellipsoidal surface not found."
 
-        assert inner_surf is not None, "Inner ellipsoidal surface not found."
-
-        gmsh.model.addPhysicalGroup(2, [inner_surf],
+        gmsh.model.addPhysicalGroup(2, cavity_surface_tags,
                                     tag=self.label_map["inner_sphere"],
                                     name="inner_sphere")
 
-        # Add box face groups from label_map
+        # Facce del box
         eps = 1e-6
         tags_map = {
             self.label_map["xmin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                    -self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                     -self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["xmax"]: ( self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                    self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["ymin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                    self.Lx/2+eps, -self.Ly/2+eps,  self.Lz/2+eps),
+                                      self.Lx/2+eps, -self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["ymax"]: (-self.Lx/2-eps,  self.Ly/2-eps, -self.Lz/2-eps,
-                                    self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
             self.label_map["zmin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                    self.Lx/2+eps,  self.Ly/2+eps, -self.Lz/2+eps),
+                                      self.Lx/2+eps,  self.Ly/2+eps, -self.Lz/2+eps),
             self.label_map["zmax"]: (-self.Lx/2-eps, -self.Ly/2-eps,  self.Lz/2-eps,
-                                    self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
         }
 
         for tag, bbox in tags_map.items():
@@ -118,8 +105,9 @@ class MeshBuilder:
             ids = [s for (_, s) in candidates]
             if ids:
                 gmsh.model.addPhysicalGroup(2, ids, tag=tag,
-                                            name=[k for k, v in self.label_map.items() if v == tag][0])
+                                            name=self.inv_label_map[tag])
 
+        # Mesh
         gmsh.model.mesh.setOrder(self.order)
         gmsh.model.mesh.generate(3)
 
@@ -130,10 +118,9 @@ class MeshBuilder:
 
     def save(self, basename="mesh", export_msh=True, export_xdmf=True):
         """Save mesh in .msh (Gmsh) and/or .xdmf (FEniCSx) format."""
-        if export_msh:
-            if self.comm.rank == 0:
-                gmsh.write(f"{basename}.msh")
-                print(f"[INFO] Saved native Gmsh mesh → {basename}.msh")
+        if export_msh and self.comm.rank == 0:
+            gmsh.write(f"{basename}.msh")
+            print(f"[INFO] Saved native Gmsh mesh → {basename}.msh")
 
         if export_xdmf:
             if self.comm.rank == 0:
@@ -144,10 +131,13 @@ class MeshBuilder:
                 xdmf.write_meshtags(self.cell_tags, self.mesh.geometry)
                 xdmf.write_meshtags(self.facet_tags, self.mesh.geometry)
 
-        gmsh.finalize()
+        gmsh.finalize()   # chiudo gmsh qui
 
     def plot(self, show_facets=True):
-        """Quick PyVista visualization."""
+        """Quick PyVista visualization (rank 0 only)."""
+        if self.comm.rank != 0:
+            return
+
         topology, cell_types, geometry = dolfinx.plot.vtk_mesh(self.mesh, self.mesh.topology.dim)
         grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
@@ -172,11 +162,12 @@ class MeshBuilder:
             unique = np.unique(values)
             print("\nFacet tags present:")
             for tag in unique:
-                name = FACET_LABELS.get(int(tag), f"tag {tag}")
+                name = self.inv_label_map.get(int(tag), f"tag {tag}")
                 print(f"  {tag} → {name}")
 
         plotter.add_axes()
         plotter.show()
+
 
 if __name__ == "__main__":
     builder = MeshBuilder("geometry.yaml")

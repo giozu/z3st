@@ -217,18 +217,24 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                 mat["k"] = k_func(self.T, bu=bu, gad=gad)
                 print("\nk expression for", name, "→", mat["k"])
 
-    def solve(self, max_iters=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol=1e-5):
+    def solve(self, max_iters=50):
         print("\nSolver settings:")
         print(f"  → Coupling              : {self.coupling}")
 
         if self.coupling == "monolithic":
-            self.solve_monolithic(tol=tol, max_iter=max_iters)
+            self.solve_monolithic(tol=1e-3, max_iter=max_iters)
 
         # if self.coupling == "monolithic":
         #     raise NotImplementedError("Monolithic coupling is not yet supported; use 'staggered'.")
 
         elif self.coupling == "staggered":
-            self.solve_staggered(max_iter=max_iters, tol_u=tol_u, tol_T=tol_T, tol_mech=tol_mech, tol_th=tol_th)
+            self.solve_staggered(
+                max_iter=max_iters,
+                rtol_th=self.rtol_th,
+                rtol_mech=self.rtol_mech,
+                stag_tol_th=self.stag_tol_th,
+                stag_tol_mech=self.stag_tol_mech
+            )
 
         else:
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")

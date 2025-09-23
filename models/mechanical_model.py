@@ -117,7 +117,7 @@ class MechanicalModel:
                         )
                         self.dirichlet_mechanical[mat_type].append(bc_i)
 
-                    print(f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_y, u_z fixed at region '{region_name}'")
+                    print(f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_y, u_z = 0.0 at region '{region_name}'")
 
                 elif bc_type == "Slip_z":
                     for i in [0, 1]:  # constrain u_x, u_y
@@ -135,7 +135,7 @@ class MechanicalModel:
                         )
                         self.dirichlet_mechanical[mat_type].append(bc_i)
 
-                    print(f"  [INFO] Slip_z mechanical BC on '{mat_type}' →  u_x, u_y fixed at region '{region_name}'")
+                    print(f"  [INFO] Slip_z mechanical BC on '{mat_type}' →  u_x, u_y = 0.0 at region '{region_name}'")
 
                 elif bc_type == "Clamp_x":
                     boundary_dofs_x = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(0), self.fdim, self.ft.find(region_id))

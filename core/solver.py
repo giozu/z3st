@@ -271,13 +271,13 @@ class Solver:
         umag = np.linalg.norm(u_vec, axis=1)
         print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")
 
-    def solve_staggered(self, max_iter=20, tol_u=1e-2, tol_T=1e-2, tol_mech=1e-6, tol_th=1e-6, tol_d=1e-3):
+    def solve_staggered(self, max_iter=20, stag_tol_th=1e-3, stag_tol_mech=1e-3, rtol_th=1e-6, rtol_mech=1e-6, stag_tol_pf=1e-3):
         print(f"  → Max iterations              : {max_iter}")
-        print(f"  → Staggering tolerance |ΔT|   : {tol_T:.1e}")
-        print(f"  → Staggering tolerance |Δu|   : {tol_u:.1e}")
-        print(f"  → Staggering tolerance |Δs|   : {tol_d:.1e}")
-        print(f"  → Thermal KSP tolerance       : {tol_th:.1e}")
-        print(f"  → Mechanical KSP tolerance    : {tol_mech:.1e}")
+        print(f"  → Staggering tolerance |ΔT|   : {stag_tol_th:.1e}")
+        print(f"  → Staggering tolerance |Δu|   : {stag_tol_mech:.1e}")
+        print(f"  → Staggering tolerance |Δd|   : {stag_tol_pf:.1e}")
+        print(f"  → Relative tolerance th       : {rtol_th:.1e}")
+        print(f"  → Relative tolerance mech     : {rtol_mech:.1e}")
 
         if self.on.get("thermal", False):
             T_i = dolfinx.fem.Function(self.V_t)
@@ -395,7 +395,7 @@ class Solver:
 
                 # --- Solve the system ---
                 petsc_opts_thermal = self.get_solver_options(
-                    solver_type=self.thermal_solver, physics="thermal", rtol=tol_th
+                    solver_type=self.thermal_solver, physics="thermal", rtol=rtol_th
                 )
                 problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_i, petsc_options=petsc_opts_thermal)
                 problem_t.solve()
@@ -468,7 +468,7 @@ class Solver:
                     petsc_opts_mech = self.get_solver_options(
                         solver_type=self.mech_options.get("linear_solver", None),
                         physics="mechanical",
-                        rtol=tol_mech
+                        rtol=rtol_mech
                     )
                     problem_m = LinearProblem(a_m, L_m, bcs=bcs_m, u=u_i, petsc_options=petsc_opts_mech)
                     problem_m.solve()
@@ -610,8 +610,8 @@ class Solver:
                 print(f"Phase-field d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
                 # print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
 
-            if (rel_norm_dT < tol_T or not self.on.get("thermal", False)) \
-            and (rel_norm_du < tol_u or not self.on.get("mechanical", False)) \
+            if (rel_norm_dT < rtol_th or not self.on.get("thermal", False)) \
+            and (rel_norm_du < rtol_mech or not self.on.get("mechanical", False)) \
             and conv_s:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
                 if self.on.get("thermal", False):
