@@ -14,14 +14,18 @@ mechanical_bcs:
       region: xmin
       displacement: [0.0, 0.0, 0.0]
 
-    # - type: Neumann
-    #   region: ymin
-    #   traction: 1e7
+    - type: Dirichlet
+      region: xmax
+      displacement: [0.0, 0.0, 0.0]
 
-    # - type: Neumann
-    #   region: ymax
-    #   traction: 1e7
-      
     - type: Neumann
-      region: inner_sphere
-      traction: -1e8
+      region: ymin
+      traction: 1e7
+
+    - type: Neumann
+      region: ymax
+      traction: 1e7
+      
+    # - type: Neumann
+    #   region: inner_sphere
+    #   traction: -1e8
