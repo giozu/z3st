@@ -11,6 +11,16 @@ class ThermalModel:
         self.neumann_thermal = {}
         self.dirichlet_thermal = {}
         self.robin_thermal = {}
+
+        data = self.input_file
+
+        self.thermal_options = data.get("thermal", {}) # parsing
+        if not self.thermal_options:
+            raise ValueError("[ThermalModel] 'thermal' missing in input.yaml.")
+
+        print("[ThermalModel] options loaded from input.yaml:")
+        for key, value in self.thermal_options.items():
+            print(f"  {key:<20}: {value}")
      
     def set_thermal_boundary_conditions(self, V_t, V_t_map=None):
         """

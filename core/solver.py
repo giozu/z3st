@@ -352,7 +352,7 @@ class Solver:
                     # q_third value in the volume "label" / "tag"
                     dofs = self.locateDomainDofs(self.label_map, label, self.V_t)
                     q_vals = self.q_third.x.array[dofs]
-                    print(f"  → q_third[{label}] min = {q_vals.min():.2e}, max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}")
+                    print(f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}")
 
                 # Neumann
                 for label in self.materials:
@@ -394,11 +394,18 @@ class Solver:
                         print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
 
                 # --- Solve the system ---
-                petsc_opts_thermal = self.get_solver_options(
-                    solver_type=self.thermal_solver, physics="thermal", rtol=rtol_th
-                )
-                problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_i, petsc_options=petsc_opts_thermal)
-                problem_t.solve()
+                if self.thermal_options.get("solver") == "linear":
+                    print(f"  Linear solver")
+                    petsc_opts_thermal = self.get_solver_options(
+                        solver_type=self.thermal_options.get("linear_solver", None),
+                        physics="thermal",
+                        rtol=rtol_th
+                    )
+                    problem_t = LinearProblem(a_t, L_t, bcs=bcs_t, u=T_i, petsc_options=petsc_opts_thermal)
+                    problem_t.solve()
+                elif self.thermal_options.get("solver") == "non-linear":
+                    print(f"  Non-linear solver")
+                    print(f"  [ERROR] Non-linear thermal solver not yet implemented.")
 
                 # Check T_fo
                 # dofs = self.locateFacetDofs(self.label_map["lateral"], self.V_t)
@@ -480,7 +487,7 @@ class Solver:
                     solver = NewtonSolver(self.mesh.comm, problem_m)
 
                     solver.atol = 1e-8
-                    solver.rtol = 1e-8
+                    solver.rtol = rtol_mech
                     solver.convergence_criterion = "incremental"
 
                     n_it, converged = solver.solve(u_i)
@@ -573,9 +580,14 @@ class Solver:
                 norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
                 rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
 
-                print(f"  ||ΔT|| = {norm_dT:.3e}, ||ΔT||/||T|| = {rel_norm_dT:.3e}")
+                # print(f"  ||ΔT|| = {norm_dT:.3e}, ||ΔT||/||T|| = {rel_norm_dT:.3e}")
 
-                conv_th = rel_norm_dT < rtol_th or not self.on.get("thermal", False)
+                if self.th_convergence == "norm":
+                    print(f"  ||ΔT|| = {norm_dT:.3e}")
+                    conv_th = norm_dT < stag_tol_th or not self.on.get("thermal", False)
+                elif self.th_convergence == "rel_norm":
+                    print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}")
+                    conv_th = rel_norm_dT < stag_tol_th or not self.on.get("thermal", False)
 
             # Mechanical convergence
             conv_mech = True
@@ -597,9 +609,14 @@ class Solver:
                 norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
                 rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
 
-                print(f"  ||Δu|| = {norm_du:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}")
+                # print(f"  ||Δu|| = {norm_du:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}")
 
-                conv_mech = rel_norm_du < rtol_mech or not self.on.get("mechanical", False)
+                if self.mech_convergence == "norm":
+                    print(f"  ||Δu|| = {norm_du:.3e}")
+                    conv_mech = norm_du < stag_tol_mech or not self.on.get("mechanical", False)
+                elif self.mech_convergence == "rel_norm":
+                    print(f"  ||Δu||/||u|| = {rel_norm_du:.3e}")
+                    conv_mech = rel_norm_du < stag_tol_mech or not self.on.get("mechanical", False)
 
             # Phase-field convergence (L-infinity norm)
             conv_pf = True

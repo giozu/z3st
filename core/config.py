@@ -28,7 +28,7 @@ class Config:
 
         # --- Mechanical solver options ---
         mech_cfg = self.input_file.get("mechanical", {})
-        self.mech_solver_type   = mech_cfg.get("solver", "linear")
+        self.mech_solver_type = mech_cfg.get("solver", "linear")
         self.mech_linear_solver = mech_cfg.get("linear_solver", "iterative_amg")
         self.rtol_mech = float(mech_cfg.get("rtol", 1e-6))
         self.stag_tol_mech = float(mech_cfg.get("stag_tol", 1e-8))
@@ -37,8 +37,11 @@ class Config:
 
         # --- Thermal solver options ---
         th_cfg = self.input_file.get("thermal", {})
+        self.th_solver_type = th_cfg.get("solver", "linear")
+        self.th_linear_solver = th_cfg.get("linear_solver", "iterative_amg")
         self.rtol_th = float(th_cfg.get("rtol", 1e-6))
         self.stag_tol_th = float(th_cfg.get("stag_tol", 1e-8))
+        self.th_convergence = th_cfg.get("convergence", "norm")
 
         # --- Phase-field solver options (if fracture is ON) ---
         pf_cfg = self.input_file.get("fracture", {})
@@ -57,5 +60,8 @@ class Config:
         print(f"  → Mechanical    : {self.mech_regime}")
         print(f"  → Mechanical solver   : {self.mech_solver_type} ({self.mech_linear_solver})")
         print(f"     tolerances         : rtol={self.rtol_mech}, stag_tol={self.stag_tol_mech}")
-        print(f"  → Thermal tolerances  : rtol={self.rtol_th}, stag_tol={self.stag_tol_th}")
+        print(f"     convergence        : {self.mech_convergence}")
+        print(f"  → Thermal solver      : {self.th_solver_type} ({self.th_linear_solver})")
+        print(f"     tolerances         : rtol={self.rtol_th}, stag_tol={self.stag_tol_th}")
+        print(f"     convergence        : {self.th_convergence}")
         print("\n")

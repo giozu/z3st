@@ -6,18 +6,9 @@ thermal_bcs:
       
 mechanical_bcs:
   fuel:
-    - type: Dirichlet
+    - type: Clamp_z
       region: bottom
-      displacement: [0.0, 0.0, 0.0]
-    # - type: Dirichlet
-    #   region: top
-    #   displacement: [0.0, 0.0, 0.0]
-    # - type: Clamp_z
-    #   region: bottom
-    #   value: 0.0
-    # - type: Clamp_z
-    #   region: top
-    #   value: 0.0
-    # - type: Neumann
-    #   region: lateral
-    #   traction: -1e6
+      value: 0.0
+    - type: Neumann
+      region: lateral
+      traction: -2e6

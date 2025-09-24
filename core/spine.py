@@ -219,7 +219,7 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
 
     def solve(self, max_iters=100):
         print("\nSolver settings:")
-        print(f"  → Coupling              : {self.coupling}")
+        print(f"  → Coupling                    : {self.coupling}")
 
         if self.coupling == "monolithic":
             self.solve_monolithic(tol=1e-6, max_iter=max_iters)
