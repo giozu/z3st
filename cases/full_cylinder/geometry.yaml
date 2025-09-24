@@ -2,7 +2,7 @@ name: full_cylinder
 
 inner_radius: 0.0
 outer_radius: 0.004
-height: 0.01
+Lz: 0.01
 
 geometry_type: cyl
 labels:
