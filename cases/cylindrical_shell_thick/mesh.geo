@@ -11,7 +11,7 @@ SetFactory("OpenCASCADE");
 // --- Parameters ---
 ri = 0.02; // Inner radius
 ro = 0.03; // Outer radius
-h  = 0.05; // Height
+Lz  = 0.05; // Height
 
 // Mesh Discretization
 // Note: Gmsh's Transfinite command uses the number of *points*, not elements.
@@ -85,7 +85,7 @@ Recombine Surface {1, 2, 3, 4};
 // IMPORTANT: Capture the output of the Extrude command. The 'out[]' array will
 // contain the tags of all newly created entities (volumes, top surfaces, lateral surfaces).
 // This is the robust way to identify entities for defining Physical Groups.
-out[] = Extrude {0, 0, h} {
+out[] = Extrude {0, 0, Lz} {
     Surface {1, 2, 3, 4};
     Layers{num_layers_height};
     Recombine;

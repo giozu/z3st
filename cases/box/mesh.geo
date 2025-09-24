@@ -9,21 +9,21 @@
 // Use built-in kernel instead of OpenCASCADE (important for transfinite meshing)
 SetFactory("Built-in");
 
-L = 0.1;       // Edge (x-direction)
-W = 0.1;       // Width (y-direction)
-H = 0.004;     // Height (z-direction)
+Lx = 0.1;       // Edge (x-direction)
+Ly = 0.1;       // Width (y-direction)
+Lz = 0.004;     // Height (z-direction)
 nxy = 21;      // Number of divisions per edge (adjust as needed)
 nz = 11;       // Number of divisions per edge (adjust as needed)
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
-Point(2) = {L, 0, 0, 1.0};
-Point(3) = {L, W, 0, 1.0};
-Point(4) = {0, W, 0, 1.0};
-Point(5) = {0, 0, H, 1.0};
-Point(6) = {L, 0, H, 1.0};
-Point(7) = {L, W, H, 1.0};
-Point(8) = {0, W, H, 1.0};
+Point(2) = {Lx, 0, 0, 1.0};
+Point(3) = {Lx, Ly, 0, 1.0};
+Point(4) = {0, Ly, 0, 1.0};
+Point(5) = {0, 0, Lz, 1.0};
+Point(6) = {Lx, 0, Lz, 1.0};
+Point(7) = {Lx, Ly, Lz, 1.0};
+Point(8) = {0, Ly, Lz, 1.0};
 
 // Eedges
 Line(1) = {1, 2};

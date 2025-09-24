@@ -1,7 +1,7 @@
 name: box
-edge: '0.1'
-width: '0.1'
-height: '0.004'
+Lx: '0.1'
+Ly: '0.1'
+Lz: '0.004'
 geometry_type: rect
 labels:
   bottom: 1

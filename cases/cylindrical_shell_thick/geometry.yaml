@@ -1,7 +1,7 @@
 name: cylindrical_shell
 inner_radius: 0.02
 outer_radius: 0.03
-height: 0.5
+Lz: 0.5
 geometry_type: cyl
 labels:
   bottom: 1
