@@ -554,9 +554,9 @@ class Solver:
             
             rel_norm_dT = 0.0
             rel_norm_du = 0.0
-            conv_s = True
 
-            # Synchronize ghost values before vector operations
+            # Thermal convergence
+            conv_th = True
             if self.on.get("thermal", False):
                 T_i.x.scatter_forward()
                 T_old.x.scatter_forward()
@@ -575,6 +575,10 @@ class Solver:
 
                 print(f"  ||ΔT|| = {norm_dT:.3e}, ||ΔT||/||T|| = {rel_norm_dT:.3e}")
 
+                conv_th = rel_norm_dT < rtol_th or not self.on.get("thermal", False)
+
+            # Mechanical convergence
+            conv_mech = True
             if self.on.get("mechanical", False):
                 u_i.x.scatter_forward()
                 u_old.x.scatter_forward()
@@ -594,25 +598,28 @@ class Solver:
                 rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
 
                 print(f"  ||Δu|| = {norm_du:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}")
-                
+
+                conv_mech = rel_norm_du < rtol_mech or not self.on.get("mechanical", False)
+
+            # Phase-field convergence (L-infinity norm)
+            conv_pf = True
             if self.on.get("fracture", False):
                 self.d.x.scatter_forward()
                 d_i.x.scatter_forward()
 
-                conv_s = True
-                d_diff_inf = 0.0
+                norm_d = 0.0
 
-                d_diff_inf = np.linalg.norm(d_i.x.array - d_old.x.array, ord=np.inf)
-                conv_s = d_diff_inf < tol_d
+                norm_d = np.linalg.norm(d_i.x.array - d_old.x.array, ord=np.inf) # L-infinity norm
+                conv_pf = norm_d < self.tol_pf
 
-                print(f"  ||Δd||_inf = {d_diff_inf:.3e}, tol_d={tol_d:.1e}")
+                print(f"  ||Δd||_inf = {norm_d:.3e}, tol_d={self.tol_pf:.1e}")
 
                 print(f"Phase-field d: min={self.d.x.array.min():.3e}, max={self.d.x.array.max():.3e}")
                 # print(f"History H: min={self.H.x.array.min():.3e}, max={self.H.x.array.max():.3e}")
 
-            if (rel_norm_dT < rtol_th or not self.on.get("thermal", False)) \
-            and (rel_norm_du < rtol_mech or not self.on.get("mechanical", False)) \
-            and conv_s:
+            if  conv_mech \
+            and conv_th \
+            and conv_pf:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
                 if self.on.get("thermal", False):
                     self.T.x.array[:] = T_i.x.array

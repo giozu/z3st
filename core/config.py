@@ -33,6 +33,7 @@ class Config:
         self.rtol_mech = float(mech_cfg.get("rtol", 1e-6))
         self.stag_tol_mech = float(mech_cfg.get("stag_tol", 1e-8))
         self.mech_regime = mech_cfg.get("mechanical_regime", "3D")
+        self.mech_convergence = mech_cfg.get("convergence", "norm")
 
         # --- Thermal solver options ---
         th_cfg = self.input_file.get("thermal", {})

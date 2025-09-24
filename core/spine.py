@@ -217,12 +217,12 @@ class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalMo
                 mat["k"] = k_func(self.T, bu=bu, gad=gad)
                 print("\nk expression for", name, "→", mat["k"])
 
-    def solve(self, max_iters=50):
+    def solve(self, max_iters=100):
         print("\nSolver settings:")
         print(f"  → Coupling              : {self.coupling}")
 
         if self.coupling == "monolithic":
-            self.solve_monolithic(tol=1e-3, max_iter=max_iters)
+            self.solve_monolithic(tol=1e-6, max_iter=max_iters)
 
         # if self.coupling == "monolithic":
         #     raise NotImplementedError("Monolithic coupling is not yet supported; use 'staggered'.")

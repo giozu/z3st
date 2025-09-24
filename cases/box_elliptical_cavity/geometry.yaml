@@ -1,14 +1,14 @@
 name: box_with_cavity
 geometry_type: rect
 
-Lx: 1.0            # box length in x (m)
-Ly: 1.0            # box length in y (m)
-Lz: 1.0            # box length in z (m)
+Lx: 0.5            # box length in x (m)
+Ly: 0.5            # box length in y (m)
+Lz: 0.5            # box length in z (m)
 ax: 0.1072         # semi-axis of ellipsoid in x (m)
 ay: 0.1072         # semi-axis of ellipsoid in y (m)
 az: 0.05           # semi-axis of ellipsoid in z (m)
-h_box: 0.05        # target mesh size in box (m)
-h_sphere: 0.025    # target mesh size near sphere (m)
+h_box: 0.040       # target mesh size in box (m)
+h_sphere: 0.0040   # target mesh size near sphere (m)
 order: 1           # element order
 
 labels:
