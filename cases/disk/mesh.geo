@@ -10,7 +10,7 @@
 SetFactory("OpenCASCADE");
 
 // --- Parameters ---
-h = 0.001;         // Height of the cylinder
+Lz = 0.001;         // Height of the cylinder
 r = 0.0025;        // Radius of the cylinder
 
 n_theta = 64;    // Number of divisions along the circumference (use a multiple of 4)
@@ -44,7 +44,7 @@ Transfinite Surface {1} = {1, 2, 3, 4};
 Recombine Surface {1};
 
 // --- 3D Extrusion ---
-geom[] = Extrude {0, 0, h} {
+geom[] = Extrude {0, 0, Lz} {
     Surface{1};
     Layers{n_z};
     Recombine;

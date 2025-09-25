@@ -59,8 +59,8 @@ class Mesh:
         self.mesh.topology.create_connectivity(self.fdim, self.tdim)
         self.mesh.topology.create_connectivity(self.tdim, self.tdim) 
         self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
-
-        print("Available volume tags (dx):")
+        
+        print("\nAvailable volume tags (dx):")
         tag_values = self.volume_tags.values
         unique_tags = set(tag_values)
         for tag in sorted(unique_tags):
@@ -97,9 +97,10 @@ class Mesh:
             print(f"  Lx = {self.Lx:.3f} m")
             print(f"  Ly = {self.Ly:.3f} m")
 
-        elif self.geometry_type == "cyl":
-            self.inner_radius = self.geometry.get("inner_radius", None)
-            self.outer_radius = self.geometry.get("outer_radius", None)
+        elif self.geometry_type == "cyl" or self.geometry_type == "cylinder":
+            self.inner_radius = self.geometry.get("inner_radius", 0.0)
+            # self.outer_radius = self.geometry.get("outer_radius", None)
+            self.outer_radius = self.geometry.get("r", None)
             self.perimeter = 2. * np.pi * self.outer_radius
             self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
             print(f"  inner_radius = {self.inner_radius:.2e} m")
