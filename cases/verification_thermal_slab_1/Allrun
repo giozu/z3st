@@ -1,7 +1,9 @@
 #!/bin/bash
+# Allrun script for ZEST case + non-regression check
 cd "${0%/*}" || exit 1  # Run from this directory
 
 echo "Executing zest.py..."
-
 python3 ../../zest.py
-python3 non-regression.py --verify-slab --plot-centerline --csv
+
+echo "Executing non-regression check..."
+python3 non-regression.py --verification --plot-centerline --plot-avg --csv
