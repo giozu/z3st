@@ -5,6 +5,6 @@ cd "${0%/*}" || exit 1  # Run from this directory
 echo "Executing zest.py..."
 python3 ../../zest.py
 
-echo "Executing non-regression check..."
+echo "\nExecuting non-regression check..."
 # python3 non-regression.py --verification --plot-centerline --plot-avg --csv --write-baseline
 python3 non-regression.py --verification --plot-centerline --plot-avg --csv

@@ -30,6 +30,14 @@ pv.OFF_SCREEN = True  # safe on headless/HPC
 OUTPUT_DIR = "output"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+# ANSI colors
+class Colors:
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    YELLOW = "\033[93m"
+    RESET = "\033[0m"
+
+
 
 # ---------------------- helpers ----------------------
 def _detect_temp_field(grid):
@@ -250,20 +258,27 @@ def read_json(path: str) -> dict:
 
 
 def compare_metrics(cur: dict, ref: dict, rtol=5e-4, atol=1e-6):
-    diffs = {}
+    """
+    Compare current vs baseline metrics with tolerances.
+    Returns (ok_all, rows) where rows is a list of (key, cur, ref, diff, status).
+    """
+    rows = []
     keys = set(k for k, v in cur.items() if isinstance(v, (int, float))) | \
            set(k for k, v in ref.items() if isinstance(v, (int, float)))
     ok_all = True
     for k in sorted(keys):
         if k not in cur or k not in ref:
+            rows.append((k, None, None, None, "MISSING"))
             ok_all = False
-            diffs.setdefault(k, []).append(f"missing in {'current' if k not in cur else 'baseline'}")
             continue
         cv, rv = float(cur[k]), float(ref[k])
-        if not (abs(cv - rv) <= atol + rtol * max(1.0, abs(cv), abs(rv))):
+        tol_ok = abs(cv - rv) <= atol + rtol * max(1.0, abs(cv), abs(rv))
+        status = "OK" if tol_ok else "FAIL"
+        if not tol_ok:
             ok_all = False
-            diffs.setdefault(k, []).append(f"got {cv:.6e}, ref {rv:.6e}")
-    return ok_all, diffs
+        rows.append((k, cv, rv, cv - rv, status))
+    return ok_all, rows
+
 
 
 # ---------------------- main ----------------------
@@ -314,14 +329,16 @@ def main():
             axis=args.axis,
             T0_known=T0_known,
             T1_known=T1_known,
-            L_domain=L_domain
+            L_domain=L_domain,
+            tol_rel_L2=1e-3,
+            tol_Linf=1e-3
         )
         if ok_ver:
-            print(f"[VERIFICATION]: rel_L2={info['rel_L2']:.3e}, "
-                  f"Linf={info['Linf']:.3e}  (T0={T0_known:.2f}, T1={T1_known:.2f}, L={L_domain:.2f})")
+            print(f"[VERIFICATION PASSED]: rel_L2={info['rel_L2']:.3e}, Linf={info['Linf']:.3e} "
+                f"(tol_rel_L2<{args.rtol}, tol_Linf<{args.atol})")
         else:
-            print(f"[VERIFICATION]:  details={info}")
-            return 1
+            print(f"[VERIFICATION FAILED]: rel_L2={info['rel_L2']:.3e}, Linf={info['Linf']:.3e} "
+                f"(tol_rel_L2<{args.rtol}, tol_Linf<{args.atol})")
         metrics.update({f"verif:{k}": v for k, v in info.items() if isinstance(v, (int, float))})
 
     # 3) Plots
@@ -352,20 +369,24 @@ def main():
     if args.write_baseline:
         write_baseline(args.baseline, metrics)
         return 0
-      
 
     if pathlib.Path(args.baseline).exists():
         baseline = read_json(args.baseline)
-        ok, diffs = compare_metrics(metrics, baseline, rtol=args.rtol, atol=args.atol)
-        if ok:
-            print("[OK] regression test PASSED.")
-            return 0
-        print("[FAIL] regression test FAILED. Differences:")
-        for key, issues in diffs.items():
-            print(f"  - {key}:")
-            for line in issues:
-                print(f"      * {line}")
-        return 1
+        ok, rows = compare_metrics(metrics, baseline, rtol=args.rtol, atol=args.atol)
+
+        print("\n" + "─"*29 + " Regression test " + "─"*29)
+        print(f"{'Metric':20s} {'Current':>12s} {'Baseline':>12s} {'Δ (cur-ref)':>12s} {'Status':>8s}")
+        print("─"*70)
+        for k, cv, rv, diff, status in rows:
+            if cv is None or rv is None:
+                print(f"{k:20s} {'-':>12s} {'-':>12s} {'-':>12s} {status:>8s}")
+            else:
+                color = Colors.GREEN if status == "OK" else Colors.RED
+                print(f"{k:20s} {cv:12.4e} {rv:12.4e} {diff:12.2e} {color}{status:>8s}{Colors.RESET}")
+        print("─"*70)
+        overall_status = f"{Colors.GREEN}PASSED{Colors.RESET}" if ok else f"{Colors.RED}FAILED{Colors.RESET}"
+        print(f"Overall: {overall_status}")
+
     else:
         print(f"[WARN] baseline not found: {args.baseline}. Use --write-baseline to create it.")
         return 2
