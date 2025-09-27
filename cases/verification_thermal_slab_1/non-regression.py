@@ -317,10 +317,10 @@ def main():
             L_domain=L_domain
         )
         if ok_ver:
-            print(f"[VERIF] linear slab: PASS  rel_L2={info['rel_L2']:.3e}, "
+            print(f"[VERIFICATION]: rel_L2={info['rel_L2']:.3e}, "
                   f"Linf={info['Linf']:.3e}  (T0={T0_known:.2f}, T1={T1_known:.2f}, L={L_domain:.2f})")
         else:
-            print(f"[VERIF] linear slab: FAIL  details={info}")
+            print(f"[VERIFICATION]:  details={info}")
             return 1
         metrics.update({f"verif:{k}": v for k, v in info.items() if isinstance(v, (int, float))})
 
@@ -352,6 +352,7 @@ def main():
     if args.write_baseline:
         write_baseline(args.baseline, metrics)
         return 0
+      
 
     if pathlib.Path(args.baseline).exists():
         baseline = read_json(args.baseline)
