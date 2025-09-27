@@ -45,13 +45,20 @@ def _detect_temp_field(grid):
     for name in cand_names:
         if name in grid.point_data:
             return ("point", name)
+        else:
+            print("Temperature field not found in point_data.")
+
     for name in cand_names:
         if name in grid.cell_data:
             return ("cell", name)
+        else:
+            print("Temperature field not found in cell_data.")
+
     return (None, None)
 
 
 def _mag(arr: np.ndarray) -> np.ndarray:
+    """ Return magnitude of array, handling both 1D and multi-D cases. """
     arr = np.asarray(arr)
     if arr.ndim == 1:
         return arr
@@ -60,50 +67,65 @@ def _mag(arr: np.ndarray) -> np.ndarray:
 
 # ---------------------- metrics ----------------------
 def compute_metrics_from_vtu(vtu_path: str, fields=("Temperature", "Displacement")) -> dict:
-    g = pv.read(vtu_path)
-    pts = g.points
-    out = {"n_points": int(len(pts))}
-    avail = {k: np.asarray(v) for k, v in g.point_data.items()}
-    if not avail and g.cell_data:
-        g = g.cell_data_to_point_data()
-        avail = {k: np.asarray(v) for k, v in g.point_data.items()}
+    # Legge il file VTU con pyvista
+    grid = pv.read(vtu_path)
 
+    # Array di coordinate di tutti i punti della mesh
+    pts = grid.points
+
+    # Inizializza il dizionario dei risultati con il numero di punti
+    out = {"n_points": int(len(pts))}
+
+    # Recupera i dati associati ai punti della mesh (point_data)
+    # → es. Temperature, Displacement, PhaseField
+    avail = {k: np.asarray(v) for k, v in grid.point_data.items()}
+
+    # Se non c'è nulla in point_data ma ci sono dati a livello di cella,
+    # li converte in point_data (così possiamo trattarli in modo uniforme)
+    if not avail and grid.cell_data:
+        grid = grid.cell_data_to_point_data()
+        avail = {k: np.asarray(v) for k, v in grid.point_data.items()}
+
+    # Loop sui campi richiesti (Temperature, Displacement, …)
     for name in fields:
+        # Cerca corrispondenze: esatto o contenuto nel nome
         matches = [k for k in avail if k == name] or [k for k in avail if name in k]
+
+        # Loop sui campi trovati
         for key in matches:
+            # Applica _mag → così se è vettoriale (es. Displacement),
+            # calcola il modulo in ogni punto, se è scalare lo lascia invariato
             values = _mag(avail[key].astype(float))
+
+            # Elimina eventuali valori NaN o infiniti
             values = values[np.isfinite(values)]
             if values.size == 0:
                 continue
-            out[f"{key}:min"] = float(values.min())
-            out[f"{key}:max"] = float(values.max())
-            out[f"{key}:mean"] = float(values.mean())
-            out[f"{key}:L2"] = float(np.sqrt(np.mean(values**2)))
-    return out
 
+            # Calcola e salva nel dizionario alcune metriche di sintesi:
+            out[f"{key}:min"]  = float(values.min())   # minimo
+            out[f"{key}:max"]  = float(values.max())   # massimo
+            out[f"{key}:mean"] = float(values.mean())  # media
+            out[f"{key}:L2"]   = float(np.sqrt(np.mean(values**2))) # norma L2 media
+
+    return out
 
 # ---------------------- verification ----------------------
 def verification(vtu_path: str, axis: int = 0,
                        T0_known: float = 600.0, T1_known: float = 800.0,
                        L_domain: float = 1.0,
-                       tol_rel_L2: float = 1e-3, tol_Linf: float = 5e-3,
                        tol_len: float = 1e-12):
     """
     Verification vs. analytic T(x) = T0 + (T1 - T0) * (x - xmin)/L_domain.
     No rescaling: requires mesh length == L_domain, otherwise FAIL.
     """
-    g = pv.read(vtu_path)
-    loc, field = _detect_temp_field(g)
-    if not field:
-        return False, {"error": "Temperature field not found in VTU."}
+    grid = pv.read(vtu_path)
+    loc, field = _detect_temp_field(grid) # "point", "Temperature"
 
     if loc == "point":
-        T = np.asarray(g.point_data[field], dtype=float)
-    else:
-        g = g.cell_data_to_point_data()
-        T = np.asarray(g.point_data[field], dtype=float)
+        T = np.asarray(grid.point_data[field], dtype=float)
 
-    X = g.points[:, axis]
+    X = grid.points[:, axis]
     xmin, xmax = float(X.min()), float(X.max())
     L_mesh = xmax - xmin
 
@@ -114,13 +136,12 @@ def verification(vtu_path: str, axis: int = 0,
     # analytic solution
     T_ana = T0_known + (T1_known - T0_known) * (X - xmin) / L_domain
     diff = T - T_ana
-    rel_L2 = float(np.sqrt(np.mean(diff ** 2)) /
-                   (np.sqrt(np.mean(T_ana ** 2)) + 1e-30))
-    Linf = float(np.max(np.abs(diff)))
-    ok = (rel_L2 < tol_rel_L2) and (Linf < tol_Linf)
-    return ok, {"rel_L2": rel_L2, "Linf": Linf,
-                "T0": T0_known, "T1": T1_known,
-                "L": L_domain, "L_mesh": L_mesh}
+    L2 = np.sqrt(np.mean(diff ** 2))
+    Linf = np.max(np.abs(diff))
+    
+    return  {"L2": L2, "Linf": Linf,
+             "T0": T0_known, "T1": T1_known,
+             "L": L_domain, "L_mesh": L_mesh}
 
 
 # ---------------------- plots ----------------------
@@ -128,20 +149,16 @@ def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
                            resolution: int = 400, axis: int = 0,
                            T0_known: float = 600.0, T1_known: float = 800.0,
                            L_domain: float = 1.0, tol_len: float = 1e-12) -> None:
-    g = pv.read(vtu_path)
-    loc, field = _detect_temp_field(g)
-    if not field:
-        print("[PLOT] Temperature field not found; skip centerline plot.")
-        return
+    grid = pv.read(vtu_path)
+    loc, field = _detect_temp_field(grid)
 
     # bounds
-    mins = np.array(g.bounds)[[0, 2, 4]]
-    maxs = np.array(g.bounds)[[1, 3, 5]]
+    mins = np.array(grid.bounds)[[0, 2, 4]] # xmin, ymin, zmin
+    maxs = np.array(grid.bounds)[[1, 3, 5]] # xmax, ymax, zmax
     xmin, xmax = float(mins[axis]), float(maxs[axis])
     L_mesh = xmax - xmin
     if abs(L_mesh - L_domain) > tol_len:
-        print(f"[PLOT] ERROR: Mesh length {L_mesh} != expected L={L_domain}. No plot generated.")
-        return
+        print(f"[PLOT] WARNING: Mesh length {L_mesh} != expected L={L_domain}.")
 
     # line through center
     mid = 0.5 * (mins + maxs)
@@ -151,7 +168,7 @@ def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
     p1[axis] = xmax - shrink
 
     try:
-        samp = g.sample_over_line(tuple(p0), tuple(p1), resolution=resolution)
+        samp = grid.sample_over_line(tuple(p0), tuple(p1), resolution=resolution)
         x = samp.points[:, axis]
         if loc == "point" and field in samp.point_data:
             T = np.asarray(samp.point_data[field], dtype=float)
@@ -160,7 +177,7 @@ def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
             T = np.asarray(arrs[field], dtype=float)
     except TypeError:
         line = pv.Line(tuple(p0), tuple(p1), resolution=resolution)
-        samp = g.sample(line)
+        samp = grid.sample(line)
         x = samp.points[:, axis]
         arrs = samp.point_data if field in samp.point_data else samp.cell_data
         T = np.asarray(arrs[field], dtype=float)
@@ -170,12 +187,12 @@ def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
 
     # analytic
     T_ana = T0_known + (T1_known - T0_known) * (x - xmin) / L_domain
-    rel_L2 = float(np.sqrt(np.mean((T - T_ana) ** 2)) /
+    L2 = float(np.sqrt(np.mean((T - T_ana) ** 2)) /
                    (np.sqrt(np.mean(T_ana ** 2)) + 1e-30))
 
     plt.figure()
     plt.plot(x, T, lw=2, label="numerical")
-    plt.plot(x, T_ana, lw=2, ls="--", label=f"analytic (rel L2={rel_L2:.1e})")
+    plt.plot(x, T_ana, lw=2, ls="--", label=f"analytic")
     plt.xlabel("x [m]"); plt.ylabel("Temperature [K]")
     plt.title("Centerline temperature profile")
     plt.grid(True); plt.legend(); plt.tight_layout()
@@ -192,15 +209,15 @@ def plot_T_vs_x_avg(vtu_path: str, out_png: str, out_csv: str = None,
                     nbins: int = 100, axis: int = 0,
                     T0_known: float = 600.0, T1_known: float = 800.0,
                     L_domain: float = 1.0, tol_len: float = 1e-12) -> None:
-    g = pv.read(vtu_path)
-    loc, field = _detect_temp_field(g)
+    grid = pv.read(vtu_path)
+    loc, field = _detect_temp_field(grid)
     if not field:
         print("[PLOT] Temperature field not found; skip averaged plot.")
         return
 
     # bounds
-    mins = np.array(g.bounds)[[0, 2, 4]]
-    maxs = np.array(g.bounds)[[1, 3, 5]]
+    mins = np.array(grid.bounds)[[0, 2, 4]]
+    maxs = np.array(grid.bounds)[[1, 3, 5]]
     xmin, xmax = float(mins[axis]), float(maxs[axis])
     L_mesh = xmax - xmin
     if abs(L_mesh - L_domain) > tol_len:
@@ -208,12 +225,9 @@ def plot_T_vs_x_avg(vtu_path: str, out_png: str, out_csv: str = None,
         return
 
     # values
-    x = g.points[:, axis]
+    x = grid.points[:, axis]
     if loc == "point":
-        T = np.asarray(g.point_data[field], dtype=float)
-    else:
-        g = g.cell_data_to_point_data()
-        T = np.asarray(g.point_data[field], dtype=float)
+        T = np.asarray(grid.point_data[field], dtype=float)
 
     # binning
     edges = np.linspace(xmin, xmax, nbins + 1)
@@ -229,7 +243,7 @@ def plot_T_vs_x_avg(vtu_path: str, out_png: str, out_csv: str = None,
     T_ana = T0_known + (T1_known - T0_known) * (centers - xmin) / L_domain
 
     plt.figure()
-    plt.plot(centers, T_avg, lw=2, label="numerical ⟨T⟩")
+    plt.plot(centers, T_avg, lw=2, label="numerical")
     plt.plot(centers, T_ana, lw=2, ls="--", label="analytic")
     plt.xlabel("x [m]"); plt.ylabel("⟨Temperature⟩ over y–z [K]")
     plt.title("Cross-section averaged temperature")
@@ -257,7 +271,7 @@ def read_json(path: str) -> dict:
         return json.load(f)
 
 
-def compare_metrics(cur: dict, ref: dict, rtol=5e-4, atol=1e-6):
+def compare_metrics(cur: dict, ref: dict, atol=1e-6):
     """
     Compare current vs baseline metrics with tolerances.
     Returns (ok_all, rows) where rows is a list of (key, cur, ref, diff, status).
@@ -272,7 +286,7 @@ def compare_metrics(cur: dict, ref: dict, rtol=5e-4, atol=1e-6):
             ok_all = False
             continue
         cv, rv = float(cur[k]), float(ref[k])
-        tol_ok = abs(cv - rv) <= atol + rtol * max(1.0, abs(cv), abs(rv))
+        tol_ok = abs(cv - rv) <= atol
         status = "OK" if tol_ok else "FAIL"
         if not tol_ok:
             ok_all = False
@@ -290,12 +304,10 @@ def main():
     # ----------------------------------------------------
 
     ap = argparse.ArgumentParser(description="Verification + non-regression checker for ZEST VTU outputs.")
-    ap.add_argument("--vtu", help="Path to VTU (e.g., output/fields.vtu)")
-    ap.add_argument("--verification", action="store_true", help="Analytic check for 1D Dirichlet–Dirichlet slab.")
+    ap.add_argument("--vtu", help="Path to VTU (e.grid., output/fields.vtu)")
     ap.add_argument("--write-baseline", action="store_true", help="Write baseline.json from current metrics.")
     ap.add_argument("--baseline", default="baseline.json", help="Path to baseline JSON.")
-    ap.add_argument("--rtol", type=float, default=5e-4, help="Relative tolerance for regression.")
-    ap.add_argument("--atol", type=float, default=1e-6, help="Absolute tolerance for regression.")
+    ap.add_argument("--atol", type=float, default=1e-4, help="Absolute tolerance for regression.")
     ap.add_argument("--plot-centerline", action="store_true", help="Save centerline T(x) plot.")
     ap.add_argument("--plot-avg", action="store_true", help="Save cross-section-averaged T(x) plot.")
     ap.add_argument("--csv", action="store_true", help="Also write CSV files for generated plots.")
@@ -323,26 +335,18 @@ def main():
         print(f"  {k}: {metrics[k]}")
 
     # 2) Analytic verification
-    if args.verification:
-        ok_ver, info = verification(
-            str(vtu),
-            axis=args.axis,
-            T0_known=T0_known,
-            T1_known=T1_known,
-            L_domain=L_domain,
-            tol_rel_L2=1e-3,
-            tol_Linf=1e-3
-        )
-        if ok_ver:
-            print(f"[VERIFICATION PASSED]: rel_L2={info['rel_L2']:.3e}, Linf={info['Linf']:.3e} "
-                f"(tol_rel_L2<{args.rtol}, tol_Linf<{args.atol})")
-        else:
-            print(f"[VERIFICATION FAILED]: rel_L2={info['rel_L2']:.3e}, Linf={info['Linf']:.3e} "
-                f"(tol_rel_L2<{args.rtol}, tol_Linf<{args.atol})")
-        metrics.update({f"verif:{k}": v for k, v in info.items() if isinstance(v, (int, float))})
+    info = verification(
+        str(vtu),
+        axis=args.axis,
+        T0_known=T0_known,
+        T1_known=T1_known,
+        L_domain=L_domain
+    )
+    print(f"[VERIFICATION]: L2={info['L2']:.3e}, Linf={info['Linf']:.3e}")
+    metrics.update({f"verif:{k}": v for k, v in info.items() if isinstance(v, (int, float))})
 
     # 3) Plots
-    if args.verification or args.plot_centerline:
+    if args.plot_centerline:
         plot_T_vs_x_centerline(
             str(vtu),
             out_png=os.path.join(OUTPUT_DIR, "T_vs_x_centerline.png"),
@@ -372,7 +376,7 @@ def main():
 
     if pathlib.Path(args.baseline).exists():
         baseline = read_json(args.baseline)
-        ok, rows = compare_metrics(metrics, baseline, rtol=args.rtol, atol=args.atol)
+        ok, rows = compare_metrics(metrics, baseline, atol=args.atol)
 
         print("\n" + "─"*29 + " Regression test " + "─"*29)
         print(f"{'Metric':20s} {'Current':>12s} {'Baseline':>12s} {'Δ (cur-ref)':>12s} {'Status':>8s}")

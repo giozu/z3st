@@ -7,12 +7,12 @@
   "Temperature:max": 799.9981292827032,
   "Temperature:mean": 700.4718084151777,
   "Temperature:min": 599.9988775615957,
-  "_baseline_date": "2025-09-27 17:53:54",
+  "_baseline_date": "2025-09-27 21:02:46",
   "n_points": 3204,
   "verif:L": 0.3,
+  "verif:L2": 0.0015155717153349658,
   "verif:L_mesh": 0.3,
   "verif:Linf": 0.0018707316850168354,
   "verif:T0": 600.0,
-  "verif:T1": 800.0,
-  "verif:rel_L2": 2.155510436897059e-06
+  "verif:T1": 800.0
 }

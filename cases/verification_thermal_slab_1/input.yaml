@@ -36,7 +36,7 @@ mechanical:
 thermal:
   solver: linear # linear | non-linear
   linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1e-10
+  rtol: 1e-8
   stag_tol: 1e-6
   convergence: rel_norm # rel_norm
 
