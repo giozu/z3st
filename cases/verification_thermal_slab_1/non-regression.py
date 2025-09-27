@@ -44,7 +44,7 @@ def _detect_temp_field(grid):
 def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
                            resolution: int = 400, axis: int = 0,
                            T0_known: float = 600.0, T1_known: float = 800.0,
-                           L_domain: float = 1.0) -> None:
+                           L_domain: float = 0.3) -> None:
     
     g = pv.read(vtu_path)
     loc, field = _detect_temp_field(g)
@@ -132,15 +132,11 @@ def compute_metrics_from_vtu(vtu_path: str, fields=("Temperature", "Displacement
             out[f"{key}:L2"] = float(np.sqrt(np.mean(values**2)))
     return out
 
-
 def verify_linear_slab(vtu_path: str, axis: int = 0,
                        T0_known: float = 600.0, T1_known: float = 800.0,
-                       L_domain: float = 1.0,
-                       tol_rel_L2: float = 1e-3, tol_Linf: float = 5e-3):
-    """
-    Verification vs. analytic T(x) = T0 + (T1 - T0) * (x / L_domain).
-    Ignores mesh bounds completely: maps coordinates to [0, L_domain].
-    """
+                       L_domain: float = 0.3,
+                       tol_rel_L2: float = 1e-3, tol_Linf: float = 5e-3,
+                       tol_len: float = 1e-12):
     g = pv.read(vtu_path)
     loc, field = _detect_temp_field(g)
     if not field:
@@ -152,18 +148,24 @@ def verify_linear_slab(vtu_path: str, axis: int = 0,
         g = g.cell_data_to_point_data()
         T = np.asarray(g.point_data[field], dtype=float)
 
-    # map to [0, L]
-    X_raw = g.points[:, axis]
-    X = (X_raw - X_raw.min()) / max(X_raw.max() - X_raw.min(), 1e-12) * L_domain
+    # coordinate raw
+    X = g.points[:, axis]
+    xmin, xmax = float(X.min()), float(X.max())
+    L_mesh = xmax - xmin
 
-    T_ana = T0_known + (T1_known - T0_known) * (X / L_domain)
+    # check consistency with L_domain
+    if abs(L_mesh - L_domain) > tol_len:
+        return False, {"error": f"Mesh length {L_mesh} != expected L={L_domain}"}
+
+    # analytic line
+    T_ana = T0_known + (T1_known - T0_known) * (X - xmin) / L_domain
     diff = T - T_ana
-    rel_L2 = float(np.sqrt(np.mean(diff ** 2)) /
-                   (np.sqrt(np.mean(T_ana ** 2)) + 1e-30))
+    rel_L2 = float(np.sqrt(np.mean(diff ** 2)) / (np.sqrt(np.mean(T_ana ** 2)) + 1e-30))
     Linf = float(np.max(np.abs(diff)))
     ok = (rel_L2 < tol_rel_L2) and (Linf < tol_Linf)
-    return ok, {"rel_L2": rel_L2, "Linf": Linf,
-                "T0": T0_known, "T1": T1_known, "L": L_domain}
+    return ok, {"rel_L2": rel_L2, "Linf": Linf, "T0": T0_known, "T1": T1_known,
+                "L": L_domain, "L_mesh": L_mesh}
+
 
 
 # ---------------------- baseline I/O & comparison ----------------------
@@ -205,7 +207,7 @@ def main():
     # ------------------ user constants ------------------
     T0_known = 600.0   # left boundary temperature [K]
     T1_known = 800.0   # right boundary temperature [K]
-    L_domain  = 2.0    # domain length [m]
+    L_domain  = 0.3    # domain length [m]
     # ----------------------------------------------------
 
     ap = argparse.ArgumentParser(description="Verification + non-regression checker for ZEST VTU outputs.")
