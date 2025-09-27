@@ -41,30 +41,38 @@ def _detect_temp_field(grid):
             return ("cell", name)
     return (None, None)
 
+
 def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
                            resolution: int = 400, axis: int = 0,
                            T0_known: float = 600.0, T1_known: float = 800.0,
-                           L_domain: float = 0.3) -> None:
-    
+                           L_domain: float = 0.3, tol_len: float = 1e-12) -> None:
     g = pv.read(vtu_path)
     loc, field = _detect_temp_field(g)
     if not field:
         print("[PLOT] Temperature field not found; skip centerline plot.")
         return
 
-    # line along chosen axis
+    # bounds along chosen axis
     mins = np.array(g.bounds)[[0, 2, 4]]
     maxs = np.array(g.bounds)[[1, 3, 5]]
-    mid = 0.5 * (mins + maxs)
+    xmin, xmax = float(mins[axis]), float(maxs[axis])
+    L_mesh = xmax - xmin
 
+    # check consistency
+    if abs(L_mesh - L_domain) > tol_len:
+        print(f"[PLOT] ERROR: Mesh length {L_mesh} != expected L={L_domain}. No plot generated.")
+        return
+
+    # build line through center
+    mid = 0.5 * (mins + maxs)
     p0 = mid.copy(); p1 = mid.copy()
-    shrink = 1e-4 * (maxs[axis] - mins[axis])
-    p0[axis] = mins[axis] + shrink
-    p1[axis] = maxs[axis] - shrink
+    shrink = 1e-4 * L_mesh
+    p0[axis] = xmin + shrink
+    p1[axis] = xmax - shrink
 
     try:
         samp = g.sample_over_line(tuple(p0), tuple(p1), resolution=resolution)
-        x_raw = samp.points[:, axis]
+        x = samp.points[:, axis]
         if loc == "point" and field in samp.point_data:
             T = np.asarray(samp.point_data[field], dtype=float)
         else:
@@ -73,17 +81,16 @@ def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
     except TypeError:
         line = pv.Line(tuple(p0), tuple(p1), resolution=resolution)
         samp = g.sample(line)
-        x_raw = samp.points[:, axis]
+        x = samp.points[:, axis]
         arrs = samp.point_data if field in samp.point_data else samp.cell_data
         T = np.asarray(arrs[field], dtype=float)
 
-    # sort and rescale to [0, L_domain]
-    ix = np.argsort(x_raw)
-    x = (x_raw[ix] - x_raw.min()) / max(x_raw.max() - x_raw.min(), 1e-12) * L_domain
-    T = T[ix]
+    # sort
+    ix = np.argsort(x)
+    x, T = x[ix], T[ix]
 
-    # analytic solution
-    T_ana = T0_known + (T1_known - T0_known) * (x / L_domain)
+    # analytic line on [xmin, xmax]
+    T_ana = T0_known + (T1_known - T0_known) * (x - xmin) / L_domain
     rel_L2 = float(np.sqrt(np.mean((T - T_ana) ** 2)) /
                    (np.sqrt(np.mean(T_ana ** 2)) + 1e-30))
 
@@ -100,6 +107,7 @@ def plot_T_vs_x_centerline(vtu_path: str, out_png: str, out_csv: str = None,
         np.savetxt(out_csv, np.column_stack([x, T, T_ana]),
                    delimiter=",", header="x,T,T_analytic", comments="")
         print(f"[PLOT] Saved: {out_csv}")
+
 
 
 # ---------------------- metrics & verification ----------------------
