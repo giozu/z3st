@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Verification + non-regression checker for ZEST VTU outputs.
+Verification
 
 - Auto-detect .VTU file under output/
 - Analytic verification for 1D Dirichlet-Dirichlet slab:
@@ -303,11 +303,11 @@ def main():
     L_domain  = 0.3    # domain length [m]
     # ----------------------------------------------------
 
-    ap = argparse.ArgumentParser(description="Verification + non-regression checker for ZEST VTU outputs.")
+    ap = argparse.ArgumentParser(description="Verification + checker for ZEST VTU outputs.")
     ap.add_argument("--vtu", help="Path to VTU (e.grid., output/fields.vtu)")
     ap.add_argument("--write-baseline", action="store_true", help="Write baseline.json from current metrics.")
     ap.add_argument("--baseline", default="baseline.json", help="Path to baseline JSON.")
-    ap.add_argument("--atol", type=float, default=1e-4, help="Absolute tolerance for regression.")
+    ap.add_argument("--atol", type=float, default=1e-4, help="Absolute tolerance.")
     ap.add_argument("--plot-centerline", action="store_true", help="Save centerline T(x) plot.")
     ap.add_argument("--plot-avg", action="store_true", help="Save cross-section-averaged T(x) plot.")
     ap.add_argument("--csv", action="store_true", help="Also write CSV files for generated plots.")
@@ -378,7 +378,7 @@ def main():
         baseline = read_json(args.baseline)
         ok, rows = compare_metrics(metrics, baseline, atol=args.atol)
 
-        print("\n" + "─"*29 + " Regression test " + "─"*29)
+        print("\n" + "─"*29 + " Verification test " + "─"*29)
         print(f"{'Metric':20s} {'Current':>12s} {'Baseline':>12s} {'Δ (cur-ref)':>12s} {'Status':>8s}")
         print("─"*70)
         for k, cv, rv, diff, status in rows:
