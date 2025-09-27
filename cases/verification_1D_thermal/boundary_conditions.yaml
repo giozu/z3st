@@ -1,0 +1,15 @@
+thermal_bcs:
+  solid:
+    - type: Dirichlet
+      region: xmin
+      temperature: 600.0
+
+    - type: Dirichlet
+      region: xmax
+      temperature: 800.0
+
+mechanical_bcs:
+  solid:
+    - type: Dirichlet
+      region: zmin
+      displacement: [0.0, 0.0, 0.0]

@@ -1,0 +1,19 @@
+name: box
+geometry_type: rect
+
+Lx: 0.3            # box length in x (m)
+Ly: 0.1            # box length in y (m)
+Lz: 0.1            # box length in z (m)
+h_box: 0.010       # target mesh size in box (m)
+order: 1           # element order
+
+labels:
+  xmin: 11
+  xmax: 12
+  ymin: 13
+  ymax: 14
+  zmin: 15
+  zmax: 16
+  solid: 100
+
+plot: False

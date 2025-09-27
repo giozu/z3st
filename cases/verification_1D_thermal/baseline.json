@@ -1,0 +1,17 @@
+{
+  "Displacement:L2": 0.0,
+  "Displacement:max": 0.0,
+  "Displacement:mean": 0.0,
+  "Displacement:min": 0.0,
+  "Temperature:L2": 703.1134849954943,
+  "Temperature:max": 799.9981292827032,
+  "Temperature:mean": 700.4718084151777,
+  "Temperature:min": 599.9988775615957,
+  "n_points": 3204,
+  "verif:Linf": 7.638618626515381e-08,
+  "verif:T0": 599.9988775667421,
+  "verif:T1": 799.9981292776727,
+  "verif:rel_L2": 2.274563214620155e-11,
+  "verif:xmax": 0.15,
+  "verif:xmin": -0.15
+}
