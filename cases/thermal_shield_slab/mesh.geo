@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------------
 //
-//  Gmsh GEO for a box WxLxH with a structured mesh
+//  Gmsh GEO for a box Lx Ly Lz with a structured mesh
 //
 //  Author: Giovanni Zullo
 //
@@ -9,20 +9,20 @@
 // Use built-in kernel instead of OpenCASCADE (important for transfinite meshing)
 SetFactory("Built-in");
 
-W = 0.045; // Edge
-L = 0.10;  // Width
-H = 0.10;  // Height
+Lx = 0.045; // Edge
+Ly = 0.10;  // Width
+Lz = 0.10;  // Height
 n = 20;    // Number of divisions per edge (adjust as needed)
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
-Point(2) = {W, 0, 0, 1.0};
-Point(3) = {W, L, 0, 1.0};
-Point(4) = {0, L, 0, 1.0};
-Point(5) = {0, 0, H, 1.0};
-Point(6) = {W, 0, H, 1.0};
-Point(7) = {W, L, H, 1.0};
-Point(8) = {0, L, H, 1.0};
+Point(2) = {Lx, 0, 0, 1.0};
+Point(3) = {Lx, Ly, 0, 1.0};
+Point(4) = {0, Ly, 0, 1.0};
+Point(5) = {0, 0, Lz, 1.0};
+Point(6) = {Lx, 0, Lz, 1.0};
+Point(7) = {Lx, Ly, Lz, 1.0};
+Point(8) = {0, Ly, Lz, 1.0};
 
 // Eedges
 Line(1) = {1, 2};
@@ -82,4 +82,4 @@ Mesh.RecombineAll = 1;
 Mesh 3;
 
 // Save mesh file
-Save "thermal_shield_slab.msh";
+Save "mesh.msh";

@@ -1,0 +1,15 @@
+name: box
+geometry_type: rect
+
+Lx: 0.045         # box length in x (m)
+Ly: 0.10          # box length in y (m)
+Lz: 0.10          # box length in z (m)
+
+labels:
+  face_xx_0: 5
+  face_xx_1: 3
+  face_yy_0: 2
+  face_yy_1: 4
+  bottom: 1
+  top: 6
+  steel: 7
