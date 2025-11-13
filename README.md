@@ -41,9 +41,19 @@ Install in editable/development mode
   pip install -e .
   ```
 
-Then, it is possible to execute in each case folder:
+Then, it is possible to execute in each case folder, for instance:
   ```bash
+  cd ~/z3st/cases/19_plate/
+  gmsh -3 mesh.geo
   python3 -m z3st > log.z3st
+  python3 non-regression.py
+  python3 ../../utils/plot_convergence.py
+  ```
+
+Or, with a single instruction:
+  ```bash
+  cd ~/z3st/cases/19_plate/
+  ./Allrun
   ```
 
 ---
