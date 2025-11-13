@@ -80,44 +80,54 @@ Optional flags:
 ## Directory Structure
 
 ```bash
-Z3ST/
-├── z3st.py                # Main driver
-├── z3st_env.yml           # Conda environment
-├── LICENSE / README.md
+
+z3st/
+├── LICENSE
+├── README.md
+├── ...
 │
-├── core/                  # FEM setup & solver core
+├── z3st/                        # Python package (entry point, CLI)
+│   ├── __main__.py
+│   ├── __init__.py
+│
+├── core/                        # FEM core
 │   ├── config.py
 │   ├── mesh.py
 │   ├── solver.py
-│   ├── finite_element_setup.py
 │   ├── spine.py
-│   └── diagnostic.py
+│   ├── finite_element_setup.py
+│   ├── diagnostic.py
+│   └── __init__.py
 │
-├── models/                # Physical submodules
+├── models/                      # Physical models
 │   ├── thermal_model.py
 │   ├── mechanical_model.py
-│   └── gap_model.py
+│   ├── gap_model.py
+│   └── __init__.py
 │
-├── materials/             # Material property files (YAML)
-│   ├── steel.yaml, zircaloy.yaml, oxide.yaml, ...
-│   └── 15_15Ti.yaml, T91.yaml, etc.
+├── materials/                   # Material databases (YAML + helpers)
+│   ├── steel.yaml
+│   ├── ...
+│   └── __init__.py
 │
-├── utils/                 # Post-processing utilities
+├── utils/                       # Post-processing and helpers
 │   ├── export_vtu.py
-│   ├── utils_extract_vtu.py
-│   ├── utils_plot.py
-│   └── interactive_gui.ipynb
+│   ├── plot_convergence.py
+│   ├── ...
+│   └── __init__.py
 │
-├── cases/                 # Example input sets and geometries
-│   ├── cylindrical_shell_thick/
-│   ├── thermal_shield/
-│   ├── spherical_shell/
-│   └── non-regression.sh
+├── cases/                       # Verification and demonstration cases
+│   ├── 1_thin_thermal_slab/
+│   ├── ...
+│   ├── non-regression.sh
+│   └── non-regression_summary.txt
 │
-└── docs/                  # Sphinx documentation
+└── docs/                        # Sphinx documentation (built by GitHub Actions)
+    ├── Makefile
     ├── source/
-    ├── index.rst
-    └── Makefile
+    └── build/                   # auto-generated, not committed
+
+
 ```
 
 ---
