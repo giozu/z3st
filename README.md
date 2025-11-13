@@ -56,6 +56,11 @@ Or, with a single instruction:
   ./Allrun
   ```
 
+Optional flags:
+
+* `--mesh_plot` → preview surface tags using PyVista
+
+
 ---
 
 ## Key Features
@@ -161,20 +166,6 @@ time:
   - 0.0
 n_steps: 1
 ```
-
----
-
-## Running a Simulation
-
-```bash
-conda activate z3st
-python z3st.py
-```
-
-Optional flags:
-
-* `--debug` → verbose diagnostic printing
-* `--mesh_plot` → preview surface tags using PyVista
 
 ---
 

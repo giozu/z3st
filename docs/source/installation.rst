@@ -135,20 +135,9 @@ The ``cases`` folder contains individual benchmark setups, each in a dedicated s
 .. code-block:: text
 
    cases/
-   ├── box_elliptical_cavity/
-   ├── cylindrical_shell_thick/
-   ├── cylindrical_shell_thick_plane_stress/
-   ├── cylindrical_shell_thick_thermal/
-   ├── cylindrical_shell_thin/
-   ├── cylindrical_shell_thin_thermal/
-   ├── cylindrical_thermal_shield/
-   ├── cylindrical_thermal_shield_insulated/
-   ├── full_cylinder/
-   ├── plate/
-   ├── spherical_pressurized_cavity/
-   ├── spherical_shell/
-   ├── thermal_shield/
-   ├── thermal_shield_insulated/
+   ├── 1_thin_thermal_slab/
+   ├── 2_thin_cylindrical_thermal_shield/
+   ├── ...
    └── non-regression.sh
 
 Each subfolder contains:
