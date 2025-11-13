@@ -17,7 +17,6 @@ It is designed to be **modular and extensible**, enabling rapid model developmen
 Clone the repository:
   ```bash
   git clone https://github.com/giozu/z3st.git
-  cd z3st
   ```
 
 Install miniconda:
@@ -32,6 +31,7 @@ Install miniconda:
 
 Create and activate the Conda environment (optional but recommended)
   ```bash
+  cd z3st
   conda env create -f z3st_env.yml
   conda activate z3st
   ```
