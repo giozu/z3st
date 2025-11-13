@@ -211,9 +211,81 @@ These tools, together with other Python utilities, provide a complete post-proce
 
 ---
 
+## FEniCSx project acknowledgement
+
+Z3ST is built on the **FEniCSx** ecosystem. Recommended citations include:
+
+### DOLFINX
+
+```bibtex
+@article{dolfinx2023,
+  author  = {Baratta, I. A. and Dean, J. P. and Dokken, J. S. and Habera, M. and Hale, J. S. and Richardson, C. N. and Rognes, M. E. and Scroggs, M. W. and Sime, N. and Wells, G. N.},
+  title   = {DOLFINx: The next generation FEniCS problem solving environment},
+  year    = {2023},
+  doi     = {10.5281/zenodo.10447666}
+}
+```
+
+### BASIX
+
+```bibtex
+@article{basix2022a,
+  author  = {Scrogggs, M. W. and Dokken, J. S. and Richardson, C. N. and Wells, G. N.},
+  title   = {Construction of arbitrary order finite element degree-of-freedom maps on polygonal and polyhedral cell meshes},
+  journal = {ACM Transactions on Mathematical Software},
+  volume  = {48},
+  number  = {2},
+  pages   = {18:1--18:23},
+  year    = {2022},
+  doi     = {10.1145/3524456}
+}
+
+@article{basix2022b,
+  author  = {Scroggs, M. W. and Baratta, I. A. and Richardson, C. N. and Wells, G. N.},
+  title   = {Basix: a runtime finite element basis evaluation library},
+  journal = {Journal of Open Source Software},
+  volume  = {7},
+  number  = {73},
+  pages   = {3982},
+  year    = {2022},
+  doi     = {10.21105/joss.03982}
+}
+```
+
+### UFL
+
+```bibtex
+@article{ufl2014,
+  author  = {Aln{\ae}s, M. S. and Logg, A. and {\O}lgaard, K. B. and Rognes, M. E. and Wells, G. N.},
+  title   = {Unified Form Language: A domain-specific language for weak formulations of partial differential equations},
+  journal = {ACM Transactions on Mathematical Software},
+  volume  = {40},
+  year    = {2014},
+  doi     = {10.1145/2566630}
+}
+```
+
+
+* **DOLFINx tutorial (J. S. Dokken):** https://jsdokken.com/dolfinx-tutorial/
+* **FEniCS project documentation:** https://fenicsproject.org/documentation/
+
+---
+
 ## License & author
 
-**Author:** Giovanni Zullo
-**Institution:** Politecnico di Milano
-**Version:** 0.1.0 (2025)
-**License:** Apache 2.0
+If you use Z3ST in your research, please cite this little work.
+
+```bibtex
+@misc{Z3ST2025,
+  author       = {Giovanni Zullo},
+  title        = {Z3ST: A FEniCSx Framework for Thermo-Mechanical Analysis},
+  year         = {2025},
+  howpublished = {\url{https://github.com/giozu/z3st}},
+  note         = {Version 0.1.0}
+}
+```
+
+* **Author:** Giovanni Zullo
+* **Institution:** Politecnico di Milano
+* **Version:** 0.1.0 (2025)
+* **License:** Apache 2.0
