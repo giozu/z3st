@@ -141,41 +141,44 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: steel.yaml
+  steel: ../../materials/steel.yaml
 
 solver_settings:
-  coupling: staggered  # monolithic | staggered
+  coupling: staggered
   max_iters: 100
   relax_T: 0.9
-  relax_u: 0.4
+  relax_u: 0.7
+  relax_adaptive: True
+  relax_growth: 1.2
+  relax_shrink: 0.8
+  relax_min: 0.05
+  relax_max: 0.95
 
 models:
   thermal: True
   mechanical: True
 
 mechanical:
-  solver: linear             # linear | non-linear
-  linear_solver: iterative_amg  # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-4
-  mechanical_regime: "3D"    # 3D | plane_stress
-  convergence: rel_norm      # rel_norm | norm
+  solver: linear
+  linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
+  mechanical_regime: "3D" # 3D | plane_stress
+  convergence: rel_norm # rel_norm | norm
   debug: False
 
 thermal:
   solver: linear
-  linear_solver: iterative_amg
+  linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  convergence: rel_norm
+  convergence: rel_norm # rel_norm | norm
 
 lhr:
-  - 0.0
+  - 0
 time:
-  - 0.0
+  - 0
 n_steps: 1
-```
-
 ---
 
 ## Post-processing and visualization
@@ -205,27 +208,12 @@ plot_field_along_r_xy(x, y, z, T, "Temperature (K)", case_dir=".")
 
 ---
 
-## Documentation
-
-To build local documentation with Sphinx:
-
-```bash
-cd docs
-make html
-```
-
-HTML output is generated in `docs/_build/html/`.
-
----
 
 ## Development Roadmap
 
 * Monolithic thermo-mechanical solver
-* Dynamic relaxation factors
-* Temperature- and stress-dependent material models
 * Contact mechanics
 * Nonlinear constitutive behavior
-* Coupling with Monte Carlo codes (e.g., OpenMC)
 * Coupling with microstructure generators (e.g., Merope)
 * Coupling with rate-theory codes
 
