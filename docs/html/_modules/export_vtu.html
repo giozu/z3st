@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>export_vtu &#8212; z3st documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/export_vtu';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">z3st documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Z3ST documentation
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st/issues/new?title=Issue%20on%20page%20%2F_modules/export_vtu.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for export_vtu</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---</span>
+<span class="c1"># Z3ST: A FEniCSx framework for thermo-mechanical analysis</span>
+<span class="c1"># Author: Giovanni Zullo</span>
+<span class="c1"># Version: 0.1.0 (2025)</span>
+<span class="c1"># --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyvista</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dolfinx</span><span class="o">,</span><span class="w"> </span><span class="nn">ufl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_von_mises</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute Von Mises equivalent stress for a batch of 2x2 or 3x3 stress tensors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sig : ndarray, shape (N, gdim, gdim)</span>
+<span class="sd">        Stress tensor at each cell/point.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vm : ndarray, shape (N,)</span>
+<span class="sd">        Von Mises equivalent stress.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Components</span>
+    <span class="n">s_xx</span><span class="p">,</span> <span class="n">s_yy</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">s_xy</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">sig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">s_zz</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">s_yz</span><span class="p">,</span> <span class="n">s_zx</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">vm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+            <span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">s_xx</span> <span class="o">-</span> <span class="n">s_yy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">s_yy</span> <span class="o">-</span> <span class="n">s_zz</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">s_zz</span> <span class="o">-</span> <span class="n">s_xx</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="o">+</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">s_xy</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">s_yz</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">s_zx</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># 2D (plane strain/stress tensor)</span>
+        <span class="n">vm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">s_xx</span> <span class="o">-</span> <span class="n">s_yy</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">s_xy</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">vm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_hydrostatic_pressure</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute hydrostatic pressure p = tr(sigma)/ndim.</span>
+<span class="sd">    Convention: negative pressure in compression.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sig : ndarray, shape (N, gdim, gdim)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    p : ndarray, shape (N,)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gdim</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tr</span> <span class="o">=</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">sig</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">sig</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="k">if</span> <span class="n">gdim</span> <span class="o">==</span> <span class="mi">3</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tr</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">gdim</span><span class="p">)</span>
+
+<div class="viewcode-block" id="export_vtu">
+<a class="viewcode-back" href="../api.html#export_vtu.export_vtu">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_vtu</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;fields.vtu&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Export global and per-material fields to a VTU file for PyVista/ParaView.</span>
+<span class="sd">    This version is updated to work with global solution fields and symbolic result expressions.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        problem: Z3ST problem object that has been solved.</span>
+<span class="sd">        output_dir: Directory to save the .vtu files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exporting results to VTU file...&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># --- Build VTK grid from FEniCSx mesh ---</span>
+    <span class="n">topology</span><span class="p">,</span> <span class="n">cell_types</span><span class="p">,</span> <span class="n">geometry</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">vtk_mesh</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">tdim</span><span class="p">)</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">pyvista</span><span class="o">.</span><span class="n">UnstructuredGrid</span><span class="p">(</span><span class="n">topology</span><span class="p">,</span> <span class="n">cell_types</span><span class="p">,</span> <span class="n">geometry</span><span class="p">)</span>
+
+    <span class="c1"># --- Global fields (point data) ---</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">point_data</span><span class="p">[</span><span class="s2">&quot;Temperature&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+    <span class="n">u_vectors</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_points</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">point_data</span><span class="p">[</span><span class="s2">&quot;Displacement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_vectors</span>
+
+    <span class="c1"># Get cell (volume) tags robustly: support both &#39;tags&#39; and &#39;volume_tags&#39;</span>
+    <span class="n">volume_tags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">volume_tags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">volume_tags</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="s2">&quot;volume_tags&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">volume_tags</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;No cell tag field found (expected &#39;tags&#39; or &#39;volume_tags&#39;).&quot;</span><span class="p">)</span>
+
+    <span class="c1"># --- Material IDs (cell data) ---</span>
+    <span class="n">num_cells</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">index_map</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">tdim</span><span class="p">)</span><span class="o">.</span><span class="n">size_local</span>
+    <span class="n">material_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_cells</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">problem</span><span class="o">.</span><span class="n">label_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">&quot;face&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cells</span> <span class="o">=</span> <span class="n">volume_tags</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+                <span class="n">material_ids</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Warning] Tag &#39;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&#39; for material &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not found in mesh volume tags. Skipping.&quot;</span><span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;MaterialID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">material_ids</span>
+
+    <span class="c1"># --- Function spaces for exporting tensors/vectors ---</span>
+    <span class="n">V_vector_cells</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">functionspace</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;DG&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">,)))</span>
+    <span class="n">V_tensor_cells</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">functionspace</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;DG&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)))</span>
+    <span class="n">V_scalar_cells</span>  <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">functionspace</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;DG&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">V_tensor_points</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">functionspace</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)))</span>
+    <span class="n">V_scalar_points</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">functionspace</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;Lagrange&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># --- Strain (global) ---</span>
+    <span class="n">strain_symbolic</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">strain</span>
+    <span class="c1"># cells</span>
+    <span class="n">strain_numeric</span> <span class="o">=</span> <span class="n">interpolate_expression</span><span class="p">(</span><span class="n">strain_symbolic</span><span class="p">,</span> <span class="n">V_tensor_cells</span><span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;Strain (cells)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strain_numeric</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span> <span class="o">*</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+    <span class="c1"># points</span>
+    <span class="n">strain_numeric</span> <span class="o">=</span> <span class="n">interpolate_expression</span><span class="p">(</span><span class="n">strain_symbolic</span><span class="p">,</span> <span class="n">V_tensor_points</span><span class="p">)</span>
+    <span class="n">strain_array</span> <span class="o">=</span> <span class="n">strain_numeric</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">))</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">point_data</span><span class="p">[</span><span class="s2">&quot;Strain (points)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strain_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_points</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="o">*</span><span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+
+    <span class="c1"># --- Per-material on CELLS: stress + Von Mises + principals + hydrostatic + heat flux ---</span>
+    <span class="n">stress_total_cells</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V_tensor_cells</span><span class="p">)</span>
+    <span class="n">heat_flux_total_cells</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V_vector_cells</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  → Projecting stress and heat flux for all materials...&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">problem</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">material_cells</span> <span class="o">=</span> <span class="n">volume_tags</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="c1"># Stress (cells) - numeric per-material field for diagnostics/plots</span>
+        <span class="n">stress_symbolic</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">stress</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">stress_expr</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">stress_symbolic</span><span class="p">,</span> <span class="n">V_tensor_cells</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">interpolation_points</span><span class="p">)</span>
+        <span class="n">stress_total_cells</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">stress_expr</span><span class="p">,</span> <span class="n">material_cells</span><span class="p">)</span>
+
+        <span class="n">stress_numeric</span> <span class="o">=</span> <span class="n">interpolate_expression</span><span class="p">(</span><span class="n">stress_symbolic</span><span class="p">,</span> <span class="n">V_tensor_cells</span><span class="p">)</span>
+        <span class="n">stress_cells</span> <span class="o">=</span> <span class="n">stress_numeric</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Stress_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (cells)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stress_cells</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span> <span class="o">*</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+
+        <span class="c1"># Von Mises (cells)</span>
+        <span class="n">vm_cells</span> <span class="o">=</span> <span class="n">_von_mises</span><span class="p">(</span><span class="n">stress_cells</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;VonMises_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (cells)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vm_cells</span>
+
+        <span class="c1"># Hydrostatic pressure (cells)</span>
+        <span class="n">p_cells</span> <span class="o">=</span> <span class="n">_hydrostatic_pressure</span><span class="p">(</span><span class="n">stress_cells</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Hydrostatic_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (cells)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_cells</span>
+
+        <span class="c1"># Heat flux (cells) per-material</span>
+        <span class="n">q_vec_symbolic</span> <span class="o">=</span> <span class="o">-</span><span class="n">material</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">q_expr</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">q_vec_symbolic</span><span class="p">,</span> <span class="n">V_vector_cells</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">interpolation_points</span><span class="p">)</span>
+        <span class="n">heat_flux_total_cells</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">q_expr</span><span class="p">,</span> <span class="n">material_cells</span><span class="p">)</span>
+
+    <span class="c1"># Global (aggregated) cell fields</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="s2">&quot;Heat flux (cells)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">heat_flux_total_cells</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+
+    <span class="c1"># --- Per-material on POINTS: stress + Von Mises + principals + hydrostatic ---</span>
+    <span class="n">stress_total_points</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V_tensor_points</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">material</span> <span class="ow">in</span> <span class="n">problem</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">tag</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">material_cells</span> <span class="o">=</span> <span class="n">volume_tags</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+
+        <span class="n">stress_symbolic</span> <span class="o">=</span> <span class="n">problem</span><span class="o">.</span><span class="n">stress</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">stress_expr</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">stress_symbolic</span><span class="p">,</span> <span class="n">V_tensor_points</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">interpolation_points</span><span class="p">)</span>
+        <span class="n">stress_total_points</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">stress_expr</span><span class="p">,</span> <span class="n">material_cells</span><span class="p">)</span>
+
+        <span class="n">stress_numeric</span> <span class="o">=</span> <span class="n">interpolate_expression</span><span class="p">(</span><span class="n">stress_symbolic</span><span class="p">,</span> <span class="n">V_tensor_points</span><span class="p">)</span>
+        <span class="n">stress_points</span> <span class="o">=</span> <span class="n">stress_numeric</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">,</span> <span class="n">problem</span><span class="o">.</span><span class="n">gdim</span><span class="p">))</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">point_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Stress_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (points)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stress_points</span>
+
+        <span class="c1"># Von Mises (points)</span>
+        <span class="n">vm_points</span> <span class="o">=</span> <span class="n">_von_mises</span><span class="p">(</span><span class="n">stress_points</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">point_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;VonMises_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (points)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vm_points</span>
+
+        <span class="c1"># Hydrostatic (points)</span>
+        <span class="n">p_points</span> <span class="o">=</span> <span class="n">_hydrostatic_pressure</span><span class="p">(</span><span class="n">stress_points</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">point_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Hydrostatic_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (points)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_points</span>
+
+        <span class="c1"># Strain energy density (points)</span>
+        <span class="n">psi_expr_pts</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">energy_density</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">V_scalar_points</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">interpolation_points</span><span class="p">)</span>
+        <span class="n">psi_fun_pts</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V_scalar_points</span><span class="p">)</span>
+        <span class="n">psi_fun_pts</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">psi_fun_pts</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">psi_expr_pts</span><span class="p">,</span> <span class="n">material_cells</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">point_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;StrainEnergyDensity_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (points)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psi_fun_pts</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Strain energy density (cells, DG0)</span>
+        <span class="n">psi_expr_cells</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">problem</span><span class="o">.</span><span class="n">energy_density</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">V_scalar_cells</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">interpolation_points</span><span class="p">)</span>
+        <span class="n">psi_fun_cells</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V_scalar_cells</span><span class="p">)</span>
+        <span class="n">psi_fun_cells</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">psi_fun_cells</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">psi_expr_cells</span><span class="p">,</span> <span class="n">material_cells</span><span class="p">)</span>
+        <span class="n">grid</span><span class="o">.</span><span class="n">cell_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;StrainEnergyDensity_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (cells)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psi_fun_cells</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># --- Save ---</span>
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;VTU file exported to: </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="interpolate_expression">
+<a class="viewcode-back" href="../api.html#export_vtu.interpolate_expression">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">interpolate_expression</span><span class="p">(</span><span class="n">symbolic_function</span><span class="p">,</span> <span class="n">V</span><span class="p">):</span>
+    <span class="n">expression</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Expression</span><span class="p">(</span><span class="n">symbolic_function</span><span class="p">,</span> <span class="n">V</span><span class="o">.</span><span class="n">element</span><span class="o">.</span><span class="n">interpolation_points</span><span class="p">)</span>
+    <span class="n">numeric_expression</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V</span><span class="p">)</span>
+    <span class="n">numeric_expression</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">expression</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numeric_expression</span></div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Giovanni Zullo
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Giovanni Zullo.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

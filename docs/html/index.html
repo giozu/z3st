@@ -1,0 +1,740 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Z3ST documentation &#8212; z3st documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">z3st documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1 current active">
+                <a class="reference internal" href="#">
+                    Z3ST documentation
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st/issues/new?title=Issue%20on%20page%20%2Findex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/index.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Z3ST documentation</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#z3st-a-fenicsx-framework-for-thermo-mechanical-analysis">Z3ST: A FEniCSx Framework for Thermo-Mechanical Analysis</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-installation">Quick installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-input-file">Example Input File</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-a-simulation">Running a Simulation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-processing-and-visualization">Post-processing and visualization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#development-roadmap">Development Roadmap</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#license-author">License &amp; Author</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="z3st-documentation">
+<h1>Z3ST documentation<a class="headerlink" href="#z3st-documentation" title="Link to this heading">#</a></h1>
+<section id="z3st-a-fenicsx-framework-for-thermo-mechanical-analysis">
+<h2>Z3ST: A FEniCSx Framework for Thermo-Mechanical Analysis<a class="headerlink" href="#z3st-a-fenicsx-framework-for-thermo-mechanical-analysis" title="Link to this heading">#</a></h2>
+<p><strong>Z3ST</strong> is an open-source finite-element framework for thermo-mechanical material analysis.
+Developed in <strong>Python</strong>, it leverages <strong>FEniCSx</strong> and provides a modular environment to couple heat conduction and linear elasticity in multi-material domains under stationary or transient conditions, with user-defined boundary conditions.</p>
+<hr class="docutils" />
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading">#</a></h3>
+<p>Z3ST supports coupled staggered thermo-mechanical analysis, handling arbitrary geometries, materials, and time-dependent power histories.
+It is designed to be <strong>modular and extensible</strong>, enabling rapid model development, integration with advanced solvers, and <strong>easy coupling with external codes</strong>.</p>
+</section>
+<hr class="docutils" />
+<section id="quick-installation">
+<h3>Quick installation<a class="headerlink" href="#quick-installation" title="Link to this heading">#</a></h3>
+<p>Clone the repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/giozu/z3st.git
+<span class="nb">cd</span><span class="w"> </span>z3st
+</pre></div>
+</div>
+<p>Create and activate the Conda environment (optional but recommended)</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>env<span class="w"> </span>create<span class="w"> </span>-f<span class="w"> </span>z3st_env.yml
+conda<span class="w"> </span>activate<span class="w"> </span>z3st
+</pre></div>
+</div>
+<p>Install in editable/development mode</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</pre></div>
+</div>
+<p>Then, it is possible to execute in each case folder:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>z3st<span class="w"> </span>&gt;<span class="w"> </span>log.z3st
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="key-features">
+<h3>Key Features<a class="headerlink" href="#key-features" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Coupled thermo-mechanical solver</strong> — heat conduction and linear elasticity with monolithic or staggered coupling</p></li>
+<li><p><strong>Multi-material domains</strong> — multiple materials with independent thermal and mechanical properties</p></li>
+<li><p><strong>Volumetric heating</strong> — arbitrary, spatially dependent internal heat sources (e.g. fission, γ-heating, user-defined functions)</p></li>
+<li><p><strong>Flexible boundary conditions</strong> — Dirichlet, Neumann, clamp, and slip BCs defined via YAML configuration files</p></li>
+<li><p><strong>Material database</strong> — YAML-based definitions (<code class="docutils literal notranslate"><span class="pre">materials/</span></code>) including steels, zircaloys, oxides, and other structural or fuel materials</p></li>
+<li><p><strong>Geometry &amp; mesh input</strong> — accepts Gmsh <code class="docutils literal notranslate"><span class="pre">.msh</span></code> files or Python-generated meshes from YAML geometry descriptors; compatible with any meshing tool</p></li>
+<li><p><strong>Built-in gap conductance model</strong> — thermal coupling between subdomains via Robin BCs or fixed conductance</p></li>
+<li><p><strong>YAML-driven configuration</strong> — all parameters, materials, and boundary conditions defined externally for reproducibility</p></li>
+<li><p><strong>Post-processing ecosystem</strong> — Python-based tools for field extraction and visualization, fully compatible with ParaView and PyVista</p></li>
+<li><p><strong>Fully documented API</strong> — comprehensive Sphinx documentation under <code class="docutils literal notranslate"><span class="pre">docs/</span></code></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="directory-structure">
+<h3>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>Z3ST/
+├──<span class="w"> </span>z3st.py<span class="w">                </span><span class="c1"># Main driver</span>
+├──<span class="w"> </span>z3st_env.yml<span class="w">           </span><span class="c1"># Conda environment</span>
+├──<span class="w"> </span>LICENSE<span class="w"> </span>/<span class="w"> </span>README.md
+│
+├──<span class="w"> </span>core/<span class="w">                  </span><span class="c1"># FEM setup &amp; solver core</span>
+│<span class="w">   </span>├──<span class="w"> </span>config.py
+│<span class="w">   </span>├──<span class="w"> </span>mesh.py
+│<span class="w">   </span>├──<span class="w"> </span>solver.py
+│<span class="w">   </span>├──<span class="w"> </span>finite_element_setup.py
+│<span class="w">   </span>├──<span class="w"> </span>spine.py
+│<span class="w">   </span>└──<span class="w"> </span>diagnostic.py
+│
+├──<span class="w"> </span>models/<span class="w">                </span><span class="c1"># Physical submodules</span>
+│<span class="w">   </span>├──<span class="w"> </span>thermal_model.py
+│<span class="w">   </span>├──<span class="w"> </span>mechanical_model.py
+│<span class="w">   </span>└──<span class="w"> </span>gap_model.py
+│
+├──<span class="w"> </span>materials/<span class="w">             </span><span class="c1"># Material property files (YAML)</span>
+│<span class="w">   </span>├──<span class="w"> </span>steel.yaml,<span class="w"> </span>zircaloy.yaml,<span class="w"> </span>oxide.yaml,<span class="w"> </span>...
+│<span class="w">   </span>└──<span class="w"> </span>15_15Ti.yaml,<span class="w"> </span>T91.yaml,<span class="w"> </span>etc.
+│
+├──<span class="w"> </span>utils/<span class="w">                 </span><span class="c1"># Post-processing utilities</span>
+│<span class="w">   </span>├──<span class="w"> </span>export_vtu.py
+│<span class="w">   </span>├──<span class="w"> </span>utils_extract_vtu.py
+│<span class="w">   </span>├──<span class="w"> </span>utils_plot.py
+│<span class="w">   </span>└──<span class="w"> </span>interactive_gui.ipynb
+│
+├──<span class="w"> </span>cases/<span class="w">                 </span><span class="c1"># Example input sets and geometries</span>
+│<span class="w">   </span>├──<span class="w"> </span>cylindrical_shell_thick/
+│<span class="w">   </span>├──<span class="w"> </span>thermal_shield/
+│<span class="w">   </span>├──<span class="w"> </span>spherical_shell/
+│<span class="w">   </span>└──<span class="w"> </span>non-regression.sh
+│
+└──<span class="w"> </span>docs/<span class="w">                  </span><span class="c1"># Sphinx documentation</span>
+<span class="w">    </span>├──<span class="w"> </span>source/
+<span class="w">    </span>├──<span class="w"> </span>index.rst
+<span class="w">    </span>└──<span class="w"> </span>Makefile
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="example-input-file">
+<h3>Example Input File<a class="headerlink" href="#example-input-file" title="Link to this heading">#</a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># input.yaml</span>
+<span class="nt">mesh_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mesh.msh</span>
+<span class="nt">geometry_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">geometry.yaml</span>
+<span class="nt">boundary_conditions_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">boundary_conditions.yaml</span>
+
+<span class="nt">materials</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">steel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steel.yaml</span>
+
+<span class="nt">solver_settings</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">coupling</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">staggered</span><span class="w">  </span><span class="c1"># monolithic | staggered</span>
+<span class="w">  </span><span class="nt">max_iters</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">  </span><span class="nt">relax_T</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span>
+<span class="w">  </span><span class="nt">relax_u</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.4</span>
+
+<span class="nt">models</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">thermal</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+<span class="w">  </span><span class="nt">mechanical</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+
+<span class="nt">mechanical</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">solver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linear</span><span class="w">             </span><span class="c1"># linear | non-linear</span>
+<span class="w">  </span><span class="nt">linear_solver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">iterative_amg</span><span class="w">  </span><span class="c1"># direct_mumps | iterative_amg | iterative_hypre</span>
+<span class="w">  </span><span class="nt">rtol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-6</span>
+<span class="w">  </span><span class="nt">stag_tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-4</span>
+<span class="w">  </span><span class="nt">mechanical_regime</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;3D&quot;</span><span class="w">    </span><span class="c1"># 3D | plane_stress</span>
+<span class="w">  </span><span class="nt">convergence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rel_norm</span><span class="w">      </span><span class="c1"># rel_norm | norm</span>
+<span class="w">  </span><span class="nt">debug</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+
+<span class="nt">thermal</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">solver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linear</span>
+<span class="w">  </span><span class="nt">linear_solver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">iterative_amg</span>
+<span class="w">  </span><span class="nt">rtol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-6</span>
+<span class="w">  </span><span class="nt">stag_tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-6</span>
+<span class="w">  </span><span class="nt">convergence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">rel_norm</span>
+
+<span class="nt">lhr</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">time</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="nt">n_steps</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="running-a-simulation">
+<h3>Running a Simulation<a class="headerlink" href="#running-a-simulation" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>activate<span class="w"> </span>z3st
+python<span class="w"> </span>z3st.py
+</pre></div>
+</div>
+<p>Optional flags:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--debug</span></code> → verbose diagnostic printing</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--mesh_plot</span></code> → preview surface tags using PyVista</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="post-processing-and-visualization">
+<h3>Post-processing and visualization<a class="headerlink" href="#post-processing-and-visualization" title="Link to this heading">#</a></h3>
+<p>Z3ST provides a flexible, Python-based post-processing environment that can be used directly or extended by the user.
+Displacement, temperature, and stress fields can be extracted, analyzed, and visualized through built-in utilities or custom scripts.
+Full compatibility with <strong>ParaView</strong> and <strong>PyVista</strong> enables both automated and interactive visualization workflows.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tool</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">export_vtu.py</span></code></p></td>
+<td><p>Exports temperature, displacement, strain, and stress fields to <code class="docutils literal notranslate"><span class="pre">.vtu</span></code> format</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">utils_extract_vtu.py</span></code></p></td>
+<td><p>Extracts scalar/vector fields and stress components from VTU outputs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">utils_plot.py</span></code></p></td>
+<td><p>Generates 1D and radial plots (e.g. T®, σ<sub>rr</sub>®) and can be easily extended</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">z-gui.py</span></code></p></td>
+<td><p>Interactive 3D viewer built on PyVista for exploratory visualization</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>These tools, together with other Python utilities, provide a complete post-processing ecosystem for field analysis and visualization.</p>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">utils_extract_vtu</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract_temperature</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils_plot</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_field_along_r_xy</span>
+
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">extract_temperature</span><span class="p">(</span><span class="s2">&quot;output/fields.vtu&quot;</span><span class="p">)</span>
+<span class="n">plot_field_along_r_xy</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="s2">&quot;Temperature (K)&quot;</span><span class="p">,</span> <span class="n">case_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h3>
+<p>To build local documentation with Sphinx:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>docs
+make<span class="w"> </span>html
+</pre></div>
+</div>
+<p>HTML output is generated in <code class="docutils literal notranslate"><span class="pre">docs/_build/html/</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="development-roadmap">
+<h3>Development Roadmap<a class="headerlink" href="#development-roadmap" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Monolithic thermo-mechanical solver</p></li>
+<li><p>Dynamic relaxation factors</p></li>
+<li><p>Temperature- and stress-dependent material models</p></li>
+<li><p>Contact mechanics</p></li>
+<li><p>Nonlinear constitutive behavior</p></li>
+<li><p>Coupling with Monte Carlo codes (e.g., OpenMC)</p></li>
+<li><p>Coupling with microstructure generators (e.g., Merope)</p></li>
+<li><p>Coupling with rate-theory codes</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="license-author">
+<h3>License &amp; Author<a class="headerlink" href="#license-author" title="Link to this heading">#</a></h3>
+<p><strong>Author:</strong> Giovanni Zullo
+<strong>Institution:</strong> Politecnico di Milano
+<strong>Version:</strong> 0.1.0 (2025)
+<strong>License:</strong> Apache 2.0</p>
+</section>
+</section>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#setup">Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#install-z3st-utility-scripts">Install z3st utility scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#building-the-documentation">Building the documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#verification-and-non-regression-tests">Verification and non-regression tests</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-config">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-thermal_model">Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-export_vtu">Utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#simple-steady-state-case">Simple steady-state case</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+</div>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="installation.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#z3st-a-fenicsx-framework-for-thermo-mechanical-analysis">Z3ST: A FEniCSx Framework for Thermo-Mechanical Analysis</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#overview">Overview</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-installation">Quick installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#directory-structure">Directory Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example-input-file">Example Input File</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-a-simulation">Running a Simulation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#post-processing-and-visualization">Post-processing and visualization</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#development-roadmap">Development Roadmap</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#license-author">License &amp; Author</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Giovanni Zullo
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Giovanni Zullo.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

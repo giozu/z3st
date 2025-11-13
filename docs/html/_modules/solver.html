@@ -1,0 +1,1058 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>solver &#8212; z3st documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/solver';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">z3st documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Z3ST documentation
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st/issues/new?title=Issue%20on%20page%20%2F_modules/solver.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for solver</h1><div class="highlight"><pre>
+<span></span><span class="c1"># --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---</span>
+<span class="c1"># Z3ST: A FEniCSx framework for thermo-mechanical analysis</span>
+<span class="c1"># Author: Giovanni Zullo</span>
+<span class="c1"># Version: 0.1.0 (2025)</span>
+<span class="c1"># --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ufl</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dolfinx</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dolfinx.fem.petsc</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearProblem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dolfinx.fem.petsc</span><span class="w"> </span><span class="kn">import</span> <span class="n">NonlinearProblem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">petsc4py</span><span class="w"> </span><span class="kn">import</span> <span class="n">PETSc</span>
+
+<div class="viewcode-block" id="Solver">
+<a class="viewcode-back" href="../api.html#solver.Solver">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Solver</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[Solver] initializer&quot;</span><span class="p">)</span>
+        <span class="n">solver_settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver_settings&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coupling</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver_settings&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;coupling&quot;</span><span class="p">,</span> <span class="s2">&quot;staggered&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">solver_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relax_T&quot;</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">solver_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relax_u&quot;</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">))</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Applied relaxation factor:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Temperature  : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Displacement : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">relax_adaptive</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">solver_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relax_adaptive&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relax_growth</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">solver_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relax_growth&quot;</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relax_shrink</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">solver_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relax_shrink&quot;</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relax_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">solver_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relax_min&quot;</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relax_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">solver_settings</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;relax_max&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_adaptive</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Adaptive relaxation enabled&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → relax_growth  : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_growth</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → relax_shrink : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_shrink</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → relax_min  : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_min</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → relax_max : </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_max</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  Adaptive relaxation disabled&quot;</span><span class="p">)</span>
+        
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Solver.get_solver_options">
+<a class="viewcode-back" href="../api.html#solver.Solver.get_solver_options">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_solver_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">physics</span><span class="p">,</span> <span class="n">solver_type</span><span class="o">=</span><span class="s2">&quot;iterative_amg&quot;</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns PETSc options for the linear solver based on the physics.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">            physics (str): &quot;thermal&quot; or &quot;mechanical&quot;. This primarily determines</span>
+<span class="sd">                        if a symmetric (CG) or non-symmetric (GMRES) solver is used.</span>
+<span class="sd">            solver_type (str): Type of solver/preconditioner strategy. Supported:</span>
+<span class="sd">                - &quot;direct_mumps&quot;: Robust but memory-intensive direct solver.</span>
+<span class="sd">                - &quot;iterative_amg&quot;: Default iterative solver with Algebraic Multigrid (PETSc GAMG).</span>
+<span class="sd">                - &quot;iterative_hypre&quot;: Iterative solver with HYPRE&#39;s BoomerAMG preconditioner.</span>
+<span class="sd">            rtol (float): Relative tolerance for KSP.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: PETSc options dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">physics</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="s2">&quot;mechanical&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown physics &#39;</span><span class="si">{</span><span class="n">physics</span><span class="si">}</span><span class="s2">&#39;. Must be &#39;thermal&#39; or &#39;mechanical&#39;.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># 1. Choose KSP type based on matrix symmetry</span>
+        <span class="k">if</span> <span class="n">physics</span> <span class="o">==</span> <span class="s2">&quot;thermal&quot;</span><span class="p">:</span>
+            <span class="n">ksp_type</span> <span class="o">=</span> <span class="s2">&quot;cg&quot;</span>  <span class="c1"># Symmetric Positive Definite matrix</span>
+        <span class="k">elif</span> <span class="n">physics</span> <span class="o">==</span> <span class="s2">&quot;mechanical&quot;</span><span class="p">:</span>
+            <span class="n">ksp_type</span> <span class="o">=</span> <span class="s2">&quot;gmres&quot;</span> <span class="c1"># Non-symmetric matrix</span>
+        
+        <span class="c1"># 2. Choose preconditioner based on solver_type</span>
+        <span class="k">if</span> <span class="n">solver_type</span> <span class="o">==</span> <span class="s2">&quot;direct_mumps&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="s2">&quot;preonly&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;lu&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pc_factor_mat_solver_type&quot;</span><span class="p">:</span> <span class="s2">&quot;mumps&quot;</span> <span class="c1"># MUMPS, direct solver</span>
+            <span class="p">}</span>
+
+        <span class="k">elif</span> <span class="n">solver_type</span> <span class="o">==</span> <span class="s2">&quot;iterative_amg&quot;</span><span class="p">:</span>
+            <span class="n">coarse_eq_limit</span> <span class="o">=</span> <span class="mi">500</span> <span class="k">if</span> <span class="n">physics</span> <span class="o">==</span> <span class="s2">&quot;thermal&quot;</span> <span class="k">else</span> <span class="mi">1000</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="n">ksp_type</span><span class="p">,</span>
+                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;gamg&quot;</span><span class="p">,</span> <span class="c1"># PETSc&#39;s built-in Algebraic Multigrid (GAMG)</span>
+                <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="n">rtol</span><span class="p">,</span>
+                <span class="s2">&quot;pc_gamg_coarse_eq_limit&quot;</span><span class="p">:</span> <span class="n">coarse_eq_limit</span><span class="p">,</span>
+                <span class="c1"># &quot;ksp_gmres_restart&quot;: 30 # Restart for GMRES can be useful for memory</span>
+            <span class="p">}</span>
+
+        <span class="k">elif</span> <span class="n">solver_type</span> <span class="o">==</span> <span class="s2">&quot;iterative_hypre&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;ksp_type&quot;</span><span class="p">:</span> <span class="n">ksp_type</span><span class="p">,</span>
+                <span class="s2">&quot;pc_type&quot;</span><span class="p">:</span> <span class="s2">&quot;hypre&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pc_hypre_type&quot;</span><span class="p">:</span> <span class="s2">&quot;boomeramg&quot;</span><span class="p">,</span> <span class="c1"># HYPRE&#39;s BoomerAMG, often more robust than GAMG</span>
+                <span class="s2">&quot;ksp_rtol&quot;</span><span class="p">:</span> <span class="n">rtol</span>
+            <span class="p">}</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown solver_type &#39;</span><span class="si">{</span><span class="n">solver_type</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span></div>
+
+        
+ 
+<div class="viewcode-block" id="Solver.solve_monolithic">
+<a class="viewcode-back" href="../api.html#solver.Solver.solve_monolithic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_monolithic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Monolithic thermo-mechanical solver (MVP, Phase 1).</span>
+
+<span class="sd">        Supported features</span>
+<span class="sd">        ------------------</span>
+<span class="sd">        - Dirichlet and Neumann boundary conditions for both thermal and mechanical problems (including Clamp_x/y/z constraints).</span>
+<span class="sd">        - Material thermal conductivity ``k`` can be constant or a UFL symbolic expression (already stored in ``self.materials[*][&quot;k&quot;]``).</span>
+
+<span class="sd">        Not included in this phase</span>
+<span class="sd">        --------------------------</span>
+<span class="sd">        - Robin-type gap conduction</span>
+<span class="sd">        - Interface projection operators</span>
+<span class="sd">        - &quot;Gas&quot; gap conductance ``h_gap``</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        - Slip_* boundary conditions and Robin conditions are not yet implemented here.</span>
+<span class="sd">        - Dirichlet BCs are reconstructed on the mixed space ``W``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[INFO] Starting monolithic thermo-mechanical solve (Phase 1)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Tolerance (Newton)     : </span><span class="si">{</span><span class="n">tol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Max iterations (Newton): </span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Split (initialized) mixed unknowns into mechanical (u_m) and thermal (u_t) parts</span>
+        <span class="p">(</span><span class="n">u_m</span><span class="p">,</span> <span class="n">u_t</span><span class="p">)</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sol_mixed</span><span class="p">)</span>
+        <span class="p">(</span><span class="n">v_m</span><span class="p">,</span> <span class="n">v_t</span><span class="p">)</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">TestFunctions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="p">)</span>
+
+        <span class="c1"># Initialize total residual</span>
+        <span class="n">F</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># --. VOLUME CONTRIBUTIONS: loop over materials --..</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+            <span class="n">dx_local</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="s2">&quot;dx&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">subdomain_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_tags</span><span class="p">,</span> <span class="n">subdomain_id</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+
+            <span class="c1"># Material properties (may be constants or UFL expressions consistent with self.T)</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span>
+
+            <span class="n">rho</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">(</span><span class="n">material</span><span class="p">[</span><span class="s2">&quot;rho&quot;</span><span class="p">])</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+            <span class="n">body_force</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="n">rho</span> <span class="o">*</span> <span class="n">g</span><span class="p">))</span>
+
+            <span class="c1"># Volumetric heat source: global Function self.q_third</span>
+            <span class="n">q_vol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_third</span>
+
+            <span class="c1"># Thermal contribution</span>
+            <span class="n">F_thermal</span> <span class="o">=</span> <span class="p">(</span><span class="n">k</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">ufl</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">u_t</span><span class="p">),</span> <span class="n">ufl</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">v_t</span><span class="p">))</span> <span class="o">-</span> <span class="n">q_vol</span> <span class="o">*</span> <span class="n">v_t</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx_local</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="p">[</span><span class="s2">&quot;thermal&quot;</span><span class="p">]:</span>
+                <span class="n">F</span> <span class="o">+=</span> <span class="n">F_thermal</span>
+
+            <span class="c1"># Mechanical stress contributions (mechanical + thermal)</span>
+            <span class="n">sigma_m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma_mech</span><span class="p">(</span><span class="n">u_m</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="p">[</span><span class="s2">&quot;thermal&quot;</span><span class="p">]:</span>
+                <span class="n">sigma_th</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma_th</span><span class="p">(</span><span class="n">u_t</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span>
+                <span class="n">sigma_tot</span> <span class="o">=</span> <span class="n">sigma_m</span> <span class="o">+</span> <span class="n">sigma_th</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sigma_tot</span> <span class="o">=</span> <span class="n">sigma_m</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="p">[</span><span class="s2">&quot;mechanical&quot;</span><span class="p">]:</span>
+                <span class="n">F</span> <span class="o">+=</span> <span class="p">(</span><span class="n">ufl</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">sigma_tot</span><span class="p">,</span> <span class="n">ufl</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="n">ufl</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">v_m</span><span class="p">)))</span> <span class="o">-</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">body_force</span><span class="p">,</span> <span class="n">v_m</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx_local</span>
+
+        <span class="c1"># --. BOUNDARY CONTRIBUTIONS --..</span>
+        <span class="n">n_vec</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">FacetNormal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+
+        <span class="c1"># Thermal Neumann BCs (heat flux) — reuse lists from set_thermal_boundary_conditions</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bc_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neumann_thermal</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">ds_local</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="s2">&quot;ds&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">subdomain_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ft</span><span class="p">,</span> <span class="n">subdomain_id</span><span class="o">=</span><span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+                <span class="n">F</span> <span class="o">-=</span> <span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">v_t</span> <span class="o">*</span> <span class="n">ds_local</span>  <span class="c1"># outward heat flux term</span>
+
+        <span class="c1"># Mechanical traction BCs — reuse lists from set_mechanical_boundary_conditions</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bc_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traction</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">ds_local</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="s2">&quot;ds&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">subdomain_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ft</span><span class="p">,</span> <span class="n">subdomain_id</span><span class="o">=</span><span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+                <span class="c1"># bc_info[&quot;value&quot;] is already a traction vector (Constant * n), use directly</span>
+                <span class="n">F</span> <span class="o">-=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="n">v_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds_local</span>
+
+        <span class="c1"># --. DIRICHLET CONDITIONS on mixed space W.sub(1) (T) and W.sub(0) (u) --..</span>
+        <span class="n">bcs_mixed</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Helper: locate DOFs on a subspace for a given facet region</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">locate_dofs_on_sub</span><span class="p">(</span><span class="n">subspace</span><span class="p">,</span> <span class="n">region_id</span><span class="p">):</span>
+            <span class="n">facets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ft</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">region_id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">locate_dofs_topological</span><span class="p">(</span><span class="n">subspace</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdim</span><span class="p">,</span> <span class="n">facets</span><span class="p">)</span>
+
+        <span class="c1"># Thermal Dirichlet BCs reconstructed on W.sub(1)</span>
+        <span class="n">thermal_bcs_defs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_conditions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal_bcs&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">mat</span><span class="p">,</span> <span class="n">bc_list</span> <span class="ow">in</span> <span class="n">thermal_bcs_defs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">bc</span> <span class="ow">in</span> <span class="n">bc_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">bc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;Dirichlet&quot;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">region</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">)</span>
+                <span class="n">Tval</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">Tval</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">region_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">region_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">dofs_T</span> <span class="o">=</span> <span class="n">locate_dofs_on_sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">region_id</span><span class="p">)</span>
+                <span class="n">T_d</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">ScalarType</span><span class="p">(</span><span class="n">Tval</span><span class="p">))</span>
+                <span class="n">bcs_mixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">dirichletbc</span><span class="p">(</span><span class="n">T_d</span><span class="p">,</span> <span class="n">dofs_T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+
+        <span class="c1"># Mechanical Dirichlet BCs: full vector displacement or single-component clamps</span>
+        <span class="n">mech_bcs_defs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_conditions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mechanical_bcs&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">mat</span><span class="p">,</span> <span class="n">bc_list</span> <span class="ow">in</span> <span class="n">mech_bcs_defs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">bc</span> <span class="ow">in</span> <span class="n">bc_list</span><span class="p">:</span>
+                <span class="n">bc_type</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+                <span class="n">region</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">bc_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">region_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">region_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="n">bc_type</span> <span class="o">==</span> <span class="s2">&quot;Dirichlet&quot;</span><span class="p">:</span>
+                    <span class="n">disp</span> <span class="o">=</span> <span class="n">bc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;displacement&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">disp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="c1"># Collapse vector subspace (u) to a full FunctionSpace</span>
+                    <span class="n">V_u_sub</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">collapse</span><span class="p">()</span>
+                    <span class="c1"># Create constant displacement Function</span>
+                    <span class="n">vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+                    <span class="n">u_d_fun</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">V_u_sub</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;u_dirichlet_const&quot;</span><span class="p">)</span>
+                    <span class="n">u_d_fun</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">v</span><span class="o">=</span><span class="n">vec</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gdim</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+                    <span class="c1"># Locate DOFs mapping mixed space → collapsed space</span>
+                    <span class="n">facets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ft</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">region_id</span><span class="p">)</span>
+                    <span class="n">dofs_mixed</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">locate_dofs_topological</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">V_u_sub</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">fdim</span><span class="p">,</span> <span class="n">facets</span><span class="p">)</span>
+                    <span class="n">bcs_mixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">dirichletbc</span><span class="p">(</span><span class="n">u_d_fun</span><span class="p">,</span> <span class="n">dofs_mixed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
+
+                <span class="k">elif</span> <span class="n">bc_type</span> <span class="o">==</span> <span class="s2">&quot;Clamp_x&quot;</span><span class="p">:</span>
+                    <span class="n">dofs_x</span> <span class="o">=</span> <span class="n">locate_dofs_on_sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">region_id</span><span class="p">)</span>
+                    <span class="n">bcs_mixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">dirichletbc</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">dofs_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
+
+                <span class="k">elif</span> <span class="n">bc_type</span> <span class="o">==</span> <span class="s2">&quot;Clamp_y&quot;</span><span class="p">:</span>
+                    <span class="n">dofs_y</span> <span class="o">=</span> <span class="n">locate_dofs_on_sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">region_id</span><span class="p">)</span>
+                    <span class="n">bcs_mixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">dirichletbc</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span> <span class="n">dofs_y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+
+                <span class="k">elif</span> <span class="n">bc_type</span> <span class="o">==</span> <span class="s2">&quot;Clamp_z&quot;</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">bc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span> <span class="c1"># allowing GPS</span>
+                    <span class="n">dofs_z</span> <span class="o">=</span> <span class="n">locate_dofs_on_sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">region_id</span><span class="p">)</span>
+                    <span class="n">bcs_mixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">dirichletbc</span><span class="p">(</span><span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="n">dofs_z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+
+        <span class="c1"># --. NONLINEAR PROBLEM &amp; NEWTON SOLVER --..</span>
+        <span class="n">problem</span> <span class="o">=</span> <span class="n">NonlinearProblem</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol_mixed</span><span class="p">,</span> <span class="n">bcs</span><span class="o">=</span><span class="n">bcs_mixed</span><span class="p">)</span>
+        <span class="n">solver</span> <span class="o">=</span> <span class="n">NewtonSolver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="n">problem</span><span class="p">)</span>
+
+        <span class="c1"># PETSc KSP options for GAMG, similar to staggered solver settings</span>
+        <span class="n">ksp</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">krylov_solver</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="n">PETSc</span><span class="o">.</span><span class="n">Options</span><span class="p">()</span>
+        <span class="n">pref</span> <span class="o">=</span> <span class="n">ksp</span><span class="o">.</span><span class="n">getOptionsPrefix</span><span class="p">()</span>
+        <span class="n">opts</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pref</span><span class="si">}</span><span class="s2">pc_gamg_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;agg&quot;</span>
+        <span class="n">opts</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pref</span><span class="si">}</span><span class="s2">pc_gamg_coarse_eq_limit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="n">opts</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pref</span><span class="si">}</span><span class="s2">mg_levels_ksp_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;chebyshev&quot;</span>
+        <span class="n">opts</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pref</span><span class="si">}</span><span class="s2">mg_levels_pc_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;sor&quot;</span>
+        <span class="n">opts</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pref</span><span class="si">}</span><span class="s2">mg_levels_esteig_ksp_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cg&quot;</span>
+        <span class="n">opts</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pref</span><span class="si">}</span><span class="s2">mg_levels_ksp_chebyshev_esteig_steps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+        <span class="n">opts</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pref</span><span class="si">}</span><span class="s2">ksp_monitor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">opts</span><span class="p">[</span><span class="s2">&quot;options_left&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+        <span class="n">ksp</span><span class="o">.</span><span class="n">setFromOptions</span><span class="p">()</span>
+
+        <span class="n">solver</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="n">tol</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">convergence_criterion</span> <span class="o">=</span> <span class="s2">&quot;incremental&quot;</span>
+        <span class="n">solver</span><span class="o">.</span><span class="n">max_it</span> <span class="o">=</span> <span class="n">max_iter</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[INFO] Solving monolithic nonlinear problem...&quot;</span><span class="p">)</span>
+        <span class="n">iters</span><span class="p">,</span> <span class="n">converged</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sol_mixed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">converged</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[INFO] Newton solver converged in </span><span class="si">{</span><span class="n">iters</span><span class="si">}</span><span class="s2"> iterations&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[WARNING] Newton solver did not converge after </span><span class="si">{</span><span class="n">iters</span><span class="si">}</span><span class="s2"> iterations&quot;</span><span class="p">)</span>
+
+        <span class="c1"># ===== UPDATE GLOBAL STATE FIELDS =====</span>
+        <span class="n">u_sol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol_mixed</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">collapse</span><span class="p">()</span>
+        <span class="n">u_sol</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Displacement&quot;</span>
+        <span class="n">T_sol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol_mixed</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">collapse</span><span class="p">()</span>
+        <span class="n">T_sol</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Temperature&quot;</span>
+
+        <span class="c1"># Copy results back into global Functions self.u / self.T</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">u_sol</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u_sol</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">T_sol</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">T_sol</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min/Max temperature: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> K&quot;</span><span class="p">)</span>
+        <span class="n">u_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+        <span class="n">umag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">u_vec</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Min/Max displacement magnitude: </span><span class="si">{</span><span class="n">umag</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">umag</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+
+<div class="viewcode-block" id="Solver.solve_staggered">
+<a class="viewcode-back" href="../api.html#solver.Solver.solve_staggered">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">solve_staggered</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">stag_tol_th</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">stag_tol_mech</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">rtol_th</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">rtol_mech</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Max iterations              : </span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Staggering tolerance |ΔT|   : </span><span class="si">{</span><span class="n">stag_tol_th</span><span class="si">:</span><span class="s2">.1e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Staggering tolerance |Δu|   : </span><span class="si">{</span><span class="n">stag_tol_mech</span><span class="si">:</span><span class="s2">.1e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Relative tolerance th       : </span><span class="si">{</span><span class="n">rtol_th</span><span class="si">:</span><span class="s2">.1e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → Relative tolerance mech     : </span><span class="si">{</span><span class="n">rtol_mech</span><span class="si">:</span><span class="s2">.1e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">T_i</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">)</span>
+            <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span> <span class="c1"># Start with the initial/previous converged state</span>
+            <span class="n">T_old</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">)</span> <span class="c1"># Functions to store the previous state for convergence check</span>
+            
+            <span class="n">bcs_t</span> <span class="o">=</span> <span class="p">[];</span>  <span class="p">[</span><span class="n">bcs_t</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">bc_list</span><span class="p">)</span> <span class="k">for</span> <span class="n">bc_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirichlet_thermal</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mechanical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="n">u_i</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_m</span><span class="p">)</span>
+            <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+            <span class="n">u_old</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_m</span><span class="p">)</span>
+
+            <span class="n">bcs_m</span> <span class="o">=</span> <span class="p">[];</span>  <span class="p">[</span><span class="n">bcs_m</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">bc_list</span><span class="p">)</span> <span class="k">for</span> <span class="n">bc_list</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirichlet_mechanical</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dx_tags</span> <span class="o">=</span> <span class="p">{</span><span class="n">tag</span><span class="p">:</span> <span class="n">ufl</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="s2">&quot;dx&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span>
+                                        <span class="n">subdomain_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_tags</span><span class="p">,</span>
+                                        <span class="n">subdomain_id</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_tags</span><span class="o">.</span><span class="n">values</span><span class="p">)}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ds_tags</span> <span class="o">=</span> <span class="p">{</span><span class="n">id_</span><span class="p">:</span> <span class="n">ufl</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="s2">&quot;ds&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span>
+                                        <span class="n">subdomain_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ft</span><span class="p">,</span>
+                                        <span class="n">subdomain_id</span><span class="o">=</span><span class="n">id_</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">id_</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ft</span><span class="o">.</span><span class="n">values</span><span class="p">)}</span>
+        
+
+        <span class="n">prev_res_T</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">prev_res_u</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># --- Staggering loop ---</span>
+        <span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iter</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">--- Staggering iteration </span><span class="si">{</span><span class="n">iteration</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">max_iter</span><span class="si">}</span><span class="s2"> ---&quot;</span><span class="p">)</span>
+
+            <span class="c1"># 1) THERMAL</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">T_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[INFO] Assembling thermal problem...&quot;</span><span class="p">)</span>
+                <span class="n">u_t</span><span class="p">,</span> <span class="n">v_t</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">),</span> <span class="n">ufl</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">)</span>
+                <span class="n">a_t</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">L_t</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="c1"># --- Volume integrals ---</span>
+                <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+                    <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_tags</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  Building weak form, volume integrals (dx) for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, tag = </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Thermal conductivity</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;k&quot;</span><span class="p">]</span>
+
+                    <span class="c1"># Output the average value of the thermal conductivity</span>
+                    <span class="c1"># if isinstance(k, (int, float)):</span>
+                    <span class="c1">#     k_avg = k</span>
+                    <span class="c1"># else:</span>
+                    <span class="c1">#     V0 = dolfinx.fem.functionspace(self.mesh, (&quot;CG&quot;, 1))</span>
+                    <span class="c1">#     k_func = dolfinx.fem.Function(V0, name=f&quot;k_{label}&quot;)</span>
+                    <span class="c1">#     expr = dolfinx.fem.Expression(k, V0.element.interpolation_points)</span>
+                    <span class="c1">#     k_func.interpolate(expr)</span>
+
+                    <span class="c1">#     num = dolfinx.fem.assemble_scalar(dolfinx.fem.form(k_func * dx))</span>
+                    <span class="c1">#     den = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))</span>
+                    <span class="c1">#     k_avg = num / den</span>
+
+                    <span class="c1"># print(f&quot;  Average conductivity for {label} = {k_avg:.3f} W/m·K&quot;)</span>
+
+                    <span class="n">a_t</span> <span class="o">+=</span> <span class="n">k</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">ufl</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">u_t</span><span class="p">),</span> <span class="n">ufl</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">v_t</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span>
+                    <span class="n">L_t</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_third</span> <span class="o">*</span> <span class="n">v_t</span> <span class="o">*</span> <span class="n">dx</span>
+
+                    <span class="c1"># q_third value in the volume &quot;label&quot; / &quot;tag&quot;</span>
+                    <span class="n">dofs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locateDomainDofs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">)</span>
+                    <span class="n">q_vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q_third</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">dofs</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → q_third[</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">](W/m3) min = </span><span class="si">{</span><span class="n">q_vals</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, max = </span><span class="si">{</span><span class="n">q_vals</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">, mean = </span><span class="si">{</span><span class="n">q_vals</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Neumann</span>
+                <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">bc_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">neumann_thermal</span><span class="p">[</span><span class="n">label</span><span class="p">]:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Applying flux on subdomain id = </span><span class="si">{</span><span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">ds_neumann</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_tags</span><span class="p">[</span><span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+                        <span class="n">L_t</span> <span class="o">+=</span> <span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">v_t</span> <span class="o">*</span> <span class="n">ds_neumann</span>
+
+                <span class="c1"># Gap (Robin)</span>
+                <span class="n">h_gap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_gap_conductance</span><span class="p">(</span><span class="n">T_i</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">bc_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">robin_thermal</span><span class="p">[</span><span class="n">label</span><span class="p">]:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Applying thermal Robin BC on subdomain id = </span><span class="si">{</span><span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                        <span class="n">region_id</span> <span class="o">=</span> <span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="c1"># e.g., fuel_interface</span>
+                        <span class="n">pair_region</span> <span class="o">=</span> <span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;pair&quot;</span><span class="p">]</span> <span class="c1"># e.g., clad_interface</span>
+
+                        <span class="n">ds_interface</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_tags</span><span class="p">[</span><span class="n">region_id</span><span class="p">]</span>  <span class="c1"># e.g., fuel_interface surface</span>
+
+                        <span class="c1"># 1) project</span>
+                        <span class="n">T_other</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">)</span> <span class="c1"># e.g., T_clad</span>
+                        <span class="n">dofs_here</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locateFacetDofs</span><span class="p">(</span><span class="n">region_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">)</span> <span class="c1"># e.g., dofs of fuel_interface</span>
+                        <span class="n">dofs_other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">locateFacetDofs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">pair_region</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">V_t</span><span class="p">)</span> <span class="c1"># e.g., dofs of clad_interface</span>
+
+                        <span class="n">T_other</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">dofs_here</span><span class="p">]</span> <span class="o">=</span> <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="n">dofs_other</span><span class="p">]</span> <span class="c1"># e.g., T_clad projected on fuel_interface dofs</span>
+
+                        <span class="c1"># 2) mean</span>
+                        <span class="c1"># T_other = T_i.x.array[dofs_other].mean()</span>
+
+                        <span class="c1"># -) bias</span>
+                        <span class="c1"># if label == &#39;fuel&#39;:</span>
+                        <span class="c1">#     print(f&quot;Biasing cladding temperature&quot;)</span>
+                        <span class="c1">#     T_other.x.array[dofs_here[:200]] += 500</span>
+
+                        <span class="n">a_t</span> <span class="o">+=</span> <span class="n">h_gap</span> <span class="o">*</span> <span class="n">u_t</span> <span class="o">*</span> <span class="n">v_t</span> <span class="o">*</span> <span class="n">ds_interface</span>
+                        <span class="n">L_t</span> <span class="o">+=</span> <span class="n">h_gap</span> <span class="o">*</span> <span class="n">T_other</span> <span class="o">*</span> <span class="n">v_t</span> <span class="o">*</span> <span class="n">ds_interface</span>
+
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [INFO] Gap Robin BC between &#39;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&#39; (region=</span><span class="si">{</span><span class="n">region_id</span><span class="si">}</span><span class="s2">) and &#39;</span><span class="si">{</span><span class="n">pair_region</span><span class="si">}</span><span class="s2">&#39; (region=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">pair_region</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+                <span class="c1"># --- Solve the system ---</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thermal_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Linear solver&quot;</span><span class="p">)</span>
+                    <span class="n">petsc_opts_thermal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_solver_options</span><span class="p">(</span>
+                        <span class="n">solver_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">thermal_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;linear_solver&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">physics</span><span class="o">=</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span>
+                        <span class="n">rtol</span><span class="o">=</span><span class="n">rtol_th</span>
+                    <span class="p">)</span>
+                    <span class="n">problem_t</span> <span class="o">=</span> <span class="n">LinearProblem</span><span class="p">(</span><span class="n">a_t</span><span class="p">,</span> <span class="n">L_t</span><span class="p">,</span> <span class="n">bcs</span><span class="o">=</span><span class="n">bcs_t</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="n">T_i</span><span class="p">,</span> <span class="n">petsc_options</span><span class="o">=</span><span class="n">petsc_opts_thermal</span><span class="p">,</span> <span class="n">petsc_options_prefix</span><span class="o">=</span><span class="s2">&quot;thermal_&quot;</span><span class="p">)</span>
+                    <span class="n">problem_t</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">thermal_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;non-linear&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Non-linear solver&quot;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [ERROR] Non-linear thermal solver not yet implemented.&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Check T_fo</span>
+                <span class="c1"># dofs = self.locateFacetDofs(self.label_map[&quot;lateral&quot;], self.V_t)</span>
+                <span class="c1"># T = T_i.x.array[dofs].mean()</span>
+                <span class="c1"># print(f&quot;  T_lateral = {T:.2f} K&quot;)</span>
+
+                <span class="c1"># Apply relaxation</span>
+                <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span> <span class="o">*</span> <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span><span class="p">)</span> <span class="o">*</span> <span class="n">T_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+
+                <span class="c1"># Print heat flux</span>
+                <span class="c1"># self.heat_flux(T_i)</span>
+
+            <span class="c1"># --. MECHANICAL SUB-PROBLEM --..</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mechanical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">u_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[INFO] Assembling mechanical problem...&quot;</span><span class="p">)</span>
+
+                <span class="n">u_m</span><span class="p">,</span> <span class="n">v_m</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">TrialFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_m</span><span class="p">),</span> <span class="n">ufl</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">V_m</span><span class="p">)</span>
+                <span class="n">a_m</span><span class="p">,</span> <span class="n">L_m</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="c1"># linear formulation a(u,v) = F(v)</span>
+                <span class="n">F_m</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># non-linear formulation F(u,v) = 0</span>
+
+                <span class="c1"># --- Volume integrals ---</span>
+                <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_map</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Building weak form, volume integrals (dx) for </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">, tag = </span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_tags</span><span class="p">[</span><span class="n">tag</span><span class="p">]</span>
+
+                    <span class="n">rho</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">(</span><span class="n">material</span><span class="p">[</span><span class="s2">&quot;rho&quot;</span><span class="p">])</span>
+                    <span class="n">g</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">default_scalar_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+                    <span class="n">body_force</span> <span class="o">=</span> <span class="n">dolfinx</span><span class="o">.</span><span class="n">fem</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span> <span class="n">rho</span> <span class="o">*</span> <span class="n">g</span><span class="p">))</span>
+
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                        <span class="n">stress_tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma_mech</span><span class="p">(</span><span class="n">u_m</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span> <span class="c1"># in mechanical_model</span>
+
+                        <span class="n">a_m</span> <span class="o">+=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">stress_tensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">(</span><span class="n">v_m</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span>
+                        <span class="n">L_m</span> <span class="o">+=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">body_force</span><span class="p">,</span> <span class="n">v_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                            <span class="n">L_m</span> <span class="o">-=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma_th</span><span class="p">(</span><span class="n">T_i</span><span class="p">,</span> <span class="n">material</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">(</span><span class="n">v_m</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span>
+
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;non-linear&quot;</span><span class="p">:</span>
+                        <span class="n">stress_tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma_mech</span><span class="p">(</span><span class="n">u_i</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span>
+                        <span class="n">F_m</span> <span class="o">+=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">stress_tensor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">epsilon</span><span class="p">(</span><span class="n">v_m</span><span class="p">))</span> <span class="o">*</span> <span class="n">dx</span> <span class="o">-</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">body_force</span><span class="p">,</span> <span class="n">v_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">dx</span>
+
+                <span class="c1"># --. Neumann BCs (traction) --..</span>
+                <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">bc_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">traction</span><span class="p">[</span><span class="n">label</span><span class="p">]:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Applying mechanical traction on subdomain id = </span><span class="si">{</span><span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_tags</span><span class="p">[</span><span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                            <span class="n">L_m</span> <span class="o">+=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="n">v_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;non-linear&quot;</span><span class="p">:</span>
+                            <span class="n">F_m</span> <span class="o">-=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">bc_info</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="n">v_m</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds</span>
+
+                <span class="c1"># --. Neumann BCs (penalties) --..</span>
+                <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">materials</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">bc_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clamp_r</span><span class="p">[</span><span class="n">label</span><span class="p">]:</span>
+                        <span class="n">alpha</span> <span class="o">=</span> <span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;penalty&quot;</span><span class="p">]</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Applying Clamp_r (weak penalty) on region id = </span><span class="si">{</span><span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s2"> (α = </span><span class="si">{</span><span class="n">alpha</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+                        <span class="n">ds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ds_tags</span><span class="p">[</span><span class="n">bc_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="n">ufl</span><span class="o">.</span><span class="n">FacetNormal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                            <span class="n">a_m</span> <span class="o">+=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u_m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v_m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds</span>
+                            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-16</span><span class="p">:</span>
+                                <span class="n">L_m</span> <span class="o">+=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">val</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v_m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds</span>
+
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;non-linear&quot;</span><span class="p">:</span>
+                            <span class="n">F_m</span> <span class="o">+=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">u_m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v_m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds</span>
+                            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-16</span><span class="p">:</span>
+                                <span class="n">F_m</span> <span class="o">-=</span> <span class="n">alpha</span> <span class="o">*</span> <span class="n">val</span> <span class="o">*</span> <span class="n">ufl</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">v_m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">ds</span>
+
+                <span class="c1"># --. check_/ debug mechanical_constraints --..</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_debug</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_mech_diagnostic_done&quot;</span><span class="p">):</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[DEBUG] Mechanical diagnostic enabled (mechanical.debug=True)&quot;</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="kn">from</span><span class="w"> </span><span class="nn">core.diagnostic</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+                                <span class="n">debug_dirichlet_mechanical</span><span class="p">,</span>
+                                <span class="n">check_fixed_dofs</span><span class="p">,</span>
+                                <span class="n">check_mechanical_constraints</span><span class="p">,</span>
+                            <span class="p">)</span>
+                            <span class="n">debug_dirichlet_mechanical</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                            <span class="n">check_fixed_dofs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;xmin&quot;</span><span class="p">)</span>
+                            <span class="n">check_mechanical_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eig_check</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[WARN] Mechanical diagnostic failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">finally</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_mech_diagnostic_done</span> <span class="o">=</span> <span class="kc">True</span>
+
+                <span class="c1"># --. solve --..</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Linear solver&quot;</span><span class="p">)</span>
+                    <span class="n">petsc_opts_mech</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_solver_options</span><span class="p">(</span>
+                        <span class="n">solver_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;linear_solver&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">physics</span><span class="o">=</span><span class="s2">&quot;mechanical&quot;</span><span class="p">,</span>
+                        <span class="n">rtol</span><span class="o">=</span><span class="n">rtol_mech</span>
+                    <span class="p">)</span>
+                    <span class="n">problem_m</span> <span class="o">=</span> <span class="n">LinearProblem</span><span class="p">(</span><span class="n">a_m</span><span class="p">,</span> <span class="n">L_m</span><span class="p">,</span> <span class="n">bcs</span><span class="o">=</span><span class="n">bcs_m</span><span class="p">,</span> <span class="n">u</span><span class="o">=</span><span class="n">u_i</span><span class="p">,</span> <span class="n">petsc_options</span><span class="o">=</span><span class="n">petsc_opts_mech</span><span class="p">,</span> <span class="n">petsc_options_prefix</span><span class="o">=</span><span class="s2">&quot;mechanical_&quot;</span><span class="p">)</span>
+                    <span class="n">problem_m</span><span class="o">.</span><span class="n">solve</span><span class="p">()</span>
+
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;solver&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;non-linear&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Non-linear solver&quot;</span><span class="p">)</span>
+
+                    <span class="n">problem_m</span> <span class="o">=</span> <span class="n">NonlinearProblem</span><span class="p">(</span><span class="n">F_m</span><span class="p">,</span> <span class="n">u_i</span><span class="p">,</span> <span class="n">bcs</span><span class="o">=</span><span class="n">bcs_m</span><span class="p">)</span>
+                    <span class="n">solver</span> <span class="o">=</span> <span class="n">NewtonSolver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">comm</span><span class="p">,</span> <span class="n">problem_m</span><span class="p">)</span>
+
+                    <span class="n">solver</span><span class="o">.</span><span class="n">atol</span> <span class="o">=</span> <span class="mf">1e-8</span>
+                    <span class="n">solver</span><span class="o">.</span><span class="n">rtol</span> <span class="o">=</span> <span class="n">rtol_mech</span>
+                    <span class="n">solver</span><span class="o">.</span><span class="n">convergence_criterion</span> <span class="o">=</span> <span class="s2">&quot;incremental&quot;</span>
+
+                    <span class="n">n_it</span><span class="p">,</span> <span class="n">converged</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">u_i</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="p">(</span><span class="n">converged</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">converged</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[mechanical] NewtonSolver failed after </span><span class="si">{</span><span class="n">n_it</span><span class="si">}</span><span class="s2"> iterations&quot;</span><span class="p">)</span>
+                    
+
+                <span class="c1"># --. Apply relaxation --..</span>
+                <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span> <span class="o">*</span> <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span><span class="p">)</span> <span class="o">*</span> <span class="n">u_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+
+            <span class="c1"># --. CONVERGENCE CHECK and LOGGING --..</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Convergence check&quot;</span><span class="p">)</span>
+            
+            <span class="n">rel_norm_dT</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">rel_norm_du</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="c1"># Thermal convergence</span>
+            <span class="n">conv_th</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">scatter_forward</span><span class="p">()</span>
+                <span class="n">T_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">scatter_forward</span><span class="p">()</span>
+
+                <span class="n">vec_T_new</span> <span class="o">=</span> <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">petsc_vec</span>
+                <span class="n">vec_T_old</span> <span class="o">=</span> <span class="n">T_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">petsc_vec</span>
+
+                <span class="c1"># Compute difference vector: diff_T = T_now - T_old</span>
+                <span class="n">diff_T</span> <span class="o">=</span> <span class="n">vec_T_new</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">diff_T</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">vec_T_old</span><span class="p">)</span> 
+
+                <span class="c1"># Compute norms</span>
+                <span class="n">norm_dT</span> <span class="o">=</span> <span class="n">diff_T</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">PETSc</span><span class="o">.</span><span class="n">NormType</span><span class="o">.</span><span class="n">NORM_2</span><span class="p">)</span>
+                <span class="n">norm_T</span> <span class="o">=</span> <span class="n">vec_T_new</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">PETSc</span><span class="o">.</span><span class="n">NormType</span><span class="o">.</span><span class="n">NORM_2</span><span class="p">)</span>
+                <span class="n">rel_norm_dT</span> <span class="o">=</span> <span class="n">norm_dT</span> <span class="o">/</span> <span class="n">norm_T</span> <span class="k">if</span> <span class="n">norm_T</span> <span class="o">&gt;</span> <span class="mf">1e-12</span> <span class="k">else</span> <span class="n">norm_dT</span>
+
+                <span class="c1"># print(f&quot;  ||ΔT|| = {norm_dT:.3e}, ||ΔT||/||T|| = {rel_norm_dT:.3e}&quot;)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">th_convergence</span> <span class="o">==</span> <span class="s2">&quot;norm&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ||ΔT|| = </span><span class="si">{</span><span class="n">norm_dT</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">conv_th</span> <span class="o">=</span> <span class="n">norm_dT</span> <span class="o">&lt;</span> <span class="n">stag_tol_th</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">th_convergence</span> <span class="o">==</span> <span class="s2">&quot;rel_norm&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ||ΔT||/||T|| = </span><span class="si">{</span><span class="n">rel_norm_dT</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">conv_th</span> <span class="o">=</span> <span class="n">rel_norm_dT</span> <span class="o">&lt;</span> <span class="n">stag_tol_th</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+                <span class="c1"># --. ADAPTIVE relax_T --..</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_adaptive</span><span class="p">:</span>
+                    <span class="n">resT_curr</span> <span class="o">=</span> <span class="n">norm_dT</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">th_convergence</span> <span class="o">==</span> <span class="s2">&quot;norm&quot;</span> <span class="k">else</span> <span class="n">rel_norm_dT</span>
+                    <span class="k">if</span> <span class="n">prev_res_T</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">resT_curr</span> <span class="o">&lt;</span> <span class="n">prev_res_T</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_growth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_max</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_shrink</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_min</span><span class="p">)</span>
+                    <span class="n">prev_res_T</span> <span class="o">=</span> <span class="n">resT_curr</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [adaptive] relax_T=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_T</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+            <span class="c1"># Mechanical convergence</span>
+            <span class="n">conv_mech</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mechanical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">scatter_forward</span><span class="p">()</span>
+                <span class="n">u_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">scatter_forward</span><span class="p">()</span>
+
+                <span class="c1"># Get the PETSc vectors</span>
+                <span class="n">vec_u_new</span> <span class="o">=</span> <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">petsc_vec</span>
+                <span class="n">vec_u_old</span> <span class="o">=</span> <span class="n">u_old</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">petsc_vec</span>
+
+                <span class="c1"># Compute difference vector: diff_u = u_now - u_old</span>
+                <span class="n">diff_u</span> <span class="o">=</span> <span class="n">vec_u_new</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">diff_u</span><span class="o">.</span><span class="n">axpy</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">vec_u_old</span><span class="p">)</span>
+
+                <span class="c1"># Compute norms</span>
+                <span class="n">norm_du</span> <span class="o">=</span> <span class="n">diff_u</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">PETSc</span><span class="o">.</span><span class="n">NormType</span><span class="o">.</span><span class="n">NORM_2</span><span class="p">)</span>
+                <span class="n">norm_u</span> <span class="o">=</span> <span class="n">vec_u_new</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">PETSc</span><span class="o">.</span><span class="n">NormType</span><span class="o">.</span><span class="n">NORM_2</span><span class="p">)</span>
+                <span class="n">rel_norm_du</span> <span class="o">=</span> <span class="n">norm_du</span> <span class="o">/</span> <span class="n">norm_u</span> <span class="k">if</span> <span class="n">norm_u</span> <span class="o">&gt;</span> <span class="mf">1e-12</span> <span class="k">else</span> <span class="n">norm_du</span>
+
+                <span class="c1"># print(f&quot;  ||Δu|| = {norm_du:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}&quot;)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_convergence</span> <span class="o">==</span> <span class="s2">&quot;norm&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ||Δu|| = </span><span class="si">{</span><span class="n">norm_du</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">conv_mech</span> <span class="o">=</span> <span class="n">norm_du</span> <span class="o">&lt;</span> <span class="n">stag_tol_mech</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mechanical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_convergence</span> <span class="o">==</span> <span class="s2">&quot;rel_norm&quot;</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  ||Δu||/||u|| = </span><span class="si">{</span><span class="n">rel_norm_du</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">conv_mech</span> <span class="o">=</span> <span class="n">rel_norm_du</span> <span class="o">&lt;</span> <span class="n">stag_tol_mech</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mechanical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+                <span class="c1"># --. ADAPTIVE relax_u --..</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_adaptive</span><span class="p">:</span>
+                    <span class="n">resU_curr</span> <span class="o">=</span> <span class="n">norm_du</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech_convergence</span> <span class="o">==</span> <span class="s2">&quot;norm&quot;</span> <span class="k">else</span> <span class="n">rel_norm_du</span>
+                    <span class="k">if</span> <span class="n">prev_res_u</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">resU_curr</span> <span class="o">&lt;</span> <span class="n">prev_res_u</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_growth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_max</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_shrink</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">relax_min</span><span class="p">)</span>
+                    <span class="n">prev_res_u</span> <span class="o">=</span> <span class="n">resU_curr</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  [adaptive] relax_u=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">relax_u</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+            <span class="k">if</span>  <span class="n">conv_mech</span> \
+            <span class="ow">and</span> <span class="n">conv_th</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[SUCCESS] Staggered solver converged in </span><span class="si">{</span><span class="n">iteration</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> iterations.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;thermal&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">T_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+                    <span class="n">T_min</span><span class="p">,</span> <span class="n">T_max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Global min/max temperature: </span><span class="si">{</span><span class="n">T_min</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">T_max</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> K&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mechanical&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span>
+                    <span class="n">u_vec</span> <span class="o">=</span> <span class="n">u_i</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdim</span><span class="p">)</span>
+                    <span class="n">umag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">u_vec</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Global min/max displacement magnitude: </span><span class="si">{</span><span class="n">umag</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">umag</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2"> m&quot;</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[WARNING] Staggered solver did not converge. Using last iteration state.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Giovanni Zullo
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Giovanni Zullo.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

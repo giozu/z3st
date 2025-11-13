@@ -1,0 +1,1290 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API Reference &#8212; z3st documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Usage" href="usage.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">z3st documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Z3ST documentation
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/giozu/z3st/issues/new?title=Issue%20on%20page%20%2Fapi.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/api.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>API Reference</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-config">Core</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.input_file"><code class="docutils literal notranslate"><span class="pre">Config.input_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.on"><code class="docutils literal notranslate"><span class="pre">Config.on</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.gap_model"><code class="docutils literal notranslate"><span class="pre">Config.gap_model</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.h_gap_value"><code class="docutils literal notranslate"><span class="pre">Config.h_gap_value</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.geometry_path"><code class="docutils literal notranslate"><span class="pre">Config.geometry_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mesh_path"><code class="docutils literal notranslate"><span class="pre">Config.mesh_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.boundary_conditions_path"><code class="docutils literal notranslate"><span class="pre">Config.boundary_conditions_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.n_steps"><code class="docutils literal notranslate"><span class="pre">Config.n_steps</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.coupling"><code class="docutils literal notranslate"><span class="pre">Config.coupling</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_solver_type"><code class="docutils literal notranslate"><span class="pre">Config.mech_solver_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_linear_solver"><code class="docutils literal notranslate"><span class="pre">Config.mech_linear_solver</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.rtol_mech"><code class="docutils literal notranslate"><span class="pre">Config.rtol_mech</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.stag_tol_mech"><code class="docutils literal notranslate"><span class="pre">Config.stag_tol_mech</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_regime"><code class="docutils literal notranslate"><span class="pre">Config.mech_regime</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_convergence"><code class="docutils literal notranslate"><span class="pre">Config.mech_convergence</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_debug"><code class="docutils literal notranslate"><span class="pre">Config.mech_debug</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.th_solver_type"><code class="docutils literal notranslate"><span class="pre">Config.th_solver_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.th_linear_solver"><code class="docutils literal notranslate"><span class="pre">Config.th_linear_solver</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.rtol_th"><code class="docutils literal notranslate"><span class="pre">Config.rtol_th</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.stag_tol_th"><code class="docutils literal notranslate"><span class="pre">Config.stag_tol_th</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.th_convergence"><code class="docutils literal notranslate"><span class="pre">Config.th_convergence</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.__init__"><code class="docutils literal notranslate"><span class="pre">Config.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh"><code class="docutils literal notranslate"><span class="pre">Mesh</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.__init__"><code class="docutils literal notranslate"><span class="pre">Mesh.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.locateFacetDofs"><code class="docutils literal notranslate"><span class="pre">Mesh.locateFacetDofs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.locateDomainDofs"><code class="docutils literal notranslate"><span class="pre">Mesh.locateDomainDofs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.volume"><code class="docutils literal notranslate"><span class="pre">Mesh.volume()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver.get_solver_options"><code class="docutils literal notranslate"><span class="pre">Solver.get_solver_options()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver.solve_monolithic"><code class="docutils literal notranslate"><span class="pre">Solver.solve_monolithic()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver.solve_staggered"><code class="docutils literal notranslate"><span class="pre">Solver.solve_staggered()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-thermal_model">Models</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermal_model.ThermalModel"><code class="docutils literal notranslate"><span class="pre">ThermalModel</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#thermal_model.ThermalModel.set_thermal_boundary_conditions"><code class="docutils literal notranslate"><span class="pre">ThermalModel.set_thermal_boundary_conditions()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#thermal_model.ThermalModel.heat_flux"><code class="docutils literal notranslate"><span class="pre">ThermalModel.heat_flux()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel"><code class="docutils literal notranslate"><span class="pre">MechanicalModel</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.set_mechanical_boundary_conditions"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.set_mechanical_boundary_conditions()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.create_dirichlet_bc"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.create_dirichlet_bc()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.epsilon"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.epsilon()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.sigma_mech"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.sigma_mech()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.sigma_th"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.sigma_th()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.elastic_energy_density"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.elastic_energy_density()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.zero_displacement"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.zero_displacement()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.fixed_displacement"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.fixed_displacement()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-export_vtu">Utilities</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export_vtu.export_vtu"><code class="docutils literal notranslate"><span class="pre">export_vtu()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export_vtu.interpolate_expression"><code class="docutils literal notranslate"><span class="pre">interpolate_expression()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.generate_power_history"><code class="docutils literal notranslate"><span class="pre">generate_power_history()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.read_power_history"><code class="docutils literal notranslate"><span class="pre">read_power_history()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.get_ksp_reason_name"><code class="docutils literal notranslate"><span class="pre">get_ksp_reason_name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.clear_log_file"><code class="docutils literal notranslate"><span class="pre">clear_log_file()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.log_step_info"><code class="docutils literal notranslate"><span class="pre">log_step_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
+<section id="module-config">
+<span id="core"></span><h2>Core<a class="headerlink" href="#module-config" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="config.Config">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.Config" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Configuration manager for Z3ST simulations.</p>
+<p>This class parses the user input YAML file and initializes the
+global configuration used by all other modules (mesh, solvers, models).</p>
+<dl class="simple">
+<dt>It loads:</dt><dd><ul class="simple">
+<li><p>active physical models (thermal, mechanical, gap conductance)</p></li>
+<li><p>solver settings (linear/non-linear, tolerances, coupling scheme)</p></li>
+<li><p>paths for geometry, mesh, and boundary conditions</p></li>
+<li><p>number of time steps</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.input_file">
+<span class="sig-name descname"><span class="pre">input_file</span></span><a class="headerlink" href="#config.Config.input_file" title="Link to this definition">#</a></dt>
+<dd><p>Dictionary parsed from the YAML input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.on">
+<span class="sig-name descname"><span class="pre">on</span></span><a class="headerlink" href="#config.Config.on" title="Link to this definition">#</a></dt>
+<dd><p>Dictionary of active physical models (<cite>thermal</cite>, <cite>mechanical</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.gap_model">
+<span class="sig-name descname"><span class="pre">gap_model</span></span><a class="headerlink" href="#config.Config.gap_model" title="Link to this definition">#</a></dt>
+<dd><p>Selected gap conductance model (e.g., “Fixed” or “Gas”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.h_gap_value">
+<span class="sig-name descname"><span class="pre">h_gap_value</span></span><a class="headerlink" href="#config.Config.h_gap_value" title="Link to this definition">#</a></dt>
+<dd><p>Gap conductance coefficient (W/m²·K).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.geometry_path">
+<span class="sig-name descname"><span class="pre">geometry_path</span></span><a class="headerlink" href="#config.Config.geometry_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to the geometry YAML file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.mesh_path">
+<span class="sig-name descname"><span class="pre">mesh_path</span></span><a class="headerlink" href="#config.Config.mesh_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to the mesh file (.msh or .py).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.boundary_conditions_path">
+<span class="sig-name descname"><span class="pre">boundary_conditions_path</span></span><a class="headerlink" href="#config.Config.boundary_conditions_path" title="Link to this definition">#</a></dt>
+<dd><p>Path to the YAML file containing boundary condition definitions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.n_steps">
+<span class="sig-name descname"><span class="pre">n_steps</span></span><a class="headerlink" href="#config.Config.n_steps" title="Link to this definition">#</a></dt>
+<dd><p>Number of time steps.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.coupling">
+<span class="sig-name descname"><span class="pre">coupling</span></span><a class="headerlink" href="#config.Config.coupling" title="Link to this definition">#</a></dt>
+<dd><p>Coupling strategy (“monolithic” or “staggered”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.mech_solver_type">
+<span class="sig-name descname"><span class="pre">mech_solver_type</span></span><a class="headerlink" href="#config.Config.mech_solver_type" title="Link to this definition">#</a></dt>
+<dd><p>Type of mechanical solver (“linear” or “non-linear”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.mech_linear_solver">
+<span class="sig-name descname"><span class="pre">mech_linear_solver</span></span><a class="headerlink" href="#config.Config.mech_linear_solver" title="Link to this definition">#</a></dt>
+<dd><p>Linear solver for the mechanical problem (e.g., “iterative_amg”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.rtol_mech">
+<span class="sig-name descname"><span class="pre">rtol_mech</span></span><a class="headerlink" href="#config.Config.rtol_mech" title="Link to this definition">#</a></dt>
+<dd><p>Relative tolerance for mechanical solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.stag_tol_mech">
+<span class="sig-name descname"><span class="pre">stag_tol_mech</span></span><a class="headerlink" href="#config.Config.stag_tol_mech" title="Link to this definition">#</a></dt>
+<dd><p>Staggered tolerance for the mechanical solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.mech_regime">
+<span class="sig-name descname"><span class="pre">mech_regime</span></span><a class="headerlink" href="#config.Config.mech_regime" title="Link to this definition">#</a></dt>
+<dd><p>Mechanical regime (“3D” or “plane_stress”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.mech_convergence">
+<span class="sig-name descname"><span class="pre">mech_convergence</span></span><a class="headerlink" href="#config.Config.mech_convergence" title="Link to this definition">#</a></dt>
+<dd><p>Convergence criterion (“norm” or “rel_norm”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.mech_debug">
+<span class="sig-name descname"><span class="pre">mech_debug</span></span><a class="headerlink" href="#config.Config.mech_debug" title="Link to this definition">#</a></dt>
+<dd><p>Debug flag for the mechanical model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.th_solver_type">
+<span class="sig-name descname"><span class="pre">th_solver_type</span></span><a class="headerlink" href="#config.Config.th_solver_type" title="Link to this definition">#</a></dt>
+<dd><p>Type of thermal solver (“linear” or “non-linear”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.th_linear_solver">
+<span class="sig-name descname"><span class="pre">th_linear_solver</span></span><a class="headerlink" href="#config.Config.th_linear_solver" title="Link to this definition">#</a></dt>
+<dd><p>Linear solver for the thermal problem (e.g., “iterative_amg”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.rtol_th">
+<span class="sig-name descname"><span class="pre">rtol_th</span></span><a class="headerlink" href="#config.Config.rtol_th" title="Link to this definition">#</a></dt>
+<dd><p>Relative tolerance for thermal solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.stag_tol_th">
+<span class="sig-name descname"><span class="pre">stag_tol_th</span></span><a class="headerlink" href="#config.Config.stag_tol_th" title="Link to this definition">#</a></dt>
+<dd><p>Staggered tolerance for the thermal solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="config.Config.th_convergence">
+<span class="sig-name descname"><span class="pre">th_convergence</span></span><a class="headerlink" href="#config.Config.th_convergence" title="Link to this definition">#</a></dt>
+<dd><p>Convergence criterion for thermal solver.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<p>This class is initialized at the start of each simulation.
+It centralizes configuration parsing so that all modules
+(thermal, mechanical, solver, gap model) share consistent parameters.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="config.Config.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/config.html#Config.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#config.Config.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the Config class from a YAML input dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>input_file</strong> (<em>dict</em>) – Parsed YAML configuration file containing all simulation parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-mesh">
+<dt class="sig sig-object py" id="mesh.Mesh">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Mesh</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mesh.html#Mesh"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mesh.Mesh" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mesh.Mesh.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geometry</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rank</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mesh.html#Mesh.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mesh.Mesh.__init__" title="Link to this definition">#</a></dt>
+<dd><p>Initialize the class with the mesh file.</p>
+<p>Parameters:
+mesh_file (str): Path to the mesh file.
+rank (int): Rank of the process (default is 0).
+gdim (int): Geometric dimension of the mesh (default is 3).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesh.Mesh.locateFacetDofs">
+<span class="sig-name descname"><span class="pre">locateFacetDofs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mesh.html#Mesh.locateFacetDofs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mesh.Mesh.locateFacetDofs" title="Link to this definition">#</a></dt>
+<dd><p>Locate degrees of freedom (DoFs) on a specific facet boundary.</p>
+<p>This is a convenience function for finding all DoFs associated with
+a boundary marked by a specific integer label. It’s commonly used
+to apply boundary conditions (e.g., DirichletBC).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span>) – The integer marker for the desired facet set (e.g., a
+specific boundary like an “inlet” or “wall”). This label must
+exist in the mesh’s facet tags.</p></li>
+<li><p><strong>V</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">functionspace</span></code></span>) – The function space from which to extract the DoFs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A 1D numpy array of DoF indices that are located on the
+specified facets.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesh.Mesh.locateDomainDofs">
+<span class="sig-name descname"><span class="pre">locateDomainDofs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mesh.html#Mesh.locateDomainDofs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mesh.Mesh.locateDomainDofs" title="Link to this definition">#</a></dt>
+<dd><p>Locate degrees of freedom (DoFs) within a specific subdomain.</p>
+<p>This function identifies all DoFs that belong to cells of a certain
+type (e.g., a specific material). It is useful for defining
+material-dependent properties, source terms, or for subdomain-specific
+post-processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>label_map</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></span>) – A dictionary mapping human-readable material labels
+(e.g., “water”, “steel”) to their corresponding integer
+tags in the mesh’s cell data.</p></li>
+<li><p><strong>material_label</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – The human-readable key (e.g., “water”) to look
+up the integer tag in <cite>label_map</cite>.</p></li>
+<li><p><strong>V</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">functionspace</span></code></span>) – The function space from which to extract the DoFs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A 1D numpy array of DoF indices located within the cells of the
+specified subdomain.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mesh.Mesh.volume">
+<span class="sig-name descname"><span class="pre">volume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output/simulation_log.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mesh.html#Mesh.volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mesh.Mesh.volume" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-solver">
+<dt class="sig sig-object py" id="solver.Solver">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Solver</span></span><a class="reference internal" href="_modules/solver.html#Solver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#solver.Solver" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="solver.Solver.get_solver_options">
+<span class="sig-name descname"><span class="pre">get_solver_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">physics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solver_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'iterative_amg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/solver.html#Solver.get_solver_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#solver.Solver.get_solver_options" title="Link to this definition">#</a></dt>
+<dd><p>Returns PETSc options for the linear solver based on the physics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>physics</strong> (<em>str</em>) – “thermal” or “mechanical”. This primarily determines
+if a symmetric (CG) or non-symmetric (GMRES) solver is used.</p></li>
+<li><p><strong>solver_type</strong> (<em>str</em>) – Type of solver/preconditioner strategy. Supported:
+- “direct_mumps”: Robust but memory-intensive direct solver.
+- “iterative_amg”: Default iterative solver with Algebraic Multigrid (PETSc GAMG).
+- “iterative_hypre”: Iterative solver with HYPRE’s BoomerAMG preconditioner.</p></li>
+<li><p><strong>rtol</strong> (<em>float</em>) – Relative tolerance for KSP.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>PETSc options dictionary.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="solver.Solver.solve_monolithic">
+<span class="sig-name descname"><span class="pre">solve_monolithic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/solver.html#Solver.solve_monolithic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#solver.Solver.solve_monolithic" title="Link to this definition">#</a></dt>
+<dd><p>Monolithic thermo-mechanical solver (MVP, Phase 1).</p>
+<section id="supported-features">
+<h3>Supported features<a class="headerlink" href="#supported-features" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Dirichlet and Neumann boundary conditions for both thermal and mechanical problems (including Clamp_x/y/z constraints).</p></li>
+<li><p>Material thermal conductivity <code class="docutils literal notranslate"><span class="pre">k</span></code> can be constant or a UFL symbolic expression (already stored in <code class="docutils literal notranslate"><span class="pre">self.materials[*][&quot;k&quot;]</span></code>).</p></li>
+</ul>
+</section>
+<section id="not-included-in-this-phase">
+<h3>Not included in this phase<a class="headerlink" href="#not-included-in-this-phase" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Robin-type gap conduction</p></li>
+<li><p>Interface projection operators</p></li>
+<li><p>“Gas” gap conductance <code class="docutils literal notranslate"><span class="pre">h_gap</span></code></p></li>
+</ul>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Slip_* boundary conditions and Robin conditions are not yet implemented here.</p></li>
+<li><p>Dirichlet BCs are reconstructed on the mixed space <code class="docutils literal notranslate"><span class="pre">W</span></code></p></li>
+</ul>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="solver.Solver.solve_staggered">
+<span class="sig-name descname"><span class="pre">solve_staggered</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stag_tol_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stag_tol_mech</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol_th</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rtol_mech</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/solver.html#Solver.solve_staggered"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#solver.Solver.solve_staggered" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-thermal_model">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-thermal_model" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="thermal_model.ThermalModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ThermalModel</span></span><a class="reference internal" href="_modules/thermal_model.html#ThermalModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermal_model.ThermalModel" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="thermal_model.ThermalModel.set_thermal_boundary_conditions">
+<span class="sig-name descname"><span class="pre">set_thermal_boundary_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V_t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V_t_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/thermal_model.html#ThermalModel.set_thermal_boundary_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermal_model.ThermalModel.set_thermal_boundary_conditions" title="Link to this definition">#</a></dt>
+<dd><p>Apply thermal boundary conditions for both staggered and mixed cases.</p>
+<p>If V_t_map is None → staggered (non-mixed spaces).
+If V_t_map is provided → mixed (collapsed subspace).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>V_t_sub</strong> – FunctionSpace (collapsed temperature space)</p></li>
+<li><p><strong>V_t_map</strong> – DoF map from mixed to collapsed (only in mixed case)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="thermal_model.ThermalModel.heat_flux">
+<span class="sig-name descname"><span class="pre">heat_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/thermal_model.html#ThermalModel.heat_flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#thermal_model.ThermalModel.heat_flux" title="Link to this definition">#</a></dt>
+<dd><p>Compute average heat flux (magnitude and x-y-z components) per materials</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class" id="module-mechanical_model">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MechanicalModel</span></span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.set_mechanical_boundary_conditions">
+<span class="sig-name descname"><span class="pre">set_mechanical_boundary_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V_u_sub</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V_u_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.set_mechanical_boundary_conditions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.set_mechanical_boundary_conditions" title="Link to this definition">#</a></dt>
+<dd><p>Apply mechanical boundary conditions for both staggered and mixed cases.</p>
+<p>If V_u_map is None → staggered (non-mixed spaces).
+If V_u_map is provided → mixed (collapsed subspace).</p>
+<p>To do:
+- ERROR if a region is assigned more than once</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.create_dirichlet_bc">
+<span class="sig-name descname"><span class="pre">create_dirichlet_bc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tdim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.create_dirichlet_bc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.create_dirichlet_bc" title="Link to this definition">#</a></dt>
+<dd><p>DirichletBC on a vectorial space, using Constant or Functiont.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> – dolfinx.mesh.Mesh</p></li>
+<li><p><strong>V</strong> – dolfinx.fem.FunctionSpace (collapsed)</p></li>
+<li><p><strong>dofs</strong> – np.ndarray</p></li>
+<li><p><strong>displacement</strong> – list, tuple, np.ndarray</p></li>
+<li><p><strong>tdim</strong> – int</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dolfinx.fem.DirichletBC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.epsilon">
+<span class="sig-name descname"><span class="pre">epsilon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.epsilon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.epsilon" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.sigma_mech">
+<span class="sig-name descname"><span class="pre">sigma_mech</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.sigma_mech"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.sigma_mech" title="Link to this definition">#</a></dt>
+<dd><p>Mechanical Cauchy stress σ(u) with two selectable constitutive routes.</p>
+<p>Mode selection (by material dict)
+–.–.–.–.-</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">material[&quot;constitutive&quot;]</span> <span class="pre">==</span> <span class="pre">&quot;voigt&quot;</span></code>:</p></li>
+</ul>
+<p>σ = C_voigt · ε_voigt  (6×6 · 6×1) → mapped back to 3×3.</p>
+<ul class="simple">
+<li><p>If <code class="docutils literal notranslate"><span class="pre">material[&quot;C_matrix&quot;]</span></code> (6×6) is provided, use it (anisotropy allowed).</p></li>
+<li><p>Else, build isotropic C from (λ, G) with shear blocks = 2G.</p></li>
+</ul>
+<p>Voigt order used here: [xx, yy, zz, yz, xz, xy] with <strong>no factor 2</strong> on shear strains.</p>
+<ul class="simple">
+<li><p>Else (default = <code class="docutils literal notranslate"><span class="pre">&quot;lame&quot;</span></code>):</p></li>
+</ul>
+<p>σ = λ tr(ε) I + 2 G ε</p>
+<p>Plane-stress handling
+–.–.—–</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">self.mech_regime</span> <span class="pre">==</span> <span class="pre">&quot;plane_stress&quot;</span></code>, the returned tensor is modified
+to enforce σ_zz = 0 in an x–y plane-stress sense (same behaviour as before).</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Assumes 3D (tdim == 3). For 2D, adapt Voigt packing/unpacking.</p></li>
+<li><p>ε = sym(∇u) is small strain.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.sigma_th">
+<span class="sig-name descname"><span class="pre">sigma_th</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.sigma_th"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.sigma_th" title="Link to this definition">#</a></dt>
+<dd><p>Returns the thermal stress tensor σ_th(T) = - (3λ + 2G) α (T - T_ref) I
+for a given temperature field T and material properties.</p>
+<dl class="simple">
+<dt>Negative sign convention:</dt><dd><p>compressive thermal stress for T &gt; T_ref.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> (<em>dolfinx.fem.Function</em>) – The temperature field.</p></li>
+<li><p><strong>material</strong> (<em>dict</em>) – Material properties.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The thermal stress tensor.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dolfinx.fem.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.elastic_energy_density">
+<span class="sig-name descname"><span class="pre">elastic_energy_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.elastic_energy_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.elastic_energy_density" title="Link to this definition">#</a></dt>
+<dd><p>Elastic strain energy density (small strain linear elasticity).
+Uses w = 1/2 * sigma_mech(u) : epsilon(u).
+Works also with self.mech_regime == ‘plane_stress’ because sigma_mech() already handles it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.zero_displacement">
+<span class="sig-name descname"><span class="pre">zero_displacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.zero_displacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.zero_displacement" title="Link to this definition">#</a></dt>
+<dd><p>Returns a DirichletBC with zero displacement vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>dolfinx.Mesh</em>) – The mesh object.</p></li>
+<li><p><strong>dofs</strong> (<em>array-like</em>) – Degrees of freedom where BC is applied.</p></li>
+<li><p><strong>V</strong> (<em>FunctionSpace</em>) – The function space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The zero displacement boundary condition.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dolfinx.fem.DirichletBC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mechanical_model.MechanicalModel.fixed_displacement">
+<span class="sig-name descname"><span class="pre">fixed_displacement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">displacement</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mechanical_model.html#MechanicalModel.fixed_displacement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mechanical_model.MechanicalModel.fixed_displacement" title="Link to this definition">#</a></dt>
+<dd><p>Returns a DirichletBC with a specified displacement vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>dolfinx.Mesh</em>) – The mesh object.</p></li>
+<li><p><strong>dofs</strong> (<em>array-like</em>) – Degrees of freedom where BC is applied.</p></li>
+<li><p><strong>V</strong> (<em>FunctionSpace</em>) – The function space (vector-valued).</p></li>
+<li><p><strong>displacement</strong> (<em>tuple</em><em> or </em><em>list</em>) – The displacement vector (e.g. (0.0, 0.0, 0.0)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The displacement boundary condition.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dolfinx.fem.DirichletBC</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-export_vtu">
+<span id="utilities"></span><h2>Utilities<a class="headerlink" href="#module-export_vtu" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="export_vtu.export_vtu">
+<span class="sig-name descname"><span class="pre">export_vtu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fields.vtu'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/export_vtu.html#export_vtu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#export_vtu.export_vtu" title="Link to this definition">#</a></dt>
+<dd><p>Export global and per-material fields to a VTU file for PyVista/ParaView.
+This version is updated to work with global solution fields and symbolic result expressions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>problem</strong> – Z3ST problem object that has been solved.</p></li>
+<li><p><strong>output_dir</strong> – Directory to save the .vtu files</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="export_vtu.interpolate_expression">
+<span class="sig-name descname"><span class="pre">interpolate_expression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbolic_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">V</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/export_vtu.html#interpolate_expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#export_vtu.interpolate_expression" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function" id="module-utils_load">
+<dt class="sig sig-object py" id="utils_load.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">yaml_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils_load.html#load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils_load.load" title="Link to this definition">#</a></dt>
+<dd><p>Load a YAML file. Convert top-level values to float unless key is ‘name’ or the value is a dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>yaml_file</strong> (<em>str</em>) – Path to the .yaml file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed dictionary with converted values where applicable.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils_load.generate_power_history">
+<span class="sig-name descname"><span class="pre">generate_power_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lhr_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'power_history.tsv'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils_load.html#generate_power_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils_load.generate_power_history" title="Link to this definition">#</a></dt>
+<dd><p>Generates a time-power (LHR) history by interpolating between specified time points.
+The function ensures exact inclusion of provided time points and adds extra points
+proportionally in each time segment.</p>
+<p>Parameters:
+- t_points (list of float): Time values in seconds.
+- lhr_points (list of float): Corresponding LHR values in W/m.
+- n_steps (int): Total number of output points (including input points).
+- filename (str): Output filename (TSV format).</p>
+<p>Returns:
+- times (np.ndarray): Interpolated time points.
+- lhrs (np.ndarray): Interpolated LHR values.
+- n_actual (int): Actual number of steps generated.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils_load.read_power_history">
+<span class="sig-name descname"><span class="pre">read_power_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils_load.html#read_power_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils_load.read_power_history" title="Link to this definition">#</a></dt>
+<dd><p>Reads a TSV file containing time and LHR columns.</p>
+<p>Parameters:
+- filename (str): Path to the TSV file.</p>
+<p>Returns:
+- times (np.ndarray): Array of time values (s).
+- lhrs (np.ndarray): Array of LHR values (W/m).
+- n_steps (int): Number of time steps read.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils_load.get_ksp_reason_name">
+<span class="sig-name descname"><span class="pre">get_ksp_reason_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason_code</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils_load.html#get_ksp_reason_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils_load.get_ksp_reason_name" title="Link to this definition">#</a></dt>
+<dd><p>Convert PETSc KSP converged/diverged reason code to a human-readable name.</p>
+<p>Parameters:
+- reason_code (int): The integer code from PETSc KSP solver</p>
+<p>Returns:
+- str: Name of the reason (e.g., ‘CONVERGED_RTOL’, ‘DIVERGED_ITS’, etc.)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils_load.clear_log_file">
+<span class="sig-name descname"><span class="pre">clear_log_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output/simulation_log.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils_load.html#clear_log_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils_load.clear_log_file" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="utils_load.log_step_info">
+<span class="sig-name descname"><span class="pre">log_step_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lhr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'output/simulation_log.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils_load.html#log_step_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#utils_load.log_step_info" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="usage.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Usage</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="examples.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-config">Core</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.input_file"><code class="docutils literal notranslate"><span class="pre">Config.input_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.on"><code class="docutils literal notranslate"><span class="pre">Config.on</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.gap_model"><code class="docutils literal notranslate"><span class="pre">Config.gap_model</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.h_gap_value"><code class="docutils literal notranslate"><span class="pre">Config.h_gap_value</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.geometry_path"><code class="docutils literal notranslate"><span class="pre">Config.geometry_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mesh_path"><code class="docutils literal notranslate"><span class="pre">Config.mesh_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.boundary_conditions_path"><code class="docutils literal notranslate"><span class="pre">Config.boundary_conditions_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.n_steps"><code class="docutils literal notranslate"><span class="pre">Config.n_steps</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.coupling"><code class="docutils literal notranslate"><span class="pre">Config.coupling</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_solver_type"><code class="docutils literal notranslate"><span class="pre">Config.mech_solver_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_linear_solver"><code class="docutils literal notranslate"><span class="pre">Config.mech_linear_solver</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.rtol_mech"><code class="docutils literal notranslate"><span class="pre">Config.rtol_mech</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.stag_tol_mech"><code class="docutils literal notranslate"><span class="pre">Config.stag_tol_mech</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_regime"><code class="docutils literal notranslate"><span class="pre">Config.mech_regime</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_convergence"><code class="docutils literal notranslate"><span class="pre">Config.mech_convergence</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.mech_debug"><code class="docutils literal notranslate"><span class="pre">Config.mech_debug</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.th_solver_type"><code class="docutils literal notranslate"><span class="pre">Config.th_solver_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.th_linear_solver"><code class="docutils literal notranslate"><span class="pre">Config.th_linear_solver</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.rtol_th"><code class="docutils literal notranslate"><span class="pre">Config.rtol_th</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.stag_tol_th"><code class="docutils literal notranslate"><span class="pre">Config.stag_tol_th</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.th_convergence"><code class="docutils literal notranslate"><span class="pre">Config.th_convergence</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#config.Config.__init__"><code class="docutils literal notranslate"><span class="pre">Config.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh"><code class="docutils literal notranslate"><span class="pre">Mesh</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.__init__"><code class="docutils literal notranslate"><span class="pre">Mesh.__init__()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.locateFacetDofs"><code class="docutils literal notranslate"><span class="pre">Mesh.locateFacetDofs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.locateDomainDofs"><code class="docutils literal notranslate"><span class="pre">Mesh.locateDomainDofs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mesh.Mesh.volume"><code class="docutils literal notranslate"><span class="pre">Mesh.volume()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver"><code class="docutils literal notranslate"><span class="pre">Solver</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver.get_solver_options"><code class="docutils literal notranslate"><span class="pre">Solver.get_solver_options()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver.solve_monolithic"><code class="docutils literal notranslate"><span class="pre">Solver.solve_monolithic()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#solver.Solver.solve_staggered"><code class="docutils literal notranslate"><span class="pre">Solver.solve_staggered()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-thermal_model">Models</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thermal_model.ThermalModel"><code class="docutils literal notranslate"><span class="pre">ThermalModel</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#thermal_model.ThermalModel.set_thermal_boundary_conditions"><code class="docutils literal notranslate"><span class="pre">ThermalModel.set_thermal_boundary_conditions()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#thermal_model.ThermalModel.heat_flux"><code class="docutils literal notranslate"><span class="pre">ThermalModel.heat_flux()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel"><code class="docutils literal notranslate"><span class="pre">MechanicalModel</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.set_mechanical_boundary_conditions"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.set_mechanical_boundary_conditions()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.create_dirichlet_bc"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.create_dirichlet_bc()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.epsilon"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.epsilon()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.sigma_mech"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.sigma_mech()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.sigma_th"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.sigma_th()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.elastic_energy_density"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.elastic_energy_density()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.zero_displacement"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.zero_displacement()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#mechanical_model.MechanicalModel.fixed_displacement"><code class="docutils literal notranslate"><span class="pre">MechanicalModel.fixed_displacement()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-export_vtu">Utilities</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export_vtu.export_vtu"><code class="docutils literal notranslate"><span class="pre">export_vtu()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export_vtu.interpolate_expression"><code class="docutils literal notranslate"><span class="pre">interpolate_expression()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.load"><code class="docutils literal notranslate"><span class="pre">load()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.generate_power_history"><code class="docutils literal notranslate"><span class="pre">generate_power_history()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.read_power_history"><code class="docutils literal notranslate"><span class="pre">read_power_history()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.get_ksp_reason_name"><code class="docutils literal notranslate"><span class="pre">get_ksp_reason_name()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.clear_log_file"><code class="docutils literal notranslate"><span class="pre">clear_log_file()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#utils_load.log_step_info"><code class="docutils literal notranslate"><span class="pre">log_step_info()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Giovanni Zullo
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Giovanni Zullo.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
