@@ -62,7 +62,7 @@ Optional flags:
 
 ---
 
-## Key Features
+## Key features
 
 * **Coupled thermo-mechanical solver** — heat conduction and linear elasticity with monolithic or staggered coupling
 * **Multi-material domains** — multiple materials with independent thermal and mechanical properties
@@ -77,7 +77,7 @@ Optional flags:
 
 ---
 
-## Directory Structure
+## Directory structure
 
 ```bash
 
@@ -127,12 +127,11 @@ z3st/
     ├── source/
     └── build/                   # auto-generated, not committed
 
-
 ```
 
 ---
 
-## Example Input File
+## Example input file
 
 ```yaml
 # input.yaml
@@ -179,6 +178,8 @@ lhr:
 time:
   - 0
 n_steps: 1
+```
+
 ---
 
 ## Post-processing and visualization
@@ -193,23 +194,14 @@ Full compatibility with **ParaView** and **PyVista** enables both automated and 
 | `utils_extract_vtu.py` | Extracts scalar/vector fields and stress components from VTU outputs                    |
 | `utils_plot.py`        | Generates 1D and radial plots (e.g. T(r), σ<sub>rr</sub>(r)) and can be easily extended |
 | `z-gui.py`             | Interactive 3D viewer built on PyVista for exploratory visualization                    |
+| ...                    | ...                                                                                     |
+
 
 These tools, together with other Python utilities, provide a complete post-processing ecosystem for field analysis and visualization.
 
-Example usage:
-
-```python
-from utils_extract_vtu import extract_temperature
-from utils_plot import plot_field_along_r_xy
-
-x, y, z, T = extract_temperature("output/fields.vtu")
-plot_field_along_r_xy(x, y, z, T, "Temperature (K)", case_dir=".")
-```
-
 ---
 
-
-## Development Roadmap
+## Development roadmap
 
 * Monolithic thermo-mechanical solver
 * Contact mechanics
@@ -219,7 +211,7 @@ plot_field_along_r_xy(x, y, z, T, "Temperature (K)", case_dir=".")
 
 ---
 
-## License & Author
+## License & author
 
 **Author:** Giovanni Zullo
 **Institution:** Politecnico di Milano
