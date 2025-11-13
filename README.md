@@ -58,8 +58,7 @@ Or, with a single instruction:
 
 Optional flags:
 
-* `--mesh_plot` → preview surface tags using PyVista
-
+* `python3 -m z3st --mesh_plot` → preview surface tags using PyVista
 
 ---
 
