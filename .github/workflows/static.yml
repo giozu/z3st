@@ -31,9 +31,10 @@ jobs:
           python-version: "3.10"
 
       - name: Install Sphinx
+      - name: Install Sphinx and extensions
         run: |
           pip install --upgrade pip
-          pip install sphinx sphinx_rtd_theme
+          pip install sphinx sphinx_rtd_theme sphinx-autodoc-typehints
 
       - name: Build Sphinx HTML
         working-directory: docs
