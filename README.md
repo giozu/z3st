@@ -19,7 +19,8 @@ Clone the repository:
   git clone https://github.com/giozu/z3st.git
   ```
 
-Install miniconda:
+Z3ST requires a working installation of FEniCSx (dolfinx), that is not installed via pip and must be obtained via Conda (or Docker).
+To install miniconda:
   ```bash
   mkdir -p ~/miniconda3
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
@@ -43,16 +44,16 @@ Install in editable/development mode
 
 Then, it is possible to execute in each case folder, for instance:
   ```bash
-  cd ~/z3st/cases/19_plate/
+  cd ~/z3st/cases/00_example/
   gmsh -3 mesh.geo
   python3 -m z3st > log.z3st
   python3 non-regression.py
   python3 ../../utils/plot_convergence.py
   ```
 
-Or, with a single instruction:
+Or, with less instructions:
   ```bash
-  cd ~/z3st/cases/19_plate/
+  cd ~/z3st/cases/00_example/
   ./Allrun
   ```
 
@@ -64,7 +65,7 @@ Optional flags:
 
 ## Key features
 
-* **Coupled thermo-mechanical solver** — heat conduction and linear elasticity with monolithic or staggered coupling
+* **Coupled thermo-mechanical solver** — heat conduction and linear elasticity with staggered coupling
 * **Multi-material domains** — multiple materials with independent thermal and mechanical properties
 * **Volumetric heating** — arbitrary, spatially dependent internal heat sources (e.g., γ-heating, user-defined functions)
 * **Flexible boundary conditions** — Dirichlet, Neumann, clamp, and slip BCs defined via YAML configuration files
@@ -201,13 +202,49 @@ These tools, together with other Python utilities, provide a complete post-proce
 
 ---
 
-## Development roadmap
+## Capabilities beyond YAML
 
-* Monolithic thermo-mechanical solver
+While Z3ST supports full configuration through YAML files for reproducibility and ease of use, the framework is deliberately designed to extend far beyond YAML-based inputs.
+
+### External Python material models
+Material behaviour does not need to be hard-coded or restricted to values inside YAML files.  
+Z3ST natively supports **Python-based material modules**, allowing users to implement:
+
+- temperature-dependent constitutive laws  
+- empirical or semi-empirical correlations  
+- nonlinear stress–strain behaviour  
+- surrogate models and neural networks  
+- models depending on local fields (e.g., temperature, gradients)
+
+These Python modules are automatically loaded and integrated into the finite-element formulation at runtime.
+
+### Integration with FEniCSx ecosystem
+Z3ST is designed to interoperate with the wider FEniCSx ecosystem, with planned integration of:
+
+- **`dolfinx_mpc`** for multi-point constraints and advanced boundary-condition enforcement  
+- **`dolfinx_materials`** for standardised material libraries and automatically tabulated thermal/mechanical properties
+
+This allows the framework to grow toward more general multiphysics and nonlinear-modelling workflows.
+
+### Microstructure and multi-scale workflows
+Z3ST is also envisaged to integrate with external tools for:
+
+- synthetic microstructure generation (e.g., **Merope**)  
+- **rate-theory solvers** for irradiation-driven defect evolution  
+- **Monte Carlo workflows** for stochastic microstructural processes  
+
+These extensions aim to connect Z3ST to multi-scale modelling pipelines involving microstructure → mesoscale → continuum thermo-mechanics.
+
+### Development roadmap
+
+* Full test and setup of the monolithic thermo-mechanical solver
 * Contact mechanics
 * Nonlinear constitutive behavior
 * Coupling with microstructure generators (e.g., Merope)
 * Coupling with rate-theory codes
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ---
 
