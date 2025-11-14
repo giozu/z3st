@@ -1,4 +1,4 @@
-# Z3ST: A FEniCSx Framework for Thermo-Mechanical Analysis
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 
 **Z3ST** is an open-source finite-element framework for thermo-mechanical material analysis.
 Developed in **Python**, it leverages **FEniCSx** and provides a modular environment to couple heat conduction and linear elasticity in multi-material domains under stationary or transient conditions, with user-defined boundary conditions.
@@ -278,7 +278,7 @@ If you use Z3ST in your research, please cite this little work.
 ```bibtex
 @misc{Z3ST2025,
   author       = {Giovanni Zullo},
-  title        = {Z3ST: A FEniCSx Framework for Thermo-Mechanical Analysis},
+  title        = {Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis},
   year         = {2025},
   howpublished = {\url{https://github.com/giozu/z3st}},
   note         = {Version 0.1.0}

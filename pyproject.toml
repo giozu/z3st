@@ -1,3 +1,43 @@
 [build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "z3st"
+version = "0.1.0"
+description = "Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis"
+authors = [
+  {name = "Giovanni Zullo", email = "giovanni.zullo@polimi.it"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+# Dependencies (pip-installable only)
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "pyvista>=0.42",
+    "meshio",
+    "pyyaml",
+    "gmsh",
+]
+
+# Optional dependencies for docs
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "myst-parser",
+    "sphinx-autodoc-typehints",
+    "sphinx-book-theme",
+]
+
+# Optional developer tools
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "rich",
+]

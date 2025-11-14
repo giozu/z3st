@@ -1,5 +1,5 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-# Z3ST: A FEniCSx framework for thermo-mechanical analysis
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
@@ -12,7 +12,7 @@ setup(
     packages=find_packages(),
     install_requires=[],
     python_requires=">=3.10",
-    description="Z3ST: A FEniCSx framework for thermo-mechanical analysis",
+    description="Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis",
     author="Giovanni Zullo",
     author_email="giovanni.zullo@polimi.it",
     license="Apache 2.0",
