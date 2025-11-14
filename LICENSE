@@ -20,7 +20,7 @@
 
 -------------------------------------------------------------------------
 
-   Z3ST: A FEniCSx Framework for Thermo-Mechanical Analysis
+   Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
    ---------------------------------------------------------
    Z3ST is an open-source finite element framework for coupled
    thermo-mechanical analysis of multi-material domains.
