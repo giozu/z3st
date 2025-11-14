@@ -29,7 +29,7 @@ To = 500.0                            # K          outer surface temperature
 Lx = Ro - Ri                          # m          wall thickness
 slenderness = Ri / Lx                 # -          slenderness ratio
 z_target, z_tol = 0.0, Lz/20          # m          z-plane for data extraction
-LHR = 5.0e+2                          # linear heat generation (W/m)
+LHR = 5.0e+2                          # linear heat rate (W/m)
 
 TOLERANCE = 7.0e-1                    # -          tolerance for non-regression
 

@@ -78,7 +78,6 @@ class Mesh:
         print("\n--- Verifying facet tags ---")
         unique_tags = np.unique(self.ft.values)
         print(f"Unique tags found in mesh facet data (self.ft): {unique_tags}")
-        # print(f"Interface tags from label_map: fuel_side={self.label_map['face_xx_1_1']}, clad_side={self.label_map['face_xx_0_2']}")
 
         print("Geometry entries:")
         for k in sorted(self.geometry.keys()):
@@ -91,7 +90,6 @@ class Mesh:
 
         self.geometry_type = self.geometry.get("geometry_type", "").lower()
         print(f"  geometry_type = {self.geometry_type}")
-
 
         self.Lz = float(self.geometry.get("Lz", 0.0))
         print(f"  Lz = {self.Lz:.3f} m")
@@ -113,16 +111,16 @@ class Mesh:
             print(f"  outer_radius = {self.outer_radius:.2e} m")
 
         elif self.geometry_type == "cyl-cyl":
-            self.fuel_inner_radius = self.geometry.get("fuel_inner_radius", None)
-            self.fuel_outer_radius = self.geometry.get("fuel_outer_radius", None)
-            self.cladding_inner_radius = self.geometry.get("cladding_inner_radius", None)
-            self.cladding_outer_radius = self.geometry.get("cladding_outer_radius", None)
-            self.perimeter = 2. * np.pi * self.fuel_outer_radius
-            self.area = np.pi * (self.fuel_outer_radius**2 - self.fuel_inner_radius**2)
-            print(f"  fuel_inner_radius = {self.fuel_inner_radius:.2e} m")
-            print(f"  fuel_outer_radius = {self.fuel_outer_radius:.2e} m")
-            print(f"  cladding_inner_radius = {self.cladding_inner_radius:.2e} m")
-            print(f"  cladding_outer_radius = {self.cladding_outer_radius:.2e} m")
+            self.inner_radius_1 = self.geometry.get("inner_radius_1", None)
+            self.outer_radius_1 = self.geometry.get("outer_radius_1", None)
+            self.inner_radius_2 = self.geometry.get("inner_radius_2", None)
+            self.outer_radius_2 = self.geometry.get("outer_radius_2", None)
+            self.perimeter = 2. * np.pi * self.outer_radius_1
+            self.area = np.pi * (self.outer_radius_1**2 - self.inner_radius_1**2)
+            print(f"  inner_radius_1 = {self.inner_radius_1:.2e} m")
+            print(f"  outer_radius_1 = {self.outer_radius_1:.2e} m")
+            print(f"  inner_radius_2 = {self.inner_radius_2:.2e} m")
+            print(f"  outer_radius_2 = {self.outer_radius_2:.2e} m")
 
         elif self.geometry_type == "sphere":
             self.inner_radius = self.geometry.get("Ri", None)
@@ -206,7 +204,7 @@ class Mesh:
     def volume(self, log_path="output/simulation_log.txt"):
 
         # Integration measures the domain
-        for label in ["fuel", "cladding"]:
+        for label in ["cyl_1", "cyl_2"]:
             if label in self.label_map:
                 tag = self.label_map[label]
                 setattr(self, f"dx_{label}", self.dx(tag))
@@ -214,8 +212,8 @@ class Mesh:
 
         # Compute mesh volumes
         volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx))
-        volume_1 = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_fuel))
-        volume_2 = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_cladding))
+        volume_1 = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_1))
+        volume_2 = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * self.dx_2))
         
         with open(log_path, "a") as f:
             f.write("Mesh Volumes\n")

@@ -392,30 +392,33 @@ class Solver:
                     for bc_info in self.robin_thermal[label]:
                         print(f"  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
 
-                        region_id = bc_info["id"] # e.g., fuel_interface
-                        pair_region = bc_info["pair"] # e.g., clad_interface
+                        region_id = bc_info["id"] # e.g., interface 1 --> 2
+                        pair_region = bc_info["pair"] # e.g., interface 1 <-- 2
 
-                        ds_interface = self.ds_tags[region_id]  # e.g., fuel_interface surface
+                        ds_interface = self.ds_tags[region_id]  # e.g., 1 interface surface
 
                         # 1) project
-                        T_other = dolfinx.fem.Function(self.V_t) # e.g., T_clad
-                        dofs_here = self.locateFacetDofs(region_id, self.V_t) # e.g., dofs of fuel_interface
-                        dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t) # e.g., dofs of clad_interface
+                        T_other = dolfinx.fem.Function(self.V_t) # e.g., T_cyl_2
+                        dofs_here = self.locateFacetDofs(region_id, self.V_t) # e.g., dofs of cyl_1_interface
+                        dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t) # e.g., dofs of cyl_2_interface
 
-                        T_other.x.array[dofs_here] = T_i.x.array[dofs_other] # e.g., T_clad projected on fuel_interface dofs
+                        T_other.x.array[dofs_here] = T_i.x.array[dofs_other] # e.g., T_cyl_2 projected on cyl_1_dofs
 
                         # 2) mean
                         # T_other = T_i.x.array[dofs_other].mean()
 
                         # -) bias
-                        # if label == 'fuel':
-                        #     print(f"Biasing cladding temperature")
+                        # if label == 'cyl_1':
+                        #     print(f"Biasing cyl_2 temperature")
                         #     T_other.x.array[dofs_here[:200]] += 500
 
                         a_t += h_gap * u_t * v_t * ds_interface
                         L_t += h_gap * T_other * v_t * ds_interface
 
                         print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
+
+                        # Print heat flux
+                        self.heat_flux(T_i)
 
                 # --- Solve the system ---
                 if self.thermal_options.get("solver") == "linear":
@@ -439,9 +442,6 @@ class Solver:
 
                 # Apply relaxation
                 T_i.x.array[:] = self.relax_T * T_i.x.array + (1 - self.relax_T) * T_old.x.array
-
-                # Print heat flux
-                # self.heat_flux(T_i)
 
             # --. MECHANICAL SUB-PROBLEM --..
             if self.on.get("mechanical", False):

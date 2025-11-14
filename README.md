@@ -66,9 +66,9 @@ Optional flags:
 
 * **Coupled thermo-mechanical solver** — heat conduction and linear elasticity with monolithic or staggered coupling
 * **Multi-material domains** — multiple materials with independent thermal and mechanical properties
-* **Volumetric heating** — arbitrary, spatially dependent internal heat sources (e.g. fission, γ-heating, user-defined functions)
+* **Volumetric heating** — arbitrary, spatially dependent internal heat sources (e.g., γ-heating, user-defined functions)
 * **Flexible boundary conditions** — Dirichlet, Neumann, clamp, and slip BCs defined via YAML configuration files
-* **Material database** — YAML-based definitions (`materials/`) including steels, zircaloys, oxides, and other structural or fuel materials
+* **Material database** — YAML-based definitions (`materials/`) including steels, oxides, and other structural materials
 * **Geometry & mesh input** — accepts Gmsh `.msh` files or Python-generated meshes from YAML geometry descriptors; compatible with any meshing tool
 * **Built-in gap conductance model** — thermal coupling between subdomains via Robin BCs or fixed conductance
 * **YAML-driven configuration** — all parameters, materials, and boundary conditions defined externally for reproducibility

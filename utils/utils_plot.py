@@ -523,7 +523,7 @@ def rescale_axis(ax, scale=1e3, axis="x", unit="mm"):
 def plotter_sigma_temperature_cylinder(
         r_s=None, sigma_rr=None, sigma_tt=None, sigma_zz=None,
         r_T=None, T=None, sigma_th_ref=None, T_ref=None, max_sigma_T=None, 
-        Ti=None, To=None, Ri=None, label_T="Temperature (analytical)",
+        Ti=None, To=None, Ri=0.0, label_T="Temperature (analytical)",
         CASE_DIR=None,
         slenderness=None,
         sigma_rr_ref=None, sigma_tt_ref=None, sigma_zz_ref=None
@@ -549,7 +549,7 @@ def plotter_sigma_temperature_cylinder(
     if sigma_zz_ref is not None:
         ax1.plot(r_s, sigma_zz_ref / 1e6, color="C2", linestyle="-.", label=r"Analytical $\sigma_{zz}$")
 
-    if sigma_th_ref is not None:
+    if sigma_th_ref is not None and r_T is not None:
         ax1.plot(r_T, sigma_th_ref / 1e6, lw=2, linestyle=":", color="red", label=r"$\sigma_{\mathrm{th}}$ (formula)")
     
     ax1.set_xlabel("Thickness (mm)")
@@ -559,8 +559,10 @@ def plotter_sigma_temperature_cylinder(
     ax1.grid(True, linestyle="--", alpha=0.6)
 
     ax2 = ax1.twinx()
-    ax2.plot(r_T, (T_ref - 273.15), lw=2, linestyle="--", color="C4", label=label_T)
-    ax2.scatter(r_T, (T - 273.15), s=18, color="black", marker="o", label="Temperature (numerical)")
+    if r_T is not None:
+        if T_ref is not None:
+            ax2.plot(r_T, (T_ref - 273.15), lw=2, linestyle="--", color="C4", label=label_T)
+        ax2.scatter(r_T, (T - 273.15), s=18, color="black", marker="o", label="Temperature (numerical)")
     ax2.set_ylabel("Temperature (°C)")
 
     lines1, labels1 = ax1.get_legend_handles_labels()

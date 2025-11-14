@@ -23,7 +23,7 @@ def plot_residuals(folder="output"):
     plt.figure(figsize=(8, 6))
 
     for file in csv_files:
-        label = file.split("_")[-1].split(".")[0]  # Extract 'fuel', 'cladding', etc.
+        label = file.split("_")[-1].split(".")[0]
         df = pd.read_csv(file)
         plt.semilogy(df["iteration"], df["residual"], label=label)
 
@@ -41,7 +41,7 @@ def plot_residuals(folder="output"):
     plt.figure(figsize=(8, 6))
 
     for file in csv_files:
-        label = file.split("_")[-1].split(".")[0]  # Extract 'fuel', 'cladding', etc.
+        label = file.split("_")[-1].split(".")[0]
         df = pd.read_csv(file)
         plt.semilogy(df["iteration"], df["residual"], label=label)
 

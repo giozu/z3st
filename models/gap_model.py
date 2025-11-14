@@ -27,8 +27,8 @@ class GapModel:
             gas_thermal_conductivity = self.h_gap_value * 1e-4 * self.gap_temperature**0.79 # (W/m-K)
 
             gap_size = self.average_gap_distance(self.mesh, self.ft,
-                                    label_a=self.label_map["fuel_lateral"],
-                                    label_b=self.label_map["cladding_inner"])
+                                    label_a=self.label_map["lateral_1"],
+                                    label_b=self.label_map["inner_2"])
 
             h_gap_value = gas_thermal_conductivity / gap_size # (W/m2-K)
 
@@ -66,8 +66,8 @@ class GapModel:
 
     def average_gap_distance(self, mesh, ft, label_a, label_b):
 
-        facets_a = ft.find(label_a) # e.g., facets of fuel_interface
-        facets_b = ft.find(label_b) # e.g., facets of clad_interface
+        facets_a = ft.find(label_a) # e.g., facets of cyl_1_interface
+        facets_b = ft.find(label_b) # e.g., facets of cyl_2_interface
 
         x = mesh.geometry.x
         topology = mesh.topology
@@ -96,6 +96,6 @@ class GapModel:
         tree_b = cKDTree(centroids_b)
         distances, _ = tree_b.query(centroids_a, k=1)
 
-        # print(f"Average distance fuel-cladding: {distances.mean()*1e3:.3e} mm")
+        # print(f"Average distance cyl_1 - cyl_2: {distances.mean()*1e3:.3e} mm")
 
         return distances.mean()
