@@ -65,23 +65,29 @@ Optional flags:
 
 ## Using z3stGPT (AI assistant)
 
-Z3ST includes an optional AI assistant, z3stGPT, designed to facilitate exploration, learning and development.
+Z3ST includes an optional AI assistant, **z3stGPT**, designed to facilitate code exploration, onboarding, and framework extension.
 
-Z3stGPT can browse the repository structure, analyze solver modules, materials database, mesh tools and analytical cases, explain workflow logic and design decisions, generate example code snippets, answer domain-specific questions (FEniCSx, linear elasticity, thermal PDEs, YAML materials, etc.), assist in onboarding, documentation and debugging.
+**Access the assistant:**  
+**https://chatgpt.com/g/g-68372061d184819192c6c441e3ea4985-z3stgpt**
 
-### Capabilities:
-* Full repository exploration (read-only)
-* Structured code review
-* Explanation of mathematical formulations and FEM implementation details
-* Step-by-step interpretation of solver routines
-* Example generation and teaching mode
+### What it can do
 
-### Limitations:
-* Cannot modify files
-* Cannot open PRs or push changes
-* Cannot execute the Z3ST codebase or run simulations
+z3stGPT provides **read-only** access to the official repository and can:
 
-z3stGPT provides a safe and accessible way users to understand and extend the Z3ST framework.
+- browse the complete directory structure  
+- perform structured code reviews  
+- explain solver logic, FEM formulations, and workflow architecture  
+- analyze YAML configurations, boundary conditions, and material models  
+- generate example scripts and debugging guidance  
+- assist new users in understanding and extending the Z3ST framework  
+
+### Safety and limitations
+
+- z3stGPT **cannot modify files**, open pull requests, or push changes  
+- all repository interactions are **read-only**  
+- privacy policy: https://giozu.github.io/z3st/privacy.html  
+
+This assistant supports users and contributors in learning and working with the Z3ST framework.
 
 ---
 
