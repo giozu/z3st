@@ -63,6 +63,28 @@ Optional flags:
 
 ---
 
+## Using z3stGPT (AI assistant)
+
+Z3ST includes an optional AI assistant, z3stGPT, designed to facilitate exploration, learning and development.
+
+Z3stGPT can browse the repository structure, analyze solver modules, materials database, mesh tools and analytical cases, explain workflow logic and design decisions, generate example code snippets, answer domain-specific questions (FEniCSx, linear elasticity, thermal PDEs, YAML materials, etc.), assist in onboarding, documentation and debugging.
+
+### Capabilities:
+* Full repository exploration (read-only)
+* Structured code review
+* Explanation of mathematical formulations and FEM implementation details
+* Step-by-step interpretation of solver routines
+* Example generation and teaching mode
+
+### Limitations:
+* Cannot modify files
+* Cannot open PRs or push changes
+* Cannot execute the Z3ST codebase or run simulations
+
+z3stGPT provides a safe and accessible way users to understand and extend the Z3ST framework.
+
+---
+
 ## Key features
 
 * **Coupled thermo-mechanical solver** — heat conduction and linear elasticity with staggered coupling
