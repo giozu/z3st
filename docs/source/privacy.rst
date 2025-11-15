@@ -1,4 +1,5 @@
-# Privacy Policy for z3stGPT
+Privacy Policy for z3stGPT
+==========================
 
 z3stGPT is an AI assistant that provides read-only access to this public GitHub repository "giozu/z3st". 
 It does not collect, store, or process personal data from users.
