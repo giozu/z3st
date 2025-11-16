@@ -120,6 +120,7 @@ class ThermalModel:
         Compute average heat flux (magnitude and x-y-z components) per materials
 
         """
+        
         print("\n--- Average heat flux magnitude per material ---")
         for label, material in self.materials.items():
             tag = self.label_map[label]

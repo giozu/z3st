@@ -8,10 +8,11 @@ import dolfinx
 import yaml
 from mpi4py import MPI
 import numpy as np
-from petsc4py import PETSc
-import ufl
 import importlib
 
+
+from core.mesh import load_mesh
+from core.mesh.manager import MeshManager
 from core.config import Config
 from core.solver import Solver
 from core.finite_element_setup import FiniteElementSetup
@@ -19,20 +20,17 @@ from models.thermal_model import ThermalModel
 from models.mechanical_model import MechanicalModel
 from models.gap_model import GapModel
 
-
 class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
-    """Main Z3ST simulation driver class."""
+    """Main Z3ST simulation driver."""
 
-    def __init__(self, input_file, mesh_file, geometry, rank=0, gdim=3):
-        from core.mesh import load_mesh
-        from core.mesh.manager import MeshManager
+    def __init__(self, input_file, mesh_file, geometry, gdim=3):
 
         # --- Load mesh and topology ---
-        mgr = load_mesh(mesh_file, comm=MPI.COMM_WORLD, gdim=gdim)
-        mgr.summary()
+        mesh, cell_tags, facet_tags = load_mesh(mesh_file, comm=MPI.COMM_WORLD, gdim=gdim)
 
-        # Create MeshManager to restore geometry + tag info
-        self.mgr = MeshManager(mgr.mesh, mgr.cell_tags, mgr.facet_tags, geometry=geometry)
+        # --- Create MeshManager only once ---
+        self.mgr = MeshManager(mesh, cell_tags, facet_tags, geometry=geometry)
+        self.mgr.summary()
 
         # Store references for later use
         self.mesh = self.mgr.mesh

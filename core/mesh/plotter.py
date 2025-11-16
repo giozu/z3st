@@ -10,7 +10,6 @@ import pyvista
 from dolfinx.plot import vtk_mesh
 from core.diagnostic import log
 
-
 class MeshPlotter:
     """Visualize mesh and boundary tags using PyVista."""
 

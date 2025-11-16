@@ -374,7 +374,7 @@ class Solver:
                     L_t += self.q_third * v_t * dx
 
                     # q_third value in the volume "label" / "tag"
-                    dofs = self.locateDomainDofs(self.label_map, label, self.V_t)
+                    dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
                     q_vals = self.q_third.x.array[dofs]
                     print(f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}")
 
@@ -399,8 +399,8 @@ class Solver:
 
                         # 1) project
                         T_other = dolfinx.fem.Function(self.V_t) # e.g., T_cyl_2
-                        dofs_here = self.locateFacetDofs(region_id, self.V_t) # e.g., dofs of cyl_1_interface
-                        dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t) # e.g., dofs of cyl_2_interface
+                        dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t) # e.g., dofs of cyl_1_interface
+                        dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t) # e.g., dofs of cyl_2_interface
 
                         T_other.x.array[dofs_here] = T_i.x.array[dofs_other] # e.g., T_cyl_2 projected on cyl_1_dofs
 
@@ -418,7 +418,7 @@ class Solver:
                         print(f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})")
 
                         # Print heat flux
-                        self.heat_flux(T_i)
+                        # self.heat_flux(T_i)
 
                 # --- Solve the system ---
                 if self.thermal_options.get("solver") == "linear":

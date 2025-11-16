@@ -11,7 +11,6 @@ from dolfinx import fem, mesh
 from mpi4py import MPI
 from core.diagnostic import log
 
-
 class MeshManager:
     """Handles Dolfinx mesh topology, tagging, and geometry utilities."""
 
@@ -61,7 +60,6 @@ class MeshManager:
 
         self._init_geometry_parameters()
 
-    # ----------------------------------------------------------------
     def _init_geometry_parameters(self):
         """Compute derived geometry quantities (area, perimeter, etc.)."""
         g = self.geometry
@@ -105,7 +103,6 @@ class MeshManager:
 
         log.info(f"  area = {self.area:.3e} m², perimeter = {self.perimeter:.3e} m")
 
-    # ----------------------------------------------------------------
     def locate_facets_dofs(self, label: int, V: fem.FunctionSpace):
         """Locate DOFs on facets by label."""
         facets = self.facet_tags.find(label)
@@ -116,7 +113,6 @@ class MeshManager:
         cells = self.cell_tags.find(label)
         return fem.locate_dofs_topological(V, self.tdim, cells)
 
-    # ----------------------------------------------------------------
     def summary(self):
         log.info("=== Mesh summary ===")
         log.info(f"  Topology dim: {self.tdim}")
