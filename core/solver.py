@@ -134,7 +134,7 @@ class Solver:
         # --. VOLUME CONTRIBUTIONS: loop over materials --..
         for label, material in self.materials.items():
             tag = self.label_map[label]
-            dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
+            dx_local = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag)
 
             # Material properties (may be constants or UFL expressions consistent with self.T)
             k = material["k"]
@@ -168,13 +168,13 @@ class Solver:
         # Thermal Neumann BCs (heat flux) — reuse lists from set_thermal_boundary_conditions
         for label in self.materials:
             for bc_info in self.neumann_thermal.get(label, []):
-                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info["id"])
+                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.facet_tags, subdomain_id=bc_info["id"])
                 F -= bc_info["value"] * v_t * ds_local  # outward heat flux term
 
         # Mechanical traction BCs — reuse lists from set_mechanical_boundary_conditions
         for label in self.materials:
             for bc_info in self.traction.get(label, []):
-                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.ft, subdomain_id=bc_info["id"])
+                ds_local = ufl.Measure("ds", domain=self.mesh, subdomain_data=self.facet_tags, subdomain_id=bc_info["id"])
                 # bc_info["value"] is already a traction vector (Constant * n), use directly
                 F -= ufl.dot(bc_info["value"], v_m) * ds_local
 
@@ -183,7 +183,7 @@ class Solver:
 
         # Helper: locate DOFs on a subspace for a given facet region
         def locate_dofs_on_sub(subspace, region_id):
-            facets = self.ft.find(region_id)
+            facets = self.facet_tags.find(region_id)
             return dolfinx.fem.locate_dofs_topological(subspace, self.fdim, facets)
 
         # Thermal Dirichlet BCs reconstructed on W.sub(1)
@@ -222,11 +222,11 @@ class Solver:
                     # Collapse vector subspace (u) to a full FunctionSpace
                     V_u_sub, _ = self.W.sub(0).collapse()
                     # Create constant displacement Function
-                    vec = np.asarray(disp, dtype=dolfinx.default_scalar_type).reshape(self.gdim)
+                    vec = np.asarray(disp, dtype=dolfinx.default_scalar_type).reshape(self.tdim)
                     u_d_fun = dolfinx.fem.Function(V_u_sub, name="u_dirichlet_const")
-                    u_d_fun.interpolate(lambda x, v=vec: np.tile(v.reshape(self.gdim, 1), (1, x.shape[1])))
+                    u_d_fun.interpolate(lambda x, v=vec: np.tile(v.reshape(self.tdim, 1), (1, x.shape[1])))
                     # Locate DOFs mapping mixed space → collapsed space
-                    facets = self.ft.find(region_id)
+                    facets = self.facet_tags.find(region_id)
                     dofs_mixed = dolfinx.fem.locate_dofs_topological((self.W.sub(0), V_u_sub), self.fdim, facets)
                     bcs_mixed.append(dolfinx.fem.dirichletbc(u_d_fun, dofs_mixed, self.W.sub(0)))
 
@@ -291,7 +291,7 @@ class Solver:
             self.T.x.array[:] = T_sol.x.array
 
         print(f"Min/Max temperature: {self.T.x.array.min():.2f} / {self.T.x.array.max():.2f} K")
-        u_vec = self.u.x.array.reshape(-1, self.gdim)
+        u_vec = self.u.x.array.reshape(-1, self.tdim)
         umag = np.linalg.norm(u_vec, axis=1)
         print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")
 
@@ -319,14 +319,14 @@ class Solver:
             bcs_m = [];  [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
 
         self.dx_tags = {tag: ufl.Measure("dx", domain=self.mesh,
-                                        subdomain_data=self.volume_tags,
+                                        subdomain_data=self.cell_tags,
                                         subdomain_id=tag)
-                        for tag in np.unique(self.volume_tags.values)}
+                        for tag in np.unique(self.cell_tags.values)}
 
         self.ds_tags = {id_: ufl.Measure("ds", domain=self.mesh,
-                                        subdomain_data=self.ft,
+                                        subdomain_data=self.facet_tags,
                                         subdomain_id=id_)
-                        for id_ in np.unique(self.ft.values)}
+                        for id_ in np.unique(self.facet_tags.values)}
         
 
         prev_res_T = None
@@ -651,7 +651,7 @@ class Solver:
 
                 if self.on.get("mechanical", False):
                     self.u.x.array[:] = u_i.x.array
-                    u_vec = u_i.x.array.reshape(-1, self.gdim)
+                    u_vec = u_i.x.array.reshape(-1, self.tdim)
                     umag = np.sqrt((u_vec**2).sum(axis=1))
                     print(f"Global min/max displacement magnitude: {umag.min():.2e} / {umag.max():.2e} m")
 

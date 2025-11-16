@@ -70,7 +70,7 @@ class MechanicalModel:
                     print(f"  [ERROR] Region '{region_name}' not found in label_map for mechanical BC.")
                     sys.exit(1)
 
-                facets = self.ft.find(region_id)
+                facets = self.facet_tags.find(region_id)
                 facet_dim = self.fdim
 
                 # --. Dirichlet --..
@@ -160,7 +160,7 @@ class MechanicalModel:
 
                 # --. Clamp (single component-wise blocking) --..
                 elif bc_type == "Clamp_x":
-                    boundary_dofs_x = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(0), self.fdim, self.ft.find(region_id))
+                    boundary_dofs_x = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(0), self.fdim, self.facet_tags.find(region_id))
                     bcx = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_x, V_u_sub.sub(0))
 
                     self.dirichlet_mechanical[mat_type].append(bcx)
@@ -168,7 +168,7 @@ class MechanicalModel:
                     print(f"  [INFO] Clamp_x mechanical BC on '{mat_type}' → Clamp_x at region '{region_name}'")
 
                 elif bc_type == "Clamp_y":
-                    boundary_dofs_y = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(1), self.fdim, self.ft.find(region_id))
+                    boundary_dofs_y = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(1), self.fdim, self.facet_tags.find(region_id))
                     bcy = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(0), boundary_dofs_y, V_u_sub.sub(1))
 
                     self.dirichlet_mechanical[mat_type].append(bcy)
@@ -178,7 +178,7 @@ class MechanicalModel:
                 elif bc_type == "Clamp_z":
                     val = bc_info.get("value", 0.0)
 
-                    boundary_dofs_z = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(2), self.fdim, self.ft.find(region_id))
+                    boundary_dofs_z = dolfinx.fem.locate_dofs_topological(V_u_sub.sub(2), self.fdim, self.facet_tags.find(region_id))
                     bcz = dolfinx.fem.dirichletbc(dolfinx.default_scalar_type(val), boundary_dofs_z, V_u_sub.sub(2))
                     self.dirichlet_mechanical[mat_type].append(bcz)
 

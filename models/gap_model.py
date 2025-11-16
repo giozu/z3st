@@ -26,7 +26,7 @@ class GapModel:
 
             gas_thermal_conductivity = self.h_gap_value * 1e-4 * self.gap_temperature**0.79 # (W/m-K)
 
-            gap_size = self.average_gap_distance(self.mesh, self.ft,
+            gap_size = self.average_gap_distance(self.mesh, self.facet_tags,
                                     label_a=self.label_map["lateral_1"],
                                     label_b=self.label_map["inner_2"])
 

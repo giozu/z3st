@@ -83,7 +83,7 @@ class ThermalModel:
                     T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
 
                     # locate dofs
-                    dofs = dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.ft.find(region_id))
+                    dofs = dolfinx.fem.locate_dofs_topological(V_t, self.fdim, self.facet_tags.find(region_id))
                     bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t)
                     self.dirichlet_thermal[label].append(bc)
 
@@ -125,7 +125,7 @@ class ThermalModel:
             tag = self.label_map[label]
             
             # Measure for integration over the specific material's subdomain
-            dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.volume_tags, subdomain_id=tag)
+            dx = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag)
 
             k = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(material["k"]))
 

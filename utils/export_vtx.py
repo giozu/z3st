@@ -96,7 +96,7 @@ def export_vtx(problem, output_dir="output", filename="fields.vtu",
     # -----------------------------------------------------------------------
     # Derived fields
     # -----------------------------------------------------------------------
-    gdim = problem.gdim
+    gdim = problem.tdim
     mesh = problem.mesh
 
     V_tensor_cells = dolfinx.fem.functionspace(mesh, ("DG", 0, (gdim, gdim)))
@@ -110,13 +110,13 @@ def export_vtx(problem, output_dir="output", filename="fields.vtu",
     fields.append(strain_cells)
 
     # Material-wise quantities
-    volume_tags = getattr(problem, "volume_tags", None)
-    if volume_tags is None:
-        raise AttributeError("No cell tag field found (expected 'volume_tags').")
+    cell_tags = getattr(problem, "cell_tags", None)
+    if cell_tags is None:
+        raise AttributeError("No cell tag field found (expected 'cell_tags').")
 
     for name, mat in problem.materials.items():
         tag = problem.label_map[name]
-        cells = volume_tags.find(tag)
+        cells = cell_tags.find(tag)
 
         # Stress (DG-0)
         stress_expr = problem.stress[name]

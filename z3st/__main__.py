@@ -52,9 +52,13 @@ if __name__ == "__main__":
 
     # --. Problem setup --..
     problem = Spine(input_file=input_file, mesh_file=input_file["mesh_path"], geometry=geometry)
-    problem.debug_mode = DEBUG_MODE
-    problem.mesh_plot_mode = MESH_PLOT_MODE
-    problem._mesh_plot(MESH_PLOT_MODE)
+
+    if MESH_PLOT_MODE:
+        from core.mesh.plotter import MeshPlotter
+        label_map = getattr(problem, "label_map", {})
+        plotter = MeshPlotter(problem.mesh, problem.facet_tags, label_map)
+        plotter.show()
+
     problem.load_materials(**loaded_materials)
 
     # --. History --..

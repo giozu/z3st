@@ -11,7 +11,17 @@ import ufl
 import scipy.sparse
 import scipy.sparse.linalg as sla
 from petsc4py import PETSc
+import logging
 
+# Create a global logger instance for the entire framework
+log = logging.getLogger("z3st")
+log.setLevel(logging.INFO)
+
+if not log.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("[%(levelname)s] %(message)s")
+    handler.setFormatter(formatter)
+    log.addHandler(handler)
 
 # --. Assembly + analysis utilities --..
 def assemble_and_analyze_matrix(a, L=None, bcs=None, title="Matrix", max_dense_size=5000, tol=1e-5):
@@ -166,7 +176,7 @@ def check_mechanical_constraints(problem, max_dense_size=5000, eig_check=False, 
     a_form = 0
     for label, mat in problem.materials.items():
         tag = problem.label_map[label]
-        dx = ufl.Measure("dx", domain=problem.mesh, subdomain_data=problem.volume_tags, subdomain_id=tag)
+        dx = ufl.Measure("dx", domain=problem.mesh, subdomain_data=problem.cell_tags, subdomain_id=tag)
         a_form += ufl.inner(problem.sigma_mech(u, mat), problem.epsilon(v)) * dx
 
     # Collect Dirichlet BCs
