@@ -25,14 +25,14 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
 
     def __init__(self, input_file, mesh_file, geometry, gdim=3):
 
-        # --- Load mesh and topology ---
+        # --. Load mesh and topology --..
         mesh, cell_tags, facet_tags = load_mesh(mesh_file, comm=MPI.COMM_WORLD, gdim=gdim)
 
-        # --- Create MeshManager only once ---
+        # --. Create MeshManager --..
         self.mgr = MeshManager(mesh, cell_tags, facet_tags, geometry=geometry)
         self.mgr.summary()
 
-        # Store references for later use
+        # Store references
         self.mesh = self.mgr.mesh
         self.cell_tags = self.mgr.cell_tags
         self.facet_tags = self.mgr.facet_tags
@@ -54,7 +54,6 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         MechanicalModel.__init__(self)
         GapModel.__init__(self)
 
-    # ------------------------------------------------------------
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
         self.lhr = lhr
@@ -64,7 +63,6 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         mod = importlib.import_module(module_path)
         return getattr(mod, func_name)
 
-    # ------------------------------------------------------------
     def load_materials(self, **materials):
         print("[LOADING MATERIALS]")
         self.materials = {}
@@ -102,7 +100,6 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
                 v = mat[k]
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
 
-    # ------------------------------------------------------------
     def set_boundary_conditions(self):
         print(f"[SETTING BOUNDARY CONDITIONS]")
 
@@ -121,7 +118,6 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
             self.set_thermal_boundary_conditions(V_t_sub, V_t_map)
             self.set_mechanical_boundary_conditions(V_u_sub, V_u_map)
 
-    # ------------------------------------------------------------
     def initialize_fields(self):
         print(f"[INITIALIZING FIELDS]")
 
@@ -175,7 +171,6 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
                 mat["k"] = k_func(self.T)
                 print("\nk expression for", name, "→", mat["k"])
 
-    # ------------------------------------------------------------
     def set_power(self):
         print(f"[UPDATING q_third]")
         self.q_third.x.array[:] = 0.0
@@ -210,7 +205,6 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
 
         self.q_third.x.scatter_forward()
 
-    # ------------------------------------------------------------
     def solve(self, max_iters=100):
         print("\nSolver settings:")
         print(f"  → Coupling : {self.coupling}")
@@ -228,7 +222,6 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         else:
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")
 
-    # ------------------------------------------------------------
     def get_results(self):
         print("Computing symbolic result fields (strain, stress, ...)")
         self.stress = {}

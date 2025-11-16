@@ -20,18 +20,24 @@ class MeshPlotter:
 
     def show(self):
         log.info("Rendering mesh with PyVista...")
-        topology, cell_types, geometry = vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
-        surface = pyvista.UnstructuredGrid(topology, cell_types, geometry)
+
+        topology, cell_types, _ = vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
+        surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
 
         unique_tags = np.unique(self.facet_tags.values)
-        cmap = cm.get_cmap("tab10", len(unique_tags))
-        label_names = list(self.label_map.keys())
+        print("[INFO] Face labels present:", unique_tags)
+
+        colors = cm.get_cmap("tab10", len(unique_tags))
+        label_map = {}
+        for i, tag in enumerate(unique_tags):
+            label_name = list(self.label_map.keys())[list(self.label_map.values()).index(tag)]
+            label_map[tag] = (label_name, colors(i)[:3])
 
         plotter = pyvista.Plotter()
-        for i, tag in enumerate(unique_tags):
-            name = label_names[i] if i < len(label_names) else f"Tag {tag}"
-            faces = surface.extract_cells(np.where(self.facet_tags.values == tag)[0])
-            plotter.add_mesh(faces, color=cmap(i)[:3], show_edges=True, label=name)
+        for tag, (name, color) in label_map.items():
+            facets = self.facet_tags.find(tag)
+            cells = surface.extract_cells(facets)
+            plotter.add_mesh(cells, color=color, show_edges=True, label=name)
 
         plotter.add_legend()
         plotter.show()
