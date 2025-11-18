@@ -20,7 +20,7 @@ class MeshManager:
         self.facet_tags = facet_tags
         self.geometry = geometry or {}
 
-        # --- Basic topology ---
+        # --. Basic topology --..
         self.tdim = self.mesh.topology.dim
         self.fdim = self.tdim - 1
         log.info(f"Mesh topology dimension d={self.tdim}")
@@ -29,22 +29,22 @@ class MeshManager:
         self.mesh.topology.create_connectivity(self.fdim, self.tdim)
         self.mesh.topology.create_connectivity(self.tdim, self.tdim)
 
-        # --- Boundary facets ---
+        # --.. Boundary facets --..
         self.boundary_facets = dolfinx.mesh.exterior_facet_indices(self.mesh.topology)
         log.debug(f"Boundary facets: {len(self.boundary_facets)}")
 
-        # --- Volume tags ---
+        # --. Volume tags --..
         log.info("\nAvailable volume tags (dx):")
         tag_values = self.cell_tags.values
         unique_tags = sorted(set(tag_values))
         for tag in unique_tags:
             log.info(f"  Tag ID: {tag}")
 
-        # --- Facet tags ---
+        # --. Facet tags --..
         unique_facets = np.unique(self.facet_tags.values)
         log.info(f"\nUnique tags found in facet data: {unique_facets}")
 
-        # --- Label map ---
+        # --. Label map --..
         self.label_map = self.geometry.get("labels", {})
         if self.label_map:
             log.info(f"Label map loaded from geometry:")
@@ -54,7 +54,7 @@ class MeshManager:
             log.warning("No label map found in geometry; defaulting to empty dict.")
             self.label_map = {}
 
-        # --- Geometry attributes ---
+        # --. Geometry attributes ----
         self.geometry_type = self.geometry.get("geometry_type", "").lower()
         self.normal = ufl.FacetNormal(self.mesh)
 

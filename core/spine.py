@@ -10,7 +10,6 @@ from mpi4py import MPI
 import numpy as np
 import importlib
 
-
 from core.mesh import load_mesh
 from core.mesh.manager import MeshManager
 from core.config import Config
@@ -25,10 +24,8 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
 
     def __init__(self, input_file, mesh_file, geometry, gdim=3):
 
-        # --. Load mesh and topology --..
         mesh, cell_tags, facet_tags = load_mesh(mesh_file, comm=MPI.COMM_WORLD, gdim=gdim)
 
-        # --. Create MeshManager --..
         self.mgr = MeshManager(mesh, cell_tags, facet_tags, geometry=geometry)
         self.mgr.summary()
 
