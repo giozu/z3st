@@ -510,7 +510,7 @@ class Solver:
                     if not hasattr(self, "_mech_diagnostic_done"):
                         print("[DEBUG] Mechanical diagnostic enabled (mechanical.debug=True)")
                         try:
-                            from core.diagnostic import (
+                            from z3st.core.diagnostic import (
                                 debug_dirichlet_mechanical,
                                 check_fixed_dofs,
                                 check_mechanical_constraints,

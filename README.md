@@ -63,6 +63,24 @@ Optional flags:
 
 ---
 
+# Simulation Cases
+
+This directory contains example simulation setups (*cases*) used for verification, validation,
+and demonstration of the Z3ST thermo-mechanical solver.
+
+Each subfolder is a simulation case, including:
+- YAML input configuration (`input.yaml`)
+- Geometry and meshing definitions (`geometry.yaml`, `mesh.geo`)
+- Boundary conditions (`boundary_conditions.yaml`)
+- A non-regression test script (`non-regression.py`)
+- Reference results in `output/non-regression_gold.json`
+
+These cases serve both as:
+- regression tests,
+- and examples for new users.
+
+---
+
 ## Using z3stGPT (AI assistant)
 
 Z3ST includes an optional AI assistant, **z3stGPT**, designed to facilitate code exploration, onboarding, and framework extension.

@@ -7,22 +7,17 @@
 # --. Python modules --..
 import dolfinx
 import yaml
-from mpi4py import MPI
 import numpy as np
-import os
-from petsc4py import PETSc
-import ufl
-import sys
 import importlib
 
 # --. Z3ST modules --..
-from core.config import Config
-from core.mesh import Mesh
-from core.solver import Solver
-from core.finite_element_setup import FiniteElementSetup
-from models.thermal_model import ThermalModel
-from models.mechanical_model import MechanicalModel
-from models.gap_model import GapModel
+from z3st.core.config import Config
+from z3st.core.mesh import Mesh
+from z3st.core.solver import Solver
+from z3st.core.finite_element_setup import FiniteElementSetup
+from z3st.models.thermal_model import ThermalModel
+from z3st.models.mechanical_model import MechanicalModel
+from z3st.models.gap_model import GapModel
 
 class Spine(Config, Mesh, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
 

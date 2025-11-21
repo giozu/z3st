@@ -11,9 +11,9 @@ non-regression script
 import os
 import numpy as np
 
-from utils.utils_extract_vtu import *
-from utils.utils_verification import *
-from utils.utils_plot import plot_field_along_x
+from z3st.utils.utils_extract_vtu import *
+from z3st.utils.utils_verification import *
+from z3st.utils.utils_plot import plot_field_along_x
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
