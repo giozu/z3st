@@ -12,9 +12,9 @@ Analytical solution for radial temperature in a cylinder with uniform volumetric
 import os
 import numpy as np
 
-from utils.utils_extract_vtu import *
-from utils.utils_verification import *
-from utils.utils_plot import plotter_sigma_temperature_cylinder, plotter_sigma_cylinder
+from z3st.utils.utils_extract_vtu import *
+from z3st.utils.utils_verification import *
+from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder, plotter_sigma_cylinder
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
