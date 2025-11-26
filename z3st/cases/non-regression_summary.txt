@@ -1,0 +1,8 @@
+Z3ST non-regression summary - Wed Nov 26 17:54:33 CET 2025
+--.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
+
+Case: 1_thin_thermal_slab
+  Run             : OK
+  Non-regression  : PASS
+  Time            : 108s
+

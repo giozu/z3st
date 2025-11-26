@@ -6,13 +6,26 @@ Version: 0.1.0 (2025)
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 
-import importlib, sys
-from pathlib import Path
+from importlib import metadata
 
-_pkg_root = Path(__file__).resolve().parent.parent
-for _name in ("core", "models", "materials", "utils"):
-    sys.path.insert(0, str(_pkg_root / _name))
-    globals()[_name] = importlib.import_module(_name)
+try:
+    __version__ = metadata.version("z3st")
+except metadata.PackageNotFoundError:
+    __version__ = "0.1.0"
 
-__all__ = ["core", "models", "materials", "utils"]
-__version__ = "0.1.0"
+from .core import solver
+from .models import mechanical_model, thermal_model, gap_model
+from .utils import export_vtu, plot_convergence
+
+__all__ = [
+    "solver",
+    "thermal_model",
+    "mechanical_model",
+    "gap_model",
+    "export_vtu",
+    "plot_convergence",
+]
+
+Solver = solver.Solver
+Thermal = thermal_model.ThermalModel
+Mechanical = mechanical_model.MechanicalModel
