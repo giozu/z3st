@@ -47,6 +47,12 @@ The Z3ST repository also includes verification (non-regression) cases to ensure 
 
 Lastly, Z3ST is intended for students, researchers, and engineers who need a flexible, scriptable computation tool that reduces the barrier of entry for complex multi-physics analysis compared to writing raw FEniCSx scripts, while retaining the full customisation capabilities required for advanced scientific investigation. Future development is focused on interoperability with other scientific tools, including open-source microstructure generators [@merope2019] and rate-theory solvers [@Zullo2023Sciantix], to establish Z3ST as a central orchestrator in mesoscale simulation workflows.
 
+## Software availability
+
+The version of Z3ST corresponding to this submission is available on Zenodo:
+[https://doi.org/10.5281/zenodo.17748028](https://doi.org/10.5281/zenodo.17748028)
+
+
 # Acknowledgements
 
 The authors acknowledge the open-source communities of FEniCSx, PETSc, Basix, and Gmsh for providing the numerical foundations that make Z3ST possible.  
