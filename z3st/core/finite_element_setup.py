@@ -7,10 +7,10 @@
 
 import ufl
 import dolfinx
-import dolfinx.fem.petsc
-from mpi4py import MPI
-from petsc4py import PETSc
 import basix
+# import dolfinx.fem.petsc
+# from mpi4py import MPI
+# from petsc4py import PETSc
 
 class FiniteElementSetup:
     def __init__(self):
