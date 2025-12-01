@@ -35,8 +35,6 @@ Z3ST is an open-source Python framework built upon the FEniCSx finite element ec
 
 The core strength of Z3ST is its extensible architecture for material modelling. Material properties, correlations, and nonlinear constitutive laws are defined externally through YAML or user-defined Python scripts, allowing advanced users to implement complex, physics-based relations (e.g., temperature-dependent properties, neural-network surrogates, or custom correlations) without modifying the core source code. Z3ST integrates natively with Gmsh [@gmsh2009] for tagged multi-material mesh definition and features built-in models for volumetric heat generation and Robin-type gap conductance, crucial for layered components.
 
-The framework also includes a read-only GPT assistant which provides interactive code exploration and documentation support directly from the public repository.
-
 # Statement of need
 
 Coupled thermo-mechanical simulations are vital for modern materials research, spanning nuclear fuel performance, high-temperature structural components, and composite materials. While commercial software (e.g., Abaqus, ANSYS, COMSOL) can solve these physics, they lack transparency, limit automation, and restrict interfaces for customised material laws. Other open-source multiphysics frameworks such as MOOSE [@moose2020] provide extensive simulation capabilities but are not coded for Python or FEM workflows built directly on FEniCSx. Conversely, raw open-source FEM libraries like FEniCSx offer mathematical control but require significant effort to implement the non-trivial workflow orchestration required for realistic engineering problems. This includes handling complex geometries, managing multi-field boundary conditions, and implementing robust multi-physics coupling schemes.
@@ -49,7 +47,11 @@ The Z3ST repository also includes verification (non-regression) cases to ensure 
 
 Lastly, Z3ST is intended for students, researchers, and engineers who need a flexible, scriptable computation tool that reduces the barrier of entry for complex multi-physics analysis compared to writing raw FEniCSx scripts, while retaining the full customisation capabilities required for advanced scientific investigation. Future development is focused on interoperability with other scientific tools, including open-source microstructure generators [@merope2019] and rate-theory solvers [@Zullo2023Sciantix], to establish Z3ST as a central orchestrator in mesoscale simulation workflows.
 
-In addition, the project includes an AI assistant (z3stGPT) that interfaces in read-only mode with the public repository to provide interactive assistance. This read-only integration preserves the integrity of the code while enhancing accessibility for users.
+## Software availability
+
+The version of Z3ST corresponding to this submission is available on Zenodo:
+[https://doi.org/10.5281/zenodo.17748028](https://doi.org/10.5281/zenodo.17748028)
+
 
 # Acknowledgements
 

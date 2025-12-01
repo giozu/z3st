@@ -22,9 +22,9 @@ conditions.
 import time, sys, yaml, os
 
 # --. Z3ST modules --..  
-from core.spine import Spine
-from utils.export_vtu import export_vtu
-from utils.utils_load import load, generate_power_history
+from z3st.core.spine import Spine
+from z3st.utils.export_vtu import export_vtu
+from z3st.utils.utils_load import load, generate_power_history
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 

@@ -1,4 +1,8 @@
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+[![DOI](https://zenodo.org/badge/648784453.svg)](https://doi.org/10.5281/zenodo.17748028)
+![CI](https://github.com/giozu/z3st/actions/workflows/ci.yml/badge.svg)
+![static](https://github.com/giozu/z3st/actions/workflows/static.yml/badge.svg)
+![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg)
 
 **Z3ST** is an open-source finite-element framework for thermo-mechanical material analysis.
 Developed in **Python**, it leverages **FEniCSx** and provides a modular environment to couple heat conduction and linear elasticity in multi-material domains under stationary or transient conditions, with user-defined boundary conditions.
@@ -63,31 +67,21 @@ Optional flags:
 
 ---
 
-## Using z3stGPT (AI assistant)
+# Simulation Cases
 
-Z3ST includes an optional AI assistant, **z3stGPT**, designed to facilitate code exploration, onboarding, and framework extension.
+This directory contains example simulation setups (*cases*) used for verification, validation,
+and demonstration of the Z3ST thermo-mechanical solver.
 
-**Access the assistant:**  
-**https://chatgpt.com/g/g-68372061d184819192c6c441e3ea4985-z3stgpt**
+Each subfolder is a simulation case, including:
+- YAML input configuration (`input.yaml`)
+- Geometry and meshing definitions (`geometry.yaml`, `mesh.geo`)
+- Boundary conditions (`boundary_conditions.yaml`)
+- A non-regression test script (`non-regression.py`)
+- Reference results in `output/non-regression_gold.json`
 
-### What it can do
-
-z3stGPT provides **read-only** access to the official repository and can:
-
-- browse the complete directory structure  
-- perform structured code reviews  
-- explain solver logic, FEM formulations, and workflow architecture  
-- analyze YAML configurations, boundary conditions, and material models  
-- generate example scripts and debugging guidance  
-- assist new users in understanding and extending the Z3ST framework  
-
-### Safety and limitations
-
-- z3stGPT **cannot modify files**, open pull requests, or push changes  
-- all repository interactions are **read-only**  
-- privacy policy: https://giozu.github.io/z3st/privacy.html  
-
-This assistant supports users and contributors in learning and working with the Z3ST framework.
+These cases serve both as:
+- regression tests,
+- and examples for new users.
 
 ---
 

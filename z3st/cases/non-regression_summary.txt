@@ -1,0 +1,13 @@
+Z3ST non-regression summary - Mon Dec  1 18:03:21 CET 2025
+--.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
+
+Case: 1_thin_thermal_slab
+  Run             : OK
+  Non-regression  : (no non-regression.json found)
+  Time            : 11s
+
+Case: 2_thin_cylindrical_thermal_shield
+  Run             : OK
+  Non-regression  : (no non-regression.json found)
+  Time            : 8s
+
