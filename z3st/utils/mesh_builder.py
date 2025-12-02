@@ -78,7 +78,7 @@ class MeshBuilder:
         print("Element types in 3D volume:", types)
 
         mesh_data = dolfinx.io.gmsh.model_to_mesh(gmsh.model, self.comm, 0, gdim=3)
-        self.mesh, self.volume_tags, self.ft =  mesh_data.mesh, mesh_data.cell_tags, mesh_data.facet_tags   
+        self.mesh, self.cell_tags, self.facet_tags =  mesh_data.mesh, mesh_data.cell_tags, mesh_data.facet_tags   
 
         return self.mesh, self.cell_tags, self.facet_tags
 

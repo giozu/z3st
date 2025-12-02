@@ -211,7 +211,7 @@ def plot1d_stress(problem, y_target=0.25, z_target=0.25, tol=1e-5):
     
     x, y, z = cell_centers[:, 0], cell_centers[:, 1], cell_centers[:, 2]
 
-    V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.gdim, problem.gdim)))
+    V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.tdim, problem.tdim)))
 
     cell_tags = problem.tags.values
     for name in problem.stress.keys():
@@ -484,8 +484,8 @@ def export_xdmf(problem, output_dir="output"):
     mesh = problem.mesh
     V_u = problem.V_m
     V_T = problem.V_t
-    V_tensor = dolfinx.fem.functionspace(mesh, ("DG", 0, (problem.gdim, problem.gdim)))  # Tensor field
-    V_eps = dolfinx.fem.functionspace(mesh, ("DG", 0, (problem.gdim, problem.gdim)))
+    V_tensor = dolfinx.fem.functionspace(mesh, ("DG", 0, (problem.tdim, problem.tdim)))  # Tensor field
+    V_eps = dolfinx.fem.functionspace(mesh, ("DG", 0, (problem.tdim, problem.tdim)))
 
     # Export displacement
     disp_file = os.path.join(output_dir, "displacement.xdmf")
