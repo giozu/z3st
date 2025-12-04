@@ -41,7 +41,6 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.ifconfig",
     "sphinx.ext.imgmath",
-
     # Type hints and doc improvements
     "sphinx_autodoc_typehints",
     "myst_parser",  # enables Markdown support
@@ -128,11 +127,11 @@ math_eqref_format = "Eq.{number}"
 # ============================================================================
 
 myst_enable_extensions = [
-    "colon_fence",        # for ::: fenced blocks
-    "deflist",            # for definition lists
-    "html_admonition",    # for notes, warnings, etc.
-    "html_image",         # for Markdown images
-    "substitution",       # for variable substitution
+    "colon_fence",  # for ::: fenced blocks
+    "deflist",  # for definition lists
+    "html_admonition",  # for notes, warnings, etc.
+    "html_image",  # for Markdown images
+    "substitution",  # for variable substitution
     "replacements",
 ]
 myst_heading_anchors = 3  # automatic anchors up to H3

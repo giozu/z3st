@@ -3,17 +3,17 @@ thermal_bcs:
     - type: Dirichlet
       region: inner
       temperature: 494.0
-      
+
     - type: Dirichlet
       region: outer
       temperature: 491.0
-      
+
 mechanical_bcs:
   mat0:
     - type: Neumann
       region: inner
       traction: 0.0
-    
+
     - type: Dirichlet
       region: outer
       displacement: [0.0, 0.0, 0.0]

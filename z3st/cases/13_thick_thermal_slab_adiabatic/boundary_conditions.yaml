@@ -6,7 +6,7 @@ thermal_bcs:
 
 mechanical_bcs:
   steel:
-    - type: Clamp_x 
+    - type: Clamp_x
       region: xmin
 
     - type: Clamp_y

@@ -19,6 +19,7 @@ saves the resulting figure as 'convergence.png'.
 
 import re
 import sys
+
 import matplotlib.pyplot as plt
 
 
@@ -37,7 +38,7 @@ def parse_convergence_log(logfile: str = "log.z3st"):
         r"--- Staggering iteration\s+(\d+)/\d+\s+---"
         r"(?:.*?\|\|ΔT\|\|\s*/\s*\|\|T\|\|\s*=\s*([0-9.eE+-]+))?"
         r"(?:.*?\|\|Δu\|\|\s*/\s*\|\|u\|\|\s*=\s*([0-9.eE+-]+))?",
-        re.DOTALL
+        re.DOTALL,
     )
 
     iterations, dT_values, du_values = [], [], []
@@ -67,6 +68,7 @@ def plot_convergence(iterations, dT_values, du_values, save_path="convergence.pn
         plt.semilogy(iterations, dT_values, "s--", label=r"residuals(T)")
 
     import yaml
+
     if os.path.exists("input.yaml"):
         config = yaml.safe_load(open("input.yaml"))
         mech_cfg = config.get("mechanical", {})
@@ -75,8 +77,8 @@ def plot_convergence(iterations, dT_values, du_values, save_path="convergence.pn
         stag_tol_u = float(mech_cfg.get("stag_tol", 1e-8))
         stag_tol_T = float(th_cfg.get("stag_tol", 1e-8))
 
-        plt.axhline(stag_tol_u, lw=0.8, color='black', linestyle="-", label="tol u")
-        plt.axhline(stag_tol_T, lw=0.8, color='black', linestyle="-.", label="tol T")
+        plt.axhline(stag_tol_u, lw=0.8, color="black", linestyle="-", label="tol u")
+        plt.axhline(stag_tol_T, lw=0.8, color="black", linestyle="-.", label="tol T")
 
     plt.xlabel("Staggering iteration")
     plt.ylabel("Relative change (log scale)")
@@ -103,4 +105,5 @@ def main():
 
 if __name__ == "__main__":
     import os
+
     main()

@@ -55,6 +55,6 @@ The version of Z3ST corresponding to this submission is available on Zenodo:
 
 # Acknowledgements
 
-The authors acknowledge the open-source communities of FEniCSx, PETSc, Basix, and Gmsh for providing the numerical foundations that make Z3ST possible.  
+The authors acknowledge the open-source communities of FEniCSx, PETSc, Basix, and Gmsh for providing the numerical foundations that make Z3ST possible.
 
 # References

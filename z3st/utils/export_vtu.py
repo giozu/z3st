@@ -4,10 +4,13 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-import pyvista
-import dolfinx, ufl
-import numpy as np
 import os
+
+import dolfinx
+import numpy as np
+import pyvista
+import ufl
+
 
 def _von_mises(sig):
     """
@@ -31,11 +34,12 @@ def _von_mises(sig):
         s_yz, s_zx = sig[:, 1, 2], sig[:, 2, 0]
         vm = np.sqrt(
             0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
-            + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
+            + 3.0 * (s_xy**2 + s_yz**2 + s_zx**2)
         )
     else:  # 2D (plane strain/stress tensor)
-        vm = np.sqrt((s_xx - s_yy) ** 2 + 3.0 * (s_xy ** 2))
+        vm = np.sqrt((s_xx - s_yy) ** 2 + 3.0 * (s_xy**2))
     return vm
+
 
 def _hydrostatic_pressure(sig):
     """
@@ -53,6 +57,7 @@ def _hydrostatic_pressure(sig):
     gdim = sig.shape[1]
     tr = sig[:, 0, 0] + sig[:, 1, 1] + (sig[:, 2, 2] if gdim == 3 else 0.0)
     return tr / float(gdim)
+
 
 def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     """
@@ -92,25 +97,33 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
                 cells = cell_tags.find(tag)
                 material_ids[cells] = tag
             except RuntimeError:
-                print(f"[Warning] Tag '{tag}' for material '{name}' not found in mesh volume tags. Skipping.")
+                print(
+                    f"[Warning] Tag '{tag}' for material '{name}' not found in mesh volume tags. Skipping."
+                )
     grid.cell_data["MaterialID"] = material_ids
 
     # --- Function spaces for exporting tensors/vectors ---
     V_vector_cells = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.tdim,)))
-    V_tensor_cells = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.tdim, problem.tdim)))
-    V_scalar_cells  = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
-    V_tensor_points = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1, (problem.tdim, problem.tdim)))
+    V_tensor_cells = dolfinx.fem.functionspace(
+        problem.mesh, ("DG", 0, (problem.tdim, problem.tdim))
+    )
+    V_scalar_cells = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
+    V_tensor_points = dolfinx.fem.functionspace(
+        problem.mesh, ("Lagrange", 1, (problem.tdim, problem.tdim))
+    )
     V_scalar_points = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1))
 
     # --- Strain (global) ---
     strain_symbolic = problem.strain
     # cells
     strain_numeric = interpolate_expression(strain_symbolic, V_tensor_cells)
-    grid.cell_data["Strain (cells)"] = strain_numeric.x.array.reshape(-1, problem.tdim * problem.tdim)
+    grid.cell_data["Strain (cells)"] = strain_numeric.x.array.reshape(
+        -1, problem.tdim * problem.tdim
+    )
     # points
     strain_numeric = interpolate_expression(strain_symbolic, V_tensor_points)
     strain_array = strain_numeric.x.array.reshape((n_points, problem.tdim, problem.tdim))
-    grid.point_data["Strain (points)"] = strain_array.reshape(n_points, problem.tdim*problem.tdim)
+    grid.point_data["Strain (points)"] = strain_array.reshape(n_points, problem.tdim * problem.tdim)
 
     # --- Per-material on CELLS: stress + Von Mises + principals + hydrostatic + heat flux ---
     stress_total_cells = dolfinx.fem.Function(V_tensor_cells)
@@ -124,12 +137,16 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
 
         # Stress (cells) - numeric per-material field for diagnostics/plots
         stress_symbolic = problem.stress[name]
-        stress_expr = dolfinx.fem.Expression(stress_symbolic, V_tensor_cells.element.interpolation_points)
+        stress_expr = dolfinx.fem.Expression(
+            stress_symbolic, V_tensor_cells.element.interpolation_points
+        )
         stress_total_cells.interpolate(stress_expr, material_cells)
 
         stress_numeric = interpolate_expression(stress_symbolic, V_tensor_cells)
         stress_cells = stress_numeric.x.array.reshape(-1, problem.tdim, problem.tdim)
-        grid.cell_data[f"Stress_{name} (cells)"] = stress_cells.reshape(-1, problem.tdim * problem.tdim)
+        grid.cell_data[f"Stress_{name} (cells)"] = stress_cells.reshape(
+            -1, problem.tdim * problem.tdim
+        )
 
         # Von Mises (cells)
         vm_cells = _von_mises(stress_cells)
@@ -155,7 +172,9 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         material_cells = cell_tags.find(tag)
 
         stress_symbolic = problem.stress[name]
-        stress_expr = dolfinx.fem.Expression(stress_symbolic, V_tensor_points.element.interpolation_points)
+        stress_expr = dolfinx.fem.Expression(
+            stress_symbolic, V_tensor_points.element.interpolation_points
+        )
         stress_total_points.interpolate(stress_expr, material_cells)
 
         stress_numeric = interpolate_expression(stress_symbolic, V_tensor_points)
@@ -171,14 +190,18 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         grid.point_data[f"Hydrostatic_{name} (points)"] = p_points
 
         # Strain energy density (points)
-        psi_expr_pts = dolfinx.fem.Expression(problem.energy_density[name], V_scalar_points.element.interpolation_points)
+        psi_expr_pts = dolfinx.fem.Expression(
+            problem.energy_density[name], V_scalar_points.element.interpolation_points
+        )
         psi_fun_pts = dolfinx.fem.Function(V_scalar_points)
         psi_fun_pts.x.array[:] = 0.0
         psi_fun_pts.interpolate(psi_expr_pts, material_cells)
         grid.point_data[f"StrainEnergyDensity_{name} (points)"] = psi_fun_pts.x.array.copy()
 
         # Strain energy density (cells, DG0)
-        psi_expr_cells = dolfinx.fem.Expression(problem.energy_density[name], V_scalar_cells.element.interpolation_points)
+        psi_expr_cells = dolfinx.fem.Expression(
+            problem.energy_density[name], V_scalar_cells.element.interpolation_points
+        )
         psi_fun_cells = dolfinx.fem.Function(V_scalar_cells)
         psi_fun_cells.x.array[:] = 0.0
         psi_fun_cells.interpolate(psi_expr_cells, material_cells)
@@ -188,6 +211,7 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     filepath = os.path.join(output_dir, filename)
     grid.save(filepath)
     print(f"VTU file exported to: {filepath}")
+
 
 def interpolate_expression(symbolic_function, V):
     expression = dolfinx.fem.Expression(symbolic_function, V.element.interpolation_points)

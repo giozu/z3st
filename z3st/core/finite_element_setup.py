@@ -5,12 +5,14 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
-import ufl
-import dolfinx
 import basix
+import dolfinx
+import ufl
+
 # import dolfinx.fem.petsc
 # from mpi4py import MPI
 # from petsc4py import PETSc
+
 
 class FiniteElementSetup:
     def __init__(self):
@@ -24,10 +26,16 @@ class FiniteElementSetup:
         """
 
         # --. Separate function space --..
-        self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))  # scalar function space (temperature)
-        self.V_m = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (self.mesh.topology.dim,)))  # vector function space (displacement)
-        self.Q   = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
-        self.V_pf = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1)) # P1 scalar space for s (phase-field variable)
+        self.V_t = dolfinx.fem.functionspace(
+            self.mesh, ("Lagrange", 1)
+        )  # scalar function space (temperature)
+        self.V_m = dolfinx.fem.functionspace(
+            self.mesh, ("Lagrange", 1, (self.mesh.topology.dim,))
+        )  # vector function space (displacement)
+        self.Q = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
+        self.V_pf = dolfinx.fem.functionspace(
+            self.mesh, ("Lagrange", 1)
+        )  # P1 scalar space for s (phase-field variable)
 
         # print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
         # print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
@@ -44,7 +52,7 @@ class FiniteElementSetup:
         P1_1 = self.V_t.ufl_element()
 
         self.W = dolfinx.fem.functionspace(self.mesh, basix.ufl.mixed_element([P1_3, P1_1]))
-        
+
         # The following line is currently not used, self.W is used instead
         # self.V_m_mixed, self.V_t_mixed = dolfinx.fem.functionspace(self.mesh, P1_3), dolfinx.fem.functionspace(self.mesh, P1_1)
         # print("Mechanical function space (V_m_mixed):", self.V_m_mixed)
@@ -58,7 +66,7 @@ class FiniteElementSetup:
         # --. Test/Trial functions in mixed spaces --..
         # (self.u_m_mixed, self.u_t_mixed) = ufl.TrialFunction(self.V_m_mixed), ufl.TrialFunction(self.V_t_mixed)
         # (self.v_m_mixed, self.v_t_mixed) = ufl.TestFunction(self.V_m_mixed), ufl.TestFunction(self.V_t_mixed)
-        
+
         # --. Test/Trial functions in separate spaces --.
         # Mechanics
         self.u_m = ufl.TrialFunction(self.V_m)

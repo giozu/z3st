@@ -4,7 +4,8 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-print("""
+print(
+    """
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
@@ -12,19 +13,25 @@ Version: 0.1.0 (2025)
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 [DESCRIPTION]
-Z3ST is an open-source framework for the thermo-mechanical modelling 
-of materials and multi-material domains. Built on FEniCSx, it supports 
-transient simulations, complex geometries, and user-defined boundary 
+Z3ST is an open-source framework for the thermo-mechanical modelling
+of materials and multi-material domains. Built on FEniCSx, it supports
+transient simulations, complex geometries, and user-defined boundary
 conditions.
-""")
+"""
+)
+
+import os
+import sys
 
 # --. Python modules --..
-import time, sys, yaml, os
+import time
 
-# --. Z3ST modules --..  
+import yaml
+
+# --. Z3ST modules --..
 from z3st.core.spine import Spine
 from z3st.utils.export_vtu import export_vtu
-from z3st.utils.utils_load import load, generate_power_history
+from z3st.utils.utils_load import generate_power_history, load
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -55,6 +62,7 @@ if __name__ == "__main__":
 
     if MESH_PLOT_MODE:
         from core.mesh.plotter import MeshPlotter
+
         label_map = getattr(problem, "label_map", {})
         plotter = MeshPlotter(problem.mesh, problem.facet_tags, label_map)
         plotter.show()
@@ -66,7 +74,9 @@ if __name__ == "__main__":
     lhr_points = input_file["lhr"]
     n_increments = input_file["n_steps"] - 1
 
-    times, lhrs, n_steps = generate_power_history(t_points, lhr_points, n_steps=n_increments, filename=None)
+    times, lhrs, n_steps = generate_power_history(
+        t_points, lhr_points, n_steps=n_increments, filename=None
+    )
 
     # --. Initialize problem --..
     problem.parameters(lhr=lhrs[0])
@@ -78,7 +88,6 @@ if __name__ == "__main__":
 
     for step, (t, lhr) in enumerate(zip(times, lhrs)):
         print(f"\n[STEP {step+1:02d}/{len(times)}] t = {t:.2e} s | LHR = {lhr:.2e} W/m")
-
 
         # Update source term
         problem.parameters(lhr=lhr)
@@ -100,7 +109,7 @@ if __name__ == "__main__":
         # else:
         #     export_vtx(problem, output_dir="output",
         #             filename="fields.vtu", time=times[step], engine="VTK")
-            
+
     end_time = time.time()
     elapsed_time = end_time - start_time
 

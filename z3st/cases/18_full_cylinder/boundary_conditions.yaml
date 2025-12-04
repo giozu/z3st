@@ -3,7 +3,7 @@ thermal_bcs:
     - type: Dirichlet
       region: lateral
       temperature: 500.0 # (K)
-      
+
 mechanical_bcs:
   oxide:
     - type: Clamp_z
