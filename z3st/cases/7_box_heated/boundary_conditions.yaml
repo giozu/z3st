@@ -17,11 +17,11 @@ mechanical_bcs:
     - type: Dirichlet
       region: xmin
       displacement: [0.0, 0.0, 0.0] # (m)
-  
+
     - type: Dirichlet
       region: xmax
       displacement: [0.0, 0.0, 0.0] # (m)
-  
+
     - type: Dirichlet
       region: ymin
       displacement: [0.0, 0.0, 0.0] # (m)

@@ -21,22 +21,25 @@ For each (Ro/Ri, mu·Ri) pair:
 The results are logged in `attenuation_run.log`.
 """
 
-import shutil, subprocess, re
-from pathlib import Path
-import yaml
+import re
+import shutil
+import subprocess
 from datetime import datetime
+from pathlib import Path
+
+import yaml
 
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
-ROOT = Path.cwd()                               # Root directory of the batch run
+ROOT = Path.cwd()  # Root directory of the batch run
 BASE_CASE = ROOT
-Z3ST_ENTRY = Path("../../../z3st.py")           # Entry point to the Z3ST solver
+Z3ST_ENTRY = Path("../../../z3st.py")  # Entry point to the Z3ST solver
 
 # Fixed parameters
-R_i = 1.000        # Inner radius (m)
-Lz  = 10.000       # Axial length (m)
-Q0  = 9.0e+4       # Volumetric heat source (gamma heating, W/m³)
+R_i = 1.000  # Inner radius (m)
+Lz = 10.000  # Axial length (m)
+Q0 = 9.0e4  # Volumetric heat source (gamma heating, W/m³)
 
 # Material configuration
 SHIELD_MAT_KEY = "steel"
@@ -45,14 +48,15 @@ SHIELD_MAT_KEY = "steel"
 # BA_LIST  = [1.02, 1.04, 1.05, 1.06, 1.08, 1.10, 1.12, 1.14, 1.16, 1.17, 1.18, 1.20]  # Ro/Ri ratios
 # MUA_LIST = [1, 2, 5, 10, 20, 30, 40, 50, 60]                 # mu * Ri
 
-BA_LIST  = [1.05, 1.15, 1.20] # Ro/Ri ratios
-MUA_LIST = [10, 30, 50] # mu * Ri
+BA_LIST = [1.05, 1.15, 1.20]  # Ro/Ri ratios
+MUA_LIST = [10, 30, 50]  # mu * Ri
 
-LOG_FILE = ROOT / "attenuation_run.log"     # Log file for all runs
+LOG_FILE = ROOT / "attenuation_run.log"  # Log file for all runs
 
 # =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
+
 
 def log(msg: str):
     """Print a message to screen and append it to the log file."""
@@ -60,13 +64,16 @@ def log(msg: str):
     with open(LOG_FILE, "a") as f:
         f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S}  {msg}\n")
 
+
 def load_yaml(path: Path):
     """Load a YAML file and return its dictionary content."""
     return yaml.safe_load(open(path))
 
+
 def dump_yaml(data: dict, path: Path):
     """Write a dictionary to a YAML file without reordering keys."""
     yaml.safe_dump(data, open(path, "w"), sort_keys=False)
+
 
 def run_cmd(cmd: list, cwd: str):
     """
@@ -84,6 +91,7 @@ def run_cmd(cmd: list, cwd: str):
         print(res.stderr)
         raise RuntimeError(f"[ERROR] while running {' '.join(cmd)}")
 
+
 # =============================================================================
 # MAIN EXECUTION PIPELINE
 # =============================================================================
@@ -92,15 +100,15 @@ log("\n=== ATTENUATION MAP BATCH START ===")
 
 for ba in BA_LIST:
     for mua in MUA_LIST:
-        mu = mua / R_i # Attenuation coefficient (1/m)
-        R_o = ba * R_i # Outer radius (m)
+        mu = mua / R_i  # Attenuation coefficient (1/m)
+        R_o = ba * R_i  # Outer radius (m)
 
         ba_tag = int(round(ba * 100))
         mua_tag = int(mua)
         run_name = f"ba_{ba_tag:03d}_mua_{mua_tag}"
         log(f"\n=== Starting case: {run_name} (Ro/Ri={ba:.3f}, mu*Ri={mua:.1f}) ===")
-        
-        run_dir  = ROOT / run_name
+
+        run_dir = ROOT / run_name
         done_file = run_dir / "output/non-regression.json"
 
         # --- Skip if already completed ---
@@ -117,12 +125,7 @@ for ba in BA_LIST:
         run_dir.mkdir(exist_ok=True)
         log(f"\n=== {run_name} ===")
 
-        files_to_copy = [
-            "boundary_conditions.yaml",
-            "geometry.yaml",
-            "input.yaml",
-            "mesh.geo"
-        ]
+        files_to_copy = ["boundary_conditions.yaml", "geometry.yaml", "input.yaml", "mesh.geo"]
 
         for fname in files_to_copy:
             src = BASE_CASE / fname

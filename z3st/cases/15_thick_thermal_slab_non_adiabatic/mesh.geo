@@ -41,8 +41,8 @@ Recombine Surface {10};
 out[] = Extrude {0, 0, Lz} {  Surface{10}; Layers{n}; Recombine; };
 
 // Physical groups for boundary conditions
-Physical Surface("zmin") = {10};        
-Physical Surface("zmax") = {out[0]};    
+Physical Surface("zmin") = {10};
+Physical Surface("zmax") = {out[0]};
 Physical Surface("ymin") = {out[2]};    // y = 0
 Physical Surface("xmax") = {out[3]};    // x = Lx
 Physical Surface("ymax") = {out[4]};    // y = Ly

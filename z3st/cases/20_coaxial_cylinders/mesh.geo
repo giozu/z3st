@@ -35,17 +35,17 @@ Point(10) = {0, r_2_o, 0};
 Point(11) = {-r_2_o, 0, 0};
 Point(12) = {0, -r_2_o, 0};
 
-Circle(1) = {1, 100, 2};  
+Circle(1) = {1, 100, 2};
 Circle(2) = {2, 100, 3};
 Circle(3) = {3, 100, 4};
 Circle(4) = {4, 100, 1};
 
-Circle(5)  = {5, 100, 6};  
+Circle(5)  = {5, 100, 6};
 Circle(6)  = {6, 100, 7};
 Circle(7)  = {7, 100, 8};
 Circle(8)  = {8, 100, 5};
 
-Circle(9)   = {9, 100, 10};  
+Circle(9)   = {9, 100, 10};
 Circle(10)  = {10, 100, 11};
 Circle(11)  = {11, 100, 12};
 Circle(12)  = {12, 100, 9};
@@ -58,10 +58,10 @@ Line(16) = {8, 12};
 
 Curve Loop(1) = {1, 2, 3, 4};
 
-Curve Loop(2) = {13, 9, -14, -5}; 
-Curve Loop(3) = {14, 10, -15, -6}; 
-Curve Loop(4) = {15, 11, -16, -7}; 
-Curve Loop(5) = {16, 12, -13, -8}; 
+Curve Loop(2) = {13, 9, -14, -5};
+Curve Loop(3) = {14, 10, -15, -6};
+Curve Loop(4) = {15, 11, -16, -7};
+Curve Loop(5) = {16, 12, -13, -8};
 
 Plane Surface(1) = {1};
 
@@ -77,10 +77,10 @@ Extrude {0, 0, h} {
 }
 
 Transfinite Line {1:12} = n_f;
-Transfinite Surface {1, 2, 3, 4, 5};  
+Transfinite Surface {1, 2, 3, 4, 5};
 Recombine Surface {1, 2, 3, 4, 5};
 
-Transfinite Line {13:16} = n_r; 
+Transfinite Line {13:16} = n_r;
 
 Physical Surface("bottom_1") = {1};
 Physical Surface("bottom_2") = {2, 3, 4, 5};

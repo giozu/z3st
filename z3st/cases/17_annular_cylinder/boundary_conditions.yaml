@@ -3,7 +3,7 @@ thermal_bcs:
     - type: Dirichlet
       region: outer
       temperature: 500.0 # (K)
-      
+
 mechanical_bcs:
   volume:
     - type: Clamp_z

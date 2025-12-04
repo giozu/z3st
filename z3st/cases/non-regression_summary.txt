@@ -100,4 +100,3 @@ Case: 20_coaxial_cylinders
   Run             : OK
   Non-regression  : PASS
   Time            : 26s
-
