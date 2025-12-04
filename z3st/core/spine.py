@@ -4,20 +4,22 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-import dolfinx
-import yaml
-import numpy as np
 import importlib
+
+import dolfinx
+import numpy as np
+import yaml
 from mpi4py import MPI
 
+from z3st.core.config import Config
+from z3st.core.finite_element_setup import FiniteElementSetup
 from z3st.core.mesh import load_mesh
 from z3st.core.mesh.manager import MeshManager
-from z3st.core.config import Config
 from z3st.core.solver import Solver
-from z3st.core.finite_element_setup import FiniteElementSetup
-from z3st.models.thermal_model import ThermalModel
-from z3st.models.mechanical_model import MechanicalModel
 from z3st.models.gap_model import GapModel
+from z3st.models.mechanical_model import MechanicalModel
+from z3st.models.thermal_model import ThermalModel
+
 
 class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
     """Main Z3ST simulation driver."""
@@ -74,7 +76,9 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
                 mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
                 mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
             else:
-                print(f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties.")
+                print(
+                    f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties."
+                )
 
             if "k" in mat:
                 if isinstance(mat["k"], str):
@@ -101,7 +105,9 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         print(f"[SETTING BOUNDARY CONDITIONS]")
 
         with open(self.input_file["boundary_conditions_path"], "r") as f:
-            print(f"Loading boundary conditions from '{self.input_file['boundary_conditions_path']}'")
+            print(
+                f"Loading boundary conditions from '{self.input_file['boundary_conditions_path']}'"
+            )
             self.boundary_conditions = yaml.safe_load(f)
 
         if self.coupling == "staggered":
@@ -133,7 +139,9 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
 
         self.T.x.scatter_forward()
         T_vals = self.T.x.array
-        print(f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K")
+        print(
+            f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K"
+        )
 
         # Displacement
         print("\nInitializing the displacement field...")
@@ -141,10 +149,14 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         self.u.x.array[:] = 0.0
         self.u.x.scatter_forward()
         u_vals = self.u.x.array
-        print(f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m")
+        print(
+            f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m"
+        )
 
         if not hasattr(self, "W"):
-            raise RuntimeError("Mixed space self.W is not initialized. Check finite_element_setup.py.")
+            raise RuntimeError(
+                "Mixed space self.W is not initialized. Check finite_element_setup.py."
+            )
 
         if not hasattr(self, "sol_mixed"):
             print("Initializing self.sol_mixed")
@@ -186,15 +198,24 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
 
-                def f(x):
+                def f(x, q_third_0=q_third_0, mu=mu):
                     if self.geometry_type == "rect":
                         return q_third_0 * np.exp(-x[0] * mu)
                     elif self.geometry_type in ["cyl", "cylinder"]:
                         import scipy.special as sp
-                        return q_third_0 * sp.k0(mu * np.sqrt(x[0] ** 2 + x[1] ** 2)) / sp.k0(mu * self.inner_radius)
+
+                        return (
+                            q_third_0
+                            * sp.k0(mu * np.sqrt(x[0] ** 2 + x[1] ** 2))
+                            / sp.k0(mu * self.inner_radius)
+                        )
                     elif self.geometry_type == "sphere":
                         r = np.sqrt(x[0] ** 2 + x[1] ** 2 + x[2] ** 2)
-                        return q_third_0 * (self.inner_radius / r) * np.exp(-mu * (r - self.inner_radius))
+                        return (
+                            q_third_0
+                            * (self.inner_radius / r)
+                            * np.exp(-mu * (r - self.inner_radius))
+                        )
 
                 f_func = dolfinx.fem.Function(self.V_t)
                 f_func.interpolate(f)

@@ -16,16 +16,17 @@ Supports DG-0 and CG-1 fields and transient output.
 """
 
 import os
+
+import dolfinx
 import numpy as np
 import ufl
-import dolfinx
 from dolfinx.io import VTXWriter
 from mpi4py import MPI
-
 
 # ---------------------------------------------------------------------------
 # Helper functions
 # ---------------------------------------------------------------------------
+
 
 def _von_mises(sig):
     """Von Mises equivalent stress."""
@@ -36,10 +37,10 @@ def _von_mises(sig):
         s_yz, s_zx = sig[:, 1, 2], sig[:, 2, 0]
         vm = np.sqrt(
             0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
-            + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
+            + 3.0 * (s_xy**2 + s_yz**2 + s_zx**2)
         )
     else:
-        vm = np.sqrt((s_xx - s_yy) ** 2 + 3.0 * s_xy ** 2)
+        vm = np.sqrt((s_xx - s_yy) ** 2 + 3.0 * s_xy**2)
     return vm
 
 
@@ -62,8 +63,8 @@ def _interpolate_expression(expr, V):
 # Main exporter
 # ---------------------------------------------------------------------------
 
-def export_vtx(problem, output_dir="output", filename="fields.vtu",
-               time=0.0, engine="VTK"):
+
+def export_vtx(problem, output_dir="output", filename="fields.vtu", time=0.0, engine="VTK"):
     """
     Export all Z3ST fields using VTXWriter.
 
@@ -100,10 +101,10 @@ def export_vtx(problem, output_dir="output", filename="fields.vtu",
     mesh = problem.mesh
 
     V_tensor_cells = dolfinx.fem.functionspace(mesh, ("DG", 0, (gdim, gdim)))
-    V_tensor_points = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
+    # V_tensor_points = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
     V_vector_cells = dolfinx.fem.functionspace(mesh, ("DG", 0, (gdim,)))
     V_scalar_cells = dolfinx.fem.functionspace(mesh, ("DG", 0))
-    V_scalar_points = dolfinx.fem.functionspace(mesh, ("Lagrange", 1))
+    # V_scalar_points = dolfinx.fem.functionspace(mesh, ("Lagrange", 1))
 
     # Strain
     strain_cells = _interpolate_expression(problem.strain, V_tensor_cells)
@@ -115,8 +116,8 @@ def export_vtx(problem, output_dir="output", filename="fields.vtu",
         raise AttributeError("No cell tag field found (expected 'cell_tags').")
 
     for name, mat in problem.materials.items():
-        tag = problem.label_map[name]
-        cells = cell_tags.find(tag)
+        # tag = problem.label_map[name]
+        # cells = cell_tags.find(tag)
 
         # Stress (DG-0)
         stress_expr = problem.stress[name]

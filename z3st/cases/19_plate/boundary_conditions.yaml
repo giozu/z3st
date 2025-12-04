@@ -1,10 +1,10 @@
 mechanical_bcs:
-  steel:     
+  steel:
     - type: Neumann
       region: xmax
       traction: +125.0e+6 # (Pa)
 
-    - type: Clamp_x 
+    - type: Clamp_x
       region: xmin
 
     - type: Clamp_y

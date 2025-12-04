@@ -9,10 +9,11 @@ non-regression script
 
 import os
 import sys
-import numpy as np
-import pyvista as pv
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
+import pyvista as pv
 
 # Add the z3st/output directory to sys.path to import extract.py
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "utils"))
@@ -26,18 +27,18 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 OUT_DIR = os.path.join(CASE_DIR, "output")
 
-Lx = 0.5            # box length in x (m)
-Ly = 0.5            # box length in y (m)
-Lz = 0.5            # box length in z (m)
+Lx = 0.5  # box length in x (m)
+Ly = 0.5  # box length in y (m)
+Lz = 0.5  # box length in z (m)
 
-ax = 0.1072         # semi-axis of ellipsoid in x (m)
-ay = 0.1072         # semi-axis of ellipsoid in y (m)
-az = 0.05           # semi-axis of ellipsoid in z (m)
+ax = 0.1072  # semi-axis of ellipsoid in x (m)
+ay = 0.1072  # semi-axis of ellipsoid in y (m)
+az = 0.05  # semi-axis of ellipsoid in z (m)
 
-stress_applied = 1 # Pa
+stress_applied = 1  # Pa
 
-y_target = 0.0 # (m)
-z_target = 0.0 # (m)
+y_target = 0.0  # (m)
+z_target = 0.0  # (m)
 ex_tol = 5.0e-1
 
 # ANSI colors
@@ -47,10 +48,10 @@ BOLD = "\033[1m"
 END = "\033[0m"
 
 # --.. ..- .-.. .-.. --- analytical solution --.. ..- .-.. .-.. ---
-VON_MISES_REF = 3.5      # (Pa)
-SIGMA_XX_REF = 0.7       # (Pa)
+VON_MISES_REF = 3.5  # (Pa)
+SIGMA_XX_REF = 0.7  # (Pa)
 
-TOLERANCE = 6e-2         # relative tolerance for pass/fail
+TOLERANCE = 6e-2  # relative tolerance for pass/fail
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 if not os.path.exists(VTU_FILE):
@@ -82,19 +83,14 @@ sigma_xx_raw = comps["xx"]
 x_vm_raw, y_vm_raw, z_vm_raw, sigma_vm_raw = extract_VonMises(VTU_FILE)
 
 import pandas as pd
+
 decimals = 6
 
-df = pd.DataFrame({
-    "x": x_raw,
-    "sigma_xx": sigma_xx_raw
-})
+df = pd.DataFrame({"x": x_raw, "sigma_xx": sigma_xx_raw})
 df["x_round"] = df["x"].round(decimals)
 sigma_xx_avg = df.groupby("x_round", as_index=False)["sigma_xx"].mean()
 
-df_vm = pd.DataFrame({
-    "x": x_vm_raw,
-    "sigma_vm": sigma_vm_raw
-})
+df_vm = pd.DataFrame({"x": x_vm_raw, "sigma_vm": sigma_vm_raw})
 df_vm["x_round"] = df_vm["x"].round(decimals)
 sigma_vm_avg = df_vm.groupby("x_round", as_index=False)["sigma_vm"].mean()
 
@@ -119,7 +115,7 @@ plt.plot(x[mask], sigma_xx[mask], "b.", lw=1.5, label=r"$\sigma_{xx}$ (num)")
 plt.plot(x[mask], sigma_vm[mask], "r.", lw=1.5, label=r"$\sigma_{vm}$ (num)")
 
 plt.axvline(ax, color="blue", lw=0.8, ls=":", label="Cavity x-semiaxis")
-plt.axvline(Lx*0.5, color="red", lw=0.8, ls="--", label="Box edge")
+plt.axvline(Lx * 0.5, color="red", lw=0.8, ls="--", label="Box edge")
 
 plt.gca().xaxis.set_major_formatter(ticker.FuncFormatter(lambda X, _: f"{X*1e3:g}"))
 plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda Y, _: f"{Y/stress_applied:g}"))
@@ -129,7 +125,9 @@ plt.title(r"$\sigma_{BCs}$ = 1 Pa, z-direction", fontsize=10)
 plt.grid(True, which="both", ls=":", lw=0.5)
 plt.legend(fontsize=8, frameon=False, loc="upper right")
 plt.tight_layout(rect=[0, 0, 1, 1])
-plt.savefig(os.path.join(OUT_DIR, "stress_comparison.png"), dpi=300, bbox_inches="tight", transparent=False)
+plt.savefig(
+    os.path.join(OUT_DIR, "stress_comparison.png"), dpi=300, bbox_inches="tight", transparent=False
+)
 plt.close()
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
@@ -141,20 +139,20 @@ errors = {
         "numerical": float(np.max(sigma_xx[mask][idx])),
         "reference": SIGMA_XX_REF,
         "abs_error": float(abs(np.max(sigma_xx[mask][idx]) - SIGMA_XX_REF)),
-        "rel_error": float(abs(np.max(sigma_xx[mask][idx]) - SIGMA_XX_REF) / SIGMA_XX_REF)
+        "rel_error": float(abs(np.max(sigma_xx[mask][idx]) - SIGMA_XX_REF) / SIGMA_XX_REF),
     },
     "sigma_von_mises": {
         "numerical": float(np.max(sigma_vm[mask][idx])),
         "reference": VON_MISES_REF,
         "abs_error": float(abs(np.max(sigma_vm[mask][idx]) - VON_MISES_REF)),
-        "rel_error": float(abs(np.max(sigma_vm[mask][idx]) - VON_MISES_REF) / VON_MISES_REF)
+        "rel_error": float(abs(np.max(sigma_vm[mask][idx]) - VON_MISES_REF) / VON_MISES_REF),
     },
     "u_displacement": {
         "numerical": float(np.max(np.linalg.norm(u, axis=1))),
         "reference": 0.0,
         "abs_error": 0.0,
-        "rel_error": 0.0
-    }
+        "rel_error": 0.0,
+    },
 }
 
 # --. pass/fail check --..

@@ -21,7 +21,7 @@ solver_settings:
   relax_shrink: 0.7
   relax_min: 0.05
   relax_max: 1.0
-  
+
 models:
   thermal: False
   mechanical: True
@@ -47,4 +47,3 @@ lhr:
 time:
   - 0
 n_steps: 1
-

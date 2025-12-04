@@ -2,11 +2,20 @@ name: Build JOSS Paper
 
 on:
   push:
+    branches:
+      - main
     paths:
       - "paper.md"
       - "paper.bib"
       - ".github/workflows/paper.yml"
+
   pull_request:
+    branches:
+      - main
+    paths:
+      - "paper.md"
+      - "paper.bib"
+      - ".github/workflows/paper.yml"
 
 jobs:
   paper:

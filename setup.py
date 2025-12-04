@@ -4,7 +4,7 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="z3st",

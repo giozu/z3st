@@ -22,30 +22,41 @@ Typical usage:
     plot_field_along_x(x, y, z, sigma_xx, r"σₓₓ (Pa)", case_dir)
     plot_field_along_x(x, y, z, U, "Displacement (m)", case_dir, component=0)
 
-Author: Giovanni Zullo  
+Author: Giovanni Zullo
 Project: Z3ST
 Date: 11/10/2025
 """
-# --.. ..- .-.. .-.. --- imports --.. ..- .-.. .-.. ---
 import os
-import pandas as pd
-import numpy as np
+
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
+import pandas as pd
 
-from .utils_extract_vtu import *
+# from .utils_extract_vtu import *
 
-# --.. ..- .-.. .-.. --- plot --.. ..- .-.. .-.. ---
-def plot_field_along_x(x, y, z, coord_name="x (m)",
-                       field=None, field_name=None, 
-                       case_dir=None, 
-                       y_target=None, z_target=None, tol=1e-5, 
-                       color="red",
-                       x_ref=None, y_ref=None, label_ref=None,
-                       average=True, decimals=5):
+
+def plot_field_along_x(
+    x,
+    y,
+    z,
+    coord_name="x (m)",
+    field=None,
+    field_name=None,
+    case_dir=None,
+    y_target=None,
+    z_target=None,
+    tol=1e-5,
+    color="red",
+    x_ref=None,
+    y_ref=None,
+    label_ref=None,
+    average=True,
+    decimals=5,
+):
     """
     Plot a scalar field (e.g. Temperature, Stress, etc.) along x for fixed y, z.
-    
+
     Parameters
     ----------
     x, y, z : np.ndarray
@@ -100,7 +111,9 @@ def plot_field_along_x(x, y, z, coord_name="x (m)",
 
     # Plot
     plt.figure(figsize=(7, 5))
-    plt.plot(x_line[idx], field_line[idx], "-o", color=color, label=f"y={y_target:.3f}, z={z_target:.3f}")
+    plt.plot(
+        x_line[idx], field_line[idx], "-o", color=color, label=f"y={y_target:.3f}, z={z_target:.3f}"
+    )
 
     if x_ref is not None and y_ref is not None:
         label_ref = label_ref or "Analytical"
@@ -114,20 +127,31 @@ def plot_field_along_x(x, y, z, coord_name="x (m)",
     plt.tight_layout()
 
     out_png = os.path.join(case_dir, "output", f"{field_name.replace(' ', '_')}_vs_x.png")
-    
+
     plt.savefig(out_png, dpi=300)
     plt.close()
     print(f"[INFO] Saved plot to {out_png}")
 
     return x_line[idx], field_line[idx]
 
-def plot_field_along_r_xy(x, y, z,
-                       field, field_name,
-                       case_dir,
-                       z_target=None, tol=1e-5,
-                       color="tab:blue",
-                       r_ref=None, f_ref=None, label_ref=None,
-                       average=True, decimals=5, plot=True):
+
+def plot_field_along_r_xy(
+    x,
+    y,
+    z,
+    field,
+    field_name,
+    case_dir,
+    z_target=None,
+    tol=1e-5,
+    color="tab:blue",
+    r_ref=None,
+    f_ref=None,
+    label_ref=None,
+    average=True,
+    decimals=5,
+    plot=True,
+):
     """
     Plot a scalar field along the radius r = sqrt(x^2 + y^2),
     with optional averaging of values at equal radii.
@@ -145,7 +169,9 @@ def plot_field_along_r_xy(x, y, z,
     if np.sum(mask) == 0:
         print(f"[WARNING] No points found near z={z_target:.4e}")
         return
-    print(f"[INFO] Found {len(z[mask])} points in plane z ≈ {np.mean(z[mask]):.5e} ± {np.std(z[mask]):.1e}")
+    print(
+        f"[INFO] Found {len(z[mask])} points in plane z ≈ {np.mean(z[mask]):.5e} ± {np.std(z[mask]):.1e}"
+    )
 
     r_line = r[mask]
     field_line = field[mask]
@@ -183,6 +209,7 @@ def plot_field_along_r_xy(x, y, z,
         plt.tight_layout()
 
         import re
+
         safe_field_name = field_name
         safe_field_name = re.sub(r"\[.*?\]", "", safe_field_name)
         safe_field_name = re.sub(r"[^\w\-.]", "_", safe_field_name)
@@ -196,6 +223,7 @@ def plot_field_along_r_xy(x, y, z,
 
     return r_line[idx], field_line[idx]
 
+
 def plot_sigma_cyl(
     df,
     z_fixed=0.0,
@@ -206,7 +234,7 @@ def plot_sigma_cyl(
 
     Parameters
     ----------
-    df : 
+    df :
         pandas dataframe.
     z_fixed : float
         Z coordinate of the slice (m).
@@ -233,6 +261,7 @@ def plot_sigma_cyl(
     plt.close()
     print(f"[PLOT] Stress profile saved → {fig_path}")
 
+
 def plot_sigma_principal(
     filename="output/fields.vtu",
     z_fixed=0.0,
@@ -240,7 +269,7 @@ def plot_sigma_principal(
     case_dir=".",
     stress_field_hint="Stress",
     data_source="auto",
-    plot=True
+    plot=True,
 ):
     """
     Plot principal stresses (σ1 ≥ σ2 ≥ σ3) at a fixed z from a .vtu file.
@@ -265,11 +294,12 @@ def plot_sigma_principal(
         Number of decimals for r rounding during averaging.
     """
 
-    import pyvista as pv
+    import os
+
+    import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
-    import matplotlib.pyplot as plt
-    import os
+    import pyvista as pv
 
     # --- Load file ---
     if not os.path.exists(filename):
@@ -316,12 +346,9 @@ def plot_sigma_principal(
     eigvals = np.linalg.eigvalsh(stresses)
     sigma1, sigma2, sigma3 = eigvals[:, 2], eigvals[:, 1], eigvals[:, 0]
 
-    df = pd.DataFrame({
-        "r": r,
-        "sigma1": sigma1,
-        "sigma2": sigma2,
-        "sigma3": sigma3
-    }).sort_values("r")
+    df = pd.DataFrame({"r": r, "sigma1": sigma1, "sigma2": sigma2, "sigma3": sigma3}).sort_values(
+        "r"
+    )
 
     # --- Save results ---
     out_dir = os.path.join(case_dir, "output")
@@ -357,12 +384,19 @@ def plot_sigma_principal(
 
 
 def plot_field_along_r_xyz(
-    x, y, z,
-    field, field_name,
+    x,
+    y,
+    z,
+    field,
+    field_name,
     case_dir,
     color="tab:blue",
-    r_ref=None, f_ref=None, label_ref=None,
-    average=True, decimals=5, n_bins=100
+    r_ref=None,
+    f_ref=None,
+    label_ref=None,
+    average=True,
+    decimals=5,
+    n_bins=100,
 ):
     """
     Plot a scalar field along the spherical radius :math:`r = \\sqrt{x^2 + y^2 + z^2}`.
@@ -449,6 +483,7 @@ def plot_field_along_r_xyz(
     plt.tight_layout()
 
     import re
+
     safe_field_name = field_name
     safe_field_name = re.sub(r"\[.*?\]", "", safe_field_name)
     safe_field_name = re.sub(r"[^\w\-.]", "_", safe_field_name)
@@ -459,8 +494,11 @@ def plot_field_along_r_xyz(
     plt.close()
     print(f"[INFO] Saved plot to {out_png}")
 
-    return r_line, field_line,
-    
+    return (
+        r_line,
+        field_line,
+    )
+
 
 def radial_average_uniform_bins(x, y, z, field, n_bins=100):
     r = np.sqrt(x**2 + y**2 + z**2)
@@ -491,6 +529,7 @@ def radial_average_weighted(x, y, z, field, n_bins=100):
 
 def radial_average_kernel(x, y, z, field, r_points=None, bandwidth=0.0005):
     from scipy.stats import norm
+
     r = np.sqrt(x**2 + y**2 + z**2)
     if r_points is None:
         r_points = np.linspace(r.min(), r.max(), 200)
@@ -502,6 +541,7 @@ def radial_average_kernel(x, y, z, field, r_points=None, bandwidth=0.0005):
             field_avg[i] = np.average(field, weights=weights)
     return r_points, field_avg
 
+
 def radial_average_round(x, y, z, field_name, field, decimals=4):
     print(f"[INFO] Performing radial averaging (decimals={decimals})")
     r = np.sqrt(x**2 + y**2 + z**2)
@@ -509,6 +549,7 @@ def radial_average_round(x, y, z, field_name, field, decimals=4):
     df["r"] = df["r"].round(decimals)
     df = df.groupby("r", as_index=False)[field_name].mean()
     return df["r"].to_numpy(), df[field_name].to_numpy()
+
 
 def rescale_axis(ax, scale=1e3, axis="x", unit="mm"):
     if axis == "x":
@@ -520,38 +561,89 @@ def rescale_axis(ax, scale=1e3, axis="x", unit="mm"):
         ax.set_ylim([y * scale for y in ax.get_ylim()])
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: f"{y:g}"))
 
+
 def plotter_sigma_temperature_cylinder(
-        r_s=None, sigma_rr=None, sigma_tt=None, sigma_zz=None,
-        r_T=None, T=None, sigma_th_ref=None, T_ref=None, max_sigma_T=None, 
-        Ti=None, To=None, Ri=0.0, label_T="Temperature (analytical)",
-        CASE_DIR=None,
-        slenderness=None,
-        sigma_rr_ref=None, sigma_tt_ref=None, sigma_zz_ref=None
-    ):
+    r_s=None,
+    sigma_rr=None,
+    sigma_tt=None,
+    sigma_zz=None,
+    r_T=None,
+    T=None,
+    sigma_th_ref=None,
+    T_ref=None,
+    max_sigma_T=None,
+    Ti=None,
+    To=None,
+    Ri=0.0,
+    label_T="Temperature (analytical)",
+    CASE_DIR=None,
+    slenderness=None,
+    sigma_rr_ref=None,
+    sigma_tt_ref=None,
+    sigma_zz_ref=None,
+):
 
     plt.rcParams.update({"font.size": 8})
     _, ax1 = plt.subplots(figsize=(7, 5))
 
     if sigma_rr is not None:
-        ax1.scatter(r_s, sigma_rr / 1e6, s=22, marker="s",
-                    facecolors="none", edgecolors="C0", label=r"Numerical $\sigma_{rr}$")
+        ax1.scatter(
+            r_s,
+            sigma_rr / 1e6,
+            s=22,
+            marker="s",
+            facecolors="none",
+            edgecolors="C0",
+            label=r"Numerical $\sigma_{rr}$",
+        )
     if sigma_tt is not None:
-        ax1.scatter(r_s, sigma_tt / 1e6, s=22, marker="o",
-                    facecolors="none", edgecolors="C1", label=r"Numerical $\sigma_{\theta\theta}$")
-    if sigma_zz is not None: 
-        ax1.scatter(r_s, sigma_zz / 1e6, s=22, marker="^",
-                facecolors="none", edgecolors="C2", label=r"Numerical $\sigma_{zz}$")
-    
+        ax1.scatter(
+            r_s,
+            sigma_tt / 1e6,
+            s=22,
+            marker="o",
+            facecolors="none",
+            edgecolors="C1",
+            label=r"Numerical $\sigma_{\theta\theta}$",
+        )
+    if sigma_zz is not None:
+        ax1.scatter(
+            r_s,
+            sigma_zz / 1e6,
+            s=22,
+            marker="^",
+            facecolors="none",
+            edgecolors="C2",
+            label=r"Numerical $\sigma_{zz}$",
+        )
+
     if sigma_rr_ref is not None:
-        ax1.plot(r_s, sigma_rr_ref / 1e6, color="C0", linestyle="-", label=r"Analytical $\sigma_{rr}$")
+        ax1.plot(
+            r_s, sigma_rr_ref / 1e6, color="C0", linestyle="-", label=r"Analytical $\sigma_{rr}$"
+        )
     if sigma_tt_ref is not None:
-        ax1.plot(r_s, sigma_tt_ref / 1e6, color="C1", linestyle="-", label=r"Analytical $\sigma_{\theta\theta}$")
+        ax1.plot(
+            r_s,
+            sigma_tt_ref / 1e6,
+            color="C1",
+            linestyle="-",
+            label=r"Analytical $\sigma_{\theta\theta}$",
+        )
     if sigma_zz_ref is not None:
-        ax1.plot(r_s, sigma_zz_ref / 1e6, color="C2", linestyle="-.", label=r"Analytical $\sigma_{zz}$")
+        ax1.plot(
+            r_s, sigma_zz_ref / 1e6, color="C2", linestyle="-.", label=r"Analytical $\sigma_{zz}$"
+        )
 
     if sigma_th_ref is not None and r_T is not None:
-        ax1.plot(r_T, sigma_th_ref / 1e6, lw=2, linestyle=":", color="red", label=r"$\sigma_{\mathrm{th}}$ (formula)")
-    
+        ax1.plot(
+            r_T,
+            sigma_th_ref / 1e6,
+            lw=2,
+            linestyle=":",
+            color="red",
+            label=r"$\sigma_{\mathrm{th}}$ (formula)",
+        )
+
     ax1.set_xlabel("Thickness (mm)")
     ax1.xaxis.set_major_formatter(ticker.FuncFormatter(lambda X, _: f"{(X - Ri)*1e3:g}"))
     ax1.xaxis.set_minor_locator(ticker.AutoMinorLocator())
@@ -562,56 +654,94 @@ def plotter_sigma_temperature_cylinder(
     if r_T is not None:
         if T_ref is not None:
             ax2.plot(r_T, (T_ref - 273.15), lw=2, linestyle="--", color="C4", label=label_T)
-        ax2.scatter(r_T, (T - 273.15), s=18, color="black", marker="o", label="Temperature (numerical)")
+        ax2.scatter(
+            r_T, (T - 273.15), s=18, color="black", marker="o", label="Temperature (numerical)"
+        )
     ax2.set_ylabel("Temperature (°C)")
 
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper center",
-                bbox_to_anchor=(0.5, -0.18), ncol=2, fontsize=8)
+    ax1.legend(
+        lines1 + lines2,
+        labels1 + labels2,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.18),
+        ncol=2,
+        fontsize=8,
+    )
 
     if To is not None and Ti is not None:
-        plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $T_o$ = {To-273.15:.0f}°C,  $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15)
+        plt.title(
+            rf"$T_i$ = {Ti-273.15:.0f}°C, $T_o$ = {To-273.15:.0f}°C,  $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa",
+            pad=15,
+        )
     elif To is None and Ti is not None:
-        plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15)
+        plt.title(
+            rf"$T_i$ = {Ti-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa",
+            pad=15,
+        )
     elif Ti is None and To is not None:
-        plt.title(rf"$T_o$ = {To-273.15:.0f}°C,  $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15)
+        plt.title(
+            rf"$T_o$ = {To-273.15:.0f}°C,  $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa",
+            pad=15,
+        )
 
     plt.tight_layout()
     fig_path = os.path.join(CASE_DIR, "output", "stress_temperature_combined.png")
     plt.savefig(fig_path, dpi=300, bbox_inches="tight")
     plt.close()
     print(f"[PLOT] Combined stress-temperature plot saved → {fig_path}")
-    
+
+
 def plotter_sigma_temperature_slab(
-        x_s, sigma, x_s_ref, sigma_ref,
-        x_T, T, max_sigma_T, T_ref,
-        Ti, To,
-        CASE_DIR
-    ):
+    x_s, sigma, x_s_ref, sigma_ref, x_T, T, max_sigma_T, T_ref, Ti, To, CASE_DIR
+):
     plt.rcParams.update({"font.size": 11})
     fig, ax1 = plt.subplots(figsize=(7, 5))
 
-    ax1.scatter(x_s, sigma/1e6, s=22, marker="o", facecolors="none", edgecolors="C0", label=r"Numerical $\sigma$")
-    ax1.plot(x_s_ref, sigma_ref/1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (formula)")
+    ax1.scatter(
+        x_s,
+        sigma / 1e6,
+        s=22,
+        marker="o",
+        facecolors="none",
+        edgecolors="C0",
+        label=r"Numerical $\sigma$",
+    )
+    ax1.plot(x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (formula)")
     ax1.set_xlabel("Thickness (mm)")
     ax1.set_ylabel("Stress (MPa)")
     ax1.xaxis.set_major_formatter(ticker.FuncFormatter(lambda X, _: f"{X*1e3:g}"))
     ax1.grid(True, linestyle="--", alpha=0.6)
 
     ax2 = ax1.twinx()
-    ax2.plot(x_T, T_ref-273.15, lw=2, linestyle="--", color="C2", label="Temperature (analytical)")
-    ax2.scatter(x_T, T-273.15, s=18, color="C3", marker="x", label="Temperature (numerical)")
+    ax2.plot(
+        x_T, T_ref - 273.15, lw=2, linestyle="--", color="C2", label="Temperature (analytical)"
+    )
+    ax2.scatter(x_T, T - 273.15, s=18, color="C3", marker="x", label="Temperature (numerical)")
     ax2.set_ylabel("Temperature (°C)")
 
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper center", bbox_to_anchor=(0.5, -0.15), ncol=2, fontsize=9)
+    ax1.legend(
+        lines1 + lines2,
+        labels1 + labels2,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.15),
+        ncol=2,
+        fontsize=9,
+    )
 
     if To is not None:
-        plt.title(rf"Ti = {Ti-273.15:.0f}°C, To = {To-273.15:.0f}°C, T,max = {np.max(T)-273.15:.0f}°C, $\sigma_T$={max_sigma_T*1e-6:.2f} MPa", pad=15)
+        plt.title(
+            rf"Ti = {Ti-273.15:.0f}°C, To = {To-273.15:.0f}°C, T,max = {np.max(T)-273.15:.0f}°C, $\sigma_T$={max_sigma_T*1e-6:.2f} MPa",
+            pad=15,
+        )
     else:
-        plt.title(rf"Ti = {Ti-273.15:.0f}°C, T,max = {np.max(T)-273.15:.0f}°C, $\sigma_T$={max_sigma_T*1e-6:.2f} MPa", pad=15)
+        plt.title(
+            rf"Ti = {Ti-273.15:.0f}°C, T,max = {np.max(T)-273.15:.0f}°C, $\sigma_T$={max_sigma_T*1e-6:.2f} MPa",
+            pad=15,
+        )
 
     plt.tight_layout()
     fig_path = os.path.join(CASE_DIR, "output", "stress_temperature_combined.png")
@@ -619,41 +749,59 @@ def plotter_sigma_temperature_slab(
     plt.close()
     print(f"[PLOT] Combined stress-temperature plot saved → {fig_path}")
 
+
 def plotter_sigma_cylinder(
-        r_s, sigma_rr, sigma_tt, sigma_zz, 
-        Ri, Ro, Pi, Po,
-        CASE_DIR,
-        slenderness,
-        sigma_rr_ana_L=None, sigma_tt_ana_L=None, sigma_zz_ana_L=None,
-        sigma_rr_ana_M=None, sigma_tt_ana_M=None, sigma_zz_ana_M=None,
-        sigma_rr_avg=None, sigma_tt_avg=None, sigma_zz_avg=None
-    ):
+    r_s,
+    sigma_rr,
+    sigma_tt,
+    sigma_zz,
+    Ri,
+    Ro,
+    Pi,
+    Po,
+    CASE_DIR,
+    slenderness,
+    sigma_rr_ana_L=None,
+    sigma_tt_ana_L=None,
+    sigma_zz_ana_L=None,
+    sigma_rr_ana_M=None,
+    sigma_tt_ana_M=None,
+    sigma_zz_ana_M=None,
+    sigma_rr_avg=None,
+    sigma_tt_avg=None,
+    sigma_zz_avg=None,
+):
 
     sigma_Tresca = np.max(
-        np.stack([
-            np.abs(sigma_tt - sigma_zz),
-            np.abs(sigma_tt - sigma_rr),
-            np.abs(sigma_zz - sigma_rr)
-        ]),
-        axis=0
+        np.stack(
+            [np.abs(sigma_tt - sigma_zz), np.abs(sigma_tt - sigma_rr), np.abs(sigma_zz - sigma_rr)]
+        ),
+        axis=0,
     )
 
     sigma_vonMises = np.sqrt(
-        0.5 * (
-            (sigma_tt - sigma_zz)**2 +
-            (sigma_zz - sigma_rr)**2 +
-            (sigma_rr - sigma_tt)**2
-        )
+        0.5 * ((sigma_tt - sigma_zz) ** 2 + (sigma_zz - sigma_rr) ** 2 + (sigma_rr - sigma_tt) ** 2)
     )
 
     plt.figure(figsize=(7, 5))
 
     if sigma_tt_ana_L is not None:
-        plt.plot(r_s, sigma_tt_ana_L, c="orange", linestyle="--", lw=2, label=r"Analytical $\sigma_{\theta\theta}$")
+        plt.plot(
+            r_s,
+            sigma_tt_ana_L,
+            c="orange",
+            linestyle="--",
+            lw=2,
+            label=r"Analytical $\sigma_{\theta\theta}$",
+        )
     if sigma_zz_ana_L is not None:
-        plt.plot(r_s, sigma_zz_ana_L, c="green", linestyle="--", lw=2, label=r"Analytical $\sigma_{zz}$")
+        plt.plot(
+            r_s, sigma_zz_ana_L, c="green", linestyle="--", lw=2, label=r"Analytical $\sigma_{zz}$"
+        )
     if sigma_rr_ana_L is not None:
-        plt.plot(r_s, sigma_rr_ana_L, c="blue", linestyle="--", lw=2, label=r"Analytical $\sigma_{rr}$")
+        plt.plot(
+            r_s, sigma_rr_ana_L, c="blue", linestyle="--", lw=2, label=r"Analytical $\sigma_{rr}$"
+        )
 
     plt.scatter(r_s, sigma_tt, s=12, c="orange", label=r"Numerical $\sigma_{\theta\theta}$")
     plt.scatter(r_s, sigma_zz, s=12, c="green", label=r"Numerical $\sigma_{zz}$")
@@ -663,22 +811,64 @@ def plotter_sigma_cylinder(
     plt.plot(r_s, sigma_Tresca, color="brown", lw=2, label=r"$\sigma_{\mathrm{Tresca}}$")
 
     if sigma_tt_ana_M is not None:
-        plt.plot(r_s, sigma_tt_ana_M * np.ones_like(r_s), c="tab:orange", linestyle="-.", lw=2, label=r"Analytical $\bar{\sigma_{\theta\theta}}$")
-    
+        plt.plot(
+            r_s,
+            sigma_tt_ana_M * np.ones_like(r_s),
+            c="tab:orange",
+            linestyle="-.",
+            lw=2,
+            label=r"Analytical $\bar{\sigma_{\theta\theta}}$",
+        )
+
     if sigma_zz_ana_M is not None:
-        plt.plot(r_s, sigma_zz_ana_M * np.ones_like(r_s), c="tab:green", linestyle="-.", lw=2, label=r"Analytical $\bar{\sigma_{zz}}$")
-    
+        plt.plot(
+            r_s,
+            sigma_zz_ana_M * np.ones_like(r_s),
+            c="tab:green",
+            linestyle="-.",
+            lw=2,
+            label=r"Analytical $\bar{\sigma_{zz}}$",
+        )
+
     if sigma_rr_ana_M is not None:
-        plt.plot(r_s, sigma_rr_ana_M * np.ones_like(r_s), c="tab:blue", linestyle="-.", lw=2, label=r"Analytical $\bar{\sigma_{rr}}$")
+        plt.plot(
+            r_s,
+            sigma_rr_ana_M * np.ones_like(r_s),
+            c="tab:blue",
+            linestyle="-.",
+            lw=2,
+            label=r"Analytical $\bar{\sigma_{rr}}$",
+        )
 
     if sigma_tt_avg is not None:
-        plt.plot(r_s, sigma_tt_avg * np.ones_like(r_s), color="tab:orange", lw=2, linestyle=":", label=r"$\langle\sigma_1\rangle$")
+        plt.plot(
+            r_s,
+            sigma_tt_avg * np.ones_like(r_s),
+            color="tab:orange",
+            lw=2,
+            linestyle=":",
+            label=r"$\langle\sigma_1\rangle$",
+        )
 
     if sigma_zz_avg is not None:
-        plt.plot(r_s, sigma_zz_avg * np.ones_like(r_s), color="tab:green", lw=2, linestyle=":", label=r"$\langle\sigma_2\rangle$")
+        plt.plot(
+            r_s,
+            sigma_zz_avg * np.ones_like(r_s),
+            color="tab:green",
+            lw=2,
+            linestyle=":",
+            label=r"$\langle\sigma_2\rangle$",
+        )
 
     if sigma_rr_avg is not None:
-        plt.plot(r_s, sigma_rr_avg * np.ones_like(r_s), color="tab:blue", lw=2, linestyle=":", label=r"$\langle\sigma_3\rangle$")
+        plt.plot(
+            r_s,
+            sigma_rr_avg * np.ones_like(r_s),
+            color="tab:blue",
+            lw=2,
+            linestyle=":",
+            label=r"$\langle\sigma_3\rangle$",
+        )
 
     plt.gca().xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x*1e3:g}"))
     plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: f"{y/Pi:g}"))
@@ -687,12 +877,7 @@ def plotter_sigma_cylinder(
     plt.title(f"Ri={Ri*1e3} mm, Ro={Ro*1e3} mm $R_i/t$ = {slenderness:.2f}", pad=20)
 
     plt.grid(True, linestyle=":")
-    plt.legend(
-        loc="center left",
-        bbox_to_anchor=(1.1, 0.5),
-        borderaxespad=0.0,
-        fontsize=8
-    )
+    plt.legend(loc="center left", bbox_to_anchor=(1.1, 0.5), borderaxespad=0.0, fontsize=8)
     plt.tight_layout(rect=[0, 0, 1, 1])
 
     fig_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
@@ -700,15 +885,22 @@ def plotter_sigma_cylinder(
     plt.close()
     print(f"[PLOT] Analytical comparison saved → {fig_path}")
 
+
 def plotter_strain_cylinder(
-        r_s, strain_rr, strain_tt, strain_zz,
-        Ri, Ro, Pi, Po,
-        CASE_DIR,
-        slenderness,
-        strain_rr_ana_L=None,
-        strain_tt_ana_L=None,
-        strain_zz_ana_L=None,
-    ):
+    r_s,
+    strain_rr,
+    strain_tt,
+    strain_zz,
+    Ri,
+    Ro,
+    Pi,
+    Po,
+    CASE_DIR,
+    slenderness,
+    strain_rr_ana_L=None,
+    strain_tt_ana_L=None,
+    strain_zz_ana_L=None,
+):
 
     plt.figure(figsize=(7, 5))
 
@@ -717,11 +909,32 @@ def plotter_strain_cylinder(
     plt.scatter(r_s, strain_zz, s=12, c="gold", label=r"Numerical $\epsilon_{zz}$")
 
     if strain_rr_ana_L is not None:
-        plt.plot(r_s, strain_rr_ana_L, c="blue", linestyle="--", lw=2, label=r"Analytical $\epsilon_{rr}$")
+        plt.plot(
+            r_s,
+            strain_rr_ana_L,
+            c="blue",
+            linestyle="--",
+            lw=2,
+            label=r"Analytical $\epsilon_{rr}$",
+        )
     if strain_rr_ana_L is not None:
-        plt.plot(r_s, strain_tt_ana_L, c="green", linestyle="--", lw=2, label=r"Analytical $\epsilon_{\theta\theta}$")
+        plt.plot(
+            r_s,
+            strain_tt_ana_L,
+            c="green",
+            linestyle="--",
+            lw=2,
+            label=r"Analytical $\epsilon_{\theta\theta}$",
+        )
     if strain_rr_ana_L is not None:
-        plt.plot(r_s, strain_zz_ana_L, c="purple", linestyle="--", lw=2, label=r"Analytical $\epsilon_{zz}$")
+        plt.plot(
+            r_s,
+            strain_zz_ana_L,
+            c="purple",
+            linestyle="--",
+            lw=2,
+            label=r"Analytical $\epsilon_{zz}$",
+        )
 
     plt.gca().xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x*1e3:g}"))
     plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda y, _: f"{y:g}"))
@@ -730,12 +943,7 @@ def plotter_strain_cylinder(
     plt.title(f"Ri={Ri*1e3} mm, Ro={Ro*1e3} mm $R_i/t$ = {slenderness:.2f}", pad=20)
 
     plt.grid(True, linestyle=":")
-    plt.legend(
-        loc="center left",
-        bbox_to_anchor=(1.1, 0.5),
-        borderaxespad=0.0,
-        fontsize=8
-    )
+    plt.legend(loc="center left", bbox_to_anchor=(1.1, 0.5), borderaxespad=0.0, fontsize=8)
     plt.tight_layout(rect=[0, 0, 1, 1])
 
     fig_path = os.path.join(CASE_DIR, "output", "strain_comparison.png")

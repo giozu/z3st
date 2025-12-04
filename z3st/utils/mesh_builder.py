@@ -1,9 +1,9 @@
-import gmsh
-from mpi4py import MPI
 import dolfinx
-import yaml
-import pyvista
+import gmsh
 import numpy as np
+import pyvista
+import yaml
+from mpi4py import MPI
 
 
 class MeshBuilder:
@@ -24,7 +24,7 @@ class MeshBuilder:
         # Mesh parameters
         self.h_box = float(self.geometry.get("h_box", 0.05))
         self.order = int(self.geometry.get("order", 1))
-        
+
         # Labels
         self.label_map = self.geometry.get("labels", {})
         self.inv_label_map = {v: k for k, v in self.label_map.items()}
@@ -40,8 +40,7 @@ class MeshBuilder:
         gmsh.model.add("box")
 
         box = gmsh.model.occ.addBox(
-            -self.Lx / 2, -self.Ly / 2, -self.Lz / 2,
-             self.Lx, self.Ly, self.Lz
+            -self.Lx / 2, -self.Ly / 2, -self.Lz / 2, self.Lx, self.Ly, self.Lz
         )
         gmsh.model.occ.synchronize()
 
@@ -49,18 +48,54 @@ class MeshBuilder:
 
         eps = 1e-6
         tags_map = {
-            self.label_map["xmin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                     -self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
-            self.label_map["xmax"]: ( self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
-            self.label_map["ymin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps, -self.Ly/2+eps,  self.Lz/2+eps),
-            self.label_map["ymax"]: (-self.Lx/2-eps,  self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
-            self.label_map["zmin"]: (-self.Lx/2-eps, -self.Ly/2-eps, -self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps, -self.Lz/2+eps),
-            self.label_map["zmax"]: (-self.Lx/2-eps, -self.Ly/2-eps,  self.Lz/2-eps,
-                                      self.Lx/2+eps,  self.Ly/2+eps,  self.Lz/2+eps),
+            self.label_map["xmin"]: (
+                -self.Lx / 2 - eps,
+                -self.Ly / 2 - eps,
+                -self.Lz / 2 - eps,
+                -self.Lx / 2 + eps,
+                self.Ly / 2 + eps,
+                self.Lz / 2 + eps,
+            ),
+            self.label_map["xmax"]: (
+                self.Lx / 2 - eps,
+                -self.Ly / 2 - eps,
+                -self.Lz / 2 - eps,
+                self.Lx / 2 + eps,
+                self.Ly / 2 + eps,
+                self.Lz / 2 + eps,
+            ),
+            self.label_map["ymin"]: (
+                -self.Lx / 2 - eps,
+                -self.Ly / 2 - eps,
+                -self.Lz / 2 - eps,
+                self.Lx / 2 + eps,
+                -self.Ly / 2 + eps,
+                self.Lz / 2 + eps,
+            ),
+            self.label_map["ymax"]: (
+                -self.Lx / 2 - eps,
+                self.Ly / 2 - eps,
+                -self.Lz / 2 - eps,
+                self.Lx / 2 + eps,
+                self.Ly / 2 + eps,
+                self.Lz / 2 + eps,
+            ),
+            self.label_map["zmin"]: (
+                -self.Lx / 2 - eps,
+                -self.Ly / 2 - eps,
+                -self.Lz / 2 - eps,
+                self.Lx / 2 + eps,
+                self.Ly / 2 + eps,
+                -self.Lz / 2 + eps,
+            ),
+            self.label_map["zmax"]: (
+                -self.Lx / 2 - eps,
+                -self.Ly / 2 - eps,
+                self.Lz / 2 - eps,
+                self.Lx / 2 + eps,
+                self.Ly / 2 + eps,
+                self.Lz / 2 + eps,
+            ),
         }
 
         for tag, bbox in tags_map.items():
@@ -78,7 +113,11 @@ class MeshBuilder:
         print("Element types in 3D volume:", types)
 
         mesh_data = dolfinx.io.gmsh.model_to_mesh(gmsh.model, self.comm, 0, gdim=3)
-        self.mesh, self.cell_tags, self.facet_tags =  mesh_data.mesh, mesh_data.cell_tags, mesh_data.facet_tags   
+        self.mesh, self.cell_tags, self.facet_tags = (
+            mesh_data.mesh,
+            mesh_data.cell_tags,
+            mesh_data.facet_tags,
+        )
 
         return self.mesh, self.cell_tags, self.facet_tags
 
@@ -123,8 +162,10 @@ class MeshBuilder:
                 if np.any(mask):
                     cells = grid_f.extract_cells(np.where(mask)[0])
                     plotter.add_mesh(
-                        cells, color=color, show_edges=True,
-                        label=self.inv_label_map.get(tag, f"tag {tag}")
+                        cells,
+                        color=color,
+                        show_edges=True,
+                        label=self.inv_label_map.get(tag, f"tag {tag}"),
                     )
 
             plotter.add_legend()
@@ -136,7 +177,7 @@ class MeshBuilder:
                 print(f"  {tag} → {name}")
 
         plotter.add_axes()
-        
+
         plotter.show(screenshot="mesh.png")
         print("[INFO] Saved screenshot → mesh.png")
 

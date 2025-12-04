@@ -15,8 +15,8 @@ It does NOT rerun Gmsh or Z3ST - it only performs the post-processing stage.
 
 import shutil
 import subprocess
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # =============================================================================
 # CONFIGURATION
@@ -24,6 +24,7 @@ from datetime import datetime
 ROOT = Path.cwd()
 BASE_NONREG = ROOT / "non-regression.py"  # Source file to copy into each folder
 LOG_FILE = ROOT / "attenuation_rerun.log"
+
 
 # =============================================================================
 # UTILITY FUNCTIONS
@@ -34,6 +35,7 @@ def log(msg):
     with open(LOG_FILE, "a") as f:
         f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S}  {msg}\n")
 
+
 def run_cmd(cmd, cwd):
     """Run a shell command in a specific working directory."""
     res = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True)
@@ -41,6 +43,7 @@ def run_cmd(cmd, cwd):
     if res.returncode != 0:
         print(res.stderr)
         raise RuntimeError(f"[ERROR] while running {' '.join(cmd)}")
+
 
 # =============================================================================
 # MAIN EXECUTION

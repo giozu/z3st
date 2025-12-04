@@ -14,7 +14,7 @@ except metadata.PackageNotFoundError:
     __version__ = "0.1.0"
 
 from .core import solver
-from .models import mechanical_model, thermal_model, gap_model
+from .models import gap_model, mechanical_model, thermal_model
 from .utils import export_vtu, plot_convergence
 
 __all__ = [

@@ -1,0 +1,41 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.1.0 (2025)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+
+# pre-commit install
+# pre-commit autoupdate
+# pre-commit run --all-files
+
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+
+  - repo: https://github.com/psf/black
+    rev: 25.11.0
+    hooks:
+      - id: black
+        args: ["."]
+        language_version: python3
+
+  - repo: https://github.com/pycqa/isort
+    rev: 7.0.0
+    hooks:
+      - id: isort
+        args: ["."]
+        language_version: python3
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear

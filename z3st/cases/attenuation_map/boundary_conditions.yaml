@@ -3,7 +3,7 @@ thermal_bcs:
     - type: Dirichlet
       region: inner_radius
       temperature: 527.0 # (K)
-      
+
     - type: Neumann
       region: outer_radius
       flux: 0.0
@@ -13,11 +13,11 @@ mechanical_bcs:
     - type: Dirichlet
       region: bottom
       displacement: [0.0, 0.0, 0.0] # (m)
-    
+
     - type: Neumann
       region: inner_radius
       traction: 0.0 # (Pa)
-    
+
     - type: Neumann
       region: outer_radius
       traction: 0.0 # (Pa)

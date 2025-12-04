@@ -3,7 +3,7 @@ thermal_bcs:
     - type: Dirichlet
       region: inner_radius
       temperature: 490.0 # (K)
-      
+
     - type: Dirichlet
       region: outer_radius
       temperature: 500.0 # (K)

@@ -3,7 +3,7 @@
 //  Elliptical cavity inside a rectangular box
 //
 //  Author: Giovanni Zullo
-// 
+//
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 SetFactory("OpenCASCADE");

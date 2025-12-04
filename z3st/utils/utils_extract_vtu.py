@@ -23,16 +23,18 @@ Typical usage:
     x, y, z, sigma_xx = extract_stress("output/fields.vtu", component="xx")
     x, y, z, U = extract_displacement("output/fields.vtu")
 
-Author: Giovanni Zullo  
+Author: Giovanni Zullo
 Project: Z3ST
 Date: 11/10/2025
 """
 
 # --.. ..- .-.. .-.. --- imports --.. ..- .-.. .-.. ---
 import os
+
 import numpy as np
-import pyvista as pv
 import pandas as pd
+import pyvista as pv
+
 
 # --.. ..- .-.. .-.. --- helpers --.. ..- .-.. .-.. ---
 def _detect_temp_field(grid):
@@ -46,6 +48,7 @@ def _detect_temp_field(grid):
             return "cell", name
     raise KeyError("Temperature field not found in VTU file.")
 
+
 def _detect_displacement(grid):
     """Find displacement field name in VTU file"""
     for name in ("Displacement", "displacement", "U", "u"):
@@ -56,6 +59,7 @@ def _detect_displacement(grid):
             print(f"[INFO] Found displacement field in cell_data: '{name}'")
             return "cell", name
     raise KeyError("Displacement field not found in VTU file.")
+
 
 def _detect_VonMises(grid, prefer="cells"):
     """Find Von Mises equivalent stress in VTU file"""
@@ -74,6 +78,7 @@ def _detect_VonMises(grid, prefer="cells"):
 
     raise KeyError("VonMises field not found in VTU file.")
 
+
 def _detect_sigma(grid, prefer="points"):
     """
     Detect the stress field in the VTU file.
@@ -90,7 +95,7 @@ def _detect_sigma(grid, prefer="points"):
             if "stress" in name.lower():
                 print(f"[INFO] Found stress field in cell_data: '{name}'")
                 return "cell", name
-            
+
     else:
         raise ValueError(f"Invalid prefer value '{prefer}'. Choose 'points' or 'cells'.")
 
@@ -98,6 +103,7 @@ def _detect_sigma(grid, prefer="points"):
     print("Available point_data:", list(grid.point_data.keys()))
     print("Available cell_data:", list(grid.cell_data.keys()))
     raise KeyError("No stress field found containing 'Stress_steel'.")
+
 
 def _data_coords(grid, location, field_name):
     """Retrieve data array and coordinates based on location (point or cell)"""
@@ -110,6 +116,7 @@ def _data_coords(grid, location, field_name):
     else:
         raise ValueError(f"Invalid location '{location}'. Must be 'point' or 'cell'.")
     return data, coords
+
 
 # --.. ..- .-.. .-.. --- field listing --.. ..- .-.. .-.. ---
 def list_fields(vtu_path):
@@ -183,6 +190,7 @@ def extract_VonMises(vtu_path, return_coords=True, prefer="cells"):
     else:
         return data
 
+
 def extract_temperature(vtu_path, return_coords=True):
     """
     Extract temperature field and coordinates from VTU.
@@ -214,6 +222,7 @@ def extract_temperature(vtu_path, return_coords=True):
         return x, y, z, data
     else:
         return data
+
 
 def extract_displacement(vtu_path, return_coords=True):
     """
@@ -285,10 +294,7 @@ def extract_stress(vtu_path, component="xx", return_coords=True, prefer="cells")
         raise ValueError(f"Unexpected stress data shape: {data.shape}")
 
     x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
-    comp_map = {
-        "xx": (0, 0), "yy": (1, 1), "zz": (2, 2),
-        "xy": (0, 1), "xz": (0, 2), "yz": (1, 2)
-    }
+    comp_map = {"xx": (0, 0), "yy": (1, 1), "zz": (2, 2), "xy": (0, 1), "xz": (0, 2), "yz": (1, 2)}
     if component == "all":
         comps = {
             "xx": stress_tensors[:, 0, 0],
@@ -308,6 +314,7 @@ def extract_stress(vtu_path, component="xx", return_coords=True, prefer="cells")
 
     return x, y, z, stress_comp if return_coords else stress_comp
 
+
 def extract_principal_stresses(
     vtu_path,
     return_coords=True,
@@ -315,7 +322,7 @@ def extract_principal_stresses(
     average=None,
     n_bins=100,
     decimals=3,
-    bandwidth=0.0005
+    bandwidth=0.0005,
 ):
     """
     Extract principal stresses (σ₁, σ₂, σ₃) from a VTU file by diagonalizing
@@ -351,41 +358,44 @@ def extract_principal_stresses(
     s_xx, s_yy, s_zz = comps["xx"], comps["yy"], comps["zz"]
     s_xy, s_xz, s_yz = comps["xy"], comps["xz"], comps["yz"]
 
-    stress_tensors = np.stack([
-        np.stack([s_xx, s_xy, s_xz], axis=1),
-        np.stack([s_xy, s_yy, s_yz], axis=1),
-        np.stack([s_xz, s_yz, s_zz], axis=1)
-    ], axis=1)  # shape (N,3,3)
+    stress_tensors = np.stack(
+        [
+            np.stack([s_xx, s_xy, s_xz], axis=1),
+            np.stack([s_xy, s_yy, s_yz], axis=1),
+            np.stack([s_xz, s_yz, s_zz], axis=1),
+        ],
+        axis=1,
+    )  # shape (N,3,3)
 
     eigvals = np.linalg.eigvalsh(stress_tensors)
     sigma1, sigma2, sigma3 = eigvals[:, 2], eigvals[:, 1], eigvals[:, 0]
 
     if average:
         from utils_plot import (
-            radial_average_uniform_bins,
-            radial_average_weighted,
             radial_average_kernel,
             radial_average_round,
+            radial_average_uniform_bins,
+            radial_average_weighted,
         )
 
         print(f"[INFO] Applying radial averaging ({average}) on principal stresses...")
 
         if average == "bins":
             r_avg, sigma1 = radial_average_uniform_bins(x, y, z, sigma1, n_bins=n_bins)
-            _,     sigma2 = radial_average_uniform_bins(x, y, z, sigma2, n_bins=n_bins)
-            _,     sigma3 = radial_average_uniform_bins(x, y, z, sigma3, n_bins=n_bins)
+            _, sigma2 = radial_average_uniform_bins(x, y, z, sigma2, n_bins=n_bins)
+            _, sigma3 = radial_average_uniform_bins(x, y, z, sigma3, n_bins=n_bins)
         elif average == "weighted":
             r_avg, sigma1 = radial_average_weighted(x, y, z, sigma1, n_bins=n_bins)
-            _,     sigma2 = radial_average_weighted(x, y, z, sigma2, n_bins=n_bins)
-            _,     sigma3 = radial_average_weighted(x, y, z, sigma3, n_bins=n_bins)
+            _, sigma2 = radial_average_weighted(x, y, z, sigma2, n_bins=n_bins)
+            _, sigma3 = radial_average_weighted(x, y, z, sigma3, n_bins=n_bins)
         elif average == "kernel":
             r_avg, sigma1 = radial_average_kernel(x, y, z, sigma1, bandwidth=bandwidth)
-            _,     sigma2 = radial_average_kernel(x, y, z, sigma2, bandwidth=bandwidth)
-            _,     sigma3 = radial_average_kernel(x, y, z, sigma3, bandwidth=bandwidth)
+            _, sigma2 = radial_average_kernel(x, y, z, sigma2, bandwidth=bandwidth)
+            _, sigma3 = radial_average_kernel(x, y, z, sigma3, bandwidth=bandwidth)
         elif average == "round":
             r_avg, sigma1 = radial_average_round(x, y, z, "sigma1", sigma1, decimals=decimals)
-            _,     sigma2 = radial_average_round(x, y, z, "sigma2", sigma2, decimals=decimals)
-            _,     sigma3 = radial_average_round(x, y, z, "sigma3", sigma3, decimals=decimals)
+            _, sigma2 = radial_average_round(x, y, z, "sigma2", sigma2, decimals=decimals)
+            _, sigma3 = radial_average_round(x, y, z, "sigma3", sigma3, decimals=decimals)
         else:
             raise ValueError(f"Unknown averaging method '{average}'.")
 
@@ -398,7 +408,6 @@ def extract_principal_stresses(
         return x, y, z, sigma1, sigma2, sigma3
     else:
         return sigma1, sigma2, sigma3
-
 
 
 def extract_spherical_stresses(
@@ -449,7 +458,7 @@ def extract_spherical_stresses(
     # --. Spherical coordinates --..
     r = np.sqrt(x**2 + y**2 + z**2)
     theta = np.arccos(np.divide(z, r, out=np.zeros_like(z), where=r > 0))  # [ 0, π]
-    phi = np.arctan2(y, x)                                                 # [-π, π]
+    phi = np.arctan2(y, x)  # [-π, π]
 
     cth, sth = np.cos(theta), np.sin(theta)
     cph, sph = np.cos(phi), np.sin(phi)
@@ -464,27 +473,23 @@ def extract_spherical_stresses(
     )
 
     sigma_tt = (
-        s_xx * (cth * cph)**2
-        + s_yy * (cth * sph)**2
+        s_xx * (cth * cph) ** 2
+        + s_yy * (cth * sph) ** 2
         + s_zz * sth**2
         + 2 * s_xy * cth**2 * sph * cph
         - 2 * s_xz * sth * cth * cph
         - 2 * s_yz * sth * cth * sph
     )
 
-    sigma_pp = (
-        s_xx * sph**2
-        + s_yy * cph**2
-        - 2 * s_xy * sph * cph
-    )
+    sigma_pp = s_xx * sph**2 + s_yy * cph**2 - 2 * s_xy * sph * cph
 
     # --. Averaging (Optional) --..
     if average:
         from utils_plot import (
-            radial_average_uniform_bins,
-            radial_average_weighted,
             radial_average_kernel,
             radial_average_round,
+            radial_average_uniform_bins,
+            radial_average_weighted,
         )
 
         print(f"[INFO] Applying radial averaging ({average}) on spherical stresses...")
@@ -519,6 +524,7 @@ def extract_spherical_stresses(
     else:
         return sigma_rr, sigma_tt, sigma_pp
 
+
 def extract_cylindrical_stresses(
     filename="output/fields.vtu",
     z_fixed=0.0,
@@ -528,7 +534,7 @@ def extract_cylindrical_stresses(
     data_source="auto",
     average=True,
     decimals=6,
-    save_results=False
+    save_results=False,
 ):
     """
     Extract a .csv σ_rr, σ_θθ, σ_zz at a fixed z from a .vtu file (cell or point data).
@@ -601,12 +607,10 @@ def extract_cylindrical_stresses(
     sigma_zz = szz
 
     import pandas as pd
-    df = pd.DataFrame({
-        "r": r,
-        "sigma_rr": sigma_rr,
-        "sigma_tt": sigma_tt,
-        "sigma_zz": sigma_zz
-    }).sort_values("r")
+
+    df = pd.DataFrame(
+        {"r": r, "sigma_rr": sigma_rr, "sigma_tt": sigma_tt, "sigma_zz": sigma_zz}
+    ).sort_values("r")
 
     # --- Average by radius (optional) ---
     if average:
@@ -621,7 +625,13 @@ def extract_cylindrical_stresses(
         df.to_csv(csv_path, index=False)
         print(f"[DATA] Stress profile saved → {csv_path}")
 
-    return df["r"].to_numpy(), df["sigma_rr"].to_numpy(), df["sigma_tt"].to_numpy(), df["sigma_zz"].to_numpy()
+    return (
+        df["r"].to_numpy(),
+        df["sigma_rr"].to_numpy(),
+        df["sigma_tt"].to_numpy(),
+        df["sigma_zz"].to_numpy(),
+    )
+
 
 def save_csv_principal_stress(
     filename="output/fields.vtu",
@@ -690,20 +700,17 @@ def save_csv_principal_stress(
 
     x, y = coords[mask, 0], coords[mask, 1]
     r = np.sqrt(x**2 + y**2)
-    
+
     # --- Principal stresses computation ---
     stresses = stress[mask]
     eigvals = np.linalg.eigvalsh(stresses)
     sigma1, sigma2, sigma3 = eigvals[:, 2], eigvals[:, 1], eigvals[:, 0]
 
-
     import pandas as pd
-    df = pd.DataFrame({
-        "r": r,
-        "sigma1": sigma1,
-        "sigma2": sigma2,
-        "sigma3": sigma3
-    }).sort_values("r")
+
+    df = pd.DataFrame({"r": r, "sigma1": sigma1, "sigma2": sigma2, "sigma3": sigma3}).sort_values(
+        "r"
+    )
 
     # --- Average by radius (optional) ---
     if average:
@@ -724,13 +731,19 @@ def save_csv_principal_stress(
         "sigma3": df["sigma3"].to_numpy(),
     }
 
+
 def average_section(x, y, z, field, y0, z0, tol=1e-3, decimals=5, label="field"):
     """Extract and average field along x at fixed y,z plane."""
     mask = (np.abs(y - y0) < tol) & (np.abs(z - z0) < tol)
     if not np.any(mask):
         raise RuntimeError(f"[ERROR] No points found for {label} (tol={tol})")
-    df = pd.DataFrame({"x": x[mask].round(decimals), label: field[mask]}).groupby("x", as_index=False).mean()
+    df = (
+        pd.DataFrame({"x": x[mask].round(decimals), label: field[mask]})
+        .groupby("x", as_index=False)
+        .mean()
+    )
     return df["x"].to_numpy(), df[label].to_numpy()
+
 
 def average_section_radial(x, y, z, field, z_target, tol=1e-3, decimals=5):
     """Average a scalar field over constant-z plane along radius r = sqrt(x² + y²)."""

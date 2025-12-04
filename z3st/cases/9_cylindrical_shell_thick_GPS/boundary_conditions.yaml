@@ -3,7 +3,7 @@ thermal_bcs:
     - type: Dirichlet
       region: inner_radius
       temperature: 300 # (K)
-      
+
 mechanical_bcs:
   steel:
     - type: Dirichlet
@@ -13,11 +13,11 @@ mechanical_bcs:
     - type: Clamp_z
       region: top
       value: -1.359155e-06 # (m)
-    
+
     - type: Neumann
       region: inner_radius
       traction: -1.0e+6 # (Pa)
-    
+
     - type: Neumann
       region: outer_radius
       traction: 0.0 # (Pa)

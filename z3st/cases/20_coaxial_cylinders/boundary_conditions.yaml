@@ -16,7 +16,7 @@ thermal_bcs:
     - type: Neumann
       region: bottom_2
       flux: 0.0
-      
+
     - type: Dirichlet
       region: outer_2
       temperature: 350.0 # (K)
@@ -41,7 +41,7 @@ mechanical_bcs:
 
     - type: Clamp_z
       region: top_1
-      
+
   cyl_2:
     - type: Dirichlet
       region: bottom_2

@@ -3,6 +3,7 @@
 ![CI](https://github.com/giozu/z3st/actions/workflows/ci.yml/badge.svg)
 ![static](https://github.com/giozu/z3st/actions/workflows/static.yml/badge.svg)
 ![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg)
+![Lint](https://github.com/giozu/z3st/actions/workflows/lint.yml/badge.svg)
 
 **Z3ST** is an open-source finite-element framework for thermo-mechanical material analysis.
 Developed in **Python**, it leverages **FEniCSx** and provides a modular environment to couple heat conduction and linear elasticity in multi-material domains under stationary or transient conditions, with user-defined boundary conditions.
@@ -229,13 +230,13 @@ These tools, together with other Python utilities, provide a complete post-proce
 While Z3ST supports full configuration through YAML files for reproducibility and ease of use, the framework is deliberately designed to extend far beyond YAML-based inputs.
 
 ### External Python material models
-Material behaviour does not need to be hard-coded or restricted to values inside YAML files.  
+Material behaviour does not need to be hard-coded or restricted to values inside YAML files.
 Z3ST natively supports **Python-based material modules**, allowing users to implement:
 
-- temperature-dependent constitutive laws  
-- empirical or semi-empirical correlations  
-- nonlinear stress–strain behaviour  
-- surrogate models and neural networks  
+- temperature-dependent constitutive laws
+- empirical or semi-empirical correlations
+- nonlinear stress–strain behaviour
+- surrogate models and neural networks
 - models depending on local fields (e.g., temperature, gradients)
 
 These Python modules are automatically loaded and integrated into the finite-element formulation at runtime.
@@ -243,7 +244,7 @@ These Python modules are automatically loaded and integrated into the finite-ele
 ### Integration with FEniCSx ecosystem
 Z3ST is designed to interoperate with the wider FEniCSx ecosystem, with planned integration of:
 
-- **`dolfinx_mpc`** for multi-point constraints and advanced boundary-condition enforcement  
+- **`dolfinx_mpc`** for multi-point constraints and advanced boundary-condition enforcement
 - **`dolfinx_materials`** for standardised material libraries and automatically tabulated thermal/mechanical properties
 
 This allows the framework to grow toward more general multiphysics and nonlinear-modelling workflows.
@@ -251,9 +252,9 @@ This allows the framework to grow toward more general multiphysics and nonlinear
 ### Microstructure and multi-scale workflows
 Z3ST is also envisaged to integrate with external tools for:
 
-- synthetic microstructure generation (e.g., **Merope**)  
-- **rate-theory solvers** for irradiation-driven defect evolution  
-- **Monte Carlo workflows** for stochastic microstructural processes  
+- synthetic microstructure generation (e.g., **Merope**)
+- **rate-theory solvers** for irradiation-driven defect evolution
+- **Monte Carlo workflows** for stochastic microstructural processes
 
 These extensions aim to connect Z3ST to multi-scale modelling pipelines involving microstructure → mesoscale → continuum thermo-mechanics.
 

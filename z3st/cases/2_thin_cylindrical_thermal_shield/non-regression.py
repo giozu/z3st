@@ -10,11 +10,12 @@ Steady-state 1D axisymmetric cylindrical wall (Dirichlet-Dirichlet).
 """
 
 import os
+
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
 from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder
+from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
@@ -22,25 +23,33 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.0, 2.1, 10             # m          inner and outer radius
-Pi, Po = 0.0, 0.0                     # Pa         internal and external pressure
-k, E, nu, alpha = 48.1, 1.77e11, 0.3, 1.7e-5    # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 490.0, 480.0                 # K          inner and outer surface temperature
-Lx = Ro - Ri                          # m          wall thickness
-slenderness = Ri / Lx                 # -          slenderness ratio
-z_target, z_tol = Lz/2, Lz/10         # m          z-plane for data extraction
+Ri, Ro, Lz = 2.0, 2.1, 10  # m          inner and outer radius
+Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
+k, E, nu, alpha = (
+    48.1,
+    1.77e11,
+    0.3,
+    1.7e-5,
+)  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
+Ti, To = 490.0, 480.0  # K          inner and outer surface temperature
+Lx = Ro - Ri  # m          wall thickness
+slenderness = Ri / Lx  # -          slenderness ratio
+z_target, z_tol = Lz / 2, Lz / 10  # m          z-plane for data extraction
 
-TOLERANCE = 7.0e-1                    # -          tolerance for non-regression
+TOLERANCE = 7.0e-1  # -          tolerance for non-regression
+
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_T(r):
     """Analytical temperature profile for a cylindrical shell with imposed T_inner and T_outer"""
-    return Ti + (To - Ti) * np.log(r / Ri) / np.log(Ro/Ri)
+    return Ti + (To - Ti) * np.log(r / Ri) / np.log(Ro / Ri)
+
 
 def sigma_th(r, T_num, c=1.0):
     """Thermal stress profile (axisymmetric)."""
     T_mean = 2 / (Ro**2 - Ri**2) * np.trapezoid(T_num * r, r)
     return alpha * E / (1.0 - c * nu) * (T_mean - T_num)
+
 
 def analytical_thermal_stress(r):
     """
@@ -72,26 +81,24 @@ def analytical_thermal_stress(r):
 
         # Local integral ∫_{Ri}^{r} T(r*) r* dr*
         mask = r_star <= ri
-        I_local  = np.trapezoid(T_star[mask] * r_star[mask], r_star[mask])
+        I_local = np.trapezoid(T_star[mask] * r_star[mask], r_star[mask])
 
         # Stress components
-        sigma_r[i] = (alpha * E / (1 - nu)) * 1/ri**2 * (
-            ((ri**2 - Ri**2) / (Ro**2 - Ri**2)) * I_global
-            - I_local
+        sigma_r[i] = (
+            (alpha * E / (1 - nu))
+            * 1
+            / ri**2
+            * (((ri**2 - Ri**2) / (Ro**2 - Ri**2)) * I_global - I_local)
         )
 
         sigma_t[i] = (alpha * E / (1 - nu)) * (
-            ((1 + (Ri/ri)**2) / (Ro**2 - Ri**2)) * I_global
-            + I_local / ri**2
-            - analytic_T(ri)
+            ((1 + (Ri / ri) ** 2) / (Ro**2 - Ri**2)) * I_global + I_local / ri**2 - analytic_T(ri)
         )
 
-        sigma_z[i] = (alpha * E / (1 - nu)) * (
-            (2 / (Ro**2 - Ri**2)) * I_global
-            - analytic_T(ri)
-        )
+        sigma_z[i] = (alpha * E / (1 - nu)) * ((2 / (Ro**2 - Ri**2)) * I_global - analytic_T(ri))
 
     return sigma_r, sigma_t, sigma_z
+
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
@@ -141,11 +148,11 @@ plotter_sigma_temperature_cylinder(
 )
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_th)**2)) / np.sqrt(np.mean(sigma_tt_ana_th**2))
-err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_th)**2)) / np.sqrt(np.mean(sigma_rr_ana_th**2))
-err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_th)**2)) / np.sqrt(np.mean(sigma_zz_ana_th**2))
+err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_th) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_th**2))
+err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_th) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_th**2))
+err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_th) ** 2)) / np.sqrt(np.mean(sigma_zz_ana_th**2))
 
-L2_T = float(np.sqrt(np.mean((T - T_ref)**2)))
+L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
 Linf_T = float(np.max(np.abs((T - T_ref))))
 RelL2_T = float(L2_T / np.mean(np.abs(T_ref)))
 
@@ -176,20 +183,20 @@ errors = {
         "numerical": float(err_rr),
         "reference": 0.0,
         "abs_error": float(err_rr),
-        "rel_error": float(err_rr)
+        "rel_error": float(err_rr),
     },
     "L2_error_sigma_tt": {
         "numerical": float(err_tt),
         "reference": 0.0,
         "abs_error": float(err_tt),
-        "rel_error": float(err_tt)
+        "rel_error": float(err_tt),
     },
     "L2_error_sigma_zz": {
         "numerical": float(err_zz),
         "reference": 0.0,
         "abs_error": float(err_zz),
-        "rel_error": float(err_zz)
-    }
+        "rel_error": float(err_zz),
+    },
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
