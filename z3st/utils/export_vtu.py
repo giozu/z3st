@@ -167,7 +167,7 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     # --- Per-material on POINTS: stress + Von Mises + principals + hydrostatic ---
     stress_total_points = dolfinx.fem.Function(V_tensor_points)
 
-    for name, material in problem.materials.items():
+    for name, _ in problem.materials.items():
         tag = problem.label_map[name]
         material_cells = cell_tags.find(tag)
 

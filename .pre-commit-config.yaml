@@ -23,12 +23,19 @@ repos:
     rev: 25.11.0
     hooks:
       - id: black
-        args: [--quiet]
-        pass_filenames: false
+        args: ["."]
+        language_version: python3
 
   - repo: https://github.com/pycqa/isort
     rev: 7.0.0
     hooks:
       - id: isort
-        args: [--quiet]
-        pass_filenames: false
+        args: ["."]
+        language_version: python3
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-bugbear

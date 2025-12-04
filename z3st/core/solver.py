@@ -197,7 +197,7 @@ class Solver:
 
         # Thermal Dirichlet BCs reconstructed on W.sub(1)
         thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
-        for mat, bc_list in thermal_bcs_defs.items():
+        for _, bc_list in thermal_bcs_defs.items():
             for bc in bc_list:
                 if bc.get("type") != "Dirichlet":
                     continue
@@ -214,7 +214,7 @@ class Solver:
 
         # Mechanical Dirichlet BCs: full vector displacement or single-component clamps
         mech_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
-        for mat, bc_list in mech_bcs_defs.items():
+        for _, bc_list in mech_bcs_defs.items():
             for bc in bc_list:
                 bc_type = bc.get("type")
                 region = bc.get("region")
