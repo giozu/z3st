@@ -544,7 +544,7 @@ class Solver:
                         alpha = bc_info["penalty"]
                         val = bc_info["value"]
                         print(
-                            f"  Applying Clamp_r (weak penalty) on region id = {bc_info["id"]} (α = {alpha:.2e})"
+                            f"  Applying Clamp_r (weak penalty) on region id = {bc_info['id']} (α = {alpha:.2e})"
                         )
 
                         ds = self.ds_tags[bc_info["id"]]
