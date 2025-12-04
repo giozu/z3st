@@ -41,5 +41,10 @@ jobs:
         echo "Running Flake8 linter..."
         flake8 .
 
+    - name: YAML formatting
+      run: |
+        pip install yamlfmt
+        find . -type f \( -name "*.yml" -o -name "*.yaml" \) | xargs yamlfmt -w
+
     - name: Summary
       run: echo "Linting and formatting checks passed!"
