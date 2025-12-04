@@ -1,59 +1,59 @@
 thermal_bcs:
   cyl_1:
-    - type: Neumann
-      region: bottom_1
-      flux: 0.0
+  - type: Neumann
+    region: bottom_1
+    flux: 0.0
 
-    - type: Neumann
-      region: top_1
-      flux: 0.0
+  - type: Neumann
+    region: top_1
+    flux: 0.0
 
-    - type: Robin
-      region: lateral_1
-      pair: inner_2
+  - type: Robin
+    region: lateral_1
+    pair: inner_2
 
   cyl_2:
-    - type: Neumann
-      region: bottom_2
-      flux: 0.0
+  - type: Neumann
+    region: bottom_2
+    flux: 0.0
 
-    - type: Dirichlet
-      region: outer_2
-      temperature: 350.0 # (K)
+  - type: Dirichlet
+    region: outer_2
+    temperature: 350.0   # (K)
 
-    - type: Neumann
-      region: top_2
-      flux: 0.0
+  - type: Neumann
+    region: top_2
+    flux: 0.0
 
-    - type: Robin
-      region: inner_2
-      pair: lateral_1
+  - type: Robin
+    region: inner_2
+    pair: lateral_1
 
 mechanical_bcs:
   cyl_1:
-    - type: Dirichlet
-      region: bottom_1
-      displacement: [0.0, 0.0, 0.0] # (m)
+  - type: Dirichlet
+    region: bottom_1
+    displacement: [0.0, 0.0, 0.0]   # (m)
 
-    - type: Neumann
-      region: lateral_1
-      traction: -2.0e6 # (Pa)
+  - type: Neumann
+    region: lateral_1
+    traction: -2.0e6   # (Pa)
 
-    - type: Clamp_z
-      region: top_1
+  - type: Clamp_z
+    region: top_1
 
   cyl_2:
-    - type: Dirichlet
-      region: bottom_2
-      displacement: [0.0, 0.0, 0.0] # (m)
+  - type: Dirichlet
+    region: bottom_2
+    displacement: [0.0, 0.0, 0.0]   # (m)
 
-    - type: Neumann
-      region: inner_2
-      traction: -2.0e6 # (Pa)
+  - type: Neumann
+    region: inner_2
+    traction: -2.0e6   # (Pa)
 
-    - type: Neumann
-      region: outer_2
-      traction: -5.0e6 # (Pa)
+  - type: Neumann
+    region: outer_2
+    traction: -5.0e6   # (Pa)
 
-    - type: Clamp_z
-      region: top_2
+  - type: Clamp_z
+    region: top_2

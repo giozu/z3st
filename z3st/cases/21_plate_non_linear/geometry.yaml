@@ -6,7 +6,7 @@ Ly: 0.100        # box length in y (m)
 Lz: 0.004        # box length in z (m)
 
 h_box: 0.001      # cell size
-plot: True
+plot: true
 
 labels:
   xmin: 5

@@ -18,17 +18,17 @@ solver_settings:
   relax_u: 0.4
 
 models:
-  thermal: False
-  mechanical: True
+  thermal: false
+  mechanical: true
 
 mechanical:
   solver: linear # linear | non-linear
   linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  mechanical_regime: "3D" # 3D | plane_stress
+  mechanical_regime: 3D   # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
-  debug: False
+  debug: false
 
 thermal:
   solver: linear # linear | non-linear
@@ -38,9 +38,9 @@ thermal:
   convergence: rel_norm # rel_norm | norm
 
 lhr:
-  - 0.0
-  - 0.0
+- 0.0
+- 0.0
 time:
-  - 0.0
-  - 10.0
+- 0.0
+- 10.0
 n_steps: 5

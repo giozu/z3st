@@ -17,15 +17,15 @@ solver_settings:
   max_iters: 100
   relax_T: 0.9
   relax_u: 0.7
-  relax_adaptive: True
+  relax_adaptive: true
   relax_growth: 1.1
   relax_shrink: 0.7
   relax_min: 0.05
   relax_max: 1.0
 
 models:
-  thermal: True
-  mechanical: False
+  thermal: true
+  mechanical: false
   gap_conductance:
     type: Fixed
     value: 2000.0    # W/m2-K
@@ -35,9 +35,9 @@ mechanical:
   linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  mechanical_regime: "3D" # 3D | plane_stress
+  mechanical_regime: 3D   # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
-  debug: False
+  debug: false
 
 thermal:
   solver: linear
@@ -47,7 +47,7 @@ thermal:
   convergence: rel_norm # rel_norm | norm
 
 lhr:
-  - 20
+- 20
 time:
-  - 0
+- 0
 n_steps: 1

@@ -1,18 +1,18 @@
 thermal_bcs:
   volume:
-    - type: Dirichlet
-      region: outer
-      temperature: 500.0 # (K)
+  - type: Dirichlet
+    region: outer
+    temperature: 500.0   # (K)
 
 mechanical_bcs:
   volume:
-    - type: Clamp_z
-      region: bottom
+  - type: Clamp_z
+    region: bottom
 
-    - type: Neumann
-      region: inner
-      traction: 0.0 # (Pa)
+  - type: Neumann
+    region: inner
+    traction: 0.0   # (Pa)
 
-    - type: Neumann
-      region: outer
-      traction: 0.0 # (Pa)
+  - type: Neumann
+    region: outer
+    traction: 0.0   # (Pa)
