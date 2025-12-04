@@ -1,5 +1,5 @@
 name: T91
-fissile: False
+fissile: false
 
 # Mechanical properties
 E: 2.0e11         # Young's modulus (Pa)

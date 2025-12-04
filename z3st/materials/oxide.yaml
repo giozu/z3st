@@ -1,5 +1,5 @@
 name: oxide
-fissile: True
+fissile: true
 
 E: 1.7e+11       # (Pa)
 nu: 0.3          # -
