@@ -120,7 +120,7 @@ To automatically execute all available verification and non-regression tests, ru
    ./non-regression.sh
 
 This script sequentially executes all predefined test cases and compares the obtained results
-against the reference data stored in the repository.  
+against the reference data stored in the repository.
 A summary of the execution status is saved in ``non-regression_summary.txt``.
 
 .. note::

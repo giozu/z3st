@@ -5,8 +5,10 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 from datetime import datetime
+
 import numpy as np
 import yaml
+
 
 def load(yaml_file):
     """
@@ -22,6 +24,7 @@ def load(yaml_file):
         data = yaml.safe_load(f)
 
     return data
+
 
 def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_history.tsv"):
     """
@@ -71,6 +74,7 @@ def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_his
 
     return times, lhrs, len(times)
 
+
 def read_power_history(filename):
     """
     Reads a TSV file containing time and LHR columns.
@@ -96,6 +100,7 @@ def read_power_history(filename):
     lhrs = np.array(lhrs)
     return times, lhrs, len(times)
 
+
 def get_ksp_reason_name(reason_code):
     """
     Convert PETSc KSP converged/diverged reason code to a human-readable name.
@@ -107,9 +112,9 @@ def get_ksp_reason_name(reason_code):
     - str: Name of the reason (e.g., 'CONVERGED_RTOL', 'DIVERGED_ITS', etc.)
     """
     reason_map = {
-        2:  "CONVERGED_RTOL",
-        3:  "CONVERGED_ATOL",
-        4:  "CONVERGED_ITS",
+        2: "CONVERGED_RTOL",
+        3: "CONVERGED_ATOL",
+        4: "CONVERGED_ITS",
         -2: "DIVERGED_NULL",
         -3: "DIVERGED_BREAKDOWN",
         -4: "DIVERGED_BREAKDOWN_BICG",

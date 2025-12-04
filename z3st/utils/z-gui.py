@@ -6,6 +6,7 @@
 
 import os
 import sys
+
 import numpy as np
 import pyvista as pv
 
@@ -15,17 +16,20 @@ from utils_extract_vtu import list_fields
 PLOTTER_WINDOW_SIZE = [1000, 800]
 VTU_FILE = "output/fields.vtu"
 
-def view_vtu(filename="output/fields.vtu",
-             show_warp=True,
-             warp_factor=1.0,
-             show_temperature=True,
-             show_stress=True,
-             show_strain=True,
-             stress_field_name=None,
-             strain_field_name=None,
-             z_slice_3d_vis=0.005,
-             tol=1e-5, 
-             material=None):
+
+def view_vtu(
+    filename="output/fields.vtu",
+    show_warp=True,
+    warp_factor=1.0,
+    show_temperature=True,
+    show_stress=True,
+    show_strain=True,
+    stress_field_name=None,
+    strain_field_name=None,
+    z_slice_3d_vis=0.005,
+    tol=1e-5,
+    material=None,
+):
     """
     Loads and visualizes a .vtu file exported by Z3ST with 3D plots using PyVista.
     # ... tutto il resto della funzione view_vtu deve essere indentato correttamente ...
@@ -40,14 +44,8 @@ def view_vtu(filename="output/fields.vtu",
 
     # --- Field selection logic ---
     if material:
-        stress_field_candidates = [
-            f"Stress_{material} (points)",
-            f"Stress_{material} (cells)"
-        ]
-        strain_field_candidates = [
-            f"Strain (points)",
-            f"Strain (cells)"
-        ]
+        stress_field_candidates = [f"Stress_{material} (points)", f"Stress_{material} (cells)"]
+        strain_field_candidates = [f"Strain (points)", f"Strain (cells)"]
 
         temp_field_name = "Temperature"
         disp_field_name = "Displacement"
@@ -84,7 +82,6 @@ def view_vtu(filename="output/fields.vtu",
         else:
             print(f"[WARNING] No strain field found for '{material}'.")
 
-            
         if temp_field_name not in grid.point_data:
             temp_field_name = "Temperature" if "Temperature" in grid.point_data else None
         if disp_field_name not in grid.point_data:
@@ -113,8 +110,10 @@ def view_vtu(filename="output/fields.vtu",
             s = grid.point_data[stress_field_name].reshape((-1, 3, 3))
             s_xx, s_yy, s_zz = s[:, 0, 0], s[:, 1, 1], s[:, 2, 2]
             s_xy, s_yz, s_zx = s[:, 0, 1], s[:, 1, 2], s[:, 2, 0]
-            von_mises = np.sqrt(0.5 * ((s_xx - s_yy)**2 + (s_yy - s_zz)**2 + (s_zz - s_xx)**2) +
-                                3 * (s_xy**2 + s_yz**2 + s_zx**2))
+            von_mises = np.sqrt(
+                0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
+                + 3 * (s_xy**2 + s_yz**2 + s_zx**2)
+            )
             grid.point_data["Von Mises stress"] = von_mises
         else:
             print(f"[WARNING] Stress field '{stress_field_name}' not found. Skipping stress plot.")
@@ -141,8 +140,14 @@ def view_vtu(filename="output/fields.vtu",
     if show_temperature and temp_field_name in grid.point_data:
         plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
         sargs = dict(title="Temperature (K)")
-        plotter.add_mesh(warped_grid, scalars=temp_field_name, cmap="plasma", show_edges=not show_warp, scalar_bar_args=sargs)
-        plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.5)
+        plotter.add_mesh(
+            warped_grid,
+            scalars=temp_field_name,
+            cmap="plasma",
+            show_edges=not show_warp,
+            scalar_bar_args=sargs,
+        )
+        plotter.add_mesh(grid, style="wireframe", color="gray", opacity=0.5)
         plotter.add_text(f"Temperature: {temp_field_name}", font_size=12)
         plotter.add_axes()
         plotter.show()
@@ -152,7 +157,7 @@ def view_vtu(filename="output/fields.vtu",
         warped_grid["Displacement_norm"] = np.linalg.norm(warped_grid[disp_field_name], axis=1)
         plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
         plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", show_edges=False)
-        plotter.add_mesh(grid, style='wireframe', color='gray', opacity=0.5)
+        plotter.add_mesh(grid, style="wireframe", color="gray", opacity=0.5)
         plotter.add_text(f"Displacement norm (Factor: {warp_factor}x)", font_size=12)
         plotter.add_axes()
         plotter.show()
@@ -163,7 +168,7 @@ def view_vtu(filename="output/fields.vtu",
             z_slice_3d_vis = 0.5 * (z_min + z_max)
             print(f"[INFO] Adjusted z_slice_3d_vis to {z_slice_3d_vis:.3e} (within mesh bounds)")
 
-        sliced_warped = warped_grid.slice(normal='z', origin=(0, 0, z_slice_3d_vis))
+        sliced_warped = warped_grid.slice(normal="z", origin=(0, 0, z_slice_3d_vis))
         if sliced_warped.n_points > 0:
             plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
             plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", opacity=0.15)
@@ -172,8 +177,9 @@ def view_vtu(filename="output/fields.vtu",
             plotter.add_axes()
             plotter.show()
         else:
-            print(f"[WARNING] Slice plane z={z_slice_3d_vis:.3e} produced empty mesh, skipping slice view.")
-
+            print(
+                f"[WARNING] Slice plane z={z_slice_3d_vis:.3e} produced empty mesh, skipping slice view."
+            )
 
     # --- Plot 3: Von Mises Stress ---
     if show_stress and "Von Mises stress" in grid.point_data:
@@ -189,7 +195,9 @@ def view_vtu(filename="output/fields.vtu",
     if show_strain and "Max principal strain" in grid.point_data:
         plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
         sargs = dict(title="Max principal strain (-)")
-        plotter.add_mesh(warped_grid, scalars="Max principal strain", cmap="coolwarm", scalar_bar_args=sargs)
+        plotter.add_mesh(
+            warped_grid, scalars="Max principal strain", cmap="coolwarm", scalar_bar_args=sargs
+        )
         plotter.add_text("Max Principal strain", font_size=12)
         plotter.add_axes()
         plotter.view_isometric()
@@ -208,5 +216,5 @@ if __name__ == "__main__":
         show_stress=True,
         show_strain=True,
         z_slice_3d_vis=0.04,
-        material="steel"
+        material="steel",
     )

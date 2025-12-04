@@ -10,11 +10,12 @@ Steady-state 1D axisymmetric cylindrical wall (Dirichlet-Dirichlet).
 """
 
 import os
+
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
 from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder
+from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
@@ -22,16 +23,17 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro = 2.0, 2.4                     # m          inner and outer radius
-Pi, Po = 0.0, 0.0                     # Pa         internal and external pressure
-k, E, nu, alpha = 48.1, 1.77e11, 0.3, 1.7e-5   # W/m·K, Pa, -, 1/K
-Ti, To = 490, 500                     # K          inner, outer surface temperature
-q0, mu = 2.0e6, 24.0                  # W/m³, 1/m  heat source, attenuation
-Lx = Ro - Ri                          # m          wall thickness
-slenderness = Ri / Lx                 # -          slenderness ratio
-z_target, z_tol = 10, 1               # m          z-plane for data extraction
+Ri, Ro = 2.0, 2.4  # m          inner and outer radius
+Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
+k, E, nu, alpha = 48.1, 1.77e11, 0.3, 1.7e-5  # W/m·K, Pa, -, 1/K
+Ti, To = 490, 500  # K          inner, outer surface temperature
+q0, mu = 2.0e6, 24.0  # W/m³, 1/m  heat source, attenuation
+Lx = Ro - Ri  # m          wall thickness
+slenderness = Ri / Lx  # -          slenderness ratio
+z_target, z_tol = 10, 1  # m          z-plane for data extraction
 
-TOLERANCE = 5.0e-2                    # -          tolerance for non-regression
+TOLERANCE = 5.0e-2  # -          tolerance for non-regression
+
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_T(x):
@@ -40,10 +42,12 @@ def analytic_T(x):
     term2 = (q0 / (mu**2 * k)) * ((x / Lx) * (np.exp(-mu * Lx) - 1) - (np.exp(-mu * x) - 1))
     return term1 + term2
 
+
 def sigma_th(r, T_num, c=1.0):
     """Thermal stress profile (axisymmetric)."""
     T_mean = 2 / (Ro**2 - Ri**2) * np.trapezoid(T_num * r, r)
     return alpha * E / (1.0 - c * nu) * (T_mean - T_num)
+
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
@@ -88,7 +92,7 @@ plotter_sigma_temperature_cylinder(
 )
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-L2 = float(np.sqrt(np.mean((T - T_ref)**2)))
+L2 = float(np.sqrt(np.mean((T - T_ref) ** 2)))
 Linf = float(np.max(np.abs((T - T_ref))))
 RelL2 = float(L2 / np.mean(np.abs(T_ref)))
 

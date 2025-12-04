@@ -4,14 +4,15 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
+import logging
+
+import dolfinx
 import matplotlib.pyplot as plt
 import numpy as np
-import dolfinx
-import ufl
 import scipy.sparse
 import scipy.sparse.linalg as sla
+import ufl
 from petsc4py import PETSc
-import logging
 
 # Create a global logger instance for the entire framework
 log = logging.getLogger("z3st")
@@ -22,6 +23,7 @@ if not log.handlers:
     formatter = logging.Formatter("[%(levelname)s] %(message)s")
     handler.setFormatter(formatter)
     log.addHandler(handler)
+
 
 # --. Assembly + analysis utilities --..
 def assemble_and_analyze_matrix(a, L=None, bcs=None, title="Matrix", max_dense_size=5000, tol=1e-5):
@@ -59,7 +61,9 @@ def assemble_and_analyze_matrix(a, L=None, bcs=None, title="Matrix", max_dense_s
         cond_est = estimate_condition_number_sparse(A)
         print(f"Estimated cond(A) (iterative): {cond_est:.3e}")
         if cond_est and cond_est > 1e8:
-            print(f"[WARN] High condition number ({cond_est:.2e}) → possible under-constraining or soft modes.")
+            print(
+                f"[WARN] High condition number ({cond_est:.2e}) → possible under-constraining or soft modes."
+            )
 
     print("-------------------------------------------------")
     return A
@@ -130,12 +134,12 @@ def analyze_matrix(A, title="Matrix", max_dense_size=5000, plot=False, tol=1e-5)
 
             if plot:
                 plt.figure(figsize=(6, 6))
-                plt.spy(A_sp, markersize=1, aspect='equal')
+                plt.spy(A_sp, markersize=1, aspect="equal")
                 plt.title(f"Sparsity Pattern: {title}")
                 plt.xlabel("Column index")
                 plt.ylabel("Row index")
                 plt.grid(True)
-                plt.savefig('output/sparsity_dense_matrix.png')
+                plt.savefig("output/sparsity_dense_matrix.png")
                 plt.close()
 
             print("Converting to dense to calculate condition number...")
@@ -162,7 +166,9 @@ def analyze_matrix(A, title="Matrix", max_dense_size=5000, plot=False, tol=1e-5)
 
 
 # --. Main mechanical constraint diagnostic --..
-def check_mechanical_constraints(problem, max_dense_size=5000, eig_check=False, plot=False, tol=1e-5):
+def check_mechanical_constraints(
+    problem, max_dense_size=5000, eig_check=False, plot=False, tol=1e-5
+):
     """
     Check whether the mechanical problem is correctly constrained
     (under-constrained, well-constrained, or over-constrained).
@@ -176,7 +182,9 @@ def check_mechanical_constraints(problem, max_dense_size=5000, eig_check=False, 
     a_form = 0
     for label, mat in problem.materials.items():
         tag = problem.label_map[label]
-        dx = ufl.Measure("dx", domain=problem.mesh, subdomain_data=problem.cell_tags, subdomain_id=tag)
+        dx = ufl.Measure(
+            "dx", domain=problem.mesh, subdomain_data=problem.cell_tags, subdomain_id=tag
+        )
         a_form += ufl.inner(problem.sigma_mech(u, mat), problem.epsilon(v)) * dx
 
     # Collect Dirichlet BCs
@@ -194,12 +202,12 @@ def check_mechanical_constraints(problem, max_dense_size=5000, eig_check=False, 
     # Sparsity plot
     if plot:
         plt.figure(figsize=(6, 6))
-        plt.spy(K, markersize=1, aspect='equal')
+        plt.spy(K, markersize=1, aspect="equal")
         plt.title("Mechanical stiffness matrix sparsity")
         plt.xlabel("Column index")
         plt.ylabel("Row index")
         plt.grid(True)
-        plt.savefig('output/sparsity_matrix.png')
+        plt.savefig("output/sparsity_matrix.png")
         plt.close()
 
     # Condition number (only if small)
@@ -221,7 +229,7 @@ def check_mechanical_constraints(problem, max_dense_size=5000, eig_check=False, 
             # k = min(6, K.shape[0]-1)
             k = 2
 
-            eigvals = sla.eigsh(K, k=k, which='SM', return_eigenvectors=False)
+            eigvals = sla.eigsh(K, k=k, which="SM", return_eigenvectors=False)
             print("Eigenvalues (smallest):", np.round(eigvals, 6))
         except Exception as e:
             print(f"[WARN] Eigenvalue analysis failed: {e}")
@@ -261,7 +269,7 @@ def check_fixed_dofs(problem, fname):
 
     print("\n[DIAGNOSTIC] Visualizing fixed mechanical DOFs...")
 
-    V = problem.V_m
+    # V = problem.V_m
     mesh = problem.mesh
     gdim = mesh.geometry.dim
 
@@ -298,8 +306,9 @@ def check_fixed_dofs(problem, fname):
 
     # Visualize
     plotter = pv.Plotter()
-    plotter.add_mesh(pv.PolyData(mesh.geometry.x),
-                     color="lightgrey", point_size=3, render_points_as_spheres=True)
+    plotter.add_mesh(
+        pv.PolyData(mesh.geometry.x), color="lightgrey", point_size=3, render_points_as_spheres=True
+    )
     plotter.add_points(coords, color="red", point_size=10, render_points_as_spheres=True)
     plotter.add_legend([("Fixed nodes", "red")])
     plotter.show()
@@ -338,8 +347,7 @@ def debug_dirichlet_mechanical(problem):
                 else:
                     flat.extend(np.atleast_1d(dofs_raw).ravel().tolist())
                 all_dofs.extend(flat)
-                print(f"  : {mat_name}[{i}]  |  {len(flat):5d} DOFs  "
-                      f"(first 10): {flat[:10]}")
+                print(f"  : {mat_name}[{i}]  |  {len(flat):5d} DOFs  " f"(first 10): {flat[:10]}")
             except Exception as e:
                 print(f"  [WARN] Could not read dof_indices: {e}")
 

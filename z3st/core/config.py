@@ -4,6 +4,7 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
+
 class Config:
     """
     Configuration manager for Z3ST simulations.

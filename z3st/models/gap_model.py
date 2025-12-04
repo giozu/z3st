@@ -5,9 +5,10 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
-from petsc4py import PETSc
-import numpy as np
 import dolfinx
+import numpy as np
+from petsc4py import PETSc
+
 
 class GapModel:
     def __init__(self):
@@ -24,13 +25,18 @@ class GapModel:
 
             self.set_gap_temperature(T_i)
 
-            gas_thermal_conductivity = self.h_gap_value * 1e-4 * self.gap_temperature**0.79 # (W/m-K)
+            gas_thermal_conductivity = (
+                self.h_gap_value * 1e-4 * self.gap_temperature**0.79
+            )  # (W/m-K)
 
-            gap_size = self.average_gap_distance(self.mesh, self.facet_tags,
-                                    label_a=self.label_map["lateral_1"],
-                                    label_b=self.label_map["inner_2"])
+            gap_size = self.average_gap_distance(
+                self.mesh,
+                self.facet_tags,
+                label_a=self.label_map["lateral_1"],
+                label_b=self.label_map["inner_2"],
+            )
 
-            h_gap_value = gas_thermal_conductivity / gap_size # (W/m2-K)
+            h_gap_value = gas_thermal_conductivity / gap_size  # (W/m2-K)
 
             print(f"  → k_gas       = {gas_thermal_conductivity:.2f} W/m·K")
             print(f"  → gap_size    = {gap_size*1e3:.3f} mm")
@@ -42,7 +48,7 @@ class GapModel:
         h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_value))
 
         return h_gap
-    
+
     def set_gap_temperature(self, T_i):
 
         for label in self.materials:
@@ -58,16 +64,17 @@ class GapModel:
 
                 self.gap_temperature = 0.5 * (T_here.mean() + T_other.mean())
 
-                print(f"  → Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K")
+                print(
+                    f"  → Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K"
+                )
 
                 break
             break
 
-
     def average_gap_distance(self, mesh, ft, label_a, label_b):
 
-        facets_a = ft.find(label_a) # e.g., facets of cyl_1_interface
-        facets_b = ft.find(label_b) # e.g., facets of cyl_2_interface
+        facets_a = ft.find(label_a)  # e.g., facets of cyl_1_interface
+        facets_b = ft.find(label_b)  # e.g., facets of cyl_2_interface
 
         x = mesh.geometry.x
         topology = mesh.topology
@@ -87,8 +94,7 @@ class GapModel:
         centroids_a = facet_centroids(facets_a)
         centroids_b = facet_centroids(facets_b)
 
-        min_len = min(len(centroids_a), len(centroids_b))
-
+        # min_len = min(len(centroids_a), len(centroids_b))
         # distances = np.linalg.norm(centroids_a[:min_len] - centroids_b[:min_len], axis=1)
 
         from scipy.spatial import cKDTree

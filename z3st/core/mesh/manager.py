@@ -4,17 +4,24 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-import numpy as np
 import dolfinx
+import numpy as np
 import ufl
 from dolfinx import fem, mesh
-from mpi4py import MPI
+
 from z3st.core.diagnostic import log
+
 
 class MeshManager:
     """Handles Dolfinx mesh topology, tagging, and geometry utilities."""
 
-    def __init__(self, mesh_obj: mesh.Mesh, cell_tags: mesh.MeshTags, facet_tags: mesh.MeshTags, geometry: dict = None):
+    def __init__(
+        self,
+        mesh_obj: mesh.Mesh,
+        cell_tags: mesh.MeshTags,
+        facet_tags: mesh.MeshTags,
+        geometry: dict = None,
+    ):
         self.mesh = mesh_obj
         self.cell_tags = cell_tags
         self.facet_tags = facet_tags
@@ -85,15 +92,19 @@ class MeshManager:
             self.outer_radius_1 = g.get("outer_radius_1", None)
             self.inner_radius_2 = g.get("inner_radius_2", None)
             self.outer_radius_2 = g.get("outer_radius_2", None)
-            self.perimeter = 2. * np.pi * self.outer_radius_1
+            self.perimeter = 2.0 * np.pi * self.outer_radius_1
             self.area = np.pi * (self.outer_radius_1**2 - self.inner_radius_1**2)
-            log.info(f"  inner_radius_1 = {self.inner_radius_1:.2e} m, outer_radius_1 = {self.outer_radius_1:.2e} m")
-            log.info(f"  inner_radius_2 = {self.inner_radius_2:.2e} m, outer_radius_2 = {self.outer_radius_2:.2e} m")
+            log.info(
+                f"  inner_radius_1 = {self.inner_radius_1:.2e} m, outer_radius_1 = {self.outer_radius_1:.2e} m"
+            )
+            log.info(
+                f"  inner_radius_2 = {self.inner_radius_2:.2e} m, outer_radius_2 = {self.outer_radius_2:.2e} m"
+            )
 
         elif self.geometry_type == "sphere":
             self.inner_radius = g.get("Ri", None)
             self.outer_radius = g.get("Ro", None)
-            self.perimeter = 2. * np.pi * self.outer_radius
+            self.perimeter = 2.0 * np.pi * self.outer_radius
             self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
             log.info(f"  Ri = {self.inner_radius:.2e} m, Ro = {self.outer_radius:.2e} m")
 

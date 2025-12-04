@@ -3,17 +3,17 @@ thermal_bcs:
     - type: Dirichlet
       region: inner_radius
       temperature: 300 # (K)
-      
+
 mechanical_bcs:
   steel:
     - type: Dirichlet
       region: bottom
       displacement: [0.0, 0.0, 0.0] # (m)
-    
+
     - type: Neumann
       region: inner_radius
       traction: -1.0e+6 # (Pa)
-    
+
     - type: Neumann
       region: outer_radius
       traction: 0.0 # (Pa)

@@ -152,6 +152,9 @@ git clean -f
 # Remove untracked files and directories
 git clean -fd
 
+# Remove untracked and ignored files and directories
+git clean -fdx
+
 # Create a lightweight tag
 git tag <tag_name>
 

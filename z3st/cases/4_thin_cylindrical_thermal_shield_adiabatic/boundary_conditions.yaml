@@ -3,7 +3,7 @@ thermal_bcs:
     - type: Dirichlet
       region: inner_radius
       temperature: 490.0 # (K)
-      
+
     - type: Neumann
       region: outer_radius
       flux: 0.0

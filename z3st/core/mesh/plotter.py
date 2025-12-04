@@ -4,11 +4,13 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-import numpy as np
 import matplotlib.cm as cm
+import numpy as np
 import pyvista
 from dolfinx.plot import vtk_mesh
+
 from z3st.core.diagnostic import log
+
 
 class MeshPlotter:
     """Visualize mesh and boundary tags using PyVista."""

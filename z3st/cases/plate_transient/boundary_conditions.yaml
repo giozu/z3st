@@ -1,6 +1,6 @@
 mechanical_bcs:
-  steel:     
-    - type: Clamp_x 
+  steel:
+    - type: Clamp_x
       region: xmin
 
     - type: Clamp_y

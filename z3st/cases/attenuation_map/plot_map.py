@@ -8,10 +8,11 @@ Author: Giovanni Zullo
 """
 
 import json
-import yaml
-import pandas as pd
-import matplotlib.pyplot as plt
 from pathlib import Path
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import yaml
 
 # =============================================================================
 # CONFIG
@@ -50,21 +51,23 @@ for sub in sorted(ROOT.glob("ba_*_mua_*")):
 
         # --- Parameters from folder name ---
         parts = sub.name.split("_")
-        ba = float(parts[1]) / 100.0      # Ro/Ri
-        mua = float(parts[-1])            # mu*Ri
-        slenderness = 0.5 * (1 + ba) / (ba - 1) # 0.5 * (Ro + Ri) / (Ro - Ri)
+        ba = float(parts[1]) / 100.0  # Ro/Ri
+        mua = float(parts[-1])  # mu*Ri
+        slenderness = 0.5 * (1 + ba) / (ba - 1)  # 0.5 * (Ro + Ri) / (Ro - Ri)
 
         # --- Normalization ---
         sigma_T = sigma_tt / (alpha * E * q0 / ((1 - nu) * k * mu**2))
 
-        data_rows.append({
-            "Ro/Ri": ba,
-            "slenderness": slenderness,
-            "muRi": mua,
-            "sigma_tt": sigma_tt,
-            "sigma_T": sigma_T,
-            "case": sub.name
-        })
+        data_rows.append(
+            {
+                "Ro/Ri": ba,
+                "slenderness": slenderness,
+                "muRi": mua,
+                "sigma_tt": sigma_tt,
+                "sigma_T": sigma_T,
+                "case": sub.name,
+            }
+        )
         print(f"→ {sub.name}: σθθ={sigma_tt:.3e} Pa → σ_T={sigma_T:.3f}")
 
     except Exception as e:
@@ -114,7 +117,7 @@ plt.show()
 plt.figure(figsize=(8, 6))
 for mua, group in df.groupby("muRi"):
     group = group.sort_values("Ro/Ri")
-    plt.plot(group["Ro/Ri"], group["sigma_T"], marker="s", label=fr"$\mu R_i$ = {mua:.0f}")
+    plt.plot(group["Ro/Ri"], group["sigma_T"], marker="s", label=rf"$\mu R_i$ = {mua:.0f}")
 
 mua10 = pd.read_csv("mua_10.txt", header=None)
 plt.plot(mua10.iloc[:, 0], mua10.iloc[:, 1], "--", label=r"$\mu R_i = 10$ (GS)")

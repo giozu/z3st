@@ -10,17 +10,18 @@ This script iterates through all subfolders (ba_XXX_mua_YYY) in the current dire
 and deletes every file inside their 'output/' subfolder - except files ending with '.vtu'.
 """
 
-import os
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 ROOT = Path.cwd()
 LOG_FILE = ROOT / "clean_outputs.log"
+
 
 def log(msg):
     print(msg)
     with open(LOG_FILE, "a") as f:
         f.write(f"{datetime.now():%Y-%m-%d %H:%M:%S}  {msg}\n")
+
 
 log("\n=== CLEAN OUTPUT FOLDERS START ===")
 
@@ -45,6 +46,7 @@ for case_dir in sorted([d for d in ROOT.iterdir() if d.is_dir() and d.name.start
             elif file.is_dir():
                 # Remove directories recursively
                 import shutil
+
                 shutil.rmtree(file)
                 log(f"  [DEL]  directory {file.name}")
         except Exception as e:

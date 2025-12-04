@@ -5,17 +5,18 @@ Z3ST case: 11_cylindrical_shell_thin
 
 non-regression script
 ---------------------
-Analytical non-regression for a thin-walled cylindrical shell under 
+Analytical non-regression for a thin-walled cylindrical shell under
 internal (Pi) pressure, using the Mariotte solution.
 
 """
 
 import os
+
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
 from z3st.utils.utils_plot import plotter_sigma_cylinder, plotter_strain_cylinder
+from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
@@ -23,18 +24,18 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.40, 2.50, 15.0         # m          inner and outer radius, height
-Pi, Po = 1.0e6, 0.0                   # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3                   # Pa, -
-t = Ro - Ri                           # m          wall thickness
-slenderness = Ri / t                  # -          slenderness ratio
-z_target, z_tol = Lz, 1.0             # m          z-plane for data extraction
+Ri, Ro, Lz = 2.40, 2.50, 15.0  # m          inner and outer radius, height
+Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
+E, nu = 2.0e11, 0.3  # Pa, -
+t = Ro - Ri  # m          wall thickness
+slenderness = Ri / t  # -          slenderness ratio
+z_target, z_tol = Lz, 1.0  # m          z-plane for data extraction
 
-TOLERANCE = 6.0e-1                    # -          tolerance for non-regression
+TOLERANCE = 6.0e-1  # -          tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 # Mariotte solutions (Po=0)
-sigma_rr_ana_M = - Pi / 2
+sigma_rr_ana_M = -Pi / 2
 sigma_tt_ana_M = Pi * Ri / t
 sigma_zz_ana_M = Pi * Ri / (2 * t)
 
@@ -78,9 +79,9 @@ sigma_tt_ana_M = sigma_tt_ana_M * np.ones_like(r_s)
 sigma_rr_ana_M = sigma_rr_ana_M * np.ones_like(r_s)
 sigma_zz_ana_M = sigma_zz_ana_M * np.ones_like(r_s)
 
-strain_tt_ana_M = 1/E * (sigma_tt_ana_M - nu * (sigma_rr_ana_M + sigma_zz_ana_M))
-strain_zz_ana_M = 1/E * (sigma_zz_ana_M - nu * (sigma_rr_ana_M + sigma_tt_ana_M))
-strain_rr_ana_M = 1/E * (sigma_rr_ana_M - nu * (sigma_tt_ana_M + sigma_zz_ana_M))
+strain_tt_ana_M = 1 / E * (sigma_tt_ana_M - nu * (sigma_rr_ana_M + sigma_zz_ana_M))
+strain_zz_ana_M = 1 / E * (sigma_zz_ana_M - nu * (sigma_rr_ana_M + sigma_tt_ana_M))
+strain_rr_ana_M = 1 / E * (sigma_rr_ana_M - nu * (sigma_tt_ana_M + sigma_zz_ana_M))
 
 # average stress
 sigma_tt_avg = 2 / (Ro**2 - Ri**2) * np.trapezoid(sigma_tt * r_s, r_s)
@@ -93,7 +94,10 @@ plotter_sigma_cylinder(
     sigma_rr=sigma_rr,
     sigma_tt=sigma_tt,
     sigma_zz=sigma_zz,
-    Ri=Ri, Ro=Ro, Pi=Pi, Po=Po,
+    Ri=Ri,
+    Ro=Ro,
+    Pi=Pi,
+    Po=Po,
     CASE_DIR=CASE_DIR,
     slenderness=slenderness,
     sigma_tt_ana_L=sigma_tt_ana_M,
@@ -106,7 +110,10 @@ plotter_strain_cylinder(
     strain_rr=strain_rr,
     strain_tt=strain_tt,
     strain_zz=strain_zz,
-    Ri=Ri, Ro=Ro, Pi=Pi, Po=Po,
+    Ri=Ri,
+    Ro=Ro,
+    Pi=Pi,
+    Po=Po,
     CASE_DIR=CASE_DIR,
     slenderness=slenderness,
     strain_tt_ana_L=strain_tt_ana_M,
@@ -115,50 +122,54 @@ plotter_strain_cylinder(
 )
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_M)**2)) / np.sqrt(np.mean(sigma_rr_ana_M**2))
-err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_M)**2)) / np.sqrt(np.mean(sigma_tt_ana_M**2))
-err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_M)**2)) / np.sqrt(np.mean(sigma_zz_ana_M**2))
-err_eps_rr = np.sqrt(np.mean((strain_rr - strain_rr_ana_M)**2)) / np.sqrt(np.mean(strain_rr_ana_M**2))
-err_eps_tt = np.sqrt(np.mean((strain_tt - strain_tt_ana_M)**2)) / np.sqrt(np.mean(strain_tt_ana_M**2))
-err_eps_zz = np.sqrt(np.mean((strain_zz - strain_zz_ana_M)**2))
+err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_M) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_M**2))
+err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_M) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_M**2))
+err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_M) ** 2)) / np.sqrt(np.mean(sigma_zz_ana_M**2))
+err_eps_rr = np.sqrt(np.mean((strain_rr - strain_rr_ana_M) ** 2)) / np.sqrt(
+    np.mean(strain_rr_ana_M**2)
+)
+err_eps_tt = np.sqrt(np.mean((strain_tt - strain_tt_ana_M) ** 2)) / np.sqrt(
+    np.mean(strain_tt_ana_M**2)
+)
+err_eps_zz = np.sqrt(np.mean((strain_zz - strain_zz_ana_M) ** 2))
 
 errors = {
     "L2_error_sigma_rr": {
         "numerical": float(err_rr),
         "reference": 0.0,
         "abs_error": float(err_rr),
-        "rel_error": float(err_rr)
+        "rel_error": float(err_rr),
     },
     "L2_error_sigma_tt": {
         "numerical": float(err_tt),
         "reference": 0.0,
         "abs_error": float(err_tt),
-        "rel_error": float(err_tt)
+        "rel_error": float(err_tt),
     },
     "L2_error_sigma_zz": {
         "numerical": float(err_zz),
         "reference": 0.0,
         "abs_error": float(err_zz),
-        "rel_error": float(err_zz)
+        "rel_error": float(err_zz),
     },
     "L2_error_strain_rr": {
         "numerical": float(err_eps_rr),
         "reference": 0.0,
         "abs_error": float(err_eps_rr),
-        "rel_error": float(err_eps_rr)
+        "rel_error": float(err_eps_rr),
     },
     "L2_error_strain_tt": {
         "numerical": float(err_eps_tt),
         "reference": 0.0,
         "abs_error": float(err_eps_tt),
-        "rel_error": float(err_eps_tt)
+        "rel_error": float(err_eps_tt),
     },
     "L2_error_strain_zz": {
         "numerical": float(err_eps_zz),
         "reference": 0.0,
         "abs_error": float(err_eps_zz),
-        "rel_error": float(err_eps_zz)
-    }
+        "rel_error": float(err_eps_zz),
+    },
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---

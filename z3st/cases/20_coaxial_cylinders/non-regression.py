@@ -9,11 +9,12 @@ non-regression script
 """
 
 import os
+
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
 from z3st.utils.utils_plot import *
+from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
@@ -21,31 +22,35 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ro1, Ri2, Ro2, Lz = 0.050, 0.060, 0.065, 0.10      # m (geometry dimensions)
-Pi, Po = 0.0, 0.0                     # Pa         internal and external pressure
-k1, E1, nu1, alpha1 = 2.5, 1.7e11, 0.3, 1.45e-5   # W/m·K, Pa, -, 1/K
-k2, E2, nu2, alpha2 = 50, 2e11, 0.3, 1.e-5        # W/m·K, Pa, -, 1/K
-To2 = 350.0                           # K          outer surface temperature
-q0, mu = 0.0, 24.0                    # W/m³, 1/m  heat source, attenuation
-z_target, z_tol = Lz/2, Lz/10         # m          z-plane for data extraction
-LHR = 20                              # (W/m)      linear heat rate 
-h_g = 2000                            # (W/m2-K)
+Ro1, Ri2, Ro2, Lz = 0.050, 0.060, 0.065, 0.10  # m (geometry dimensions)
+Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
+k1, E1, nu1, alpha1 = 2.5, 1.7e11, 0.3, 1.45e-5  # W/m·K, Pa, -, 1/K
+k2, E2, nu2, alpha2 = 50, 2e11, 0.3, 1.0e-5  # W/m·K, Pa, -, 1/K
+To2 = 350.0  # K          outer surface temperature
+q0, mu = 0.0, 24.0  # W/m³, 1/m  heat source, attenuation
+z_target, z_tol = Lz / 2, Lz / 10  # m          z-plane for data extraction
+LHR = 20  # (W/m)      linear heat rate
+h_g = 2000  # (W/m2-K)
 
-TOLERANCE = 5.0e-2                    # -          tolerance for non-regression
+TOLERANCE = 5.0e-2  # -          tolerance for non-regression
+
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_T_1(r, T_interface_1):
     r = np.asarray(r)
     return LHR / (4 * np.pi * k1) * (1 - r**2 / Ro1**2) + T_interface_1
 
+
 def analytic_T_2(r):
     r = np.asarray(r)
     return To2 + LHR / (2 * np.pi * k2) * np.log(Ro2 / r)
+
 
 def analytic_T_g(r, T_interface_2):
     r = np.asarray(r)
     k_g = h_g * (Ri2 - Ro1)
     return T_interface_2 + LHR / (2 * np.pi * k_g) * np.log(Ri2 / r)
+
 
 def analytic_T_piecewise(r):
     r = np.asarray(r)
@@ -58,15 +63,16 @@ def analytic_T_piecewise(r):
     T_ref = np.zeros_like(r)
 
     # regions
-    mask_1 = (r <= Ro1)
-    mask_g  = (r > Ro1) & (r <= Ri2)
-    mask_2 = (r > Ri2)
+    mask_1 = r <= Ro1
+    mask_g = (r > Ro1) & (r <= Ri2)
+    mask_2 = r > Ri2
 
     T_ref[mask_1] = analytic_T_1(r[mask_1], T_g_at_Ro1)
-    T_ref[mask_g]  = analytic_T_g(r[mask_g], T_2_at_Ri2)
+    T_ref[mask_g] = analytic_T_g(r[mask_g], T_2_at_Ri2)
     T_ref[mask_2] = analytic_T_2(r[mask_2])
 
     return T_ref
+
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
@@ -102,7 +108,7 @@ plotter_sigma_temperature_cylinder(
 )
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-L2_T = float(np.sqrt(np.mean((T - T_ref)**2)))
+L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
 Linf_T = float(np.max(np.abs((T - T_ref))))
 RelL2_T = float(L2_T / np.mean(np.abs(T_ref)))
 

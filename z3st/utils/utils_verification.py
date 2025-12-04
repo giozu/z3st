@@ -4,16 +4,17 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
+import json
 import os
 import sys
-import json
 
 USE_COLOR = sys.stdout.isatty()
 
 GREEN = "\033[92m" if USE_COLOR else ""
-RED   = "\033[91m" if USE_COLOR else ""
-BOLD  = "\033[1m"  if USE_COLOR else ""
-END   = "\033[0m"  if USE_COLOR else ""
+RED = "\033[91m" if USE_COLOR else ""
+BOLD = "\033[1m" if USE_COLOR else ""
+END = "\033[0m" if USE_COLOR else ""
+
 
 def pass_fail_check(errors, tolerance, out_json, case_dir):
     """
@@ -44,16 +45,17 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
 
     summary = (
         f"{GREEN}PASS{END} All checks within tolerance"
-        if all_pass else f"{RED}FAIL{END} Some checks exceeded tolerance"
+        if all_pass
+        else f"{RED}FAIL{END} Some checks exceeded tolerance"
     )
     print(f"\n[SUMMARY] {BOLD}{summary}{END}")
 
     # Save results
     with open(out_json, "w") as f:
         json.dump(
-            {"results": errors, "tolerance": tolerance,
-             "summary": "PASS" if all_pass else "FAIL"},
-            f, indent=4
+            {"results": errors, "tolerance": tolerance, "summary": "PASS" if all_pass else "FAIL"},
+            f,
+            indent=4,
         )
 
     print(f"[INFO] non-regression results written to: {out_json}")
@@ -102,15 +104,11 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         passed = rel_diff < regression_tol
 
         improvement = (
-            rel_err_now is not None and
-            rel_err_gold is not None and
-            rel_err_now < rel_err_gold
+            rel_err_now is not None and rel_err_gold is not None and rel_err_now < rel_err_gold
         )
 
         worsening = (
-            rel_err_now is not None and
-            rel_err_gold is not None and
-            rel_err_now > rel_err_gold
+            rel_err_now is not None and rel_err_gold is not None and rel_err_now > rel_err_gold
         )
 
         color = GREEN if passed else RED
@@ -128,7 +126,8 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
 
     summary_reg = (
         f"{GREEN}PASS{END} Regression within tolerance"
-        if reg_pass else f"{RED}FAIL{END} Regression mismatch"
+        if reg_pass
+        else f"{RED}FAIL{END} Regression mismatch"
     )
     print(f"\n[SUMMARY] {BOLD}{summary_reg}{END}")
 

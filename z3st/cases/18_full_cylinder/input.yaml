@@ -16,7 +16,7 @@ solver_settings:
   max_iters: 100
   relax_T: 0.8
   relax_u: 0.6
-  
+
 models:
   thermal: True
   mechanical: True
@@ -41,4 +41,3 @@ lhr:
 time:
   - 0.0
 n_steps: 1
-
