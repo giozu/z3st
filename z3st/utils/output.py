@@ -143,7 +143,7 @@ def plot3d_displacement(problem):
     # Initialize displacement full field (nodal)
     u_vector = np.zeros_like(geometry)
     if isinstance(problem.u, dict):
-        for name, u_func in problem.u.items():
+        for _, u_func in problem.u.items():
             u_vector += u_func.x.array.reshape(geometry.shape)
     else:
         u_vector += problem.u.x.array.reshape(geometry.shape)

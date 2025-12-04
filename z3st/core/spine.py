@@ -198,7 +198,7 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
 
-                def f(x):
+                def f(x, q_third_0=q_third_0, mu=mu):
                     if self.geometry_type == "rect":
                         return q_third_0 * np.exp(-x[0] * mu)
                     elif self.geometry_type in ["cyl", "cylinder"]:
