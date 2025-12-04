@@ -20,10 +20,9 @@ conditions.
 """
 )
 
+# --. Python modules --..
 import os
 import sys
-
-# --. Python modules --..
 import time
 
 import yaml
