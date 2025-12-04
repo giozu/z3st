@@ -1,4 +1,4 @@
-# find . -type f -name "*.yml" -o -name "*.yaml" | xargs yamlfmt -w
+# find . -type f \( -name "*.yml" -o -name "*.yaml" \) | xargs yamlfmt -w
 
 formatter:
   type: basic
