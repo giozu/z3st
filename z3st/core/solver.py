@@ -418,7 +418,7 @@ class Solver:
                     for bc_info in self.neumann_thermal[label]:
                         print(f"  Applying flux on subdomain id = {bc_info['id']}")
                         ds_neumann = self.ds_tags[bc_info["id"]]
-                        L_t += bc_info["value"] * v_t * ds_neumann
+                        L_t += (-bc_info["value"]) * v_t * ds_neumann
 
                 # Gap (Robin)
                 h_gap = self.set_gap_conductance(T_i)
