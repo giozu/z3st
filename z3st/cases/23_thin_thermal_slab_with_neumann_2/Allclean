@@ -1,0 +1,14 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1  # Run from this directory
+
+echo "Cleaning current directory..."
+
+rm -f output/non-regression.json
+rm -f output/fields.vtu
+rm -f output/*.png
+rm -f output/*.csv
+rm -f *.msh
+rm -f *.png
+rm -f log.*
+
+echo "Done. All output and temporary files cleaned."
