@@ -30,6 +30,7 @@ CASES=(
     "18_full_cylinder"
     "19_plate"
     "20_coaxial_cylinders"
+    "21_plate_non_linear"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"
