@@ -1,11 +1,11 @@
 mechanical_bcs:
   steel:
   - type: Neumann
-    region: xmax
+    region: ymax
     traction: +125.0e+6   # (Pa)
 
   - type: Dirichlet
-    region: xmin
+    region: ymin
     displacement: [0.0, 0.0, 0.0]   # (m)
 
 thermal_bcs:
