@@ -16,12 +16,15 @@ from z3st.core.finite_element_setup import FiniteElementSetup
 from z3st.core.mesh import load_mesh
 from z3st.core.mesh.manager import MeshManager
 from z3st.core.solver import Solver
+from z3st.models.damage_model import DamageModel
 from z3st.models.gap_model import GapModel
 from z3st.models.mechanical_model import MechanicalModel
 from z3st.models.thermal_model import ThermalModel
 
 
-class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
+class Spine(
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, DamageModel
+):
     """Main Z3ST simulation driver."""
 
     def __init__(self, input_file, mesh_file, geometry, gdim=3):
@@ -52,6 +55,7 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         ThermalModel.__init__(self)
         MechanicalModel.__init__(self)
         GapModel.__init__(self)
+        DamageModel.__init__(self)
 
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
@@ -153,11 +157,7 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
             f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m"
         )
 
-        if not hasattr(self, "W"):
-            raise RuntimeError(
-                "Mixed space self.W is not initialized. Check finite_element_setup.py."
-            )
-
+        # Temperature/displacement (mixed)
         if not hasattr(self, "sol_mixed"):
             print("Initializing self.sol_mixed")
             self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
@@ -167,6 +167,13 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
                 self.sol_mixed.sub(1).interpolate(self.T)
             except Exception:
                 self.sol_mixed.x.array[:] = 0.0
+
+        # Damage variables:
+        print("\nInitializing the damage field...")
+        self.D = dolfinx.fem.Function(self.V_d, name="Damage")
+        self.D.x.array[:] = 0.0  # undamaged initial state
+        self.H = dolfinx.fem.Function(self.Q, name="CrackDrivingForce")
+        self.H.x.array[:] = 0.0
 
         print("\nComparing solution function spaces:")
         print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
