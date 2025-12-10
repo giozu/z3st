@@ -255,9 +255,16 @@ class Spine(
         self.energy_density = {}
         self.strain = self.epsilon(self.u)
 
+        # damage fields
+        self.damage_field = {}
+
         for name, mat in self.materials.items():
             self.energy_density[name] = self.elastic_energy_density(self.u, mat)
             self.stress_mech[name] = self.sigma_mech(self.u, mat)
             self.stress_th[name] = self.sigma_th(self.T, mat)
             self.stress[name] = self.stress_mech[name] + self.stress_th[name]
+
+            if self.on.get("damage", False):
+                self.damage_field[name] = self.D
+
         return True
