@@ -37,6 +37,18 @@ import pyvista as pv
 
 
 # --.. ..- .-.. .-.. --- helpers --.. ..- .-.. .-.. ---
+def _detect_field(grid, field_name):
+    """Find field in VTU file, searching in point and cell data."""
+    fname = field_name
+    if fname in grid.point_data:
+        print(f"[INFO] Found field in point_data: '{field_name}'")
+        return "point", field_name
+    elif fname in grid.cell_data:
+        print(f"[INFO] Found field in cell_data: '{field_name}'")
+        return "cell", field_name
+    raise KeyError(f"<{field_name}> field not found in VTU file.")
+
+
 def _detect_temp_field(grid):
     """Find temperature field name in VTU file"""
     for name in ("Temperature", "temperature", "T", "temp"):
@@ -186,6 +198,41 @@ def extract_VonMises(vtu_path, return_coords=True, prefer="cells"):
     x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
 
     if return_coords:
+        return x, y, z, data
+    else:
+        return data
+
+
+def extract_field(vtu_path, field_name, return_coords=True):
+    """
+    Extract a field (scalar or vector) and coordinates from a VTU file.
+
+    Parameters
+    ----------
+    vtu_path : str
+        Path to the .vtu file.
+    field_name : str
+        Name of the field to extract (e.g. "temperature", "heat_flux").
+    return_coords : bool, optional
+        If True, returns x, y, z arrays together with the field.
+
+    Returns
+    -------
+    field : np.ndarray
+        Numpy array of field values (Nx1 for scalars, Nx3 for vectors).
+    (x, y, z) : np.ndarray, np.ndarray, np.ndarray (optional)
+        Coordinates of each point (or cell center if data is in cell_data).
+    """
+    if not os.path.exists(vtu_path):
+        raise FileNotFoundError(f"VTU file not found: {vtu_path}")
+
+    grid = pv.read(vtu_path)
+
+    loc_t, field_t = _detect_field(grid, field_name)
+    data, coords = _data_coords(grid, loc_t, field_t)
+
+    if return_coords:
+        x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
         return x, y, z, data
     else:
         return data
