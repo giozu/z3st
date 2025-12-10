@@ -5,6 +5,8 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
+import dolfinx
+import numpy as np
 import ufl
 
 
@@ -22,6 +24,7 @@ class DamageModel:
         for key, value in self.damage_options.items():
             print(f"  {key:<20}: {value}")
 
+    @staticmethod
     def degradation_function(D, K=1e-4):
         """
         Stress degradation function g_d(D) = (1-D)**2 + K
@@ -43,14 +46,17 @@ class DamageModel:
         return psi_eff
 
     def crack_driving_force(self, u, material):
-
+        """
+        Crack-driving quantity H(u) in forma energetica positiva.
+        Usa le costanti di un materiale (E, λ, G, σ_c, ζ).
+        """
         E = material["E"]
         lam = material["lmbda"]
         G = material["G"]
         sigma_c = material["sigma_c"]
         zeta = material["zeta"]
 
-        eps = self.epsilon(self.u)
+        eps = self.epsilon(u)
         tr_eps = ufl.tr(eps)
         tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
         psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
@@ -62,11 +68,33 @@ class DamageModel:
             psi_pos / psi_c - 1.0,
             0.0,
         )
-
-        print(f"[DEBUG] H(u) symbolic rank: {H.ufl_shape}")
-
         return H
 
+    @staticmethod
     def gamma_density(D, grad_D, lc):
         """Fracture energy density γ(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)."""
         return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
+
+    def update_history(self, u):
+        """
+        Aggiorna il campo di storia H in modo irreversibile:
+            H(x) = max(H_old(x), H_new(x))
+
+        Proiezione L2 su DG0 tramite Expression + interpolate.
+        Per semplicità usa i parametri del primo materiale.
+        """
+        if not hasattr(self, "H"):
+            raise RuntimeError("[DamageModel] self.H non inizializzato.")
+
+        # prendi il primo materiale come "materiale danneggiabile"
+        mat_name, mat = next(iter(self.materials.items()))
+        H_expr = self.crack_driving_force(u, mat)
+
+        Q = self.Q
+        H_new = dolfinx.fem.Function(Q, name="CrackDrivingForce_new")
+        expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points)
+        H_new.interpolate(expr)
+
+        H_old_arr = self.H.x.array
+        H_new_arr = H_new.x.array
+        self.H.x.array[:] = np.maximum(H_old_arr, H_new_arr)
