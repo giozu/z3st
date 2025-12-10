@@ -342,8 +342,8 @@ class Solver:
         print(f"  → Relative tolerance dmg      : {rtol_dmg:.1e}")
 
         if self.on.get("thermal", False):
-            T_i = dolfinx.fem.Function(self.V_t)
-            T_i.x.array[:] = self.T.x.array  # Start with the initial/previous converged state
+            T_new = dolfinx.fem.Function(self.V_t)
+            T_new.x.array[:] = self.T.x.array  # Start with the initial/previous converged state
             T_old = dolfinx.fem.Function(
                 self.V_t
             )  # Functions to store the previous state for convergence check
@@ -352,16 +352,16 @@ class Solver:
             [bcs_t.extend(bc_list) for bc_list in self.dirichlet_thermal.values()]
 
         if self.on.get("mechanical", False):
-            u_i = dolfinx.fem.Function(self.V_m)
-            u_i.x.array[:] = self.u.x.array
+            u_new = dolfinx.fem.Function(self.V_m)
+            u_new.x.array[:] = self.u.x.array
             u_old = dolfinx.fem.Function(self.V_m)
 
             bcs_m = []
             [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
 
         if self.on.get("damage", False):
-            D_i = dolfinx.fem.Function(self.V_d)
-            D_i.x.array[:] = self.D.x.array
+            D_new = dolfinx.fem.Function(self.V_d)
+            D_new.x.array[:] = self.D.x.array
             D_old = dolfinx.fem.Function(self.V_d)
 
             bcs_d = []
@@ -390,7 +390,7 @@ class Solver:
 
             # 1) THERMAL
             if self.on.get("thermal", False):
-                T_old.x.array[:] = T_i.x.array
+                T_old.x.array[:] = T_new.x.array
 
                 print("\n[INFO] Assembling thermal problem...")
                 u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
@@ -440,7 +440,7 @@ class Solver:
                         L_t += (-bc_info["value"]) * v_t * ds_neumann
 
                 # Gap (Robin)
-                h_gap = self.set_gap_conductance(T_i)
+                h_gap = self.set_gap_conductance(T_new)
 
                 for label in self.materials:
                     for bc_info in self.robin_thermal[label]:
@@ -460,12 +460,12 @@ class Solver:
                             self.label_map[pair_region], self.V_t
                         )  # e.g., dofs of cyl_2_interface
 
-                        T_other.x.array[dofs_here] = T_i.x.array[
+                        T_other.x.array[dofs_here] = T_new.x.array[
                             dofs_other
                         ]  # e.g., T_cyl_2 projected on cyl_1_dofs
 
                         # 2) mean
-                        # T_other = T_i.x.array[dofs_other].mean()
+                        # T_other = T_new.x.array[dofs_other].mean()
 
                         # -) bias
                         # if label == 'cyl_1':
@@ -480,7 +480,7 @@ class Solver:
                         )
 
                         # Print heat flux
-                        # self.heat_flux(T_i)
+                        # self.heat_flux(T_new)
 
                 # --- Solve the system ---
                 if self.thermal_options.get("solver") == "linear":
@@ -494,7 +494,7 @@ class Solver:
                         a_t,
                         L_t,
                         bcs=bcs_t,
-                        u=T_i,
+                        u=T_new,
                         petsc_options=petsc_opts_thermal,
                         petsc_options_prefix="thermal_",
                     )
@@ -506,15 +506,15 @@ class Solver:
 
                 # Check T_fo
                 # dofs = self.locateFacetDofs(self.label_map["lateral"], self.V_t)
-                # T = T_i.x.array[dofs].mean()
+                # T = T_new.x.array[dofs].mean()
                 # print(f"  T_lateral = {T:.2f} K")
 
                 # Apply relaxation
-                T_i.x.array[:] = self.relax_T * T_i.x.array + (1 - self.relax_T) * T_old.x.array
+                T_new.x.array[:] = self.relax_T * T_new.x.array + (1 - self.relax_T) * T_old.x.array
 
             # --. MECHANICAL SUB-PROBLEM --..
             if self.on.get("mechanical", False):
-                u_old.x.array[:] = u_i.x.array
+                u_old.x.array[:] = u_new.x.array
 
                 print("\n[INFO] Assembling mechanical problem...")
 
@@ -538,10 +538,10 @@ class Solver:
                         a_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
                         L_m += ufl.dot(body_force, v_m) * dx
                         if self.on.get("thermal", False):
-                            L_m -= ufl.inner(self.sigma_th(T_i, material), self.epsilon(v_m)) * dx
+                            L_m -= ufl.inner(self.sigma_th(T_new, material), self.epsilon(v_m)) * dx
 
                     elif self.mech_options.get("solver") == "non-linear":
-                        stress_tensor = self.sigma_mech(u_i, material)
+                        stress_tensor = self.sigma_mech(u_new, material)
                         F_m += (
                             ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
                             - ufl.dot(body_force, v_m) * dx
@@ -612,7 +612,7 @@ class Solver:
                         a_m,
                         L_m,
                         bcs=bcs_m,
-                        u=u_i,
+                        u=u_new,
                         petsc_options=petsc_opts_mech,
                         petsc_options_prefix="mechanical_",
                     )
@@ -629,7 +629,7 @@ class Solver:
 
                     problem_m = NonlinearProblem(
                         F_m,
-                        u_i,
+                        u_new,
                         bcs=bcs_m,
                         petsc_options=petsc_opts_mech,
                         petsc_options_prefix="elasticity",
@@ -649,16 +649,16 @@ class Solver:
                         )
 
                 # --. Apply relaxation --..
-                u_i.x.array[:] = self.relax_u * u_i.x.array + (1 - self.relax_u) * u_old.x.array
+                u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
 
             # --. DAMAGE SUB-PROBLEM --..
             if self.on.get("damage", False):
-                D_old.x.array[:] = D_i.x.array
+                D_old.x.array[:] = D_new.x.array
 
                 print("\n[INFO] Assembling damage (phase-field) problem...")
                 self.damage_material = "steel"
 
-                self.update_history(u_i)
+                self.update_history(u_new)
                 self.H.x.array[:] = np.minimum(self.H.x.array, 50.0)
 
                 u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
@@ -687,16 +687,16 @@ class Solver:
                     a_d,
                     L_d,
                     bcs=bcs_d,
-                    u=D_i,
+                    u=D_new,
                     petsc_options=petsc_opts_damage,
                     petsc_options_prefix="damage_",
                 )
                 problem_d.solve()
 
-                D_i.x.array[:] = np.clip(D_i.x.array, 0.0, 1.0)
+                D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
                 # proiezione irreversibile è già in H, qui facciamo solo il residuo in norma infinita
-                res_D = np.linalg.norm(D_i.x.array - D_old.x.array, ord=np.inf)
+                res_D = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
                 print(f"  |ΔD|_∞ = {res_D:.3e}")
 
             # --. CONVERGENCE CHECK and LOGGING --..
@@ -709,10 +709,10 @@ class Solver:
             # Thermal convergence
             conv_th = True
             if self.on.get("thermal", False):
-                T_i.x.scatter_forward()
+                T_new.x.scatter_forward()
                 T_old.x.scatter_forward()
 
-                vec_T_new = T_i.x.petsc_vec
+                vec_T_new = T_new.x.petsc_vec
                 vec_T_old = T_old.x.petsc_vec
 
                 # Compute difference vector: diff_T = T_now - T_old
@@ -748,11 +748,11 @@ class Solver:
             # Mechanical convergence
             conv_mech = True
             if self.on.get("mechanical", False):
-                u_i.x.scatter_forward()
+                u_new.x.scatter_forward()
                 u_old.x.scatter_forward()
 
                 # Get the PETSc vectors
-                vec_u_new = u_i.x.petsc_vec
+                vec_u_new = u_new.x.petsc_vec
                 vec_u_old = u_old.x.petsc_vec
 
                 # Compute difference vector: diff_u = u_now - u_old
@@ -788,10 +788,10 @@ class Solver:
             # Damage convergence
             conv_damage = True
             if self.on.get("damage", False):
-                D_i.x.scatter_forward()
+                D_new.x.scatter_forward()
                 D_old.x.scatter_forward()
 
-                vec_D_new = D_i.x.petsc_vec
+                vec_D_new = D_new.x.petsc_vec
                 vec_D_old = D_old.x.petsc_vec
 
                 diff_D = vec_D_new.copy()
@@ -802,25 +802,25 @@ class Solver:
                 rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
 
                 print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
-                conv_damage = (norm_dD < stag_tol_dmg) or (D_i.x.array.max() < 1e-8)
+                conv_damage = (norm_dD < stag_tol_dmg) or (D_new.x.array.max() < 1e-8)
 
             if conv_mech and conv_th and conv_damage:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
                 if self.on.get("thermal", False):
-                    self.T.x.array[:] = T_i.x.array
+                    self.T.x.array[:] = T_new.x.array
                     T_min, T_max = self.T.x.array.min(), self.T.x.array.max()
                     print(f"Global min/max temperature: {T_min:.2f} / {T_max:.2f} K")
 
                 if self.on.get("mechanical", False):
-                    self.u.x.array[:] = u_i.x.array
-                    u_vec = u_i.x.array.reshape(-1, self.tdim)
+                    self.u.x.array[:] = u_new.x.array
+                    u_vec = u_new.x.array.reshape(-1, self.tdim)
                     umag = np.sqrt((u_vec**2).sum(axis=1))
                     print(
                         f"Global min/max displacement magnitude: {umag.min():.2e} / {umag.max():.2e} m"
                     )
 
                 if self.on.get("damage", False):
-                    self.D.x.array[:] = D_i.x.array
+                    self.D.x.array[:] = D_new.x.array
                     D_min, D_max = self.D.x.array.min(), self.D.x.array.max()
                     print(f"Global min/max damage: {D_min:.3e} / {D_max:.3e}")
 

@@ -86,7 +86,6 @@ class DamageModel:
         if not hasattr(self, "H"):
             raise RuntimeError("[DamageModel] self.H non inizializzato.")
 
-        # prendi il primo materiale come "materiale danneggiabile"
         mat_name, mat = next(iter(self.materials.items()))
         H_expr = self.crack_driving_force(u, mat)
 
