@@ -58,8 +58,10 @@ class Solver:
         Returns:
             dict: PETSc options dictionary.
         """
-        if physics not in ["thermal", "mechanical"]:
-            raise ValueError(f"Unknown physics '{physics}'. Must be 'thermal' or 'mechanical'.")
+        if physics not in ["thermal", "mechanical", "damage"]:
+            raise ValueError(
+                f"Unknown physics '{physics}'. Must be 'thermal' or 'mechanical' or 'damage'."
+            )
 
         # 1. Choose KSP type based on matrix symmetry
         if physics == "thermal":
@@ -322,13 +324,22 @@ class Solver:
         print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")
 
     def solve_staggered(
-        self, max_iter=20, stag_tol_th=1e-3, stag_tol_mech=1e-3, rtol_th=1e-6, rtol_mech=1e-6
+        self,
+        max_iter=20,
+        stag_tol_th=1e-3,
+        stag_tol_mech=1e-3,
+        stag_tol_dmg=1e-3,
+        rtol_th=1e-6,
+        rtol_mech=1e-6,
+        rtol_dmg=1e-5,
     ):
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {stag_tol_th:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {stag_tol_mech:.1e}")
+        print(f"  → Staggering tolerance |ΔD|   : {stag_tol_dmg:.1e}")
         print(f"  → Relative tolerance th       : {rtol_th:.1e}")
         print(f"  → Relative tolerance mech     : {rtol_mech:.1e}")
+        print(f"  → Relative tolerance dmg      : {rtol_dmg:.1e}")
 
         if self.on.get("thermal", False):
             T_i = dolfinx.fem.Function(self.V_t)
@@ -347,6 +358,11 @@ class Solver:
 
             bcs_m = []
             [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
+
+        if self.on.get("damage", False):
+            D_i = dolfinx.fem.Function(self.V_d)
+            D_i.x.array[:] = self.D.x.array
+            D_old = dolfinx.fem.Function(self.V_d)
 
         self.dx_tags = {
             tag: ufl.Measure(
@@ -632,11 +648,56 @@ class Solver:
                 # --. Apply relaxation --..
                 u_i.x.array[:] = self.relax_u * u_i.x.array + (1 - self.relax_u) * u_old.x.array
 
+            # --. DAMAGE SUB-PROBLEM --..
+            if self.on.get("damage", False):
+                print("\n[INFO] Assembling damage (phase-field) problem...")
+                D_old.x.array[:] = self.D.x.array
+                for _, material in self.materials.items():
+
+                    # Crack driving force H(u)
+                    H = self.crack_driving_force(u_i, material)
+                    # self.H.interpolate(
+                    #     dolfinx.fem.Expression(H_expr, self.Q.element.interpolation_points())
+                    # )
+
+                    # # Weak form Eq. (16)
+                    lc = material["lc"]
+                    # H = self.H
+
+                    F_D = (
+                        (1 + H) * self.u_d * self.v_d
+                        + lc**2 * ufl.dot(ufl.grad(self.u_d), ufl.grad(self.v_d))
+                        - H * self.v_d
+                    ) * ufl.dx
+                    a_D, L_D = ufl.lhs(F_D), ufl.rhs(F_D)
+
+                    # Solve
+                    problem_D = LinearProblem(
+                        a_D,
+                        L_D,
+                        u=D_i,
+                        petsc_options_prefix="damage_",
+                        petsc_options=self.get_solver_options(
+                            solver_type=self.damage_options.get("linear_solver", "cg"),
+                            physics="damage",
+                            rtol=rtol_dmg,
+                        ),
+                    )
+                    problem_D.solve()
+
+                    # Irreversibilità
+                    D_i.x.array[:] = np.maximum(D_i.x.array, D_old.x.array)
+
+                    # Log
+                    D_min, D_max = self.D.x.array.min(), self.D.x.array.max()
+                    print(f"  Damage field D: min = {D_min:.3e}, max = {D_max:.3e}")
+
             # --. CONVERGENCE CHECK and LOGGING --..
             print(f"\nConvergence check")
 
             rel_norm_dT = 0.0
             rel_norm_du = 0.0
+            rel_norm_dD = 0.0
 
             # Thermal convergence
             conv_th = True
@@ -717,7 +778,26 @@ class Solver:
 
                     print(f"  [adaptive] relax_u={self.relax_u:.2f}")
 
-            if conv_mech and conv_th:
+            # Damage convergence
+            conv_damage = True
+            if self.on.get("damage", False):
+                D_i.x.scatter_forward()
+                D_old.x.scatter_forward()
+
+                vec_D_new = D_i.x.petsc_vec
+                vec_D_old = D_old.x.petsc_vec
+
+                diff_D = vec_D_new.copy()
+                diff_D.axpy(-1.0, vec_D_old)
+
+                norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
+                norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
+                rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
+
+                print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
+                conv_damage = rel_norm_dD < stag_tol_dmg
+
+            if conv_mech and conv_th and conv_damage:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
                 if self.on.get("thermal", False):
                     self.T.x.array[:] = T_i.x.array
@@ -731,6 +811,11 @@ class Solver:
                     print(
                         f"Global min/max displacement magnitude: {umag.min():.2e} / {umag.max():.2e} m"
                     )
+
+                if self.on.get("damage", False):
+                    self.D.x.array[:] = D_i.x.array
+                    D_min, D_max = self.D.x.array.min(), self.D.x.array.max()
+                    print(f"Global min/max damage: {D_min:.3e} / {D_max:.3e}")
 
                 return True
 
