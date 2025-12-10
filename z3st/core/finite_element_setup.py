@@ -4,21 +4,14 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-
 import basix
 import dolfinx
-import ufl
-
-# import dolfinx.fem.petsc
-# from mpi4py import MPI
-# from petsc4py import PETSc
 
 
 class FiniteElementSetup:
     def __init__(self):
         print("__FiniteElementSetup initializer__")
         self._setup_function_space()
-        self._initialize_functions()
 
     def _setup_function_space(self):
         """
@@ -58,25 +51,3 @@ class FiniteElementSetup:
         # self.V_m_mixed, self.V_t_mixed = dolfinx.fem.functionspace(self.mesh, P1_3), dolfinx.fem.functionspace(self.mesh, P1_1)
         # print("Mechanical function space (V_m_mixed):", self.V_m_mixed)
         # print("Thermal function space (V_t_mixed):", self.V_t_mixed)
-
-    def _initialize_functions(self):
-        """
-        Initialize trial and test functions.
-        """
-
-        # --. Test/Trial functions in mixed spaces --..
-        # (self.u_m_mixed, self.u_t_mixed) = ufl.TrialFunction(self.V_m_mixed), ufl.TrialFunction(self.V_t_mixed)
-        # (self.v_m_mixed, self.v_t_mixed) = ufl.TestFunction(self.V_m_mixed), ufl.TestFunction(self.V_t_mixed)
-
-        # --. Test/Trial functions in separate spaces --.
-        # Mechanics
-        self.u_m = ufl.TrialFunction(self.V_m)
-        self.v_m = ufl.TestFunction(self.V_m)
-
-        # --. Thermal --..
-        self.u_t = ufl.TrialFunction(self.V_t)
-        self.v_t = ufl.TestFunction(self.V_t)
-
-        # --. Damage --..
-        self.u_d = ufl.TrialFunction(self.V_d)
-        self.v_d = ufl.TestFunction(self.V_d)

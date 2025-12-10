@@ -64,7 +64,7 @@ class Solver:
             )
 
         # 1. Choose KSP type based on matrix symmetry
-        if physics == "thermal":
+        if physics in ["thermal", "damage"]:
             ksp_type = "cg"  # Symmetric Positive Definite matrix
         elif physics == "mechanical":
             ksp_type = "gmres"  # Non-symmetric matrix
@@ -364,6 +364,8 @@ class Solver:
             D_i.x.array[:] = self.D.x.array
             D_old = dolfinx.fem.Function(self.V_d)
 
+            bcs_d = []
+
         self.dx_tags = {
             tag: ufl.Measure(
                 "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
@@ -380,6 +382,7 @@ class Solver:
 
         prev_res_T = None
         prev_res_u = None
+        # prev_res_D = None
 
         # --- Staggering loop ---
         for iteration in range(max_iter):
@@ -650,47 +653,51 @@ class Solver:
 
             # --. DAMAGE SUB-PROBLEM --..
             if self.on.get("damage", False):
+                D_old.x.array[:] = D_i.x.array
+
                 print("\n[INFO] Assembling damage (phase-field) problem...")
-                D_old.x.array[:] = self.D.x.array
-                for _, material in self.materials.items():
+                self.damage_material = "steel"
 
-                    # Crack driving force H(u)
-                    H = self.crack_driving_force(u_i, material)
-                    # self.H.interpolate(
-                    #     dolfinx.fem.Expression(H_expr, self.Q.element.interpolation_points())
-                    # )
+                self.update_history(u_i)
+                self.H.x.array[:] = np.minimum(self.H.x.array, 50.0)
 
-                    # # Weak form Eq. (16)
-                    lc = material["lc"]
-                    # H = self.H
+                u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
+                a_d, L_d = 0, 0
 
-                    F_D = (
-                        (1 + H) * self.u_d * self.v_d
-                        + lc**2 * ufl.dot(ufl.grad(self.u_d), ufl.grad(self.v_d))
-                        - H * self.v_d
-                    ) * ufl.dx
-                    a_D, L_D = ufl.lhs(F_D), ufl.rhs(F_D)
+                for label, _ in self.materials.items():
 
-                    # Solve
-                    problem_D = LinearProblem(
-                        a_D,
-                        L_D,
-                        u=D_i,
-                        petsc_options_prefix="damage_",
-                        petsc_options=self.get_solver_options(
-                            solver_type=self.damage_options.get("linear_solver", "cg"),
-                            physics="damage",
-                            rtol=rtol_dmg,
-                        ),
-                    )
-                    problem_D.solve()
+                    lc = float(self.damage_options["lc"])
+                    Gc = float(self.damage_options["Gc"])
 
-                    # Irreversibilità
-                    D_i.x.array[:] = np.maximum(D_i.x.array, D_old.x.array)
+                    if label != self.damage_material:
+                        continue
+                    tag = self.label_map[label]
+                    dx = self.dx_tags[tag]
 
-                    # Log
-                    D_min, D_max = self.D.x.array.min(), self.D.x.array.max()
-                    print(f"  Damage field D: min = {D_min:.3e}, max = {D_max:.3e}")
+                    a_d += (Gc / lc) * (1.0 + self.H) * u_d * v_d * dx
+                    L_d += (Gc / lc) * self.H * v_d * dx
+
+                petsc_opts_damage = self.get_solver_options(
+                    physics="damage",
+                    solver_type=self.mech_options.get("linear_solver", None),
+                    rtol=rtol_dmg,
+                )
+
+                problem_d = LinearProblem(
+                    a_d,
+                    L_d,
+                    bcs=bcs_d,
+                    u=D_i,
+                    petsc_options=petsc_opts_damage,
+                    petsc_options_prefix="damage_",
+                )
+                problem_d.solve()
+
+                D_i.x.array[:] = np.clip(D_i.x.array, 0.0, 1.0)
+
+                # proiezione irreversibile è già in H, qui facciamo solo il residuo in norma infinita
+                res_D = np.linalg.norm(D_i.x.array - D_old.x.array, ord=np.inf)
+                print(f"  |ΔD|_∞ = {res_D:.3e}")
 
             # --. CONVERGENCE CHECK and LOGGING --..
             print(f"\nConvergence check")
@@ -795,7 +802,7 @@ class Solver:
                 rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
 
                 print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
-                conv_damage = rel_norm_dD < stag_tol_dmg
+                conv_damage = (norm_dD < stag_tol_dmg) or (D_i.x.array.max() < 1e-8)
 
             if conv_mech and conv_th and conv_damage:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
