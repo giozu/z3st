@@ -102,7 +102,7 @@ class Config:
         self.boundary_conditions_path = self.input_file.get("boundary_conditions_path", None)
         self.n_steps = self.input_file.get("n_steps", 10)
 
-        # --. Mechanical solver options --..
+        # --. Mechanical model options --..
         mech_cfg = self.input_file.get("mechanical", {})
         self.mech_solver_type = mech_cfg.get("solver", "linear")
         self.mech_linear_solver = mech_cfg.get("linear_solver", "iterative_amg")
@@ -112,7 +112,7 @@ class Config:
         self.mech_convergence = mech_cfg.get("convergence", "norm")
         self.mech_debug = bool(mech_cfg.get("debug", False))
 
-        # --. Thermal solver options --..
+        # --. Thermal model options --..
         th_cfg = self.input_file.get("thermal", {})
         self.th_solver_type = th_cfg.get("solver", "linear")
         self.th_linear_solver = th_cfg.get("linear_solver", "iterative_amg")

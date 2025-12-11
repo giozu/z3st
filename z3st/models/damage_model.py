@@ -14,14 +14,14 @@ class DamageModel:
     def __init__(self):
         print("[DamageModel] initializer")
 
-        data = self.input_file
+        # --. Damage model options --..
+        self.dmg_cfg = self.input_file.get("damage", {})
 
-        self.damage_options = data.get("damage", {})
-        if not self.damage_options:
+        if not self.dmg_cfg:
             raise ValueError("[DamageModel] 'damage' missing in input.yaml.")
 
         print("[DamageModel] options loaded from input.yaml:")
-        for key, value in self.damage_options.items():
+        for key, value in self.dmg_cfg.items():
             print(f"  {key:<20}: {value}")
 
     @staticmethod
