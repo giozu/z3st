@@ -300,7 +300,7 @@ class Solver:
         else:
             print("  Non-linear solver")
             petsc_opts_mech = self.get_solver_options(
-                solver_type=self.mech_options.get("linear_solver", None),
+                solver_type=self.mech_cfg["linear_solver"],
                 physics="mechanical",
                 rtol=rtol_mech,
             )
@@ -355,26 +355,26 @@ class Solver:
         D_old.x.array[:] = D_new.x.array
 
         print("\n[INFO] Assembling damage (phase-field) problem...")
-        self.damage_material = "steel"
-
-        self.update_history(u_current)
-        self.H.x.array[:] = np.minimum(self.H.x.array, 50.0)
 
         u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
         a_d, L_d = 0, 0
+        lc = float(self.dmg_cfg["lc"])
 
-        for label, _ in self.materials.items():
-            if label != self.damage_material:
-                continue
+        for label, material in self.materials.items():
 
-            lc = float(self.dmg_cfg["lc"])
-            Gc = float(self.dmg_cfg["Gc"])
+            print(
+                f"Solving damage problem for '{label}' material, with sigma_c = {material['sigma_c']*1e-6} MPa"
+            )
+
+            self.update_history(u_current)
 
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
 
-            a_d += (Gc / lc) * (1.0 + self.H) * u_d * v_d * dx
-            L_d += (Gc / lc) * self.H * v_d * dx
+            a_d += (1.0 + self.H) * u_d * v_d * dx + lc**2 * ufl.inner(
+                ufl.grad(u_d), ufl.grad(v_d)
+            ) * dx
+            L_d += self.H * v_d * dx
 
         petsc_opts_damage = self.get_solver_options(
             physics="damage",
@@ -392,6 +392,8 @@ class Solver:
         )
         problem_d.solve()
 
+        # irreversibility
+        D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         # Residual in L_inf norm
