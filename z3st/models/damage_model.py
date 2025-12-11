@@ -34,21 +34,9 @@ class DamageModel:
         """
         return (1 - D) ** 2 + K
 
-    def effective_strain_energy(self, u, material):
-        eps = ufl.sym(ufl.grad(u))
-        lam = material["lmbda"]
-        G = material["G"]
-        E = material["E"]
-
-        sigma_eff = lam * ufl.tr(eps) * ufl.Identity(3) + 2 * G * eps
-        tr_pos = 0.5 * (ufl.tr(sigma_eff) + abs(ufl.tr(sigma_eff)))  # ⟨tr(σ)⟩
-        psi_eff = 0.5 / E * tr_pos**2
-        return psi_eff
-
     def crack_driving_force(self, u, material):
         """
-        Crack-driving quantity H(u) in forma energetica positiva.
-        Usa le costanti di un materiale (E, λ, G, σ_c, ζ).
+        Crack-driving force H(u)
         """
         E = material["E"]
         lam = material["lmbda"]
@@ -77,23 +65,32 @@ class DamageModel:
 
     def update_history(self, u):
         """
-        Aggiorna il campo di storia H in modo irreversibile:
+        Ensure the irreversibility for the field H:
             H(x) = max(H_old(x), H_new(x))
-
-        Proiezione L2 su DG0 tramite Expression + interpolate.
-        Per semplicità usa i parametri del primo materiale.
         """
-        if not hasattr(self, "H"):
-            raise RuntimeError("[DamageModel] self.H non inizializzato.")
-
-        mat_name, mat = next(iter(self.materials.items()))
-        H_expr = self.crack_driving_force(u, mat)
 
         Q = self.Q
-        H_new = dolfinx.fem.Function(Q, name="CrackDrivingForce_new")
-        expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points)
-        H_new.interpolate(expr)
+        H_new = dolfinx.fem.Function(Q)
 
-        H_old_arr = self.H.x.array
-        H_new_arr = H_new.x.array
-        self.H.x.array[:] = np.maximum(H_old_arr, H_new_arr)
+        # iterate over materials
+        for label, material in self.materials.items():
+            tag = self.label_map[label]
+
+            # get cells belonging to this material
+            cells = np.where(self.cell_tags.values == tag)[0]
+            if len(cells) == 0:
+                continue
+
+            # compute crack driving force for this material
+            H_expr = self.crack_driving_force(u, material)
+            tmp = dolfinx.fem.Function(Q)
+            expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points)
+            tmp.interpolate(expr)
+
+            # assign tmp values to H_new only on these cells
+            for cell in cells:
+                dof = Q.dofmap.cell_dofs(cell)[0]  # DG0 --> 1 dof per cell
+                H_new.x.array[dof] = tmp.x.array[dof]
+
+        # irreversibility
+        self.H.x.array[:] = np.maximum(self.H.x.array, H_new.x.array)
