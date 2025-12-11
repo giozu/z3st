@@ -239,7 +239,7 @@ class Solver:
             g = dolfinx.default_scalar_type(self.g)
             body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
 
-            if self.mech_options.get("solver") == "linear":
+            if self.mech_cfg["solver"] == "linear":
                 sigma = self.sigma_mech(u_m, material)
                 a_m += ufl.inner(sigma, self.epsilon(v_m)) * dx
                 L_m += ufl.dot(body_force, v_m) * dx
@@ -254,7 +254,7 @@ class Solver:
             for bc_info in self.traction[label]:
                 print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
                 ds = self.ds_tags[bc_info["id"]]
-                if self.mech_options.get("solver") == "linear":
+                if self.mech_cfg["solver"] == "linear":
                     L_m += ufl.dot(bc_info["value"], v_m) * ds
                 else:
                     F_m -= ufl.dot(bc_info["value"], v_m) * ds
@@ -271,7 +271,7 @@ class Solver:
                 ds = self.ds_tags[bc_info["id"]]
                 n = ufl.FacetNormal(self.mesh)
 
-                if self.mech_options.get("solver") == "linear":
+                if self.mech_cfg["solver"] == "linear":
                     a_m += alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
                     if abs(val) > 1e-16:
                         L_m += alpha * val * ufl.dot(v_m, n) * ds
@@ -281,10 +281,10 @@ class Solver:
                         F_m -= alpha * val * ufl.dot(v_m, n) * ds
 
         # Solve
-        if self.mech_options.get("solver") == "linear":
+        if self.mech_cfg["solver"] == "linear":
             print("  Linear solver")
             petsc_opts_mech = self.get_solver_options(
-                solver_type=self.mech_options.get("linear_solver", None),
+                solver_type=self.mech_cfg["linear_solver"],
                 physics="mechanical",
                 rtol=rtol_mech,
             )
@@ -330,7 +330,7 @@ class Solver:
         norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
         rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
 
-        if self.mech_convergence == "norm":
+        if self.mech_cfg["convergence"] == "norm":
             print(f"  ||Δu|| = {norm_du:.3e}")
             conv_mech = norm_du < stag_tol_mech
             res_curr = norm_du

@@ -102,16 +102,6 @@ class Config:
         self.boundary_conditions_path = self.input_file.get("boundary_conditions_path", None)
         self.n_steps = self.input_file.get("n_steps", 10)
 
-        # --. Mechanical model options --..
-        mech_cfg = self.input_file.get("mechanical", {})
-        self.mech_solver_type = mech_cfg.get("solver", "linear")
-        self.mech_linear_solver = mech_cfg.get("linear_solver", "iterative_amg")
-        self.rtol_mech = float(mech_cfg.get("rtol", 1e-6))
-        self.stag_tol_mech = float(mech_cfg.get("stag_tol", 1e-8))
-        self.mech_regime = mech_cfg.get("mechanical_regime", "3D")
-        self.mech_convergence = mech_cfg.get("convergence", "norm")
-        self.mech_debug = bool(mech_cfg.get("debug", False))
-
         # --. Debug print --..
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")
@@ -122,8 +112,4 @@ class Config:
             print(f"      {model:<10} → {'ON' if active else 'OFF'}")
 
         print(f"  → Gap conductance     : {self.gap_model} (value = {self.h_gap_value})")
-        print(f"  → Mechanical          : {self.mech_regime}")
-        print(f"  → Mechanical solver   : {self.mech_solver_type} ({self.mech_linear_solver})")
-        print(f"     tolerances         : rtol={self.rtol_mech}, stag_tol={self.stag_tol_mech}")
-        print(f"     convergence        : {self.mech_convergence}")
         print("\n")

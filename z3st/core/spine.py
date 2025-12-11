@@ -242,9 +242,9 @@ class Spine(
             self.solve_staggered(
                 max_iter=max_iters,
                 rtol_th=self.th_cfg["rtol"],
-                rtol_mech=self.rtol_mech,
+                rtol_mech=self.mech_cfg["rtol"],
                 stag_tol_th=self.th_cfg["stag_tol"],
-                stag_tol_mech=self.stag_tol_mech,
+                stag_tol_mech=self.mech_cfg["stag_tol"],
             )
         else:
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")
