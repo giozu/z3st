@@ -8,13 +8,13 @@
 
 SetFactory("OpenCASCADE");
 
-h = 0.1; // height
-r_1_o = 0.05;      // Outer radius of the inner cylinder
-r_2_i = 0.06;      // Inner radius of the outer cylinder
-r_2_o = 0.065;     // Outer radius of the outer cylinder
+h = 0.1;            // height
+r_1_o = 0.05;       // Outer radius of the inner cylinder
+r_2_i = 0.06;       // Inner radius of the outer cylinder
+r_2_o = 0.065;      // Outer radius of the outer cylinder
 
 n_h = 20;
-n_r = 10;
+n_r = 20;
 n_f = 30;
 
 Point(100) = {0, 0, 0};       // Center of the bottom face
