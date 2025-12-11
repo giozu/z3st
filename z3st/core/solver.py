@@ -163,10 +163,10 @@ class Solver:
                 )
 
         # Solve
-        if self.thermal_options.get("solver") == "linear":
+        if self.th_cfg["solver"] == "linear":
             print("  Linear solver")
             petsc_opts_thermal = self.get_solver_options(
-                solver_type=self.thermal_options.get("linear_solver", None),
+                solver_type=self.th_cfg["linear_solver"],
                 physics="thermal",
                 rtol=rtol_th,
             )
@@ -199,7 +199,7 @@ class Solver:
         norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
         rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
 
-        if self.th_convergence == "norm":
+        if self.th_cfg["convergence"] == "norm":
             print(f"  ||ΔT|| = {norm_dT:.3e}")
             conv_th = norm_dT < stag_tol_th
             res_curr = norm_dT

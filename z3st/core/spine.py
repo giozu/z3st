@@ -241,9 +241,9 @@ class Spine(
         elif self.coupling == "staggered":
             self.solve_staggered(
                 max_iter=max_iters,
-                rtol_th=self.rtol_th,
+                rtol_th=self.th_cfg["rtol"],
                 rtol_mech=self.rtol_mech,
-                stag_tol_th=self.stag_tol_th,
+                stag_tol_th=self.th_cfg["stag_tol"],
                 stag_tol_mech=self.stag_tol_mech,
             )
         else:
