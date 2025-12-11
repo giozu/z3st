@@ -7,7 +7,7 @@
 import dolfinx
 import numpy as np
 import ufl
-from dolfinx.fem.petsc import LinearProblem, NonlinearProblem
+from dolfinx.fem.petsc import NonlinearProblem
 from petsc4py import PETSc
 
 
@@ -15,7 +15,8 @@ class Solver:
     def __init__(self):
         print("[Solver] initializer")
         solver_settings = self.input_file.get("solver_settings", {})
-        self.coupling = self.input_file.get("solver_settings", {}).get("coupling", "staggered")
+
+        self.coupling = solver_settings.get("coupling", "staggered")
 
         self.relax_T = float(solver_settings.get("relax_T", 0.9))
         self.relax_u = float(solver_settings.get("relax_u", 0.4))
@@ -36,7 +37,6 @@ class Solver:
             print(f"  → relax_shrink : {self.relax_shrink}")
             print(f"  → relax_min  : {self.relax_min}")
             print(f"  → relax_max : {self.relax_max}")
-
         else:
             print("  Adaptive relaxation disabled")
 
@@ -46,57 +46,375 @@ class Solver:
         """
         Returns PETSc options for the linear solver based on the physics.
 
-        Parameters:
-            physics (str): "thermal" or "mechanical". This primarily determines
-                        if a symmetric (CG) or non-symmetric (GMRES) solver is used.
-            solver_type (str): Type of solver/preconditioner strategy. Supported:
-                - "direct_mumps": Robust but memory-intensive direct solver.
-                - "iterative_amg": Default iterative solver with Algebraic Multigrid (PETSc GAMG).
-                - "iterative_hypre": Iterative solver with HYPRE's BoomerAMG preconditioner.
-            rtol (float): Relative tolerance for KSP.
-
-        Returns:
-            dict: PETSc options dictionary.
+        physics: "thermal", "mechanical" or "damage".
         """
         if physics not in ["thermal", "mechanical", "damage"]:
             raise ValueError(
-                f"Unknown physics '{physics}'. Must be 'thermal' or 'mechanical' or 'damage'."
+                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical' or 'damage'."
             )
 
-        # 1. Choose KSP type based on matrix symmetry
+        # 1) KSP type
         if physics in ["thermal", "damage"]:
-            ksp_type = "cg"  # Symmetric Positive Definite matrix
-        elif physics == "mechanical":
-            ksp_type = "gmres"  # Non-symmetric matrix
+            ksp_type = "cg"  # SPD
+        else:  # mechanical
+            ksp_type = "gmres"  # non-symmetric
 
-        # 2. Choose preconditioner based on solver_type
+        # 2) Preconditioner
         if solver_type == "direct_mumps":
             return {
                 "ksp_type": "preonly",
                 "pc_type": "lu",
-                "pc_factor_mat_solver_type": "mumps",  # MUMPS, direct solver
+                "pc_factor_mat_solver_type": "mumps",
             }
 
         elif solver_type == "iterative_amg":
             coarse_eq_limit = 500 if physics == "thermal" else 1000
             return {
                 "ksp_type": ksp_type,
-                "pc_type": "gamg",  # PETSc's built-in Algebraic Multigrid (GAMG)
+                "pc_type": "gamg",
                 "ksp_rtol": rtol,
                 "pc_gamg_coarse_eq_limit": coarse_eq_limit,
-                # "ksp_gmres_restart": 30 # Restart for GMRES can be useful for memory
             }
 
         elif solver_type == "iterative_hypre":
             return {
                 "ksp_type": ksp_type,
                 "pc_type": "hypre",
-                "pc_hypre_type": "boomeramg",  # HYPRE's BoomerAMG, often more robust than GAMG
+                "pc_hypre_type": "boomeramg",
                 "ksp_rtol": rtol,
             }
 
         else:
             raise ValueError(f"Unknown solver_type '{solver_type}'.")
+
+    def _build_measures(self):
+        """Build dx_tags and ds_tags measures once per solve."""
+
+        self.dx_tags = {
+            tag: ufl.Measure(
+                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
+            )
+            for tag in np.unique(self.cell_tags.values)
+        }
+
+        self.ds_tags = {
+            id_: ufl.Measure(
+                "ds", domain=self.mesh, subdomain_data=self.facet_tags, subdomain_id=id_
+            )
+            for id_ in np.unique(self.facet_tags.values)
+        }
+
+    def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
+
+        T_old.x.array[:] = T_new.x.array
+
+        print("\n[INFO] Assembling thermal problem...")
+        u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
+        a_t = 0
+        L_t = 0
+
+        # Volume integrals
+        for label, material in self.materials.items():
+            tag = self.label_map[label]
+            dx = self.dx_tags[tag]
+
+            print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+            k = material["k"]
+
+            a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
+            L_t += self.q_third * v_t * dx
+
+            dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
+            q_vals = self.q_third.x.array[dofs]
+            print(
+                f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, "
+                f"max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
+            )
+
+        # Neumann
+        for label in self.materials:
+            for bc_info in self.neumann_thermal[label]:
+                print(f"  Applying flux on subdomain id = {bc_info['id']}")
+                ds_neumann = self.ds_tags[bc_info["id"]]
+                L_t += (-bc_info["value"]) * v_t * ds_neumann
+
+        # Gap (Robin)
+        h_gap = self.set_gap_conductance(T_new)
+
+        for label in self.materials:
+            for bc_info in self.robin_thermal[label]:
+                print(f"  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
+                region_id = bc_info["id"]
+                pair_region = bc_info["pair"]
+                ds_interface = self.ds_tags[region_id]
+
+                T_other = dolfinx.fem.Function(self.V_t)
+                dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
+                dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
+                T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
+
+                a_t += h_gap * u_t * v_t * ds_interface
+                L_t += h_gap * T_other * v_t * ds_interface
+
+                print(
+                    f"  [INFO] Gap Robin BC between '{label}' "
+                    f"(region={region_id}) and '{pair_region}' "
+                    f"(region={self.label_map[pair_region]})"
+                )
+
+        # Solve
+        if self.thermal_options.get("solver") == "linear":
+            print("  Linear solver")
+            petsc_opts_thermal = self.get_solver_options(
+                solver_type=self.thermal_options.get("linear_solver", None),
+                physics="thermal",
+                rtol=rtol_th,
+            )
+            problem_t = dolfinx.fem.petsc.LinearProblem(
+                a_t,
+                L_t,
+                bcs=bcs_t,
+                u=T_new,
+                petsc_options=petsc_opts_thermal,
+                petsc_options_prefix="thermal_",
+            )
+            problem_t.solve()
+        else:
+            print("  [ERROR] Non-linear thermal solver not yet implemented.")
+
+        # Relax
+        T_new.x.array[:] = self.relax_T * T_new.x.array + (1 - self.relax_T) * T_old.x.array
+
+        # Convergenza (norma o rel_norm)
+        T_new.x.scatter_forward()
+        T_old.x.scatter_forward()
+
+        vec_T_new = T_new.x.petsc_vec
+        vec_T_old = T_old.x.petsc_vec
+
+        diff_T = vec_T_new.copy()
+        diff_T.axpy(-1.0, vec_T_old)
+
+        norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
+        norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
+        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
+
+        if self.th_convergence == "norm":
+            print(f"  ||ΔT|| = {norm_dT:.3e}")
+            conv_th = norm_dT < stag_tol_th
+            res_curr = norm_dT
+        else:
+            print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}")
+            conv_th = rel_norm_dT < stag_tol_th
+            res_curr = rel_norm_dT
+
+        if self.relax_adaptive:
+            if prev_res_T is not None:
+                if res_curr < prev_res_T:
+                    self.relax_T = min(self.relax_T * self.relax_growth, self.relax_max)
+                else:
+                    self.relax_T = max(self.relax_T * self.relax_shrink, self.relax_min)
+            prev_res_T = res_curr
+            print(f"  [adaptive] relax_T={self.relax_T:.2f}")
+
+        return conv_th, norm_dT, rel_norm_dT, prev_res_T
+
+    def _mechanical_step(
+        self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current
+    ):
+        u_old.x.array[:] = u_new.x.array
+
+        print("\n[INFO] Assembling mechanical problem...")
+
+        u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
+        a_m, L_m = 0, 0
+        F_m = 0
+
+        for label, material in self.materials.items():
+            tag = self.label_map[label]
+            dx = self.dx_tags[tag]
+            print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+
+            rho = dolfinx.default_scalar_type(material["rho"])
+            g = dolfinx.default_scalar_type(self.g)
+            body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
+
+            if self.mech_options.get("solver") == "linear":
+                sigma = self.sigma_mech(u_m, material)
+                a_m += ufl.inner(sigma, self.epsilon(v_m)) * dx
+                L_m += ufl.dot(body_force, v_m) * dx
+                if self.on.get("thermal", False):
+                    L_m -= ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+            else:
+                sigma = self.sigma_mech(u_new, material)
+                F_m += ufl.inner(sigma, self.epsilon(v_m)) * dx - ufl.dot(body_force, v_m) * dx
+
+        # Traction BCs
+        for label in self.materials:
+            for bc_info in self.traction[label]:
+                print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
+                ds = self.ds_tags[bc_info["id"]]
+                if self.mech_options.get("solver") == "linear":
+                    L_m += ufl.dot(bc_info["value"], v_m) * ds
+                else:
+                    F_m -= ufl.dot(bc_info["value"], v_m) * ds
+
+        # Clamp_r penalties
+        for label in self.materials:
+            for bc_info in self.clamp_r[label]:
+                alpha = bc_info["penalty"]
+                val = bc_info["value"]
+                print(
+                    f"  Applying Clamp_r (weak penalty) on region id = {bc_info['id']} "
+                    f"(α = {alpha:.2e})"
+                )
+                ds = self.ds_tags[bc_info["id"]]
+                n = ufl.FacetNormal(self.mesh)
+
+                if self.mech_options.get("solver") == "linear":
+                    a_m += alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
+                    if abs(val) > 1e-16:
+                        L_m += alpha * val * ufl.dot(v_m, n) * ds
+                else:
+                    F_m += alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
+                    if abs(val) > 1e-16:
+                        F_m -= alpha * val * ufl.dot(v_m, n) * ds
+
+        # Solve
+        if self.mech_options.get("solver") == "linear":
+            print("  Linear solver")
+            petsc_opts_mech = self.get_solver_options(
+                solver_type=self.mech_options.get("linear_solver", None),
+                physics="mechanical",
+                rtol=rtol_mech,
+            )
+            problem_m = dolfinx.fem.petsc.LinearProblem(
+                a_m,
+                L_m,
+                bcs=bcs_m,
+                u=u_new,
+                petsc_options=petsc_opts_mech,
+                petsc_options_prefix="mechanical_",
+            )
+            problem_m.solve()
+        else:
+            print("  Non-linear solver")
+            petsc_opts_mech = self.get_solver_options(
+                solver_type=self.mech_options.get("linear_solver", None),
+                physics="mechanical",
+                rtol=rtol_mech,
+            )
+            problem_m = NonlinearProblem(
+                F_m,
+                u_new,
+                bcs=bcs_m,
+                petsc_options=petsc_opts_mech,
+                petsc_options_prefix="elasticity",
+            )
+            problem_m.solve()
+
+        # Relax
+        u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
+
+        # Convergence
+        u_new.x.scatter_forward()
+        u_old.x.scatter_forward()
+
+        vec_u_new = u_new.x.petsc_vec
+        vec_u_old = u_old.x.petsc_vec
+
+        diff_u = vec_u_new.copy()
+        diff_u.axpy(-1.0, vec_u_old)
+
+        norm_du = diff_u.norm(PETSc.NormType.NORM_2)
+        norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
+        rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
+
+        if self.mech_convergence == "norm":
+            print(f"  ||Δu|| = {norm_du:.3e}")
+            conv_mech = norm_du < stag_tol_mech
+            res_curr = norm_du
+        else:
+            print(f"  ||Δu||/||u|| = {rel_norm_du:.3e}")
+            conv_mech = rel_norm_du < stag_tol_mech
+            res_curr = rel_norm_du
+
+        if self.relax_adaptive:
+            if prev_res_u is not None:
+                if res_curr < prev_res_u:
+                    self.relax_u = min(self.relax_u * self.relax_growth, self.relax_max)
+                else:
+                    self.relax_u = max(self.relax_u * self.relax_shrink, self.relax_min)
+            prev_res_u = res_curr
+            print(f"  [adaptive] relax_u={self.relax_u:.2f}")
+
+        return conv_mech, norm_du, rel_norm_du, prev_res_u
+
+    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, u_current):
+
+        D_old.x.array[:] = D_new.x.array
+
+        print("\n[INFO] Assembling damage (phase-field) problem...")
+        self.damage_material = "steel"
+
+        self.update_history(u_current)
+        self.H.x.array[:] = np.minimum(self.H.x.array, 50.0)
+
+        u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
+        a_d, L_d = 0, 0
+
+        for label, _ in self.materials.items():
+            if label != self.damage_material:
+                continue
+
+            lc = float(self.dmg_cfg["lc"])
+            Gc = float(self.dmg_cfg["Gc"])
+
+            tag = self.label_map[label]
+            dx = self.dx_tags[tag]
+
+            a_d += (Gc / lc) * (1.0 + self.H) * u_d * v_d * dx
+            L_d += (Gc / lc) * self.H * v_d * dx
+
+        petsc_opts_damage = self.get_solver_options(
+            physics="damage",
+            solver_type=self.dmg_cfg["linear_solver"],
+            rtol=rtol_dmg,
+        )
+
+        problem_d = dolfinx.fem.petsc.LinearProblem(
+            a_d,
+            L_d,
+            bcs=[],
+            u=D_new,
+            petsc_options=petsc_opts_damage,
+            petsc_options_prefix="damage_",
+        )
+        problem_d.solve()
+
+        D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
+
+        # Residual in L_inf norm
+        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
+        print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
+
+        # Convergence
+        D_new.x.scatter_forward()
+        D_old.x.scatter_forward()
+        vec_D_new = D_new.x.petsc_vec
+        vec_D_old = D_old.x.petsc_vec
+
+        diff_D = vec_D_new.copy()
+        diff_D.axpy(-1.0, vec_D_old)
+
+        norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
+        norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
+        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
+
+        print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
+        conv_damage = (norm_dD < stag_tol_dmg) or (D_new.x.array.max() < 1e-8)
+
+        return conv_damage, norm_dD, rel_norm_dD
 
     def solve_staggered(
         self,
@@ -116,15 +434,20 @@ class Solver:
         print(f"  → Relative tolerance mech     : {rtol_mech:.1e}")
         print(f"  → Relative tolerance dmg      : {rtol_dmg:.1e}")
 
+        # Build measures once
+        self._build_measures()
+
+        # Allocate local fields
         if self.on.get("thermal", False):
             T_new = dolfinx.fem.Function(self.V_t)
-            T_new.x.array[:] = self.T.x.array  # Start with the initial/previous converged state
-            T_old = dolfinx.fem.Function(
-                self.V_t
-            )  # Functions to store the previous state for convergence check
+            T_new.x.array[:] = self.T.x.array
+            T_old = dolfinx.fem.Function(self.V_t)
 
             bcs_t = []
             [bcs_t.extend(bc_list) for bc_list in self.dirichlet_thermal.values()]
+        else:
+            T_new = T_old = None
+            bcs_t = []
 
         if self.on.get("mechanical", False):
             u_new = dolfinx.fem.Function(self.V_m)
@@ -133,475 +456,79 @@ class Solver:
 
             bcs_m = []
             [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
+        else:
+            u_new = u_old = None
+            bcs_m = []
 
         if self.on.get("damage", False):
             D_new = dolfinx.fem.Function(self.V_d)
             D_new.x.array[:] = self.D.x.array
             D_old = dolfinx.fem.Function(self.V_d)
-
-            bcs_d = []
-
-        self.dx_tags = {
-            tag: ufl.Measure(
-                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
-            )
-            for tag in np.unique(self.cell_tags.values)
-        }
-
-        self.ds_tags = {
-            id_: ufl.Measure(
-                "ds", domain=self.mesh, subdomain_data=self.facet_tags, subdomain_id=id_
-            )
-            for id_ in np.unique(self.facet_tags.values)
-        }
+        else:
+            D_new = D_old = None
 
         prev_res_T = None
         prev_res_u = None
-        # prev_res_D = None
 
-        # --- Staggering loop ---
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
 
-            # 1) THERMAL
-            if self.on.get("thermal", False):
-                T_old.x.array[:] = T_new.x.array
-
-                print("\n[INFO] Assembling thermal problem...")
-                u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
-                a_t = 0
-                L_t = 0
-
-                # --- Volume integrals ---
-                for label, material in self.materials.items():
-                    tag = self.label_map[label]
-                    dx = self.dx_tags[tag]
-
-                    print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
-
-                    # Thermal conductivity
-                    k = material["k"]
-
-                    # Output the average value of the thermal conductivity
-                    # if isinstance(k, (int, float)):
-                    #     k_avg = k
-                    # else:
-                    #     V0 = dolfinx.fem.functionspace(self.mesh, ("CG", 1))
-                    #     k_func = dolfinx.fem.Function(V0, name=f"k_{label}")
-                    #     expr = dolfinx.fem.Expression(k, V0.element.interpolation_points)
-                    #     k_func.interpolate(expr)
-
-                    #     num = dolfinx.fem.assemble_scalar(dolfinx.fem.form(k_func * dx))
-                    #     den = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1 * dx))
-                    #     k_avg = num / den
-
-                    # print(f"  Average conductivity for {label} = {k_avg:.3f} W/m·K")
-
-                    a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
-                    L_t += self.q_third * v_t * dx
-
-                    # q_third value in the volume "label" / "tag"
-                    dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
-                    q_vals = self.q_third.x.array[dofs]
-                    print(
-                        f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
-                    )
-
-                # Neumann
-                for label in self.materials:
-                    for bc_info in self.neumann_thermal[label]:
-                        print(f"  Applying flux on subdomain id = {bc_info['id']}")
-                        ds_neumann = self.ds_tags[bc_info["id"]]
-                        L_t += (-bc_info["value"]) * v_t * ds_neumann
-
-                # Gap (Robin)
-                h_gap = self.set_gap_conductance(T_new)
-
-                for label in self.materials:
-                    for bc_info in self.robin_thermal[label]:
-                        print(f"  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
-
-                        region_id = bc_info["id"]  # e.g., interface 1 --> 2
-                        pair_region = bc_info["pair"]  # e.g., interface 1 <-- 2
-
-                        ds_interface = self.ds_tags[region_id]  # e.g., 1 interface surface
-
-                        # 1) project
-                        T_other = dolfinx.fem.Function(self.V_t)  # e.g., T_cyl_2
-                        dofs_here = self.mgr.locate_facets_dofs(
-                            region_id, self.V_t
-                        )  # e.g., dofs of cyl_1_interface
-                        dofs_other = self.mgr.locate_facets_dofs(
-                            self.label_map[pair_region], self.V_t
-                        )  # e.g., dofs of cyl_2_interface
-
-                        T_other.x.array[dofs_here] = T_new.x.array[
-                            dofs_other
-                        ]  # e.g., T_cyl_2 projected on cyl_1_dofs
-
-                        # 2) mean
-                        # T_other = T_new.x.array[dofs_other].mean()
-
-                        # -) bias
-                        # if label == 'cyl_1':
-                        #     print(f"Biasing cyl_2 temperature")
-                        #     T_other.x.array[dofs_here[:200]] += 500
-
-                        a_t += h_gap * u_t * v_t * ds_interface
-                        L_t += h_gap * T_other * v_t * ds_interface
-
-                        print(
-                            f"  [INFO] Gap Robin BC between '{label}' (region={region_id}) and '{pair_region}' (region={self.label_map[pair_region]})"
-                        )
-
-                        # Print heat flux
-                        # self.heat_flux(T_new)
-
-                # --- Solve the system ---
-                if self.thermal_options.get("solver") == "linear":
-                    print(f"  Linear solver")
-                    petsc_opts_thermal = self.get_solver_options(
-                        solver_type=self.thermal_options.get("linear_solver", None),
-                        physics="thermal",
-                        rtol=rtol_th,
-                    )
-                    problem_t = LinearProblem(
-                        a_t,
-                        L_t,
-                        bcs=bcs_t,
-                        u=T_new,
-                        petsc_options=petsc_opts_thermal,
-                        petsc_options_prefix="thermal_",
-                    )
-                    problem_t.solve()
-
-                elif self.thermal_options.get("solver") == "non-linear":
-                    print(f"  Non-linear solver")
-                    print(f"  [ERROR] Non-linear thermal solver not yet implemented.")
-
-                # Check T_fo
-                # dofs = self.locateFacetDofs(self.label_map["lateral"], self.V_t)
-                # T = T_new.x.array[dofs].mean()
-                # print(f"  T_lateral = {T:.2f} K")
-
-                # Apply relaxation
-                T_new.x.array[:] = self.relax_T * T_new.x.array + (1 - self.relax_T) * T_old.x.array
-
-            # --. MECHANICAL SUB-PROBLEM --..
-            if self.on.get("mechanical", False):
-                u_old.x.array[:] = u_new.x.array
-
-                print("\n[INFO] Assembling mechanical problem...")
-
-                u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
-                a_m, L_m = 0, 0  # linear formulation a(u,v) = F(v)
-                F_m = 0  # non-linear formulation F(u,v) = 0
-
-                # --- Volume integrals ---
-                for label, material in self.materials.items():
-                    tag = self.label_map[label]
-                    print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
-                    dx = self.dx_tags[tag]
-
-                    rho = dolfinx.default_scalar_type(material["rho"])
-                    g = dolfinx.default_scalar_type(self.g)
-                    body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
-
-                    if self.mech_options.get("solver") == "linear":
-                        stress_tensor = self.sigma_mech(u_m, material)  # in mechanical_model
-
-                        a_m += ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
-                        L_m += ufl.dot(body_force, v_m) * dx
-                        if self.on.get("thermal", False):
-                            L_m -= ufl.inner(self.sigma_th(T_new, material), self.epsilon(v_m)) * dx
-
-                    elif self.mech_options.get("solver") == "non-linear":
-                        stress_tensor = self.sigma_mech(u_new, material)
-                        F_m += (
-                            ufl.inner(stress_tensor, self.epsilon(v_m)) * dx
-                            - ufl.dot(body_force, v_m) * dx
-                        )
-
-                # --. Neumann BCs (traction) --..
-                for label in self.materials:
-                    for bc_info in self.traction[label]:
-                        print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
-                        ds = self.ds_tags[bc_info["id"]]
-                        if self.mech_options.get("solver") == "linear":
-                            L_m += ufl.dot(bc_info["value"], v_m) * ds
-                        elif self.mech_options.get("solver") == "non-linear":
-                            F_m -= ufl.dot(bc_info["value"], v_m) * ds
-
-                # --. Neumann BCs (penalties) --..
-                for label in self.materials:
-                    for bc_info in self.clamp_r[label]:
-                        alpha = bc_info["penalty"]
-                        val = bc_info["value"]
-                        print(
-                            f"  Applying Clamp_r (weak penalty) on region id = {bc_info['id']} (α = {alpha:.2e})"
-                        )
-
-                        ds = self.ds_tags[bc_info["id"]]
-                        n = ufl.FacetNormal(self.mesh)
-
-                        if self.mech_options.get("solver") == "linear":
-                            a_m += alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
-                            if abs(val) > 1e-16:
-                                L_m += alpha * val * ufl.dot(v_m, n) * ds
-
-                        elif self.mech_options.get("solver") == "non-linear":
-                            F_m += alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
-                            if abs(val) > 1e-16:
-                                F_m -= alpha * val * ufl.dot(v_m, n) * ds
-
-                # --. check_/ debug mechanical_constraints --..
-                if self.mech_debug:
-                    if not hasattr(self, "_mech_diagnostic_done"):
-                        print("[DEBUG] Mechanical diagnostic enabled (mechanical.debug=True)")
-                        try:
-                            from z3st.core.diagnostic import (
-                                check_fixed_dofs,
-                                check_mechanical_constraints,
-                                debug_dirichlet_mechanical,
-                            )
-
-                            debug_dirichlet_mechanical(self)
-                            check_fixed_dofs(self, "xmin")
-                            check_mechanical_constraints(
-                                self, eig_check=False, plot=False, tol=1e-5
-                            )
-                        except Exception as e:
-                            print(f"[WARN] Mechanical diagnostic failed: {e}")
-                        finally:
-                            self._mech_diagnostic_done = True
-
-                # --. solve --..
-                if self.mech_options.get("solver") == "linear":
-                    print(f"  Linear solver")
-                    petsc_opts_mech = self.get_solver_options(
-                        solver_type=self.mech_options.get("linear_solver", None),
-                        physics="mechanical",
-                        rtol=rtol_mech,
-                    )
-                    problem_m = LinearProblem(
-                        a_m,
-                        L_m,
-                        bcs=bcs_m,
-                        u=u_new,
-                        petsc_options=petsc_opts_mech,
-                        petsc_options_prefix="mechanical_",
-                    )
-                    problem_m.solve()
-
-                elif self.mech_options.get("solver") == "non-linear":
-                    print(f"  Non-linear solver")
-
-                    petsc_opts_mech = self.get_solver_options(
-                        solver_type=self.mech_options.get("linear_solver", None),
-                        physics="mechanical",
-                        rtol=rtol_mech,
-                    )
-
-                    problem_m = NonlinearProblem(
-                        F_m,
-                        u_new,
-                        bcs=bcs_m,
-                        petsc_options=petsc_opts_mech,
-                        petsc_options_prefix="elasticity",
-                    )
-
-                    problem_m.solve()
-
-                    snes = problem_m.solver
-                    iters = snes.getIterationNumber()
-                    converged = snes.getConvergedReason()
-
-                    assert converged
-
-                    if not converged:
-                        raise RuntimeError(
-                            f"[mechanical] NewtonSolver failed after {iters} iterations"
-                        )
-
-                # --. Apply relaxation --..
-                u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
-
-            # --. DAMAGE SUB-PROBLEM --..
-            if self.on.get("damage", False):
-                D_old.x.array[:] = D_new.x.array
-
-                print("\n[INFO] Assembling damage (phase-field) problem...")
-                self.damage_material = "steel"
-
-                self.update_history(u_new)
-                self.H.x.array[:] = np.minimum(self.H.x.array, 50.0)
-
-                u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
-                a_d, L_d = 0, 0
-
-                for label, _ in self.materials.items():
-
-                    lc = self.dmg_cfg["lc"]
-                    Gc = self.dmg_cfg["Gc"]
-
-                    if label != self.damage_material:
-                        continue
-                    tag = self.label_map[label]
-                    dx = self.dx_tags[tag]
-
-                    a_d += (Gc / lc) * (1.0 + self.H) * u_d * v_d * dx
-                    L_d += (Gc / lc) * self.H * v_d * dx
-
-                petsc_opts_damage = self.get_solver_options(
-                    physics="damage",
-                    solver_type=self.mech_options.get("linear_solver", None),
-                    rtol=rtol_dmg,
-                )
-
-                problem_d = LinearProblem(
-                    a_d,
-                    L_d,
-                    bcs=bcs_d,
-                    u=D_new,
-                    petsc_options=petsc_opts_damage,
-                    petsc_options_prefix="damage_",
-                )
-                problem_d.solve()
-
-                D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
-
-                # proiezione irreversibile è già in H, qui facciamo solo il residuo in norma infinita
-                res_D = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
-                print(f"  |ΔD|_∞ = {res_D:.3e}")
-
-            # --. CONVERGENCE CHECK and LOGGING --..
-            print(f"\nConvergence check")
-
-            rel_norm_dT = 0.0
-            rel_norm_du = 0.0
-            rel_norm_dD = 0.0
-
-            # Thermal convergence
+            # Defaults
             conv_th = True
-            if self.on.get("thermal", False):
-                T_new.x.scatter_forward()
-                T_old.x.scatter_forward()
-
-                vec_T_new = T_new.x.petsc_vec
-                vec_T_old = T_old.x.petsc_vec
-
-                # Compute difference vector: diff_T = T_now - T_old
-                diff_T = vec_T_new.copy()
-                diff_T.axpy(-1.0, vec_T_old)
-
-                # Compute norms
-                norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
-                norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
-                rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
-
-                # print(f"  ||ΔT|| = {norm_dT:.3e}, ||ΔT||/||T|| = {rel_norm_dT:.3e}")
-
-                if self.th_convergence == "norm":
-                    print(f"  ||ΔT|| = {norm_dT:.3e}")
-                    conv_th = norm_dT < stag_tol_th or not self.on.get("thermal", False)
-                elif self.th_convergence == "rel_norm":
-                    print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}")
-                    conv_th = rel_norm_dT < stag_tol_th or not self.on.get("thermal", False)
-
-                # --. ADAPTIVE relax_T --..
-                if self.relax_adaptive:
-                    resT_curr = norm_dT if self.th_convergence == "norm" else rel_norm_dT
-                    if prev_res_T is not None:
-                        if resT_curr < prev_res_T:
-                            self.relax_T = min(self.relax_T * self.relax_growth, self.relax_max)
-                        else:
-                            self.relax_T = max(self.relax_T * self.relax_shrink, self.relax_min)
-                    prev_res_T = resT_curr
-
-                    print(f"  [adaptive] relax_T={self.relax_T:.2f}")
-
-            # Mechanical convergence
             conv_mech = True
-            if self.on.get("mechanical", False):
-                u_new.x.scatter_forward()
-                u_old.x.scatter_forward()
-
-                # Get the PETSc vectors
-                vec_u_new = u_new.x.petsc_vec
-                vec_u_old = u_old.x.petsc_vec
-
-                # Compute difference vector: diff_u = u_now - u_old
-                diff_u = vec_u_new.copy()
-                diff_u.axpy(-1.0, vec_u_old)
-
-                # Compute norms
-                norm_du = diff_u.norm(PETSc.NormType.NORM_2)
-                norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
-                rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
-
-                # print(f"  ||Δu|| = {norm_du:.3e}, ||Δu||/||u|| = {rel_norm_du:.3e}")
-
-                if self.mech_convergence == "norm":
-                    print(f"  ||Δu|| = {norm_du:.3e}")
-                    conv_mech = norm_du < stag_tol_mech or not self.on.get("mechanical", False)
-                elif self.mech_convergence == "rel_norm":
-                    print(f"  ||Δu||/||u|| = {rel_norm_du:.3e}")
-                    conv_mech = rel_norm_du < stag_tol_mech or not self.on.get("mechanical", False)
-
-                # --. ADAPTIVE relax_u --..
-                if self.relax_adaptive:
-                    resU_curr = norm_du if self.mech_convergence == "norm" else rel_norm_du
-                    if prev_res_u is not None:
-                        if resU_curr < prev_res_u:
-                            self.relax_u = min(self.relax_u * self.relax_growth, self.relax_max)
-                        else:
-                            self.relax_u = max(self.relax_u * self.relax_shrink, self.relax_min)
-                    prev_res_u = resU_curr
-
-                    print(f"  [adaptive] relax_u={self.relax_u:.2f}")
-
-            # Damage convergence
             conv_damage = True
+
+            # --- THERMAL STEP ---
+            if self.on.get("thermal", False):
+                # print("Before:", T_new.x.array[:10])
+                conv_th, _, _, prev_res_T = self._thermal_step(
+                    T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
+                )
+                # print("After :", T_new.x.array[:10])
+
+            # --- MECHANICAL STEP ---
+            if self.on.get("mechanical", False):
+                conv_mech, _, _, prev_res_u = self._mechanical_step(
+                    u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
+                )
+
+            # --- DAMAGE STEP ---
             if self.on.get("damage", False):
-                D_new.x.scatter_forward()
-                D_old.x.scatter_forward()
+                conv_damage, _, _ = self._damage_step(
+                    D_new,
+                    D_old,
+                    rtol_dmg,
+                    stag_tol_dmg,
+                    u_current=u_new,
+                )
 
-                vec_D_new = D_new.x.petsc_vec
-                vec_D_old = D_old.x.petsc_vec
+            # --- OVERALL CONVERGENCE ---
+            print("\nConvergence check")
 
-                diff_D = vec_D_new.copy()
-                diff_D.axpy(-1.0, vec_D_old)
-
-                norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
-                norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
-                rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
-
-                print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
-                conv_damage = (norm_dD < stag_tol_dmg) or (D_new.x.array.max() < 1e-8)
-
-            if conv_mech and conv_th and conv_damage:
+            if conv_th and conv_mech and conv_damage:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
+
+                # Commit results
                 if self.on.get("thermal", False):
                     self.T.x.array[:] = T_new.x.array
-                    T_min, T_max = self.T.x.array.min(), self.T.x.array.max()
-                    print(f"Global min/max temperature: {T_min:.2f} / {T_max:.2f} K")
 
                 if self.on.get("mechanical", False):
                     self.u.x.array[:] = u_new.x.array
-                    u_vec = u_new.x.array.reshape(-1, self.tdim)
-                    umag = np.sqrt((u_vec**2).sum(axis=1))
-                    print(
-                        f"Global min/max displacement magnitude: {umag.min():.2e} / {umag.max():.2e} m"
-                    )
 
                 if self.on.get("damage", False):
                     self.D.x.array[:] = D_new.x.array
-                    D_min, D_max = self.D.x.array.min(), self.D.x.array.max()
-                    print(f"Global min/max damage: {D_min:.3e} / {D_max:.3e}")
 
                 return True
 
+        # --- IF NOT CONVERGED ---
         print("\n[WARNING] Staggered solver did not converge. Using last iteration state.")
+
+        if self.on.get("thermal", False):
+            self.T.x.array[:] = T_new.x.array
+        if self.on.get("mechanical", False):
+            self.u.x.array[:] = u_new.x.array
+        if self.on.get("damage", False):
+            self.D.x.array[:] = D_new.x.array
 
         return False
 
