@@ -55,7 +55,8 @@ class Spine(
         ThermalModel.__init__(self)
         MechanicalModel.__init__(self)
         GapModel.__init__(self)
-        DamageModel.__init__(self)
+        if self.on.get("damage", False):
+            DamageModel.__init__(self)
 
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
@@ -169,11 +170,12 @@ class Spine(
                 self.sol_mixed.x.array[:] = 0.0
 
         # Damage variables:
-        print("\nInitializing the damage field...")
-        self.D = dolfinx.fem.Function(self.V_d, name="Damage")
-        self.D.x.array[:] = 0.0  # undamaged initial state
-        self.H = dolfinx.fem.Function(self.Q, name="CrackDrivingForce")
-        self.H.x.array[:] = 0.0
+        if self.on.get("damage", False):
+            print("\nInitializing the damage field...")
+            self.D = dolfinx.fem.Function(self.V_d, name="Damage")
+            self.D.x.array[:] = 0.0  # undamaged initial state
+            self.H = dolfinx.fem.Function(self.Q, name="CrackDrivingForce")
+            self.H.x.array[:] = 0.0
 
         print("\nComparing solution function spaces:")
         print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
@@ -256,7 +258,8 @@ class Spine(
         self.strain = self.epsilon(self.u)
 
         # damage fields
-        self.damage_field = {}
+        if self.on.get("damage", False):
+            self.damage_field = {}
 
         for name, mat in self.materials.items():
             self.energy_density[name] = self.elastic_energy_density(self.u, mat)
