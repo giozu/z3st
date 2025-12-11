@@ -19,14 +19,13 @@ class MechanicalModel:
         self.dirichlet_mechanical = {}
         self.clamp_r = {}
 
-        data = self.input_file
-
-        self.mech_options = data.get("mechanical", {})
-        if not self.mech_options:
+        # --. Mechanical model options --..
+        self.mech_cfg = self.input_file.get("mechanical", {})
+        if not self.mech_cfg:
             raise ValueError("[MechanicalModel] 'mechanical' missing in input.yaml.")
 
         print("[MechanicalModel] options loaded from input.yaml:")
-        for key, value in self.mech_options.items():
+        for key, value in self.mech_cfg.items():
             print(f"  {key:<20}: {value}")
 
     def set_mechanical_boundary_conditions(self, V_u_sub, V_u_map=None):
@@ -358,7 +357,7 @@ class MechanicalModel:
 
         else:
             # Plane-stress reduction (x–y plane)
-            if self.mech_regime == "plane_stress" or self.mech_regime == "2D":
+            if self.mech_cfg["mechanical_regime"].lower() in ["plane_stress", "2d"]:
 
                 eps = self.epsilon(u)
                 sigma = (
@@ -378,7 +377,7 @@ class MechanicalModel:
                 )
 
             # Default isotropic Lamé
-            elif self.mech_regime == "3D":
+            elif self.mech_cfg["mechanical_regime"].lower() == "3d":
                 eps = self.epsilon(u)
                 sigma = (
                     material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.tdim)
