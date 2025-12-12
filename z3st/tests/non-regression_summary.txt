@@ -1,4 +1,0 @@
-Z3ST non-regression summary - Fri Dec 12 16:36:24 CET 2025
-
-Case: 00_example -> OK
-Case: 3_thin_thermal_slab_adiabatic -> OK
