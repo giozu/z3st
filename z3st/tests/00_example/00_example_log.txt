@@ -1,0 +1,127 @@
+Executing z3st.py...
+Info    : Running '/home/giovanni/miniconda3/envs/z3st/bin/gmsh mesh.geo -3' [Gmsh 4.14.1, 1 node, max. 1 thread]
+Info    : Started on Fri Dec 12 16:36:25 2025
+Info    : Reading 'mesh.geo'...
+Info    : Meshing 1D...
+Info    : [  0%] Meshing curve 1 (Line)
+Info    : [ 10%] Meshing curve 2 (Line)
+Info    : [ 20%] Meshing curve 3 (Line)
+Info    : [ 30%] Meshing curve 4 (Line)
+Info    : [ 40%] Meshing curve 5 (Line)
+Info    : [ 50%] Meshing curve 6 (Line)
+Info    : [ 60%] Meshing curve 7 (Line)
+Info    : [ 60%] Meshing curve 8 (Line)
+Info    : [ 70%] Meshing curve 9 (Line)
+Info    : [ 80%] Meshing curve 10 (Line)
+Info    : [ 90%] Meshing curve 11 (Line)
+Info    : [100%] Meshing curve 12 (Line)
+Info    : Done meshing 1D (Wall 0.000193121s, CPU 4.9e-05s)
+Info    : Meshing 2D...
+Info    : [  0%] Meshing surface 1 (Transfinite)
+Info    : [ 20%] Meshing surface 2 (Transfinite)
+Info    : [ 40%] Meshing surface 3 (Transfinite)
+Info    : [ 60%] Meshing surface 4 (Transfinite)
+Info    : [ 70%] Meshing surface 5 (Transfinite)
+Info    : [ 90%] Meshing surface 6 (Transfinite)
+Info    : Done meshing 2D (Wall 0.000971736s, CPU 4.6e-05s)
+Info    : Meshing 3D...
+Info    : Meshing volume 1 (Transfinite)
+Info    : Done meshing 3D (Wall 0.00170049s, CPU 0s)
+Info    : Optimizing mesh...
+Info    : Done optimizing mesh (Wall 4.993e-06s, CPU 0s)
+Info    : 729 nodes 1000 elements
+Info    : Writing 'mesh.msh'...
+Info    : Done writing 'mesh.msh'
+Info    : Done reading 'mesh.geo'
+Info    : Meshing 3D...
+Info    : Meshing volume 1 (Transfinite)
+Info    : Done meshing 3D (Wall 0.000586328s, CPU 0s)
+Info    : Optimizing mesh...
+Info    : Done optimizing mesh (Wall 4.834e-06s, CPU 0s)
+Info    : 729 nodes 1000 elements
+Info    : Writing 'mesh.msh'...
+Info    : Done writing 'mesh.msh'
+Info    : Stopped on Fri Dec 12 16:36:25 2025 (From start: Wall 0.0175961s, CPU 0.350262s)
+[INFO] Loading mesh from mesh.msh
+[INFO] Mesh successfully loaded from Gmsh file.
+[INFO] Mesh topology dimension d=3
+[INFO]
+Available volume tags (dx):
+[INFO]   Tag ID: 7
+[INFO]
+Unique tags found in facet data: [1 2 3 4 5 6]
+[INFO] Label map loaded from geometry:
+[INFO]   zmin         → 1
+[INFO]   ymin         → 2
+[INFO]   xmax         → 3
+[INFO]   ymax         → 4
+[INFO]   xmin         → 5
+[INFO]   zmax         → 6
+[INFO]   steel        → 7
+[INFO]   Lz = 0.004 m
+[INFO]   Lx = 0.100 m, Ly = 0.100 m
+[INFO]   area = 1.000e-02 m², perimeter = 4.000e-01 m
+[INFO] === Mesh summary ===
+[INFO]   Topology dim: 3
+[INFO]   Facet dim: 2
+[INFO]   Num cells: 512
+[INFO]   Cell tags: {np.int32(7)}
+[INFO]   Facet tags: {np.int32(1), np.int32(2), np.int32(3), np.int32(4), np.int32(5), np.int32(6)}
+[INFO]   Geometry type: rect
+[INFO] Reading VTU file: /home/giovanni/z3st/z3st/tests/00_example/output/fields.vtu
+
+[AVAILABLE FIELDS]
+  Point data:
+     1) Temperature                    shape=(729,)
+     2) Displacement                   shape=(729, 3)
+     3) Strain (points)                shape=(729, 9)
+     4) Stress_steel (points)          shape=(729, 9)
+     5) VonMises_steel (points)        shape=(729,)
+     6) Hydrostatic_steel (points)     shape=(729,)
+     7) StrainEnergyDensity_steel (points) shape=(729,)
+
+  Cell data:
+     1) MaterialID                     shape=(512,)
+     2) Strain (cells)                 shape=(512, 9)
+     3) Stress_steel (cells)           shape=(512, 9)
+     4) VonMises_steel (cells)         shape=(512,)
+     5) Hydrostatic_steel (cells)      shape=(512,)
+     6) Heat flux                      shape=(512, 3)
+     7) StrainEnergyDensity_steel (cells) shape=(512,)
+
+[INFO] Grid bounds:
+	x ∈ [0.0000e+00, 1.0000e-01]
+	y ∈ [0.0000e+00, 1.0000e-01]
+	z ∈ [0.0000e+00, 4.0000e-03]
+[INFO] Target y-plane for extraction: y = 5.0000e-02 m
+[INFO] Target z-plane for extraction: z = 2.0000e-03 m
+[INFO] Found stress field in cell_data: 'Stress_steel (cells)'
+[INFO] Found displacement field in point_data: 'Displacement'
+[INFO] Displacement extracted: |u|_max = 6.526e-05
+[INFO] Found VonMises in point_data: 'VonMises_steel (points)'
+[INFO] Plotting Displacement ux (m)(x) at y=5.0000e-02, z=2.0000e-03
+[INFO] Performing spatial averaging (decimals=5)
+[INFO] Saved plot to /home/giovanni/z3st/z3st/tests/00_example/output/Displacement_ux_(m)_vs_x.png
+[INFO] Plotting Von Mises stress (Pa)(x) at y=5.0000e-02, z=2.0000e-03
+[INFO] Performing spatial averaging (decimals=5)
+[INFO] Saved plot to /home/giovanni/z3st/z3st/tests/00_example/output/Von_Mises_stress_(Pa)_vs_x.png
+
+Pass/Fail check (tolerance = 1.0e-02)
+  sigma_xx           → rel err = 7.32e-13  → PASS
+  sigma_von_mises    → rel err = 6.52e-13  → PASS
+  ux_displacement    → rel err = 4.33e-13  → PASS
+
+[SUMMARY] PASS All checks within tolerance
+[INFO] non-regression results written to: /home/giovanni/z3st/z3st/tests/00_example/output/non-regression.json
+
+Regression check vs GOLD reference:
+  sigma_xx           → rel diff = 5.10e-14  → PASS (worse)
+  sigma_von_mises    → rel diff = 8.40e-14  → PASS (worse)
+  ux_displacement    → rel diff = 1.03e-13  → PASS (better)
+
+[SUMMARY] PASS Regression within tolerance
+
+[INFO] non-regression completed.
+
+Reading log file: log.z3st
+Plot saved as 'convergence.png' (13 iterations)
