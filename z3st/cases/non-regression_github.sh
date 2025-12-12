@@ -12,7 +12,7 @@ CASES=(
     "00_example"
     "3_thin_thermal_slab_adiabatic"
 )
-SUMMARY_FILE="${ROOT_DIR}/tests/non-regression_summary.txt"
+SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_summary.txt"
 
 echo "Running minimal non-regression suite..."
 echo "---------------------------------------"
