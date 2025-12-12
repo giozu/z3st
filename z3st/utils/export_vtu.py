@@ -162,7 +162,7 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         heat_flux_total_cells.interpolate(q_expr, material_cells)
 
     # Global (aggregated) cell fields
-    grid.cell_data["Heat flux (cells)"] = heat_flux_total_cells.x.array.reshape(-1, problem.tdim)
+    grid.cell_data["Heat flux"] = heat_flux_total_cells.x.array.reshape(-1, problem.tdim)
 
     # --- Per-material on POINTS: stress + Von Mises + principals + hydrostatic ---
     stress_total_points = dolfinx.fem.Function(V_tensor_points)

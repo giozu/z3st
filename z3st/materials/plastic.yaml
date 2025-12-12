@@ -1,6 +1,6 @@
 name: HDPE
 type: structural
-fissile: False
+fissile: false
 
 # constitutive: voigt
 # C_matrix can be omitted, the code creates:

@@ -1,15 +1,15 @@
 thermal_bcs:
   steel:
-    - type: Dirichlet
-      region: inner_radius
-      temperature: 490.0 # (K)
+  - type: Dirichlet
+    region: inner_radius
+    temperature: 490.0   # (K)
 
-    - type: Neumann
-      region: outer_radius
-      flux: 0.0
+  - type: Neumann
+    region: outer_radius
+    flux: 0.0
 
 mechanical_bcs:
   steel:
-    - type: Dirichlet
-      region: bottom
-      displacement: [0.0, 0.0, 0.0] # (m)
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]   # (m)

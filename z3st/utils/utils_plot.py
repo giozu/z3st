@@ -697,7 +697,7 @@ def plotter_sigma_temperature_slab(
     x_s, sigma, x_s_ref, sigma_ref, x_T, T, max_sigma_T, T_ref, Ti, To, CASE_DIR
 ):
     plt.rcParams.update({"font.size": 11})
-    fig, ax1 = plt.subplots(figsize=(7, 5))
+    _, ax1 = plt.subplots(figsize=(7, 5))
 
     ax1.scatter(
         x_s,
@@ -715,11 +715,14 @@ def plotter_sigma_temperature_slab(
     ax1.grid(True, linestyle="--", alpha=0.6)
 
     ax2 = ax1.twinx()
-    ax2.plot(
-        x_T, T_ref - 273.15, lw=2, linestyle="--", color="C2", label="Temperature (analytical)"
-    )
+    if T_ref is not None:
+        ax2.plot(
+            x_T, T_ref - 273.15, lw=2, linestyle="--", color="C2", label="Temperature (analytical)"
+        )
     ax2.scatter(x_T, T - 273.15, s=18, color="C3", marker="x", label="Temperature (numerical)")
     ax2.set_ylabel("Temperature (°C)")
+
+    plt.gca().yaxis.set_major_formatter(plt.FormatStrFormatter("%.2f"))
 
     lines1, labels1 = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
