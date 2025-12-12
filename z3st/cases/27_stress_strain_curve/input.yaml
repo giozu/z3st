@@ -20,7 +20,6 @@ solver_settings:
 models:
   thermal: false
   mechanical: true
-  damage: false
 
 mechanical:
   solver: linear # linear | non-linear
@@ -37,15 +36,6 @@ thermal:
   rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
-
-damage:
-  solver: linear
-  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-6
-  convergence: norm # rel_norm | norm
-  lc: 0.001
-  Gc: 1.0
 
 lhr:
 - 0.0

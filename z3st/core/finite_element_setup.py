@@ -26,16 +26,12 @@ class FiniteElementSetup:
             self.mesh, ("Lagrange", 1, (self.mesh.topology.dim,))
         )  # vector function space (displacement)
         self.Q = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
-        self.V_d = dolfinx.fem.functionspace(
-            self.mesh, ("Lagrange", 1)
-        )  # scalar function space (damage variable)
 
         # print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
         # print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
 
         print("Mechanical function space (V_m):", self.V_m)
         print("Thermal function space (V_t):", self.V_t)
-        print("Scalar function space (V_d):", self.V_d)
         print("Scalar function space (Q):", self.Q)
 
         # --. Mixed function spaces --..

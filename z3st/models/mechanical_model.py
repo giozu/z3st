@@ -425,10 +425,6 @@ class MechanicalModel:
                     + 2.0 * material["G"] * eps
                 )
 
-        if self.on.get("damage", False):
-            g_d = self.degradation_function(self.D)
-            sigma = g_d * sigma
-
         return sigma
 
     def sigma_th(self, T, material):

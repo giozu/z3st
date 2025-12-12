@@ -46,15 +46,13 @@ class Solver:
         """
         Returns PETSc options for the linear solver based on the physics.
 
-        physics: "thermal", "mechanical" or "damage".
+        physics: "thermal", "mechanical".
         """
-        if physics not in ["thermal", "mechanical", "damage"]:
-            raise ValueError(
-                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical' or 'damage'."
-            )
+        if physics not in ["thermal", "mechanical"]:
+            raise ValueError(f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical'.")
 
         # 1) KSP type
-        if physics in ["thermal", "damage"]:
+        if physics in ["thermal"]:
             ksp_type = "cg"  # SPD
         else:  # mechanical
             ksp_type = "gmres"  # non-symmetric
@@ -370,74 +368,6 @@ class Solver:
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
 
-    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, u_current):
-
-        D_old.x.array[:] = D_new.x.array
-
-        print("\n[INFO] Assembling damage (phase-field) problem...")
-
-        u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
-        a_d, L_d = 0, 0
-        lc = float(self.dmg_cfg["lc"])
-
-        for label, material in self.materials.items():
-
-            print(
-                f"Solving damage problem for '{label}' material, with sigma_c = {material['sigma_c']*1e-6} MPa"
-            )
-
-            self.update_history(u_current)
-
-            tag = self.label_map[label]
-            dx = self.dx_tags[tag]
-
-            a_d += (1.0 + self.H) * u_d * v_d * dx + lc**2 * ufl.inner(
-                ufl.grad(u_d), ufl.grad(v_d)
-            ) * dx
-            L_d += self.H * v_d * dx
-
-        petsc_opts_damage = self.get_solver_options(
-            physics="damage",
-            solver_type=self.dmg_cfg["linear_solver"],
-            rtol=rtol_dmg,
-        )
-
-        problem_d = dolfinx.fem.petsc.LinearProblem(
-            a_d,
-            L_d,
-            bcs=[],
-            u=D_new,
-            petsc_options=petsc_opts_damage,
-            petsc_options_prefix="damage_",
-        )
-        problem_d.solve()
-
-        # irreversibility
-        D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
-        D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
-
-        # Residual in L_inf norm
-        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
-        print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
-
-        # Convergence
-        D_new.x.scatter_forward()
-        D_old.x.scatter_forward()
-        vec_D_new = D_new.x.petsc_vec
-        vec_D_old = D_old.x.petsc_vec
-
-        diff_D = vec_D_new.copy()
-        diff_D.axpy(-1.0, vec_D_old)
-
-        norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
-        norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
-
-        print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
-        conv_damage = (norm_dD < stag_tol_dmg) or (D_new.x.array.max() < 1e-8)
-
-        return conv_damage, norm_dD, rel_norm_dD
-
     def solve_staggered(
         self,
         max_iter=20,
@@ -482,13 +412,6 @@ class Solver:
             u_new = u_old = None
             bcs_m = []
 
-        if self.on.get("damage", False):
-            D_new = dolfinx.fem.Function(self.V_d)
-            D_new.x.array[:] = self.D.x.array
-            D_old = dolfinx.fem.Function(self.V_d)
-        else:
-            D_new = D_old = None
-
         prev_res_T = None
         prev_res_u = None
 
@@ -498,7 +421,6 @@ class Solver:
             # Defaults
             conv_th = True
             conv_mech = True
-            conv_damage = True
 
             # --- THERMAL STEP ---
             if self.on.get("thermal", False):
@@ -514,20 +436,10 @@ class Solver:
                     u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
                 )
 
-            # --- DAMAGE STEP ---
-            if self.on.get("damage", False):
-                conv_damage, _, _ = self._damage_step(
-                    D_new,
-                    D_old,
-                    rtol_dmg,
-                    stag_tol_dmg,
-                    u_current=u_new,
-                )
-
             # --- OVERALL CONVERGENCE ---
             print("\nConvergence check")
 
-            if conv_th and conv_mech and conv_damage:
+            if conv_th and conv_mech:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
 
                 # Commit results
@@ -536,9 +448,6 @@ class Solver:
 
                 if self.on.get("mechanical", False):
                     self.u.x.array[:] = u_new.x.array
-
-                if self.on.get("damage", False):
-                    self.D.x.array[:] = D_new.x.array
 
                 return True
 
@@ -549,8 +458,6 @@ class Solver:
             self.T.x.array[:] = T_new.x.array
         if self.on.get("mechanical", False):
             self.u.x.array[:] = u_new.x.array
-        if self.on.get("damage", False):
-            self.D.x.array[:] = D_new.x.array
 
         return False
 

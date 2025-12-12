@@ -88,7 +88,6 @@ class Config:
         self.on = {
             "thermal": models.get("thermal", False),
             "mechanical": models.get("mechanical", False),
-            "damage": models.get("damage", False),
         }
 
         # --. Gap conductance --..

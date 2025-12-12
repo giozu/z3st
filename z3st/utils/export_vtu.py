@@ -207,10 +207,6 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         psi_fun_cells.interpolate(psi_expr_cells, material_cells)
         grid.cell_data[f"StrainEnergyDensity_{name} (cells)"] = psi_fun_cells.x.array.copy()
 
-    if problem.on.get("damage", False):
-        print("  → Adding damage field to VTU...")
-        grid.point_data["Damage"] = problem.D.x.array.copy()
-
     # --- Save ---
     filepath = os.path.join(output_dir, filename)
     grid.save(filepath)
