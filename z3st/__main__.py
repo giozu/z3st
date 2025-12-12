@@ -88,6 +88,8 @@ if __name__ == "__main__":
     for step, (t, lhr) in enumerate(zip(times, lhrs)):
         print(f"\n[STEP {step+1:02d}/{len(times)}] t = {t:.2e} s | LHR = {lhr:.2e} W/m")
 
+        problem.current_step = step
+
         # Update source term
         problem.parameters(lhr=lhr)
         problem.set_power()

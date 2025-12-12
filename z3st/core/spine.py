@@ -29,6 +29,8 @@ class Spine(
 
     def __init__(self, input_file, mesh_file, geometry, gdim=3):
 
+        self.current_step = 0
+
         mesh, cell_tags, facet_tags = load_mesh(mesh_file, comm=MPI.COMM_WORLD, gdim=gdim)
 
         self.mgr = MeshManager(mesh, cell_tags, facet_tags, geometry=geometry)
@@ -233,6 +235,7 @@ class Spine(
         self.q_third.x.scatter_forward()
 
     def solve(self, max_iters=100):
+        print(f"Current step = {self.current_step}")
         print("\nSolver settings:")
         print(f"  → Coupling : {self.coupling}")
 

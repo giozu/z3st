@@ -1,0 +1,21 @@
+mechanical_bcs:
+  steel:
+  - type: Clamp_x
+    region: xmin
+
+  - type: Clamp_y
+    region: ymin
+
+  - type: Clamp_z
+    region: zmin
+
+  - type: Neumann
+    region: xmax
+    traction: [0.0, 50.0e+2, 50.0e+3, 75.0e+4, 125.0e+6]   # (Pa)
+
+
+thermal_bcs:
+  steel:
+  - type: Dirichlet
+    region: zmin
+    temperature: 300.0   # (K)

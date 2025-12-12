@@ -222,9 +222,29 @@ class Solver:
     def _mechanical_step(
         self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current
     ):
-        u_old.x.array[:] = u_new.x.array
 
+        u_old.x.array[:] = u_new.x.array
         print("\n[INFO] Assembling mechanical problem...")
+
+        # --- update step-dependent tractions ---
+        for _, bc_list in self.traction.items():
+            for bc in bc_list:
+                raw = bc.get("raw", None)
+
+                # constant traction → no update
+                if isinstance(raw, (int, float)):
+                    bc["const"].value = raw
+                    continue
+
+                # list of tractions → pick current_step
+                if isinstance(raw, list):
+                    idx = min(self.current_step, len(raw) - 1)
+                    bc["const"].value = raw[idx]
+                    print(f"  [INFO] Updating traction on region {bc['id']} → {raw[idx]} Pa")
+                else:
+                    raise RuntimeError("Invalid traction 'raw' format")
+
+                bc["value"] = bc["const"] * self.normal
 
         u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
         a_m, L_m = 0, 0
