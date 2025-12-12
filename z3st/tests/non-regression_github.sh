@@ -12,7 +12,7 @@ CASES=(
     "00_example"
     "3_thin_thermal_slab_adiabatic"
 )
-SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_summary.txt"
+SUMMARY_FILE="${ROOT_DIR}/tests/non-regression_summary.txt"
 
 echo "Running minimal non-regression suite..."
 echo "---------------------------------------"
@@ -27,7 +27,7 @@ echo "" >> "$SUMMARY_FILE"
 global_status=0
 
 for case_name in "${CASES[@]}"; do
-    case_dir="${ROOT_DIR}/cases/${case_name}"
+    case_dir="${ROOT_DIR}/tests/${case_name}"
 
     echo "-------------------------------------------------"
     echo "Running case: ${case_name}"

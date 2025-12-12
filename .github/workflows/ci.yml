@@ -31,8 +31,8 @@ jobs:
 
     - name: Run non-regression tests
       run: |
-        chmod +x ./z3st/cases/non-regression_github.sh
-        ./z3st/cases/non-regression_github.sh
+        chmod +x ./z3st/tests/non-regression_github.sh
+        ./z3st/tests/non-regression_github.sh
 
     - name: Upload test summary
       if: always()
@@ -41,5 +41,5 @@ jobs:
         name: non-regression-summary
         path: |
           non-regression_summary.txt
-          cases/non-regression_summary.txt
+          tests/non-regression_summary.txt
           */non-regression_summary.txt
