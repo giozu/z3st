@@ -1,0 +1,18 @@
+name: box
+geometry_type: rect
+
+Lx: 0.100        # box length in x (m)
+Ly: 0.100        # box length in y (m)
+Lz: 0.004        # box length in z (m)
+
+h_box: 0.001      # cell size
+plot: true
+
+labels:
+  xmin: 5
+  xmax: 3
+  ymin: 2
+  ymax: 4
+  zmin: 1
+  zmax: 6
+  steel: 7

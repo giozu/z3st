@@ -1,0 +1,13 @@
+name: cylindrical_shell
+geometry_type: cyl
+
+Ri: 2.000 # (m)
+Ro: 2.400 # (m)
+Lz: 10.00 # (m)
+
+labels:
+  bottom: 1
+  top: 2
+  inner_radius: 3
+  outer_radius: 4
+  steel: 5

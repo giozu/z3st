@@ -9,8 +9,15 @@
 set -e
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 CASES=(
-    "00_example"
-    "3_thin_thermal_slab_adiabatic"
+    # "00_example"
+    # "3_thin_thermal_slab_adiabatic"
+    # "7_box_heated"
+    # "9_cylindrical_shell_thick_GPS"
+    "12_thick_cylindrical_thermal_shield"
+    "14_thick_cylindrical_thermal_shield_adiabatic"
+    "20_coaxial_cylinders"
+    "21_plate_non_linear"
+    "22_thin_thermal_slab_with_neumann"
 )
 SUMMARY_FILE="${ROOT_DIR}/tests/non-regression_summary.txt"
 

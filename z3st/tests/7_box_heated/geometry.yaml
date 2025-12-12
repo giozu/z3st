@@ -1,0 +1,15 @@
+name: box
+geometry_type: rect
+
+Lx: 0.200 # box length in x (m)
+Ly: 0.200 # box length in y (m)
+Lz: 0.200 # box length in z (m)
+
+labels:
+  xmin: 5
+  xmax: 3
+  ymin: 2
+  ymax: 4
+  zmin: 1
+  zmax: 6
+  steel: 7
