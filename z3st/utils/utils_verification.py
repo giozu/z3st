@@ -8,6 +8,8 @@ import json
 import os
 import sys
 
+import numpy as np
+
 USE_COLOR = sys.stdout.isatty()
 
 GREEN = "\033[92m" if USE_COLOR else ""
@@ -36,11 +38,22 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
     all_pass = True
     for key, val in errors.items():
         rel_err = val["rel_error"]
-        passed = rel_err < tolerance
+
+        if isinstance(rel_err, (list, tuple)):
+            rel_arr = np.array(rel_err, dtype=float)
+            passed = np.all(rel_arr < tolerance)
+            rel_err_display = float(np.max(rel_arr))
+        else:
+            passed = rel_err < tolerance
+            rel_err_display = float(rel_err)
+
         color = GREEN if passed else RED
         status = "PASS" if passed else "FAIL"
         all_pass &= passed
-        print(f"  {key:18s} → rel err = {rel_err:.2e}  → {color}{status}{END}")
+
+        print(f"  {key:18s} → rel err = {rel_err_display:.2e}  → {color}{status}{END}")
+        val["status"] = status
+
         val["status"] = status
 
     summary = (
@@ -100,8 +113,17 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
             print(f"  {key:18s} → missing in GOLD file, skipped")
             continue
 
-        rel_diff = abs(num_now - num_gold) / max(abs(num_gold), 1e-12)
-        passed = rel_diff < regression_tol
+        num_now_arr = (
+            np.array(num_now, dtype=float) if isinstance(num_now, list) else np.array([num_now])
+        )
+        num_gold_arr = (
+            np.array(num_gold, dtype=float) if isinstance(num_gold, list) else np.array([num_gold])
+        )
+
+        rel_diff_arr = np.abs(num_now_arr - num_gold_arr) / np.maximum(np.abs(num_gold_arr), 1e-12)
+
+        passed = np.all(rel_diff_arr < regression_tol)
+        rel_diff_display = float(np.max(rel_diff_arr))
 
         improvement = (
             rel_err_now is not None and rel_err_gold is not None and rel_err_now < rel_err_gold
@@ -121,7 +143,7 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         else:
             extra = ""
 
-        print(f"  {key:18s} → rel diff = {rel_diff:.2e}  → {color}{status}{END}{extra}")
+        print(f"  {key:18s} → rel diff = {rel_diff_display:.2e}  → {color}{status}{END}{extra}")
         reg_pass &= passed
 
     summary_reg = (

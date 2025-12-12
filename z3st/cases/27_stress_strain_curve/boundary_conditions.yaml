@@ -11,7 +11,7 @@ mechanical_bcs:
 
   - type: Neumann
     region: xmax
-    traction: [0.0, 50.0e+2, 50.0e+3, 75.0e+4, 125.0e+6]   # (Pa)
+    traction: [0.0, 1.0e+2, 1.0e+4, 1.0e+6, 1.0e+8]   # (Pa)
 
 
 thermal_bcs:
