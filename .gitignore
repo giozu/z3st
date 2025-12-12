@@ -11,8 +11,9 @@
 __pycache__/
 z3st.egg-info
 
-# --. Sphinx documentation --..
+# --. Compilation objects --..
 build/
+cache/
 
 # --. Batch and temporary scripts --..
 ba_*

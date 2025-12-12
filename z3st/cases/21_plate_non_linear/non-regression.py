@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 19_plate
+Z3ST case: 21_plate_non_linear
 
 non-regression script
 ---------------------

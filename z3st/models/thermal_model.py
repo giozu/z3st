@@ -13,7 +13,7 @@ from petsc4py import PETSc
 
 class ThermalModel:
     def __init__(self):
-        print("__ThermalModel initializer__")
+        print("[ThermalModel] initializer")
         self.a_thermal = {}
         self.L_thermal = {}
         self.thermal_residuals = {}
@@ -21,14 +21,14 @@ class ThermalModel:
         self.dirichlet_thermal = {}
         self.robin_thermal = {}
 
-        data = self.input_file
+        # --. Thermal model options --..
+        self.th_cfg = self.input_file.get("thermal", {})
 
-        self.thermal_options = data.get("thermal", {})  # parsing
-        if not self.thermal_options:
+        if not self.th_cfg:
             raise ValueError("[ThermalModel] 'thermal' missing in input.yaml.")
 
         print("[ThermalModel] options loaded from input.yaml:")
-        for key, value in self.thermal_options.items():
+        for key, value in self.th_cfg.items():
             print(f"  {key:<20}: {value}")
 
     def set_thermal_boundary_conditions(self, V_t, V_t_map=None):

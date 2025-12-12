@@ -26,6 +26,8 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
 
     def __init__(self, input_file, mesh_file, geometry, gdim=3):
 
+        self.current_step = 0
+
         mesh, cell_tags, facet_tags = load_mesh(mesh_file, comm=MPI.COMM_WORLD, gdim=gdim)
 
         self.mgr = MeshManager(mesh, cell_tags, facet_tags, geometry=geometry)
@@ -153,11 +155,7 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
             f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m"
         )
 
-        if not hasattr(self, "W"):
-            raise RuntimeError(
-                "Mixed space self.W is not initialized. Check finite_element_setup.py."
-            )
-
+        # Temperature/displacement (mixed)
         if not hasattr(self, "sol_mixed"):
             print("Initializing self.sol_mixed")
             self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
@@ -224,6 +222,7 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         self.q_third.x.scatter_forward()
 
     def solve(self, max_iters=100):
+        print(f"Current step = {self.current_step}")
         print("\nSolver settings:")
         print(f"  → Coupling : {self.coupling}")
 
@@ -232,10 +231,10 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
         elif self.coupling == "staggered":
             self.solve_staggered(
                 max_iter=max_iters,
-                rtol_th=self.rtol_th,
-                rtol_mech=self.rtol_mech,
-                stag_tol_th=self.stag_tol_th,
-                stag_tol_mech=self.stag_tol_mech,
+                rtol_th=self.th_cfg["rtol"],
+                rtol_mech=self.mech_cfg["rtol"],
+                stag_tol_th=self.th_cfg["stag_tol"],
+                stag_tol_mech=self.mech_cfg["stag_tol"],
             )
         else:
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")
@@ -253,4 +252,5 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
             self.stress_mech[name] = self.sigma_mech(self.u, mat)
             self.stress_th[name] = self.sigma_th(self.T, mat)
             self.stress[name] = self.stress_mech[name] + self.stress_th[name]
+
         return True

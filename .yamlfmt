@@ -1,0 +1,7 @@
+# find . -type f \( -name "*.yml" -o -name "*.yaml" \) | xargs yamlfmt -w
+
+formatter:
+  type: basic
+  indent: 2
+  line_ending: lf
+  retain_line_breaks: true

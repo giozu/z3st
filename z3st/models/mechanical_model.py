@@ -19,14 +19,13 @@ class MechanicalModel:
         self.dirichlet_mechanical = {}
         self.clamp_r = {}
 
-        data = self.input_file
-
-        self.mech_options = data.get("mechanical", {})
-        if not self.mech_options:
+        # --. Mechanical model options --..
+        self.mech_cfg = self.input_file.get("mechanical", {})
+        if not self.mech_cfg:
             raise ValueError("[MechanicalModel] 'mechanical' missing in input.yaml.")
 
         print("[MechanicalModel] options loaded from input.yaml:")
-        for key, value in self.mech_options.items():
+        for key, value in self.mech_cfg.items():
             print(f"  {key:<20}: {value}")
 
     def set_mechanical_boundary_conditions(self, V_u_sub, V_u_map=None):
@@ -106,17 +105,58 @@ class MechanicalModel:
                         )
                         sys.exit(1)
 
+                    # --- interpret traction input ---
+                    # Case 1: single scalar
+                    if isinstance(traction_value, (int, float)):
+                        raw_value = traction_value
+
+                    # Case 2: list of values over steps
+                    elif isinstance(traction_value, list):
+                        # check list contains scalars
+                        if not all(isinstance(x, (int, float)) for x in traction_value):
+                            print(
+                                f"[ERROR] traction list on '{region_name}' contains non-scalar values."
+                            )
+                            sys.exit(1)
+
+                        # check matching n_steps
+                        if len(traction_value) != self.n_steps:
+                            print(
+                                f"[ERROR] traction list length = {len(traction_value)}, "
+                                f"but n_steps = {self.n_steps}. Must match."
+                            )
+                            sys.exit(1)
+
+                        raw_value = traction_value
+
+                    else:
+                        print(
+                            f"[ERROR] traction value for '{region_name}' must be scalar or list, got {type(traction_value)}"
+                        )
+                        sys.exit(1)
+
+                    # Initial traction is either the scalar or the first entry of the list
+                    if isinstance(raw_value, list):
+                        initial_traction = raw_value[0]
+                    else:
+                        initial_traction = raw_value
+
                     traction_const = dolfinx.fem.Constant(
-                        self.mesh, PETSc.ScalarType(traction_value)
+                        self.mesh, PETSc.ScalarType(initial_traction)
                     )
                     traction_expr = traction_const * self.normal
 
                     self.traction[mat_type].append(
-                        {"id": region_id, "value": traction_expr, "const": traction_const}
+                        {
+                            "id": region_id,
+                            "value": traction_expr,
+                            "const": traction_const,
+                            "raw": raw_value,
+                        }
                     )
 
                     print(
-                        f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_value} Pa at region '{region_name}'"
+                        f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {initial_traction} Pa at region '{region_name}'"
                     )
 
                 # --. Slip (double component-wise blocking) --..
@@ -358,7 +398,7 @@ class MechanicalModel:
 
         else:
             # Plane-stress reduction (x–y plane)
-            if self.mech_regime == "plane_stress" or self.mech_regime == "2D":
+            if self.mech_cfg["mechanical_regime"].lower() in ["plane_stress", "2d"]:
 
                 eps = self.epsilon(u)
                 sigma = (
@@ -378,7 +418,7 @@ class MechanicalModel:
                 )
 
             # Default isotropic Lamé
-            elif self.mech_regime == "3D":
+            elif self.mech_cfg["mechanical_regime"].lower() == "3d":
                 eps = self.epsilon(u)
                 sigma = (
                     material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.tdim)

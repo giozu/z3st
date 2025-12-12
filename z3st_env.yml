@@ -6,32 +6,32 @@
 
 name: z3st
 channels:
-  - conda-forge
-  - defaults
+- conda-forge
+- defaults
 
 dependencies:
   # --. Python --..
-  - python=3.12
-  - pip
+- python=3.12
+- pip
 
   # --. FEniCSx --..
-  - fenics-dolfinx  # includes ufl, basix, petsc, slepc, mpi4py
+- fenics-dolfinx    # includes ufl, basix, petsc, slepc, mpi4py
 
   # --. Scientific stack --..
-  - numpy
-  - scipy
-  - pandas
-  - matplotlib
-  - pyvista
-  - meshio
+- numpy
+- scipy
+- pandas
+- matplotlib
+- pyvista
+- meshio
 
   # --. Jupyter / visualization --..
-  - jupyterlab
-  - ipywidgets
-  - pyqt
+- jupyterlab
+- ipywidgets
+- pyqt
 
   # --. YAML / config --..
-  - pyyaml
+- pyyaml
 
   # --. (Optional) for debugging or development --..
   # - tqdm
@@ -46,9 +46,9 @@ dependencies:
   # - pre-commit       # git hook management
 
   # --. Install via pip (not conda!) --..
-  - pip:
-      - gmsh
-      - sphinx
-      - sphinx-book-theme
-      - myst-parser
-      - sphinx-autodoc-typehints
+- pip:
+  - gmsh
+  - sphinx
+  - sphinx-book-theme
+  - myst-parser
+  - sphinx-autodoc-typehints

@@ -1,15 +1,15 @@
 thermal_bcs:
   solid:
-    - type: Dirichlet
-      region: xmin
-      temperature: 300.0 # (K)
+  - type: Dirichlet
+    region: xmin
+    temperature: 300.0   # (K)
 
 mechanical_bcs:
   solid:
-    - type: Neumann
-      region: zmin
-      traction: 1.0 # (Pa)
+  - type: Neumann
+    region: zmin
+    traction: 1.0   # (Pa)
 
-    - type: Neumann
-      region: zmax
-      traction: 1.0 # (Pa)
+  - type: Neumann
+    region: zmax
+    traction: 1.0   # (Pa)

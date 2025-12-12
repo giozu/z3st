@@ -1,0 +1,20 @@
+thermal_bcs:
+  steel:
+  - type: Neumann
+    region: xmax
+    flux: -4810.0   # (W/m2) negative, entering from xmax face
+
+  - type: Dirichlet
+    region: xmin
+    temperature: 573.0   # (K)
+
+mechanical_bcs:
+  steel:
+  - type: Clamp_x
+    region: xmin
+
+  - type: Clamp_y
+    region: ymin
+
+  - type: Clamp_z
+    region: zmin

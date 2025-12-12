@@ -16,24 +16,24 @@ solver_settings:
   max_iters: 100
   relax_T: 0.9
   relax_u: 0.4
-  relax_adaptive: True
+  relax_adaptive: true
   relax_growth: 1.10
   relax_shrink: 0.70
   relax_min: 0.05
   relax_max: 0.95
 
 models:
-  thermal: True
-  mechanical: True
+  thermal: true
+  mechanical: true
 
 mechanical:
   solver: linear
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  mechanical_regime: "3D" # 3D | plane_stress
+  mechanical_regime: 3D   # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
-  debug: False
+  debug: false
 
 thermal:
   solver: linear
@@ -43,7 +43,7 @@ thermal:
   convergence: rel_norm # rel_norm | norm
 
 lhr:
-  - 0.0
+- 0.0
 time:
-  - 0.0
+- 0.0
 n_steps: 1
