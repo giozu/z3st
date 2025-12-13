@@ -1,0 +1,10 @@
+Z3ST non-regression summary - Sat Dec 13 17:55:13 CET 2025
+
+Case: 00_example -> OK
+Case: 3_thin_thermal_slab_adiabatic -> OK
+Case: 7_box_heated -> OK
+Case: 9_cylindrical_shell_thick_GPS -> OK
+Case: 12_thick_cylindrical_thermal_shield -> OK
+Case: 20_coaxial_cylinders -> OK
+Case: 21_plate_non_linear -> OK
+Case: 22_thin_thermal_slab_with_neumann -> OK
