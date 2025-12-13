@@ -1,125 +1,225 @@
 Usage
 =====
 
-This section describes how to run a **Z3ST** simulation, how to use the reference
-example case, and how to execute the integrated verification and non-regression tests.
+This section describes how to set a **Z3ST** simulation through the reference
+example case, and how to execute the available verification and non-regression tests.
 
 
 00_example
 -----------
 
-A minimal example is provided in the ``examples/00_example`` directory.
-It demonstrates the typical workflow of a Z3ST simulation, including
-configuration parsing, mesh handling, and solver execution.
+A minimal demonstration case is provided in ``cases/00_example``.
+It illustrates the complete workflow of a thermo-mechanical simulation:
+- YAML-based configuration input;
+- mesh generation and region tagging;
+- coupled thermal and mechanical solver execution.
 
 To run the example:
 
 .. code-block:: bash
 
-   cd examples/00_example
+   cd cases/00_example
    python3 -m z3st
 
-Optional command-line flags:
+Optional flags:
 
 - ``--mesh_plot`` — displays the generated mesh before solving
-- ``--verbose`` — enables detailed logging of solver progress
 
 Example folder structure:
 
 .. code-block:: text
 
-   examples/00_example/
+   00_example/
    ├── input.yaml
    ├── geometry.yaml
    ├── boundary_conditions.yaml
-   ├── mesh.geo
-   ├── mesh.msh
-   └── material.yaml
+   └── mesh.msh
 
-Each YAML file defines one aspect of the model configuration:
-- ``input.yaml``: global parameters, solver options, and time control
-- ``geometry.yaml``: mesh dimensions and domain setup
-- ``boundary_conditions.yaml``: Dirichlet/Neumann conditions
-- ``material.yaml``: physical properties (optional if using defaults)
+Each file defines one aspect of the model setup:
 
 
-Verification Cases
+**input.yaml**
+~~~~~~~~~~~~~~
+
+This file controls the **coupling strategy**, solver tolerance, relaxation factors, and physical models (thermal/mechanical).
+The staggered scheme alternates between thermal and mechanical solves until both reach convergence.
+
+.. code-block:: yaml
+
+   mesh_path: mesh.msh
+   geometry_path: geometry.yaml
+   boundary_conditions_path: boundary_conditions.yaml
+
+   materials:
+     steel: ../../materials/steel.yaml
+
+   solver_settings:
+     coupling: staggered
+     max_iters: 100
+     relax_T: 0.9
+     relax_u: 0.7
+     relax_adaptive: true
+     relax_growth: 1.2
+     relax_shrink: 0.8
+     relax_min: 0.05
+     relax_max: 0.95
+
+   models:
+     thermal: true
+     mechanical: true
+
+   mechanical:
+     solver: linear
+     linear_solver: iterative_amg
+     rtol: 1.0e-6
+     stag_tol: 1.0e-6
+     mechanical_regime: 3D
+     convergence: rel_norm
+
+   thermal:
+     solver: linear
+     linear_solver: iterative_amg
+     rtol: 1.0e-6
+     stag_tol: 1.0e-6
+     convergence: rel_norm
+
+   lhr:
+   - 0
+   time:
+   - 0
+   n_steps: 1
+
+
+**geometry.yaml**
+~~~~~~~~~~~~~~~~~
+
+Defines the domain geometry, dimensions, and tagged boundaries.
+
+.. code-block:: yaml
+
+   name: box
+   geometry_type: rect
+
+   Lx: 0.100   # length in x (m)
+   Ly: 2.000   # length in y (m)
+   Lz: 2.000   # length in z (m)
+
+   labels:
+     zmin: 1
+     zmax: 2
+     ymin: 3
+     xmax: 4
+     ymax: 5
+     xmin: 6
+     steel: 7
+
+Z3ST automatically interprets these labels as physical regions and surfaces.
+Each label is used later to apply boundary conditions or assign material subdomains.
+Also, each label corresponds to a **Physical Group** defined in the mesh (either a surface or a volume). These integer IDs are essential for boundary condition assignment and material region identification.
+
+**Mesh labeling and physical groups**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Z3ST uses *Gmsh* to define and export all geometric entities.
+The mapping between the textual labels in ``geometry.yaml`` and the numeric
+tags in the mesh file ``mesh.msh`` is handled through *Physical Groups*.
+
+Example from ``mesh.msh``, created from ``mesh.geo``:
+
+.. code-block:: text
+
+   $MeshFormat
+   4.1 0 8
+   $EndMeshFormat
+   $PhysicalNames
+   7
+   2 1 "zmin"
+   2 2 "ymin"
+   2 3 "xmax"
+   2 4 "ymax"
+   2 5 "xmin"
+   2 6 "zmax"
+   3 7 "steel"
+
+Here:
+- the first number (`2`) indicates a **surface** (2D entity),
+- the second number is the **ID** used in `geometry.yaml`,
+- and the quoted string (e.g. `"zmin"`) is the **name** of the region.
+
+The 3D entity labeled `"steel"` represents the solid volume domain.
+When the `.msh` file is read, Z3ST automatically associates each
+boundary or volume tag to its corresponding label in `geometry.yaml`.
+
+**boundary_conditions.yaml**
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Specifies all thermal and mechanical constraints applied to the model.
+
+.. code-block:: yaml
+
+   thermal_bcs:
+     steel:
+     - type: Dirichlet
+       region: xmin
+       temperature: 490.0   # (K)
+
+   mechanical_bcs:
+     steel:
+     - type: Clamp_x
+       region: xmin
+
+     - type: Clamp_y
+       region: ymin
+
+     - type: Clamp_z
+       region: zmin
+
+In this configuration:
+- the thermal field is fixed at **490 K** on the ``xmin`` face;
+- the mechanical problem applies a tri-directional clamping (fixed displacements in X, Y, and Z) on the corresponding faces.
+
+This setup results in a steady-state thermo-mechanical equilibrium problem on a 3D rectangular domain.
+
+
+Verification cases
 ------------------
 
-The ``cases/`` directory contains a set of verification and benchmark problems
-used to validate the numerical formulation and the solver behavior.
+The ``cases/`` directory contains a collection of verification and benchmark problems
+used to validate the numerical formulation and solver performance.
 
-Each case reproduces a reference simulation whose results are compared
-against known analytical or previously validated data.
+Each case reproduces a reference simulation and compares the computed results
+with analytical or previously validated data.
 
-To run a specific verification case:
+To run a verification case:
 
 .. code-block:: bash
 
    cd cases/1_thin_thermal_slab
-   python3 -m z3st
-
-The folder structure of verification cases follows a consistent format:
-
-.. code-block:: text
-
-   cases/
-   ├── 1_thin_thermal_slab/
-   │   ├── input.yaml
-   │   ├── geometry.yaml
-   │   ├── boundary_conditions.yaml
-   │   ├── mesh.geo
-   │   ├── reference/
-   │   │   └── fields_reference.xdmf
-   │   └── postprocess.py
-   ├── 2_thin_cylindrical_thermal_shield/
-   └── ...
+   ./Allrun
 
 Each verification folder contains:
-- Input and configuration files for the simulation;
+- Input and configuration files;
 - Reference output fields for comparison;
-- A Python script (optional) for post-processing and visualization.
+- (Optional) post-processing or plotting scripts.
 
 
-Non-Regression Tests
+Non-Regression tests
 --------------------
 
-To ensure long-term numerical consistency, Z3ST includes a suite of
-non-regression tests that can be executed automatically.
+To maintain numerical consistency across code updates, Z3ST provides an automated
+non-regression test suite.
 
-From the project root:
+Run all tests with:
 
 .. code-block:: bash
 
    cd cases
    ./non-regression.sh
 
-This script sequentially executes all verification cases and compares
-the obtained results with the stored reference data.
-
-A summary of the test results is written to ``non-regression_summary.txt``.
-Each entry reports the test folder name and a short description of any discrepancies.
+This script executes verification tests, compares each new result with its reference,
+and logs the outcome to ``non-regression_summary.txt``.
 
 .. note::
 
-   The non-regression workflow ensures that new developments in Z3ST
-   do not alter verified physical results.
-   If a case fails, the script highlights the corresponding folder
-   and provides hints about the mismatch.
-
-To add a new regression test:
-
-1. Create a new subfolder under ``cases/``
-2. Include the required input and reference files
-3. Register the case inside ``non-regression.sh``
-
-Typical layout:
-
-.. code-block:: text
-
-   cases/
-   ├── 1_thin_thermal_slab/
-   ├── 2_thin_cylindrical_thermal_shield/
-   ├── 3_thermo_mechanical_bar/
-   ├── ...
-   └── non-regression.sh
+   The non-regression workflow ensures that modifications to Z3ST preserve
+   validated physics and solver consistency.
