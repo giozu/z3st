@@ -12,8 +12,6 @@ It is designed with a strong focus on:
 - **Interoperability**, leveraging standard tools like *Gmsh*, *meshio*, and *ParaView*;
 - **Scientific transparency**, through open-source code and complete documentation.
 
----
-
 Overview
 --------
 
@@ -29,8 +27,6 @@ The framework supports both steady-state and transient analyses,
 and includes a collection of benchmark problems to ensure
 consistency across versions.
 
----
-
 Citing Z3ST
 -----------
 
@@ -41,8 +37,6 @@ If you use **Z3ST** in your research, please cite it as:
    Giovanni Zullo (2025).
    Z3ST: an open-source FEniCSx framework for thermo-mechanical analysis.
    https://doi.org/10.5281/zenodo.17748028
-
----
 
 Documentation Contents
 ----------------------
@@ -57,8 +51,6 @@ Documentation Contents
    api
    contributing
    license
-
----
 
 Support and contact
 -------------------

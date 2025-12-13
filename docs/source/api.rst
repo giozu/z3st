@@ -1,49 +1,54 @@
 API Reference
 =============
 
-This section documents the core modules and classes of **Z3ST**.
-All modules include docstrings that follow the NumPy convention.
+This section provides a detailed reference of the **Z3ST** core modules,
+including solver setup, configuration management, and mesh handling.
 
-Core modules
+Core Modules
 ------------
 
-.. automodule:: z3st.config
+.. automodule:: z3st.core.config
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: z3st.mesh
+.. automodule:: z3st.core.solver
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: z3st.solver
+.. automodule:: z3st.core.spine
    :members:
    :undoc-members:
    :show-inheritance:
 
-Models
-------
-
-.. automodule:: z3st.thermal_model
+.. automodule:: z3st.core.finite_element_setup
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: z3st.mechanical_model
+Diagnostics
+-----------
+
+.. automodule:: z3st.core.diagnostic
    :members:
    :undoc-members:
    :show-inheritance:
 
-Utilities
----------
+Mesh management
+---------------
 
-.. automodule:: z3st.export_vtu
+.. automodule:: z3st.core.mesh.manager
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: z3st.utils_load
+.. automodule:: z3st.core.mesh.reader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.core.mesh.plotter
    :members:
    :undoc-members:
    :show-inheritance:
