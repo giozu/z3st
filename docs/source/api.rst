@@ -1,43 +1,49 @@
 API Reference
 =============
 
-Core
-----
-.. automodule:: config
+This section documents the core modules and classes of **Z3ST**.
+All modules include docstrings that follow the NumPy convention.
+
+Core modules
+------------
+
+.. automodule:: z3st.config
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: mesh
+.. automodule:: z3st.mesh
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: solver
+.. automodule:: z3st.solver
    :members:
    :undoc-members:
    :show-inheritance:
 
 Models
 ------
-.. automodule:: thermal_model
+
+.. automodule:: z3st.thermal_model
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: mechanical_model
+.. automodule:: z3st.mechanical_model
    :members:
    :undoc-members:
    :show-inheritance:
 
 Utilities
 ---------
-.. automodule:: export_vtu
+
+.. automodule:: z3st.export_vtu
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: utils_load
+.. automodule:: z3st.utils_load
    :members:
    :undoc-members:
    :show-inheritance:

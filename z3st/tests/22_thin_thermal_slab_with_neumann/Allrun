@@ -9,4 +9,4 @@ python3 -m z3st
 
 python3 non-regression.py
 
-python3 ../../utils/plot_convergence.py
+python3 ../../utils/plot_convergence.py 22_thin_thermal_slab_with_neumann_log.txt

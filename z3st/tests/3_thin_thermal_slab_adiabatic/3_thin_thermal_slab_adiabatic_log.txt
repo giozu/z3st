@@ -1,0 +1,394 @@
+Executing z3st.py...
+Info    : Running '/home/giovanni/miniconda3/envs/z3st/bin/gmsh mesh.geo -3' [Gmsh 4.14.1, 1 node, max. 1 thread]
+Info    : Started on Sat Dec 13 17:55:51 2025
+Info    : Reading 'mesh.geo'...
+Info    : Meshing 1D...
+Info    : [  0%] Meshing curve 1 (Line)
+Info    : [ 10%] Meshing curve 2 (Line)
+Info    : [ 20%] Meshing curve 3 (Line)
+Info    : [ 30%] Meshing curve 4 (Line)
+Info    : [ 40%] Meshing curve 12 (Extruded)
+Info    : [ 50%] Meshing curve 13 (Extruded)
+Info    : [ 60%] Meshing curve 14 (Extruded)
+Info    : [ 60%] Meshing curve 15 (Extruded)
+Info    : [ 70%] Meshing curve 17 (Extruded)
+Info    : [ 80%] Meshing curve 18 (Extruded)
+Info    : [ 90%] Meshing curve 22 (Extruded)
+Info    : [100%] Meshing curve 26 (Extruded)
+Info    : Done meshing 1D (Wall 0.00196542s, CPU 0.00798s)
+Info    : Meshing 2D...
+Info    : [  0%] Meshing surface 10 (Transfinite)
+Info    : [ 20%] Meshing surface 19 (Extruded)
+Info    : [ 40%] Meshing surface 23 (Extruded)
+Info    : [ 60%] Meshing surface 27 (Extruded)
+Info    : [ 70%] Meshing surface 31 (Extruded)
+Info    : [ 90%] Meshing surface 32 (Extruded)
+Info    : Done meshing 2D (Wall 0.0216963s, CPU 0.09044s)
+Info    : Meshing 3D...
+Info    : Meshing volume 1 (Extruded)
+Info    : Done meshing 3D (Wall 0.121403s, CPU 0.131862s)
+Info    : Optimizing mesh...
+Info    : Done optimizing mesh (Wall 0.000327341s, CPU 0.000137s)
+Info    : 27900 nodes 30752 elements
+Info    : Writing 'mesh.msh'...
+Info    : Done writing 'mesh.msh'
+Info    : Done reading 'mesh.geo'
+Info    : Meshing 3D...
+Info    : Meshing volume 1 (Extruded)
+Info    : Done meshing 3D (Wall 0.112664s, CPU 0.122273s)
+Info    : Optimizing mesh...
+Info    : Done optimizing mesh (Wall 0.000359627s, CPU 0.000178s)
+Info    : 27900 nodes 30752 elements
+Info    : Writing 'mesh.msh'...
+Info    : Done writing 'mesh.msh'
+Info    : Stopped on Sat Dec 13 17:55:52 2025 (From start: Wall 0.391752s, CPU 0.823598s)
+[INFO] Loading mesh from mesh.msh
+Info    : Reading 'mesh.msh'...
+Info    : 27 entities
+Info    : 27900 nodes
+Info    : 30392 elements
+Info    : Done reading 'mesh.msh'
+[INFO] Mesh successfully loaded from Gmsh file.
+[INFO] Mesh topology dimension d=3
+[INFO]
+Available volume tags (dx):
+[INFO]   Tag ID: 7
+[INFO]
+Unique tags found in facet data: [1 2 3 4 5 6]
+[INFO] Label map loaded from geometry:
+[INFO]   zmin         → 1
+[INFO]   zmax         → 2
+[INFO]   ymin         → 3
+[INFO]   xmax         → 4
+[INFO]   ymax         → 5
+[INFO]   xmin         → 6
+[INFO]   steel        → 7
+[INFO]   Lz = 2.000 m
+[INFO]   Lx = 0.100 m, Ly = 2.000 m
+[INFO]   area = 2.000e-01 m², perimeter = 4.200e+00 m
+[INFO] === Mesh summary ===
+[INFO]   Topology dim: 3
+[INFO]   Facet dim: 2
+[INFO]   Num cells: 25230
+[INFO]   Cell tags: {np.int32(7)}
+[INFO]   Facet tags: {np.int32(1), np.int32(2), np.int32(3), np.int32(4), np.int32(5), np.int32(6)}
+[INFO]   Geometry type: rect
+
+--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+Author: Giovanni Zullo
+Version: 0.1.0 (2025)
+--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+[DESCRIPTION]
+Z3ST is an open-source framework for the thermo-mechanical modelling
+of materials and multi-material domains. Built on FEniCSx, it supports
+transient simulations, complex geometries, and user-defined boundary
+conditions.
+
+__Config initializer__
+  → Geometry            : geometry.yaml
+  → Mesh                : mesh.msh
+  → Boundary conditions : boundary_conditions.yaml
+  → Time steps          : 1
+  → Models active       :
+      thermal    → ON
+      mechanical → ON
+  → Gap conductance     : None (value = 0.0)
+
+
+__FiniteElementSetup initializer__
+Mechanical function space (V_m): FunctionSpace(<Mesh #0>, blocked element (Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []), (3,)))
+Thermal function space (V_t): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []))
+Scalar function space (Q): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []))
+[Solver] initializer
+  Applied relaxation factor:
+  → Temperature  : 0.9
+  → Displacement : 0.7
+  Adaptive relaxation enabled
+  → relax_growth  : 1.2
+  → relax_shrink : 0.8
+  → relax_min  : 0.05
+  → relax_max : 0.95
+
+
+[ThermalModel] initializer
+[ThermalModel] options loaded from input.yaml:
+  solver              : linear
+  linear_solver       : iterative_amg
+  rtol                : 1e-06
+  stag_tol            : 1e-06
+  convergence         : rel_norm
+[MechanicalModel] initializer
+[MechanicalModel] options loaded from input.yaml:
+  solver              : linear
+  linear_solver       : iterative_amg
+  rtol                : 1e-06
+  stag_tol            : 1e-06
+  mechanical_regime   : 3D
+  convergence         : rel_norm
+  debug               : False
+[GapModel] initializer
+[LOADING MATERIALS]
+Steel material loaded:
+  → k defined as constant: 48.1
+  → constitutive model: lame
+  E               → 177000000000.0 (float)
+  G               → 68076923076.92307 (float)
+  T_ref           → 300.0 (float)
+  alpha           → 1.7e-05 (float)
+  bulk_modulus    → 147499999999.99997 (float)
+  constitutive_mode → lame (str)
+  cp              → 200.0 (float)
+  gamma_heating   → 2000000.0 (float)
+  k               → 48.1 (float)
+  lmbda           → 102115384615.38461 (float)
+  mu_gamma        → 24.0 (float)
+  name            → vessel_steel (str)
+  nu              → 0.3 (float)
+  rho             → 8000.0 (float)
+[INITIALIZING FIELDS]
+[UPDATING q_third]
+
+Initializing the temperature field...
+  → Setting initial temperature for material: 'steel'
+    Set 27900 DOFs to 300.00 K
+  Initial T: min=300.00 K, max=300.00 K, mean=300.00 K
+
+Initializing the displacement field...
+  Initial u: min=0.00e+00 m, max=0.00e+00 m, mean=0.00e+00 m
+Initializing self.sol_mixed
+Initialize with the current state (displacement and temperature fields)
+
+Comparing solution function spaces:
+  Displacement space (self.u):          blocked element (Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []), (3,))
+  Mixed-space displacement (W.sub(0)):  blocked element (Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []), (3,))
+  Temperature space (self.T):           Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, [])
+  Mixed-space temperature (W.sub(1)):   Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, [])
+[SETTING BOUNDARY CONDITIONS]
+Loading boundary conditions from 'boundary_conditions.yaml'
+
+Setting thermal boundary conditions...
+  [INFO] Dirichlet thermal BC on 'steel' → 490.0 K at region 'xmin'
+
+Setting mechanical boundary conditions...
+  [INFO] Clamp_x mechanical BC on 'steel' → Clamp_x at region 'xmin'
+  [INFO] Clamp_y mechanical BC on 'steel' → Clamp_y at region 'ymin'
+  [INFO] Clamp_z mechanical BC on 'steel' → u_z = 0.0 at region 'zmin'
+
+[STEP 01/1] t = 0.00e+00 s | LHR = 0.00e+00 W/m
+[UPDATING q_third]
+Current step = 0
+
+Solver settings:
+  → Coupling : staggered
+  → Max iterations              : 100
+  → Staggering tolerance |ΔT|   : 1.0e-06
+  → Staggering tolerance |Δu|   : 1.0e-06
+  → Staggering tolerance |ΔD|   : 1.0e-03
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-06
+  → Relative tolerance dmg      : 1.0e-05
+
+--- Staggering iteration 1/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 3.934e-01
+  [adaptive] relax_T=0.90
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 1.000e+00
+  [adaptive] relax_u=0.70
+
+Convergence check
+
+--- Staggering iteration 2/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 3.934e-02
+  [adaptive] relax_T=0.95
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 4.000e-01
+  [adaptive] relax_u=0.84
+
+Convergence check
+
+--- Staggering iteration 3/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 4.153e-03
+  [adaptive] relax_T=0.95
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 1.567e-01
+  [adaptive] relax_u=0.95
+
+Convergence check
+
+--- Staggering iteration 4/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 2.076e-04
+  [adaptive] relax_T=0.95
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 2.907e-02
+  [adaptive] relax_u=0.95
+
+Convergence check
+
+--- Staggering iteration 5/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 1.038e-05
+  [adaptive] relax_T=0.95
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 1.489e-03
+  [adaptive] relax_u=0.95
+
+Convergence check
+
+--- Staggering iteration 6/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 5.191e-07
+  [adaptive] relax_T=0.95
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 7.625e-05
+  [adaptive] relax_u=0.95
+
+Convergence check
+
+--- Staggering iteration 7/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 2.596e-08
+  [adaptive] relax_T=0.95
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 3.902e-06
+  [adaptive] relax_u=0.95
+
+Convergence check
+
+--- Staggering iteration 8/100 ---
+
+[INFO] Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  → q_third[steel](W/m3) min = 1.81e+05, max = 2.00e+06, mean = 1.17e+06
+  Linear solver
+  ||ΔT||/||T|| = 1.298e-09
+  [adaptive] relax_T=0.95
+
+[INFO] Assembling mechanical problem...
+  Building weak form, volume integrals (dx) for steel, tag = 7
+  Linear solver
+  ||Δu||/||u|| = 1.996e-07
+  [adaptive] relax_u=0.95
+
+Convergence check
+
+[SUCCESS] Staggered solver converged in 8 iterations.
+Computing symbolic result fields (strain, stress, ...)
+Exporting results to VTU file...
+  → Projecting stress and heat flux for all materials...
+VTU file exported to: output/fields.vtu
+
+Simulation completed in 83.33 s
+Total time steps solved: 1
+[INFO] Reading VTU file: /home/giovanni/z3st/z3st/tests/3_thin_thermal_slab_adiabatic/output/fields.vtu
+
+[AVAILABLE FIELDS]
+  Point data:
+     1) Temperature                    shape=(27900,)
+     2) Displacement                   shape=(27900, 3)
+     3) Strain (points)                shape=(27900, 9)
+     4) Stress_steel (points)          shape=(27900, 9)
+     5) VonMises_steel (points)        shape=(27900,)
+     6) Hydrostatic_steel (points)     shape=(27900,)
+     7) StrainEnergyDensity_steel (points) shape=(27900,)
+
+  Cell data:
+     1) MaterialID                     shape=(25230,)
+     2) Strain (cells)                 shape=(25230, 9)
+     3) Stress_steel (cells)           shape=(25230, 9)
+     4) VonMises_steel (cells)         shape=(25230,)
+     5) Hydrostatic_steel (cells)      shape=(25230,)
+     6) Heat flux                      shape=(25230, 3)
+     7) StrainEnergyDensity_steel (cells) shape=(25230,)
+
+[INFO] Grid bounds:
+	x ∈ [0.0000e+00, 1.0000e-01]
+	y ∈ [0.0000e+00, 2.0000e+00]
+	z ∈ [0.0000e+00, 2.0000e+00]
+[INFO] Target y-plane for extraction: y = 1.0000e+00 m
+[INFO] Target z-plane for extraction: z = 1.0000e+00 m
+[INFO] Found temperature field in point_data: 'Temperature'
+[INFO] Found stress field in cell_data: 'Stress_steel (cells)'
+[PLOT] Combined stress-temperature plot saved → /home/giovanni/z3st/z3st/tests/3_thin_thermal_slab_adiabatic/output/stress_temperature_combined.png
+
+Pass/Fail check (tolerance = 3.0e-03)
+  L2_error_T         → rel err = 9.35e-05  → PASS
+  Linf_error_T       → rel err = 1.79e-04  → PASS
+  T_max              → rel err = 1.71e-04  → PASS
+
+[SUMMARY] PASS All checks within tolerance
+[INFO] non-regression results written to: /home/giovanni/z3st/z3st/tests/3_thin_thermal_slab_adiabatic/output/non-regression.json
+
+Regression check vs GOLD reference:
+  L2_error_T         → rel diff = 0.00e+00  → PASS
+  Linf_error_T       → rel diff = 0.00e+00  → PASS
+  T_max              → rel diff = 0.00e+00  → PASS
+
+[SUMMARY] PASS Regression within tolerance
+
+[INFO] non-regression completed.
+
+Reading log file: 3_thin_thermal_slab_adiabatic_log.txt
+Plot saved as 'convergence.png' (8 iterations)
