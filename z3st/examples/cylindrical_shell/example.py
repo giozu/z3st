@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# --.. ..- .-.. .-.. --- Z3ST exapmle script --.. ..- .-.. .-.. ---
+# --.. ..- .-.. .-.. --- Z3ST example script --.. ..- .-.. .-.. ---
 """
 Z3ST case: cylindrical_shell
 
