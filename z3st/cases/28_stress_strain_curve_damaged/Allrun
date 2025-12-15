@@ -6,3 +6,5 @@ echo "Executing z3st.py..."
 gmsh mesh.geo -3
 
 python3 -m z3st > log.z3st
+
+python3 non-regression.py
