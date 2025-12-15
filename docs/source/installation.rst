@@ -77,7 +77,9 @@ You should see an output similar to:
 
 Install z3st utility scripts
 ----------------------------
+
 To install locally the utilities (recommended) to post-process the simulation output, run:
+
 .. code-block:: bash
 
    pip install -e .

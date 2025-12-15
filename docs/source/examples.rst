@@ -133,9 +133,6 @@ Strain components:
 
 Temperature field:
 
-For thermo-mechanical runs, a temperature field can be prescribed
-and coupled to the mechanical problem.
-
 .. figure:: images/cylindrical_shell/temperature_with_mesh.png
    :width: 70%
    :align: center
