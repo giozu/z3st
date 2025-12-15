@@ -81,7 +81,7 @@ def plot_convergence(iterations, dT_values, du_values, save_path="convergence.pn
         plt.axhline(stag_tol_T, lw=0.8, color="black", linestyle="-.", label="tol T")
 
     plt.xlabel("Staggering iteration")
-    plt.ylabel("Relative change (log scale)")
+    plt.ylabel("Residuals")
     plt.title("Z3ST staggered solver convergence")
     plt.grid(True, which="both", ls=":")
     plt.legend()

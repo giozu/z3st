@@ -1,4 +1,4 @@
-mechanical_bcs:
+mechanical:
   steel:
   - type: Clamp_x
     region: xmin
@@ -13,7 +13,7 @@ mechanical_bcs:
     region: xmax
     traction: +125.0e+6   # (Pa)
 
-thermal_bcs:
+thermal:
   steel:
   - type: Dirichlet
     region: zmin

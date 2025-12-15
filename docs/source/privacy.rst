@@ -1,3 +1,5 @@
+:orphan:
+
 Privacy Policy for z3stGPT
 ==========================
 

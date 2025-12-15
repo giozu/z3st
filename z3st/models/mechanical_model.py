@@ -39,7 +39,7 @@ class MechanicalModel:
         - ERROR if a region is assigned more than once
         """
         print("\nSetting mechanical boundary conditions...")
-        mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
+        mechanical_bcs_defs = self.boundary_conditions.get("mechanical", {})
 
         seen_regions = {}
 
