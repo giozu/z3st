@@ -1,10 +1,10 @@
-thermal_bcs:
+thermal:
   solid:
   - type: Dirichlet
     region: xmin
     temperature: 300.0   # (K)
 
-mechanical_bcs:
+mechanical:
   solid:
   - type: Dirichlet
     region: zmin

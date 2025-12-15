@@ -561,7 +561,7 @@ class Solver:
             return dolfinx.fem.locate_dofs_topological(subspace, self.fdim, facets)
 
         # Thermal Dirichlet BCs reconstructed on W.sub(1)
-        thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
+        thermal_bcs_defs = self.boundary_conditions.get("thermal", {})
         for _, bc_list in thermal_bcs_defs.items():
             for bc in bc_list:
                 if bc.get("type") != "Dirichlet":
@@ -578,7 +578,7 @@ class Solver:
                 bcs_mixed.append(dolfinx.fem.dirichletbc(T_d, dofs_T, self.W.sub(1)))
 
         # Mechanical Dirichlet BCs: full vector displacement or single-component clamps
-        mech_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
+        mech_bcs_defs = self.boundary_conditions.get("mechanical", {})
         for _, bc_list in mech_bcs_defs.items():
             for bc in bc_list:
                 bc_type = bc.get("type")

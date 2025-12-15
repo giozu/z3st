@@ -1,4 +1,4 @@
-thermal_bcs:
+thermal:
   steel:
   - type: Dirichlet
     region: xmin
@@ -8,7 +8,7 @@ thermal_bcs:
     region: xmax
     temperature: 500.0   # (K)
 
-mechanical_bcs:
+mechanical:
   steel:
   - type: Clamp_x
     region: xmin

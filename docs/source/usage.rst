@@ -1,9 +1,7 @@
 Usage
 =====
 
-This section describes how to set a **Z3ST** simulation through the reference
-example case, and how to execute the available verification and non-regression tests.
-
+This section describes how to configure and run a Z3ST simulation using the reference example case, and how to execute the available verification and non-regression tests.
 
 00_example
 -----------
@@ -153,17 +151,21 @@ boundary or volume tag to its corresponding label in `geometry.yaml`.
 **boundary_conditions.yaml**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Specifies all thermal and mechanical constraints applied to the model.
+This file specifies the model boundary conditions applied during the simulation.
+The available models are **thermal** and **mechanical**.
+Each boundary condition is assigned to a material region (e.g. ``steel``) and
+applied on a named region defined in ``mesh.msh`` and ``geometry.yaml``.
 
+An example is given here below:
 .. code-block:: yaml
 
-   thermal_bcs:
+   thermal:
      steel:
      - type: Dirichlet
        region: xmin
        temperature: 490.0   # (K)
 
-   mechanical_bcs:
+   mechanical:
      steel:
      - type: Clamp_x
        region: xmin
@@ -181,8 +183,81 @@ In this configuration:
 This setup results in a steady-state thermo-mechanical equilibrium problem on a 3D rectangular domain.
 
 
+Available Boundary Conditions
+------------------------------
+Z3ST currently supports the following types of boundary conditions:
+
+### Thermal Boundary Conditions
+
+**Dirichlet**
+   - Enforces a fixed temperature (K) on a boundary region.
+   - Example:
+     .. code-block:: yaml
+        - type: Dirichlet
+          region: xmin
+          temperature: 490.0
+   - Mathematical form:
+     :math:`T = T_0` on :math:`\Gamma_D`
+   - Used to impose constant temperature fields.
+
+**Neumann**
+   - Applies a constant heat flux (:math:`\mathrm{W\,m^{-2}}`).
+   - Example:
+     .. code-block:: yaml
+        - type: Neumann
+          region: zmax
+          q: 5000.0
+   - Mathematical form:
+     :math:`-k \nabla T \cdot \mathbf{n} = q_0 \text{ on } \Gamma_N`
+   - Used for convection or heat generation boundaries.
+
+### Mechanical Boundary Conditions
+
+**Clamp: Clamp_x, Clamp_y, Clamp_z**
+   - Constrains displacement in a single direction only.
+   - Example:
+     .. code-block:: yaml
+        - type: Clamp_x
+          region: xmin
+     .. code-block:: yaml
+        - type: Clamp_y
+          region: ymin
+     .. code-block:: yaml
+        - type: Clamp_z
+          region: zmin
+
+**Dirichlet**
+   - Imposes a fixed displacement :math:`\mathbf{u} = (u_x, u_y, u_z)` (m).
+   - Example:
+     .. code-block:: yaml
+        - type: Dirichlet
+          region: outer
+          displacement: [0.0, 0.0, 0.0]
+   - Mathematical form:
+     :math:`\mathbf{u} = \mathbf{u}_0 \text{ on } \Gamma_D`
+
+**Neumann**
+   - Imposes a surface traction or pressure load :math:`\mathbf{t}_0` (:math:`\mathrm{N\,m^{-2}}`) on the specified boundary.
+   - Example:
+     .. code-block:: yaml
+        - type: Neumann
+          region: inner
+          traction: 1.0e6
+   - Mathematical form:
+     :math:`\boldsymbol{\sigma} \cdot \mathbf{n} = \mathbf{t}_0 \text{ on } \Gamma_N`
+   - A scalar value must be provided, it is interpreted as a **pressure acting normal to the surface**,
+     i.e. :math:`\mathbf{t}_0 = p\, \mathbf{n}`.
+   - Vector-valued tractions can also be prescribed explicitly by passing a 3-component list.
+
+### Notes
+
+- Each boundary condition is applied to a *region* defined in ``geometry.yaml``
+  and associated with the corresponding physical tag in the mesh file (``.msh``).
+
+
 Verification cases
 ------------------
+
 
 The ``cases/`` directory contains a collection of verification and benchmark problems
 used to validate the numerical formulation and solver performance.

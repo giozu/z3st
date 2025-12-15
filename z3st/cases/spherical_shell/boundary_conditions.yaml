@@ -1,4 +1,4 @@
-thermal_bcs:
+thermal:
   mat0:
   - type: Dirichlet
     region: inner
@@ -8,7 +8,7 @@ thermal_bcs:
     region: outer
     temperature: 491.0
 
-mechanical_bcs:
+mechanical:
   mat0:
   - type: Neumann
     region: inner

@@ -43,7 +43,7 @@ class ThermalModel:
             V_t_map: DoF map from mixed to collapsed (only in mixed case)
         """
         print(f"\nSetting thermal boundary conditions...")
-        thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
+        thermal_bcs_defs = self.boundary_conditions.get("thermal", {})
 
         seen_regions = {}
 
