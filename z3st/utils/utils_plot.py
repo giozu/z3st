@@ -699,6 +699,9 @@ def plotter_sigma_temperature_slab(
     plt.rcParams.update({"font.size": 11})
     _, ax1 = plt.subplots(figsize=(7, 5))
 
+    ax1.plot(
+        x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (analytical)"
+    )
     ax1.scatter(
         x_s,
         sigma / 1e6,
@@ -706,9 +709,8 @@ def plotter_sigma_temperature_slab(
         marker="o",
         facecolors="none",
         edgecolors="C0",
-        label=r"Numerical $\sigma$",
+        label=r"$\sigma_{\mathrm{th}}$ (numerical)",
     )
-    ax1.plot(x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (formula)")
     ax1.set_xlabel("Thickness (mm)")
     ax1.set_ylabel("Stress (MPa)")
     ax1.xaxis.set_major_formatter(ticker.FuncFormatter(lambda X, _: f"{X*1e3:g}"))
