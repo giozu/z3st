@@ -22,28 +22,84 @@ It is intended as a **verification and reference case** for the thermal
 solver and convergence behavior.
 
 The example demonstrates:
-- YAML-based configuration of geometry, materials, and boundary conditions;
-- pure thermal problem (mechanical solver disabled);
-- adiabatic (zero-flux) boundary conditions;
-- mesh convergence assessment and non-regression testing.
+- YAML-based configuration of geometry and boundary conditions;
+- pure thermal simulation;
+- mesh convergence assessment;
+- post-processing of temperature and displacement-related fields with mesh overlay.
 
 How to run
 ^^^^^^^^^^
 
 .. code-block:: bash
 
-cd z3st/examples/thin_thermal_slab_adiabatic
-./Allrun
+   cd z3st/examples/thin_thermal_slab_adiabatic
+   ./Allrun
 
-Expected output
-^^^^^^^^^^^^^^^
+Mesh and geometry
+~~~~~~~~~~~~~~~~~
 
-   - Solver log written to ``thin_thermal_slab_adiabatic_log.txt``;
-   - Numerical results in the ``output/`` directory;
-   - A convergence plot saved as ``convergence.png``.
+.. _fig-slab-mesh:
 
-Notes
-^^^^^
+.. figure:: images/mesh.png
+   :width: 70%
+   :align: center
 
-This case is also used by the non-regression test suite to ensure numerical
-consistency of the thermal solver across code updates.
+   Finite-element mesh of the thin thermal slab example.
+
+An additional mesh rendering used for documentation and debugging purposes is
+shown in :numref:`fig-slab-mesh-example`.
+
+.. _fig-slab-mesh-example:
+
+.. figure:: images/mesh_example.png
+   :width: 70%
+   :align: center
+
+   Alternative view of the computational mesh.
+
+Convergence behavior
+~~~~~~~~~~~~~~~~~~~~
+
+.. _fig-slab-convergence:
+
+.. figure:: images/convergence.png
+   :width: 70%
+   :align: center
+
+   Mesh convergence study for the thin thermal slab with adiabatic boundary conditions.
+
+Temperature field
+~~~~~~~~~~~~~~~~~
+
+.. _fig-slab-temperature:
+
+.. figure:: images/temperature_with_mesh.png
+   :width: 85%
+   :align: center
+
+   Temperature field overlaid with the finite-element mesh.
+
+Displacement-related post-processing
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Although the simulation is purely thermal, post-processing of displacement-related
+quantities is shown here to demonstrate the visualization workflow.
+
+.. _fig-slab-displacement:
+
+.. figure:: images/displacement_norm_with_mesh.png
+   :width: 85%
+   :align: center
+
+   Displacement norm visualized on the deformed configuration with mesh overlay.
+
+Combined fields
+~~~~~~~~~~~~~~~
+
+.. _fig-slab-stress-temperature:
+
+.. figure:: images/stress_temperature_combined.png
+   :width: 90%
+   :align: center
+
+   Combined visualization of temperature and stress-related quantities for the thin slab example.

@@ -121,6 +121,7 @@ html_title = "z3st documentation"
 todo_include_todos = False
 math_number_all = True
 math_eqref_format = "Eq.{number}"
+numfig = True
 
 # ============================================================================
 # MARKDOWN (MyST) CONFIGURATION
