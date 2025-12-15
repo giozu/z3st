@@ -1,4 +1,4 @@
-thermal_bcs:
+thermal:
   steel:
   - type: Dirichlet
     region: inner_radius
@@ -8,7 +8,7 @@ thermal_bcs:
     region: outer_radius
     temperature: 480.0   # (K)
 
-mechanical_bcs:
+mechanical:
   steel:
   - type: Dirichlet
     region: bottom

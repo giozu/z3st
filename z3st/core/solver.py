@@ -373,18 +373,14 @@ class Solver:
         max_iter=20,
         stag_tol_th=1e-3,
         stag_tol_mech=1e-3,
-        stag_tol_dmg=1e-3,
         rtol_th=1e-6,
         rtol_mech=1e-6,
-        rtol_dmg=1e-5,
     ):
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {stag_tol_th:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {stag_tol_mech:.1e}")
-        print(f"  → Staggering tolerance |ΔD|   : {stag_tol_dmg:.1e}")
         print(f"  → Relative tolerance th       : {rtol_th:.1e}")
         print(f"  → Relative tolerance mech     : {rtol_mech:.1e}")
-        print(f"  → Relative tolerance dmg      : {rtol_dmg:.1e}")
 
         # Build measures once
         self._build_measures()
@@ -561,7 +557,7 @@ class Solver:
             return dolfinx.fem.locate_dofs_topological(subspace, self.fdim, facets)
 
         # Thermal Dirichlet BCs reconstructed on W.sub(1)
-        thermal_bcs_defs = self.boundary_conditions.get("thermal_bcs", {})
+        thermal_bcs_defs = self.boundary_conditions.get("thermal", {})
         for _, bc_list in thermal_bcs_defs.items():
             for bc in bc_list:
                 if bc.get("type") != "Dirichlet":
@@ -578,7 +574,7 @@ class Solver:
                 bcs_mixed.append(dolfinx.fem.dirichletbc(T_d, dofs_T, self.W.sub(1)))
 
         # Mechanical Dirichlet BCs: full vector displacement or single-component clamps
-        mech_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
+        mech_bcs_defs = self.boundary_conditions.get("mechanical", {})
         for _, bc_list in mech_bcs_defs.items():
             for bc in bc_list:
                 bc_type = bc.get("type")

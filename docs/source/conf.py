@@ -40,7 +40,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.ifconfig",
-    "sphinx.ext.imgmath",
+    # "sphinx.ext.imgmath",
     # Type hints and doc improvements
     "sphinx_autodoc_typehints",
     "myst_parser",  # enables Markdown support
@@ -68,7 +68,7 @@ autosummary_generate = True
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
 napoleon_include_init_with_doc = True
-napoleon_include_special_with_doc = True
+# napoleon_include_special_with_doc = True
 add_module_names = False
 
 # ============================================================================
@@ -106,9 +106,9 @@ html_theme_options = {
     "show_toc_level": 2,
     "use_sidenotes": True,
     "show_navbar_depth": 2,
-    "launch_buttons": {
-        "binderhub_url": "",
-    },
+    # "launch_buttons": {
+    #     "binderhub_url": "",
+    # },
 }
 
 html_title = "z3st documentation"
@@ -118,9 +118,10 @@ html_title = "z3st documentation"
 # MATH AND TODO OPTIONS
 # ============================================================================
 
-todo_include_todos = True
+todo_include_todos = False
 math_number_all = True
 math_eqref_format = "Eq.{number}"
+numfig = True
 
 # ============================================================================
 # MARKDOWN (MyST) CONFIGURATION

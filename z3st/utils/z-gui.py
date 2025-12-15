@@ -17,6 +17,46 @@ PLOTTER_WINDOW_SIZE = [1000, 800]
 VTU_FILE = "output/fields.vtu"
 
 
+def plot_mesh(
+    warped_grid,
+    grid,
+    field=None,
+    fname="mesh.png",
+    cmap="plasma",
+    field_title=None,
+    text=None,
+):
+    plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
+
+    # Wireframe mesh (always)
+    plotter.add_mesh(
+        grid,
+        style="wireframe",
+        color="gray",
+        opacity=0.5,
+    )
+
+    # Optional field
+    if field is not None:
+        if field not in warped_grid.point_data:
+            raise ValueError(f"Field '{field}' not found in grid.point_data")
+
+        plotter.add_mesh(
+            warped_grid,
+            scalars=field,
+            cmap=cmap,
+            scalar_bar_args=dict(title=field_title or field),
+            show_edges=False,
+        )
+
+    if text:
+        plotter.add_text(text, font_size=12)
+
+    plotter.add_axes()
+    plotter.view_isometric()
+    plotter.show(screenshot=fname, auto_close=True)
+
+
 def view_vtu(
     filename="output/fields.vtu",
     show_warp=True,
@@ -136,50 +176,38 @@ def view_vtu(
     else:
         warped_grid = grid
 
+    # --- Plot 0: Mesh ---
+    plot_mesh(
+        warped_grid=grid,
+        grid=grid,
+        fname="mesh.png",
+        text=f"Mesh",
+    )
+
     # --- Plot 1: Temperature ---
     if show_temperature and temp_field_name in grid.point_data:
-        plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
-        sargs = dict(title="Temperature (K)")
-        plotter.add_mesh(
-            warped_grid,
-            scalars=temp_field_name,
+        plot_mesh(
+            warped_grid=warped_grid,
+            grid=grid,
+            field=temp_field_name,
+            fname="temperature_with_mesh.png",
             cmap="plasma",
-            show_edges=not show_warp,
-            scalar_bar_args=sargs,
+            field_title="Temperature (K)",
+            text=f"Temperature",
         )
-        plotter.add_mesh(grid, style="wireframe", color="gray", opacity=0.5)
-        plotter.add_text(f"Temperature: {temp_field_name}", font_size=12)
-        plotter.add_axes()
-        plotter.show()
 
-    # --- Plot 2: Displacement Norm ---
+    # --- Plot 2: Displacement norm ---
     if has_displacement:
         warped_grid["Displacement_norm"] = np.linalg.norm(warped_grid[disp_field_name], axis=1)
-        plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
-        plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", show_edges=False)
-        plotter.add_mesh(grid, style="wireframe", color="gray", opacity=0.5)
-        plotter.add_text(f"Displacement norm (Factor: {warp_factor}x)", font_size=12)
-        plotter.add_axes()
-        plotter.show()
-
-        # Sliced view
-        z_min, z_max = warped_grid.bounds[4], warped_grid.bounds[5]
-        if not (z_min <= z_slice_3d_vis <= z_max):
-            z_slice_3d_vis = 0.5 * (z_min + z_max)
-            print(f"[INFO] Adjusted z_slice_3d_vis to {z_slice_3d_vis:.3e} (within mesh bounds)")
-
-        sliced_warped = warped_grid.slice(normal="z", origin=(0, 0, z_slice_3d_vis))
-        if sliced_warped.n_points > 0:
-            plotter = pv.Plotter(window_size=PLOTTER_WINDOW_SIZE)
-            plotter.add_mesh(warped_grid, scalars="Displacement_norm", cmap="viridis", opacity=0.15)
-            plotter.add_mesh(sliced_warped, scalars="Displacement_norm", cmap="viridis")
-            plotter.add_text(f"Displacement slice at z={z_slice_3d_vis:.3e}", font_size=12)
-            plotter.add_axes()
-            plotter.show()
-        else:
-            print(
-                f"[WARNING] Slice plane z={z_slice_3d_vis:.3e} produced empty mesh, skipping slice view."
-            )
+        plot_mesh(
+            warped_grid=warped_grid,
+            grid=grid,
+            field="Displacement_norm",
+            fname="displacement_norm_with_mesh.png",
+            cmap="viridis",
+            field_title="Displacement norm (-)",
+            text=f"Displacement norm (Factor: {warp_factor}x)",
+        )
 
     # --- Plot 3: Von Mises Stress ---
     if show_stress and "Von Mises stress" in grid.point_data:
@@ -211,7 +239,7 @@ if __name__ == "__main__":
     view_vtu(
         filename="output/fields.vtu",
         show_warp=True,
-        warp_factor=100.0,
+        warp_factor=1.0,
         show_temperature=True,
         show_stress=True,
         show_strain=True,
