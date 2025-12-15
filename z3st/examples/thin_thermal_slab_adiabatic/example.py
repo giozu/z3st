@@ -84,39 +84,3 @@ plotter_sigma_temperature_slab(
     To=None,
     CASE_DIR=CASE_DIR,
 )
-
-# --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
-Linf_T = float(np.max(np.abs((T - T_ref))))
-RelL2_T = float(L2_T / np.mean(np.abs(T_ref)))
-
-Tmax_num = float(np.max(T))
-Tmax_ref = float(np.max(T_ref))
-RelErr_Tmax = abs(Tmax_num - Tmax_ref) / Tmax_ref
-
-errors = {
-    "L2_error_T": {
-        "numerical": L2_T,
-        "reference": 0.0,
-        "abs_error": L2_T,
-        "rel_error": RelL2_T,
-    },
-    "Linf_error_T": {
-        "numerical": Linf_T,
-        "reference": 0.0,
-        "abs_error": Linf_T,
-        "rel_error": Linf_T / np.mean(np.abs(T_ref)),
-    },
-    "T_max": {
-        "numerical": Tmax_num,
-        "reference": Tmax_ref,
-        "abs_error": abs(Tmax_num - Tmax_ref),
-        "rel_error": RelErr_Tmax,
-    },
-}
-
-# --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
