@@ -1,18 +1,30 @@
 mechanical_bcs:
   steel:
-  - type: Clamp_x
-    region: xmin
+  # - type: Clamp_x
+  #   region: xmin
 
-  - type: Clamp_y
-    region: ymin
+  # - type: Clamp_y
+  #   region: ymin
 
-  - type: Clamp_z
-    region: zmin
+  # - type: Clamp_z
+  #   region: zmin
 
-  - type: Neumann
-    region: xmax
-    traction: [0.0, 1.0e+2, 1.0e+4, 1.0e+6, 1.0e+8]   # (Pa)
+  # - type: Neumann
+  #   region: xmax
+  #   traction: [0.0, 1.0e+5, 1.0e+6, 5.0e+6, 1.0e+7]   # (Pa)
 
+    - region: xmin
+      type: Dirichlet
+      displacement: [0.0, 0.0, 0.0]
+
+    - region: xmax
+      type: Dirichlet
+      displacement:
+        - [0.0, 0.0, 0.0]
+        - [1.0e-5, 0.0, 0.0]
+        - [2.0e-5, 0.0, 0.0]
+        - [3.0e-5, 0.0, 0.0]
+        - [4.0e-5, 0.0, 0.0]
 
 thermal_bcs:
   steel:

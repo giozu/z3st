@@ -226,6 +226,15 @@ class Solver:
         u_old.x.array[:] = u_new.x.array
         print("\n[INFO] Assembling mechanical problem...")
 
+        # --- update step-dependent displacement ---
+        for _, bc_list in self.dirichlet_mechanical.items():
+            for bc in bc_list:
+                raw = bc.get("raw", None)
+                if isinstance(raw, list):
+                    idx = min(self.current_step, len(raw) - 1)
+                    bc["const"].value = raw[idx]
+                    print(f"  [INFO] Updating Dirichlet on region {bc['id']} → {raw[idx]}")
+
         # --- update step-dependent tractions ---
         for _, bc_list in self.traction.items():
             for bc in bc_list:
@@ -300,6 +309,10 @@ class Solver:
                     if abs(val) > 1e-16:
                         F_m -= alpha * val * ufl.dot(v_m, n) * ds
 
+        bcs_mech = [
+            bc["value"] for _, bc_list in self.dirichlet_mechanical.items() for bc in bc_list
+        ]
+
         # Solve
         if self.mech_cfg["solver"] == "linear":
             print("  Linear solver")
@@ -311,7 +324,7 @@ class Solver:
             problem_m = dolfinx.fem.petsc.LinearProblem(
                 a_m,
                 L_m,
-                bcs=bcs_m,
+                bcs=bcs_mech,
                 u=u_new,
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="mechanical_",
@@ -327,7 +340,7 @@ class Solver:
             problem_m = NonlinearProblem(
                 F_m,
                 u_new,
-                bcs=bcs_m,
+                bcs=bcs_mech,
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="elasticity",
             )

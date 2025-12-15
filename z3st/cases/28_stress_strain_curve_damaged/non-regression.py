@@ -113,28 +113,45 @@ for e, s in zip(strains, sigmas):
     print(f"ε = {e:.3e}   σ = {s:.3e}")
 
 plt.figure(figsize=(7, 5))
-plt.plot(strains, sigmas, "--o", lw=2)
-plt.plot(strain_ref_np, sigmas_ref_np, "-", lw=2)
-plt.xlabel("strain ε_xx")
-plt.ylabel("stress σ_xx (Pa)")
+plt.plot(strains, sigmas, "--o", lw=2, label="Numerical")
+# plt.plot(strain_ref_np, sigmas_ref_np, "-", lw=2, label='Analytical')
+plt.xlabel(r"strain $\epsilon_{xx}$ (/)")
+plt.ylabel(r"stress $\sigma_{xx}$ (Pa)")
 plt.grid(True)
 plt.title("Stress-strain curve")
+plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
 print("[INFO] stress_strain_curve.png saved\n")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 strains_np = np.array(strains, dtype=float)
+stresses_np = np.array(sigmas, dtype=float)
 
 mask_zero = np.isclose(strain_ref_np, 0.0)
+
 rel_error = np.empty_like(strains_np)
+rel_error_s = np.empty_like(stresses_np)
+
 rel_error[~mask_zero] = np.abs(strains_np[~mask_zero] - strain_ref_np[~mask_zero]) / np.abs(
     strain_ref_np[~mask_zero]
 )
 rel_error[mask_zero] = np.abs(strains_np[mask_zero] - strain_ref_np[mask_zero])
 rel_error = rel_error.tolist()
 
+rel_error_s[~mask_zero] = np.abs(strains_np[~mask_zero] - strain_ref_np[~mask_zero]) / np.abs(
+    strain_ref_np[~mask_zero]
+)
+rel_error_s[mask_zero] = np.abs(strains_np[mask_zero] - strain_ref_np[mask_zero])
+rel_error_s = rel_error_s.tolist()
+
 errors = {
+    "sigma_xx": {
+        "numerical": strains_np.tolist(),
+        "reference": strain_ref_np.tolist(),
+        "abs_error": abs(strains_np - strain_ref_np).tolist(),
+        "rel_error": rel_error,
+    },
     "epsilon_xx": {
         "numerical": strains_np.tolist(),
         "reference": strain_ref_np.tolist(),
