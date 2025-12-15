@@ -1,0 +1,20 @@
+mechanical_bcs:
+  volume:
+  - type: Clamp_x
+    region: xmin
+
+  - type: Clamp_y
+    region: ymin
+
+  - type: Clamp_z
+    region: zmin
+
+thermal_bcs:
+  volume:
+  - type: Dirichlet
+    region: zmin
+    temperature: 300.0   # (K)
+
+  - type: Dirichlet
+    region: zmax
+    temperature: 300.0   # (K)
