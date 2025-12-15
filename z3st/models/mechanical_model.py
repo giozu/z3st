@@ -89,11 +89,54 @@ class MechanicalModel:
                         )
                         sys.exit(1)
 
+                    # --- interpret displacement input ---
+                    # Case 1: single vector [ux, uy, uz]
+                    if isinstance(displacement, (list, tuple)) and all(
+                        isinstance(x, (int, float)) for x in displacement
+                    ):
+                        raw_value = [displacement]  # wrap as list of one vector
+                        print(f"  [INFO] Constant Dirichlet vector → {displacement}")
+
+                    # Case 2: list of vectors over steps
+                    elif isinstance(displacement, list) and all(
+                        isinstance(v, (list, tuple)) and len(v) == 3 for v in displacement
+                    ):
+                        raw_value = displacement
+                        print(
+                            f"  [INFO] Time-dependent Dirichlet vector list of length {len(displacement)}"
+                        )
+
+                        if len(displacement) != self.n_steps:
+                            print(
+                                f"[ERROR] Dirichlet BC list length = {len(displacement)}, but n_steps = {self.n_steps}. Must match."
+                            )
+                            sys.exit(1)
+
+                    else:
+                        print(
+                            f"[ERROR] Invalid Dirichlet 'displacement' format for region '{region_name}'. "
+                            f"Must be [ux,uy,uz] or list of such vectors."
+                        )
+                        sys.exit(1)
+
+                    # --- create constant ---
+                    initial_disp = raw_value[0]
+                    disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
+
                     dofs = dolfinx.fem.locate_dofs_topological(V_u_sub, self.fdim, facets)
-                    bc = self.create_dirichlet_bc(self.mesh, V_u_sub, dofs, displacement, self.tdim)
-                    self.dirichlet_mechanical[mat_type].append(bc)
+                    bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u_sub)
+
+                    self.dirichlet_mechanical[mat_type].append(
+                        {
+                            "id": region_id,
+                            "value": bc,
+                            "const": disp_const,
+                            "raw": raw_value,
+                        }
+                    )
+
                     print(
-                        f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {displacement} at region '{region_name}'"
+                        f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {initial_disp} at region '{region_name}'"
                     )
 
                 # --. Neumann --..

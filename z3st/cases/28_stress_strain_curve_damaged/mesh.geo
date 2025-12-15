@@ -13,8 +13,8 @@ Lx = 0.100;
 Ly = 0.100;
 Lz = 0.004;
 
-nxy = 9;   // Lx, Lz
-nz  = 9;   // Lz
+nxy = 20;   // Lx, Lz
+nz  = 20;   // Lz
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
