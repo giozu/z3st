@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
+# --.. ..- .-.. .-.. --- Z3ST example script --.. ..- .-.. .-.. ---
 """
 Z3ST case: thin_thermal_slab_adiabatic
 
@@ -20,7 +20,6 @@ from z3st.utils.utils_verification import *
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
 Lx, Ly, Lz = 0.100, 2.0, 2.0  # m (geometry dimensions)

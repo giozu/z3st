@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
+# --.. ..- .-.. .-.. --- Z3ST exapmle script --.. ..- .-.. .-.. ---
 """
 Z3ST case: cylindrical_shell
 
 example script
 --------------
-Analytical non-regression for a thick-walled cylindrical shell under
+Thick-walled cylindrical shell under
 internal (Pi) and external (Po) pressure.
 Reference is the Lamé solution.
 
@@ -22,7 +22,6 @@ from z3st.utils.utils_verification import *
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
 Ri, Ro, Lz = 0.02, 0.03, 0.5  # m inner and outer radius, height

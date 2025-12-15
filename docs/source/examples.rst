@@ -14,7 +14,7 @@ The case is used as a **thermo-mechanical verification benchmark**, comparing Z3
 
 Direct links to the documented examples:
 
-- `Thin slab under thermal loading <https://github.com/giovannizullo/z3st/tree/main/z3st/examples/thin_slab>`_
+- `Thin slab under thermal loading <https://github.com/giozu/z3st/tree/main/z3st/examples/thin_slab>`_
 
 
 Geometry and loading
@@ -71,7 +71,7 @@ The case is used as a **verification benchmark**, comparing Z3ST results against
 
 Direct links to the documented examples:
 
-- `Cylindrical shell under pressure <https://github.com/giovannizullo/z3st/tree/main/z3st/examples/cylindrical_shell>`_
+- `Cylindrical shell under pressure <https://github.com/giozu/z3st/tree/main/z3st/examples/cylindrical_shell>`_
 
 Geometry and loading
 ^^^^^^^^^^^^^^^^^^^^
