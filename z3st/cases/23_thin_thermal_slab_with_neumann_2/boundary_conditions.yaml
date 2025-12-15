@@ -2,7 +2,7 @@ thermal:
   steel:
   - type: Neumann
     region: xmax
-    flux: -4810.0   # (W/m2) negative, entering from xmax face
+    flux: -4810.0   # (W/m2) negative, entering in xmax face
 
   - type: Dirichlet
     region: xmin

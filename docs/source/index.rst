@@ -1,5 +1,5 @@
-Z3ST documentation
-==================
+Z3ST
+====
 
 **Z3ST** is a finite-element framework built upon the **FEniCSx** ecosystem.
 It enables thermo-mechanical and multiphysics simulations for scientific research, didactive activities, and verification workflows.

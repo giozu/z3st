@@ -3,7 +3,7 @@ Usage
 
 This section describes how to configure and run a Z3ST simulation using the reference example case, and how to execute the available verification and non-regression tests.
 
-00_example
+Input files
 -----------
 
 A minimal demonstration case is provided in ``cases/00_example``.
@@ -36,8 +36,8 @@ Example folder structure:
 Each file defines one aspect of the model setup:
 
 
-**input.yaml**
-~~~~~~~~~~~~~~
+input.yaml
+~~~~~~~~~~
 
 This file controls the **coupling strategy**, solver tolerance, relaxation factors, and physical models (thermal/mechanical).
 The staggered scheme alternates between thermal and mechanical solves until both reach convergence.
@@ -88,8 +88,8 @@ The staggered scheme alternates between thermal and mechanical solves until both
    n_steps: 1
 
 
-**geometry.yaml**
-~~~~~~~~~~~~~~~~~
+geometry.yaml
+~~~~~~~~~~~~~
 
 Defines the domain geometry, dimensions, and tagged boundaries.
 
@@ -115,8 +115,8 @@ Z3ST automatically interprets these labels as physical regions and surfaces.
 Each label is used later to apply boundary conditions or assign material subdomains.
 Also, each label corresponds to a **Physical Group** defined in the mesh (either a surface or a volume). These integer IDs are essential for boundary condition assignment and material region identification.
 
-**Mesh labeling and physical groups**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Mesh labeling and physical groups
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Z3ST uses *Gmsh* to define and export all geometric entities.
 The mapping between the textual labels in ``geometry.yaml`` and the numeric
@@ -148,8 +148,8 @@ The 3D entity labeled `"steel"` represents the solid volume domain.
 When the `.msh` file is read, Z3ST automatically associates each
 boundary or volume tag to its corresponding label in `geometry.yaml`.
 
-**boundary_conditions.yaml**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+boundary_conditions.yaml
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 This file specifies the model boundary conditions applied during the simulation.
 The available models are **thermal** and **mechanical**.
@@ -157,24 +157,25 @@ Each boundary condition is assigned to a material region (e.g. ``steel``) and
 applied on a named region defined in ``mesh.msh`` and ``geometry.yaml``.
 
 An example is given here below:
+
 .. code-block:: yaml
 
-   thermal:
-     steel:
-     - type: Dirichlet
-       region: xmin
-       temperature: 490.0   # (K)
+  thermal:
+    steel:
+    - type: Dirichlet
+      region: xmin
+      temperature: 490.0   # (K)
 
-   mechanical:
-     steel:
-     - type: Clamp_x
-       region: xmin
+  mechanical:
+    steel:
+    - type: Clamp_x
+      region: xmin
 
-     - type: Clamp_y
-       region: ymin
+    - type: Clamp_y
+      region: ymin
 
-     - type: Clamp_z
-       region: zmin
+    - type: Clamp_z
+      region: zmin
 
 In this configuration:
 - the thermal field is fixed at **490 K** on the ``xmin`` face;
@@ -182,82 +183,161 @@ In this configuration:
 
 This setup results in a steady-state thermo-mechanical equilibrium problem on a 3D rectangular domain.
 
+Thermal boundary conditions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Available Boundary Conditions
-------------------------------
-Z3ST currently supports the following types of boundary conditions:
+Dirichlet
+"""""""""
 
-### Thermal Boundary Conditions
+- Enforces a fixed temperature (K) on a boundary region.
 
-**Dirichlet**
-   - Enforces a fixed temperature (K) on a boundary region.
-   - Example:
-     .. code-block:: yaml
-        - type: Dirichlet
-          region: xmin
-          temperature: 490.0
-   - Mathematical form:
-     :math:`T = T_0` on :math:`\Gamma_D`
-   - Used to impose constant temperature fields.
+- Example:
 
-**Neumann**
-   - Applies a constant heat flux (:math:`\mathrm{W\,m^{-2}}`).
-   - Example:
-     .. code-block:: yaml
-        - type: Neumann
-          region: zmax
-          q: 5000.0
-   - Mathematical form:
-     :math:`-k \nabla T \cdot \mathbf{n} = q_0 \text{ on } \Gamma_N`
-   - Used for convection or heat generation boundaries.
+  .. code-block:: yaml
 
-### Mechanical Boundary Conditions
+    - type: Dirichlet
+      region: xmin
+      temperature: 490.0
 
-**Clamp: Clamp_x, Clamp_y, Clamp_z**
-   - Constrains displacement in a single direction only.
-   - Example:
-     .. code-block:: yaml
-        - type: Clamp_x
-          region: xmin
-     .. code-block:: yaml
-        - type: Clamp_y
-          region: ymin
-     .. code-block:: yaml
-        - type: Clamp_z
-          region: zmin
+- Mathematical form: :math:`T = T_0` on :math:`\Gamma_D`
 
-**Dirichlet**
-   - Imposes a fixed displacement :math:`\mathbf{u} = (u_x, u_y, u_z)` (m).
-   - Example:
-     .. code-block:: yaml
-        - type: Dirichlet
-          region: outer
-          displacement: [0.0, 0.0, 0.0]
-   - Mathematical form:
-     :math:`\mathbf{u} = \mathbf{u}_0 \text{ on } \Gamma_D`
+- Used to impose constant temperature fields.
 
-**Neumann**
-   - Imposes a surface traction or pressure load :math:`\mathbf{t}_0` (:math:`\mathrm{N\,m^{-2}}`) on the specified boundary.
-   - Example:
-     .. code-block:: yaml
-        - type: Neumann
-          region: inner
-          traction: 1.0e6
-   - Mathematical form:
-     :math:`\boldsymbol{\sigma} \cdot \mathbf{n} = \mathbf{t}_0 \text{ on } \Gamma_N`
-   - A scalar value must be provided, it is interpreted as a **pressure acting normal to the surface**,
-     i.e. :math:`\mathbf{t}_0 = p\, \mathbf{n}`.
-   - Vector-valued tractions can also be prescribed explicitly by passing a 3-component list.
+Neumann
+"""""""
 
-### Notes
+- Applies a constant heat flux (:math:`\mathrm{W\,m^{-2}}`).
+
+- Example:
+
+  .. code-block:: yaml
+
+    - type: Neumann
+      region: zmax
+      flux: 5000.0
+
+- Mathematical form: :math:`-k \nabla T \cdot \mathbf{n} = q_0 \text{ on } \Gamma_N`
+
+- Positive flux, exiting from the region. Negative flux, entering in the region.
+
+- Used for convection or heat generation boundaries.
+
+Mechanical boundary conditions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Dirichlet
+"""""""""
+
+- Imposes a fixed displacement :math:`\mathbf{u} = (u_x, u_y, u_z)` (m).
+
+- Example:
+
+  .. code-block:: yaml
+
+    - type: Dirichlet
+      region: outer
+      displacement: [0.0, 0.0, 0.0]
+
+- Mathematical form: :math:`\mathbf{u} = \mathbf{u}_0 \text{ on } \Gamma_D`
+
+Neumann
+"""""""
+
+- Imposes a surface traction or pressure load :math:`\mathbf{t}_0` (:math:`\mathrm{N\,m^{-2}}`) on the specified boundary.
+
+- Example:
+
+  .. code-block:: yaml
+
+    - type: Neumann
+      region: inner
+      traction: 1.0e6
+
+- Mathematical form: :math:`\boldsymbol{\sigma} \cdot \mathbf{n} = \mathbf{t}_0 \text{ on } \Gamma_N`
+
+- A scalar value must be provided, it is interpreted as a **pressure acting normal to the surface**,  i.e. :math:`\mathbf{t}_0 = p\, \mathbf{n}`.
+
+Clamp
+"""""
+- Constrains displacement in a single direction only, on the assigned region.
+
+  **Clamp_x**
+
+  - Constrains :math:`u_x = 0` on the assigned region.
+
+  **Clamp_y**
+
+  - Constrains :math:`u_y = 0` on the assigned region.
+
+  **Clamp_z**
+
+  - Constrains :math:`u_y = 0` on the assigned region.
+
+- **Example**
+
+  .. code-block:: yaml
+
+    - type: Clamp_x
+      region: xmin
+
+    - type: Clamp_y
+      region: ymin
+
+    - type: Clamp_z
+      region: zmin
+
+  Note: The combined effect of the tri-directional clamping above is a single **fixed point**, preventing rigid-body motion and rotation of the domain.
+
+Slip
+""""
+
+- Enforces a *slip* condition by constraining two displacement components while leaving the normal component free.
+
+- Used to prevent rigid-body motion while allowing tangential sliding along a boundary.
+
+  **Slip_x**
+
+  - Constrains :math:`u_y = 0` and :math:`u_z = 0`
+
+  - Allows displacement in the :math:`x` direction
+
+  **Slip_y**
+
+  - Constrains :math:`u_x = 0` and :math:`u_z = 0`
+
+  - Allows displacement in the :math:`y` direction
+
+  **Slip_z**
+
+  - Constrains :math:`u_x = 0` and :math:`u_y = 0`
+
+  - Allows displacement in the :math:`z` direction
+
+- **Example**
+
+  .. code-block:: yaml
+
+    - type: Slip_x
+      region: xmin
+
+    - type: Slip_y
+      region: ymin
+
+    - type: Slip_z
+      region: zmin
+
+The slip boundary condition blocks motion tangential to the boundary
+while allowing displacement along the normal direction.
+It is typically used to remove rigid-body modes without fully clamping
+the structure.
+
+Notes:
 
 - Each boundary condition is applied to a *region* defined in ``geometry.yaml``
   and associated with the corresponding physical tag in the mesh file (``.msh``).
 
-
 Verification cases
 ------------------
-
 
 The ``cases/`` directory contains a collection of verification and benchmark problems
 used to validate the numerical formulation and solver performance.
