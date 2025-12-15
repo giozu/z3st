@@ -1,118 +1,143 @@
 Examples
 ========
 
-This section documents a reference example case distributed with Z3ST.
+This section documents reference examples distributed with Z3ST.
 Each example corresponds to a fully reproducible simulation located in the
 ``z3st/examples`` directory of the repository.
+
 
 Thin slab
 ---------
 
-Location
-^^^^^^^^
+This example considers a thin slab subjected to a prescribed temperature on a region, and an adiabatic condition on another region.
+The case is used as a **thermo-mechanical verification benchmark**, comparing Z3ST results against a analytical reference solutions.
 
-`z3st/examples/thin_thermal_slab_adiabatic <https://github.com/giozu/z3st/tree/main/z3st/examples/thin_thermal_slab_adiabatic>`_
+Direct links to the documented examples:
 
-Description
-^^^^^^^^^^^
+- `Thin slab under thermal loading <https://github.com/giovannizullo/z3st/tree/main/z3st/examples/thin_slab>`_
 
-This example solves a steady-state **thermo-mechanical** problem in a thin slab.
-It is intended as a **verification and reference case** for the coupled
-thermal and mechanical solvers and for the associated convergence behaviour.
 
-The example demonstrates:
+Geometry and loading
+^^^^^^^^^^^^^^^^^^^^
 
-- YAML-based configuration of geometry and boundary conditions;
+- Slab thickness: :math:`L_x`
+- In-plane dimensions: :math:`L_y \times L_z`
 
-- coupled thermo-mechanical simulation;
+The material is linear elastic and isotropic.
+Small-strain thermo-elasticity is assumed.
 
-- mesh visualization;
+Mesh
+^^^^
 
-- post-processing of temperature and displacement-related fields with mesh overlay.
-
-How to run
-^^^^^^^^^^
-
-.. code-block:: bash
-
-   cd z3st/examples/thin_thermal_slab_adiabatic
-   ./Allrun
-
-Mesh and geometry
-~~~~~~~~~~~~~~~~~
-
-.. _fig-slab-mesh:
+The domain is discretized with a finite element mesh.
 
 .. figure:: images/thin_slab/mesh.png
    :width: 70%
    :align: center
 
-   Finite-element mesh of the thin slab example (``mesh.geo`` and ``mesh.msh``).
-
-An additional mesh rendering used for documentation and debugging purposes is
-shown in :numref:`fig-slab-mesh-example`, obtained with
-
-.. code-block:: bash
-
-   python3 -m z3st --mesh_plot
-
-.. _fig-slab-mesh-example:
-
-.. figure:: images/thin_slab/mesh_example.png
-   :width: 70%
-   :align: center
-
-   Alternative view of the computational mesh.
-
-Convergence behaviour
-~~~~~~~~~~~~~~~~~~~~~
-
-.. _fig-slab-convergence:
+   Finite element mesh of the thin slab.
 
 .. figure:: images/thin_slab/convergence.png
    :width: 70%
    :align: center
 
-   Convergence behaviour of the coupled thermal and mechanical solvers.
+   Convergence of the solution during the simulation.
 
-Temperature field
-~~~~~~~~~~~~~~~~~
+Results
+^^^^^^^
 
-.. _fig-slab-temperature:
+Temperature field:
 
 .. figure:: images/thin_slab/temperature_with_mesh.png
-   :width: 85%
+   :width: 70%
    :align: center
 
-   Temperature field overlaid with the finite-element mesh.
+   Temperature distribution with mesh overlay.
 
-Displacement field
-~~~~~~~~~~~~~~~~~~
-
-.. _fig-slab-displacement:
+Displacement field:
 
 .. figure:: images/thin_slab/displacement_norm_with_mesh.png
-   :width: 85%
+   :width: 70%
    :align: center
 
-   Displacement norm visualized on the deformed configuration with mesh overlay.
+   Displacement norm with mesh overlay.
 
 
-Combined fields
-~~~~~~~~~~~~~~~
+Cylindrical shell under pressure
+--------------------------------
 
-.. _fig-slab-stress-temperature:
+This example shows a thick-walled cylindrical shell subjected to internal pressure.
+The case is used as a **verification benchmark**, comparing Z3ST results against the analytical Lamé solution.
 
-.. figure:: images/thin_slab/stress_temperature_combined.png
-   :width: 90%
+Direct links to the documented examples:
+
+- `Cylindrical shell under pressure <https://github.com/giovannizullo/z3st/tree/main/z3st/examples/cylindrical_shell>`_
+
+Geometry and loading
+^^^^^^^^^^^^^^^^^^^^
+
+- Inner radius: :math:`R_i`
+- Outer radius: :math:`R_o`
+- Length: :math:`L_z`
+- Internal pressure: :math:`P_i`
+
+The material is assumed to be linear elastic and isotropic.
+Plane-strain conditions are enforced along the axial direction (:math: `\varepsilon_z=0`)
+
+Mesh
+^^^^
+
+The mesh is axisymmetric and extruded along the axial direction.
+
+.. figure:: images/cylindrical_shell/mesh.png
+   :width: 70%
    :align: center
 
-   Combined visualization of temperature and stress-related quantities for the thin slab example.
+   Finite element mesh of the cylindrical shell.
 
-In this post-processing step, the numerical temperature and stress fields are
-extracted along the :math:`x` direction at a fixed section of the domain,
-corresponding to the mid-planes :math:`y = L_y/2` and :math:`z = L_z/2`,
-within a prescribed spatial tolerance.
-The resulting one-dimensional profiles are then **compared against analytical
-solutions** for both the temperature distribution and the associated thermal
-stress, providing a quantitative verification of the thermo-mechanical response.
+.. figure:: images/cylindrical_shell/convergence.png
+   :width: 70%
+   :align: center
+
+   Convergence of the solution during the simulation.
+
+Results
+^^^^^^^
+
+The following figures compare numerical and analytical results
+along the radial direction at a fixed axial coordinate.
+
+Displacement field:
+
+.. figure:: images/cylindrical_shell/displacement_norm_with_mesh.png
+   :width: 70%
+   :align: center
+
+   Radial displacement norm with mesh overlay.
+
+Stress components:
+
+.. figure:: images/cylindrical_shell/stress_comparison.png
+   :width: 80%
+   :align: center
+
+   Radial, hoop and axial stresses compared with the Lamé solution.
+
+Strain components:
+
+.. figure:: images/cylindrical_shell/strain_comparison.png
+   :width: 80%
+   :align: center
+
+   Radial, hoop and axial strains compared with the analytical reference.
+
+Temperature field:
+
+For thermo-mechanical runs, a temperature field can be prescribed
+and coupled to the mechanical problem.
+
+.. figure:: images/cylindrical_shell/temperature_with_mesh.png
+   :width: 70%
+   :align: center
+
+   Temperature distribution with mesh overlay.
