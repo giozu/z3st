@@ -373,18 +373,14 @@ class Solver:
         max_iter=20,
         stag_tol_th=1e-3,
         stag_tol_mech=1e-3,
-        stag_tol_dmg=1e-3,
         rtol_th=1e-6,
         rtol_mech=1e-6,
-        rtol_dmg=1e-5,
     ):
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {stag_tol_th:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {stag_tol_mech:.1e}")
-        print(f"  → Staggering tolerance |ΔD|   : {stag_tol_dmg:.1e}")
         print(f"  → Relative tolerance th       : {rtol_th:.1e}")
         print(f"  → Relative tolerance mech     : {rtol_mech:.1e}")
-        print(f"  → Relative tolerance dmg      : {rtol_dmg:.1e}")
 
         # Build measures once
         self._build_measures()
