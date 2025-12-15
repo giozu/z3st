@@ -1,0 +1,12 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1  # Run from this directory
+
+echo "Executing z3st.py..."
+
+gmsh mesh.geo -3
+
+python3 -m z3st
+
+python3 non-regression.py
+
+python3 ../../utils/plot_convergence.py plate_log.txt

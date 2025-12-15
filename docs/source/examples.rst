@@ -1,17 +1,49 @@
 Examples
 ========
 
-Simple steady-state case
-------------------------
+This section documents the reference example cases distributed with Z3ST.
+Each example corresponds to a fully reproducible simulation located in the
+``z3st/examples`` directory of the repository.
 
-1. Define the input files: ``input.yaml``, ``boundary_conditions.yaml``, ``geometry.yaml``, and the mesh file ``mesh.msh``:
+Thin thermal slab with an adiabatic boundary
+--------------------------------------------
 
-2. Run the simulation:
-   .. code-block:: bash
+Location
+^^^^^^^^
 
-        python3 -m z3st
+`z3st/examples/thin_thermal_slab_adiabatic <https://github.com/giozu/z3st/tree/main/z3st/examples/thin_thermal_slab_adiabatic>`_
 
-3. Visualize results (e.g., with paraview):
-   .. code-block:: bash
+Description
+^^^^^^^^^^^
 
-        paraview output/fields.vtu
+This example solves a steady-state heat conduction problem in a thin slab
+with adiabatic boundary conditions.
+It is intended as a **verification and reference case** for the thermal
+solver and convergence behavior.
+
+The example demonstrates:
+- YAML-based configuration of geometry, materials, and boundary conditions;
+- pure thermal problem (mechanical solver disabled);
+- adiabatic (zero-flux) boundary conditions;
+- mesh convergence assessment and non-regression testing.
+
+How to run
+^^^^^^^^^^
+
+.. code-block:: bash
+
+cd z3st/examples/thin_thermal_slab_adiabatic
+./Allrun
+
+Expected output
+^^^^^^^^^^^^^^^
+
+   - Solver log written to ``thin_thermal_slab_adiabatic_log.txt``;
+   - Numerical results in the ``output/`` directory;
+   - A convergence plot saved as ``convergence.png``.
+
+Notes
+^^^^^
+
+This case is also used by the non-regression test suite to ensure numerical
+consistency of the thermal solver across code updates.
