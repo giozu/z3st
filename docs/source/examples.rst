@@ -1,12 +1,12 @@
 Examples
 ========
 
-This section documents the reference example cases distributed with Z3ST.
+This section documents a reference example case distributed with Z3ST.
 Each example corresponds to a fully reproducible simulation located in the
 ``z3st/examples`` directory of the repository.
 
-Thin thermal slab with an adiabatic boundary
---------------------------------------------
+Thin slab
+---------
 
 Location
 ^^^^^^^^
@@ -16,15 +16,18 @@ Location
 Description
 ^^^^^^^^^^^
 
-This example solves a steady-state heat conduction problem in a thin slab
-with adiabatic boundary conditions.
-It is intended as a **verification and reference case** for the thermal
-solver and convergence behavior.
+This example solves a steady-state **thermo-mechanical** problem in a thin slab.
+It is intended as a **verification and reference case** for the coupled
+thermal and mechanical solvers and for the associated convergence behaviour.
 
 The example demonstrates:
+
 - YAML-based configuration of geometry and boundary conditions;
-- pure thermal simulation;
-- mesh convergence assessment;
+
+- coupled thermo-mechanical simulation;
+
+- mesh visualization;
+
 - post-processing of temperature and displacement-related fields with mesh overlay.
 
 How to run
@@ -40,66 +43,76 @@ Mesh and geometry
 
 .. _fig-slab-mesh:
 
-.. figure:: images/mesh.png
+.. figure:: images/thin_slab/mesh.png
    :width: 70%
    :align: center
 
-   Finite-element mesh of the thin thermal slab example.
+   Finite-element mesh of the thin slab example (``mesh.geo`` and ``mesh.msh``).
 
 An additional mesh rendering used for documentation and debugging purposes is
-shown in :numref:`fig-slab-mesh-example`.
+shown in :numref:`fig-slab-mesh-example`, obtained with
+
+.. code-block:: bash
+
+   python3 -m z3st --mesh_plot
 
 .. _fig-slab-mesh-example:
 
-.. figure:: images/mesh_example.png
+.. figure:: images/thin_slab/mesh_example.png
    :width: 70%
    :align: center
 
    Alternative view of the computational mesh.
 
-Convergence behavior
-~~~~~~~~~~~~~~~~~~~~
+Convergence behaviour
+~~~~~~~~~~~~~~~~~~~~~
 
 .. _fig-slab-convergence:
 
-.. figure:: images/convergence.png
+.. figure:: images/thin_slab/convergence.png
    :width: 70%
    :align: center
 
-   Mesh convergence study for the thin thermal slab with adiabatic boundary conditions.
+   Convergence behaviour of the coupled thermal and mechanical solvers.
 
 Temperature field
 ~~~~~~~~~~~~~~~~~
 
 .. _fig-slab-temperature:
 
-.. figure:: images/temperature_with_mesh.png
+.. figure:: images/thin_slab/temperature_with_mesh.png
    :width: 85%
    :align: center
 
    Temperature field overlaid with the finite-element mesh.
 
-Displacement-related post-processing
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Although the simulation is purely thermal, post-processing of displacement-related
-quantities is shown here to demonstrate the visualization workflow.
+Displacement field
+~~~~~~~~~~~~~~~~~~
 
 .. _fig-slab-displacement:
 
-.. figure:: images/displacement_norm_with_mesh.png
+.. figure:: images/thin_slab/displacement_norm_with_mesh.png
    :width: 85%
    :align: center
 
    Displacement norm visualized on the deformed configuration with mesh overlay.
+
 
 Combined fields
 ~~~~~~~~~~~~~~~
 
 .. _fig-slab-stress-temperature:
 
-.. figure:: images/stress_temperature_combined.png
+.. figure:: images/thin_slab/stress_temperature_combined.png
    :width: 90%
    :align: center
 
    Combined visualization of temperature and stress-related quantities for the thin slab example.
+
+In this post-processing step, the numerical temperature and stress fields are
+extracted along the :math:`x` direction at a fixed section of the domain,
+corresponding to the mid-planes :math:`y = L_y/2` and :math:`z = L_z/2`,
+within a prescribed spatial tolerance.
+The resulting one-dimensional profiles are then **compared against analytical
+solutions** for both the temperature distribution and the associated thermal
+stress, providing a quantitative verification of the thermo-mechanical response.

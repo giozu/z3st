@@ -3,8 +3,8 @@
 """
 Z3ST case: thin_thermal_slab_adiabatic
 
-non-regression script
----------------------
+example script
+--------------
 Steady-state 1D slab (Dirichlet-Neumann).
 
 """
