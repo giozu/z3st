@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 27_stress_strain_curve
+Z3ST case: 27_stress_strain_curve_stress
 
 non-regression script
 ---------------------
@@ -36,7 +36,7 @@ E = 200e9  # (Pa) Young modulus
 y_target, z_target, mask_tol = (
     Ly / 2,
     Lz / 2,
-    0.01,
+    0.005,
 )  # m, m, m (extraction plane selection and tolerance)
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---

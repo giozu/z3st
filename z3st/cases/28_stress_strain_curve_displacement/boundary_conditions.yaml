@@ -1,8 +1,17 @@
 mechanical_bcs:
   steel:
-  - region: xmin
-    type: Dirichlet
-    displacement: [0.0, 0.0, 0.0]   # (m)
+  # - region: xmin
+  #   type: Dirichlet
+  #   displacement: [0.0, 0.0, 0.0]   # (m)
+
+  - type: Clamp_x
+    region: xmin
+
+  - type: Clamp_y
+    region: ymin
+
+  - type: Clamp_z
+    region: zmin
 
   - region: xmax
     type: Dirichlet
