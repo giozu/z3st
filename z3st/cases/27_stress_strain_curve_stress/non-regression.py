@@ -106,6 +106,7 @@ for step, vtufile in enumerate(VTU_FILES):
 
     print(f"  → σ_xx = {sigmas[-1]:.3e} Pa")
     print(f"  → ε_xx = {strains[-1]:.3e}")
+    print(f"  → u_x  = {u_max:.3e} m")
 
 # Stress–strain curve output
 print("\n--. stress-strain values --..")

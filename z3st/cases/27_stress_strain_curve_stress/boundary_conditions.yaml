@@ -13,7 +13,6 @@ mechanical_bcs:
     region: xmax
     traction: [0.0, 1.0e+2, 1.0e+4, 1.0e+6, 1.0e+8]   # (Pa)
 
-
 thermal_bcs:
   steel:
   - type: Dirichlet

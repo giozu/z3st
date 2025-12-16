@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 28_stress_strain_curve_damaged
+Z3ST case: 27_stress_strain_curve_displacement
 
 non-regression script
 ---------------------
@@ -101,12 +101,24 @@ for step, vtufile in enumerate(VTU_FILES):
     displacements.append(u_max)
 
     # Strain extraction
-    eps_eng = u_max / Lx
+    x_e, y_e, z_e, e = extract_strain(vtufile, component="all")
+    _, eps_xx_section = average_section(
+        x_e,
+        y_e,
+        z_e,
+        e["xx"],
+        y_target,
+        z_target,
+        mask_tol,
+        decimals=5,
+        label="eps_xx",
+    )
+    eps_eng = float(np.mean(eps_xx_section))
     strains.append(eps_eng)
 
     print(f"  → σ_xx = {sigmas[-1]:.3e} Pa")
     print(f"  → ε_xx = {strains[-1]:.3e}")
-    print(f"  → u_x  = {u_max:.3e} m")
+    print(f"  → u_x = {strains[-1]:.3e}")
 
 # Stress–strain curve output
 print("\n--. stress-strain values --..")
@@ -115,11 +127,12 @@ for e, s in zip(strains, sigmas):
 
 plt.figure(figsize=(7, 5))
 plt.plot(strains, sigmas, "--o", lw=2, label="Numerical")
-# plt.plot(strain_ref_np, sigmas_ref_np, "-", lw=2, label='Analytical')
+plt.plot(strain_ref_np, sigmas_ref_np, "-", lw=2, label="Analytical")
 plt.xlabel(r"strain $\epsilon_{xx}$ (/)")
 plt.ylabel(r"stress $\sigma_{xx}$ (Pa)")
 plt.grid(True)
 plt.title("Stress-strain curve")
+plt.yscale("log")
 plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
@@ -127,32 +140,16 @@ print("[INFO] stress_strain_curve.png saved\n")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 strains_np = np.array(strains, dtype=float)
-stresses_np = np.array(sigmas, dtype=float)
 
 mask_zero = np.isclose(strain_ref_np, 0.0)
-
 rel_error = np.empty_like(strains_np)
-rel_error_s = np.empty_like(stresses_np)
-
 rel_error[~mask_zero] = np.abs(strains_np[~mask_zero] - strain_ref_np[~mask_zero]) / np.abs(
     strain_ref_np[~mask_zero]
 )
 rel_error[mask_zero] = np.abs(strains_np[mask_zero] - strain_ref_np[mask_zero])
 rel_error = rel_error.tolist()
 
-rel_error_s[~mask_zero] = np.abs(strains_np[~mask_zero] - strain_ref_np[~mask_zero]) / np.abs(
-    strain_ref_np[~mask_zero]
-)
-rel_error_s[mask_zero] = np.abs(strains_np[mask_zero] - strain_ref_np[mask_zero])
-rel_error_s = rel_error_s.tolist()
-
 errors = {
-    "sigma_xx": {
-        "numerical": strains_np.tolist(),
-        "reference": strain_ref_np.tolist(),
-        "abs_error": abs(strains_np - strain_ref_np).tolist(),
-        "rel_error": rel_error,
-    },
     "epsilon_xx": {
         "numerical": strains_np.tolist(),
         "reference": strain_ref_np.tolist(),

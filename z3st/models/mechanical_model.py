@@ -103,7 +103,7 @@ class MechanicalModel:
                     ):
                         raw_value = displacement
                         print(
-                            f"  [INFO] Time-dependent Dirichlet vector list of length {len(displacement)}"
+                            f"  [INFO] Step-dependent Dirichlet vector list of length {len(displacement)}"
                         )
 
                         if len(displacement) != self.n_steps:

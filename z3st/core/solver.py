@@ -229,6 +229,10 @@ class Solver:
         # --- update step-dependent displacement ---
         for _, bc_list in self.dirichlet_mechanical.items():
             for bc in bc_list:
+                # Skip BCs that are Clamp, Slip, etc. (not step-dependent)
+                if not isinstance(bc, dict):
+                    continue
+
                 raw = bc.get("raw", None)
                 if isinstance(raw, list):
                     idx = min(self.current_step, len(raw) - 1)
@@ -309,8 +313,11 @@ class Solver:
                     if abs(val) > 1e-16:
                         F_m -= alpha * val * ufl.dot(v_m, n) * ds
 
+        # --- Extract actual DirichletBC objects (handles both dict and direct BCs) ---
         bcs_mech = [
-            bc["value"] for _, bc_list in self.dirichlet_mechanical.items() for bc in bc_list
+            bc["value"] if isinstance(bc, dict) else bc
+            for _, bc_list in self.dirichlet_mechanical.items()
+            for bc in bc_list
         ]
 
         # Solve

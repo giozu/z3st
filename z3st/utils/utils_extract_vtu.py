@@ -362,6 +362,27 @@ def extract_stress(vtu_path, component="xx", return_coords=True, prefer="cells")
     return x, y, z, stress_comp if return_coords else stress_comp
 
 
+def extract_strain(vtu_path, component="xx"):
+    grid = pv.read(vtu_path)
+    loc_e, field_name = _detect_field(grid, "Strain (cells)")
+    data, coords = _data_coords(grid, loc_e, field_name)
+
+    data = np.asarray(data)
+    if data.ndim == 2 and data.shape[1] == 9:
+        strain_tensors = data.reshape(-1, 3, 3)
+    else:
+        raise ValueError(f"Unexpected strain data shape: {data.shape}")
+
+    comp_map = {"xx": (0, 0), "yy": (1, 1), "zz": (2, 2), "xy": (0, 1), "xz": (0, 2), "yz": (1, 2)}
+
+    if component == "all":
+        comps = {k: strain_tensors[:, i, j] for k, (i, j) in comp_map.items()}
+        return coords[:, 0], coords[:, 1], coords[:, 2], comps
+
+    i, j = comp_map[component]
+    return coords[:, 0], coords[:, 1], coords[:, 2], strain_tensors[:, i, j]
+
+
 def extract_principal_stresses(
     vtu_path,
     return_coords=True,
