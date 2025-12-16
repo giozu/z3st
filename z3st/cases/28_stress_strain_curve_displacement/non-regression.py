@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 27_stress_strain_curve_displacement
+Z3ST case: 28_stress_strain_curve_displacement
 
 non-regression script
 ---------------------
@@ -118,12 +118,12 @@ for step, vtufile in enumerate(VTU_FILES):
 
     print(f"  → σ_xx = {sigmas[-1]:.3e} Pa")
     print(f"  → ε_xx = {strains[-1]:.3e}")
-    print(f"  → u_x = {strains[-1]:.3e}")
+    print(f"  → u_x =  {u_max:.3e} m")
 
 # Stress–strain curve output
-print("\n--. stress-strain values --..")
-for e, s in zip(strains, sigmas):
-    print(f"ε = {e:.3e}   σ = {s:.3e}")
+print("\n--. stress-strain-displacement values --..")
+for e, s, u in zip(strains, sigmas, displacements):
+    print(f"ε_xx = {e:.3e}\tσ_xx = {s:.3e}\tu_x = {u:.3e}")
 
 plt.figure(figsize=(7, 5))
 plt.plot(strains, sigmas, "--o", lw=2, label="Numerical")
