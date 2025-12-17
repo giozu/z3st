@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 5_thin_linear_thermal_shield_non_adiabatic
+Z3ST case: 5_thin_thermal_slab_non_adiabatic
 
 non-regression script
 ---------------------
@@ -23,15 +23,15 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly, Lz = 0.100, 2.0, 2.0  # m (geometry dimensions)
+Lx, Ly, Lz = 0.150, 2.0, 2.0  # m (geometry dimensions)
 k, E, nu, alpha = (
     48.1,
     1.77e11,
     0.3,
     1.7e-5,
 )  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 490, 500.0  # K (boundary temperature)
-q0, mu = 2.00e6, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
+Ti, To = 239.1 + 273.15, 366.3 + 273.15  # K
+q0, mu = 4.84e6, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
 y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.1  # m, m, m (plane selection and tolerance)
 
 TOLERANCE = 3e-3  # - (relative tolerance for non-regression tests)
