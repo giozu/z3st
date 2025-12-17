@@ -8,11 +8,12 @@
 
 SetFactory("Built-in");
 
-Lx = 0.100; // (m)
-Ly = 2.000; // (m)
+Lx = 0.150;
+Ly = 2.000;
 Lz = 2.000; // (m)
 
-n = 40; // Number of divisions per Lx/y/z
+nxy = 30;   // Lx, Lz
+nz  = 20;   // Lz
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
@@ -24,7 +25,7 @@ Point(6) = {Lx, 0, Lz, 1.0};
 Point(7) = {Lx, Ly, Lz, 1.0};
 Point(8) = {0, Ly, Lz, 1.0};
 
-// Edges
+// Eedges
 Line(1) = {1, 2};
 Line(2) = {2, 3};
 Line(3) = {3, 4};
@@ -61,14 +62,14 @@ Plane Surface(6) = {6};
 Surface Loop(1) = {1, 2, 3, 4, 5, 6};
 Volume(1) = {1};
 
-// Transfinite structure
-Transfinite Curve {1, 2, 3, 4, 9, 10, 11, 12} = n Using Progression 1;
-Transfinite Curve {5, 6, 7, 8} = n Using Progression 1;
+// Transfinite structure: ensure structured meshing
+Transfinite Curve {1, 2, 3, 4, 9, 10, 11, 12} = nxy Using Progression 1;
+Transfinite Curve {5, 6, 7, 8} = nz Using Progression 1;
 Transfinite Surface {1, 2, 3, 4, 5, 6};
 Recombine Surface {1, 2, 3, 4, 5, 6};
 Transfinite Volume {1};
 
-// Physical groups for boundary conditions
+// Define physical groups for boundary conditions
 Physical Surface("zmin") = {1};
 Physical Surface("ymin") = {2};
 Physical Surface("xmax") = {3};
