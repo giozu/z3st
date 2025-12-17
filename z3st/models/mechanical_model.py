@@ -193,7 +193,7 @@ class MechanicalModel:
                         self.dirichlet_mechanical[mat_type].append(bc_i)
 
                     print(
-                        f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_y, u_z = 0.0 at region '{region_name}'"
+                        f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_x, u_z = 0.0 at region '{region_name}'"
                     )
 
                 elif bc_type == "Slip_z":
@@ -255,7 +255,7 @@ class MechanicalModel:
                     self.dirichlet_mechanical[mat_type].append(bcz)
 
                     print(
-                        f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → u_z = {val} at region '{region_name}'"
+                        f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'"
                     )
 
                 # --. Clamp_r --..
