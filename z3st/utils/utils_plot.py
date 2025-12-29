@@ -699,9 +699,10 @@ def plotter_sigma_temperature_slab(
     plt.rcParams.update({"font.size": 11})
     _, ax1 = plt.subplots(figsize=(7, 5))
 
-    ax1.plot(
-        x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (analytical)"
-    )
+    if sigma_ref is not None:
+        ax1.plot(
+            x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (analytical)"
+        )
     ax1.scatter(
         x_s,
         sigma / 1e6,
