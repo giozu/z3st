@@ -12,7 +12,10 @@ Lx = 0.100; // (m)
 Ly = 2.000; // (m)
 Lz = 2.000; // (m)
 
-n = 30; // Number of divisions per Lx/y/z
+n = 15;  // Number of divisions per Ly/z
+nx = 26; // Number of divisions per Lz
+
+prog_x = 1.1; // FE progression
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
@@ -31,8 +34,8 @@ Line Loop(10) = {1, 2, 3, 4};
 Plane Surface(10) = {10};
 
 // Transfinite structure
-Transfinite Curve {1} = n Using Progression 1.1;
-Transfinite Curve {-3} = n Using Progression 1.1;
+Transfinite Curve {1} = nx Using Progression prog_x;
+Transfinite Curve {-3} = nx Using Progression prog_x;
 Transfinite Curve {2, 4} = n Using Progression 1;
 Transfinite Surface {10};
 Recombine Surface {10};
