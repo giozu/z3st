@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 2_thin_cylindrical_thermal_shield
+Z3ST case: 2_thin_cylindrical_shell
 
 non-regression script
 ---------------------
