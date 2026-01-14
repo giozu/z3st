@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 3_thin_linear_thermal_shield_adiabatic
+Z3ST case: 3_thin_slab_adiabatic
 
 non-regression script
 ---------------------
@@ -32,7 +32,7 @@ k, E, nu, alpha = (
 )  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
 Ti = 490.0  # K (boundary temperature)
 q0, mu = 2.00e6, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
-y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.1  # m, m, m (plane selection and tolerance)
+y_target, z_target, mask_tol = Ly / 2, Lz / 2, Lx / 1.5  # m, m, m (plane selection and tolerance)
 
 TOLERANCE = 3e-3  # - (relative tolerance for non-regression tests)
 
@@ -68,6 +68,8 @@ x_s, sigma_yy = average_section(
 # Analytical results
 T_ref = analytic_T(x_T)
 sigma_th_ref = sigma_th(x_T, T_ref, c=1.0)
+
+# Numerical, maximum thermal stress
 max_sigma_T = np.max(sigma_yy)
 
 # Plot
