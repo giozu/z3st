@@ -8,7 +8,7 @@
 
 SetFactory("Built-in");
 
-Lx = 0.150;
+Lx = 0.100;
 Ly = 2.000;
 Lz = 2.000; // (m)
 
