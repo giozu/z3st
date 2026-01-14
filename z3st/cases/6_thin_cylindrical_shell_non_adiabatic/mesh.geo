@@ -12,9 +12,11 @@ Ri = 2.000;  // Inner radius (m)
 Ro = 2.100;  // Outer radius (m)
 Lz = 10.00;  // Height
 
-num_points_radial = 20;      // Number of points in the radial direction
-num_points_circ_qtr = 15;    // Number of points on each 90-degree arc
+num_points_radial = 26;      // Number of points in the radial direction
+num_points_circ_qtr = 12;    // Number of points on each 90-degree arc
 num_layers_height = 30;      // Number of element layers along the height
+
+prog_r = 1.1; // FE radial progression
 
 // 2D slice
 Point(1) = {0, 0, 0};        // Center point
@@ -62,7 +64,7 @@ Plane Surface(3) = {3};
 Plane Surface(4) = {4};
 
 // 2D Structured Mesh
-Transfinite Line {9, 10, 11, 12} = num_points_radial Using Progression 1.1;
+Transfinite Line {9, 10, 11, 12} = num_points_radial Using Progression prog_r;
 
 // Circumferential arcs (inner and outer):
 Transfinite Line {1, 2, 3, 4, 5, 6, 7, 8} = num_points_circ_qtr;

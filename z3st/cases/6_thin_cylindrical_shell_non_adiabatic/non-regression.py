@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 4_thin_cylindrical_thermal_shield_adiabatic
+Z3ST case: 6_thin_cylindrical_shell_non_adiabatic
 
 non-regression script
 ---------------------
-Steady-state 1D axisymmetric cylindrical wall (Dirichlet-Neumann).
+Steady-state 1D axisymmetric cylindrical wall (Dirichlet-Dirichlet).
 
 """
 
@@ -23,7 +23,7 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.0, 2.1, 10  # m          inner and outer radius
+Ri, Ro, Lz = 1.5, 1.65, 10  # m          inner and outer radius
 Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
 k, E, nu, alpha = (
     48.1,
@@ -31,7 +31,7 @@ k, E, nu, alpha = (
     0.3,
     1.7e-5,
 )  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti = 490.0  # K          inner and outer surface temperature
+Ti, To = 490.0, 500.0  # K          inner and outer surface temperature
 q0, mu = 2.0e6, 24.0  # W/m³, 1/m  heat source, attenuation
 Lx = Ro - Ri  # m          wall thickness
 slenderness = Ri / Lx  # -          slenderness ratio
@@ -42,9 +42,11 @@ TOLERANCE = 7.0e-1  # -          tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_T(x):
-    """Analytical temperature profile (slab), Dirichlet-Neumann."""
+    """Analytical temperature profile (slab), Dirichlet-Dirichlet."""
     x = x - Ri
-    return Ti + q0 / (k * mu**2) * (1 - np.exp(-mu * x) - mu * x * np.exp(-mu * Lx))
+    term1 = Ti + (To - Ti) * (x / Lx)
+    term2 = (q0 / (mu**2 * k)) * ((x / Lx) * (np.exp(-mu * Lx) - 1) - (np.exp(-mu * x) - 1))
+    return term1 + term2
 
 
 def sigma_th(r, T_num, c=1.0):
@@ -69,7 +71,7 @@ def analytical_thermal_stress(r):
         Radial, hoop, and axial stresses (Pa)
     """
 
-    r_star = np.linspace(Ri, Ro, 500)
+    r_star = np.linspace(Ri, Ro, 2000)
     T_star = analytic_T(r_star)
 
     # Pre-compute global integral ∫_{Ri}^{Ro} T(r*) r* dr*
@@ -118,7 +120,7 @@ r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_stresses(
     tol=z_tol,
     case_dir=CASE_DIR,
     stress_field_hint="Stress",
-    data_source="point",
+    data_source="cell",
     average=True,
     decimals=6,
 )
@@ -129,10 +131,10 @@ T_ref = analytic_T(r_T)
 sigma_rr_ana_th, sigma_tt_ana_th, sigma_zz_ana_th = analytical_thermal_stress(r_s)
 max_sigma_T = np.max(sigma_tt)
 
-# map
+# map (adiabatic, conservative reference)
 print(f"Ro/Ri = {Ro/Ri:.2f}")
 print(f"mu*Ri = {mu*Ri:.2f}")
-sigma_T_map = 0.52
+sigma_T_map = 0.7
 sigma_th_max_map = alpha * E * q0 / ((1 - nu) * k * mu**2) * sigma_T_map
 print(f"From attenuation map, maximum thermal stress = {sigma_th_max_map/1e6:.2f} MPa")
 
@@ -147,7 +149,7 @@ plotter_sigma_temperature_cylinder(
     label_T="Temperature (analytical, slab)",
     max_sigma_T=max_sigma_T,
     Ti=Ti,
-    To=None,
+    To=To,
     Ri=Ri,
     CASE_DIR=CASE_DIR,
     slenderness=slenderness,
