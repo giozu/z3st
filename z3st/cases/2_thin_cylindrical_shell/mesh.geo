@@ -10,11 +10,11 @@ SetFactory("OpenCASCADE");
 
 Ri = 2.000;  // Inner radius (m)
 Ro = 2.100;  // Outer radius (m)
-Lz = 1.00;  // Height
+Lz = 20.00;  // Height
 
 // Divisions
-nx = 31;     // 30 radial elements
-ny = 61;     // 60 axial elements
+nx = 41;     // 40 radial elements
+ny = 91;     // 90 axial elements
 
 Point(1) = {Ri, 0, 0};
 Point(2) = {Ro, 0, 0};

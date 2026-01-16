@@ -62,9 +62,9 @@ sigma_zz_ana_M = Pi * Ri / (2 * t)
 list_fields(VTU_FILE)
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-# Numerical results
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
+# Numerical results
 # Stress
 x_S, z_S, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
 mask = np.abs(z_S - z_target) < z_tol
