@@ -24,11 +24,11 @@ from z3st.models.thermal_model import ThermalModel
 class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel):
     """Main Z3ST simulation driver."""
 
-    def __init__(self, input_file, mesh_file, geometry, gdim=3):
+    def __init__(self, input_file, mesh_file, geometry):
 
         self.current_step = 0
 
-        mesh, cell_tags, facet_tags = load_mesh(mesh_file, comm=MPI.COMM_WORLD, gdim=gdim)
+        mesh, cell_tags, facet_tags = load_mesh(mesh_file, comm=MPI.COMM_WORLD)
 
         self.mgr = MeshManager(mesh, cell_tags, facet_tags, geometry=geometry)
         self.mgr.summary()

@@ -31,7 +31,7 @@ mechanical:
   linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-5
-  mechanical_regime: 3D   # 3D | plane_stress
+  mechanical_regime: axisymmetric   # 3D | plane_stress | axisymmetric
   convergence: rel_norm # rel_norm | norm
 
 thermal:

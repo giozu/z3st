@@ -86,7 +86,13 @@ class Solver:
             raise ValueError(f"Unknown solver_type '{solver_type}'.")
 
     def _build_measures(self):
-        """Build dx_tags and ds_tags measures once per solve."""
+        """Build dx_tags and ds_tags measures with axisymmetric support."""
+        x = ufl.SpatialCoordinate(self.mesh)
+        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+        
+        # Integration weight: 1.0 for 3D, 2*pi*r for axisymmetric 2D problems
+        # Note: x[0] is the radial coordinate 'r'
+        self.w_axi = 2.0 * ufl.pi * x[0] if regime == "axisymmetric" else 1.0
 
         self.dx_tags = {
             tag: ufl.Measure(
@@ -111,6 +117,8 @@ class Solver:
         a_t = 0
         L_t = 0
 
+        w = self.w_axi
+
         # Volume integrals
         for label, material in self.materials.items():
             tag = self.label_map[label]
@@ -119,8 +127,8 @@ class Solver:
             print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
             k = material["k"]
 
-            a_t += k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
-            L_t += self.q_third * v_t * dx
+            a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
+            L_t += w * self.q_third * v_t * dx
 
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
             q_vals = self.q_third.x.array[dofs]
@@ -134,7 +142,7 @@ class Solver:
             for bc_info in self.neumann_thermal[label]:
                 print(f"  Applying flux on subdomain id = {bc_info['id']}")
                 ds_neumann = self.ds_tags[bc_info["id"]]
-                L_t += (-bc_info["value"]) * v_t * ds_neumann
+                L_t += w * (-bc_info["value"]) * v_t * ds_neumann
 
         # Gap (Robin)
         h_gap = self.set_gap_conductance(T_new)
@@ -151,8 +159,8 @@ class Solver:
                 dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
                 T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
 
-                a_t += h_gap * u_t * v_t * ds_interface
-                L_t += h_gap * T_other * v_t * ds_interface
+                a_t += w * h_gap * u_t * v_t * ds_interface
+                L_t += w * h_gap * T_other * v_t * ds_interface
 
                 print(
                     f"  [INFO] Gap Robin BC between '{label}' "
@@ -247,6 +255,7 @@ class Solver:
         u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
         a_m, L_m = 0, 0
         F_m = 0
+        w = self.w_axi
 
         for label, material in self.materials.items():
             tag = self.label_map[label]
@@ -255,17 +264,23 @@ class Solver:
 
             rho = dolfinx.default_scalar_type(material["rho"])
             g = dolfinx.default_scalar_type(self.g)
-            body_force = dolfinx.fem.Constant(self.mesh, (0, 0, -rho * g))
+            
+            if self.mech_cfg.get("mechanical_regime") == "axisymmetric":
+                # 2D: (F_r, F_z)
+                body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
+            else:
+                # 3D: (F_x, F_y, F_z)
+                body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
 
             if self.mech_cfg["solver"] == "linear":
                 sigma = self.sigma_mech(u_m, material)
-                a_m += ufl.inner(sigma, self.epsilon(v_m)) * dx
-                L_m += ufl.dot(body_force, v_m) * dx
+                a_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
+                L_m += w * ufl.dot(body_force, v_m) * dx
                 if self.on.get("thermal", False):
-                    L_m -= ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+                    L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
             else:
                 sigma = self.sigma_mech(u_new, material)
-                F_m += ufl.inner(sigma, self.epsilon(v_m)) * dx - ufl.dot(body_force, v_m) * dx
+                F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - ufl.dot(body_force, v_m) * dx
 
         # Traction BCs
         for label in self.materials:
@@ -273,9 +288,9 @@ class Solver:
                 print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
                 ds = self.ds_tags[bc_info["id"]]
                 if self.mech_cfg["solver"] == "linear":
-                    L_m += ufl.dot(bc_info["value"], v_m) * ds
+                    L_m += w * ufl.dot(bc_info["value"], v_m) * ds
                 else:
-                    F_m -= ufl.dot(bc_info["value"], v_m) * ds
+                    F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
 
         # Clamp_r penalties
         for label in self.materials:
@@ -290,13 +305,13 @@ class Solver:
                 n = ufl.FacetNormal(self.mesh)
 
                 if self.mech_cfg["solver"] == "linear":
-                    a_m += alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
+                    a_m += w * alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
                     if abs(val) > 1e-16:
-                        L_m += alpha * val * ufl.dot(v_m, n) * ds
+                        L_m += w * alpha * val * ufl.dot(v_m, n) * ds
                 else:
-                    F_m += alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
+                    F_m += w * alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
                     if abs(val) > 1e-16:
-                        F_m -= alpha * val * ufl.dot(v_m, n) * ds
+                        F_m -= w * alpha * val * ufl.dot(v_m, n) * ds
 
         # Solve
         if self.mech_cfg["solver"] == "linear":
