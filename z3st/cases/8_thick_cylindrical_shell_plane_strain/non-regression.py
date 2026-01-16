@@ -27,12 +27,12 @@ OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 # Geometry and material
 Ri, Ro, Lz = 0.02, 0.03, 0.5        # m          inner and outer radius, height
 Pi, Po = 1.0e6, 0.0                 # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3                 # Pa, -
+E, nu = 2.0e11, 0.3                 # Pa, -      elastic moduli
 t = Ro - Ri                         # m          wall thickness
 slenderness = Ri / t                # -          slenderness ratio
 z_target, z_tol = Lz/2, Lz/10       # m          z-plane for data extraction
 
-TOLERANCE = 5.0e-2                  # -          tolerance for non-regression
+TOLERANCE = 7.0e-3                  # -          tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 # Lamé solutions
@@ -65,30 +65,28 @@ list_fields(VTU_FILE)
 # Numerical results
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
-x_S, y_S, z_S, S_all = extract_stress(VTU_FILE, component="all", prefer="cells")
-mask = np.abs(y_S - z_target) < z_tol
+# Stress
+x_S, z_S, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+mask = np.abs(z_S - z_target) < z_tol
 sort_idx = np.argsort(x_S[mask])
 
 r_s = x_S[mask][sort_idx]
-sigma_rr = S_all["xx"][mask][sort_idx]
-sigma_tt = S_all["yy"][mask][sort_idx]
-sigma_zz = S_all["zz"][mask][sort_idx]
 
-print(f"[INFO] Profilo cilindrico estratto: {len(r_s)} nodi trovati nel piano target.")
+sigma_rr = S_all[mask, 0][sort_idx]
+sigma_tt = S_all[mask, 4][sort_idx]
+sigma_zz = S_all[mask, 8][sort_idx]
 
-# 2. Estrazione Strain (Cercando il campo 'Strain (cells)')
-x_E, y_E, z_E, E_all = extract_field(VTU_FILE, field_name="Strain (cells)")
-mask_e = np.abs(y_E - z_target) < z_tol
-sort_idx_e = np.argsort(x_E[mask_e])
+# Strain
+x_E, z_E, _, E_all = extract_field(VTU_FILE, field_name="Strain (cells)")
+mask = np.abs(z_E - z_target) < z_tol
+sort_idx = np.argsort(x_E[mask])
 
-# E_all è un array (N, 9). Mappiamo le componenti diagonali:
-# Indice 0 -> rr, Indice 4 -> tt, Indice 8 -> zz
-strain_rr = E_all[mask_e, 0][sort_idx_e]
-strain_tt = E_all[mask_e, 4][sort_idx_e]
-strain_zz = E_all[mask_e, 8][sort_idx_e]
+epsilon_rr = E_all[mask, 0][sort_idx]
+epsilon_tt = E_all[mask, 4][sort_idx]
+epsilon_zz = E_all[mask, 8][sort_idx]
 
 # Analytical results
-# lamé
+# Lamé
 sigma_tt_ana_L = A + B / r_s**2
 sigma_zz_ana_L = sigma_zz_ana_L * np.ones_like(r_s)
 sigma_rr_ana_L = A - B / r_s**2
@@ -97,7 +95,7 @@ strain_tt_ana_L = strain_tt_ref(r_s)
 strain_zz_ana_L = np.zeros_like(r_s)  # plane strain
 strain_rr_ana_L = strain_rr_ref(r_s)
 
-# average stress
+# Average stress
 sigma_zz_ana_M = sigma_zz_ana_M * np.ones_like(r_s)
 
 sigma_tt_avg = 2 / (Ro**2 - Ri**2) * np.trapezoid(sigma_tt * r_s, r_s)
@@ -129,9 +127,9 @@ plotter_sigma_cylinder(
 
 plotter_strain_cylinder(
     r_s=r_s,
-    strain_rr=strain_rr,
-    strain_tt=strain_tt,
-    strain_zz=strain_zz,
+    strain_rr=epsilon_rr,
+    strain_tt=epsilon_tt,
+    strain_zz=epsilon_zz,
     Ri=Ri,
     Ro=Ro,
     Pi=Pi,
@@ -147,13 +145,13 @@ plotter_strain_cylinder(
 err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_L) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_L**2))
 err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_L) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_L**2))
 err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_L) ** 2)) / np.sqrt(np.mean(sigma_zz_ana_L**2))
-err_eps_rr = np.sqrt(np.mean((strain_rr - strain_rr_ana_L) ** 2)) / np.sqrt(
+err_eps_rr = np.sqrt(np.mean((epsilon_rr - strain_rr_ana_L) ** 2)) / np.sqrt(
     np.mean(strain_rr_ana_L**2)
 )
-err_eps_tt = np.sqrt(np.mean((strain_tt - strain_tt_ana_L) ** 2)) / np.sqrt(
+err_eps_tt = np.sqrt(np.mean((epsilon_tt - strain_tt_ana_L) ** 2)) / np.sqrt(
     np.mean(strain_tt_ana_L**2)
 )
-err_eps_zz = np.sqrt(np.mean((strain_zz - strain_zz_ana_L) ** 2))
+err_eps_zz = np.sqrt(np.mean((epsilon_zz - strain_zz_ana_L) ** 2))
 
 errors = {
     "L2_error_sigma_rr": {
