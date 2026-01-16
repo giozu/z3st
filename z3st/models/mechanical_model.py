@@ -144,7 +144,13 @@ class MechanicalModel:
                     traction_const = dolfinx.fem.Constant(
                         self.mesh, PETSc.ScalarType(initial_traction)
                     )
-                    traction_expr = traction_const * self.normal
+
+                    if self.mech_cfg.get("mechanical_regime") == "axisymmetric":
+                        # Only r and z components
+                        n_2d = ufl.as_vector([self.normal[0], self.normal[1]])
+                        traction_expr = traction_const * n_2d
+                    else:
+                        traction_expr = traction_const * self.normal
 
                     self.traction[mat_type].append(
                         {
@@ -303,8 +309,43 @@ class MechanicalModel:
             raise ValueError(f"Formato displacement non valido: shape {displacement.shape}")
 
     def epsilon(self, u):
-        # return 0.5 * (ufl.grad(u) + ufl.transpose(ufl.grad(u)))
-        return ufl.sym(ufl.grad(u))
+            """
+            Compute the infinitesimal strain tensor epsilon.
+            
+            This function supports:
+            1. 'axisymmetric': A 2D formulation where the problem is symmetric with respect to the azimutal coordinate.
+            The x-coordinate is treated as the radial component (r), 
+            and the y-coordinate as the axial component (z).
+            2. '3d' or other: Standard symmetric gradient of the displacement vector.
+
+            Parameters:
+                u: Displacement field.
+
+            Returns:
+                The 3x3 strain tensor.
+            """
+            regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+
+            if regime == "axisymmetric":
+                # u[0] is radial displacement (u_r), u[1] is axial displacement (u_z)
+                r = ufl.SpatialCoordinate(self.mesh)[0]
+                
+                # Components of the strain tensor in cylindrical coordinates (r, theta, z)
+                eps_rr = u[0].dx(0)                  # Normal radial strain
+                eps_tt = u[0] / r                    # Hoop strain (tangential)
+                eps_zz = u[1].dx(1)                  # Normal axial strain
+                eps_rz = 0.5 * (u[0].dx(1) + u[1].dx(0)) # Shear strain in the r-z plane
+                
+                # Return the 3x3 tensor.
+                return ufl.as_tensor([
+                    [eps_rr, 0.0,    eps_rz],
+                    [0.0,    eps_tt, 0.0],
+                    [eps_rz, 0.0,    eps_zz]
+                ])
+            
+            else:
+                # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)
+                return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
         """
@@ -418,10 +459,13 @@ class MechanicalModel:
                 )
 
             # Default isotropic Lamé
-            elif self.mech_cfg["mechanical_regime"].lower() == "3d":
+            elif self.mech_cfg["mechanical_regime"].lower() == "3d" or self.mech_cfg["mechanical_regime"].lower() == "axisymmetric":
                 eps = self.epsilon(u)
+
+                dim = eps.ufl_shape[0]
+                
                 sigma = (
-                    material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.tdim)
+                    material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim)
                     + 2.0 * material["G"] * eps
                 )
 
@@ -444,11 +488,14 @@ class MechanicalModel:
             dolfinx.fem.Tensor: The thermal stress tensor.
 
         """
+        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+        dim = 3 if regime in ["axisymmetric", "3d"] else self.tdim
+
         return (
             -(3 * material["lmbda"] + 2 * material["G"])
             * material["alpha"]
             * (T - material["T_ref"])
-            * ufl.Identity(self.tdim)
+            * ufl.Identity(dim)
         )
 
     def elastic_energy_density(self, u, material):

@@ -12,7 +12,7 @@ mechanical:
   steel:
   - type: Dirichlet
     region: bottom
-    displacement: [0.0, 0.0, 0.0]   # (m)
+    displacement: [0.0, 0.0]   # (m)
 
   - type: Neumann
     region: inner_radius
