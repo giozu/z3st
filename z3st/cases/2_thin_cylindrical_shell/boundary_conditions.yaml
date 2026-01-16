@@ -10,8 +10,5 @@ thermal:
 
 mechanical:
   steel:
-  # Blocking only the vertical movement of the bottom.
-  # Free radial expansion
-  # Free axial expansion
   - type: Clamp_y
     region: bottom

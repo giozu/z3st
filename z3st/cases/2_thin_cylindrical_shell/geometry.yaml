@@ -3,7 +3,7 @@ geometry_type: cyl
 
 Ri: 2.000 # inner radius (m)
 Ro: 2.100 # outer radius (m)
-Lz: 1.00 # height (m)
+Lz: 20.00 # height (m)
 
 labels:
   inner_radius: 1
