@@ -1,67 +1,33 @@
-Z3ST non-regression summary - Fri Dec 12 15:06:25 CET 2025
+Z3ST non-regression summary - Thu Jan 15 10:38:09 CET 2026
 --.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
 
-Case: 00_example
+Case: 1_thin_slab
   Run             : OK
   Non-regression  : PASS
-  Time            : 32s
+  Time            : 48s
 
-Case: 3_thin_thermal_slab_adiabatic
+Case: 2_thin_cylindrical_shell
   Run             : OK
   Non-regression  : PASS
-  Time            : 140s
+  Time            : 745s
 
-Case: 7_box_heated
+Case: 3_thin_slab_adiabatic
   Run             : OK
-  Non-regression  : PASS
-  Time            : 22s
+  Non-regression  : (no non-regression.json found)
+  Time            : 30s
 
-Case: 8_cylindrical_shell_thick_plane_strain
+Case: 4_thin_cylindrical_shell_adiabatic
   Run             : OK
   Non-regression  : PASS
-  Time            : 196s
+  Time            : 1977s
 
-Case: 9_cylindrical_shell_thick_GPS
+Case: 5_thin_slab_non_adiabatic
   Run             : OK
-  Non-regression  : PASS
-  Time            : 104s
+  Non-regression  : (no non-regression.json found)
+  Time            : 9s
 
-Case: 10_cylindrical_shell_thick_plane_stress
+Case: 6_thin_cylindrical_shell_non_adiabatic
   Run             : OK
-  Non-regression  : PASS
-  Time            : 450s
+  Non-regression  : (no non-regression.json found)
+  Time            : 10s
 
-Case: 12_thick_cylindrical_thermal_shield
-  Run             : OK
-  Non-regression  : PASS
-  Time            : 294s
-
-Case: 13_thick_thermal_slab_adiabatic
-  Run             : OK
-  Non-regression  : PASS
-  Time            : 105s
-
-Case: 14_thick_cylindrical_thermal_shield_adiabatic
-  Run             : OK
-  Non-regression  : PASS
-  Time            : 469s
-
-Case: 20_coaxial_cylinders
-  Run             : OK
-  Non-regression  : PASS
-  Time            : 78s
-
-Case: 21_plate_non_linear
-  Run             : OK
-  Non-regression  : PASS
-  Time            : 39s
-
-Case: 22_thin_thermal_slab_with_neumann
-  Run             : OK
-  Non-regression  : PASS
-  Time            : 93s
-
-Case: 27_stress_strain_curve
-  Run             : OK
-  Non-regression  : PASS
-  Time            : 510s

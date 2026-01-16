@@ -23,7 +23,7 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.0, 2.1, 10  # m          inner and outer radius
+Ri, Ro, Lz = 2.0, 2.1, 1  # m          inner and outer radius
 Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
 k, E, nu, alpha = (
     48.1,
@@ -34,7 +34,7 @@ k, E, nu, alpha = (
 Ti, To = 490.0, 480.0  # K          inner and outer surface temperature
 Lx = Ro - Ri  # m          wall thickness
 slenderness = Ri / Lx  # -          slenderness ratio
-z_target, z_tol = Lz / 2, Lz / 10  # m          z-plane for data extraction
+z_target, z_tol = Lz / 2, Lz / 50  # m          z-plane for data extraction
 
 TOLERANCE = 7.0e-1  # -          tolerance for non-regression
 
@@ -107,19 +107,33 @@ list_fields(VTU_FILE)
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
-x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
-r_T, T = average_section_radial(x_T, y_T, z_T, T_all, z_target=z_target, tol=z_tol, decimals=6)
+x_T, z_T, _, T_all = extract_temperature(VTU_FILE)
 
-r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_stresses(
-    filename=VTU_FILE,
-    z_fixed=z_target,
-    tol=z_tol,
-    case_dir=CASE_DIR,
-    stress_field_hint="Stress",
-    data_source="auto",
-    average=True,
-    decimals=6,
-)
+r_raw = x_T 
+z_raw = z_T
+mask = np.abs(z_raw - z_target) < z_tol
+
+r_T = r_raw[mask]
+T   = T_all[mask]
+
+sort_idx = np.argsort(r_T)
+r_T = r_T[sort_idx]
+T   = T[sort_idx]
+
+print(f"[INFO] Estratti {len(r_T)} punti per il profilo radiale.")
+
+x_S, y_S, z_S, S_all = extract_stress(VTU_FILE, component="all", prefer="cells")
+
+mask = np.abs(y_S - z_target) < z_tol
+sort_idx = np.argsort(x_S[mask])
+
+
+r_s = x_S[mask][sort_idx]
+sigma_rr = S_all["xx"][mask][sort_idx]
+sigma_tt = S_all["yy"][mask][sort_idx]
+sigma_zz = S_all["zz"][mask][sort_idx]
+
+print(f"[INFO] Profilo cilindrico estratto: {len(r_s)} nodi trovati nel piano target.")
 
 # Analytical results
 sigma_th_ref = sigma_th(r_T, T, c=1.0)
@@ -130,7 +144,7 @@ max_sigma_T = np.max(sigma_tt)
 # Plot
 plotter_sigma_temperature_cylinder(
     r_s=r_s,
-    # sigma_rr=sigma_rr,
+    sigma_rr=sigma_rr,
     sigma_tt=sigma_tt,
     sigma_zz=sigma_zz,
     r_T=r_T,
@@ -142,7 +156,7 @@ plotter_sigma_temperature_cylinder(
     Ri=Ri,
     CASE_DIR=CASE_DIR,
     slenderness=slenderness,
-    # sigma_rr_ref=sigma_rr_ana_th,
+    sigma_rr_ref=sigma_rr_ana_th,
     sigma_zz_ref=sigma_zz_ana_th,
     sigma_tt_ref=sigma_tt_ana_th,
 )
