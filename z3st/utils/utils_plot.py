@@ -910,9 +910,9 @@ def plotter_strain_cylinder(
 
     plt.figure(figsize=(7, 5))
 
-    plt.scatter(r_s, strain_rr, s=12, c="orange", label=r"Numerical $\epsilon_{rr}$")
-    plt.scatter(r_s, strain_tt, s=12, c="red", label=r"Numerical $\epsilon_{\theta\theta}$")
-    plt.scatter(r_s, strain_zz, s=12, c="gold", label=r"Numerical $\epsilon_{zz}$")
+    plt.scatter(r_s, strain_rr, s=12, c="blue", label=r"Numerical $\epsilon_{rr}$")
+    plt.scatter(r_s, strain_tt, s=12, c="green", label=r"Numerical $\epsilon_{\theta\theta}$")
+    plt.scatter(r_s, strain_zz, s=12, c="purple", label=r"Numerical $\epsilon_{zz}$")
 
     if strain_rr_ana_L is not None:
         plt.plot(

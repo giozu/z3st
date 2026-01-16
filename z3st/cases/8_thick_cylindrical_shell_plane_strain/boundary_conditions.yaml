@@ -6,9 +6,8 @@ thermal:
 
 mechanical:
   steel:
-  - type: Dirichlet
+  - type: Clamp_y
     region: bottom
-    displacement: [0.0, 0.0]   # (m)
 
   - type: Clamp_y
     region: top
