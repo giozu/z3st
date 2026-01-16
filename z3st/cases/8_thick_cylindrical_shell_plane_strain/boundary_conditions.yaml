@@ -8,9 +8,9 @@ mechanical:
   steel:
   - type: Dirichlet
     region: bottom
-    displacement: [0.0, 0.0, 0.0]   # (m)
+    displacement: [0.0, 0.0]   # (m)
 
-  - type: Clamp_z
+  - type: Clamp_y
     region: top
 
   - type: Neumann

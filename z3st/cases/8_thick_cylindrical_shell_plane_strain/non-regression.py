@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 8_cylindrical_shell_thick_plane_strain
+Z3ST case: 8_thick_cylindrical_shell_plane_strain
 
 non-regression script
 ---------------------
@@ -25,14 +25,14 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.5  # m          inner and outer radius, height
-Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3  # Pa, -
-t = Ro - Ri  # m          wall thickness
-slenderness = Ri / t  # -          slenderness ratio
-z_target, z_tol = 0.25, 0.1  # m          z-plane for data extraction
+Ri, Ro, Lz = 0.02, 0.03, 0.5        # m          inner and outer radius, height
+Pi, Po = 1.0e6, 0.0                 # Pa         internal and external pressure
+E, nu = 2.0e11, 0.3                 # Pa, -
+t = Ro - Ri                         # m          wall thickness
+slenderness = Ri / t                # -          slenderness ratio
+z_target, z_tol = Lz/2, Lz/10       # m          z-plane for data extraction
 
-TOLERANCE = 5.0e-2  # -          tolerance for non-regression
+TOLERANCE = 5.0e-2                  # -          tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 # Lamé solutions
@@ -65,27 +65,27 @@ list_fields(VTU_FILE)
 # Numerical results
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
-r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_stresses(
-    filename=VTU_FILE,
-    z_fixed=z_target,
-    tol=z_tol,
-    case_dir=CASE_DIR,
-    stress_field_hint="Stress",
-    data_source="auto",
-    average=True,
-    decimals=6,
-)
+x_S, y_S, z_S, S_all = extract_stress(VTU_FILE, component="all", prefer="cells")
+mask = np.abs(y_S - z_target) < z_tol
+sort_idx = np.argsort(x_S[mask])
 
-r_s, strain_rr, strain_tt, strain_zz = extract_cylindrical_stresses(
-    filename=VTU_FILE,
-    z_fixed=z_target,
-    tol=z_tol,
-    case_dir=CASE_DIR,
-    stress_field_hint="Strain",
-    data_source="auto",
-    average=True,
-    decimals=6,
-)
+r_s = x_S[mask][sort_idx]
+sigma_rr = S_all["xx"][mask][sort_idx]
+sigma_tt = S_all["yy"][mask][sort_idx]
+sigma_zz = S_all["zz"][mask][sort_idx]
+
+print(f"[INFO] Profilo cilindrico estratto: {len(r_s)} nodi trovati nel piano target.")
+
+# 2. Estrazione Strain (Cercando il campo 'Strain (cells)')
+x_E, y_E, z_E, E_all = extract_field(VTU_FILE, field_name="Strain (cells)")
+mask_e = np.abs(y_E - z_target) < z_tol
+sort_idx_e = np.argsort(x_E[mask_e])
+
+# E_all è un array (N, 9). Mappiamo le componenti diagonali:
+# Indice 0 -> rr, Indice 4 -> tt, Indice 8 -> zz
+strain_rr = E_all[mask_e, 0][sort_idx_e]
+strain_tt = E_all[mask_e, 4][sort_idx_e]
+strain_zz = E_all[mask_e, 8][sort_idx_e]
 
 # Analytical results
 # lamé
