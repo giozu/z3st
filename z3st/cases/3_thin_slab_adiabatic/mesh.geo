@@ -12,10 +12,10 @@ Lx = 0.100; // (m)
 Ly = 2.000; // (m)
 Lz = 2.000; // (m)
 
-n = 15;  // Number of divisions per Ly/z
-nx = 26; // Number of divisions per Lz
+n = 21;  // Number of divisions per Ly/z
+nx = 31; // Number of divisions per Lx
 
-prog_x = 1.1; // FE progression
+prog_x = 1.0; // FE progression
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};

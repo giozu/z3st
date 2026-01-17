@@ -136,13 +136,6 @@ sigma_rr_ana_th, sigma_tt_ana_th, sigma_zz_ana_th = analytical_thermal_stress(r_
 # Numerical maximum thermal stress (hoop)
 max_sigma_T = np.max(sigma_tt)
 
-# map
-print(f"Ro/Ri = {Ro/Ri:.2f}")
-print(f"mu*Ri = {mu*Ri:.2f}")
-sigma_T_map = 0.7
-sigma_th_max_map = alpha * E * q0 / ((1 - nu) * k * mu**2) * sigma_T_map
-print(f"From attenuation map, maximum thermal stress = {sigma_th_max_map/1e6:.2f} MPa")
-
 # Plot
 Pa_to_MPa = 1e-6
 
@@ -179,7 +172,6 @@ plt.tight_layout()
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
-plt.show()
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_th) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_th**2))
