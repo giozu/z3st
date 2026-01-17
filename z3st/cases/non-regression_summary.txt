@@ -1,4 +1,4 @@
-Z3ST non-regression summary - Sat Jan 17 14:58:31 CET 2026
+Z3ST non-regression summary - Sat Jan 17 17:21:41 CET 2026
 --.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
 
 Case: 00_example
@@ -14,30 +14,30 @@ Case: 1_thin_slab
 Case: 2_thin_cylindrical_shell_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 27s
+  Time            : 19s
 
 Case: 3_thin_slab_adiabatic
   Run             : OK
-  Non-regression  : (no non-regression.json found)
-  Time            : 27s
+  Non-regression  : PASS
+  Time            : 70s
 
 Case: 4_thin_cylindrical_shell_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 31s
+  Time            : 28s
 
 Case: 5_thin_slab_non_adiabatic
   Run             : OK
-  Non-regression  : (no non-regression.json found)
-  Time            : 6s
+  Non-regression  : PASS
+  Time            : 143s
 
 Case: 6_thin_cylindrical_shell_non_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 24s
+  Time            : 22s
 
 Case: 8_thick_cylindrical_shell_plane_strain_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 8s
+  Time            : 11s
 

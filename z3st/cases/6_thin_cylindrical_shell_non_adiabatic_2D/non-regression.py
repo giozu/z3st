@@ -183,7 +183,6 @@ plt.tight_layout()
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
-plt.show()
 
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
