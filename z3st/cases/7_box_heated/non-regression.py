@@ -9,11 +9,10 @@ non-regression script
 """
 
 import os
-
 import numpy as np
+import matplotlib.pyplot as plt
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import plotter_sigma_temperature_slab
 from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
@@ -22,29 +21,22 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly, Lz = 0.2, 0.2, 0.2  # m (geometry dimensions)
+Lx, Ly, Lz = 0.2, 0.2, 0.2          # m (geometry dimensions)
 k, E, nu, alpha = (
     50.0,
     2.0e11,
     0.30,
     1.0e-5,
-)  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 500.0, 500.0  # K (boundary temperatures)
+)                                   # W/m-K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
+Ti, To = 500.0, 500.0               # K (boundary temperatures)
 y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.01  # m, m, m (plane selection and tolerance)
 
-TOLERANCE = 1e-3  # - (relative tolerance for non-regression tests)
+TOLERANCE = 1e-3                    # - (relative tolerance for non-regression tests)
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_T(x):
     return Ti * np.ones_like(x)
-
-
-# --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
-if not os.path.exists(VTU_FILE):
-    raise FileNotFoundError(f"[ERROR] VTU file not found at {VTU_FILE}")
-
-print(f"[INFO] Using VTU file: {VTU_FILE}")
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
@@ -54,39 +46,67 @@ print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
-x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
-x_T, T = average_section(x_T, y_T, z_T, T_all, y_target, z_target, mask_tol, label="T", decimals=5)
+# Temperature
+x_T, y_T, z_T, T_all = extract_field(VTU_FILE, field_name="Temperature")
+mask = (np.abs(y_T - y_target) < mask_tol) & (np.abs(z_T - z_target) < mask_tol)
+sort_idx = np.argsort(x_T[mask])
 
-x_s, y_s, z_s, s = extract_stress(VTU_FILE, component="all", return_coords=True, prefer="cells")
-_, sigma_xx = average_section(
-    x_s, y_s, z_s, s["xx"], y_target, z_target, mask_tol, decimals=5, label="sigma_xx"
-)
-_, sigma_yy = average_section(
-    x_s, y_s, z_s, s["yy"], y_target, z_target, mask_tol, decimals=5, label="sigma_yy"
-)
-x_s, sigma_zz = average_section(
-    x_s, y_s, z_s, s["zz"], y_target, z_target, mask_tol, decimals=5, label="sigma_zz"
-)
+x_T = x_T[mask][sort_idx]
+T = T_all[mask][sort_idx]
+
+# Stress
+x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+mask = (np.abs(y_S - y_target) < mask_tol) & (np.abs(z_S - z_target) < mask_tol)
+sort_idx = np.argsort(x_S[mask])
+
+x_s = x_S[mask][sort_idx]
+
+sigma_xx = S_all[mask, 0][sort_idx]
+sigma_xy = S_all[mask, 1][sort_idx]
+sigma_xz = S_all[mask, 2][sort_idx]
+sigma_yy = S_all[mask, 4][sort_idx]
+sigma_zz = S_all[mask, 8][sort_idx]
 
 # Analytical results
 T_ref = analytic_T(x_T)
-sigma_th_ref = -alpha * E * np.abs(To - 300) / (1 - 2 * nu) * np.ones_like(x_T)
+sigma_th_ref = -alpha * E * np.abs(To - 300) / (1 - 2 * nu) * np.ones_like(x_s)
 max_sigma_T = -alpha * E * np.abs(To - 300) / (1 - 2 * nu)
 
 # Plot
-plotter_sigma_temperature_slab(
-    x_s=x_s,
-    sigma=sigma_yy,
-    x_s_ref=x_T,
-    sigma_ref=sigma_th_ref,
-    T_ref=T_ref,
-    x_T=x_T,
-    T=T,
-    max_sigma_T=max_sigma_T,
-    Ti=Ti,
-    To=To,
-    CASE_DIR=CASE_DIR,
-)
+Pa_to_MPa = 1e-6
+
+plt.figure(figsize=(10, 7))
+
+# Stress
+ax1 = plt.gca()
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, 'b.', label=r'Num. $\sigma_{xx}$', alpha=0.5)
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, 'g.', label=r'Num. $\sigma_{yy}$', alpha=0.5)
+ax1.plot(x_s, sigma_zz * Pa_to_MPa, 'c.', label=r'Num. $\sigma_{zz}$', alpha=0.5)
+ax1.plot(x_s, sigma_th_ref * Pa_to_MPa, 'm--', label=r'Ana. $\sigma_{th}$', linewidth=2.0, alpha=0.7)
+
+ax1.set_xlabel("x (m)", fontsize=12)
+ax1.set_ylabel("Stress (MPa)", fontsize=12)
+ax1.grid(True, linestyle='--', alpha=0.7)
+ax1.set_ylim(-1001, -999)
+
+# Temperature
+ax2 = ax1.twinx()
+ax2.plot(x_T, T, 'ks', label='Num. Temperature', markersize=3, alpha=0.4)
+ax2.plot(x_T, T_ref, 'k--', label='Ana. Temperature', linewidth=1.0, alpha=0.8)
+ax2.set_ylabel("Temperature (K)", fontsize=12)
+ax2.set_ylim(499, 501)
+
+# Legend
+lines, labels = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines + lines2, labels + labels2, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=3)
+
+plt.title(rf"$T_i$ = {Ti:.0f}°C, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
+plt.tight_layout()
+
+plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
+plt.savefig(plot_path, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path}")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
@@ -96,6 +116,10 @@ RelL2_T = float(L2_T / np.mean(np.abs(T_ref)))
 Tmax_num = float(np.max(T))
 Tmax_ref = float(np.max(T_ref))
 RelErr_Tmax = abs(Tmax_num - Tmax_ref) / Tmax_ref
+
+err_sigma = np.sqrt(np.mean((sigma_yy - sigma_th_ref) ** 2)) / np.max(np.abs(sigma_th_ref))
+err_shear_xy = np.max(np.abs(sigma_xy)) / np.max(np.abs(sigma_th_ref))
+err_shear_xz = np.max(np.abs(sigma_xz)) / np.max(np.abs(sigma_th_ref))
 
 errors = {
     "L2_error_T": {
@@ -115,6 +139,24 @@ errors = {
         "reference": Tmax_ref,
         "abs_error": abs(Tmax_num - Tmax_ref),
         "rel_error": RelErr_Tmax,
+    },
+    "L2_error_sigma_yy": {
+        "numerical": float(err_sigma),
+        "reference": 0.0,
+        "abs_error": float(err_sigma),
+        "rel_error": float(err_sigma),
+    },
+    "L2_error_sigma_xy": {
+        "numerical": float(err_shear_xy),
+        "reference": 0.0,
+        "abs_error": float(err_shear_xy),
+        "rel_error": float(err_shear_xy),
+    },
+    "L2_error_sigma_xz": {
+        "numerical": float(err_shear_xz),
+        "reference": 0.0,
+        "abs_error": float(err_shear_xz),
+        "rel_error": float(err_shear_xz),
     },
 }
 
