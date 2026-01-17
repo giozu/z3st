@@ -22,19 +22,19 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly = 0.1, 1.0               # m (geometry dimensions)
+Lx, Ly = 0.1, 1.0                   # m (geometry dimensions)
 k, E, nu, alpha = (
     48.1,
     1.77e11,
     0.3,
     1.7e-5,
-)                               # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 490.0, 480.0           # K
-q0, mu = 0.0, 24                # W/m3, 1/m
+)                                   # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
+Ti, To = 490.0, 480.0               # K
+q0, mu = 0.0, 24                    # W/m3, 1/m
 
-y_target, mask_tol = Ly/2, 0.05  # m, m, m (extraction line and tolerance)
+y_target, mask_tol = Ly/2, 0.05     # m, m, m (extraction line and tolerance)
 
-TOLERANCE = 2e-3                # - (relative tolerance for non-regression tests)
+TOLERANCE = 2e-3                    # - (relative tolerance for non-regression tests)
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -75,12 +75,11 @@ x_s = x_S[mask][sort_idx]
 
 sigma_xx = S_all[mask, 0][sort_idx]
 sigma_yy = S_all[mask, 4][sort_idx]
-sigma_zz = S_all[mask, 8][sort_idx]
 
 # Analytical results
 T_ref = analytic_T(x_T)
 sigma_th_ref = sigma_th(x_s, analytic_T(x_s), c=1.0)
-max_sigma_T = np.max(sigma_xx)
+max_sigma_T = np.max(sigma_yy)
 
 # Plot
 Pa_to_MPa = 1e-6
@@ -114,7 +113,6 @@ plt.tight_layout()
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
-plt.show()
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
@@ -124,6 +122,8 @@ RelL2_T = float(L2_T / np.mean(np.abs(T_ref)))
 Tmax_num = float(np.max(T))
 Tmax_ref = float(np.max(T_ref))
 RelErr_Tmax = abs(Tmax_num - Tmax_ref) / Tmax_ref
+
+err_sigma = np.sqrt(np.mean((sigma_yy - sigma_th_ref) ** 2)) / np.max(np.abs(sigma_th_ref))
 
 errors = {
     "L2_error_T": {
@@ -143,6 +143,12 @@ errors = {
         "reference": Tmax_ref,
         "abs_error": abs(Tmax_num - Tmax_ref),
         "rel_error": RelErr_Tmax,
+    },
+    "L2_error_sigma_yy": {
+        "numerical": float(err_sigma),
+        "reference": 0.0,
+        "abs_error": float(err_sigma),
+        "rel_error": float(err_sigma),
     },
 }
 
