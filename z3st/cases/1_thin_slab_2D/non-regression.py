@@ -14,7 +14,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import plotter_sigma_temperature_slab
 from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
@@ -90,6 +89,7 @@ plt.figure(figsize=(10, 7))
 
 # Stress
 ax1 = plt.gca()
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, 'bo', label=r'Num. $\sigma_{xx}$', markersize=4, alpha=0.6)
 ax1.plot(x_s, sigma_yy * Pa_to_MPa, 'ro', label=r'Num. $\sigma_{yy}$', markersize=4, alpha=0.6)
 ax1.plot(x_s, sigma_th_ref * Pa_to_MPa, 'm--', label=r'Approx. $\sigma_{th}$ (ref)', linewidth=2.0, alpha=0.7)
 
@@ -114,6 +114,7 @@ plt.tight_layout()
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
+plt.show()
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))

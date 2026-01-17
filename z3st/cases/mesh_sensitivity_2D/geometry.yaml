@@ -1,13 +1,12 @@
-name: cylindrical_shell
-geometry_type: cyl
+name: box
+geometry_type: rect
 
-Ri: 2.000 # inner radius (m)
-Ro: 2.100 # outer radius (m)
-Lz: 20.00 # height (m)
+Lx: 0.10 # box length in x (m)
+Ly: 1.00 # box length in y (m)
 
 labels:
-  inner_radius: 1
-  outer_radius: 2
-  bottom: 3
-  top: 4
-  steel: 10
+  ymin: 1
+  xmax: 2
+  ymax: 3
+  xmin: 4
+  steel: 5
