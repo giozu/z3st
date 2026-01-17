@@ -1,0 +1,10 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+echo "Mesh sensitivity script..."
+
+python3 mesh_sensitivity.py
+
+python3 ../../utils/plot_convergence.py
+
+echo "Done. Check output/convergence_study.png"

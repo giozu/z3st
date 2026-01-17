@@ -145,8 +145,8 @@ class MechanicalModel:
                         self.mesh, PETSc.ScalarType(initial_traction)
                     )
 
-                    if self.mech_cfg.get("mechanical_regime") == "axisymmetric":
-                        # Only r and z components
+                    if self.mech_cfg.get("mechanical_regime").lower() == "axisymmetric" or self.mech_cfg.get("mechanical_regime").lower() == "2D":
+                        # 2D: only r and z components or x and y
                         n_2d = ufl.as_vector([self.normal[0], self.normal[1]])
                         traction_expr = traction_const * n_2d
                     else:
@@ -316,7 +316,8 @@ class MechanicalModel:
             1. 'axisymmetric': A 2D formulation where the problem is symmetric with respect to the azimutal coordinate.
             The x-coordinate is treated as the radial component (r), 
             and the y-coordinate as the axial component (z).
-            2. '3d' or other: Standard symmetric gradient of the displacement vector.
+            3. '2D': x-y 2D formulation
+            3. '3D' or other: Standard symmetric gradient of the displacement vector.
 
             Parameters:
                 u: Displacement field.
@@ -341,6 +342,19 @@ class MechanicalModel:
                     [eps_rr, 0.0,    eps_rz],
                     [0.0,    eps_tt, 0.0],
                     [eps_rz, 0.0,    eps_zz]
+                ])
+
+            elif regime == "2d":
+                # u[0] = x-displacement
+                # u[1] = y-displacement
+                eps_xx = u[0].dx(0)
+                eps_yy = u[1].dx(1)
+                eps_xy = 0.5 * (u[0].dx(1) + u[1].dx(0))
+                
+                return ufl.as_tensor([
+                    [eps_xx, eps_xy, 0.0],
+                    [eps_xy, eps_yy, 0.0],
+                    [0.0,    0.0,    0.0]
                 ])
             
             else:
@@ -385,6 +399,7 @@ class MechanicalModel:
 
         # mode = material["constitutive_mode"]
         mode = material.get("constitutive_mode", "lame")
+        regime = self.mech_cfg["mechanical_regime"].lower()
 
         if mode == "voigt":
             # small strain
@@ -439,7 +454,7 @@ class MechanicalModel:
 
         else:
             # Plane-stress reduction (x–y plane)
-            if self.mech_cfg["mechanical_regime"].lower() in ["plane_stress", "2d"]:
+            if regime == "plane_stress":
 
                 eps = self.epsilon(u)
                 sigma = (
@@ -459,11 +474,9 @@ class MechanicalModel:
                 )
 
             # Default isotropic Lamé
-            elif self.mech_cfg["mechanical_regime"].lower() == "3d" or self.mech_cfg["mechanical_regime"].lower() == "axisymmetric":
+            elif regime == "3d" or regime == "axisymmetric" or regime == "2d":
                 eps = self.epsilon(u)
-
                 dim = eps.ufl_shape[0]
-                
                 sigma = (
                     material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim)
                     + 2.0 * material["G"] * eps
@@ -489,7 +502,7 @@ class MechanicalModel:
 
         """
         regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
-        dim = 3 if regime in ["axisymmetric", "3d"] else self.tdim
+        dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
 
         return (
             -(3 * material["lmbda"] + 2 * material["G"])

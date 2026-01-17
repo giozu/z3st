@@ -86,13 +86,21 @@ class Solver:
             raise ValueError(f"Unknown solver_type '{solver_type}'.")
 
     def _build_measures(self):
-        """Build dx_tags and ds_tags measures with axisymmetric support."""
+        """Build dx_tags and ds_tags measures with axisymmetric and cartesian support."""
         x = ufl.SpatialCoordinate(self.mesh)
         regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
         
-        # Integration weight: 1.0 for 3D, 2*pi*r for axisymmetric 2D problems
-        # Note: x[0] is the radial coordinate 'r'
-        self.w_axi = 2.0 * ufl.pi * x[0] if regime == "axisymmetric" else 1.0
+        # Integration weight logic:
+        # - Axisymmetric: 2*pi*r
+        # - Cartesian 2D: 1.0 (Area)
+        # - 3D: 1.0 (Volume)
+        
+        if regime == "axisymmetric":
+            self.weight = 2.0 * ufl.pi * x[0]
+        elif regime == "2d":
+            self.weight = 1.0
+        else:
+            self.weight = 1.0
 
         self.dx_tags = {
             tag: ufl.Measure(
@@ -117,7 +125,7 @@ class Solver:
         a_t = 0
         L_t = 0
 
-        w = self.w_axi
+        w = self.weight
 
         # Volume integrals
         for label, material in self.materials.items():
@@ -255,7 +263,7 @@ class Solver:
         u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
         a_m, L_m = 0, 0
         F_m = 0
-        w = self.w_axi
+        w = self.weight
 
         for label, material in self.materials.items():
             tag = self.label_map[label]
@@ -265,8 +273,9 @@ class Solver:
             rho = dolfinx.default_scalar_type(material["rho"])
             g = dolfinx.default_scalar_type(self.g)
             
-            if self.mech_cfg.get("mechanical_regime") == "axisymmetric":
-                # 2D: (F_r, F_z)
+            regime = self.mech_cfg.get("mechanical_regime").lower()
+            if regime == "axisymmetric" or regime == '2d':
+                # 2D: (F_r, F_z) or (F_x, F_y)
                 body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
             else:
                 # 3D: (F_x, F_y, F_z)

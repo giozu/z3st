@@ -202,10 +202,11 @@ class Spine(Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, G
                     elif self.geometry_type in ["cyl", "cylinder"]:
                         import scipy.special as sp
 
-                        if self.mech_cfg["mechanical_regime"].lower() == "axisymmetric":
+                        if self.mech_cfg["mechanical_regime"].lower() == "axisymmetric" or self.mech_cfg["mechanical_regime"].lower() == "2d":
                             # 2D axisymmetric case, x[0] = r, x[1] = z
+                            # 2D axisymmetric case, x[0] = x, x[1] = y
                             radius = x[0]
-                        elif self.mech_cfg["mechanical_regime"].lower() == "3D":
+                        elif self.mech_cfg["mechanical_regime"].lower() == "3d":
                             # 3D cartesian case, x[0] = x, x[1] = y
                             radius = np.sqrt(x[0] ** 2 + x[1] ** 2)
 

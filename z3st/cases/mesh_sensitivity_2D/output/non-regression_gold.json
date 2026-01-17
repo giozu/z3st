@@ -1,0 +1,41 @@
+{
+    "results": {
+        "L2_error_T": {
+            "numerical": 0.10761953547685647,
+            "reference": 0.0,
+            "abs_error": 0.10761953547685647,
+            "rel_error": 0.0002123856808446252,
+            "status": "PASS"
+        },
+        "Linf_error_T": {
+            "numerical": 0.16671459344297546,
+            "reference": 0.0,
+            "abs_error": 0.16671459344297546,
+            "rel_error": 0.0003290089692194932,
+            "status": "PASS"
+        },
+        "T_max": {
+            "numerical": 512.531220787826,
+            "reference": 512.6721533550017,
+            "abs_error": 0.14093256717569602,
+            "rel_error": 0.0002748980342572005,
+            "status": "PASS"
+        },
+        "L2_error_sigma_tt": {
+            "numerical": 0.010192920764334775,
+            "reference": 0.0,
+            "abs_error": 0.010192920764334775,
+            "rel_error": 0.010192920764334775,
+            "status": "PASS"
+        },
+        "L2_error_sigma_zz": {
+            "numerical": 0.010262273456543793,
+            "reference": 0.0,
+            "abs_error": 0.010262273456543793,
+            "rel_error": 0.010262273456543793,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.7,
+    "summary": "PASS"
+}
