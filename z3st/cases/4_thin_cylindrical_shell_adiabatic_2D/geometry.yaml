@@ -3,11 +3,11 @@ geometry_type: cyl
 
 Ri: 2.000 # inner radius (m)
 Ro: 2.100 # outer radius (m)
-Lz: 10.00 # height (m)
+Lz: 20.00 # height (m)
 
 labels:
-  bottom: 1
-  top: 2
-  inner_radius: 3
-  outer_radius: 4
-  steel: 5
+  inner_radius: 1
+  outer_radius: 2
+  bottom: 3
+  top: 4
+  steel: 10
