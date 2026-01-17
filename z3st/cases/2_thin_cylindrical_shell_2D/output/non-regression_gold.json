@@ -22,24 +22,24 @@
             "status": "PASS"
         },
         "L2_error_sigma_rr": {
-            "numerical": 0.017648724243753293,
+            "numerical": 0.01764628221698099,
             "reference": 0.0,
-            "abs_error": 0.017648724243753293,
-            "rel_error": 0.017648724243753293,
+            "abs_error": 0.01764628221698099,
+            "rel_error": 0.01764628221698099,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.0004301845084643261,
+            "numerical": 0.0004308496163187944,
             "reference": 0.0,
-            "abs_error": 0.0004301845084643261,
-            "rel_error": 0.0004301845084643261,
+            "abs_error": 0.0004308496163187944,
+            "rel_error": 0.0004308496163187944,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 8.47770871736242e-05,
+            "numerical": 8.346971964945454e-05,
             "reference": 0.0,
-            "abs_error": 8.47770871736242e-05,
-            "rel_error": 8.47770871736242e-05,
+            "abs_error": 8.346971964945454e-05,
+            "rel_error": 8.346971964945454e-05,
             "status": "PASS"
         }
     },

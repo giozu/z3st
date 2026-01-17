@@ -11,11 +11,11 @@ SUMMARY_FILE="${ROOT_DIR}/non-regression_summary.txt"
 
 CASES=(
     "00_example"
-    "1_thin_slab"
+    "1_thin_slab_2D"
     "2_thin_cylindrical_shell_2D"
-    "3_thin_slab_adiabatic"
+    "3_thin_slab_adiabatic_2D"
     "4_thin_cylindrical_shell_adiabatic_2D"
-    "5_thin_slab_non_adiabatic"
+    "5_thin_slab_non_adiabatic_2D"
     "6_thin_cylindrical_shell_non_adiabatic_2D"
     "8_thick_cylindrical_shell_plane_strain_2D"
 )
