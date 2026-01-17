@@ -1,51 +1,51 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a 2D section of a thin-walled cylinder, structured mesh
+//  Gmsh GEO for a box Lx Ly with a structured mesh
 //
 //  Author: Giovanni Zullo
 //
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-SetFactory("OpenCASCADE");
+SetFactory("Built-in");
 
-Ri = 2.000;  // Inner radius (m)
-Ro = 2.100;  // Outer radius (m)
-Lz = 20.00;  // Height
+Lx = 0.100;
+Ly = 1.000;
 
-// Divisions
-nx = 41;     // 40 radial elements
-ny = 91;     // 90 axial elements
+nx = 81;
+ny = 41;
 
-Point(1) = {Ri, 0, 0};
-Point(2) = {Ro, 0, 0};
-Point(3) = {Ro, Lz, 0};
-Point(4) = {Ri, Lz, 0};
+// Corner points
+Point(1) = {0,  0, 0, 1.0};
+Point(2) = {Lx, 0, 0, 1.0};
+Point(3) = {Lx, Ly, 0, 1.0};
+Point(4) = {0,  Ly, 0, 1.0};
 
-Line(1) = {1, 2}; // Bottom (z=0)
-Line(2) = {2, 3}; // Outer radius (r=Ro)
-Line(3) = {3, 4}; // Top (z=H)
-Line(4) = {4, 1}; // Inner radius (r=Ri)
+// Edges
+Line(1) = {1, 2}; // Bottom (y-min)
+Line(2) = {2, 3}; // Right  (x-max)
+Line(3) = {3, 4}; // Top    (y-max)
+Line(4) = {4, 1}; // Left   (x-min)
 
-Curve Loop(1) = {1, 2, 3, 4};
+// Surface
+Line Loop(1) = {1, 2, 3, 4};
 Plane Surface(1) = {1};
 
-// Structured
-Transfinite Line {1, 3} = nx;
-Transfinite Line {2, 4} = ny;
+// --- Transfinite structure for quad mesh ---
+Transfinite Curve {1, 3} = nx Using Progression 1;
+Transfinite Curve {2, 4} = ny Using Progression 1;
+
 Transfinite Surface {1};
 Recombine Surface {1};
 
-// Hex
-Recombine Surface{1};
+// --- Physical Groups for Z3ST ---
+Physical Curve("ymin") = {1};
+Physical Curve("xmax") = {2};
+Physical Curve("ymax") = {3};
+Physical Curve("xmin") = {4};
+Physical Surface("steel") = {1};
 
-Physical Surface("steel", 10) = {1};
-Physical Curve("inner_radius", 1) = {4};
-Physical Curve("outer_radius", 2) = {2};
-Physical Curve("bottom", 3) = {1};
-Physical Curve("top", 4) = {3};
-
-// Generate the 2D mesh
+// Meshing settings
 Mesh 2;
 
-// Save the mesh
+// Save mesh file
 Save "mesh.msh";

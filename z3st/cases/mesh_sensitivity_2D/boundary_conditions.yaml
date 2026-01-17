@@ -1,14 +1,18 @@
 thermal:
   steel:
   - type: Dirichlet
-    region: inner_radius
+    region: xmin
     temperature: 490.0   # (K)
 
   - type: Dirichlet
-    region: outer_radius
-    temperature: 500.0   # (K)
+    region: xmax
+    temperature: 480.0   # (K)
 
 mechanical:
   steel:
+  - type: Clamp_x
+    region: xmin
+    
   - type: Clamp_y
-    region: bottom
+    region: ymin
+
