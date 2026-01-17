@@ -10,12 +10,14 @@ ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SUMMARY_FILE="${ROOT_DIR}/non-regression_summary.txt"
 
 CASES=(
+    "00_example"
     "1_thin_slab"
-    "2_thin_cylindrical_shell"
+    "2_thin_cylindrical_shell_2D"
     "3_thin_slab_adiabatic"
-    "4_thin_cylindrical_shell_adiabatic"
+    "4_thin_cylindrical_shell_adiabatic_2D"
     "5_thin_slab_non_adiabatic"
-    "6_thin_cylindrical_shell_non_adiabatic"
+    "6_thin_cylindrical_shell_non_adiabatic_2D"
+    "8_thick_cylindrical_shell_plane_strain_2D"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"

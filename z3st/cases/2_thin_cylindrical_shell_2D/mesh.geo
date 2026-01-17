@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a 3D thick-walled cylinder, radial-structured mesh
+//  Gmsh GEO for a 2D section of a thin-walled cylinder, structured mesh
 //
 //  Author: Giovanni Zullo
 //

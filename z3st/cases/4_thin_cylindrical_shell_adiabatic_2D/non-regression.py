@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 2_thin_cylindrical_shell
+Z3ST case: 4_thin_cylindrical_shell_adiabatic_2D
 
 non-regression script
 ---------------------
-Steady-state 1D axisymmetric cylindrical wall (Dirichlet-Dirichlet).
+Steady-state axisymmetric cylindrical shell (Dirichlet-Neumann).
 
 """
 
@@ -23,7 +23,7 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.0, 2.1, 20           # m          inner and outer radius
+Ri, Ro, Lz = 2.0, 2.1, 10           # m          inner and outer radius, height
 Pi, Po = 0.0, 0.0                   # Pa         internal and external pressure
 k, E, nu, alpha = (
     48.1,
@@ -31,20 +31,22 @@ k, E, nu, alpha = (
     0.3,
     1.7e-5,
 )                                   # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 490.0, 480.0               # K          inner and outer surface temperature
+Ti = 490.0                          # K          inner and outer surface temperature
+q0, mu = 2.0e6, 24.0                # W/m³, 1/m  heat source, attenuation
 Lx = Ro - Ri                        # m          wall thickness
 slenderness = Ri / Lx               # -          slenderness ratio
 
 h_z = Lz / 90                       # element height
 z_target, z_tol = Lz / 2 + h_z / 2, h_z * 0.6  # m          z-plane for data extraction
 
-TOLERANCE = 2.0e-2                  # -          tolerance for non-regression
+TOLERANCE = 1.0e-2                  # -          tolerance for non-regression
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
-def analytic_T(r):
-    """Analytical temperature profile for a cylindrical shell with imposed T_inner and T_outer"""
-    return Ti + (To - Ti) * np.log(r / Ri) / np.log(Ro / Ri)
+def analytic_T(x):
+    """Analytical temperature profile (slab), Dirichlet-Neumann."""
+    x = x - Ri
+    return Ti + q0 / (k * mu**2) * (1 - np.exp(-mu * x) - mu * x * np.exp(-mu * Lx))
 
 
 def sigma_th(r, T_num, c=1.0):
@@ -132,7 +134,16 @@ sigma_zz = S_all[mask, 8][sort_idx]
 sigma_th_ref = sigma_th(r_T, T, c=1.0)
 T_ref = analytic_T(r_T)
 sigma_rr_ana_th, sigma_tt_ana_th, sigma_zz_ana_th = analytical_thermal_stress(r_s)
+
+# Numerical maximum thermal stress (hoop)
 max_sigma_T = np.max(sigma_tt)
+
+# map
+print(f"Ro/Ri = {Ro/Ri:.2f}")
+print(f"mu*Ri = {mu*Ri:.2f}")
+sigma_T_map = 0.7
+sigma_th_max_map = alpha * E * q0 / ((1 - nu) * k * mu**2) * sigma_T_map
+print(f"From attenuation map, maximum thermal stress = {sigma_th_max_map/1e6:.2f} MPa")
 
 # Plot
 Pa_to_MPa = 1e-6
@@ -164,7 +175,7 @@ lines, labels = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
 ax1.legend(lines + lines2, labels + labels2, loc='best', frameon=True)
 
-plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $T_o$ = {To-273.15:.0f}°C,  $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
+plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
 plt.tight_layout()
 
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
@@ -174,7 +185,6 @@ plt.show()
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_th) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_th**2))
-err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_th) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_th**2))
 err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_th) ** 2)) / np.sqrt(np.mean(sigma_zz_ana_th**2))
 
 L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
@@ -203,12 +213,6 @@ errors = {
         "reference": Tmax_ref,
         "abs_error": abs(Tmax_num - Tmax_ref),
         "rel_error": RelErr_Tmax,
-    },
-    "L2_error_sigma_rr": {
-        "numerical": float(err_rr),
-        "reference": 0.0,
-        "abs_error": float(err_rr),
-        "rel_error": float(err_rr),
     },
     "L2_error_sigma_tt": {
         "numerical": float(err_tt),
