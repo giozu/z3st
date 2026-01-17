@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 5_thin_slab_non_adiabatic
+Z3ST case: 5_thin_slab_non_adiabatic_2D
 
 non-regression script
 ---------------------
-Steady-state slab (Dirichlet-Dirichlet).
+Steady-state 2D slab (Dirichlet-Dirichlet).
 
 """
 
@@ -14,7 +14,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import plotter_sigma_temperature_slab
 from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
@@ -23,7 +22,7 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly, Lz = 0.100, 2.0, 2.0            # m (geometry dimensions)
+Lx, Ly = 0.100, 1.0                     # m (geometry dimensions)
 k, E, nu, alpha = (
     48.1,
     1.77e11,
@@ -32,9 +31,9 @@ k, E, nu, alpha = (
 )                                       # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
 Ti, To = 490.0, 500.0                   # K
 q0, mu = 2.0e6, 24.0                    # W/m³, 1/m (volumetric heat source, attenuation coefficient)
-y_target, z_target, mask_tol = Ly / 2, Lz / 2, Lx / 2.0  # m, m, m (extraction line and tolerance)
+y_target, mask_tol = Ly/2, 0.02         # m, m, m (extraction line and tolerance)
 
-TOLERANCE = 2e-2  # - (relative tolerance for non-regression tests)
+TOLERANCE = 2e-2                        # - (relative tolerance for non-regression tests)
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -56,12 +55,11 @@ list_fields(VTU_FILE)
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
-print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
 # Temperature
 x_T, y_T, z_T, T_all = extract_field(VTU_FILE, field_name="Temperature")
-mask = (np.abs(y_T - y_target) < mask_tol) & (np.abs(z_T - z_target) < mask_tol)
+mask = np.abs(y_T - y_target) < mask_tol
 sort_idx = np.argsort(x_T[mask])
 
 x_T = x_T[mask][sort_idx]
@@ -69,18 +67,18 @@ T = T_all[mask][sort_idx]
 
 # Stress
 x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
-mask = (np.abs(y_S - y_target) < mask_tol) & (np.abs(z_S - z_target) < mask_tol)
+mask = np.abs(y_S - y_target) < mask_tol
 sort_idx = np.argsort(x_S[mask])
 
 x_s = x_S[mask][sort_idx]
 
 sigma_xx = S_all[mask, 0][sort_idx]
 sigma_yy = S_all[mask, 4][sort_idx]
-sigma_zz = S_all[mask, 8][sort_idx]
 
 # Analytical results
 sigma_th_ref = sigma_th(x_s, analytic_T(x_s), c=1.0)
 T_ref = analytic_T(x_T)
+max_sigma_T = np.max(sigma_yy)
 
 # Numerical maximum thermal stress
 max_sigma_T = np.max(sigma_yy)
@@ -117,6 +115,7 @@ plt.tight_layout()
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
+plt.show()
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))

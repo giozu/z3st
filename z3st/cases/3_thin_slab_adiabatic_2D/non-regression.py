@@ -77,7 +77,7 @@ sigma_yy = S_all[mask, 4][sort_idx]
 # Analytical results
 sigma_th_ref = sigma_th(x_s, analytic_T(x_s), c=1.0)
 T_ref = analytic_T(x_T)
-max_sigma_T = np.max(sigma_xx)
+max_sigma_T = np.max(sigma_yy)
 
 # Numerical maximum thermal stress
 max_sigma_T = np.max(sigma_yy)
