@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 1_thin_slab
+Z3ST case: 1_thin_slab_2D
 
 non-regression script
 ---------------------
-Steady-state 1D slab (Dirichlet-Dirichlet).
+Steady-state 2D slab (Dirichlet-Dirichlet).
 
 """
 
 import os
-
 import numpy as np
+import matplotlib.pyplot as plt
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_plot import plotter_sigma_temperature_slab
@@ -23,18 +23,19 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly, Lz = 0.100, 2.0, 2.0  # m (geometry dimensions)
+Lx, Ly = 0.1, 1.0               # m (geometry dimensions)
 k, E, nu, alpha = (
     48.1,
     1.77e11,
     0.3,
     1.7e-5,
-)  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 490.0, 480.0  # K (boundary temperatures)
-q0, mu = 0.0, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
-y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.1  # m, m, m (plane selection and tolerance)
+)                               # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
+Ti, To = 490.0, 480.0           # K
+q0, mu = 0.0, 24                # W/m3, 1/m
 
-TOLERANCE = 2e-3  # - (relative tolerance for non-regression tests)
+y_target, mask_tol = Ly/2, 0.05  # m, m, m (extraction line and tolerance)
+
+TOLERANCE = 2e-3                # - (relative tolerance for non-regression tests)
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -56,36 +57,63 @@ list_fields(VTU_FILE)
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
-print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
-x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
-x_T, T = average_section(x_T, y_T, z_T, T_all, y_target, z_target, mask_tol, label="T", decimals=5)
+# Temperature
+x_T, y_T, z_T, T_all = extract_field(VTU_FILE, field_name="Temperature")
+mask = np.abs(y_T - y_target) < mask_tol
+sort_idx = np.argsort(x_T[mask])
 
-x_s, y_s, z_s, s = extract_stress(VTU_FILE, component="all", return_coords=True, prefer="cells")
-x_s, sigma_yy = average_section(
-    x_s, y_s, z_s, s["yy"], y_target, z_target, mask_tol, decimals=5, label="sigma_yy"
-)
+x_T = x_T[mask][sort_idx]
+T = T_all[mask][sort_idx]
+
+# Stress
+x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+mask = np.abs(y_S - y_target) < mask_tol
+sort_idx = np.argsort(x_S[mask])
+
+x_s = x_S[mask][sort_idx]
+
+sigma_xx = S_all[mask, 0][sort_idx]
+sigma_yy = S_all[mask, 4][sort_idx]
+sigma_zz = S_all[mask, 8][sort_idx]
 
 # Analytical results
 T_ref = analytic_T(x_T)
-sigma_th_ref = sigma_th(x_T, T_ref, c=1.0)
-max_sigma_T = np.max(sigma_yy)
+sigma_th_ref = sigma_th(x_s, analytic_T(x_s), c=1.0)
+max_sigma_T = np.max(sigma_xx)
 
 # Plot
-plotter_sigma_temperature_slab(
-    x_s=x_s,
-    sigma=sigma_yy,
-    x_s_ref=x_T,
-    sigma_ref=sigma_th_ref,
-    T_ref=T_ref,
-    x_T=x_T,
-    T=T,
-    max_sigma_T=max_sigma_T,
-    Ti=Ti,
-    To=To,
-    CASE_DIR=CASE_DIR,
-)
+Pa_to_MPa = 1e-6
+
+plt.figure(figsize=(10, 7))
+
+# Stress
+ax1 = plt.gca()
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, 'ro', label=r'Num. $\sigma_{yy}$', markersize=4, alpha=0.6)
+ax1.plot(x_s, sigma_th_ref * Pa_to_MPa, 'm--', label=r'Approx. $\sigma_{th}$ (ref)', linewidth=2.0, alpha=0.7)
+
+ax1.set_xlabel("x (m)", fontsize=12)
+ax1.set_ylabel("Stress (MPa)", fontsize=12)
+ax1.grid(True, linestyle='--', alpha=0.7)
+
+# Temperature
+ax2 = ax1.twinx()
+ax2.plot(x_T, T, 'ks', label='Num. Temperature', markersize=3, alpha=0.4)
+ax2.plot(x_T, T_ref, 'k--', label='Ana. Temperature', linewidth=1.0, alpha=0.8)
+ax2.set_ylabel("Temperature (K)", fontsize=12)
+
+# Legend
+lines, labels = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines + lines2, labels + labels2, loc='best', frameon=True)
+
+plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $T_o$ = {To-273.15:.0f}°C,  $Tmax$ = {np.max(T)-273.15:.0f}°C, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
+plt.tight_layout()
+
+plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
+plt.savefig(plot_path, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path}")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
