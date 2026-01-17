@@ -11,6 +11,4 @@ mechanical:
 
   - type: Clamp_y
     region: ymin
-
-  - type: Clamp_z
-    region: zmin
+  
