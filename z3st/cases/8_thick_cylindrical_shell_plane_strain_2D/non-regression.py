@@ -12,8 +12,8 @@ Reference is the Lamé solution.
 """
 
 import os
-
 import numpy as np
+import matplotlib.pyplot as plt
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_plot import plotter_sigma_cylinder, plotter_strain_cylinder
@@ -102,44 +102,55 @@ sigma_tt_avg = 2 / (Ro**2 - Ri**2) * np.trapezoid(sigma_tt * r_s, r_s)
 sigma_zz_avg = 2 / (Ro**2 - Ri**2) * np.trapezoid(sigma_zz * r_s, r_s)
 sigma_rr_avg = 2 / (Ro**2 - Ri**2) * np.trapezoid(sigma_rr * r_s, r_s)
 
-# Plot
-plotter_sigma_cylinder(
-    r_s=r_s,
-    sigma_rr=sigma_rr,
-    sigma_tt=sigma_tt,
-    sigma_zz=sigma_zz,
-    Ri=Ri,
-    Ro=Ro,
-    Pi=Pi,
-    Po=Po,
-    CASE_DIR=CASE_DIR,
-    slenderness=slenderness,
-    sigma_tt_ana_L=sigma_tt_ana_L,
-    sigma_zz_ana_L=sigma_zz_ana_L,
-    sigma_rr_ana_L=sigma_rr_ana_L,
-    # sigma_tt_ana_M=sigma_tt_ana_M,
-    # sigma_zz_ana_M=sigma_zz_ana_M,
-    # sigma_rr_ana_M=sigma_rr_ana_M,
-    # sigma_tt_avg=sigma_tt_avg,
-    # sigma_zz_avg=sigma_zz_avg,
-    # sigma_rr_avg=sigma_rr_avg,
-)
 
-plotter_strain_cylinder(
-    r_s=r_s,
-    strain_rr=epsilon_rr,
-    strain_tt=epsilon_tt,
-    strain_zz=epsilon_zz,
-    Ri=Ri,
-    Ro=Ro,
-    Pi=Pi,
-    Po=Po,
-    CASE_DIR=CASE_DIR,
-    slenderness=slenderness,
-    strain_rr_ana_L=strain_rr_ana_L,
-    strain_tt_ana_L=strain_tt_ana_L,
-    strain_zz_ana_L=strain_zz_ana_L,
-)
+# Plot
+Pa_to_MPa = 1e-6
+
+plt.figure(figsize=(10, 7))
+
+# Stress
+ax1 = plt.gca()
+ax1.plot(r_s, sigma_rr * Pa_to_MPa, 'ro', label=r'Num. $\sigma_{rr}$ (Radial)', markersize=4, alpha=0.6)
+ax1.plot(r_s, sigma_rr_ana_L * Pa_to_MPa, 'r-', label=r'Ana. $\sigma_{rr}$ (Radial)', linewidth=1.5)
+ax1.plot(r_s, sigma_tt * Pa_to_MPa, 'go', label=r'Num. $\sigma_{\theta\theta}$ (Hoop)', markersize=4, alpha=0.6)
+ax1.plot(r_s, sigma_tt_ana_L * Pa_to_MPa, 'g-', label=r'Ana. $\sigma_{\theta\theta}$ (Hoop)', linewidth=1.5)
+ax1.plot(r_s, sigma_zz * Pa_to_MPa, 'bo', label=r'Num. $\sigma_{zz}$ (Axial)', markersize=4, alpha=0.6)
+ax1.plot(r_s, sigma_zz_ana_L * Pa_to_MPa, 'b-', label=r'Ana. $\sigma_{zz}$ (Axial)', linewidth=1.5)
+
+ax1.set_xlabel("Radius (m)", fontsize=12)
+ax1.set_ylabel("Stress (MPa)", fontsize=12)
+ax1.grid(True, linestyle='--', alpha=0.7)
+
+plt.legend()
+plt.tight_layout()
+
+plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
+plt.savefig(plot_path, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path}")
+
+
+# Plot
+plt.figure(figsize=(10, 7))
+
+# Strain
+ax1 = plt.gca()
+ax1.plot(r_s, epsilon_rr, 'ro', label=r'Num. $\varepsilon_{rr}$ (Radial)', markersize=4, alpha=0.6)
+ax1.plot(r_s, strain_rr_ana_L, 'r-', label=r'Ana. $\varepsilon_{rr}$ (Radial)', linewidth=1.5)
+ax1.plot(r_s, epsilon_tt, 'go', label=r'Num. $\varepsilon_{\theta\theta}$ (Hoop)', markersize=4, alpha=0.6)
+ax1.plot(r_s, strain_tt_ana_L, 'g-', label=r'Ana. $\varepsilon_{\theta\theta}$ (Hoop)', linewidth=1.5)
+ax1.plot(r_s, epsilon_zz, 'bo', label=r'Num. $\varepsilon_{zz}$ (Axial)', markersize=4, alpha=0.6)
+ax1.plot(r_s, strain_zz_ana_L, 'b-', label=r'Ana. $\varepsilon_{zz}$ (Axial)', linewidth=1.5)
+
+ax1.set_xlabel("Radius (m)", fontsize=12)
+ax1.set_ylabel("Strain (/)", fontsize=12)
+ax1.grid(True, linestyle='--', alpha=0.7)
+
+plt.legend()
+plt.tight_layout()
+
+plot_path = os.path.join(CASE_DIR, "output", "strain_comparison.png")
+plt.savefig(plot_path, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path}")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_L) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_L**2))
