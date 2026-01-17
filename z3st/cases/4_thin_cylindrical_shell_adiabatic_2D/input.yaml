@@ -33,6 +33,7 @@ mechanical:
   stag_tol: 1.0e-6
   mechanical_regime: axisymmetric   # 3D | plane_stress | axisymmetric
   convergence: rel_norm # rel_norm | norm
+  debug: false
 
 thermal:
   solver: linear
