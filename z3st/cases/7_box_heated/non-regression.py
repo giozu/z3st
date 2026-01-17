@@ -5,6 +5,7 @@ Z3ST case: 7_box_heated
 
 non-regression script
 ---------------------
+3D box, fully-constrained and heated
 
 """
 
