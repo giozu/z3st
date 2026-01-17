@@ -82,7 +82,6 @@ plt.grid(True, linestyle='--', alpha=0.6)
 plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(CASE_DIR, "output", "plot_stress.png"))
-plt.show()
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 sigma_xx_num = np.mean(sigma_xx)
