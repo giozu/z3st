@@ -1,0 +1,48 @@
+{
+    "results": {
+        "L2_error_sigma_rr": {
+            "numerical": 0.0001705525850183296,
+            "reference": 0.0,
+            "abs_error": 0.0001705525850183296,
+            "rel_error": 0.0001705525850183296,
+            "status": "PASS"
+        },
+        "L2_error_sigma_tt": {
+            "numerical": 0.0001806248362982629,
+            "reference": 0.0,
+            "abs_error": 0.0001806248362982629,
+            "rel_error": 0.0001806248362982629,
+            "status": "PASS"
+        },
+        "L2_error_sigma_zz": {
+            "numerical": 0.0031269669729270025,
+            "reference": 0.0,
+            "abs_error": 0.0031269669729270025,
+            "rel_error": 0.0031269669729270025,
+            "status": "PASS"
+        },
+        "L2_error_strain_rr": {
+            "numerical": 0.0005649222652448939,
+            "reference": 0.0,
+            "abs_error": 0.0005649222652448939,
+            "rel_error": 0.0005649222652448939,
+            "status": "PASS"
+        },
+        "L2_error_strain_tt": {
+            "numerical": 0.00010617624775900702,
+            "reference": 0.0,
+            "abs_error": 0.00010617624775900702,
+            "rel_error": 0.00010617624775900702,
+            "status": "PASS"
+        },
+        "L2_error_strain_zz": {
+            "numerical": 0.0010866703065837275,
+            "reference": 0.0,
+            "abs_error": 0.0010866703065837275,
+            "rel_error": 0.0010866703065837275,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.007,
+    "summary": "PASS"
+}
