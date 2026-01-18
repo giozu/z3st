@@ -23,6 +23,8 @@ CASES=(
     "9_thick_cylindrical_shell_GPS_3D"
     "10_thick_cylindrical_shell_plane_stress"
     "11_thin_cylindrical_shell_Mariotte"
+    "12_cylindrical_shell_thermal_gradient_2D"
+    "12_cylindrical_shell_thermal_gradient_3D"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"
