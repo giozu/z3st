@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 10_cylindrical_shell_thick_plane_stress
+Z3ST case: 10_thick_cylindrical_shell_plane_stress
 
 non-regression script
 ---------------------
@@ -12,12 +12,11 @@ Reference is the Lamé solution under plane stress.
 """
 
 import os
-
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import plotter_sigma_cylinder, plotter_strain_cylinder
 from z3st.utils.utils_verification import *
+from z3st.utils.utils_plot import plotter_sigma_cylinder, plotter_strain_cylinder
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
@@ -25,12 +24,12 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.01  # m          inner and outer radius, height
-Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
-t = Ro - Ri  # m          wall thickness
-slenderness = Ri / t  # -          slenderness ratio
-z_target, z_tol = Lz / 2, 0.01  # m          z-plane for data extraction
+Ri, Ro, Lz = 0.02, 0.03, 0.01               # m          inner and outer radius, height
+Pi, Po = 1.0e6, 0.0                         # Pa         internal and external pressure
+E, nu = 2.0e11, 0.3                         # Pa, -      Young modulus, Poisson ratio
+t = Ro - Ri                                 # m          wall thickness
+slenderness = Ri / t                        # -          slenderness ratio
+z_target, z_tol = Lz / 2, 0.01              # m          z-plane for data extraction
 
 TOLERANCE = 3.0e-2  # -          tolerance for non-regression
 
