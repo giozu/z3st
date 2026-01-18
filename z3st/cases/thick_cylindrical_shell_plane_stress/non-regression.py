@@ -62,13 +62,13 @@ list_fields(VTU_FILE)
 # Numerical results
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
-r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_stresses(
+r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_field(
     filename=VTU_FILE,
     z_fixed=z_target,
     tol=z_tol,
     case_dir=CASE_DIR,
-    stress_field_hint="Stress",
-    data_source="auto",
+    field_hint="Stress",
+    data_source="cell",
     average=True,
     decimals=6,
 )

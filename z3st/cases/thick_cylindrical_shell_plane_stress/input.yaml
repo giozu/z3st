@@ -16,7 +16,11 @@ solver_settings:
   max_iters: 100
   relax_T: 0.9
   relax_u: 0.4
-  relax_adaptive: false
+  relax_adaptive: true
+  relax_growth: 1.1
+  relax_shrink: 0.9
+  relax_min: 0.05
+  relax_max: 0.95
 
 models:
   thermal: true
