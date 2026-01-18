@@ -236,11 +236,14 @@ class MechanicalModel:
                     )
 
                 elif bc_type == "Clamp_y":
+
+                    val = bc_info.get("value", 0.0)
+
                     boundary_dofs_y = dolfinx.fem.locate_dofs_topological(
                         V_u_sub.sub(1), self.fdim, self.facet_tags.find(region_id)
                     )
                     bcy = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(0), boundary_dofs_y, V_u_sub.sub(1)
+                        dolfinx.default_scalar_type(val), boundary_dofs_y, V_u_sub.sub(1)
                     )
 
                     self.dirichlet_mechanical[mat_type].append(bcy)
@@ -250,6 +253,15 @@ class MechanicalModel:
                     )
 
                 elif bc_type == "Clamp_z":
+
+                    regime = self.mech_cfg["mechanical_regime"].lower()
+                    if regime == '2d':
+                        raise ValueError(
+                            f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
+                            f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"
+                            f"        Please use 'Clamp_y' in your boundary_conditions.yaml for region '{region_name}'."
+                        )
+
                     val = bc_info.get("value", 0.0)
 
                     boundary_dofs_z = dolfinx.fem.locate_dofs_topological(

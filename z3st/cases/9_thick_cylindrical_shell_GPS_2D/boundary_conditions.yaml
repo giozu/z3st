@@ -11,6 +11,7 @@ mechanical:
 
   - type: Clamp_y
     region: top
+    value: -1.359155e-06   # (m)
 
   - type: Neumann
     region: inner_radius

@@ -1,11 +1,11 @@
 #!/bin/bash
-cd "${0%/*}" || exit 1  # Run from this directory
+cd "${0%/*}" || exit 1
 
 echo "Executing z3st.py..."
 
-gmsh mesh.geo -3
+gmsh mesh.geo -3 > mesh.log
 
-python3 -m z3st > log.z3st
+python3 -m z3st > z3st.log
 
 python3 non-regression.py
 
