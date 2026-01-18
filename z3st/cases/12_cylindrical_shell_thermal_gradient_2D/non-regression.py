@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 12_thick_cylindrical_thermal_shield
+Z3ST case: 12_cylindrical_shell_thermal_gradient_2D
 
 non-regression script
 ---------------------
-Steady-state 1D axisymmetric cylindrical wall (Dirichlet-Dirichlet).
 
 """
 
 import os
-
 import numpy as np
+import matplotlib.pyplot as plt
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder
 from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
@@ -23,16 +21,16 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.5  # m          inner and outer radius
-Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
-k, E, nu, alpha = 50, 2e11, 0.3, 1.0e-5  # W/m·K, Pa, -, 1/K
-Ti, To = 500.0, 400.0  # K          inner and outer surface temperature
-q0, mu = 0.0, 24.0  # W/m³, 1/m  heat source, attenuation
-Lx = Ro - Ri  # m          wall thickness
-slenderness = Ri / Lx  # -          slenderness ratio
-z_target, z_tol = Lz / 2, Lz / 10  # m          z-plane for data extraction
+Ri, Ro, Lz = 0.02, 0.03, 0.5                # m          inner and outer radius
+Pi, Po = 0.0, 0.0                           # Pa         internal and external pressure
+k, E, nu, alpha = 50, 2e11, 0.3, 1.0e-5     # W/m·K, Pa, -, 1/K
+Ti, To = 500.0, 400.0                       # K          inner and outer surface temperature
+q0, mu = 0.0, 24.0                          # W/m³, 1/m  heat source, attenuation
+Lx = Ro - Ri                                # m          wall thickness
+slenderness = Ri / Lx                       # -          slenderness ratio
+z_target, z_tol = Lz / 2, Lz / 10           # m          z-plane for data extraction
 
-TOLERANCE = 5.0e-2  # -          tolerance for non-regression
+TOLERANCE = 3.0e-2                          # -          tolerance for non-regression
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -63,7 +61,7 @@ def analytical_thermal_stress(r):
         Radial, hoop, and axial stresses (Pa)
     """
 
-    r_star = np.linspace(Ri, Ro, 10000)
+    r_star = np.linspace(Ri, Ro, 20000)
     T_star = analytic_T(r_star)
 
     # Pre-compute global integral ∫_{Ri}^{Ro} T(r*) r* dr*
@@ -103,46 +101,73 @@ list_fields(VTU_FILE)
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
-x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
-r_T, T = average_section_radial(x_T, y_T, z_T, T_all, z_target=z_target, tol=z_tol, decimals=6)
+# Numerical results
+# Temperature
+x_T, z_T, _, T_all = extract_field(VTU_FILE, field_name="Temperature")
+mask = np.abs(z_T - z_target) < z_tol
+sort_idx = np.argsort(x_T[mask])
 
-r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_stresses(
-    filename=VTU_FILE,
-    z_fixed=z_target,
-    tol=z_tol,
-    case_dir=CASE_DIR,
-    stress_field_hint="Stress",
-    data_source="auto",
-    average=True,
-    decimals=6,
-)
+r_T = x_T[mask][sort_idx]
+T = T_all[mask][sort_idx]
+
+# Stress
+x_S, z_S, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+mask = np.abs(z_S - z_target) < z_tol
+sort_idx = np.argsort(x_S[mask])
+
+r_s = x_S[mask][sort_idx]
+
+sigma_rr = S_all[mask, 0][sort_idx]
+sigma_tt = S_all[mask, 4][sort_idx]
+sigma_zz = S_all[mask, 8][sort_idx]
 
 # Analytical results
 sigma_th_ref = sigma_th(r_T, T, c=1.0)
 T_ref = analytic_T(r_T)
 sigma_rr_ana_th, sigma_tt_ana_th, sigma_zz_ana_th = analytical_thermal_stress(r_s)
+
+# Numerical maximum thermal stress (hoop)
 max_sigma_T = np.max(sigma_tt)
 
+
+
 # Plot
-plotter_sigma_temperature_cylinder(
-    r_s=r_s,
-    sigma_rr=sigma_rr,
-    sigma_tt=sigma_tt,
-    sigma_zz=sigma_zz,
-    r_T=r_T,
-    T=T,
-    sigma_th_ref=sigma_th_ref,
-    T_ref=T_ref,
-    max_sigma_T=max_sigma_T,
-    Ti=Ti,
-    To=To,
-    Ri=Ri,
-    CASE_DIR=CASE_DIR,
-    slenderness=slenderness,
-    sigma_rr_ref=sigma_rr_ana_th,
-    sigma_zz_ref=sigma_zz_ana_th,
-    sigma_tt_ref=sigma_tt_ana_th,
-)
+Pa_to_MPa = 1e-6
+
+plt.figure(figsize=(10, 7))
+
+# Stress
+ax1 = plt.gca()
+ax1.plot(r_s, sigma_rr * Pa_to_MPa, 'ro', label=r'Num. $\sigma_{rr}$ (Radial)', markersize=4, alpha=0.6)
+ax1.plot(r_s, sigma_rr_ana_th * Pa_to_MPa, 'r-', label=r'Ana. $\sigma_{rr}$ (Radial)', linewidth=1.5)
+ax1.plot(r_s, sigma_tt * Pa_to_MPa, 'go', label=r'Num. $\sigma_{\theta\theta}$ (Hoop)', markersize=4, alpha=0.6)
+ax1.plot(r_s, sigma_tt_ana_th * Pa_to_MPa, 'g-', label=r'Ana. $\sigma_{\theta\theta}$ (Hoop)', linewidth=1.5)
+ax1.plot(r_s, sigma_zz * Pa_to_MPa, 'bo', label=r'Num. $\sigma_{zz}$ (Axial)', markersize=4, alpha=0.6)
+ax1.plot(r_s, sigma_zz_ana_th * Pa_to_MPa, 'b-', label=r'Ana. $\sigma_{zz}$ (Axial)', linewidth=1.5)
+ax1.plot(r_T, sigma_th_ref * Pa_to_MPa, 'm--', label=r'Approx. $\sigma_{th}$ (ref)', linewidth=2.0, alpha=0.7)
+
+ax1.set_xlabel("Radius (m)", fontsize=12)
+ax1.set_ylabel("Stress (MPa)", fontsize=12)
+ax1.grid(True, linestyle='--', alpha=0.7)
+
+# Temperature
+ax2 = ax1.twinx()
+ax2.plot(r_T, T, 'ks', label='Num. Temperature', markersize=3, alpha=0.4)
+ax2.plot(r_T, T_ref, 'k--', label='Ana. Temperature', linewidth=1.0, alpha=0.8)
+ax2.set_ylabel("Temperature (K)", fontsize=12)
+
+# Legend
+lines, labels = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines + lines2, labels + labels2, loc='best', frameon=True)
+
+plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
+plt.tight_layout()
+
+plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
+plt.savefig(plot_path, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path}")
+
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_th) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_th**2))

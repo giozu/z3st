@@ -12,9 +12,9 @@ Ri = 0.02;  // Inner radius (m)
 Ro = 0.03;  // Outer radius (m)
 Lz = 0.50;  // Height
 
-num_points_radial = 20;      // Number of points in the radial direction
-num_points_circ_qtr = 15;    // Number of points on each 90-degree arc
-num_layers_height = 30;      // Number of element layers along the height
+num_points_radial = 41;      // Number of points in the radial direction
+num_points_circ_qtr = 11;    // Number of points on each 90-degree arc
+num_layers_height = 21;      // Number of element layers along the height
 
 // 2D slice
 Point(1) = {0, 0, 0};        // Center point
