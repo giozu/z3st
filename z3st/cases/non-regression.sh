@@ -19,6 +19,9 @@ CASES=(
     "6_thin_cylindrical_shell_non_adiabatic_2D"
     "7_box_heated"
     "8_thick_cylindrical_shell_plane_strain_2D"
+    "9_thick_cylindrical_shell_GPS_2D"
+    "9_thick_cylindrical_shell_GPS_3D"
+    "10_thick_cylindrical_shell_plane_stress"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"
