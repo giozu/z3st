@@ -22,18 +22,18 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly = 0.100, 1.0                     # m (geometry dimensions)
+Lx, Ly = 0.100, 1.0  # m (geometry dimensions)
 k, E, nu, alpha = (
     48.1,
     1.77e11,
     0.3,
     1.7e-5,
-)                                       # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 490.0, 500.0                   # K
-q0, mu = 2.0e6, 24.0                    # W/m³, 1/m (volumetric heat source, attenuation coefficient)
-y_target, mask_tol = Ly/2, 0.02         # m, m, m (extraction line and tolerance)
+)  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
+Ti, To = 490.0, 500.0  # K
+q0, mu = 2.0e6, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
+y_target, mask_tol = Ly / 2, 0.02  # m, m, m (extraction line and tolerance)
 
-TOLERANCE = 2e-2                        # - (relative tolerance for non-regression tests)
+TOLERANCE = 2e-2  # - (relative tolerance for non-regression tests)
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -90,26 +90,32 @@ plt.figure(figsize=(10, 7))
 
 # Stress
 ax1 = plt.gca()
-ax1.plot(x_s, sigma_yy * Pa_to_MPa, 'ro', label=r'Num. $\sigma_{yy}$', markersize=4, alpha=0.6)
-ax1.plot(x_s, sigma_xx * Pa_to_MPa, 'b.', label=r'Num. $\sigma_{xx}$', markersize=2, alpha=0.3)
-ax1.plot(x_s, sigma_th_ref * Pa_to_MPa, 'm--', label=r'Ana. $\sigma_{th}$', linewidth=2.0, alpha=0.7)
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, "ro", label=r"Num. $\sigma_{yy}$", markersize=4, alpha=0.6)
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, "b.", label=r"Num. $\sigma_{xx}$", markersize=2, alpha=0.3)
+ax1.plot(
+    x_s, sigma_th_ref * Pa_to_MPa, "m--", label=r"Ana. $\sigma_{th}$", linewidth=2.0, alpha=0.7
+)
 
 ax1.set_xlabel("x (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
-ax1.grid(True, linestyle='--', alpha=0.7)
+ax1.grid(True, linestyle="--", alpha=0.7)
 
 # Temperature
 ax2 = ax1.twinx()
-ax2.plot(x_T, T, 'ks', label='Num. Temperature', markersize=3, alpha=0.4)
-ax2.plot(x_T, T_ref, 'k--', label='Ana. Temperature', linewidth=1.0, alpha=0.8)
+ax2.plot(x_T, T, "ks", label="Num. Temperature", markersize=3, alpha=0.4)
+ax2.plot(x_T, T_ref, "k--", label="Ana. Temperature", linewidth=1.0, alpha=0.8)
 ax2.set_ylabel("Temperature (K)", fontsize=12)
 
 # Legend
 lines, labels = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
-ax1.legend(lines + lines2, labels + labels2, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=3)
+ax1.legend(lines + lines2, labels + labels2, loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=3)
 
-plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $T_o$ = {To-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
+plt.title(
+    rf"$T_i$ = {Ti-273.15:.0f}°C, $T_o$ = {To-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa",
+    pad=15,
+    fontsize=14,
+)
 plt.tight_layout()
 
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")

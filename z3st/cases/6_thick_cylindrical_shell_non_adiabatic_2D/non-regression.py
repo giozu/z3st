@@ -22,18 +22,18 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.0, 2.4, 20                       # m          inner and outer radius
-Pi, Po = 0.0, 0.0                               # Pa         internal and external pressure
-k, E, nu, alpha = 48.1, 1.77e11, 0.3, 1.7e-5    # W/m·K, Pa, -, 1/K
-Ti, To = 490, 500                               # K          inner, outer surface temperature
-q0, mu = 2.0e6, 24.0                            # W/m³, 1/m  heat source, attenuation
-Lx = Ro - Ri                                    # m          wall thickness
-slenderness = Ri / Lx                           # -          slenderness ratio
+Ri, Ro, Lz = 2.0, 2.4, 20  # m          inner and outer radius
+Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
+k, E, nu, alpha = 48.1, 1.77e11, 0.3, 1.7e-5  # W/m·K, Pa, -, 1/K
+Ti, To = 490, 500  # K          inner, outer surface temperature
+q0, mu = 2.0e6, 24.0  # W/m³, 1/m  heat source, attenuation
+Lx = Ro - Ri  # m          wall thickness
+slenderness = Ri / Lx  # -          slenderness ratio
 
-h_z = Lz / 90                                   # element height
-z_target, z_tol = Lz / 2 + h_z / 2, h_z * 0.6   # m, z-plane for data extraction
+h_z = Lz / 90  # element height
+z_target, z_tol = Lz / 2 + h_z / 2, h_z * 0.6  # m, z-plane for data extraction
 
-TOLERANCE = 3.0e-2                              # -          tolerance for non-regression
+TOLERANCE = 3.0e-2  # -          tolerance for non-regression
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -148,30 +148,60 @@ plt.figure(figsize=(10, 7))
 
 # Stress
 ax1 = plt.gca()
-ax1.plot(r_s, sigma_rr * Pa_to_MPa, 'ro', label=r'Num. $\sigma_{rr}$ (Radial)', markersize=4, alpha=0.6)
-ax1.plot(r_s, sigma_rr_ana_th * Pa_to_MPa, 'r-', label=r'Ana. $\sigma_{rr}$ (Radial)', linewidth=1.5)
-ax1.plot(r_s, sigma_tt * Pa_to_MPa, 'go', label=r'Num. $\sigma_{\theta\theta}$ (Hoop)', markersize=4, alpha=0.6)
-ax1.plot(r_s, sigma_tt_ana_th * Pa_to_MPa, 'g-', label=r'Ana. $\sigma_{\theta\theta}$ (Hoop)', linewidth=1.5)
-ax1.plot(r_s, sigma_zz * Pa_to_MPa, 'bo', label=r'Num. $\sigma_{zz}$ (Axial)', markersize=4, alpha=0.6)
-ax1.plot(r_s, sigma_zz_ana_th * Pa_to_MPa, 'b-', label=r'Ana. $\sigma_{zz}$ (Axial)', linewidth=1.5)
-ax1.plot(r_T, sigma_th_ref * Pa_to_MPa, 'm--', label=r'Approx. $\sigma_{th}$ (ref)', linewidth=2.0, alpha=0.7)
+ax1.plot(
+    r_s, sigma_rr * Pa_to_MPa, "ro", label=r"Num. $\sigma_{rr}$ (Radial)", markersize=4, alpha=0.6
+)
+ax1.plot(
+    r_s, sigma_rr_ana_th * Pa_to_MPa, "r-", label=r"Ana. $\sigma_{rr}$ (Radial)", linewidth=1.5
+)
+ax1.plot(
+    r_s,
+    sigma_tt * Pa_to_MPa,
+    "go",
+    label=r"Num. $\sigma_{\theta\theta}$ (Hoop)",
+    markersize=4,
+    alpha=0.6,
+)
+ax1.plot(
+    r_s,
+    sigma_tt_ana_th * Pa_to_MPa,
+    "g-",
+    label=r"Ana. $\sigma_{\theta\theta}$ (Hoop)",
+    linewidth=1.5,
+)
+ax1.plot(
+    r_s, sigma_zz * Pa_to_MPa, "bo", label=r"Num. $\sigma_{zz}$ (Axial)", markersize=4, alpha=0.6
+)
+ax1.plot(r_s, sigma_zz_ana_th * Pa_to_MPa, "b-", label=r"Ana. $\sigma_{zz}$ (Axial)", linewidth=1.5)
+ax1.plot(
+    r_T,
+    sigma_th_ref * Pa_to_MPa,
+    "m--",
+    label=r"Approx. $\sigma_{th}$ (ref)",
+    linewidth=2.0,
+    alpha=0.7,
+)
 
 ax1.set_xlabel("Radius (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
-ax1.grid(True, linestyle='--', alpha=0.7)
+ax1.grid(True, linestyle="--", alpha=0.7)
 
 # Temperature
 ax2 = ax1.twinx()
-ax2.plot(r_T, T, 'ks', label='Num. Temperature (Cyl.)', markersize=3, alpha=0.4)
-ax2.plot(r_T, T_ref, 'k--', label='Ana. Temperature (Slab)', linewidth=1.0, alpha=0.8)
+ax2.plot(r_T, T, "ks", label="Num. Temperature (Cyl.)", markersize=3, alpha=0.4)
+ax2.plot(r_T, T_ref, "k--", label="Ana. Temperature (Slab)", linewidth=1.0, alpha=0.8)
 ax2.set_ylabel("Temperature (K)", fontsize=12)
 
 # Legend
 lines, labels = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
-ax1.legend(lines + lines2, labels + labels2, loc='best', frameon=True)
+ax1.legend(lines + lines2, labels + labels2, loc="best", frameon=True)
 
-plt.title(rf"$T_i$ = {Ti-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
+plt.title(
+    rf"$T_i$ = {Ti-273.15:.0f}°C, $Tmax$ = {np.max(T)-273.15:.0f}°C, $R_i/t$ = {slenderness:.2f}, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa",
+    pad=15,
+    fontsize=14,
+)
 plt.tight_layout()
 
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")

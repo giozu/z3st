@@ -571,6 +571,7 @@ def extract_spherical_stresses(
     else:
         return sigma_rr, sigma_tt, sigma_pp
 
+
 def extract_cylindrical_field(
     filename="output/fields.vtu",
     z_fixed=0.0,
@@ -590,14 +591,16 @@ def extract_cylindrical_field(
     # Detect field name
     actual_field_name = None
     data_obj = grid.cell_data if data_source == "cell" else grid.point_data
-    
+
     for key in data_obj.keys():
         if field_hint.lower() in key.lower():
             actual_field_name = key
             break
 
     if actual_field_name is None:
-        raise KeyError(f"No field found containing '{field_hint}' in {data_source}_data of {filename}")
+        raise KeyError(
+            f"No field found containing '{field_hint}' in {data_source}_data of {filename}"
+        )
 
     print(f"[INFO] Extracting '{actual_field_name}' from {data_source}_data")
 
@@ -615,7 +618,7 @@ def extract_cylindrical_field(
     mask = np.abs(coords[:, 2] - z_fixed) < tol
     if np.sum(mask) == 0:
         raise ValueError(f"No data found at z = {z_fixed:.4e} ± {tol:.1e}")
-    
+
     x, y = coords[mask, 0], coords[mask, 1]
 
     fxx, fyy, fzz, fxy = (
@@ -629,15 +632,14 @@ def extract_cylindrical_field(
     r = np.sqrt(x**2 + y**2)
     theta = np.arctan2(y, x)
     c, s = np.cos(theta), np.sin(theta)
-    
+
     frr = fxx * c**2 + fyy * s**2 + 2 * fxy * s * c
     ftt = fxx * s**2 + fyy * c**2 - 2 * fxy * s * c
     fzz = fzz
 
     import pandas as pd
-    df = pd.DataFrame(
-        {"r": r, "frr": frr, "ftt": ftt, "fzz": fzz}
-    ).sort_values("r")
+
+    df = pd.DataFrame({"r": r, "frr": frr, "ftt": ftt, "fzz": fzz}).sort_values("r")
 
     if average:
         df["r"] = df["r"].round(decimals)
@@ -655,6 +657,7 @@ def extract_cylindrical_field(
         df["ftt"].to_numpy(),
         df["fzz"].to_numpy(),
     )
+
 
 def save_csv_principal_stress(
     filename="output/fields.vtu",

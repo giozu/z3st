@@ -30,7 +30,9 @@ class GmshMeshReader:
         try:
             # FEniCSx ≥ 0.10.0 – returns an object with attributes mesh, cell_tags, facet_tags
             mesh_data = dolfinx.io.gmsh.read_from_msh(
-                str(mesh_path), MPI.COMM_WORLD, rank=self.rank,
+                str(mesh_path),
+                MPI.COMM_WORLD,
+                rank=self.rank,
             )
             mesh, cell_tags, facet_tags = (
                 mesh_data.mesh,

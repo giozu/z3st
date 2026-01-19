@@ -145,7 +145,10 @@ class MechanicalModel:
                         self.mesh, PETSc.ScalarType(initial_traction)
                     )
 
-                    if self.mech_cfg.get("mechanical_regime").lower() == "axisymmetric" or self.mech_cfg.get("mechanical_regime").lower() == "2D":
+                    if (
+                        self.mech_cfg.get("mechanical_regime").lower() == "axisymmetric"
+                        or self.mech_cfg.get("mechanical_regime").lower() == "2D"
+                    ):
                         # 2D: only r and z components or x and y
                         n_2d = ufl.as_vector([self.normal[0], self.normal[1]])
                         traction_expr = traction_const * n_2d
@@ -255,7 +258,7 @@ class MechanicalModel:
                 elif bc_type == "Clamp_z":
 
                     regime = self.mech_cfg["mechanical_regime"].lower()
-                    if regime == '2d' or regime == 'axisymmetric':
+                    if regime == "2d" or regime == "axisymmetric":
                         raise ValueError(
                             f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
                             f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"
@@ -321,57 +324,49 @@ class MechanicalModel:
             raise ValueError(f"Formato displacement non valido: shape {displacement.shape}")
 
     def epsilon(self, u):
-            """
-            Compute the infinitesimal strain tensor epsilon.
-            
-            This function supports:
-            1. 'axisymmetric': A 2D formulation where the problem is symmetric with respect to the azimutal coordinate.
-            The x-coordinate is treated as the radial component (r), 
-            and the y-coordinate as the axial component (z).
-            3. '2D': x-y 2D formulation
-            3. '3D' or other: Standard symmetric gradient of the displacement vector.
+        """
+        Compute the infinitesimal strain tensor epsilon.
 
-            Parameters:
-                u: Displacement field.
+        This function supports:
+        1. 'axisymmetric': A 2D formulation where the problem is symmetric with respect to the azimutal coordinate.
+        The x-coordinate is treated as the radial component (r),
+        and the y-coordinate as the axial component (z).
+        3. '2D': x-y 2D formulation
+        3. '3D' or other: Standard symmetric gradient of the displacement vector.
 
-            Returns:
-                The 3x3 strain tensor.
-            """
-            regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+        Parameters:
+            u: Displacement field.
 
-            if regime == "axisymmetric":
-                # u[0] is radial displacement (u_r), u[1] is axial displacement (u_z)
-                r = ufl.SpatialCoordinate(self.mesh)[0]
-                
-                # Components of the strain tensor in cylindrical coordinates (r, theta, z)
-                eps_rr = u[0].dx(0)                  # Normal radial strain
-                eps_tt = u[0] / r                    # Hoop strain (tangential)
-                eps_zz = u[1].dx(1)                  # Normal axial strain
-                eps_rz = 0.5 * (u[0].dx(1) + u[1].dx(0)) # Shear strain in the r-z plane
-                
-                # Return the 3x3 tensor.
-                return ufl.as_tensor([
-                    [eps_rr, 0.0,    eps_rz],
-                    [0.0,    eps_tt, 0.0],
-                    [eps_rz, 0.0,    eps_zz]
-                ])
+        Returns:
+            The 3x3 strain tensor.
+        """
+        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
 
-            elif regime == "2d":
-                # u[0] = x-displacement
-                # u[1] = y-displacement
-                eps_xx = u[0].dx(0)
-                eps_yy = u[1].dx(1)
-                eps_xy = 0.5 * (u[0].dx(1) + u[1].dx(0))
-                
-                return ufl.as_tensor([
-                    [eps_xx, eps_xy, 0.0],
-                    [eps_xy, eps_yy, 0.0],
-                    [0.0,    0.0,    0.0]
-                ])
-            
-            else:
-                # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)
-                return ufl.sym(ufl.grad(u))
+        if regime == "axisymmetric":
+            # u[0] is radial displacement (u_r), u[1] is axial displacement (u_z)
+            r = ufl.SpatialCoordinate(self.mesh)[0]
+
+            # Components of the strain tensor in cylindrical coordinates (r, theta, z)
+            eps_rr = u[0].dx(0)  # Normal radial strain
+            eps_tt = u[0] / r  # Hoop strain (tangential)
+            eps_zz = u[1].dx(1)  # Normal axial strain
+            eps_rz = 0.5 * (u[0].dx(1) + u[1].dx(0))  # Shear strain in the r-z plane
+
+            # Return the 3x3 tensor.
+            return ufl.as_tensor([[eps_rr, 0.0, eps_rz], [0.0, eps_tt, 0.0], [eps_rz, 0.0, eps_zz]])
+
+        elif regime == "2d":
+            # u[0] = x-displacement
+            # u[1] = y-displacement
+            eps_xx = u[0].dx(0)
+            eps_yy = u[1].dx(1)
+            eps_xy = 0.5 * (u[0].dx(1) + u[1].dx(0))
+
+            return ufl.as_tensor([[eps_xx, eps_xy, 0.0], [eps_xy, eps_yy, 0.0], [0.0, 0.0, 0.0]])
+
+        else:
+            # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)
+            return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
         """
@@ -490,8 +485,7 @@ class MechanicalModel:
                 eps = self.epsilon(u)
                 dim = eps.ufl_shape[0]
                 sigma = (
-                    material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim)
-                    + 2.0 * material["G"] * eps
+                    material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim) + 2.0 * material["G"] * eps
                 )
 
         return sigma
