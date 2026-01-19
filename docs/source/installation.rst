@@ -103,32 +103,3 @@ The generated HTML documentation will be available at:
 .. code-block:: bash
 
    build/html/index.html
-
-
-Development tools (Optional)
-----------------------------
-
-
-If you plan to contribute to **Z3ST**, it is highly recommended to install the code quality and formatting tools. These ensure that your code adheres to the project's standards (Black, isort, and Flake8) before committing.
-
-Install the development dependencies via ``pip``:
-
-.. code-block:: bash
-
-    pip install black isort flake8 pre-commit
-
-To enable the automatic checks every time you perform a ``git commit``, initialize the pre-commit hooks:
-
-.. code-block:: bash
-
-    pre-commit install
-
-.. note::
-
-    If you encounter an ``AssertionError`` related to the environment "health" while running pre-commit, ensure you have removed any system-wide installation (e.g., via ``apt``) and are using the version installed within your conda environment.
-
-To manually run the checks on all files:
-
-.. code-block:: bash
-
-    pre-commit run --all-files
