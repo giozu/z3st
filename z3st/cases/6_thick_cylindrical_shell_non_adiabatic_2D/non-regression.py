@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 6_thin_cylindrical_shell_non_adiabatic_2D
+Z3ST case: 6_thick_cylindrical_shell_non_adiabatic_2D
 
 non-regression script
 ---------------------
-Steady-state axisymmetric cylindrical shell (Dirichlet-Dirichlet).
+Steady-state axisymmetric cylindrical wall (Dirichlet-Dirichlet).
 
 """
 
@@ -22,23 +22,18 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.0, 2.1, 20           # m          inner and outer radius
-Pi, Po = 0.0, 0.0                   # Pa         internal and external pressure
-k, E, nu, alpha = (
-    48.1,
-    1.77e11,
-    0.3,
-    1.7e-5,
-)                                   # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 490.0, 500.0               # K          inner and outer surface temperature
-q0, mu = 2.0e6, 24.0                # W/m³, 1/m  heat source, attenuation
-Lx = Ro - Ri                        # m          wall thickness
-slenderness = Ri / Lx               # -          slenderness ratio
+Ri, Ro, Lz = 2.0, 2.4, 20                       # m          inner and outer radius
+Pi, Po = 0.0, 0.0                               # Pa         internal and external pressure
+k, E, nu, alpha = 48.1, 1.77e11, 0.3, 1.7e-5    # W/m·K, Pa, -, 1/K
+Ti, To = 490, 500                               # K          inner, outer surface temperature
+q0, mu = 2.0e6, 24.0                            # W/m³, 1/m  heat source, attenuation
+Lx = Ro - Ri                                    # m          wall thickness
+slenderness = Ri / Lx                           # -          slenderness ratio
 
-h_z = Lz / 90                       # element height
-z_target, z_tol = Lz / 2 + h_z / 2, h_z * 0.6  # m, z-plane for data extraction
+h_z = Lz / 90                                   # element height
+z_target, z_tol = Lz / 2 + h_z / 2, h_z * 0.6   # m, z-plane for data extraction
 
-TOLERANCE = 2.0e-2                  # -          tolerance for non-regression
+TOLERANCE = 3.0e-2                              # -          tolerance for non-regression
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---

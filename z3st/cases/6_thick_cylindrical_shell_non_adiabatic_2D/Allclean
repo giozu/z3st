@@ -1,5 +1,5 @@
 #!/bin/bash
-cd "${0%/*}" || exit 1  # Run from this directory
+cd "${0%/*}" || exit 1
 
 echo "Cleaning current directory..."
 
@@ -11,4 +11,4 @@ rm -f *.msh
 rm -f *.png
 rm -f log.*
 
-echo "Done. All output and temporary files cleaned."
+echo "Done. Output and temporary files deleted."
