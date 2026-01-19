@@ -69,4 +69,3 @@ Case: 12_cylindrical_shell_thermal_gradient_3D
   Run             : OK
   Non-regression  : PASS
   Time            : 794s
-
