@@ -1,0 +1,13 @@
+name: cylinder
+geometry_type: cyl
+
+Ri: 0.004 # hole (m)
+Ro: 0.040 # outer radius (m)
+Lz: 0.100 # height (m)
+
+labels:
+  inner: 1
+  outer: 2
+  bottom: 3
+  top: 4
+  volume: 10
