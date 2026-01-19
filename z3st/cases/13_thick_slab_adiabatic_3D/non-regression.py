@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 13_thick_linear_thermal_shield_adiabatic
+Z3ST case: 13_thick_slab_adiabatic_3D
 
 non-regression script
 ---------------------
