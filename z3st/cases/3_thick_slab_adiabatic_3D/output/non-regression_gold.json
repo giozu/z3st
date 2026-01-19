@@ -1,24 +1,24 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 0.6439700642980536,
+            "numerical": 0.8788661679036602,
             "reference": 0.0,
-            "abs_error": 0.6439700642980536,
-            "rel_error": 0.0012232367854578268,
+            "abs_error": 0.8788661679036602,
+            "rel_error": 0.0015857079066209205,
             "status": "PASS"
         },
         "Linf_error_T": {
-            "numerical": 1.2309612576851805,
+            "numerical": 0.962518875324804,
             "reference": 0.0,
-            "abs_error": 1.2309612576851805,
-            "rel_error": 0.002338240821046959,
+            "abs_error": 0.962518875324804,
+            "rel_error": 0.0017366396006743602,
             "status": "PASS"
         },
         "T_max": {
-            "numerical": 563.3667082108785,
+            "numerical": 563.0979126371376,
             "reference": 562.1357469531933,
-            "abs_error": 1.2309612576851805,
-            "rel_error": 0.0021897935940865853,
+            "abs_error": 0.9621656839442494,
+            "rel_error": 0.0017116251531044597,
             "status": "PASS"
         }
     },
