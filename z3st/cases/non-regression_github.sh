@@ -13,10 +13,9 @@ CASES=(
     "2_thin_cylindrical_shell_2D"
     "3_thick_slab_adiabatic_3D"
     "7_box_heated"
-    "9_thick_cylindrical_shell_GPS_3D"
     "14_full_cylinder"
 )
-SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_summary.txt"
+SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 
 echo "Running minimal non-regression suite..."
 echo "---------------------------------------"
