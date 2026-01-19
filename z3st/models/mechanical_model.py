@@ -255,7 +255,7 @@ class MechanicalModel:
                 elif bc_type == "Clamp_z":
 
                     regime = self.mech_cfg["mechanical_regime"].lower()
-                    if regime == '2d':
+                    if regime == '2d' or regime == 'axisymmetric':
                         raise ValueError(
                             f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
                             f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"

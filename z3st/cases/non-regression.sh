@@ -20,13 +20,16 @@ CASES=(
     "5_thick_slab_non_adiabatic_3D"
     "5_thin_slab_non_adiabatic_2D"
     "6_thin_cylindrical_shell_non_adiabatic_2D"
+    "6_thick_cylindrical_shell_non_adiabatic_2D"
     "7_box_heated"
     "8_thick_cylindrical_shell_plane_strain_2D"
     "9_thick_cylindrical_shell_GPS_2D"
-    "10_thick_cylindrical_shell_GPS_3D"
+    "9_thick_cylindrical_shell_GPS_3D"
     "11_thin_cylindrical_shell_Mariotte"
     "12_cylindrical_shell_thermal_gradient_2D"
     "12_cylindrical_shell_thermal_gradient_3D"
+    "13_annular_cylinder"
+    "14_full_cylinder"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"
