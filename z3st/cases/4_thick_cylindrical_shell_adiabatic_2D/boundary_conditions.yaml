@@ -6,10 +6,9 @@ thermal:
 
   - type: Neumann
     region: outer_radius
-    flux: 0.0
+    flux: 0.0   # (W/m2)
 
 mechanical:
   steel:
-  - type: Dirichlet
+  - type: Clamp_y
     region: bottom
-    displacement: [0.0, 0.0, 0.0]
