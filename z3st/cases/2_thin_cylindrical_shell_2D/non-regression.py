@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder
 from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
