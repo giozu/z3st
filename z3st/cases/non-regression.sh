@@ -16,6 +16,8 @@ CASES=(
     "3_thick_slab_adiabatic_3D"
     "3_thin_slab_adiabatic_2D"
     "4_thin_cylindrical_shell_adiabatic_2D"
+    "4_thick_cylindrical_shell_adiabatic_2D"
+    "5_thick_slab_non_adiabatic_3D"
     "5_thin_slab_non_adiabatic_2D"
     "6_thin_cylindrical_shell_non_adiabatic_2D"
     "7_box_heated"

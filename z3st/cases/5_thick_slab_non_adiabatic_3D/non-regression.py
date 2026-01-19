@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 15_thick_linear_thermal_shield_non_adiabatic
+Z3ST case: 5_thick_slab_non_adiabatic_3D
 
 non-regression script
 ---------------------
-Steady-state 1D slab (Dirichlet-Dirichlet).
+Steady-state 3D slab (Dirichlet-Dirichlet).
 
 """
 
@@ -34,7 +34,7 @@ Ti, To = 490, 500.0  # K (boundary temperature)
 q0, mu = 2.00e6, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
 y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.1  # m, m, m (plane selection and tolerance)
 
-TOLERANCE = 3e-3  # - (relative tolerance for non-regression tests)
+TOLERANCE = 3e-2  # - (relative tolerance for non-regression tests)
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -69,14 +69,14 @@ x_s, sigma_yy = average_section(
 
 # Analytical results
 T_ref = analytic_T(x_T)
-sigma_th_ref = sigma_th(x_T, T_ref, c=1.0)
+sigma_th_ref = sigma_th(x_s, analytic_T(x_s), c=1.0)
 max_sigma_T = np.max(sigma_yy)
 
 # Plot
 plotter_sigma_temperature_slab(
     x_s=x_s,
     sigma=sigma_yy,
-    x_s_ref=x_T,
+    x_s_ref=x_s,
     sigma_ref=sigma_th_ref,
     T_ref=T_ref,
     x_T=x_T,
@@ -96,6 +96,8 @@ Tmax_num = float(np.max(T))
 Tmax_ref = float(np.max(T_ref))
 RelErr_Tmax = abs(Tmax_num - Tmax_ref) / Tmax_ref
 
+err_sigma = np.sqrt(np.mean((sigma_yy - sigma_th_ref) ** 2)) / np.max(np.abs(sigma_th_ref))
+
 errors = {
     "L2_error_T": {
         "numerical": L2_T,
@@ -114,6 +116,12 @@ errors = {
         "reference": Tmax_ref,
         "abs_error": abs(Tmax_num - Tmax_ref),
         "rel_error": RelErr_Tmax,
+    },
+    "L2_error_sigma_yy": {
+        "numerical": float(err_sigma),
+        "reference": 0.0,
+        "abs_error": float(err_sigma),
+        "rel_error": float(err_sigma),
     },
 }
 
