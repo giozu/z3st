@@ -7,10 +7,11 @@ Mesh sensitivity script
 """
 
 import os
-import subprocess
 import re
-import numpy as np
+import subprocess
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 from z3st.utils.utils_extract_vtu import extract_field
 

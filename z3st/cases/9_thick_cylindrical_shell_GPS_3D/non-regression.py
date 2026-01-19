@@ -12,11 +12,12 @@ Reference is the Lamé solution under generalized plane strain.
 """
 
 import os
+
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
 from z3st.utils.utils_plot import plotter_sigma_cylinder, plotter_strain_cylinder
+from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)

@@ -11,8 +11,9 @@ annular cylinder with uniform volumetric heat generation.
 """
 
 import os
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
