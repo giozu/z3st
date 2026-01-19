@@ -4,8 +4,7 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-print(
-    """
+print("""
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
@@ -17,8 +16,7 @@ Z3ST is an open-source framework for the thermo-mechanical modelling
 of materials and multi-material domains. Built on FEniCSx, it supports
 transient simulations, complex geometries, and user-defined boundary
 conditions.
-"""
-)
+""")
 
 # --. Python modules --..
 import os

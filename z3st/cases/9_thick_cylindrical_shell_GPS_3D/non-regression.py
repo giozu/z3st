@@ -24,14 +24,14 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.50           # m          inner and outer radius, height
-Pi, Po = 1.0e6, 0.0                     # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3                     # Pa, -      Young modulus, Poisson ratio
-t = Ro - Ri                             # m          wall thickness
-slenderness = Ri / t                    # -          slenderness ratio
-z_target, z_tol = Lz / 2, 0.01          # m          z-plane for data extraction
+Ri, Ro, Lz = 0.02, 0.03, 0.50  # m          inner and outer radius, height
+Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
+E, nu = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
+t = Ro - Ri  # m          wall thickness
+slenderness = Ri / t  # -          slenderness ratio
+z_target, z_tol = Lz / 2, 0.01  # m          z-plane for data extraction
 
-TOLERANCE = 3.0e-1                      # -          tolerance for non-regression
+TOLERANCE = 3.0e-1  # -          tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 eps_zz_GPS = -2.718310e-06
@@ -137,9 +137,15 @@ plotter_strain_cylinder(
 err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_L) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_L**2))
 err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_L) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_L**2))
 err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_L) ** 2)) / np.sqrt(np.mean(sigma_zz_ana_L**2))
-err_eps_rr = np.sqrt(np.mean((epsilon_rr - epsilon_rr_ana_L) ** 2)) / np.sqrt(np.mean(epsilon_rr_ana_L**2))
-err_eps_tt = np.sqrt(np.mean((epsilon_tt - epsilon_tt_ana_L) ** 2)) / np.sqrt(np.mean(epsilon_tt_ana_L**2))
-err_eps_zz = np.sqrt(np.mean((epsilon_zz - epsilon_zz_ana_L) ** 2)) / np.sqrt(np.mean(epsilon_zz_ana_L**2))
+err_eps_rr = np.sqrt(np.mean((epsilon_rr - epsilon_rr_ana_L) ** 2)) / np.sqrt(
+    np.mean(epsilon_rr_ana_L**2)
+)
+err_eps_tt = np.sqrt(np.mean((epsilon_tt - epsilon_tt_ana_L) ** 2)) / np.sqrt(
+    np.mean(epsilon_tt_ana_L**2)
+)
+err_eps_zz = np.sqrt(np.mean((epsilon_zz - epsilon_zz_ana_L) ** 2)) / np.sqrt(
+    np.mean(epsilon_zz_ana_L**2)
+)
 
 errors = {
     "L2_error_sigma_rr": {

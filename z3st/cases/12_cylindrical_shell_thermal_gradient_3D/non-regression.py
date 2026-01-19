@@ -22,16 +22,16 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.5                # m          inner and outer radius
-Pi, Po = 0.0, 0.0                           # Pa         internal and external pressure
-k, E, nu, alpha = 50, 2e11, 0.3, 1.0e-5     # W/m·K, Pa, -, 1/K
-Ti, To = 500.0, 400.0                       # K          inner and outer surface temperature
-q0, mu = 0.0, 24.0                          # W/m³, 1/m  heat source, attenuation
-Lx = Ro - Ri                                # m          wall thickness
-slenderness = Ri / Lx                       # -          slenderness ratio
-z_target, z_tol = Lz / 2, Lz / 10           # m          z-plane for data extraction
+Ri, Ro, Lz = 0.02, 0.03, 0.5  # m          inner and outer radius
+Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
+k, E, nu, alpha = 50, 2e11, 0.3, 1.0e-5  # W/m·K, Pa, -, 1/K
+Ti, To = 500.0, 400.0  # K          inner and outer surface temperature
+q0, mu = 0.0, 24.0  # W/m³, 1/m  heat source, attenuation
+Lx = Ro - Ri  # m          wall thickness
+slenderness = Ri / Lx  # -          slenderness ratio
+z_target, z_tol = Lz / 2, Lz / 10  # m          z-plane for data extraction
 
-TOLERANCE = 4.0e-2                          # -          tolerance for non-regression
+TOLERANCE = 4.0e-2  # -          tolerance for non-regression
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---

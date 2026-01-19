@@ -22,22 +22,23 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly, Lz = 0.2, 0.2, 0.2          # m (geometry dimensions)
+Lx, Ly, Lz = 0.2, 0.2, 0.2  # m (geometry dimensions)
 k, E, nu, alpha = (
     50.0,
     2.0e11,
     0.30,
     1.0e-5,
-)                                   # W/m-K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
-Ti, To = 500.0, 500.0               # K (boundary temperatures)
+)  # W/m-K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
+Ti, To = 500.0, 500.0  # K (boundary temperatures)
 y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.01  # m, m, m (plane selection and tolerance)
 
-TOLERANCE = 1e-3                    # - (relative tolerance for non-regression tests)
+TOLERANCE = 1e-3  # - (relative tolerance for non-regression tests)
 
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_T(x):
     return Ti * np.ones_like(x)
+
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
@@ -80,27 +81,29 @@ plt.figure(figsize=(10, 7))
 
 # Stress
 ax1 = plt.gca()
-ax1.plot(x_s, sigma_xx * Pa_to_MPa, 'b.', label=r'Num. $\sigma_{xx}$', alpha=0.5)
-ax1.plot(x_s, sigma_yy * Pa_to_MPa, 'g.', label=r'Num. $\sigma_{yy}$', alpha=0.5)
-ax1.plot(x_s, sigma_zz * Pa_to_MPa, 'c.', label=r'Num. $\sigma_{zz}$', alpha=0.5)
-ax1.plot(x_s, sigma_th_ref * Pa_to_MPa, 'm--', label=r'Ana. $\sigma_{th}$', linewidth=2.0, alpha=0.7)
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, "b.", label=r"Num. $\sigma_{xx}$", alpha=0.5)
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, "g.", label=r"Num. $\sigma_{yy}$", alpha=0.5)
+ax1.plot(x_s, sigma_zz * Pa_to_MPa, "c.", label=r"Num. $\sigma_{zz}$", alpha=0.5)
+ax1.plot(
+    x_s, sigma_th_ref * Pa_to_MPa, "m--", label=r"Ana. $\sigma_{th}$", linewidth=2.0, alpha=0.7
+)
 
 ax1.set_xlabel("x (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
-ax1.grid(True, linestyle='--', alpha=0.7)
+ax1.grid(True, linestyle="--", alpha=0.7)
 ax1.set_ylim(-1001, -999)
 
 # Temperature
 ax2 = ax1.twinx()
-ax2.plot(x_T, T, 'ks', label='Num. Temperature', markersize=3, alpha=0.4)
-ax2.plot(x_T, T_ref, 'k--', label='Ana. Temperature', linewidth=1.0, alpha=0.8)
+ax2.plot(x_T, T, "ks", label="Num. Temperature", markersize=3, alpha=0.4)
+ax2.plot(x_T, T_ref, "k--", label="Ana. Temperature", linewidth=1.0, alpha=0.8)
 ax2.set_ylabel("Temperature (K)", fontsize=12)
 ax2.set_ylim(499, 501)
 
 # Legend
 lines, labels = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
-ax1.legend(lines + lines2, labels + labels2, loc='upper center', bbox_to_anchor=(0.5, -0.1), ncol=3)
+ax1.legend(lines + lines2, labels + labels2, loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=3)
 
 plt.title(rf"$T_i$ = {Ti:.0f}°C, $\sigma_T$ = {max_sigma_T*1e-6:.1f} MPa", pad=15, fontsize=14)
 plt.tight_layout()

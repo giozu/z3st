@@ -89,12 +89,12 @@ class Solver:
         """Build dx_tags and ds_tags measures with axisymmetric and cartesian support."""
         x = ufl.SpatialCoordinate(self.mesh)
         regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
-        
+
         # Integration weight logic:
         # - Axisymmetric: 2*pi*r
         # - Cartesian 2D: 1.0 (Area)
         # - 3D: 1.0 (Volume)
-        
+
         if regime == "axisymmetric":
             self.weight = 2.0 * ufl.pi * x[0]
         elif regime == "2d":
@@ -272,9 +272,9 @@ class Solver:
 
             rho = dolfinx.default_scalar_type(material["rho"])
             g = dolfinx.default_scalar_type(self.g)
-            
+
             regime = self.mech_cfg.get("mechanical_regime").lower()
-            if regime == "axisymmetric" or regime == '2d':
+            if regime == "axisymmetric" or regime == "2d":
                 # 2D: (F_r, F_z) or (F_x, F_y)
                 body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
             else:
@@ -508,8 +508,8 @@ class Solver:
         print(f"  → Max iterations (Newton): {max_iter}")
 
         # Split (initialized) mixed unknowns into mechanical (u_m) and thermal (u_t) parts
-        (u_m, u_t) = ufl.split(self.sol_mixed)
-        (v_m, v_t) = ufl.TestFunctions(self.W)
+        u_m, u_t = ufl.split(self.sol_mixed)
+        v_m, v_t = ufl.TestFunctions(self.W)
 
         # Initialize total residual
         F = 0

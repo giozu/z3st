@@ -23,14 +23,14 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.40, 2.50, 15.0                   # m          inner and outer radius, height
-Pi, Po = 1.0e6, 0.0                             # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3                             # Pa, -
-t = Ro - Ri                                     # m          wall thickness
-slenderness = Ri / t                            # -          slenderness ratio
-z_target, z_tol = Lz, 1.0                       # m          z-plane for data extraction
+Ri, Ro, Lz = 2.40, 2.50, 15.0  # m          inner and outer radius, height
+Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
+E, nu = 2.0e11, 0.3  # Pa, -
+t = Ro - Ri  # m          wall thickness
+slenderness = Ri / t  # -          slenderness ratio
+z_target, z_tol = Lz, 1.0  # m          z-plane for data extraction
 
-TOLERANCE = 6.0e-1                              # -          tolerance for non-regression
+TOLERANCE = 6.0e-1  # -          tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 # Mariotte solutions (Po=0)
@@ -89,16 +89,33 @@ plt.figure(figsize=(10, 7))
 
 # Stress
 ax1 = plt.gca()
-ax1.plot(r_s, sigma_rr * Pa_to_MPa, 'ro', label=r'Num. $\sigma_{rr}$ (Radial)', markersize=4, alpha=0.6)
-ax1.plot(r_s, sigma_rr_ana_M * Pa_to_MPa, 'r-', label=r'Ana. $\sigma_{rr}$ (Radial)', linewidth=1.5)
-ax1.plot(r_s, sigma_tt * Pa_to_MPa, 'go', label=r'Num. $\sigma_{\theta\theta}$ (Hoop)', markersize=4, alpha=0.6)
-ax1.plot(r_s, sigma_tt_ana_M * Pa_to_MPa, 'g-', label=r'Ana. $\sigma_{\theta\theta}$ (Hoop)', linewidth=1.5)
-ax1.plot(r_s, sigma_zz * Pa_to_MPa, 'bo', label=r'Num. $\sigma_{zz}$ (Axial)', markersize=4, alpha=0.6)
-ax1.plot(r_s, sigma_zz_ana_M * Pa_to_MPa, 'b-', label=r'Ana. $\sigma_{zz}$ (Axial)', linewidth=1.5)
+ax1.plot(
+    r_s, sigma_rr * Pa_to_MPa, "ro", label=r"Num. $\sigma_{rr}$ (Radial)", markersize=4, alpha=0.6
+)
+ax1.plot(r_s, sigma_rr_ana_M * Pa_to_MPa, "r-", label=r"Ana. $\sigma_{rr}$ (Radial)", linewidth=1.5)
+ax1.plot(
+    r_s,
+    sigma_tt * Pa_to_MPa,
+    "go",
+    label=r"Num. $\sigma_{\theta\theta}$ (Hoop)",
+    markersize=4,
+    alpha=0.6,
+)
+ax1.plot(
+    r_s,
+    sigma_tt_ana_M * Pa_to_MPa,
+    "g-",
+    label=r"Ana. $\sigma_{\theta\theta}$ (Hoop)",
+    linewidth=1.5,
+)
+ax1.plot(
+    r_s, sigma_zz * Pa_to_MPa, "bo", label=r"Num. $\sigma_{zz}$ (Axial)", markersize=4, alpha=0.6
+)
+ax1.plot(r_s, sigma_zz_ana_M * Pa_to_MPa, "b-", label=r"Ana. $\sigma_{zz}$ (Axial)", linewidth=1.5)
 
 ax1.set_xlabel("Radius (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
-ax1.grid(True, linestyle='--', alpha=0.7)
+ax1.grid(True, linestyle="--", alpha=0.7)
 
 plt.legend()
 plt.tight_layout()
@@ -113,16 +130,25 @@ plt.figure(figsize=(10, 7))
 
 # Strain
 ax1 = plt.gca()
-ax1.plot(r_s, epsilon_rr, 'ro', label=r'Num. $\varepsilon_{rr}$ (Radial)', markersize=4, alpha=0.6)
-ax1.plot(r_s, epsilon_rr_ana_M, 'r-', label=r'Ana. $\varepsilon_{rr}$ (Radial)', linewidth=1.5)
-ax1.plot(r_s, epsilon_tt, 'go', label=r'Num. $\varepsilon_{\theta\theta}$ (Hoop)', markersize=4, alpha=0.6)
-ax1.plot(r_s, epsilon_tt_ana_M, 'g-', label=r'Ana. $\varepsilon_{\theta\theta}$ (Hoop)', linewidth=1.5)
-ax1.plot(r_s, epsilon_zz, 'bo', label=r'Num. $\varepsilon_{zz}$ (Axial)', markersize=4, alpha=0.6)
-ax1.plot(r_s, epsilon_zz_ana_M, 'b-', label=r'Ana. $\varepsilon_{zz}$ (Axial)', linewidth=1.5)
+ax1.plot(r_s, epsilon_rr, "ro", label=r"Num. $\varepsilon_{rr}$ (Radial)", markersize=4, alpha=0.6)
+ax1.plot(r_s, epsilon_rr_ana_M, "r-", label=r"Ana. $\varepsilon_{rr}$ (Radial)", linewidth=1.5)
+ax1.plot(
+    r_s,
+    epsilon_tt,
+    "go",
+    label=r"Num. $\varepsilon_{\theta\theta}$ (Hoop)",
+    markersize=4,
+    alpha=0.6,
+)
+ax1.plot(
+    r_s, epsilon_tt_ana_M, "g-", label=r"Ana. $\varepsilon_{\theta\theta}$ (Hoop)", linewidth=1.5
+)
+ax1.plot(r_s, epsilon_zz, "bo", label=r"Num. $\varepsilon_{zz}$ (Axial)", markersize=4, alpha=0.6)
+ax1.plot(r_s, epsilon_zz_ana_M, "b-", label=r"Ana. $\varepsilon_{zz}$ (Axial)", linewidth=1.5)
 
 ax1.set_xlabel("Radius (m)", fontsize=12)
 ax1.set_ylabel("Strain (/)", fontsize=12)
-ax1.grid(True, linestyle='--', alpha=0.7)
+ax1.grid(True, linestyle="--", alpha=0.7)
 
 plt.legend()
 plt.tight_layout()
@@ -132,14 +158,19 @@ plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
 
 
-
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_M) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_M**2))
 err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_M) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_M**2))
 err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_M) ** 2)) / np.sqrt(np.mean(sigma_zz_ana_M**2))
-err_eps_rr = np.sqrt(np.mean((epsilon_rr - epsilon_rr_ana_M) ** 2)) / np.sqrt(np.mean(epsilon_rr_ana_M**2))
-err_eps_tt = np.sqrt(np.mean((epsilon_tt - epsilon_tt_ana_M) ** 2)) / np.sqrt(np.mean(epsilon_tt_ana_M**2))
-err_eps_zz = np.sqrt(np.mean((epsilon_zz - epsilon_zz_ana_M) ** 2)) / np.sqrt(np.mean(epsilon_zz_ana_M**2))
+err_eps_rr = np.sqrt(np.mean((epsilon_rr - epsilon_rr_ana_M) ** 2)) / np.sqrt(
+    np.mean(epsilon_rr_ana_M**2)
+)
+err_eps_tt = np.sqrt(np.mean((epsilon_tt - epsilon_tt_ana_M) ** 2)) / np.sqrt(
+    np.mean(epsilon_tt_ana_M**2)
+)
+err_eps_zz = np.sqrt(np.mean((epsilon_zz - epsilon_zz_ana_M) ** 2)) / np.sqrt(
+    np.mean(epsilon_zz_ana_M**2)
+)
 
 errors = {
     "L2_error_sigma_rr": {

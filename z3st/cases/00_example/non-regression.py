@@ -21,16 +21,16 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly, Lz = 0.100, 0.100, 0.004                    # m
-E = 200e9                                           # Pa
-y_target, z_target, mask_tol = Ly/2, Lz/2, Ly*0.1   # Extraction line
+Lx, Ly, Lz = 0.100, 0.100, 0.004  # m
+E = 200e9  # Pa
+y_target, z_target, mask_tol = Ly / 2, Lz / 2, Ly * 0.1  # Extraction line
 
 # Analytical references
-SIGMA_REF = 125e6                          # Pa
-VON_MISES_REF = 125e6                      # Pa
-UX_REF = SIGMA_REF * Lx / E                # m
+SIGMA_REF = 125e6  # Pa
+VON_MISES_REF = 125e6  # Pa
+UX_REF = SIGMA_REF * Lx / E  # m
 
-TOLERANCE = 1e-2                           # Relative tolerance
+TOLERANCE = 1e-2  # Relative tolerance
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
@@ -59,26 +59,26 @@ ux_line = u_all[mask_u, 0][sort_idx_u]
 
 # Plot displacement along X
 plt.figure(figsize=(10, 5))
-plt.plot(x_u_line, ux_line*1e3, 'go-', label='Z3ST (ux)', markersize=4)
-plt.axhline(y=UX_REF*1e3, color='r', linestyle='--', label='Analytical Ref')
+plt.plot(x_u_line, ux_line * 1e3, "go-", label="Z3ST (ux)", markersize=4)
+plt.axhline(y=UX_REF * 1e3, color="r", linestyle="--", label="Analytical Ref")
 plt.title(f"Displacement u_x profile (y={y_target}, z={z_target})")
 plt.xlabel("x-coordinate (m)")
 plt.ylabel("u_x (mm)")
-plt.grid(True, linestyle='--', alpha=0.6)
+plt.grid(True, linestyle="--", alpha=0.6)
 plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(CASE_DIR, "output", "plot_ux.png"))
 
 # Plot stresses along X
 plt.figure(figsize=(10, 5))
-plt.plot(x_s_line, sigma_xx*1e-6, 's-', color='tab:orange', label='Sigma XX', markersize=4)
-plt.plot(x_s_line, sigma_vm_line*1e-6, 'd-', color='tab:red', label='Von Mises ', markersize=4)
-plt.axhline(y=SIGMA_REF*1e-6, color='k', linestyle=':', label='Analytical Ref')
+plt.plot(x_s_line, sigma_xx * 1e-6, "s-", color="tab:orange", label="Sigma XX", markersize=4)
+plt.plot(x_s_line, sigma_vm_line * 1e-6, "d-", color="tab:red", label="Von Mises ", markersize=4)
+plt.axhline(y=SIGMA_REF * 1e-6, color="k", linestyle=":", label="Analytical Ref")
 plt.title(f"Stress profiles (y={y_target}, z={z_target})")
 plt.xlabel("x-coordinate (m)")
 plt.ylabel("Stress (MPa)")
 plt.ylim(124, 126)
-plt.grid(True, linestyle='--', alpha=0.6)
+plt.grid(True, linestyle="--", alpha=0.6)
 plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(CASE_DIR, "output", "plot_stress.png"))
