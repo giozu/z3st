@@ -699,6 +699,10 @@ def plotter_sigma_temperature_slab(
     plt.rcParams.update({"font.size": 11})
     _, ax1 = plt.subplots(figsize=(7, 5))
 
+    if sigma_ref is not None:
+        ax1.plot(
+            x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (analytical)"
+        )
     ax1.scatter(
         x_s,
         sigma / 1e6,
@@ -706,9 +710,8 @@ def plotter_sigma_temperature_slab(
         marker="o",
         facecolors="none",
         edgecolors="C0",
-        label=r"Numerical $\sigma$",
+        label=r"$\sigma_{\mathrm{th}}$ (numerical)",
     )
-    ax1.plot(x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (formula)")
     ax1.set_xlabel("Thickness (mm)")
     ax1.set_ylabel("Stress (MPa)")
     ax1.xaxis.set_major_formatter(ticker.FuncFormatter(lambda X, _: f"{X*1e3:g}"))
@@ -907,9 +910,9 @@ def plotter_strain_cylinder(
 
     plt.figure(figsize=(7, 5))
 
-    plt.scatter(r_s, strain_rr, s=12, c="orange", label=r"Numerical $\epsilon_{rr}$")
-    plt.scatter(r_s, strain_tt, s=12, c="red", label=r"Numerical $\epsilon_{\theta\theta}$")
-    plt.scatter(r_s, strain_zz, s=12, c="gold", label=r"Numerical $\epsilon_{zz}$")
+    plt.scatter(r_s, strain_rr, s=12, c="blue", label=r"Numerical $\epsilon_{rr}$")
+    plt.scatter(r_s, strain_tt, s=12, c="green", label=r"Numerical $\epsilon_{\theta\theta}$")
+    plt.scatter(r_s, strain_zz, s=12, c="purple", label=r"Numerical $\epsilon_{zz}$")
 
     if strain_rr_ana_L is not None:
         plt.plot(

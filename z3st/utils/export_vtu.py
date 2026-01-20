@@ -18,7 +18,7 @@ def _von_mises(sig):
 
     Parameters
     ----------
-    sig : ndarray, shape (N, gdim, gdim)
+    sig : ndarray, shape (N, 3, 3)
         Stress tensor at each cell/point.
 
     Returns
@@ -103,27 +103,23 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     grid.cell_data["MaterialID"] = material_ids
 
     # --- Function spaces for exporting tensors/vectors ---
-    V_vector_cells = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (problem.tdim,)))
-    V_tensor_cells = dolfinx.fem.functionspace(
-        problem.mesh, ("DG", 0, (problem.tdim, problem.tdim))
-    )
+    dim = 3
+
+    V_vector_cells = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (dim,)))
+    V_tensor_cells = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (dim, dim)))
     V_scalar_cells = dolfinx.fem.functionspace(problem.mesh, ("DG", 0))
-    V_tensor_points = dolfinx.fem.functionspace(
-        problem.mesh, ("Lagrange", 1, (problem.tdim, problem.tdim))
-    )
+    V_tensor_points = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1, (dim, dim)))
     V_scalar_points = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1))
 
     # --- Strain (global) ---
     strain_symbolic = problem.strain
     # cells
     strain_numeric = interpolate_expression(strain_symbolic, V_tensor_cells)
-    grid.cell_data["Strain (cells)"] = strain_numeric.x.array.reshape(
-        -1, problem.tdim * problem.tdim
-    )
+    grid.cell_data["Strain (cells)"] = strain_numeric.x.array.reshape(-1, dim * dim)
     # points
     strain_numeric = interpolate_expression(strain_symbolic, V_tensor_points)
-    strain_array = strain_numeric.x.array.reshape((n_points, problem.tdim, problem.tdim))
-    grid.point_data["Strain (points)"] = strain_array.reshape(n_points, problem.tdim * problem.tdim)
+    strain_array = strain_numeric.x.array.reshape((n_points, dim, dim))
+    grid.point_data["Strain (points)"] = strain_array.reshape(n_points, dim * dim)
 
     # --- Per-material on CELLS: stress + Von Mises + principals + hydrostatic + heat flux ---
     stress_total_cells = dolfinx.fem.Function(V_tensor_cells)
@@ -143,10 +139,8 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         stress_total_cells.interpolate(stress_expr, material_cells)
 
         stress_numeric = interpolate_expression(stress_symbolic, V_tensor_cells)
-        stress_cells = stress_numeric.x.array.reshape(-1, problem.tdim, problem.tdim)
-        grid.cell_data[f"Stress_{name} (cells)"] = stress_cells.reshape(
-            -1, problem.tdim * problem.tdim
-        )
+        stress_cells = stress_numeric.x.array.reshape(-1, dim, dim)
+        grid.cell_data[f"Stress_{name} (cells)"] = stress_cells.reshape(-1, dim * dim)
 
         # Von Mises (cells)
         vm_cells = _von_mises(stress_cells)
@@ -162,7 +156,7 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         heat_flux_total_cells.interpolate(q_expr, material_cells)
 
     # Global (aggregated) cell fields
-    grid.cell_data["Heat flux"] = heat_flux_total_cells.x.array.reshape(-1, problem.tdim)
+    grid.cell_data["Heat flux"] = heat_flux_total_cells.x.array.reshape(-1, dim)
 
     # --- Per-material on POINTS: stress + Von Mises + principals + hydrostatic ---
     stress_total_points = dolfinx.fem.Function(V_tensor_points)
@@ -178,7 +172,7 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         stress_total_points.interpolate(stress_expr, material_cells)
 
         stress_numeric = interpolate_expression(stress_symbolic, V_tensor_points)
-        stress_points = stress_numeric.x.array.reshape((n_points, problem.tdim, problem.tdim))
+        stress_points = stress_numeric.x.array.reshape((n_points, dim, dim))
         grid.point_data[f"Stress_{name} (points)"] = stress_points
 
         # Von Mises (points)

@@ -1,24 +1,45 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 0.24567656485958644,
+            "numerical": 8.741424944314e-05,
             "reference": 0.0,
-            "abs_error": 0.24567656485958644,
-            "rel_error": 0.0004913531297191729,
+            "abs_error": 8.741424944314e-05,
+            "rel_error": 1.7482849888628e-07,
             "status": "PASS"
         },
         "Linf_error_T": {
-            "numerical": 0.39361597958128414,
+            "numerical": 0.00022529698173912038,
             "reference": 0.0,
-            "abs_error": 0.39361597958128414,
-            "rel_error": 0.0007872319591625683,
+            "abs_error": 0.00022529698173912038,
+            "rel_error": 4.505939634782408e-07,
             "status": "PASS"
         },
         "T_max": {
-            "numerical": 500.0311387684711,
+            "numerical": 500.00022529698174,
             "reference": 500.0,
-            "abs_error": 0.031138768471123512,
-            "rel_error": 6.227753694224703e-05,
+            "abs_error": 0.00022529698173912038,
+            "rel_error": 4.505939634782408e-07,
+            "status": "PASS"
+        },
+        "L2_error_sigma_yy": {
+            "numerical": 2.6111294125649446e-07,
+            "reference": 0.0,
+            "abs_error": 2.6111294125649446e-07,
+            "rel_error": 2.6111294125649446e-07,
+            "status": "PASS"
+        },
+        "L2_error_sigma_xy": {
+            "numerical": 2.5188654096965156e-07,
+            "reference": 0.0,
+            "abs_error": 2.5188654096965156e-07,
+            "rel_error": 2.5188654096965156e-07,
+            "status": "PASS"
+        },
+        "L2_error_sigma_xz": {
+            "numerical": 1.1409638541666788e-07,
+            "reference": 0.0,
+            "abs_error": 1.1409638541666788e-07,
+            "rel_error": 1.1409638541666788e-07,
             "status": "PASS"
         }
     },

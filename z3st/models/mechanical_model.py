@@ -19,14 +19,13 @@ class MechanicalModel:
         self.dirichlet_mechanical = {}
         self.clamp_r = {}
 
-        data = self.input_file
-
-        self.mech_options = data.get("mechanical", {})
-        if not self.mech_options:
+        # --. Mechanical model options --..
+        self.mech_cfg = self.input_file.get("mechanical", {})
+        if not self.mech_cfg:
             raise ValueError("[MechanicalModel] 'mechanical' missing in input.yaml.")
 
         print("[MechanicalModel] options loaded from input.yaml:")
-        for key, value in self.mech_options.items():
+        for key, value in self.mech_cfg.items():
             print(f"  {key:<20}: {value}")
 
     def set_mechanical_boundary_conditions(self, V_u_sub, V_u_map=None):
@@ -40,7 +39,7 @@ class MechanicalModel:
         - ERROR if a region is assigned more than once
         """
         print("\nSetting mechanical boundary conditions...")
-        mechanical_bcs_defs = self.boundary_conditions.get("mechanical_bcs", {})
+        mechanical_bcs_defs = self.boundary_conditions.get("mechanical", {})
 
         seen_regions = {}
 
@@ -106,17 +105,67 @@ class MechanicalModel:
                         )
                         sys.exit(1)
 
+                    # --- interpret traction input ---
+                    # Case 1: single scalar
+                    if isinstance(traction_value, (int, float)):
+                        raw_value = traction_value
+
+                    # Case 2: list of values over steps
+                    elif isinstance(traction_value, list):
+                        # check list contains scalars
+                        if not all(isinstance(x, (int, float)) for x in traction_value):
+                            print(
+                                f"[ERROR] traction list on '{region_name}' contains non-scalar values."
+                            )
+                            sys.exit(1)
+
+                        # check matching n_steps
+                        if len(traction_value) != self.n_steps:
+                            print(
+                                f"[ERROR] traction list length = {len(traction_value)}, "
+                                f"but n_steps = {self.n_steps}. Must match."
+                            )
+                            sys.exit(1)
+
+                        raw_value = traction_value
+
+                    else:
+                        print(
+                            f"[ERROR] traction value for '{region_name}' must be scalar or list, got {type(traction_value)}"
+                        )
+                        sys.exit(1)
+
+                    # Initial traction is either the scalar or the first entry of the list
+                    if isinstance(raw_value, list):
+                        initial_traction = raw_value[0]
+                    else:
+                        initial_traction = raw_value
+
                     traction_const = dolfinx.fem.Constant(
-                        self.mesh, PETSc.ScalarType(traction_value)
+                        self.mesh, PETSc.ScalarType(initial_traction)
                     )
-                    traction_expr = traction_const * self.normal
+
+                    if (
+                        self.mech_cfg.get("mechanical_regime").lower() == "axisymmetric"
+                        or self.mech_cfg.get("mechanical_regime").lower() == "2D"
+                    ):
+                        # 2D: only r and z components or x and y
+                        n_2d = ufl.as_vector([self.normal[0], self.normal[1]])
+                        traction_expr = traction_const * n_2d
+                    else:
+                        traction_expr = traction_const * self.normal
 
                     self.traction[mat_type].append(
-                        {"id": region_id, "value": traction_expr, "const": traction_const}
+                        {
+                            "id": region_id,
+                            "value": traction_expr,
+                            "const": traction_const,
+                            "raw": raw_value,
+                        }
                     )
 
                     print(
-                        f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {traction_value} Pa at region '{region_name}'"
+                        f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {initial_traction} Pa at region '{region_name}'"
                     )
 
                 # --. Slip (double component-wise blocking) --..
@@ -153,7 +202,7 @@ class MechanicalModel:
                         self.dirichlet_mechanical[mat_type].append(bc_i)
 
                     print(
-                        f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_y, u_z = 0.0 at region '{region_name}'"
+                        f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_x, u_z = 0.0 at region '{region_name}'"
                     )
 
                 elif bc_type == "Slip_z":
@@ -190,11 +239,14 @@ class MechanicalModel:
                     )
 
                 elif bc_type == "Clamp_y":
+
+                    val = bc_info.get("value", 0.0)
+
                     boundary_dofs_y = dolfinx.fem.locate_dofs_topological(
                         V_u_sub.sub(1), self.fdim, self.facet_tags.find(region_id)
                     )
                     bcy = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(0), boundary_dofs_y, V_u_sub.sub(1)
+                        dolfinx.default_scalar_type(val), boundary_dofs_y, V_u_sub.sub(1)
                     )
 
                     self.dirichlet_mechanical[mat_type].append(bcy)
@@ -204,6 +256,15 @@ class MechanicalModel:
                     )
 
                 elif bc_type == "Clamp_z":
+
+                    regime = self.mech_cfg["mechanical_regime"].lower()
+                    if regime == "2d" or regime == "axisymmetric":
+                        raise ValueError(
+                            f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
+                            f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"
+                            f"        Please use 'Clamp_y' in your boundary_conditions.yaml for region '{region_name}'."
+                        )
+
                     val = bc_info.get("value", 0.0)
 
                     boundary_dofs_z = dolfinx.fem.locate_dofs_topological(
@@ -215,7 +276,7 @@ class MechanicalModel:
                     self.dirichlet_mechanical[mat_type].append(bcz)
 
                     print(
-                        f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → u_z = {val} at region '{region_name}'"
+                        f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'"
                     )
 
                 # --. Clamp_r --..
@@ -263,8 +324,49 @@ class MechanicalModel:
             raise ValueError(f"Formato displacement non valido: shape {displacement.shape}")
 
     def epsilon(self, u):
-        # return 0.5 * (ufl.grad(u) + ufl.transpose(ufl.grad(u)))
-        return ufl.sym(ufl.grad(u))
+        """
+        Compute the infinitesimal strain tensor epsilon.
+
+        This function supports:
+        1. 'axisymmetric': A 2D formulation where the problem is symmetric with respect to the azimutal coordinate.
+        The x-coordinate is treated as the radial component (r),
+        and the y-coordinate as the axial component (z).
+        3. '2D': x-y 2D formulation
+        3. '3D' or other: Standard symmetric gradient of the displacement vector.
+
+        Parameters:
+            u: Displacement field.
+
+        Returns:
+            The 3x3 strain tensor.
+        """
+        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+
+        if regime == "axisymmetric":
+            # u[0] is radial displacement (u_r), u[1] is axial displacement (u_z)
+            r = ufl.SpatialCoordinate(self.mesh)[0]
+
+            # Components of the strain tensor in cylindrical coordinates (r, theta, z)
+            eps_rr = u[0].dx(0)  # Normal radial strain
+            eps_tt = u[0] / r  # Hoop strain (tangential)
+            eps_zz = u[1].dx(1)  # Normal axial strain
+            eps_rz = 0.5 * (u[0].dx(1) + u[1].dx(0))  # Shear strain in the r-z plane
+
+            # Return the 3x3 tensor.
+            return ufl.as_tensor([[eps_rr, 0.0, eps_rz], [0.0, eps_tt, 0.0], [eps_rz, 0.0, eps_zz]])
+
+        elif regime == "2d":
+            # u[0] = x-displacement
+            # u[1] = y-displacement
+            eps_xx = u[0].dx(0)
+            eps_yy = u[1].dx(1)
+            eps_xy = 0.5 * (u[0].dx(1) + u[1].dx(0))
+
+            return ufl.as_tensor([[eps_xx, eps_xy, 0.0], [eps_xy, eps_yy, 0.0], [0.0, 0.0, 0.0]])
+
+        else:
+            # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)
+            return ufl.sym(ufl.grad(u))
 
     def sigma_mech(self, u, material):
         """
@@ -304,6 +406,7 @@ class MechanicalModel:
 
         # mode = material["constitutive_mode"]
         mode = material.get("constitutive_mode", "lame")
+        regime = self.mech_cfg["mechanical_regime"].lower()
 
         if mode == "voigt":
             # small strain
@@ -358,7 +461,7 @@ class MechanicalModel:
 
         else:
             # Plane-stress reduction (x–y plane)
-            if self.mech_regime == "plane_stress" or self.mech_regime == "2D":
+            if regime == "plane_stress":
 
                 eps = self.epsilon(u)
                 sigma = (
@@ -378,11 +481,11 @@ class MechanicalModel:
                 )
 
             # Default isotropic Lamé
-            elif self.mech_regime == "3D":
+            elif regime == "3d" or regime == "axisymmetric" or regime == "2d":
                 eps = self.epsilon(u)
+                dim = eps.ufl_shape[0]
                 sigma = (
-                    material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.tdim)
-                    + 2.0 * material["G"] * eps
+                    material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim) + 2.0 * material["G"] * eps
                 )
 
         return sigma
@@ -404,11 +507,14 @@ class MechanicalModel:
             dolfinx.fem.Tensor: The thermal stress tensor.
 
         """
+        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+        dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
+
         return (
             -(3 * material["lmbda"] + 2 * material["G"])
             * material["alpha"]
             * (T - material["T_ref"])
-            * ufl.Identity(self.tdim)
+            * ufl.Identity(dim)
         )
 
     def elastic_energy_density(self, u, material):

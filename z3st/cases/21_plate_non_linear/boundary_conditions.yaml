@@ -1,4 +1,4 @@
-mechanical_bcs:
+mechanical:
   steel:
   - type: Neumann
     region: xmax
@@ -13,7 +13,7 @@ mechanical_bcs:
   - type: Clamp_z
     region: zmin
 
-thermal_bcs:
+thermal:
   steel:
   - type: Dirichlet
     region: zmin

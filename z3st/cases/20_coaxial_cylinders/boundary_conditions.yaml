@@ -1,4 +1,4 @@
-thermal_bcs:
+thermal:
   cyl_1:
   - type: Neumann
     region: bottom_1
@@ -29,7 +29,7 @@ thermal_bcs:
     region: inner_2
     pair: lateral_1
 
-mechanical_bcs:
+mechanical:
   cyl_1:
   - type: Dirichlet
     region: bottom_1
@@ -37,7 +37,7 @@ mechanical_bcs:
 
   - type: Neumann
     region: lateral_1
-    traction: -2.0e6   # (Pa)
+    traction: -2.0e+6   # (Pa)
 
   - type: Clamp_z
     region: top_1
@@ -49,11 +49,11 @@ mechanical_bcs:
 
   - type: Neumann
     region: inner_2
-    traction: -2.0e6   # (Pa)
+    traction: -2.0e+6   # (Pa)
 
   - type: Neumann
     region: outer_2
-    traction: -5.0e6   # (Pa)
+    traction: -5.0e+6   # (Pa)
 
   - type: Clamp_z
     region: top_2

@@ -20,7 +20,7 @@ class MeshPlotter:
         self.facet_tags = facet_tags
         self.label_map = label_map
 
-    def show(self):
+    def show(self, screenshot=None):
         log.info("Rendering mesh with PyVista...")
 
         topology, cell_types, _ = vtk_mesh(self.mesh, self.mesh.topology.dim - 1)
@@ -42,4 +42,11 @@ class MeshPlotter:
             plotter.add_mesh(cells, color=color, show_edges=True, label=name)
 
         plotter.add_legend()
-        plotter.show()
+        plotter.add_axes(xlabel="X", ylabel="Y", zlabel="Z", line_width=2, color="black")
+        plotter.show_axes()
+
+        if screenshot:
+            plotter.show(screenshot=screenshot, auto_close=True)
+            log.info(f"Mesh screenshot saved to {screenshot}")
+        else:
+            plotter.show()

@@ -1,0 +1,10 @@
+thermal:
+  volume:
+  - type: Dirichlet
+    region: outer
+    temperature: 500.0   # (K)
+
+mechanical:
+  volume:
+  - type: Clamp_y
+    region: bottom

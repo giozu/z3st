@@ -572,111 +572,90 @@ def extract_spherical_stresses(
         return sigma_rr, sigma_tt, sigma_pp
 
 
-def extract_cylindrical_stresses(
+def extract_cylindrical_field(
     filename="output/fields.vtu",
     z_fixed=0.0,
     tol=1e-3,
     case_dir=".",
-    stress_field_hint="Stress",
-    data_source="auto",
+    field_hint="Strain",
+    data_source="cell",
     average=True,
     decimals=6,
     save_results=False,
 ):
-    """
-    Extract a .csv σ_rr, σ_θθ, σ_zz at a fixed z from a .vtu file (cell or point data).
-
-    Parameters
-    ----------
-    filename : str
-        Path to the VTU file.
-    z_fixed : float
-        Z coordinate of the slice (m).
-    tol : float
-        Tolerance for slice selection.
-    stress_field_hint : str
-        Keyword to detect stress field (default: 'Stress').
-    data_source : str
-        'cell', 'point', or 'auto' (default).
-    """
-
-    # --- Load file ---
+    # Load file
     if not os.path.exists(filename):
         raise FileNotFoundError(f"[ERROR] File not found: {filename}")
     grid = pv.read(filename)
 
-    # --- Detect stress field ---
-    stress_field_name = None
-    if data_source in ("auto", "cell"):
-        for key in grid.cell_data.keys():
-            if stress_field_hint.lower() in key.lower():
-                stress_field_name = key
-                data_source = "cell"
-                break
+    # Detect field name
+    actual_field_name = None
+    data_obj = grid.cell_data if data_source == "cell" else grid.point_data
 
-    if stress_field_name is None and data_source in ("auto", "point"):
-        for key in grid.point_data.keys():
-            if stress_field_hint.lower() in key.lower():
-                stress_field_name = key
-                data_source = "point"
-                break
+    for key in data_obj.keys():
+        if field_hint.lower() in key.lower():
+            actual_field_name = key
+            break
 
-    if stress_field_name is None:
-        raise KeyError(f"No stress field found (searched '{stress_field_hint}') in {filename}")
+    if actual_field_name is None:
+        raise KeyError(
+            f"No field found containing '{field_hint}' in {data_source}_data of {filename}"
+        )
 
-    print(f"[INFO] Using stress field '{stress_field_name}' from {data_source}_data")
+    print(f"[INFO] Extracting '{actual_field_name}' from {data_source}_data")
 
+    # Data extraction
     if data_source == "cell":
-        stress = grid.cell_data[stress_field_name].reshape((-1, 3, 3))
+        raw_values = grid.cell_data[actual_field_name]
+        field_values = raw_values.reshape((-1, 3, 3))
         coords = grid.cell_centers().points
-    elif data_source == "point":
-        stress = grid.point_data[stress_field_name].reshape((-1, 3, 3))
+    else:
+        raw_values = grid.point_data[actual_field_name]
+        field_values = raw_values.reshape((-1, 3, 3))
         coords = grid.points
 
-    # --- Select slice ---
+    # Select slice
     mask = np.abs(coords[:, 2] - z_fixed) < tol
     if np.sum(mask) == 0:
         raise ValueError(f"No data found at z = {z_fixed:.4e} ± {tol:.1e}")
+
     x, y = coords[mask, 0], coords[mask, 1]
-    sxx, syy, szz, sxy = (
-        stress[mask, 0, 0],
-        stress[mask, 1, 1],
-        stress[mask, 2, 2],
-        stress[mask, 0, 1],
+
+    fxx, fyy, fzz, fxy = (
+        field_values[mask, 0, 0],
+        field_values[mask, 1, 1],
+        field_values[mask, 2, 2],
+        field_values[mask, 0, 1],
     )
 
-    # --- Convert to cylindrical ---
+    # Convert to cylindrical
     r = np.sqrt(x**2 + y**2)
     theta = np.arctan2(y, x)
     c, s = np.cos(theta), np.sin(theta)
-    sigma_rr = sxx * c**2 + syy * s**2 + 2 * sxy * s * c
-    sigma_tt = sxx * s**2 + syy * c**2 - 2 * sxy * s * c
-    sigma_zz = szz
+
+    frr = fxx * c**2 + fyy * s**2 + 2 * fxy * s * c
+    ftt = fxx * s**2 + fyy * c**2 - 2 * fxy * s * c
+    fzz = fzz
 
     import pandas as pd
 
-    df = pd.DataFrame(
-        {"r": r, "sigma_rr": sigma_rr, "sigma_tt": sigma_tt, "sigma_zz": sigma_zz}
-    ).sort_values("r")
+    df = pd.DataFrame({"r": r, "frr": frr, "ftt": ftt, "fzz": fzz}).sort_values("r")
 
-    # --- Average by radius (optional) ---
     if average:
         df["r"] = df["r"].round(decimals)
-        df = df.groupby("r")[["sigma_rr", "sigma_tt", "sigma_zz"]].mean().reset_index()
+        df = df.groupby("r")[["frr", "ftt", "fzz"]].mean().reset_index()
 
-    # --- Save results ---
     if save_results:
         out_dir = os.path.join(case_dir, "output")
         os.makedirs(out_dir, exist_ok=True)
-        csv_path = os.path.join(out_dir, f"stress_profile_z{z_fixed:.4e}.csv")
+        csv_path = os.path.join(out_dir, f"{field_hint.lower()}_cylindrical_z{z_fixed:.2f}.csv")
         df.to_csv(csv_path, index=False)
-        print(f"[DATA] Stress profile saved → {csv_path}")
 
     return (
         df["r"].to_numpy(),
-        df["sigma_rr"].to_numpy(),
-        df["sigma_tt"].to_numpy(),
-        df["sigma_zz"].to_numpy(),
+        df["frr"].to_numpy(),
+        df["ftt"].to_numpy(),
+        df["fzz"].to_numpy(),
     )
 
 
