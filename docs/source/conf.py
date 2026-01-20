@@ -40,7 +40,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.ifconfig",
-    # "sphinx.ext.imgmath",
+    "sphinx.ext.imgmath",
     # Type hints and doc improvements
     "sphinx_autodoc_typehints",
     "myst_parser",  # enables Markdown support
