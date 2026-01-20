@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 20_coaxial_cylinders
+Z3ST case: 20_slab_contact_2D
 
 non-regression script
 ---------------------
@@ -84,15 +84,15 @@ print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
 r_T, T = average_section_radial(x_T, y_T, z_T, T_all, z_target=z_target, tol=z_tol, decimals=4)
 
-r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_stresses(
+r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_field(
     filename=VTU_FILE,
     z_fixed=z_target,
     tol=z_tol,
     case_dir=CASE_DIR,
-    stress_field_hint="Stress",
-    data_source="auto",
+    field_hint="Stress",
+    data_source="cell",
     average=True,
-    decimals=4,
+    decimals=6,
 )
 
 # Analytical results

@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for two coaxial cylinders
+//  Gmsh GEO for two 3D coaxial cylinders
 //
 //  Author: Giovanni Zullo
 //
