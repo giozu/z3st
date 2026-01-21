@@ -30,6 +30,7 @@ CASES=(
     "12_cylindrical_shell_thermal_gradient_3D"
     "13_annular_cylinder"
     "14_full_cylinder"
+    "20_coaxial_cylinders_3D"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"

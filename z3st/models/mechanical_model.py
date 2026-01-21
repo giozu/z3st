@@ -100,74 +100,47 @@ class MechanicalModel:
                 elif bc_type == "Neumann":
                     traction_value = bc_info.get("traction")
                     if traction_value is None:
-                        print(
-                            f"  [ERROR] Neumann BC on '{mat_type}' for region '{region_name}' has no traction."
-                        )
+                        print(f"  [ERROR] Neumann BC on '{mat_type}' for region '{region_name}' has no traction.")
                         sys.exit(1)
 
-                    # --- interpret traction input ---
-                    # Case 1: single scalar
                     if isinstance(traction_value, (int, float)):
                         raw_value = traction_value
-
-                    # Case 2: list of values over steps
+                        initial_val = traction_value
                     elif isinstance(traction_value, list):
-                        # check list contains scalars
                         if not all(isinstance(x, (int, float)) for x in traction_value):
-                            print(
-                                f"[ERROR] traction list on '{region_name}' contains non-scalar values."
-                            )
+                            print(f"[ERROR] Traction list on '{region_name}' contains non-scalar values.")
                             sys.exit(1)
-
-                        # check matching n_steps
                         if len(traction_value) != self.n_steps:
-                            print(
-                                f"[ERROR] traction list length = {len(traction_value)}, "
-                                f"but n_steps = {self.n_steps}. Must match."
-                            )
+                            print(f"[ERROR] Traction list length ({len(traction_value)}) != n_steps ({self.n_steps}).")
                             sys.exit(1)
-
                         raw_value = traction_value
-
+                        initial_val = traction_value[0]
                     else:
-                        print(
-                            f"[ERROR] traction value for '{region_name}' must be scalar or list, got {type(traction_value)}"
-                        )
+                        print(f"[ERROR] Traction for '{region_name}' must be scalar or list, got {type(traction_value)}")
                         sys.exit(1)
 
-                    # Initial traction is either the scalar or the first entry of the list
-                    if isinstance(raw_value, list):
-                        initial_traction = raw_value[0]
-                    else:
-                        initial_traction = raw_value
-
                     traction_const = dolfinx.fem.Constant(
-                        self.mesh, PETSc.ScalarType(initial_traction)
+                        self.mesh, PETSc.ScalarType(initial_val)
                     )
 
-                    if (
-                        self.mech_cfg.get("mechanical_regime").lower() == "axisymmetric"
-                        or self.mech_cfg.get("mechanical_regime").lower() == "2D"
-                    ):
-                        # 2D: only r and z components or x and y
-                        n_2d = ufl.as_vector([self.normal[0], self.normal[1]])
-                        traction_expr = traction_const * n_2d
+                    regime = self.mech_cfg.get("mechanical_regime", "").lower()
+                    
+                    if regime in ["axisymmetric", "2d"]:
+                        n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                     else:
-                        traction_expr = traction_const * self.normal
+                        n_vec = self.normal
 
-                    self.traction[mat_type].append(
-                        {
-                            "id": region_id,
-                            "value": traction_expr,
-                            "const": traction_const,
-                            "raw": raw_value,
-                        }
-                    )
+                    traction_expr = traction_const * n_vec
 
-                    print(
-                        f"  [INFO] Neumann mechanical BC on '{mat_type}' → traction {initial_traction} Pa at region '{region_name}'"
-                    )
+                    self.traction[mat_type].append({
+                        "id": region_id,
+                        "value": traction_expr,
+                        "const": traction_const,
+                        "raw": raw_value,
+                    })
 
+                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → region '{region_name}': {initial_val} Pa")
+                
                 # --. Slip (double component-wise blocking) --..
                 elif bc_type == "Slip_x":
                     for i in [1, 2]:  # constrain u_y, u_z

@@ -13,8 +13,8 @@ Ro = 0.040;  // Outer radius (m)
 Lz = 0.100;  // Height (m)
 
 // Divisions
-nx = 81;     // 80 radial elements
-ny = 81;     // 80 axial elements
+nx = 81;     
+ny = 81;     
 
 Point(1) = {Ri, 0, 0};
 Point(2) = {Ro, 0, 0};
