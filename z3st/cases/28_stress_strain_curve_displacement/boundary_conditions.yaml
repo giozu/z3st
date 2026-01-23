@@ -1,7 +1,7 @@
 mechanical:
   steel:
-  - type: Clamp_x
-    region: xmin
+  - region: xmin
+    type: Clamp_x
 
   - region: xmax
     type: Dirichlet

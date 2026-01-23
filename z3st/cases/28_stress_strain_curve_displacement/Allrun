@@ -9,4 +9,4 @@ python3 -m z3st > log.txt
 
 python3 non-regression.py
 
-python3 ../../utils/plot_convergence.py log.txt
+# python3 ../../utils/plot_convergence.py log.txt

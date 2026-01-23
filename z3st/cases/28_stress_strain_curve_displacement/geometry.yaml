@@ -2,7 +2,7 @@ name: box
 geometry_type: rect
 
 Lx: 1.00 # box length in x (m)
-Ly: 1.00 # box length in y (m)
+Ly: 0.01 # box length in y (m)
 
 labels:
   ymin: 1
