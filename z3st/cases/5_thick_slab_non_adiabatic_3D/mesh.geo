@@ -48,7 +48,7 @@ Line Loop(4) = {7, 11, -8, -3}; Plane Surface(4) = {4}; // ymax
 Line Loop(5) = {8, 12, -5, -4}; Plane Surface(5) = {5}; // xmin
 Line Loop(6) = {9, 10, 11, 12}; Plane Surface(6) = {6}; // zmax
 
-// Cube volume
+// Volume
 Surface Loop(1) = {1, 2, 3, 4, 5, 6};
 Volume(1) = {1};
 

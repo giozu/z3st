@@ -14,7 +14,7 @@ r_inter = 0.055;
 r_max = 0.065;     
 
 // --- Mesh Density Parameters ---
-n_radial = 15;  // Nodes along each radial segment (thickness)
+n_radial = 30;  // Nodes along each radial segment (thickness)
 n_vertical = 50; // Nodes along the height (z-axis)
 
 // Create the two surfaces
@@ -43,8 +43,10 @@ Physical Surface("cyl_inner", 1) = {1};
 Physical Surface("cyl_outer", 2) = {2};
 
 // --- Physical Curves ---
-Physical Curve("bottom", 11) = {1, 5};
-Physical Curve("top", 12) = {3, 7};
+Physical Curve("top2", 9) = {7};
+Physical Curve("bottom2", 10) = {5};
+Physical Curve("bottom1", 11) = {1};
+Physical Curve("top1", 12) = {3};
 Physical Curve("contact", 13) = {2};
 Physical Curve("outer_wall", 14) = {6};
 Physical Curve("inner_wall", 15) = {4};

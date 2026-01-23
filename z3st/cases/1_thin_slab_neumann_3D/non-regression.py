@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 22_thin_thermal_slab_with_neumann
+Z3ST case: 1_thin_slab_neumann_3D
 
 non-regression script
 ---------------------
-Steady-state 1D slab (Neumann-Dirichlet).
+Steady-state 3D slab (Neumann-Dirichlet).
 
 """
 
@@ -32,7 +32,7 @@ k, E, nu, alpha = (
 )  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
 Ti, To = 573.0, 583.0  # K (boundary temperature)
 q0, mu = 0.00, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
-y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.1  # m, m, m (plane selection and tolerance)
+y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.65  # m, m, m (plane selection and tolerance)
 
 TOLERANCE = 3e-3  # - (relative tolerance for non-regression tests)
 
@@ -59,13 +59,23 @@ print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
-x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
-x_T, T = average_section(x_T, y_T, z_T, T_all, y_target, z_target, mask_tol, label="T", decimals=5)
+# Temperature
+x_T, y_T, z_T, T_all = extract_field(VTU_FILE, field_name="Temperature")
+mask = (np.abs(y_T - y_target) < mask_tol) & (np.abs(z_T - z_target) < mask_tol)
+sort_idx = np.argsort(x_T[mask])
 
-x_s, y_s, z_s, s = extract_stress(VTU_FILE, component="all", return_coords=True, prefer="cells")
-x_s, sigma_yy = average_section(
-    x_s, y_s, z_s, s["yy"], y_target, z_target, mask_tol, decimals=5, label="sigma_yy"
-)
+x_T = x_T[mask][sort_idx]
+T = T_all[mask][sort_idx]
+
+# Stress
+x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+mask = (np.abs(y_S - y_target) < mask_tol) & (np.abs(z_S - z_target) < mask_tol)
+sort_idx = np.argsort(x_S[mask])
+
+x_s = x_S[mask][sort_idx]
+
+sigma_xx = S_all[mask, 0][sort_idx]
+sigma_yy = S_all[mask, 4][sort_idx]
 
 # Analytical results
 T_ref = analytic_T(x_T)

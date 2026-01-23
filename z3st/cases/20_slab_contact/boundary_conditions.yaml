@@ -2,26 +2,47 @@ thermal:
   cyl_inner:
   - type: Dirichlet
     region: inner_wall
-    temperature: 350.0   # (K)
+    temperature: 300.0   # (K)
+
+  # - type: Dirichlet
+  #   region: bottom1
+  #   temperature: 400.0   # (K)
+
+  # - type: Dirichlet
+  #   region: top1
+  #   temperature: 460.0   # (K)
 
   cyl_outer:
+  # - type: Dirichlet
+  #   region: bottom2
+  #   temperature: 230.0   # (K)
+
+  # - type: Dirichlet
+  #   region: top2
+  #   temperature: 200.0   # (K)
+
+  # - type: Dirichlet
+  #   region: contact
+  #   temperature: 600.0   # (K)
+
   - type: Dirichlet
     region: outer_wall
-    temperature: 350.0   # (K)
+    temperature: 300.0   # (K)
 
 mechanical:
   cyl_inner:
   - type: Dirichlet
-    region: top
-    displacement: [0.0, 0.0]   # (m)
-
-  - type: Dirichlet
-    region: bottom
-    displacement: [0.0, 0.0]   # (m)
+    region: bottom1
+    displacement: [0.0, 0.0]
 
   - type: Neumann
     region: inner_wall
     traction: -2.0e+6   # (Pa)
+
+  cyl_outer:
+  - type: Dirichlet
+    region: bottom1
+    displacement: [0.0, 0.0]
 
   - type: Neumann
     region: outer_wall

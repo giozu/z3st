@@ -9,8 +9,10 @@ outer_radius_2: 0.065 # (m)
 Lz: 0.1 # (m)
 
 labels:
-  bottom: 11
-  top: 12
+  top2: 9
+  bottom2: 10
+  bottom1: 11
+  top1: 12
   contact: 13
   outer_wall: 14
   inner_wall: 15

@@ -8,11 +8,11 @@
 
 SetFactory("Built-in");
 
-Lx = 0.400; // (m)
+Lx = 0.100; // (m)
 Ly = 2.000; // (m)
 Lz = 2.000; // (m)
 
-nx = 31;
+nx = 41;
 ny = 11;
 nz = 11;
 

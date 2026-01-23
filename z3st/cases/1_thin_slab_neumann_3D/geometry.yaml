@@ -7,9 +7,9 @@ Lz: 2.000 # box length in z (m)
 
 labels:
   zmin: 1
-  zmax: 2
-  ymin: 3
-  xmax: 4
-  ymax: 5
-  xmin: 6
+  ymin: 2
+  xmax: 3
+  ymax: 4
+  xmin: 5
+  zmax: 6
   steel: 7

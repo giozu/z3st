@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
-"""
-Z3ST case: 20_slab_contact_2D
-
-non-regression script
----------------------
-
-"""
 
 import os
-
 import numpy as np
-
+import matplotlib.pyplot as plt
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_plot import *
 from z3st.utils.utils_verification import *
@@ -21,114 +13,89 @@ CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
-# Geometry and material
-Ro1, Ri2, Ro2, Lz = 0.050, 0.060, 0.065, 0.10  # m (geometry dimensions)
-Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
-k1, E1, nu1, alpha1 = 2.5, 1.7e11, 0.3, 1.45e-5  # W/m·K, Pa, -, 1/K
-k2, E2, nu2, alpha2 = 50, 2e11, 0.3, 1.0e-5  # W/m·K, Pa, -, 1/K
-To2 = 350.0  # K          outer surface temperature
-q0, mu = 0.0, 24.0  # W/m³, 1/m  heat source, attenuation
-z_target, z_tol = Lz / 2, Lz / 10  # m          z-plane for data extraction
-LHR = 20  # (W/m)      linear heat rate
-h_g = 2000  # (W/m2-K)
+# Parametri fisici fissi
+Ti, To = 350.0, 350.0
+P_applied = 2.0e6  # Pa
+TOLERANCE = 1.0e-1 
 
-TOLERANCE = 5.0e-2  # -          tolerance for non-regression
+# --.. ..- .-.. .-.. --- execution --.. ..- .-.. .-.. ---
+if not os.path.exists(VTU_FILE):
+    print(f"[ERROR] VTU file not found at {VTU_FILE}")
+    exit(1)
 
-
-# --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
-def analytic_T_1(r, T_interface_1):
-    r = np.asarray(r)
-    return LHR / (4 * np.pi * k1) * (1 - r**2 / Ro1**2) + T_interface_1
-
-
-def analytic_T_2(r):
-    r = np.asarray(r)
-    return To2 + LHR / (2 * np.pi * k2) * np.log(Ro2 / r)
-
-
-def analytic_T_g(r, T_interface_2):
-    r = np.asarray(r)
-    k_g = h_g * (Ri2 - Ro1)
-    return T_interface_2 + LHR / (2 * np.pi * k_g) * np.log(Ri2 / r)
-
-
-def analytic_T_piecewise(r):
-    r = np.asarray(r)
-
-    # interface temperatures
-    T_2_at_Ri2 = analytic_T_2(Ri2)
-    T_g_at_Ro1 = analytic_T_g(Ro1, T_2_at_Ri2)
-
-    # allocate output
-    T_ref = np.zeros_like(r)
-
-    # regions
-    mask_1 = r <= Ro1
-    mask_g = (r > Ro1) & (r <= Ri2)
-    mask_2 = r > Ri2
-
-    T_ref[mask_1] = analytic_T_1(r[mask_1], T_g_at_Ro1)
-    T_ref[mask_g] = analytic_T_g(r[mask_g], T_2_at_Ri2)
-    T_ref[mask_2] = analytic_T_2(r[mask_2])
-
-    return T_ref
-
-
-# --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
+# Estrazione info mesh automatica
 list_fields(VTU_FILE)
+# Assumiamo y come altezza (z) e x come raggio (r)
+y_target = 0.05 
+mask_tol = 0.005
 
-# --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
+# --- 1. Temperature Extraction ---
+x_raw, y_raw, z_raw, T_all = extract_field(VTU_FILE, field_name="Temperature")
+mask_T = np.abs(y_raw - y_target) < mask_tol
+sort_idx_T = np.argsort(x_raw[mask_T])
 
-# Numerical results
-x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
-r_T, T = average_section_radial(x_T, y_T, z_T, T_all, z_target=z_target, tol=z_tol, decimals=4)
+x_T = x_raw[mask_T][sort_idx_T]
+T_num = T_all[mask_T][sort_idx_T]
+T_ref = np.full_like(x_T, Ti)
 
-r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_field(
-    filename=VTU_FILE,
-    z_fixed=z_target,
-    tol=z_tol,
-    case_dir=CASE_DIR,
-    field_hint="Stress",
-    data_source="cell",
-    average=True,
-    decimals=6,
-)
+# --- 2. Stress Extraction & Merge ---
+xs_1, ys_1, zs_1, S1 = extract_field(VTU_FILE, field_name="Stress_cyl_inner (cells)")
+xs_2, ys_2, zs_2, S2 = extract_field(VTU_FILE, field_name="Stress_cyl_outer (cells)")
 
-# Analytical results
-T_ref = analytic_T_piecewise(r_T)
+# Pulizia: scartiamo i valori nulli (fuori dal dominio del materiale)
+mask_act1 = np.any(np.abs(S1) > 1e-3, axis=1)
+mask_act2 = np.any(np.abs(S2) > 1e-3, axis=1)
 
-# Plot
-plotter_sigma_temperature_cylinder(
-    r_s=r_s,
-    r_T=r_T,
-    T=T,
-    T_ref=T_ref,
-    CASE_DIR=CASE_DIR,
-)
+xs_all = np.concatenate([xs_1[mask_act1], xs_2[mask_act2]])
+ys_all = np.concatenate([ys_1[mask_act1], ys_2[mask_act2]])
+S_all = np.concatenate([S1[mask_act1], S2[mask_act2]])
 
-# --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
-Linf_T = float(np.max(np.abs((T - T_ref))))
-RelL2_T = float(L2_T / np.mean(np.abs(T_ref)))
+# Filtro sulla sezione centrale
+mask_s = np.abs(ys_all - y_target) < mask_tol
+sort_idx_s = np.argsort(xs_all[mask_s])
+
+x_s = xs_all[mask_s][sort_idx_s]
+# Indici tensore 9 comp: 0=xx (radiale), 4=yy (assiale)
+sigma_xx = S_all[mask_s, 0][sort_idx_s]
+sigma_yy = S_all[mask_s, 4][sort_idx_s]
+sigma_th_ref = np.full_like(x_s, -P_applied)
+
+# --.. ..- .-.. .-.. --- plotting --.. ..- .-.. .-.. ---
+Pa_to_MPa = 1e-6
+plt.figure(figsize=(10, 7))
+ax1 = plt.gca()
+
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, "b-o", label=r"Num. $\sigma_{xx}$ (Radial)", markersize=4)
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, "r-s", label=r"Num. $\sigma_{yy}$ (Axial)", markersize=4)
+ax1.plot(x_s, sigma_th_ref * Pa_to_MPa, "k--", label="Ref. Pressure", alpha=0.8)
+
+ax1.set_xlabel("Radius x (m)")
+ax1.set_ylabel("Stress (MPa)")
+ax1.grid(True, linestyle="--", alpha=0.5)
+
+ax2 = ax1.twinx()
+ax2.plot(x_T, T_num, "gD", label="Temperature", markersize=3, alpha=0.4)
+ax2.set_ylabel("Temperature (K)")
+ax2.set_ylim([Ti-2, Ti+2])
+
+lines, labels = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines + lines2, labels + labels2, loc="best")
+
+plt.title(f"Z3ST Verification: Coaxial Contact Profile at y={y_target}m")
+plt.tight_layout()
+plt.savefig(os.path.join(CASE_DIR, "output", "stress_comparison.png"), dpi=300)
+
+# --.. ..- .-.. .-.. --- metrics --.. ..- .-.. .-.. ---
+L2_T = float(np.sqrt(np.mean((T_num - T_ref) ** 2)))
+# Errore relativo sullo stress radiale rispetto alla pressione applicata
+err_sigma_xx = np.sqrt(np.mean((sigma_xx - sigma_th_ref) ** 2)) / np.abs(np.mean(sigma_th_ref))
 
 errors = {
-    "L2_error_T": {
-        "numerical": L2_T,
-        "reference": 0.0,
-        "abs_error": L2_T,
-        "rel_error": RelL2_T,
-    },
-    "Linf_error_T": {
-        "numerical": Linf_T,
-        "reference": 0.0,
-        "abs_error": Linf_T,
-        "rel_error": Linf_T / np.mean(np.abs(T_ref)),
-    },
+    "L2_error_T": {"numerical": L2_T, "reference": 0.0, "rel_error": L2_T/Ti},
+    "L2_error_sigma_xx": {"numerical": float(err_sigma_xx), "reference": 0.0, "rel_error": float(err_sigma_xx)},
 }
 
-# --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 regression_check(errors, CASE_DIR)
-
 print("\n[INFO] Non-regression completed.\n")

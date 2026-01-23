@@ -59,7 +59,7 @@ Plane Surface(5) = {5};
 Line Loop(6) = {9, 10, 11, 12};
 Plane Surface(6) = {6};
 
-// Define cube volume
+// Volume
 Surface Loop(1) = {1, 2, 3, 4, 5, 6};
 Volume(1) = {1};
 
