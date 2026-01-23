@@ -46,13 +46,15 @@ class Solver:
         """
         Returns PETSc options for the linear solver based on the physics.
 
-        physics: "thermal", "mechanical".
+        physics: "thermal", "mechanical" or "damage".
         """
-        if physics not in ["thermal", "mechanical"]:
-            raise ValueError(f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical'.")
+        if physics not in ["thermal", "mechanical", "damage"]:
+            raise ValueError(
+                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical' or 'damage'."
+            )
 
         # 1) KSP type
-        if physics in ["thermal"]:
+        if physics in ["thermal", "damage"]:
             ksp_type = "cg"  # SPD
         else:  # mechanical
             ksp_type = "gmres"  # non-symmetric
@@ -240,6 +242,19 @@ class Solver:
         u_old.x.array[:] = u_new.x.array
         print("\n[INFO] Assembling mechanical problem...")
 
+        # --- update step-dependent displacement ---
+        for _, bc_list in self.dirichlet_mechanical.items():
+            for bc in bc_list:
+                # Skip BCs that are Clamp, Slip, etc. (not yet step-dependent)
+                if not isinstance(bc, dict):
+                    continue
+
+                raw = bc.get("raw", None)
+                if isinstance(raw, list):
+                    idx = min(self.current_step, len(raw) - 1)
+                    bc["const"].value = raw[idx]
+                    print(f"  [INFO] Updating Dirichlet on region {bc['id']} → {raw[idx]}")
+
         # --- update step-dependent tractions ---
         for _, bc_list in self.traction.items():
             for bc in bc_list:
@@ -322,6 +337,13 @@ class Solver:
                     if abs(val) > 1e-16:
                         F_m -= w * alpha * val * ufl.dot(v_m, n) * ds
 
+        # --- Extract actual DirichletBC objects (handles both dict and direct BCs) ---
+        bcs_mech = [
+            bc["value"] if isinstance(bc, dict) else bc
+            for _, bc_list in self.dirichlet_mechanical.items()
+            for bc in bc_list
+        ]
+
         # Solve
         if self.mech_cfg["solver"] == "linear":
             print("  Linear solver")
@@ -333,7 +355,7 @@ class Solver:
             problem_m = dolfinx.fem.petsc.LinearProblem(
                 a_m,
                 L_m,
-                bcs=bcs_m,
+                bcs=bcs_mech,
                 u=u_new,
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="mechanical_",
@@ -349,7 +371,7 @@ class Solver:
             problem_m = NonlinearProblem(
                 F_m,
                 u_new,
-                bcs=bcs_m,
+                bcs=bcs_mech,
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="elasticity",
             )
@@ -392,19 +414,91 @@ class Solver:
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
 
+    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, u_current):
+
+        D_old.x.array[:] = D_new.x.array
+
+        print("\n[INFO] Assembling damage (phase-field) problem...")
+
+        u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
+        a_d, L_d = 0, 0
+        lc = float(self.dmg_cfg["lc"])
+
+        for label, material in self.materials.items():
+
+            print(
+                f"Solving damage problem for '{label}' material, with sigma_c = {material['sigma_c']*1e-6} MPa"
+            )
+
+            self.update_history(u_current)
+
+            tag = self.label_map[label]
+            dx = self.dx_tags[tag]
+
+            a_d += (1.0 + self.H) * u_d * v_d * dx + lc**2 * ufl.inner(
+                ufl.grad(u_d), ufl.grad(v_d)
+            ) * dx
+            L_d += self.H * v_d * dx
+
+        petsc_opts_damage = self.get_solver_options(
+            physics="damage",
+            solver_type=self.dmg_cfg["linear_solver"],
+            rtol=rtol_dmg,
+        )
+
+        problem_d = dolfinx.fem.petsc.LinearProblem(
+            a_d,
+            L_d,
+            bcs=[],
+            u=D_new,
+            petsc_options=petsc_opts_damage,
+            petsc_options_prefix="damage_",
+        )
+        problem_d.solve()
+
+        # irreversibility
+        D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
+        D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
+
+        # Residual in L_inf norm
+        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
+        print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
+
+        # Convergence
+        D_new.x.scatter_forward()
+        D_old.x.scatter_forward()
+        vec_D_new = D_new.x.petsc_vec
+        vec_D_old = D_old.x.petsc_vec
+
+        diff_D = vec_D_new.copy()
+        diff_D.axpy(-1.0, vec_D_old)
+
+        norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
+        norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
+        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
+
+        print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
+        conv_damage = (norm_dD < stag_tol_dmg) or (D_new.x.array.max() < 1e-8)
+
+        return conv_damage, norm_dD, rel_norm_dD
+
     def solve_staggered(
         self,
         max_iter=20,
         stag_tol_th=1e-3,
         stag_tol_mech=1e-3,
+        stag_tol_dmg=1e-3,
         rtol_th=1e-6,
         rtol_mech=1e-6,
+        rtol_dmg=1e-5,
     ):
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {stag_tol_th:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {stag_tol_mech:.1e}")
+        print(f"  → Staggering tolerance |ΔD|   : {stag_tol_dmg:.1e}")
         print(f"  → Relative tolerance th       : {rtol_th:.1e}")
         print(f"  → Relative tolerance mech     : {rtol_mech:.1e}")
+        print(f"  → Relative tolerance dmg      : {rtol_dmg:.1e}")
 
         # Build measures once
         self._build_measures()
@@ -432,6 +526,13 @@ class Solver:
             u_new = u_old = None
             bcs_m = []
 
+        if self.on.get("damage", False):
+            D_new = dolfinx.fem.Function(self.V_d)
+            D_new.x.array[:] = self.D.x.array
+            D_old = dolfinx.fem.Function(self.V_d)
+        else:
+            D_new = D_old = None
+
         prev_res_T = None
         prev_res_u = None
 
@@ -441,6 +542,7 @@ class Solver:
             # Defaults
             conv_th = True
             conv_mech = True
+            conv_damage = True
 
             # --- THERMAL STEP ---
             if self.on.get("thermal", False):
@@ -456,10 +558,20 @@ class Solver:
                     u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
                 )
 
+            # --- DAMAGE STEP ---
+            if self.on.get("damage", False):
+                conv_damage, _, _ = self._damage_step(
+                    D_new,
+                    D_old,
+                    rtol_dmg,
+                    stag_tol_dmg,
+                    u_current=u_new,
+                )
+
             # --- OVERALL CONVERGENCE ---
             print("\nConvergence check")
 
-            if conv_th and conv_mech:
+            if conv_th and conv_mech and conv_damage:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
 
                 # Commit results
@@ -468,6 +580,9 @@ class Solver:
 
                 if self.on.get("mechanical", False):
                     self.u.x.array[:] = u_new.x.array
+
+                if self.on.get("damage", False):
+                    self.D.x.array[:] = D_new.x.array
 
                 return True
 
@@ -478,6 +593,8 @@ class Solver:
             self.T.x.array[:] = T_new.x.array
         if self.on.get("mechanical", False):
             self.u.x.array[:] = u_new.x.array
+        if self.on.get("damage", False):
+            self.D.x.array[:] = D_new.x.array
 
         return False
 
@@ -508,8 +625,8 @@ class Solver:
         print(f"  → Max iterations (Newton): {max_iter}")
 
         # Split (initialized) mixed unknowns into mechanical (u_m) and thermal (u_t) parts
-        u_m, u_t = ufl.split(self.sol_mixed)
-        v_m, v_t = ufl.TestFunctions(self.W)
+        (u_m, u_t) = ufl.split(self.sol_mixed)
+        (v_m, v_t) = ufl.TestFunctions(self.W)
 
         # Initialize total residual
         F = 0

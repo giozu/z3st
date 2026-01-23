@@ -10,3 +10,5 @@ T_ref: 300.0     # (K)
 rho: 11000.0     # (kg/m³)
 mu_gamma: 0.0         # Linear attenuation coefficient / macroscopic cross section of gamma rays in steels (1/m)
 gamma_heating: 0.0    # Volumetric source due to gamma heating (W/m³)
+sigma_c: 1.0e+9  # (Pa)
+zeta: 1.0        # -
