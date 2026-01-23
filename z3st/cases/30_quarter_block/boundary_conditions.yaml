@@ -1,5 +1,5 @@
 mechanical:
-  steel:
+  volume:
   - type: Clamp_x
     region: xmin
 
@@ -9,13 +9,12 @@ mechanical:
   - type: Clamp_z
     region: zmin
 
-  - type: Neumann
-    region: xmax
-    traction: [0.0, 1.0e+2, 1.0e+4, 1.0e+6, 1.0e+8]   # (Pa)
-
-
 thermal:
-  steel:
+  volume:
   - type: Dirichlet
     region: zmin
+    temperature: 300.0   # (K)
+
+  - type: Dirichlet
+    region: zmax
     temperature: 300.0   # (K)

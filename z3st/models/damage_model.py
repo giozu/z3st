@@ -94,3 +94,31 @@ class DamageModel:
 
         # irreversibility
         self.H.x.array[:] = np.maximum(self.H.x.array, H_new.x.array)
+
+    def update_history_faster(self, u):
+        Q = self.Q
+        H_new_total = np.zeros_like(self.H.x.array)
+
+        for label, material in self.materials.items():
+            tag = self.label_map[label]
+
+            entities = self.cell_tags.find(tag)
+            if len(entities) == 0: continue
+            
+            H_expr = self.crack_driving_force(u, material)
+            expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points())
+            
+            tmp = dolfinx.fem.Function(Q)
+            tmp.interpolate(expr)
+            
+            dofs = dolfinx.fem.locate_dofs_topological(Q, self.mesh.topology.dim, entities)
+            H_new_total[dofs] = tmp.x.array[dofs]
+
+        self.H.x.array[:] = np.maximum(self.H.x.array, H_new_total)
+
+    def get_damage_residual(self, D, D_test, material):
+        lc = material["lc"]
+        H = self.H
+        
+        res = ( (1 + H) * D * D_test + lc**2 * ufl.dot(ufl.grad(D), ufl.grad(D_test)) - H * D_test ) * ufl.dx
+        return res

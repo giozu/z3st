@@ -13,8 +13,8 @@ Lx = 0.100;
 Ly = 0.100;
 Lz = 0.004;
 
-nxy = 9;   // Lx, Lz
-nz  = 9;   // Lz
+nxy = 30;   // Lx, Lz
+nz  = 15;   // Lz
 
 // Corner points
 Point(1) = {0, 0, 0, 1.0};
@@ -59,7 +59,7 @@ Plane Surface(5) = {5};
 Line Loop(6) = {9, 10, 11, 12};
 Plane Surface(6) = {6};
 
-// Define volume
+// Define cube volume
 Surface Loop(1) = {1, 2, 3, 4, 5, 6};
 Volume(1) = {1};
 

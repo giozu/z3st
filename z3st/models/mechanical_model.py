@@ -90,26 +90,27 @@ class MechanicalModel:
                         sys.exit(1)
 
                     # --- interpret displacement input ---
-                    # Case 1: single vector [ux, uy, uz]
-                    if isinstance(displacement, (list, tuple)) and all(
-                        isinstance(x, (int, float)) for x in displacement
-                    ):
-                        raw_value = [displacement]  # wrap as list of one vector
-                        print(f"  [INFO] Constant Dirichlet vector → {displacement}")
+                    dim = self.tdim
+
+                    # Case 1: single vector [ux, uy, uz] or [u1, u2]
+                    if isinstance(displacement, (list, tuple)) and all(isinstance(x, (int, float)) for x in displacement):
+                        if len(displacement) != dim:
+                            print(f"[ERROR] Displacement vector length {len(displacement)} != mesh dimension {dim}.")
+                            sys.exit(1)
+                        raw_value = [displacement]
+                        print(f"  [INFO] Constant Dirichlet vector ({dim}D) → {displacement}")
 
                     # Case 2: list of vectors over steps
-                    elif isinstance(displacement, list) and all(
-                        isinstance(v, (list, tuple)) and len(v) == 3 for v in displacement
-                    ):
-                        raw_value = displacement
-                        print(
-                            f"  [INFO] Step-dependent Dirichlet vector list of length {len(displacement)}"
-                        )
+                    elif isinstance(displacement, list):
+                        if all(isinstance(v, (list, tuple)) and len(v) == dim for v in displacement):
+                            raw_value = displacement
+                            print(f"  [INFO] Step-dependent Dirichlet list ({dim}D), length {len(displacement)}")
 
-                        if len(displacement) != self.n_steps:
-                            print(
-                                f"[ERROR] Dirichlet BC list length = {len(displacement)}, but n_steps = {self.n_steps}. Must match."
-                            )
+                            if len(displacement) != self.n_steps:
+                                print(f"[ERROR] BC list length {len(displacement)} != n_steps {self.n_steps}.")
+                                sys.exit(1)
+                        else:
+                            print(f"[ERROR] All vectors in the list must have length {dim} for a {dim}D mesh.")
                             sys.exit(1)
 
                     else:

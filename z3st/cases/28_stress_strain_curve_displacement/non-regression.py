@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 27_stress_strain_curve
+Z3ST case: 28_stress_strain_curve_displacement
 
 non-regression script
 ---------------------
@@ -23,19 +23,14 @@ from z3st.utils.utils_verification import *
 CASE_DIR = os.path.dirname(__file__)
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
 VTU_FILES = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
-
-if len(VTU_FILES) == 0:
-    raise RuntimeError("[ERROR] No VTU files found in output/. Expected fields_*.vtu")
-
 OUT_JSON = os.path.join(OUTPUT_DIR, "non-regression.json")
 
 # geometry and material
-Lx, Ly, Lz = 0.100, 0.100, 0.004  # m
+Lx, Ly = 0.1, 1.0  # m (geometry dimensions)
 E = 200e9  # (Pa) Young modulus
 
-y_target, z_target, mask_tol = (
+y_target, mask_tol = (
     Ly / 2,
-    Lz / 2,
     0.01,
 )  # m, m, m (extraction plane selection and tolerance)
 
@@ -50,7 +45,6 @@ TOLERANCE = 1e-2  # relative tolerance for pass/fail
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
-print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # stress–strain arrays
 strains = []
@@ -68,57 +62,56 @@ for step, vtufile in enumerate(VTU_FILES):
     list_fields(vtufile)
 
     # Stress extraction
-    x_s, y_s, z_s, s = extract_stress(vtufile, component="all", return_coords=True, prefer="cells")
-    _, sigma_xx = average_section(
-        x_s,
-        y_s,
-        z_s,
-        s["xx"],
-        y_target,
-        z_target,
-        mask_tol,
-        decimals=5,
-        label="sigma_xx",
-    )
+    x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+    mask = np.abs(y_S - y_target) < mask_tol
+    sort_idx = np.argsort(x_S[mask])
+
+    x_s = x_S[mask][sort_idx]
+
+    sigma_xx = S_all[mask, 0][sort_idx]
     sigmas.append(float(np.mean(sigma_xx)))
 
     # Displacement extraction
-    x_d, y_d, z_d, u = extract_displacement(vtufile)
-    ux = u[:, 0]
+    x_u_all, y_u_all, z_u_all, u_all = extract_field(VTU_FILE, field_name="Displacement")
+    mask_u = np.abs(y_u_all - y_target) < mask_tol
+    sort_idx_u = np.argsort(x_u_all[mask_u])
 
-    _, ux_section = average_section(
-        x_d,
-        y_d,
-        z_d,
-        ux,
-        y_target,
-        z_target,
-        mask_tol,
-        decimals=5,
-        label="ux",
-    )
-    u_max = np.max(ux_section)
+    x_u_line = x_u_all[mask_u][sort_idx_u]
+    ux_line = u_all[mask_u, 0][sort_idx_u]
+
+    u_max = np.max(ux_line)
     displacements.append(u_max)
 
     # Strain extraction
-    eps_eng = u_max / Lx
+    x_s_all, y_s_all, z_s_all, S_all = extract_field(VTU_FILE, field_name="Strain (cells)")
+    mask_s = np.abs(y_s_all - y_target) < mask_tol
+    sort_idx_s = np.argsort(x_s_all[mask_s])
+
+    x_s_line = x_s_all[mask_s][sort_idx_s]
+    sigma_xx = S_all[mask_s, 0][sort_idx_s]
+
+
+    eps_eng = float(np.mean(eps_xx_section))
     strains.append(eps_eng)
 
     print(f"  → σ_xx = {sigmas[-1]:.3e} Pa")
     print(f"  → ε_xx = {strains[-1]:.3e}")
+    print(f"  → u_x =  {u_max:.3e} m")
 
 # Stress–strain curve output
-print("\n--. stress-strain values --..")
-for e, s in zip(strains, sigmas):
-    print(f"ε = {e:.3e}   σ = {s:.3e}")
+print("\n--. stress-strain-displacement values --..")
+for e, s, u in zip(strains, sigmas, displacements):
+    print(f"ε_xx = {e:.3e}\tσ_xx = {s:.3e}\tu_x = {u:.3e}")
 
 plt.figure(figsize=(7, 5))
-plt.plot(strains, sigmas, "--o", lw=2)
-plt.plot(strain_ref_np, sigmas_ref_np, "-", lw=2)
-plt.xlabel("strain ε_xx")
-plt.ylabel("stress σ_xx (Pa)")
+plt.plot(strains, sigmas, "--o", lw=2, label="Numerical")
+plt.plot(strain_ref_np, sigmas_ref_np, "-", lw=2, label="Analytical")
+plt.xlabel(r"strain $\epsilon_{xx}$ (/)")
+plt.ylabel(r"stress $\sigma_{xx}$ (Pa)")
 plt.grid(True)
 plt.title("Stress-strain curve")
+plt.yscale("log")
+plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
 print("[INFO] stress_strain_curve.png saved\n")
