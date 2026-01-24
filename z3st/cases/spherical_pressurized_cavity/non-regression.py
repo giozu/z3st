@@ -15,78 +15,88 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
 
-# Add the z3st/utils directory to sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "utils"))
-from utils_extract_vtu import extract_spherical_stresses, list_fields
-from utils_verification import pass_fail_check, regression_check
+from z3st.utils.utils_extract_vtu import *
+from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 OUT_DIR = os.path.join(CASE_DIR, "output")
-os.makedirs(OUT_DIR, exist_ok=True)
 
 # Parameters
-L = 1.0  # cube edge (m)
-R = 0.04  # cavity radius (m)
-Pi = 1.0e6  # internal pressure (Pa)
+L = 1.0             # cube edge (m)
+R = 0.04            # cavity radius (m)
+Pi = 1.0e6          # internal pressure (Pa)
 
-E = 2.0e11  # Young modulus (/)
-nu = 0.30  # Poisson ratio
+E = 2.0e11          # Young modulus (/)
+nu = 0.30           # Poisson ratio
 
 TOLERANCE = 2e-1
-
-# ANSI colors
-GREEN = "\033[92m"
-RED = "\033[91m"
-BOLD = "\033[1m"
-END = "\033[0m"
-
 
 # --.. ..- .-.. .-.. --- analytical solution --.. ..- .-.. .-.. ---
 def sigma_rr_an(r):
     return -Pi * (R / r) ** 3
 
-
 def sigma_tt_an(r):
     return +0.5 * Pi * (R / r) ** 3
-
 
 def sigma_vm_an(r):
     return 1.5 * Pi * (R / r) ** 3
 
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
-if not os.path.exists(VTU_FILE):
-    raise FileNotFoundError(f"[ERROR] VTU file not found at {VTU_FILE}")
-print(f"[INFO] Using VTU file: {VTU_FILE}")
-
-# --.. ..- .-.. .-.. --- list fields --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
 
-# --. mesh bounds --..
-grid = pv.read(VTU_FILE)
-
-xmin, xmax, ymin, ymax, zmin, zmax = grid.bounds
-print(f"\n[INFO] Grid bounds:")
-print(f"\tx ∈ [{xmin:.4e}, {xmax:.4e}]")
-print(f"\ty ∈ [{ymin:.4e}, {ymax:.4e}]")
-print(f"\tz ∈ [{zmin:.4e}, {zmax:.4e}]")
-
 # --.. ..- .-.. .-.. --- extract field --.. ..- .-.. .-.. ---
-r_all, _, _, srr_all, stt_all, spp_all = extract_spherical_stresses(
-    VTU_FILE, average="bins", decimals=4, n_bins=200
+x, y, z, S_all = extract_field(VTU_FILE, field_name="Stress_solid (cells)")
+
+r_raw = np.sqrt(x**2 + y**2 + z**2)
+theta = np.arccos(np.divide(z, r_raw, out=np.zeros_like(z), where=r_raw > 0))
+phi = np.arctan2(y, x)
+
+s_xx, s_yy, s_zz = S_all[:, 0], S_all[:, 4], S_all[:, 8]
+s_xy, s_xz, s_yz = S_all[:, 1], S_all[:, 2], S_all[:, 5]
+
+cth, sth = np.cos(theta), np.sin(theta)
+cph, sph = np.cos(phi), np.sin(phi)
+
+sigma_rr_raw = (
+    s_xx * (sth * cph)**2 +
+    s_yy * (sth * sph)**2 +
+    s_zz * (cth)**2 +
+    2 * s_xy * (sth**2 * sph * cph) +
+    2 * s_xz * (sth * cth * cph) +
+    2 * s_yz * (sth * cth * sph)
 )
 
-# r in [R, L/2]
-mask = (r_all >= R) & (r_all <= L / 2.0)
-if not np.any(mask):
-    raise RuntimeError(f"{RED}[ERROR]{END} No samples found with R <= r <= L/2.")
-r = r_all[mask]
-sigma_rr_num = srr_all[mask]
-sigma_tt_num = stt_all[mask]
-sigma_pp_num = spp_all[mask]
+sigma_tt_raw = (
+    s_xx * (cth * cph)**2 +
+    s_yy * (cth * sph)**2 +
+    s_zz * (sth)**2 +
+    2 * s_xy * (cth**2 * sph * cph) -
+    2 * s_xz * (sth * cth * cph) -
+    2 * s_yz * (sth * cth * sph)
+)
+
+n_bins = 200
+r_edges = np.linspace(R, L/2, n_bins + 1)
+r_centers = 0.5 * (r_edges[:-1] + r_edges[1:])
+
+sigma_rr_num = np.zeros(n_bins)
+sigma_tt_num = np.zeros(n_bins)
+
+for i in range(n_bins):
+    mask = (r_raw >= r_edges[i]) & (r_raw < r_edges[i+1])
+    if np.any(mask):
+        sigma_rr_num[i] = np.mean(sigma_rr_raw[mask])
+        sigma_tt_num[i] = np.mean(sigma_tt_raw[mask])
+
+valid = sigma_rr_num != 0
+r = r_centers[valid]
+sigma_rr_num = sigma_rr_num[valid]
+sigma_tt_num = sigma_pp_num = sigma_tt_num[valid]
+
 
 sigma_Tresca_num = np.max(
     np.stack(
@@ -152,10 +162,8 @@ errors = {
     "sigma_vm": {"rel_error": float(err_vm), "numerical": np.mean(sigma_vm_num)},
 }
 
-# --. pass/fail check --..
-all_pass = pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-
-# --. regression vs gold --..
+# --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
+pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 regression_check(errors, CASE_DIR)
 
 print("\n[INFO] non-regression completed.\n")
