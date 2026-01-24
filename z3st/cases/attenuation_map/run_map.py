@@ -1,5 +1,5 @@
 """
-Batch automation for attenuation map (thermal shield)
+Batch automation for attenuation map
 
 Author: Giovanni Zullo
 Date: 2025-10-17
@@ -8,10 +8,10 @@ Description:
 ------------
 This script automates a parameter sweep over two variables:
 - the slenderness ratio (Ro/Ri) and
-- the attenuation coefficient (mu·Ri)
+- the attenuation coefficient (mu*Ri)
 for the thermal shield attenuation study.
 
-For each (Ro/Ri, mu·Ri) pair:
+For each (Ro/Ri, mu*Ri) pair:
   1. It creates a new case directory by cloning a base case.
   2. Updates geometry, mesh, and material YAML files.
   3. Runs Gmsh to generate the mesh.
@@ -34,12 +34,11 @@ import yaml
 # =============================================================================
 ROOT = Path.cwd()  # Root directory of the batch run
 BASE_CASE = ROOT
-Z3ST_ENTRY = Path("../../../z3st.py")  # Entry point to the Z3ST solver
 
 # Fixed parameters
-R_i = 1.000  # Inner radius (m)
-Lz = 10.000  # Axial length (m)
-Q0 = 9.0e4  # Volumetric heat source (gamma heating, W/m³)
+R_i = 1.000     # Inner radius (m)
+Lz = 10.000     # Axial length (m)
+Q0 = 9.0e4      # Volumetric heat source (gamma heating, W/m³)
 
 # Material configuration
 SHIELD_MAT_KEY = "steel"
@@ -48,8 +47,8 @@ SHIELD_MAT_KEY = "steel"
 # BA_LIST  = [1.02, 1.04, 1.05, 1.06, 1.08, 1.10, 1.12, 1.14, 1.16, 1.17, 1.18, 1.20]  # Ro/Ri ratios
 # MUA_LIST = [1, 2, 5, 10, 20, 30, 40, 50, 60]                 # mu * Ri
 
-BA_LIST = [1.05, 1.15, 1.20]  # Ro/Ri ratios
-MUA_LIST = [10, 30, 50]  # mu * Ri
+BA_LIST = [1.05]    # Ro/Ri ratios
+MUA_LIST = [10]         # mu * Ri
 
 LOG_FILE = ROOT / "attenuation_run.log"  # Log file for all runs
 
