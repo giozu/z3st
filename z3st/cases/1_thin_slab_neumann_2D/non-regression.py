@@ -157,23 +157,6 @@ plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
 
-# import pyvista as pv
-# mesh = pv.read(VTU_FILE)
-# plotter = pv.Plotter(title="Z3ST - Stress analysis")
-# mesh.cell_data["sigma_yy_MPa"] = mesh.cell_data["Stress_steel (cells)"][:, 4] * 1e-6
-# plotter.add_mesh(mesh, scalars="sigma_yy_MPa", cmap="jet", show_edges=True)
-# plotter.add_scalar_bar(title="Stress YY (MPa)")
-# plotter.view_xy()
-# plotter.show()
-
-# chart = pv.Chart2D()
-# chart.plot(x_s, sigma_yy * Pa_to_MPa)
-# chart.plot(x_s, sigma_th_ref * Pa_to_MPa)
-
-# plotter = pv.Plotter()
-# plotter.add_chart(chart)
-# plotter.show()
-
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 L2_T = float(np.sqrt(np.mean((T - T_ref) ** 2)))
 Linf_T = float(np.max(np.abs((T - T_ref))))

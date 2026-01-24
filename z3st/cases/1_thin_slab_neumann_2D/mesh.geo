@@ -9,10 +9,10 @@
 SetFactory("Built-in");
 
 Lx = 0.100;
-Ly = 2.000;
+Ly = 4.000;
 
-nx = 21;
-ny = 21;
+nx = 81;
+ny = 81;
 
 // Corner points
 Point(1) = {0,  0, 0, 1.0};
