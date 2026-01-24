@@ -12,9 +12,3 @@ mechanical:
   steel:
   - type: Clamp_x
     region: xmin
-
-  - type: Clamp_y
-    region: ymin
-
-  - type: Clamp_z
-    region: zmin

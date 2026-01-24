@@ -12,6 +12,7 @@ SUMMARY_FILE="${ROOT_DIR}/non-regression_summary.txt"
 CASES=(
     "00_example"
     "1_thin_slab_2D"
+    "1_thin_slab_neumann_3D"
     "2_thin_cylindrical_shell_2D"
     "3_thick_slab_adiabatic_3D"
     "3_thin_slab_adiabatic_2D"
@@ -31,6 +32,10 @@ CASES=(
     "13_annular_cylinder"
     "14_full_cylinder"
     "20_coaxial_cylinders_3D"
+    "21_plate_non_linear"
+    "mesh_sensitivity_2D"
+    "stress_strain_curve_stress"
+    "stress_strain_curve_displacement"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"

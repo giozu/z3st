@@ -17,7 +17,6 @@ class MechanicalModel:
         print("[MechanicalModel] initializer")
         self.traction = {}
         self.dirichlet_mechanical = {}
-        self.clamp_r = {}
 
         # --. Mechanical model options --..
         self.mech_cfg = self.input_file.get("mechanical", {})
@@ -59,7 +58,6 @@ class MechanicalModel:
         for name in self.materials:
             self.traction[name] = []
             self.dirichlet_mechanical[name] = []
-            self.clamp_r[name] = []
 
         for mat_type, bc_list in mechanical_bcs_defs.items():
             for bc_info in bc_list:
@@ -143,48 +141,39 @@ class MechanicalModel:
                 # --. Neumann --..
                 elif bc_type == "Neumann":
                     traction_value = bc_info.get("traction")
-                    if traction_value is None:
-                        print(f"  [ERROR] Neumann BC on '{mat_type}' for region '{region_name}' has no traction.")
-                        sys.exit(1)
-
-                    if isinstance(traction_value, (int, float)):
-                        raw_value = traction_value
-                        initial_val = traction_value
-                    elif isinstance(traction_value, list):
-                        if not all(isinstance(x, (int, float)) for x in traction_value):
-                            print(f"[ERROR] Traction list on '{region_name}' contains non-scalar values.")
-                            sys.exit(1)
-                        if len(traction_value) != self.n_steps:
-                            print(f"[ERROR] Traction list length ({len(traction_value)}) != n_steps ({self.n_steps}).")
-                            sys.exit(1)
-                        raw_value = traction_value
-                        initial_val = traction_value[0]
-                    else:
-                        print(f"[ERROR] Traction for '{region_name}' must be scalar or list, got {type(traction_value)}")
-                        sys.exit(1)
-
-                    traction_const = dolfinx.fem.Constant(
-                        self.mesh, PETSc.ScalarType(initial_val)
-                    )
-
-                    regime = self.mech_cfg.get("mechanical_regime", "").lower()
                     
-                    if regime in ["axisymmetric", "2d"]:
+                    # Handling list
+                    if isinstance(traction_value, list):
+                        raw_value = traction_value
+                        initial_val = float(traction_value[0]) # starting from step 0
+                    # Scalar
+                    else:
+                        raw_value = [traction_value] * self.n_steps
+                        initial_val = float(traction_value)
+
+                    # scalar constant (Pa)
+                    traction_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_val))
+
+                    # normal vector according to the mechanical regime
+                    regime = self.mech_cfg["mechanical_regime"].lower()
+                    if regime in ["axisymmetric", "2d", "plane_stress"]:
                         n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                     else:
                         n_vec = self.normal
 
+                    # T = p * n
                     traction_expr = traction_const * n_vec
 
                     self.traction[mat_type].append({
                         "id": region_id,
-                        "value": traction_expr,
-                        "const": traction_const,
-                        "raw": raw_value,
+                        "region_name": region_name,
+                        "value": traction_expr,  # --> in weak form
+                        "const": traction_const, # --> in the loop
+                        "raw": raw_value,        # --> list
                     })
 
-                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → region '{region_name}': {initial_val} Pa")
-                
+                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → {region_name}: {initial_val} Pa (list loaded)")
+                    
                 # --. Slip (double component-wise blocking) --..
                 elif bc_type == "Slip_x":
                     for i in [1, 2]:  # constrain u_y, u_z
@@ -296,21 +285,9 @@ class MechanicalModel:
                         f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'"
                     )
 
-                # --. Clamp_r --..
-                elif bc_type == "Clamp_r":
-                    value = 0.0
-                    penalty = bc_info.get("penalty", 1e12)
-
-                    self.clamp_r[mat_type].append(
-                        {"id": region_id, "value": value, "penalty": penalty}
-                    )
-                    print(
-                        f"  [INFO] Clamp_r mechanical BC on '{mat_type}' → u·n = {value} (penalty α = {penalty:.1e}) at region '{region_name}'"
-                    )
-
                 else:
                     print(f"  [ERROR] Unknown mechanical BC type '{bc_type}' for '{mat_type}'.")
-                    print(f"  Available are: Dirichlet, Neumann, Clamp_x/y/z/r, Slip_x/y/z.")
+                    print(f"  Available are: Dirichlet, Neumann, Clamp_x/y/z, Slip_x/y/z.")
                     sys.exit(1)
 
     def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):

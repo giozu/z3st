@@ -259,21 +259,25 @@ class Solver:
         for _, bc_list in self.traction.items():
             for bc in bc_list:
                 raw = bc.get("raw", None)
-
-                # constant traction → no update
-                if isinstance(raw, (int, float)):
-                    bc["const"].value = raw
-                    continue
-
-                # list of tractions → pick current_step
+                
                 if isinstance(raw, list):
                     idx = min(self.current_step, len(raw) - 1)
-                    bc["const"].value = raw[idx]
-                    print(f"  [INFO] Updating traction on region {bc['id']} → {raw[idx]} Pa")
+                    val = raw[idx]
+                elif isinstance(raw, (int, float)):
+                    val = raw
                 else:
                     raise RuntimeError("Invalid traction 'raw' format")
 
-                bc["value"] = bc["const"] * self.normal
+                bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
+                print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
+
+                regime = self.mech_cfg.get("mechanical_regime").lower()
+                if regime in ["axisymmetric", "2d"]:
+                    n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
+                else:
+                    n_vec = self.normal
+                
+                bc["value"] = bc["const"] * n_vec
 
         u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
         a_m, L_m = 0, 0
@@ -315,27 +319,6 @@ class Solver:
                     L_m += w * ufl.dot(bc_info["value"], v_m) * ds
                 else:
                     F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
-
-        # Clamp_r penalties
-        for label in self.materials:
-            for bc_info in self.clamp_r[label]:
-                alpha = bc_info["penalty"]
-                val = bc_info["value"]
-                print(
-                    f"  Applying Clamp_r (weak penalty) on region id = {bc_info['id']} "
-                    f"(α = {alpha:.2e})"
-                )
-                ds = self.ds_tags[bc_info["id"]]
-                n = ufl.FacetNormal(self.mesh)
-
-                if self.mech_cfg["solver"] == "linear":
-                    a_m += w * alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
-                    if abs(val) > 1e-16:
-                        L_m += w * alpha * val * ufl.dot(v_m, n) * ds
-                else:
-                    F_m += w * alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
-                    if abs(val) > 1e-16:
-                        F_m -= w * alpha * val * ufl.dot(v_m, n) * ds
 
         # --- Extract actual DirichletBC objects (handles both dict and direct BCs) ---
         bcs_mech = [
