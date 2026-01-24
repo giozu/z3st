@@ -44,11 +44,8 @@ Q0 = 9.0e4      # Volumetric heat source (gamma heating, W/m³)
 SHIELD_MAT_KEY = "steel"
 
 # Sweep parameters
-# BA_LIST  = [1.02, 1.04, 1.05, 1.06, 1.08, 1.10, 1.12, 1.14, 1.16, 1.17, 1.18, 1.20]  # Ro/Ri ratios
-# MUA_LIST = [1, 2, 5, 10, 20, 30, 40, 50, 60]                 # mu * Ri
-
-BA_LIST = [1.05]    # Ro/Ri ratios
-MUA_LIST = [10]         # mu * Ri
+BA_LIST  = [1.02, 1.04, 1.05, 1.06, 1.08, 1.10, 1.12, 1.14, 1.16, 1.17, 1.18, 1.20]  # Ro/Ri ratios
+MUA_LIST = [1, 2, 5, 10, 20, 30, 40, 50, 60]                 # mu * Ri
 
 LOG_FILE = ROOT / "attenuation_run.log"  # Log file for all runs
 
