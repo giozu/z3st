@@ -18,8 +18,8 @@ X_left  = (Lx/2) - (W_notch/2);
 X_right = (Lx/2) + (W_notch/2);
 Y_tip   = Ly - D_notch;
 
-lc_fine = 0.0005;
-lc_coarse = 0.05;
+lc_fine = 0.00075;
+lc_coarse = 0.01;
 
 Point(1) = {0,  0,  0, lc_coarse};
 Point(2) = {Lx, 0,  0, lc_coarse};
