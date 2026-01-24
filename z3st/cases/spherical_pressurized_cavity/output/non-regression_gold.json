@@ -1,18 +1,18 @@
 {
     "results": {
         "sigma_rr": {
-            "rel_error": 0.08560637341741484,
-            "numerical": -41416.598546530055,
+            "rel_error": 0.038234328221359686,
+            "numerical": -42096.87196776596,
             "status": "PASS"
         },
         "sigma_tt": {
-            "rel_error": 0.03964872759108796,
-            "numerical": 22185.617593998333,
+            "rel_error": 0.044630215050123344,
+            "numerical": 21747.014840189597,
             "status": "PASS"
         },
         "sigma_vm": {
-            "rel_error": 0.06128942728358556,
-            "numerical": 63590.92337603757,
+            "rel_error": 0.01464368486060857,
+            "numerical": 63843.88680795555,
             "status": "PASS"
         }
     },

@@ -24,26 +24,26 @@ models:
 
 mechanical:
   solver: linear # linear | non-linear
-  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
+  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  mechanical_regime: 3D   # 3D | plane_stress
+  mechanical_regime: 2D   # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
   debug: false
 
 thermal:
   solver: linear # linear | non-linear
-  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
+  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
 
 damage:
   solver: linear
-  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
+  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  convergence: norm # rel_norm | norm
+  convergence: rel_norm # rel_norm | norm
   lc: 0.001
 
 lhr:
@@ -52,4 +52,4 @@ lhr:
 time:
 - 0.0
 - 10.0
-n_steps: 5
+n_steps: 10

@@ -9,7 +9,7 @@
 SetFactory("Built-in");
 
 Lx = 1.000;
-Ly = 0.001;
+Ly = 0.500;
 
 nx = 81;
 ny = 41;

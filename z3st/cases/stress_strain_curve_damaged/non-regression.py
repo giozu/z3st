@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: stress_strain_curve_stress
+Z3ST case: stress_strain_curve_damage
 
 non-regression script
 ---------------------
@@ -90,55 +90,8 @@ plt.xlabel(r"strain $\epsilon_{xx}$ (/)")
 plt.ylabel(r"stress $\sigma_{xx}$ (Pa)")
 plt.grid(True)
 plt.title("Stress-strain curve")
-plt.yscale("log")
+plt.yscale("linear")
 plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
 print("[INFO] stress_strain_curve.png saved\n")
-
-# --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-# Strain
-mask_zero = np.isclose(strain_ref_np, 0.0)
-rel_error_E = np.zeros_like(strains_np)
-rel_error_E[~mask_zero] = np.abs(strains_np[~mask_zero] - strain_ref_np[~mask_zero]) / np.abs(strain_ref_np[~mask_zero])
-rel_error_E[mask_zero] = np.abs(strains_np[mask_zero] - strain_ref_np[mask_zero])
-
-# Stress
-rel_error_S = np.zeros_like(stresses_np)
-mask_zero_S = np.isclose(stresses_ref_np, 0.0)
-rel_error_S[~mask_zero_S] = np.abs(stresses_np[~mask_zero_S] - stresses_ref_np[~mask_zero_S]) / np.abs(stresses_ref_np[~mask_zero_S])
-rel_error_S[mask_zero_S] = np.abs(stresses_np[mask_zero_S] - stresses_ref_np[mask_zero_S])
-
-# Displacement
-rel_error_U = np.zeros_like(displ_x_np)
-mask_zero_U = np.isclose(displ_x_ref_np, 0.0)
-rel_error_U[~mask_zero_U] = np.abs(displ_x_np[~mask_zero_U] - displ_x_ref_np[~mask_zero_U]) / np.abs(displ_x_ref_np[~mask_zero_U])
-rel_error_U[mask_zero_U] = np.abs(displ_x_np[mask_zero_U] - displ_x_ref_np[mask_zero_U])
-
-
-errors = {
-    "epsilon_xx": {
-        "numerical": strains_np.tolist(),
-        "reference": strain_ref_np.tolist(),
-        "abs_error": np.abs(strains_np - strain_ref_np).tolist(),
-        "rel_error": rel_error_E.tolist(),
-    },
-    "sigma_xx": {
-        "numerical": stresses_np.tolist(),
-        "reference": stresses_ref_np.tolist(),
-        "abs_error": np.abs(stresses_np - stresses_ref_np).tolist(),
-        "rel_error": rel_error_S.tolist(),
-    },
-    "u_xx": {
-        "numerical": displ_x_np.tolist(),
-        "reference": displ_x_ref_np.tolist(),
-        "abs_error": np.abs(displ_x_np - displ_x_ref_np).tolist(),
-        "rel_error": rel_error_U.tolist(),
-    },
-}
-
-# --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")

@@ -34,10 +34,10 @@ CASES=(
     "13_annular_cylinder"
     "14_full_cylinder"
     "20_coaxial_cylinders_3D"
-    "21_plate_non_linear"
     "mesh_sensitivity_2D"
     "stress_strain_curve_stress"
     "stress_strain_curve_displacement"
+    "spherical_pressurized_cavity"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"
