@@ -13,6 +13,7 @@ CASES=(
     "00_example"
     "1_thin_slab_2D"
     "1_thin_slab_neumann_3D"
+    "1_thin_slab_neumann_2D"
     "2_thin_cylindrical_shell_2D"
     "3_thick_slab_adiabatic_3D"
     "3_thin_slab_adiabatic_2D"
