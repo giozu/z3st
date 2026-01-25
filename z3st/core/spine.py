@@ -254,8 +254,10 @@ class Spine(
                 max_iter=max_iters,
                 rtol_th=self.th_cfg["rtol"],
                 rtol_mech=self.mech_cfg["rtol"],
+                rtol_dmg=self.dmg_cfg["rtol"],
                 stag_tol_th=self.th_cfg["stag_tol"],
                 stag_tol_mech=self.mech_cfg["stag_tol"],
+                stag_tol_dmg=self.dmg_cfg["stag_tol"],
             )
         else:
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")

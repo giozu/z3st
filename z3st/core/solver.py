@@ -484,8 +484,6 @@ class Solver:
         res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
         print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
 
-        conv_damage = (norm_dD < stag_tol_dmg) or (D_new.x.array.max() < 1e-8)
-
         return conv_damage, norm_dD, rel_norm_dD
 
     def solve_staggered(
