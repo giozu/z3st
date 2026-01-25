@@ -20,10 +20,12 @@ class Solver:
 
         self.relax_T = float(solver_settings.get("relax_T", 0.9))
         self.relax_u = float(solver_settings.get("relax_u", 0.4))
+        self.relax_D = float(solver_settings.get("relax_D", 0.4))
 
         print("  Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
+        print(f"  → Damage       : {self.relax_D}")
 
         self.relax_adaptive = bool(solver_settings.get("relax_adaptive", False))
         self.relax_growth = float(solver_settings.get("relax_growth", 1.2))
@@ -439,17 +441,17 @@ class Solver:
         )
         problem_d.solve()
 
+        # Relax
+        D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
+
         # irreversibility
         D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
-        # Residual in L_inf norm
-        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
-        print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
-
         # Convergence
         D_new.x.scatter_forward()
         D_old.x.scatter_forward()
+
         vec_D_new = D_new.x.petsc_vec
         vec_D_old = D_old.x.petsc_vec
 
@@ -460,7 +462,28 @@ class Solver:
         norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
         rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
 
-        print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
+        if self.dmg_cfg["convergence"] == "norm":
+            print(f"  ||ΔD|| = {norm_dD:.3e}")
+            conv_damage = norm_dD < stag_tol_dmg
+            res_curr = norm_dD
+        else:
+            print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
+            conv_damage = rel_norm_dD < stag_tol_dmg
+            res_curr = rel_norm_dD
+
+        if self.relax_adaptive:
+            if prev_res_D is not None:
+                if res_curr < prev_res_D:
+                    self.relax_D = min(self.relax_D * self.relax_growth, self.relax_max)
+                else:
+                    self.relax_D = max(self.relax_D * self.relax_shrink, self.relax_min)
+            prev_res_S = res_curr
+            print(f"  [adaptive] relax_D={self.relax_D:.2f}")
+
+        # Residual in L_inf norm
+        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
+        print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
+
         conv_damage = (norm_dD < stag_tol_dmg) or (D_new.x.array.max() < 1e-8)
 
         return conv_damage, norm_dD, rel_norm_dD
@@ -527,21 +550,13 @@ class Solver:
             conv_mech = True
             conv_damage = True
 
-            # --- THERMAL STEP ---
+            # --. THERMAL STEP --..
             if self.on.get("thermal", False):
-                # print("Before:", T_new.x.array[:10])
                 conv_th, _, _, prev_res_T = self._thermal_step(
                     T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
                 )
-                # print("After :", T_new.x.array[:10])
 
-            # --- MECHANICAL STEP ---
-            if self.on.get("mechanical", False):
-                conv_mech, _, _, prev_res_u = self._mechanical_step(
-                    u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
-                )
-
-            # --- DAMAGE STEP ---
+            # --. DAMAGE STEP --..
             if self.on.get("damage", False):
                 conv_damage, _, _ = self._damage_step(
                     D_new,
@@ -551,13 +566,18 @@ class Solver:
                     u_current=u_new,
                 )
 
-            # --- OVERALL CONVERGENCE ---
+            # --. MECHANICAL STEP --..
+            if self.on.get("mechanical", False):
+                conv_mech, _, _, prev_res_u = self._mechanical_step(
+                    u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
+                )
+
+            # --.. GLOBAL CONVERGENCE --..
             print("\nConvergence check")
 
             if conv_th and conv_mech and conv_damage:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
 
-                # Commit results
                 if self.on.get("thermal", False):
                     self.T.x.array[:] = T_new.x.array
 
