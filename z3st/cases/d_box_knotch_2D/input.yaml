@@ -46,6 +46,8 @@ damage:
   convergence: rel_norm # rel_norm | norm
   lc: 0.002
 
-lhr: 0.0
-time: 0.0
+lhr: 
+- 0.0
+time: 
+- 0.0
 n_steps: 1
