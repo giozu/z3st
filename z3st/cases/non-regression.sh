@@ -38,6 +38,7 @@ CASES=(
     "stress_strain_curve_stress"
     "stress_strain_curve_displacement"
     "spherical_pressurized_cavity"
+    "d_box_knotch_2D"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"

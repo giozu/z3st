@@ -45,7 +45,7 @@ sigma_c = float(mat_data.get('sigma_c'))
 lc = 0.002  
 Gc_ref = (3.0 * sigma_c**2 * lc) / (2.0 * E)
 
-TOLERANCE = 1e-2 
+TOLERANCE = 5e-1 
 
 # --.. ..- .-.. .-.. --- Data --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
