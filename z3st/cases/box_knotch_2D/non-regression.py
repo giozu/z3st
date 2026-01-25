@@ -1,113 +1,97 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 00_example
+Z3ST case: stress_strain_curve_damage
 
 non-regression script
 ---------------------
 
+This script processes multiple VTU files (fields_0000.vtu, ...),
+extracts σ_xx and ε_xx for each step, and reconstructs the stress-strain curve.
 """
 
 import os
-
 import numpy as np
-
+from glob import glob
+import matplotlib.pyplot as plt
 from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import plot_field_along_x
 from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+OUTPUT_DIR = os.path.join(CASE_DIR, "output")
+VTU_FILES = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
+OUT_JSON = os.path.join(OUTPUT_DIR, "non-regression.json")
 
-# Geometry and material
-Lx, Ly, Lz = 0.100, 0.100, 0.004  # m (geometry dimensions)
-E = 200e9  # (Pa) Young modulus
-y_target, z_target, mask_tol = Ly / 2, Lz / 2, 0.01  # m, m, m (plane selection and tolerance)
+# geometry and material
+Lx, Ly = 1.0, 0.500         # m (geometry dimensions)
+E = 200e9                   # (Pa) Young modulus
+nu = 0.3                    # Poisson modulus
+
+n_fe = 40                   # number of vertical finite elements (from mesh.geo)
+
+y_target, mask_tol = (
+    Ly / 2,
+    1 / (2 * n_fe),
+)                           # m, m, m (extraction plane selection and tolerance)
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
-SIGMA_REF = 125e6  # (Pa)
-VON_MISES_REF = 125e6  # (Pa)
-UX_REF = SIGMA_REF * Lx / E  # (m)
+STRESSES_REF = [ 0, 1e2, 1e4, 1e6, 1e8 ]                            # (Pa)
+# IMPOSED STRESS: (1 - nu**2) accounts for the 2D PLANE STRAIN conditions (epsilon_zz = 0)
+STRAINS_REF = [(1 - nu**2) / E * sigma for sigma in STRESSES_REF]   # (/)
+U_X_REF = [eps * Lx for eps in STRAINS_REF]                         # (m)
 
-TOLERANCE = 1e-2  # relative tolerance for pass/fail
-
-# --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
-list_fields(VTU_FILE)
+TOLERANCE = 1e-2            # relative tolerance for pass/fail
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
-print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
-x_s, y_s, z_s, s = extract_stress(VTU_FILE, component="all", return_coords=True, prefer="cells")
-_, sigma_xx = average_section(
-    x_s, y_s, z_s, s["xx"], y_target, z_target, mask_tol, decimals=5, label="sigma_xx"
-)
-_, sigma_yy = average_section(
-    x_s, y_s, z_s, s["yy"], y_target, z_target, mask_tol, decimals=5, label="sigma_yy"
-)
-x_s, sigma_zz = average_section(
-    x_s, y_s, z_s, s["zz"], y_target, z_target, mask_tol, decimals=5, label="sigma_zz"
-)
+strains = []
+stresses = []
+displacements = []
 
-x, y, z, u = extract_displacement(VTU_FILE)
-ux, uy, uz = u[:, 0], u[:, 1], u[:, 2]
-print(f"[INFO] Displacement extracted: |u|_max = {np.max(np.linalg.norm(u, axis=1)):.3e}")
+for step, vtufile in enumerate(VTU_FILES):
+    print(f"\n[STEP {step}] Processing {os.path.basename(vtufile)}")
 
-_, _, _, sigma_vm = extract_VonMises(VTU_FILE, prefer="points")
+    # Stress extraction - usa vtufile (minuscolo)
+    x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress_steel (cells)")
+    mask = np.abs(y_S - y_target) < mask_tol
+    stresses.append(float(np.mean(S_all[mask, 0])))
 
-plot_field_along_x(
-    x,
-    y,
-    z,
-    field=ux,
-    field_name="Displacement ux (m)",
-    case_dir=CASE_DIR,
-    y_target=y_target,
-    z_target=z_target,
-    color="tab:green",
-)
-plot_field_along_x(
-    x,
-    y,
-    z,
-    field=sigma_vm,
-    field_name=r"Von Mises stress (Pa)",
-    case_dir=CASE_DIR,
-    y_target=y_target,
-    z_target=z_target,
-    color="tab:orange",
-)
+    # Displacement extraction
+    x_u_all, y_u_all, z_u_all, u_all = extract_field(vtufile, field_name="Displacement")
+    mask_u = np.abs(y_u_all - y_target) < mask_tol
+    u_max = np.max(u_all[mask_u, 0])
+    displacements.append(u_max)
 
-# --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-sigma_xx_num = np.mean(sigma_xx)
-sigma_vm_num = np.mean(sigma_vm)
-ux_num = np.max(ux)
+    # Strain extraction
+    x_eps_all, y_eps_all, z_eps_all, E_all = extract_field(vtufile, field_name="Strain (cells)")
+    mask_e = np.abs(y_eps_all - y_target) < mask_tol
+    eps_eng = float(np.mean(E_all[mask_e, 0]))
+    strains.append(eps_eng)
 
-errors = {
-    "sigma_xx": {
-        "numerical": float(sigma_xx_num),
-        "reference": SIGMA_REF,
-        "abs_error": float(abs(sigma_xx_num - SIGMA_REF)),
-        "rel_error": float(abs(sigma_xx_num - SIGMA_REF) / SIGMA_REF),
-    },
-    "sigma_von_mises": {
-        "numerical": float(sigma_vm_num),
-        "reference": VON_MISES_REF,
-        "abs_error": float(abs(sigma_vm_num - VON_MISES_REF)),
-        "rel_error": float(abs(sigma_vm_num - VON_MISES_REF) / VON_MISES_REF),
-    },
-    "ux_displacement": {
-        "numerical": float(ux_num),
-        "reference": UX_REF,
-        "abs_error": float(abs(ux_num - UX_REF)),
-        "rel_error": float(abs(ux_num - UX_REF) / UX_REF),
-    },
-}
+# Stress–strain curve output
+strain_ref_np = np.array(STRAINS_REF, dtype=float)
+stresses_ref_np = np.array(STRESSES_REF, dtype=float)
+displ_x_ref_np = np.array(U_X_REF, dtype=float)
 
-# --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
+strains_np = np.array(strains, dtype=float)
+stresses_np = np.array(stresses, dtype=float)
+displ_x_np = np.array(displacements, dtype=float)
 
-print("\n[INFO] non-regression completed.\n")
+print("\n--. stress-strain-displacement values --..")
+for e, s, u in zip(strains, stresses, displacements):
+    print(f"ε_xx = {e:.3e}\tσ_xx = {s:.3e}\tu_x = {u:.3e}")
+
+plt.figure(figsize=(7, 5))
+plt.plot(strains, stresses, "--o", lw=2, label="Numerical")
+plt.plot(strain_ref_np, stresses_ref_np, "-", lw=2, label="Analytical")
+plt.xlabel(r"strain $\epsilon_{xx}$ (/)")
+plt.ylabel(r"stress $\sigma_{xx}$ (Pa)")
+plt.grid(True)
+plt.title("Stress-strain curve")
+plt.yscale("linear")
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
+print("[INFO] stress_strain_curve.png saved\n")

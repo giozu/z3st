@@ -517,9 +517,7 @@ class MechanicalModel:
 
     def elastic_energy_density(self, u, material):
         """
-        Elastic strain energy density (small strain linear elasticity).
-        Uses w = 1/2 * sigma_mech(u) : epsilon(u).
-        Works also with self.mech_regime == 'plane_stress' because sigma_mech() already handles it.
+        Elastic strain energy density = 1/2 * sigma_mech(u) : epsilon(u).
         """
 
         sigma = self.sigma_mech(u, material)

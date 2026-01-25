@@ -98,6 +98,12 @@ if __name__ == "__main__":
         problem.solve(max_iters=int(input_file["solver_settings"]["max_iters"]))
         problem.get_results()
 
+        if problem.on.get("damage"):
+            E_el, E_frac = problem.compute_energy_balance()
+            print(f"  → Elastic energy  : {E_el:.4e} J")
+            print(f"  → Fracture energy : {E_frac:.4e} J")
+            print(f"  → Total energy    : {E_el + E_frac:.4e} J")
+
         # Export VTU
         if len(times) == 1:
             export_vtu(problem, output_dir="output")

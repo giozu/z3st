@@ -141,3 +141,29 @@ class DamageModel:
         
         res = ( (1 + H) * D * D_test + lc**2 * ufl.dot(ufl.grad(D), ufl.grad(D_test)) - H * D_test ) * ufl.dx
         return res
+
+    def compute_energy_balance(self):
+        """
+        Compute the energy component to verify the conservation law.
+        """
+        E_el = 0.0
+        E_frac = 0.0
+        
+        for label, mat in self.materials.items():
+            tag = self.label_map[label]
+            dx = self.dx_tags[tag]
+            
+            # 1. Elastic energy (already degraded by damage)
+            E_el += dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.elastic_energy_density(self.u, mat) * dx))
+            
+            # 2. Fracture energy
+            # Gamma = Gc/2 * (d^2/lc + lc * grad(d)^2)
+            if self.on.get("damage"):
+                lc = self.dmg_cfg.get("lc") # characteristic length
+                Gc = (3.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (2.0 * mat["E"]) # Gc, fracture energy
+                print(f"Fracture energy: Gc = 3*sigma_c**2/(lc*2*E) = {Gc} J")
+                
+                gamma = (Gc / 2.0) * ((self.D**2 / lc) + lc * ufl.dot(ufl.grad(self.D), ufl.grad(self.D)))
+                E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * dx))
+                
+        return E_el, E_frac
