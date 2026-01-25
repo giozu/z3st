@@ -70,39 +70,6 @@ class DamageModel:
         """Fracture energy density γ(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)."""
         return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
 
-    # def update_history(self, u):
-    #     """
-    #     Ensure the irreversibility for the field H:
-    #         H(x) = max(H_old(x), H_new(x))
-    #     """
-
-    #     Q = self.Q
-    #     H_new = dolfinx.fem.Function(Q)
-
-    #     # iterate over materials
-    #     for label, material in self.materials.items():
-    #         tag = self.label_map[label]
-
-    #         # get cells belonging to this material
-    #         cells = np.where(self.cell_tags.values == tag)[0]
-    #         if len(cells) == 0:
-    #             continue
-
-    #         # compute crack driving force for this material
-    #         H_expr = self.crack_driving_force(u, material)
-    #         tmp = dolfinx.fem.Function(Q)
-    #         expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points)
-    #         tmp.interpolate(expr)
-
-    #         # assign tmp values to H_new only on these cells
-    #         for cell in cells:
-    #             dof = Q.dofmap.cell_dofs(cell)[0]  # DG0 --> 1 dof per cell
-    #             H_new.x.array[dof] = tmp.x.array[dof]
-
-    #     # irreversibility
-    #     self.H.x.array[:] = np.maximum(self.H.x.array, H_new.x.array)
-
-
     def update_history(self, u):
         """
         Vectorized function (faster), to update the field H (crack driving force)
