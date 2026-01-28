@@ -127,7 +127,7 @@ class DamageModel:
             # Gamma = Gc/2 * (d^2/lc + lc * grad(d)^2)
             if self.on.get("damage"):
                 lc = self.dmg_cfg.get("lc") # characteristic length
-                Gc = (3.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (2.0 * mat["E"]) # Gc, fracture energy
+                Gc = (3.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (2.0 * mat["E"]) # Gc, fracture energy = 3 * phi * lc
                 print(f"Fracture energy: Gc = 3*sigma_c**2/(lc*2*E) = {Gc} J")
                 
                 gamma = (Gc / 2.0) * ((self.D**2 / lc) + lc * ufl.dot(ufl.grad(self.D), ufl.grad(self.D)))
