@@ -252,12 +252,12 @@ class Spine(
         elif self.coupling == "staggered":
             self.solve_staggered(
                 max_iter=max_iters,
-                rtol_th=self.th_cfg["rtol"],
-                rtol_mech=self.mech_cfg["rtol"],
-                rtol_dmg=self.dmg_cfg["rtol"],
-                stag_tol_th=self.th_cfg["stag_tol"],
-                stag_tol_mech=self.mech_cfg["stag_tol"],
-                stag_tol_dmg=self.dmg_cfg["stag_tol"],
+                rtol_th=self.th_cfg.get("rtol", 1e-6) if self.on.get("thermal") else 1e-6,
+                rtol_mech=self.mech_cfg.get("rtol", 1e-6) if self.on.get("mechanical") else 1e-6,
+                rtol_dmg=self.dmg_cfg.get("rtol", 1e-6) if hasattr(self, 'dmg_cfg') else 1e-6,
+                stag_tol_th=self.th_cfg.get("stag_tol", 1e-4) if self.on.get("thermal") else 1e-4,
+                stag_tol_mech=self.mech_cfg.get("stag_tol", 1e-4) if self.on.get("mechanical") else 1e-4,
+                stag_tol_dmg=self.dmg_cfg.get("stag_tol", 1e-4) if hasattr(self, 'dmg_cfg') else 1e-4
             )
         else:
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")
