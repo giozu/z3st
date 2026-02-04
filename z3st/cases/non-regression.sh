@@ -37,8 +37,9 @@ CASES=(
     "mesh_sensitivity_2D"
     "stress_strain_curve_stress"
     "stress_strain_curve_displacement"
-    "spherical_pressurized_cavity"
+    "stress_strain_curve_damaged"
     "d_box_knotch_2D"
+    "spherical_pressurized_cavity"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"

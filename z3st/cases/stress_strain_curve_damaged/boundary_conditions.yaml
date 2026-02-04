@@ -8,7 +8,7 @@ mechanical:
 
   - type: Neumann
     region: xmax
-    traction: [0.0, 2.0e7, 4.0e7, 6.0e7, 8.0e7, 8.2e7, 8.4e7, 8.5e7, 8.6e7, 8.65e7] # (Pa)
+    traction: [0.0, 1.0e6, 1.0e7, 1.0e8, 2.0e8, 3.0e8]   # (Pa)
 
 thermal:
   steel:

@@ -82,7 +82,7 @@ if __name__ == "__main__":
     problem.initialize_fields()
     problem.set_boundary_conditions()
 
-    # --. Time loop (quasi-stationary sequence) --..
+    # --. Time loop --..
     start_time = time.time()
 
     for step, (t, lhr) in enumerate(zip(times, lhrs)):
