@@ -24,6 +24,8 @@ class DamageModel:
         for key, value in self.dmg_cfg.items():
             print(f"  {key:<20}: {value}")
 
+        self.dirichlet_damage = {}
+
     @staticmethod
     def degradation_function(D, K=1e-4):
         """
@@ -134,3 +136,43 @@ class DamageModel:
                 E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * dx))
                 
         return E_el, E_frac
+
+    def set_damage_boundary_conditions(self, V_damage):
+            print("\nSetting damage boundary conditions...")
+            damage_bcs_defs = self.boundary_conditions.get("damage", {})
+
+            for name in self.materials:
+                self.dirichlet_damage[name] = []
+
+            for mat_type, bc_list in damage_bcs_defs.items():
+                for bc_info in bc_list:
+                    region_name = bc_info.get("region")
+                    bc_type = bc_info.get("type")
+                    
+                    val_d = bc_info.get("value") or bc_info.get("temperature")
+
+                    if region_name is None or bc_type is None or val_d is None:
+                        print(f"  [ERROR] Incomplete damage BC definition for '{mat_type}'.")
+                        continue
+
+                    region_id = self.label_map.get(region_name)
+                    if region_id is None:
+                        print(f"  [ERROR] Region '{region_name}' not found in label_map.")
+                        continue
+
+                    facets = self.facet_tags.find(region_id)
+                    
+                    if bc_type == "Dirichlet":
+                        d_const = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(val_d))
+                        
+                        dofs = dolfinx.fem.locate_dofs_topological(V_damage, self.fdim, facets)
+                        
+                        bc = dolfinx.fem.dirichletbc(d_const, dofs, V_damage)
+
+                        self.dirichlet_damage[mat_type].append({
+                            "id": region_id,
+                            "value": bc,
+                            "const": d_const
+                        })
+
+                        print(f"  [INFO] Dirichlet damage BC on '{mat_type}' → D = {val_d} at region '{region_name}'")

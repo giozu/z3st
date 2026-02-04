@@ -409,6 +409,11 @@ class Solver:
         a_d, L_d = 0, 0
         lc = float(self.dmg_cfg["lc"])
 
+        bcs_d = []
+        for mat_name in self.materials:
+            for bc_entry in self.dirichlet_damage.get(mat_name, []):
+                bcs_d.append(bc_entry["value"])
+
         for label, material in self.materials.items():
 
             print(
@@ -434,7 +439,7 @@ class Solver:
         problem_d = dolfinx.fem.petsc.LinearProblem(
             a_d,
             L_d,
-            bcs=[],
+            bcs=bcs_d,
             u=D_new,
             petsc_options=petsc_opts_damage,
             petsc_options_prefix="damage_",
