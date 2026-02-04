@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
     # --. Output --..
     os.makedirs("output", exist_ok=True)
+    if os.path.exists('energies.txt'): os.remove('energies.txt')
 
     # --. Geometry --..
     geometry = load(input_file["geometry_path"])
@@ -100,9 +101,15 @@ if __name__ == "__main__":
 
         if problem.on.get("damage"):
             E_el, E_frac = problem.compute_energy_balance()
+            E_tot = E_el + E_frac
             print(f"  → Elastic energy  : {E_el:.4e} J")
             print(f"  → Fracture energy : {E_frac:.4e} J")
             print(f"  → Total energy    : {E_el + E_frac:.4e} J")
+
+            with open("energies.txt", "a") as f:
+                if step == 0:
+                    f.write("Step\tE_el\tE_frac\tE_tot\n")
+                f.write(f"{step}\t{E_el:.6e}\t{E_frac:.6e}\t{E_tot:.6e}\n")
 
         # Export VTU
         if len(times) == 1:

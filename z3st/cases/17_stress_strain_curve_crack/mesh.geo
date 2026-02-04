@@ -12,17 +12,17 @@ Lx = 1.000;
 Ly = 0.500;
 Dn = 0.25;
 
-nx = 81;
-ny = 41;
+lc_damage = 0.002;
+h_fine = lc_damage / 5.0;
+h_coarse = 0.01;
 
 // Corner points
-Point(1) = {0,  0, 0, 1.0};
-Point(2) = {Lx, 0, 0, 1.0};
-Point(3) = {Lx, Ly, 0, 1.0};
-Point(4) = {0,  Ly, 0, 1.0};
-
-Point(5) = {Dn, Ly/2, 0, 1.0};
-Point(6) = {0, Ly/2, 0, 1.0};
+Point(1) = {0,  0,  0, h_coarse};
+Point(2) = {Lx, 0,  0, h_coarse};
+Point(3) = {Lx, Ly, 0, h_coarse};
+Point(4) = {0,  Ly, 0, h_coarse};
+Point(5) = {Dn, Ly/2, 0, h_fine};
+Point(6) = {0,  Ly/2, 0, h_fine};
 
 // Edges
 Line(1) = {1, 2}; // y-min
@@ -36,11 +36,6 @@ Line(6) = {6, 5};
 Line Loop(1) = {1, 2, 3, 4, 6, -6, 5};
 Plane Surface(1) = {1};
 
-// Transfinite structure for quad
-Transfinite Curve {1, 2, 3} = nx Using Progression 1;
-Transfinite Curve {4, 5, 6} = nx Using Progression 1;
-
-// Transfinite Surface {1};
 // Recombine Surface {1};
 
 // Physical groups

@@ -121,7 +121,7 @@ class Spine(
         if self.coupling == "staggered":
             self.set_thermal_boundary_conditions(self.V_t)
             self.set_mechanical_boundary_conditions(self.V_m)
-            self.set_damage_boundary_conditions(self.V_d)
+            if self.on["damage"]: self.set_damage_boundary_conditions(self.V_d)
         else:
             V_t_sub, V_t_map = self.W.sub(1).collapse()
             V_t_map = np.array(V_t_map, dtype=np.int32)

@@ -36,9 +36,9 @@ CASES=(
     "15_spherical_pressurized_cavity"
     "16_coaxial_cylinders_3D"
     "17_stress_strain_curve_crack"
-    "17_stress_strain_curve_stress"
     "17_stress_strain_curve_displacement"
-    "17_stress_strain_curve_damaged"
+    "17_stress_strain_curve_knotch"
+    "17_stress_strain_curve_stress"
     "18_box_knotch_2D"
     "I_mesh_sensitivity_2D"
 )
