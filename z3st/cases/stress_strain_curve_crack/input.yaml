@@ -48,6 +48,8 @@ damage:
 
 lhr:
 - 0.0
+- 0.0
 time:
 - 0.0
-n_steps: 1
+- 3600.0
+n_steps: 6

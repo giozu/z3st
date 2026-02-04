@@ -42,16 +42,15 @@ sigma_c = float(mat_data.get('sigma_c'))
 
 with open(MESH_GEO_FILE, 'r') as f:
     content = f.read()
-W_notch = float(re.search(rf'W_notch\s*=\s*([\d\.]+);', content).group(1))
-D_notch = float(re.search(rf'D_notch\s*=\s*([\d\.]+);', content).group(1))
+Dn = float(re.search(rf'Dn\s*=\s*([\d\.]+);', content).group(1))
 
 print(f"[INFO] Geometry loaded: Lx = {Lx} m, Ly = {Ly} m")
 print(f"[INFO] Material loaded: E = {E:.2e} Pa, nu = {nu}")
 print(f"[INFO]                : sigma_c = {sigma_c:.2e} Pa")
-print(f"[INFO] W_notch loaded: W_notch = {W_notch}")
+print(f"[INFO] Dn loaded      : Dn = {Dn}")
 
 # geometry and material
-y_target, mask_tol = (Ly - D_notch, 1 / (2 * 40)) # m, m, m (extraction line selection and tolerance)
+x_target, mask_tol = (Dn, 1 / (2 * 40)) # m, m, m (extraction line selection and tolerance)
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 STRESSES_REF = [0.0, 1.0e6, 1.0e7, 1.0e8, 2.0e8, 3.0e8]             # (Pa)
@@ -62,8 +61,6 @@ U_X_REF = [eps * Lx for eps in STRAINS_REF]                         # (m)
 TOLERANCE = 1e-2            # relative tolerance for pass/fail
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
-
 strains = []
 stresses = []
 displacements = []
@@ -75,19 +72,19 @@ for step, vtufile in enumerate(VTU_FILES):
 
     # Stress extraction - usa vtufile (minuscolo)
     x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress_steel (cells)")
-    mask = np.abs(y_S - y_target) < mask_tol
-    stresses.append(float(np.mean(S_all[mask, 0])))
+    mask = np.abs(x_S - x_target) < mask_tol
+    stresses.append(float(np.mean(S_all[mask, 4])))
 
     # Displacement extraction
     x_u_all, y_u_all, z_u_all, u_all = extract_field(vtufile, field_name="Displacement")
-    mask_u = np.abs(y_u_all - y_target) < mask_tol
-    u_max = np.max(u_all[mask_u, 0])
+    mask_u = np.abs(x_u_all - x_target) < mask_tol
+    u_max = np.max(u_all[mask_u, 1])
     displacements.append(u_max)
 
     # Strain extraction
     x_eps_all, y_eps_all, z_eps_all, E_all = extract_field(vtufile, field_name="Strain (cells)")
-    mask_e = np.abs(y_eps_all - y_target) < mask_tol
-    eps_eng = float(np.mean(E_all[mask_e, 0]))
+    mask_e = np.abs(x_eps_all - x_target) < mask_tol
+    eps_eng = float(np.mean(E_all[mask_e, 4]))
     strains.append(eps_eng)
 
     # Damage
@@ -149,6 +146,6 @@ lns = lns1 + lns2 + lns3
 labs = [l.get_label() for l in lns]
 ax1.legend(lns, labs, loc='center left', frameon=True, shadow=True)
 
-plt.title(f"Z3ST: Crack initiation & softening\nNotch tip evolution (y={y_target:.3f}m)")
+plt.title(f"Z3ST: Crack initiation & softening\nNotch tip evolution (x={x_target:.3f}m)")
 fig.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "damage_evolution.png"), dpi=300)
