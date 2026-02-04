@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: stress_strain_curve_damage
+Z3ST case: stress_strain_curve_knotch
 
 non-regression script
 ---------------------
