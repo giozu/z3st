@@ -42,35 +42,64 @@ class DamageModel:
         """
 
         # Material properties
-        E = material["E"]
         lam = material["lmbda"]
         G = material["G"]
-        sigma_c = material["sigma_c"]
-        zeta = material["zeta"]
 
-        # Definitions
-        eps = self.epsilon(u)
-        tr_eps = ufl.tr(eps)
-        tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
-        # No cracking under pure hydrostatic compression
-        psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+        damage_type = self.dmg_cfg["type"]
 
-        psi_c = sigma_c**2 / (2 * E)
+        if damage_type == "AT2":
+            E = material["E"]
+            sigma_c = material["sigma_c"]
+            zeta = material["zeta"]
 
-        # The damage initiates once the energy density ratio
-        # psi_pos / psi_c > 1.0
-        # microscopic fracture energy <---> macroscopic stress sigma_c
-        H = zeta * ufl.conditional(
-            ufl.gt(psi_pos / psi_c, 1.0),
-            psi_pos / psi_c - 1.0,
-            0.0,
-        )
-        return H
+            # Definitions
+            eps = self.epsilon(u)
+            tr_eps = ufl.tr(eps)
+            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps)) # Macauley bracket pos
+
+            # No cracking under pure hydrostatic compression
+            psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+
+            psi_c = sigma_c**2 / (2 * E)
+
+            # The damage initiates once the energy density ratio
+            # psi_pos / psi_c > 1.0
+            # microscopic fracture energy <---> macroscopic stress sigma_c
+            H = zeta * ufl.conditional(
+                ufl.gt(psi_pos / psi_c, 1.0),
+                psi_pos / psi_c - 1.0,
+                0.0,
+            )
+            return H
+
+        elif damage_type == "AT1":
+            
+            # Definitions
+            eps = self.epsilon(u)
+            
+            # Volumetric-Deviatoric Split (Amor et al.)
+            tr_eps = ufl.tr(eps)
+            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps)) # Macauley bracket pos
+            
+            # No cracking under pure hydrostatic compression
+            psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+
+            return psi_pos
 
     @staticmethod
     def gamma_density(D, grad_D, lc):
-        """Fracture energy density γ(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)."""
-        return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
+        damage_type = self.dmg_cfg["type"]
+
+        if damage_type == "AT2":
+            """Fracture energy density gamma(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)."""
+            return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
+
+        elif damage_type == "AT1":
+            """
+            Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
+            """
+            
+            return D / lc + lc * ufl.dot(grad_D, grad_D)
 
     def update_history(self, u):
         """
@@ -86,8 +115,7 @@ class DamageModel:
             
             # Finding cells of this material
             entities = self.cell_tags.find(tag)
-            if len(entities) == 0:
-                continue
+            if len(entities) == 0: continue
             
             H_expr = self.crack_driving_force(u, material)
             expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points)
@@ -99,10 +127,14 @@ class DamageModel:
             
             H_new_array[dofs] = tmp_func.x.array[dofs]
 
-        self.H.x.array[:] = np.maximum(self.H.x.array, H_new_array)
+        damage_type = self.dmg_cfg["type"]
+        
+        if damage_type == "AT1":
+            self.H.x.array[:] = H_new_array
+        elif damage_type == "AT2":
+            self.H.x.array[:] = np.maximum(self.H.x.array, H_new_array)
+        
         self.H.x.scatter_forward()
-
-
 
     def get_damage_residual(self, D, D_test, material):
         lc = material["lc"]

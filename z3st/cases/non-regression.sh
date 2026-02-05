@@ -40,6 +40,7 @@ CASES=(
     "17_stress_strain_curve_knotch"
     "17_stress_strain_curve_stress"
     "18_box_knotch_2D"
+    "18_box_crack_2D"
     "I_mesh_sensitivity_2D"
 )
 

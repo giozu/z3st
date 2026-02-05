@@ -39,6 +39,7 @@ thermal:
   convergence: rel_norm # rel_norm | norm
 
 damage:
+  type: AT2
   solver: linear
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6

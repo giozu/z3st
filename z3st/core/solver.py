@@ -399,36 +399,60 @@ class Solver:
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
 
-    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, u_current):
+    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, prev_res_D, u_current):
 
         D_old.x.array[:] = D_new.x.array
+        
+        lc = float(self.dmg_cfg["lc"])
+        damage_type = self.dmg_cfg["type"]
 
-        print("\n[INFO] Assembling damage (phase-field) problem...")
+        print(f"\n[INFO] Assembling damage ({damage_type}) problem...")
 
         u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
         a_d, L_d = 0, 0
-        lc = float(self.dmg_cfg["lc"])
 
         bcs_d = []
         for mat_name in self.materials:
             for bc_entry in self.dirichlet_damage.get(mat_name, []):
                 bcs_d.append(bc_entry["value"])
 
-        for label, material in self.materials.items():
+        # Updating H field (according to damage model)
+        self.update_history(u_current) 
 
+        for label, material in self.materials.items():
             print(
                 f"Solving damage problem for '{label}' material, with sigma_c = {material['sigma_c']*1e-6} MPa"
             )
-
-            self.update_history(u_current)
-
+            
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
 
-            a_d += (1.0 + self.H) * u_d * v_d * dx + lc**2 * ufl.inner(
-                ufl.grad(u_d), ufl.grad(v_d)
-            ) * dx
-            L_d += self.H * v_d * dx
+            if damage_type == "AT2":
+                print(f"  - Material '{label}': Stress-based solve.")
+                a_d += (1.0 + self.H) * u_d * v_d * dx + lc**2 * ufl.inner(
+                    ufl.grad(u_d), ufl.grad(v_d)
+                ) * dx
+                L_d += self.H * v_d * dx
+
+            elif damage_type == "AT1":
+
+                E_mod = material["E"]
+                sigma_c = material["sigma_c"]
+
+                cw = 8.0 / 3.0 
+                Gc = (8.0 * lc * sigma_c**2) / (3.0 * E_mod)
+                pref = Gc / cw
+                
+                tol_ir = 0.05
+                gamma_penalty = (Gc / lc) * (27.0 / (64.0 * tol_ir**2))
+                w_act = (3.0 * Gc) / (8.0 * lc)
+
+                print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, Gamma={gamma_penalty:.2e}")
+
+                a_d += (2.0 * self.H + gamma_penalty) * u_d * v_d * dx + \
+                    (pref * lc) * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
+                                                
+                L_d += (2.0 * self.H - (pref / lc) + gamma_penalty * D_old) * v_d * dx
 
         petsc_opts_damage = self.get_solver_options(
             physics="damage",
@@ -445,6 +469,10 @@ class Solver:
             petsc_options_prefix="damage_",
         )
         problem_d.solve()
+        
+        if damage_type == "AT1":
+            # Clipping:
+            D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         # Relax
         D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
@@ -482,14 +510,14 @@ class Solver:
                     self.relax_D = min(self.relax_D * self.relax_growth, self.relax_max)
                 else:
                     self.relax_D = max(self.relax_D * self.relax_shrink, self.relax_min)
-            prev_res_S = res_curr
+            prev_res_D = res_curr
             print(f"  [adaptive] relax_D={self.relax_D:.2f}")
 
         # Residual in L_inf norm
         res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
         print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
 
-        return conv_damage, norm_dD, rel_norm_dD
+        return conv_damage, norm_dD, rel_norm_dD, prev_res_D
 
     def solve_staggered(
         self,
@@ -544,6 +572,7 @@ class Solver:
 
         prev_res_T = None
         prev_res_u = None
+        prev_res_D = None
 
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
@@ -561,11 +590,12 @@ class Solver:
 
             # --. DAMAGE STEP --..
             if self.on.get("damage", False):
-                conv_damage, _, _ = self._damage_step(
+                conv_damage, _, _, prev_res_D = self._damage_step(
                     D_new,
                     D_old,
                     rtol_dmg,
                     stag_tol_dmg,
+                    prev_res_D,
                     u_current=u_new,
                 )
 
