@@ -81,40 +81,40 @@ plt.subplot(1, 2, 1)
 plt.plot(y_slice_prof, d_slice_prof, 'r-', markersize=4, label=f"Damage at y={x_slice:.2f}")
 plt.axhline(1.0, color='k', linestyle='--', alpha=0.3)
 plt.xlabel("x (m)")
-plt.ylabel("Damage $d$")
+plt.ylabel("Damage $D$")
 plt.grid(True, ls=':')
 plt.legend()
 
 plt.subplot(1, 2, 2)
 sc = plt.scatter(x_d, y_d, c=D_all, cmap='jet', s=2)
 plt.colorbar(sc, label="Damage $d$")
-plt.axhline(X_tip, color='white', linestyle=':', alpha=0.5, label="Notch Tip Line")
+plt.axhline(X_tip, color='white', linestyle=':', alpha=0.5, label="Notch tip line")
 plt.xlabel("x (m)")
 plt.ylabel("y (m)")
-plt.title(f"Max Damage: {d_max:.3f}")
+plt.title(f"Max damage: {d_max:.3f}")
 plt.tight_layout()
 plt.savefig(os.path.join(CASE_DIR, "output", "damage_check.png"), dpi=300)
 
 # PLOT 2:
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 
-# Damge
-ax1.plot(x_prof, D_prof, "r-", lw=2, label="Damage $d$")
+# Damage
+ax1.plot(x_prof, D_prof, "r-", lw=2, label="Damage $D$")
 ax1.fill_between(x_prof, D_prof, color='red', alpha=0.1)
 ax1.axvline(X_tip, color='k', ls=':', label="Notch tip")
-ax1.set_ylabel("Damage $d$ [-]", color='red')
+ax1.set_ylabel("Damage $D$", color='red')
 ax1.set_ylim(-0.05, 1.05)
 ax1.grid(True, ls=":", alpha=0.6)
 ax1.legend()
-ax1.set_title(rf"Z3ST analysis: centerline profile (x = {y_target:.2f} m)\n"
+ax1.set_title(f"Z3ST analysis: centerline profile (x = {y_target:.2f} m)\n"
               rf"Steel: $\sigma_c$={sigma_c*1e-6:.0f} MPa, $G_c$={Gc_ref:.1f} J/m²")
 
 # Stress
 ax2.plot(x_s_prof, sigma_yy_prof * 1e-6, "b-", lw=2, label=r"$\sigma_{yy}$")
 ax2.axhline(sigma_c * 1e-6, color='black', ls='--', lw=1, label=rf"$\sigma_c$ Limit")
 ax2.axvline(X_tip, color='k', ls=':', label="Notch Tip")
-ax2.set_xlabel("Vertical position $y$ [m]")
-ax2.set_ylabel(fr"Vertical stress $\sigma_yy$ [MPa]", color='blue')
+ax2.set_xlabel("Vertical position $y$ (m)")
+ax2.set_ylabel(fr"Vertical stress $\sigma_yy$ (MPa)", color='blue')
 ax2.grid(True, ls=":", alpha=0.6)
 ax2.legend(loc='best')
 
