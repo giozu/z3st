@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 9_thick_cylindrical_shell_GPS_2D
+Z3ST case: thick_cylindrical_shell_GPS_2D
 
 non-regression script
 ---------------------

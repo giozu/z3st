@@ -10,7 +10,7 @@ solver convergence trends.
 
 Example
 -------
-$ python3 ../../utils/plot_convergence.py output_cyl.log
+$ python3 ../../utils/plot_convergence.py output.log
 $ python3 ../../utils/plot_convergence.py
 
 The script expects a Z3ST log file (default: 'log.z3st') and
@@ -104,9 +104,9 @@ def plot_convergence(steps_data, save_path="convergence.png"):
         plt.axhline(float(config.get("mechanical", {}).get("stag_tol", 1e-8)), color="blue", ls="--", alpha=0.3, label="tol u")
         plt.axhline(float(config.get("damage", {}).get("stag_tol", 1e-4)), color="red", ls="-", alpha=0.3, label="tol D")
 
-    plt.xlabel("Total Staggering Iterations (cumulative)")
-    plt.ylabel("Relative Residuals")
-    plt.title("Z3ST Convergence History")
+    plt.xlabel("Iterations")
+    plt.ylabel("Residuals")
+    plt.title("Z3ST convergence history")
     plt.grid(True, which="both", ls=":", alpha=0.4)
     plt.legend(loc='lower left', fontsize='small', ncol=3)
     plt.tight_layout()
