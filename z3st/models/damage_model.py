@@ -149,7 +149,7 @@ class DamageModel:
                     region_name = bc_info.get("region")
                     bc_type = bc_info.get("type")
                     
-                    val_d = bc_info.get("value") or bc_info.get("temperature")
+                    val_d = bc_info.get("value")
 
                     if region_name is None or bc_type is None or val_d is None:
                         print(f"  [ERROR] Incomplete damage BC definition for '{mat_type}'.")

@@ -20,4 +20,4 @@ damage:
   steel:
   - type: Dirichlet
     region: crack
-    temperature: 1.0   # (/)
+    value: 1.0   # (/)
