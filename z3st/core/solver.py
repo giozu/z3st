@@ -416,7 +416,7 @@ class Solver:
             for bc_entry in self.dirichlet_damage.get(mat_name, []):
                 bcs_d.append(bc_entry["value"])
 
-        # Updating H field (according to damage model)
+        # Updating H field (according to the damage model)
         self.update_history(u_current) 
 
         for label, material in self.materials.items():
@@ -429,9 +429,13 @@ class Solver:
 
             if damage_type == "AT2":
                 print(f"  - Material '{label}': Stress-based solve.")
-                a_d += (1.0 + self.H) * u_d * v_d * dx + lc**2 * ufl.inner(
-                    ufl.grad(u_d), ufl.grad(v_d)
-                ) * dx
+
+                E = material["E"]
+                sigma_c = material["sigma_c"]
+                Gc = 256/27 * lc * sigma_c**2 / E
+
+                a_d += ((self.H + 1.0) * u_d * v_d 
+                + lc**2 * ufl.inner(ufl.grad(u_d), ufl.grad(v_d))) * dx
                 L_d += self.H * v_d * dx
 
             elif damage_type == "AT1":

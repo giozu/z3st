@@ -8,8 +8,8 @@
 
 SetFactory("Built-in");
 
-Lx = 1.000;
-Ly = 0.500;
+Lx = 0.50;
+Ly = 0.50;
 Dn = 0.25;
 
 lc_damage = 0.002;

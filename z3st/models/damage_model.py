@@ -27,7 +27,7 @@ class DamageModel:
         self.dirichlet_damage = {}
 
     @staticmethod
-    def degradation_function(D, K=1e-4):
+    def degradation_function(D, K=1e-6):
         """
         Stress degradation function g_d(D) = (1-D)**2 + K
 
@@ -38,38 +38,36 @@ class DamageModel:
 
     def crack_driving_force(self, u, material):
         """
-        Crack-driving force
+        Compute the dimensionless driving force H for the damage formulations
         """
 
         # Material properties
         lam = material["lmbda"]
         G = material["G"]
+        E = material["E"]
+
+        lc = self.dmg_cfg.get("lc")
+        sigma_c = material["sigma_c"]
+        Gc = 256/27 * lc * sigma_c**2 / E
+
+        zeta = material["zeta"]
 
         damage_type = self.dmg_cfg["type"]
 
         if damage_type == "AT2":
-            E = material["E"]
-            sigma_c = material["sigma_c"]
-            zeta = material["zeta"]
 
-            # Definitions
-            eps = self.epsilon(u)
-            tr_eps = ufl.tr(eps)
-            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps)) # Macauley bracket pos
+            # Spectral
+            psi_pos = self.psi_miehe_spectral(u, material)
+            H = (2.0 * lc / Gc) * psi_pos
 
-            # No cracking under pure hydrostatic compression
-            psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+            # Volumetric
+            # lam = material["lmbda"]
+            # G = material["G"]
+            # eps = self.epsilon(u)
+            # tr_eps = ufl.tr(eps)
+            # tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+            # psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
 
-            psi_c = sigma_c**2 / (2 * E)
-
-            # The damage initiates once the energy density ratio
-            # psi_pos / psi_c > 1.0
-            # microscopic fracture energy <---> macroscopic stress sigma_c
-            H = zeta * ufl.conditional(
-                ufl.gt(psi_pos / psi_c, 1.0),
-                psi_pos / psi_c - 1.0,
-                0.0,
-            )
             return H
 
         elif damage_type == "AT1":
@@ -101,12 +99,44 @@ class DamageModel:
             
             return D / lc + lc * ufl.dot(grad_D, grad_D)
 
+    def psi_miehe_spectral(self, u, material):
+
+        lmbda = material["lmbda"]
+        mu = material["G"]
+        
+        eps = self.epsilon(u)
+                
+        eps_xx = eps[0, 0]
+        eps_yy = eps[1, 1]
+        eps_xy = eps[0, 1]
+        
+        tr_eps = eps_xx + eps_yy
+        
+        tol = 1.0e-16
+        R = ufl.sqrt(((eps_xx - eps_yy) / 2.0)**2 + eps_xy**2 + tol)
+        
+        eig1 = tr_eps / 2.0 + R
+        eig2 = tr_eps / 2.0 - R
+        
+        # <x>_+ = (x + |x|) / 2
+        eig1_pos = 0.5 * (eig1 + abs(eig1))
+        eig2_pos = 0.5 * (eig2 + abs(eig2))
+        
+        tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+                
+        psi_pos = (0.5 * lmbda * tr_eps_pos**2) + (mu * (eig1_pos**2 + eig2_pos**2))
+        
+        return psi_pos
+
     def update_history(self, u):
         """
         Vectorized function (faster), to update the field H (crack driving force)
         Handles irreversibility:  H_n+1 = max(H_old, H_new) without loops over cells.
+        
         """
+        
         Q = self.Q
+
         # Temporary array, storing H of this step
         H_new_array = np.zeros_like(self.H.x.array)
 
@@ -136,13 +166,6 @@ class DamageModel:
         
         self.H.x.scatter_forward()
 
-    def get_damage_residual(self, D, D_test, material):
-        lc = material["lc"]
-        H = self.H
-        
-        res = ( (1 + H) * D * D_test + lc**2 * ufl.dot(ufl.grad(D), ufl.grad(D_test)) - H * D_test ) * ufl.dx
-        return res
-
     def compute_energy_balance(self):
         """
         Compute the energy component to verify the conservation law.
@@ -158,14 +181,12 @@ class DamageModel:
             E_el += dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.elastic_energy_density(self.u, mat) * dx))
             
             # 2. Fracture energy
-            # Gamma = Gc/2 * (d^2/lc + lc * grad(d)^2)
-            if self.on.get("damage"):
-                lc = self.dmg_cfg.get("lc") # characteristic length
-                Gc = (3.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (2.0 * mat["E"]) # Gc, fracture energy = 3 * phi * lc
-                print(f"Fracture energy: Gc = 3*sigma_c**2/(lc*2*E) = {Gc} J")
-                
-                gamma = (Gc / 2.0) * ((self.D**2 / lc) + lc * ufl.dot(ufl.grad(self.D), ufl.grad(self.D)))
-                E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * dx))
+            lc = self.dmg_cfg.get("lc") # characteristic length
+            Gc = (8.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (3.0 * mat["E"])
+            print(f"Fracture energy: Gc = {Gc} J")
+            
+            gamma = (Gc / 2.0) * ((self.D**2 / lc) + lc * ufl.dot(ufl.grad(self.D), ufl.grad(self.D)))
+            E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * dx))
                 
         return E_el, E_frac
 
