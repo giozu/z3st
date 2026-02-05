@@ -86,6 +86,7 @@ class DamageModel:
 
     @staticmethod
     def gamma_density(D, grad_D, lc):
+
         damage_type = self.dmg_cfg["type"]
 
         if damage_type == "AT2":
@@ -166,25 +167,31 @@ class DamageModel:
         
         self.H.x.scatter_forward()
 
-    def compute_energy_balance(self):
+    def compute_energy_balance(self, u):
         """
         Compute the energy component to verify the conservation law.
         """
         E_el = 0.0
         E_frac = 0.0
-        
+        damage_type = self.dmg_cfg["type"]
+
         for label, mat in self.materials.items():
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
             
             # 1. Elastic energy (already degraded by damage)
-            E_el += dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.elastic_energy_density(self.u, mat) * dx))
+            E_el += dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.elastic_energy_density(u, mat) * dx))
             
             # 2. Fracture energy
             lc = self.dmg_cfg.get("lc") # characteristic length
-            Gc = (8.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (3.0 * mat["E"])
-            print(f"Fracture energy: Gc = {Gc} J")
             
+            if damage_type == "AT1":
+                Gc = (8.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (3.0 * mat["E"])
+            elif damage_type == "AT2":
+                Gc = (256.0 * lc * mat["sigma_c"]**2) / (27.0 * mat["E"])
+            
+            print(f"Fracture energy ({self.dmg_cfg['type']}): Gc = {Gc} J")
+
             gamma = (Gc / 2.0) * ((self.D**2 / lc) + lc * ufl.dot(ufl.grad(self.D), ufl.grad(self.D)))
             E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * dx))
                 

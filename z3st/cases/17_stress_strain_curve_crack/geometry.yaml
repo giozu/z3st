@@ -1,7 +1,7 @@
 name: box
 geometry_type: rect
 
-Lx: 1.000 # box length in x (m)
+Lx: 0.500 # box length in x (m)
 Ly: 0.500 # box length in y (m)
 
 labels:

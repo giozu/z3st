@@ -100,7 +100,7 @@ if __name__ == "__main__":
         problem.get_results()
 
         if problem.on.get("damage"):
-            E_el, E_frac = problem.compute_energy_balance()
+            E_el, E_frac = problem.compute_energy_balance(problem.u)
             E_tot = E_el + E_frac
             print(f"  → Elastic energy  : {E_el:.4e} J")
             print(f"  → Fracture energy : {E_frac:.4e} J")

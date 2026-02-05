@@ -399,7 +399,7 @@ class Solver:
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
 
-    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, prev_res_D, u_current):
+    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, prev_res_D):
 
         D_old.x.array[:] = D_new.x.array
         
@@ -416,9 +416,6 @@ class Solver:
             for bc_entry in self.dirichlet_damage.get(mat_name, []):
                 bcs_d.append(bc_entry["value"])
 
-        # Updating H field (according to the damage model)
-        self.update_history(u_current) 
-
         for label, material in self.materials.items():
             print(
                 f"Solving damage problem for '{label}' material, with sigma_c = {material['sigma_c']*1e-6} MPa"
@@ -428,8 +425,6 @@ class Solver:
             dx = self.dx_tags[tag]
 
             if damage_type == "AT2":
-                print(f"  - Material '{label}': Stress-based solve.")
-
                 E = material["E"]
                 sigma_c = material["sigma_c"]
                 Gc = 256/27 * lc * sigma_c**2 / E
@@ -594,13 +589,13 @@ class Solver:
 
             # --. DAMAGE STEP --..
             if self.on.get("damage", False):
+                self.update_history(u_new) 
                 conv_damage, _, _, prev_res_D = self._damage_step(
                     D_new,
                     D_old,
                     rtol_dmg,
                     stag_tol_dmg,
                     prev_res_D,
-                    u_current=u_new,
                 )
 
             # --. MECHANICAL STEP --..
