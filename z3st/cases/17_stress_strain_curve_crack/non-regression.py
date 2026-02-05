@@ -134,6 +134,7 @@ yc = Ly / 2.0
 colors = plt.cm.jet(np.linspace(0, 1, len(VTU_FILES)))
 
 for i, vtufile in enumerate(VTU_FILES):
+    print(vtufile)
     x_d, y_d, _, D_all = extract_field(vtufile, field_name="Damage")
     mask_line = np.abs(x_d - x_line) < tol_x
     
@@ -145,7 +146,7 @@ for i, vtufile in enumerate(VTU_FILES):
         y_plot = y_coords[sort_idx]
         d_plot = d_values[sort_idx]
         
-        label = f"Step {i}" if i % max(1, len(VTU_FILES)//5) == 0 or i == len(VTU_FILES)-1 else None
+        label = f"Step {i}"
         plt.plot(y_plot, d_plot, color=colors[i], lw=1.5, label=label, alpha=0.8)
 
 d_analytical = np.exp(-np.abs(y_plot - yc) / lc)
