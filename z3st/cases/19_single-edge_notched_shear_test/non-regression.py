@@ -173,7 +173,6 @@ if os.path.exists(energy_file):
 # Sigma-epsilon
 plt.figure(figsize=(7, 5))
 plt.plot(strains, stresses, "--o", lw=2, label="Numerical")
-plt.plot(strain_ref_np, stresses_ref_np, "-", lw=2, label="Analytical")
 plt.xlabel(r"strain $\epsilon_{yy}$ (/)")
 plt.ylabel(r"stress $\sigma_{yy}$ (Pa)")
 plt.grid(True)
@@ -186,6 +185,7 @@ print("[INFO] stress_strain_curve.png saved\n")
 
 # Damage
 steps = np.arange(len(VTU_FILES))
+
 fig, ax1 = plt.subplots(figsize=(9, 6))
 
 ax1.set_xlabel('Step')
