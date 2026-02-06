@@ -31,8 +31,8 @@ models:
 mechanical:
   solver: linear # linear | non-linear
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-8
-  stag_tol: 1.0e-8
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
   mechanical_regime: 2D   # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
 
@@ -47,8 +47,8 @@ damage:
   type: AT2
   solver: linear
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-6
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
   convergence: rel_norm # rel_norm | norm
   lc: 4.0e-6
 
@@ -58,4 +58,4 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 20
+n_steps: 501
