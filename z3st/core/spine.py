@@ -102,8 +102,8 @@ class Spine(
 
             sigma_c = mat.get("sigma_c")
             Gc = mat.get("Gc")
-            dmg_type = self.dmg_cfg.get("type")
-            
+            dmg_type = getattr(self, "dmg_cfg", {}).get("type")
+
             if lc:
                 if sigma_c is not None:
                     if dmg_type == "AT2":
