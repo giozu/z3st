@@ -1,11 +1,10 @@
 mechanical:
   steel:
-  - type: Clamp_x
-    region: xmax
-  - type: Clamp_y
+  - type: Dirichlet
     region: ymin
-  - region: ymax
-    type: Dirichlet
+    displacement: [0.0, 0.0]
+  - type: Dirichlet
+    region: ymax
     displacement:
     - [0.0, 5.01e-06]
     - [0.0, 5.02e-06]

@@ -4,7 +4,6 @@ cd "${0%/*}" || exit 1
 echo "Cleaning current directory..."
 
 rm -rf output
-rm -f *.msh
 rm -f *.png
 rm -f log.*
 rm -f *.txt
