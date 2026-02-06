@@ -42,6 +42,7 @@ CASES=(
     "18_box_knotch_2D"
     "18_box_crack_2D"
     "19_single-edge_notched_tension_test"
+    "19_single-edge_notched_shear_test"
     "I_mesh_sensitivity_2D"
 )
 
