@@ -9,7 +9,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../materials/steel.yaml
+  steel: ../../materials/high_carbon_steel.yaml
 
 solver_settings:
   coupling: staggered
@@ -39,6 +39,7 @@ thermal:
   convergence: rel_norm # rel_norm | norm
 
 damage:
+  type: AT2
   solver: linear
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6

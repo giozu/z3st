@@ -55,7 +55,6 @@ Gc = float(mat_data.get('Gc'))
 # sigma_c = float(mat_data.get('sigma_c'))
 sigma_c = ((27 * E * Gc) / (256 * lc))**0.5
 
-
 TOLERANCE = 7e-2
 
 # --.. ..- .-.. .-.. --- Data --.. ..- .-.. .-.. ---

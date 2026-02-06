@@ -22,11 +22,17 @@ CASE_DIR = os.path.dirname(__file__)
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 VTU_FILES = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
-
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/steel.yaml")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/high_carbon_steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
+INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
+
+# Phase-field / damage
+with open(INPUT_FILE, 'r') as f:
+    input_data = yaml.safe_load(f)
+dmg_cfg = input_data.get("damage", {})
+lc = float(dmg_cfg["lc"])
 
 # Geometry, material, boundary conditions:
 with open(GEOMETRY_FILE, 'r') as f:
@@ -38,7 +44,8 @@ with open(MATERIAL_FILE, 'r') as f:
     mat_data = yaml.safe_load(f)
 E  = float(mat_data.get('E'))
 nu = float(mat_data.get('nu'))
-sigma_c = float(mat_data.get('sigma_c'))
+Gc = float(mat_data.get('Gc'))
+sigma_c = ((27 * E * Gc) / (256 * lc))**0.5
 
 with open(MESH_GEO_FILE, 'r') as f:
     content = f.read()
@@ -50,7 +57,6 @@ print(f"[INFO] Material loaded: E = {E:.2e} Pa, nu = {nu}")
 print(f"[INFO]                : sigma_c = {sigma_c:.2e} Pa")
 print(f"[INFO] W_notch loaded: W_notch = {W_notch}")
 
-# geometry and material
 y_target, mask_tol = (Ly - D_notch, 1 / (2 * 40)) # m, m, m (extraction line selection and tolerance)
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
