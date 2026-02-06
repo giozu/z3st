@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a box Lx Ly with a structured mesh
+//  Gmsh GEO for a single-edge notched tension test
 //
 //  Author: Giovanni Zullo
 //
@@ -8,9 +8,9 @@
 
 SetFactory("Built-in");
 
-Lx = 0.50;
-Ly = 0.50;
-Dn = 0.25;
+Lx = 1.00;
+Ly = 1.00;
+Dn = 0.50;
 
 lc_damage = 0.002;
 h_fine = lc_damage / 5.0;
