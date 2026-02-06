@@ -73,7 +73,8 @@ class Spine(
     def load_materials(self, **materials):
         print("[LOADING MATERIALS]")
         self.materials = {}
-        lc = self.dmg_cfg.get("lc")
+        
+        lc = getattr(self, "dmg_cfg", {}).get("lc")
 
         for name, mat in materials.items():
             print(f"{name.capitalize()} material loaded:")
