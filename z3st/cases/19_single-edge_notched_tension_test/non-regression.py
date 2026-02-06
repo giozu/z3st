@@ -208,7 +208,7 @@ ax1.tick_params(axis='y', labelcolor='tab:red')
 ax1.grid(True, ls=':', alpha=0.6)
 
 ax2 = ax1.twinx()
-ax2.set_ylabel(r'Stress $\sigma_{yy}$ [MPa]', color='tab:blue')
+ax2.set_ylabel(r'Stress $\sigma_{yy}$ (MPa)', color='tab:blue')
 lns3 = ax2.plot(steps, np.array(stresses)*1e-6, 'b-s', lw=2, label=r'$\sigma_{yy}$ Mean at Tip')
 ax2.axhline(sigma_c * 1e-6, color='black', ls=':', alpha=0.4, label=r'Critical $\sigma_c$')
 ax2.tick_params(axis='y', labelcolor='tab:blue')

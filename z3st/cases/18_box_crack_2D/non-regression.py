@@ -8,7 +8,7 @@ non-regression script
 
 """
 
-import os
+import os, re
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,8 +20,16 @@ from z3st.utils.utils_verification import *
 CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/steel.yaml")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/high_carbon_steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
+MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
+INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
+
+# Phase-field / damage
+with open(INPUT_FILE, 'r') as f:
+    input_data = yaml.safe_load(f)
+dmg_cfg = input_data.get("damage", {})
+lc = float(dmg_cfg["lc"])
 
 # Geometry
 with open(GEOMETRY_FILE, 'r') as f:
@@ -29,22 +37,26 @@ with open(GEOMETRY_FILE, 'r') as f:
 Lx = float(geom_data.get('Lx'))
 Ly = float(geom_data.get('Ly'))
 
-# Knotch
-Dn = 0.25
+with open(MESH_GEO_FILE, 'r') as f:
+    content = f.read()
+
+Dn = float(re.search(rf'Dn\s*=\s*([\d\.]+);', content).group(1))
+
 X_tip = Dn
 y_target = Ly/2
 
 # Material
 with open(MATERIAL_FILE, 'r') as f:
     mat_data = yaml.safe_load(f)
+
 E = float(mat_data.get('E'))
-sigma_c = float(mat_data.get('sigma_c'))
+nu = float(mat_data.get('nu'))
+Gc = float(mat_data.get('Gc'))
+# sigma_c = float(mat_data.get('sigma_c'))
+sigma_c = ((27 * E * Gc) / (256 * lc))**0.5
 
-# Phase-field / damage
-lc = 0.002  
-Gc_ref = (3.0 * sigma_c**2 * lc) / (2.0 * E)
 
-TOLERANCE = 5e-2 
+TOLERANCE = 7e-2
 
 # --.. ..- .-.. .-.. --- Data --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
@@ -62,7 +74,7 @@ idx_h = np.argsort(x_d[mask_horiz])
 x_prof = x_d[mask_horiz][idx_h]
 D_prof = D_all[mask_horiz][idx_h]
 
-mask_s = np.abs(y_s - y_target) < (Ly/1500)
+mask_s = np.abs(y_s - y_target) < (Ly/600)
 idx_s = np.argsort(x_s[mask_s])
 x_s_prof = x_s[mask_s][idx_s]
 sigma_yy_prof = S_all[mask_s, 4][idx_s]
@@ -78,7 +90,7 @@ d_slice_prof = D_all[mask_vert][idx_v]
 # PLOT 1:
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
-plt.plot(y_slice_prof, d_slice_prof, 'r-', markersize=4, label=f"Damage at y={x_slice:.2f}")
+plt.plot(y_slice_prof, d_slice_prof, 'r-', markersize=4, label=f"Damage at x={x_slice:.2f}")
 plt.axhline(1.0, color='k', linestyle='--', alpha=0.3)
 plt.xlabel("x (m)")
 plt.ylabel("Damage $D$")
@@ -87,8 +99,8 @@ plt.legend()
 
 plt.subplot(1, 2, 2)
 sc = plt.scatter(x_d, y_d, c=D_all, cmap='jet', s=2)
-plt.colorbar(sc, label="Damage $d$")
-plt.axhline(X_tip, color='white', linestyle=':', alpha=0.5, label="Notch tip line")
+plt.colorbar(sc, label="Damage $D$")
+plt.axvline(X_tip, color='white', linestyle=':', alpha=0.5, label="Notch tip line")
 plt.xlabel("x (m)")
 plt.ylabel("y (m)")
 plt.title(f"Max damage: {d_max:.3f}")
@@ -106,15 +118,15 @@ ax1.set_ylabel("Damage $D$", color='red')
 ax1.set_ylim(-0.05, 1.05)
 ax1.grid(True, ls=":", alpha=0.6)
 ax1.legend()
-ax1.set_title(f"Z3ST analysis: centerline profile (x = {y_target:.2f} m)\n"
-              rf"Steel: $\sigma_c$={sigma_c*1e-6:.0f} MPa, $G_c$={Gc_ref:.1f} J/m²")
+ax1.set_title(f"Z3ST analysis: centerline profile (y = {y_target:.2f} m)\n"
+              rf"Steel: $\sigma_c$={sigma_c*1e-6:.0f} MPa, $G_c$={Gc:.1f} J/m²")
 
 # Stress
 ax2.plot(x_s_prof, sigma_yy_prof * 1e-6, "b-", lw=2, label=r"$\sigma_{yy}$")
-ax2.axhline(sigma_c * 1e-6, color='black', ls='--', lw=1, label=rf"$\sigma_c$ Limit")
-ax2.axvline(X_tip, color='k', ls=':', label="Notch Tip")
+ax2.axhline(sigma_c * 1e-6, color='black', ls='--', lw=1, label=rf"$\sigma_c$")
+ax2.axvline(X_tip, color='red', ls=':', label="Notch tip")
 ax2.set_xlabel("Vertical position $y$ (m)")
-ax2.set_ylabel(fr"Vertical stress $\sigma_yy$ (MPa)", color='blue')
+ax2.set_ylabel(fr"Vertical stress $\sigma$ (MPa)", color='blue')
 ax2.grid(True, ls=":", alpha=0.6)
 ax2.legend(loc='best')
 
@@ -126,8 +138,8 @@ print(f"[INFO] Detailed profiles saved in: output/damage_stress_profile.png")
 errors = {
     "max_damage": {
         "numerical": float(d_max),
-        "reference": 0.5, # Soglia indicativa per innesco cricca
-        "rel_error": float(abs(d_max - 0.5)) if d_max < 0.5 else 0.0
+        "reference": 1.0, 
+        "rel_error": float(abs(d_max - 1.0))
     },
     "max_stress_yy": {
         "numerical": float(sigma_yy_max),

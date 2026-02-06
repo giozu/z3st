@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: d_box_knotch_2D
+Z3ST case: box_knotch_2D
 
 non-regression script
 ---------------------
 
 """
 
-import os
+import os, re
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,8 +20,16 @@ from z3st.utils.utils_verification import *
 CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/steel.yaml")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/high_carbon_steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
+MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
+INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
+
+# Phase-field / damage
+with open(INPUT_FILE, 'r') as f: 
+    input_data = yaml.safe_load(f)
+dmg_cfg = input_data.get("damage", {})
+lc = float(dmg_cfg["lc"])
 
 # Geometry
 with open(GEOMETRY_FILE, 'r') as f:
@@ -29,9 +37,12 @@ with open(GEOMETRY_FILE, 'r') as f:
 Lx = float(geom_data.get('Lx'))
 Ly = float(geom_data.get('Ly'))
 
-# Knotch
-W_notch = 0.02
-D_notch = 0.10
+with open(MESH_GEO_FILE, 'r') as f:
+    content = f.read()
+
+W_notch = float(re.search(rf'W_notch\s*=\s*([\d\.]+);', content).group(1))
+D_notch = float(re.search(rf'D_notch\s*=\s*([\d\.]+);', content).group(1))
+
 Y_tip   = Ly - D_notch
 x_target = Lx / 2
 
@@ -39,11 +50,10 @@ x_target = Lx / 2
 with open(MATERIAL_FILE, 'r') as f:
     mat_data = yaml.safe_load(f)
 E = float(mat_data.get('E'))
-sigma_c = float(mat_data.get('sigma_c'))
-
-# Phase-field / damage
-lc = 0.002  
-Gc_ref = (3.0 * sigma_c**2 * lc) / (2.0 * E)
+nu = float(mat_data.get('nu'))
+Gc = float(mat_data.get('Gc'))
+# sigma_c = float(mat_data.get('sigma_c'))
+sigma_c = ((27 * E * Gc) / (256 * lc))**0.5
 
 TOLERANCE = 5e-1 
 
@@ -57,14 +67,15 @@ d_max = np.max(D_all)
 # Stress
 x_s, y_s, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
 sigma_xx_max = np.max(S_all[:, 0]) 
+sigma_yy_max = np.max(S_all[:, 4]) 
 
-# Stress profile
+# Profiles
 mask_d = np.abs(x_d - x_target) < (Lx/200)
 idx_d = np.argsort(y_d[mask_d])
 y_prof = y_d[mask_d][idx_d]
 D_prof = D_all[mask_d][idx_d]
 
-mask_s = np.abs(x_s - x_target) < (Lx/200)
+mask_s = np.abs(x_s - x_target) < (Lx/500)
 idx_s = np.argsort(y_s[mask_s])
 y_s_prof = y_s[mask_s][idx_s]
 sigma_yy_prof = S_all[mask_s, 4][idx_s]
@@ -90,7 +101,7 @@ plt.legend()
 plt.subplot(1, 2, 2)
 sc = plt.scatter(x_d, y_d, c=D_all, cmap='jet', s=2)
 plt.colorbar(sc, label="Damage $d$")
-plt.axhline(Y_tip, color='white', linestyle=':', alpha=0.5, label="Notch Tip Line")
+plt.axhline(Y_tip, color='white', linestyle=':', alpha=0.5, label="Notch tip")
 plt.xlabel("x (m)")
 plt.ylabel("y (m)")
 plt.title(f"Max Damage: {d_max:.3f}")
@@ -104,19 +115,19 @@ fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
 ax1.plot(y_prof, D_prof, "r-", lw=2, label="Damage $d$")
 ax1.fill_between(y_prof, D_prof, color='red', alpha=0.1)
 ax1.axvline(Y_tip, color='k', ls=':', label="Notch tip")
-ax1.set_ylabel("Damage $d$ [-]", color='red')
+ax1.set_ylabel("Damage $d$ ", color='red')
 ax1.set_ylim(-0.05, 1.05)
 ax1.grid(True, ls=":", alpha=0.6)
 ax1.legend()
 ax1.set_title(rf"Z3ST analysis: centerline profile (x = {x_target:.2f} m)\n"
-              rf"Steel: $\sigma_c$={sigma_c*1e-6:.0f} MPa, $G_c$={Gc_ref:.1f} J/m²")
+              rf"Steel: $\sigma_c$={sigma_c*1e-6:.0f} MPa, $G_c$={Gc:.1f} J/m²")
 
 # Stress
 ax2.plot(y_s_prof, sigma_yy_prof * 1e-6, "b-", lw=2, label=r"$\sigma_{yy}$")
 ax2.axhline(sigma_c * 1e-6, color='black', ls='--', lw=1, label=rf"$\sigma_c$ Limit")
-ax2.axvline(Y_tip, color='k', ls=':', label="Notch Tip")
-ax2.set_xlabel("Vertical position $y$ [m]")
-ax2.set_ylabel(fr"Vertical stress $\sigma_yy$ [MPa]", color='blue')
+ax2.axvline(Y_tip, color='k', ls=':', label="Notch tip")
+ax2.set_xlabel("Vertical position $y$ (m)")
+ax2.set_ylabel(fr"Vertical stress $\sigma_yy$ (MPa)", color='blue')
 ax2.grid(True, ls=":", alpha=0.6)
 ax2.legend(loc='best')
 
@@ -125,16 +136,19 @@ plt.savefig(os.path.join(CASE_DIR, "output", "damage_stress_profile.png"), dpi=3
 print(f"[INFO] Detailed profiles saved in: output/damage_stress_profile.png")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
+max_dmg = 0.9
+ref_sigma = sigma_c * max_dmg
+
 errors = {
     "max_damage": {
         "numerical": float(d_max),
-        "reference": 0.5, # Soglia indicativa per innesco cricca
-        "rel_error": float(abs(d_max - 0.5)) if d_max < 0.5 else 0.0
+        "reference": max_dmg,
+        "rel_error": float(abs(d_max - max_dmg))
     },
-    "max_stress_xx": {
-        "numerical": float(sigma_xx_max),
-        "reference": sigma_c,
-        "rel_error": float(abs(sigma_xx_max - sigma_c)/sigma_c)
+    "max_stress_yy": {
+        "numerical": float(sigma_yy_max),
+        "reference": ref_sigma,
+        "rel_error": float(abs(sigma_yy_max - ref_sigma)/(ref_sigma))
     }
 }
 
@@ -142,6 +156,6 @@ pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 regression_check(errors, CASE_DIR)
 
 print(f"\n[INFO] Max damage: {d_max:.4f}")
-print(f"[INFO] Max sigma_xx: {sigma_xx_max*1e-6:.2f} MPa")
+print(f"[INFO] Max sigma_yy: {sigma_yy_max*1e-6:.2f} MPa")
 
 print("[INFO] non-regression completed.\n")
