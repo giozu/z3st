@@ -73,6 +73,7 @@ class Spine(
     def load_materials(self, **materials):
         print("[LOADING MATERIALS]")
         self.materials = {}
+        lc = self.dmg_cfg.get("lc")
 
         for name, mat in materials.items():
             print(f"{name.capitalize()} material loaded:")
@@ -97,6 +98,33 @@ class Spine(
                     print(f"  → k defined as constant: {mat['k']}")
             else:
                 print(f"  → k not defined for {name}")
+
+            sigma_c = mat.get("sigma_c")
+            Gc = mat.get("Gc")
+            dmg_type = self.dmg_cfg.get("type")
+            
+            if lc:
+                if sigma_c is not None:
+                    if dmg_type == "AT2":
+                        Gc = (256/27) * lc * (sigma_c**2) / mat["E"]
+                        print(f"  - Material '{name}': Gc (AT2) from sigma_c = {sigma_c:.2e} Pa")
+
+                    elif dmg_type == "AT1":
+                        Gc = (8/3) * lc * (sigma_c**2) / mat["E"]
+                        print(f"  - Material '{name}': Gc (AT1) from sigma_c = {sigma_c:.2e} Pa")
+
+                    mat["Gc"] = float(Gc)
+
+                elif Gc is not None:
+                    if dmg_type == "AT2":
+                        sigma_c = ((27 * mat["E"] * Gc) / (256 * lc))**0.5
+                        print(f"  - Material '{name}': sigma_c (AT2) from Gc = {Gc:.2f} J/m2")
+
+                    elif dmg_type == "AT1":
+                        sigma_c = ((3 * mat["E"] * Gc) / (8 * lc))**0.5
+                        print(f"  - Material '{name}': sigma_c (AT1) from Gc = {Gc:.2f} J/m2")
+
+                    mat["sigma_c"] = float(sigma_c)
 
             constitutive_mode = mat.get("constitutive", "lame").lower()
             mat["constitutive_mode"] = constitutive_mode

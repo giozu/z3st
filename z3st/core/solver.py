@@ -424,22 +424,19 @@ class Solver:
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
 
-            if damage_type == "AT2":
-                E = material["E"]
-                sigma_c = material["sigma_c"]
-                Gc = 256/27 * lc * sigma_c**2 / E
+            Gc = material["Gc"]
+            sigma_c = material["sigma_c"]
+            E = material["E"]
 
+            if damage_type == "AT2":
+                
                 a_d += ((self.H + 1.0) * u_d * v_d 
                 + lc**2 * ufl.inner(ufl.grad(u_d), ufl.grad(v_d))) * dx
                 L_d += self.H * v_d * dx
 
             elif damage_type == "AT1":
 
-                E_mod = material["E"]
-                sigma_c = material["sigma_c"]
-
                 cw = 8.0 / 3.0 
-                Gc = (8.0 * lc * sigma_c**2) / (3.0 * E_mod)
                 pref = Gc / cw
                 
                 tol_ir = 0.05

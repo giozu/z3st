@@ -8,13 +8,13 @@
 
 SetFactory("Built-in");
 
-Lx = 1.00;
-Ly = 1.00;
-Dn = 0.50;
+Lx = 0.001;
+Ly = 0.001;
+Dn = 0.0005;
 
-lc_damage = 0.002;
+lc_damage = 0.000004;
 h_fine = lc_damage / 5.0;
-h_coarse = 0.01;
+h_coarse = Lx / 100;
 
 // Corner points
 Point(1) = {0,  0,  0, h_coarse};

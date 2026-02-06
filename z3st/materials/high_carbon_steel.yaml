@@ -1,0 +1,12 @@
+name: high_carbon_steel
+
+E: 2.10e11            # Young's modulus (Pa)
+nu: 0.3               # Poisson's ratio (/)
+k: 45.0               # Thermal conductivity (W/m-K)
+cp: 470.0             # Specific heat capacity (J/kg-K)
+alpha: 1.1e-5         # Thermal expansion coefficient (1/K)
+rho: 7850.0           # Density (kg/m³)
+T_ref: 293.15         # Reference temperature (K)
+mu_gamma: 25.0        # Linear attenuation coefficient / macroscopic cross section of gamma rays in steels (1/m)
+gamma_heating: 0.0    # Volumetric source (W/m³)
+Gc: 2700.0            # Fracture toughness (J/m2)

@@ -46,11 +46,9 @@ class DamageModel:
         G = material["G"]
         E = material["E"]
 
-        lc = self.dmg_cfg.get("lc")
+        lc = float(self.dmg_cfg["lc"])
         sigma_c = material["sigma_c"]
-        Gc = 256/27 * lc * sigma_c**2 / E
-
-        zeta = material["zeta"]
+        Gc = material["Gc"]
 
         damage_type = self.dmg_cfg["type"]
 
@@ -174,6 +172,7 @@ class DamageModel:
         E_el = 0.0
         E_frac = 0.0
         damage_type = self.dmg_cfg["type"]
+        lc = self.dmg_cfg.get("lc") # characteristic length
 
         for label, mat in self.materials.items():
             tag = self.label_map[label]
@@ -182,14 +181,8 @@ class DamageModel:
             # 1. Elastic energy (already degraded by damage)
             E_el += dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.elastic_energy_density(u, mat) * dx))
             
-            # 2. Fracture energy
-            lc = self.dmg_cfg.get("lc") # characteristic length
-            
-            if damage_type == "AT1":
-                Gc = (8.0 * mat["sigma_c"]**2 * self.dmg_cfg["lc"]) / (3.0 * mat["E"])
-            elif damage_type == "AT2":
-                Gc = (256.0 * lc * mat["sigma_c"]**2) / (27.0 * mat["E"])
-            
+            Gc = mat["Gc"]
+            sigma_c = mat["sigma_c"]
             print(f"Fracture energy ({self.dmg_cfg['type']}): Gc = {Gc} J")
 
             gamma = (Gc / 2.0) * ((self.D**2 / lc) + lc * ufl.dot(ufl.grad(self.D), ufl.grad(self.D)))
