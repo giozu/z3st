@@ -1,10 +1,10 @@
 name: oxide
 fissile: true
 
-E: 1.7e-1        # (Pa)
+E: 1.7e+5        # (170 GPa)
 nu: 0.32         # -
 k: materials.oxide.k # (W/micron-K)
-cp: 330.0e+6     # (J/kg-K)
+cp: 330.0        # (J/kg-K)
 alpha: 1.45e-5   # (1/K)
 T_ref: 300.0     # (K)
 rho: 11000.0e-18 # (kg/micron³)

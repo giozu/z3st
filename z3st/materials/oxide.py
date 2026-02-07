@@ -8,7 +8,7 @@ def k(T):
         k: Thermal conductivity as a UFL expression
     """
 
-    return 2.5
+    return 2.5e-6
 
 def Gc(mesh):
     """
@@ -27,4 +27,4 @@ def Gc(mesh):
 
     transition = ufl.tanh(abs(y) / half_width)
     
-    return (Gc_gb + (Gc_bulk - Gc_gb) * transition) * 1e-6
+    return (Gc_gb + (Gc_bulk - Gc_gb) * transition)

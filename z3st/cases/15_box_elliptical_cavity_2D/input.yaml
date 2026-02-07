@@ -25,7 +25,7 @@ solver_settings:
 models:
   thermal: false
   mechanical: true
-  damage: false
+  damage: true
 
 mechanical:
   solver: linear
@@ -50,7 +50,7 @@ damage:
   rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
-  lc: 0.000002
+  lc: 0.004
 
 lhr:
 - 0

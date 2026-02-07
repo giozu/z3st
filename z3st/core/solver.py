@@ -418,7 +418,7 @@ class Solver:
 
         for label, material in self.materials.items():
             print(
-                f"Solving damage problem for '{label}' material, with sigma_c = {material['sigma_c']*1e-6:.2f} MPa"
+                f"Solving damage problem for '{label}' material"
             )
             
             tag = self.label_map[label]

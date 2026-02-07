@@ -33,6 +33,7 @@ CASES=(
     # "12_cylindrical_shell_thermal_gradient_3D"
     "13_annular_cylinder"
     "14_full_cylinder"
+    # "15_box_elliptical_cavity_2D"
     "15_spherical_pressurized_cavity"
     "16_coaxial_cylinders_3D"
     # "17_stress_strain_curve_double_crack"

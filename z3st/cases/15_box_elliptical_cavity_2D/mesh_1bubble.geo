@@ -12,15 +12,9 @@ SetFactory("OpenCASCADE");
 scale = 1; // (micrometers)
 
 // Parameters
-ax = 0.100;          // Semi-axis X (100 nm)
-Fc_target = 0.40;    // Target coverage (40%)
-
-Lx = 2 * ax * Sqrt(Pi / Fc_target);
-Ly = Lx;
-x_pos = Lx / 4; 
-
-Printf("Target Fc: %g", Fc_target);
-Printf("Lx: %g", Lx);
+Lx = 0.4 * scale;          // length 
+Ly = 0.4 * scale;          // height
+ax = 0.06 * scale;         // Semi-axis X
 
 theta = 50 * Pi / 180; // Semi-dihedral angle in radiants 
 ay = ax * (1 - Cos(theta)) / Sin(theta); // Semi-axis Y coherent
@@ -35,28 +29,25 @@ h_cavity = scale * 0.0015; // fine mesh size at bubble tip
 Rectangle(1) = {-Lx/2, -Ly/2, 0, Lx, Ly};
 
 // Elliptical hole
-Ellipse(10) = {-Lx/4, 0, 0, ax, ay};
+Ellipse(10) = {0, 0, 0, ax, ay};
+
 Curve Loop(10) = {10};
 Plane Surface(10) = {10};
 
-Ellipse(11) = {+Lx/4, 0, 0, ax, ay};
-Curve Loop(11) = {11};
-Plane Surface(11) = {11};
-
 // Subtract the ellipse from the rectangle
-BooleanDifference{ Surface{1}; Delete; }{ Surface{10, 11}; Delete; }
+BooleanDifference{ Surface{1}; Delete; }{ Surface{10}; Delete; }
 
 // Physical groups
 Physical Surface("solid") = {1};
-Physical Curve("cavity") = {10, 11};  // Internal elliptical boundary
-Physical Curve("ymin") = {12};    // Bottom
-Physical Curve("xmin") = {13};    // Left
-Physical Curve("xmax") = {14};    // Right
-Physical Curve("ymax") = {15};    // Top
+Physical Curve("cavity") = {10};  // Internal elliptical boundary
+Physical Curve("ymin") = {11};    // Bottom
+Physical Curve("xmin") = {12};    // Left
+Physical Curve("xmax") = {13};    // Right
+Physical Curve("ymax") = {14};    // Top
 
 // Mesh Refinement
 Field[1] = Distance;
-Field[1].CurvesList = {10, 11};
+Field[1].CurvesList = {10};
 Field[1].NumPointsPerCurve = 100;
 
 Field[2] = Threshold;

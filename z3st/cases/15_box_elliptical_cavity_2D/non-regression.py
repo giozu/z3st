@@ -44,8 +44,9 @@ print(f"[INFO] Theoretical intensification factor: {intensification_factor:.2f}"
 p_applied = 1.0 # MPa
 p_target = p_applied * intensification_factor
 
-Fc_linear = (2.0 * ax) / Lx
-Fc_area = (np.pi * ax**2) / (Lx**2)
+n_bubbles = 2
+Fc_linear = n_bubbles * 2.0 * ax / Lx
+Fc_area = n_bubbles**2 * (np.pi * ax**2) / (Lx**2)
 
 print(f"\n[GEOMETRY ANALYSIS]")
 print(f"  → Fc (2D): {Fc_linear:.4f}")
@@ -71,13 +72,14 @@ list_fields(VTU_FILE)
 X_tip = ax
 y_target = 0.0
 
-# x_d, y_d, _, D_all = extract_field(VTU_FILE, field_name="Damage")
-# d_max = np.max(D_all)
+x_d, y_d, _, D_all = extract_field(VTU_FILE, field_name="Damage")
+d_max = np.max(D_all)
 
 x, y, _, sigma = extract_field(VTU_FILE, field_name="Stress_solid (cells)")
 sigma_yy_max = np.max(sigma[:, 4]) 
 
-mask = (np.abs(y - y_target) < (Ly/500)) & (x >= X_tip)
+# mask = (np.abs(y - y_target) < (Ly/500)) & (x >= X_tip)
+mask = (np.abs(y - y_target) < (Ly/100))
 idx_line = np.argsort(x[mask])
 x_line = x[mask][idx_line]
 sigma_yy_line = sigma[mask, 4][idx_line]
@@ -85,12 +87,11 @@ sigma_yy_line = sigma[mask, 4][idx_line]
 # --.. ..- .-.. .-.. --- plot --.. ..- .-.. .-.. ---
 plt.figure(figsize=(10, 6))
 
-plt.plot(x_line, sigma_yy_line * 1e-6, 'b-o', markersize=4, label=r"$\sigma_{yy}$ numerical")
-plt.axvline(X_tip, color='r', linestyle='--', label="Bubble tip")
+plt.plot(x_line, sigma_yy_line, 'b-o', markersize=4, label=r"$\sigma_{yy}$")
+# plt.axvline(X_tip, color='r', linestyle='--', label="Bubble tip")
 
 plt.xlabel(r"Distance $x$ ($\mu$m)")
-plt.ylabel(r"Stress $\sigma_{yy}$ (MPa)")
-plt.title(rf"Stress profile on the grain face, ($l_c$ = {lc} $\mu$m, $G_{{c,gb}}$ = 2.0 J/m$^2$)")
+plt.ylabel(r"Stress$ (MPa)")
 plt.grid(True, ls=':', alpha=0.6)
 plt.legend()
 
@@ -100,26 +101,26 @@ plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
 
 # Gc profile
-y_line = np.linspace(-Ly/2, Ly/2, 500) # (micron)
-gc_line = Gc(y_line)
+# y_line = np.linspace(-Ly/2, Ly/2, 500) # (micron)
+# gc_line = Gc(y_line)
 
-sigma_c = ((27 * E * gc_line) / (256 * lc))**0.5
+# sigma_c = ((27 * E * gc_line) / (256 * lc))**0.5
 
-plt.figure(figsize=(8, 5))
-plt.plot(y_line * 1000, gc_line * 1e6, 'g-', label="$G_c$ profile (GB zone)")
-plt.xlabel(r"Distance $y$ (nm)")
-plt.ylabel("$G_c$ ($J/m^2$)")
-plt.grid(True, ls=':')
-plt.legend()
-plt.savefig(os.path.join(CASE_DIR, "output", "gc_profile_check.png"))
+# plt.figure(figsize=(8, 5))
+# plt.plot(y_line * 1000, gc_line * 1e6, 'g-', label="$G_c$ profile (GB zone)")
+# plt.xlabel(r"Distance $y$ (nm)")
+# plt.ylabel("$G_c$ ($J/m^2$)")
+# plt.grid(True, ls=':')
+# plt.legend()
+# plt.savefig(os.path.join(CASE_DIR, "output", "gc_profile_check.png"))
 
 TOLERANCE = 0.1
 errors = {
-    # "max_damage": {
-    #     "numerical": float(d_max),
-    #     "reference": 1.0, 
-    #     "rel_error": float(abs(d_max - 1.0)) if d_max < 1.0 else 0.0
-    # },
+    "max_damage": {
+        "numerical": float(d_max),
+        "reference": 1.0, 
+        "rel_error": float(abs(d_max - 1.0))
+    },
     "max_stress_yy": {
         "numerical": float(sigma_yy_max),
         "reference": float(p_target),

@@ -107,6 +107,7 @@ class Spine(
                 print(f"  → k not defined for {name}")
 
             sigma_c = mat.get("sigma_c")
+            Gc = mat.get("Gc")
 
             if "Gc" in mat:
                 if isinstance(mat["Gc"], str):
@@ -116,7 +117,7 @@ class Spine(
                 else:
                     print(f"  → Gc defined as constant: {mat['Gc']}")
             else:
-                print(f"  → k not defined for {name}")
+                print(f"  → Gc not defined for {name}")
 
             dmg_type = getattr(self, "dmg_cfg", {}).get("type")
 
@@ -132,7 +133,7 @@ class Spine(
 
                     mat["Gc"] = float(Gc)
 
-                elif Gc is not None:
+                elif Gc is not None and type(Gc) == float:
                     if dmg_type == "AT2":
                         sigma_c = ((27 * mat["E"] * Gc) / (256 * lc))**0.5
                         print(f"  - Material '{name}': sigma_c (AT2) from Gc = {Gc:.2f} J/m2")
@@ -246,6 +247,11 @@ class Spine(
                 Gc_func = mat["_Gc_func"]
                 mat["Gc"] = Gc_func(self.mesh)
                 print("\nGc expression for", name, "→", mat["Gc"])
+
+                # temp
+                lc = getattr(self, "dmg_cfg", {}).get("lc")
+                mat["sigma_c"] = ((27 * mat["E"] * 2.0) / (256 * lc))**0.5
+
 
     def set_power(self):
         print(f"[UPDATING q_third]")
