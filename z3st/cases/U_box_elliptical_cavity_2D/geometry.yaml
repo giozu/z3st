@@ -1,11 +1,11 @@
 name: box_with_cavity
 geometry_type: rect
 
-Lx: 1.0            # box length in x (m)
-Ly: 1.0            # box length in y (m)
+Lx: 0.4            # box length in x (m)
+Ly: 0.4            # box length in y (m)
 
-ax: 0.1072         # semi-axis of ellipsoid in x (m)
-ay: 0.0499882      # semi-axis of ellipsoid in z (m)
+ax: 0.06         # semi-axis of ellipsoid in x (m)
+ay: 0.0279785    # semi-axis of ellipsoid in z (m)
 
 labels:
   solid: 1

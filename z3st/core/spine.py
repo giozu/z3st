@@ -71,7 +71,13 @@ class Spine(
         return getattr(mod, func_name)
 
     def load_materials(self, **materials):
-        print("[LOADING MATERIALS]")
+
+        print("\n")
+        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
+        print(f"--. spine - load_materials --..")
+        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
+        print("\n")
+
         self.materials = {}
         
         lc = getattr(self, "dmg_cfg", {}).get("lc")
@@ -101,7 +107,17 @@ class Spine(
                 print(f"  → k not defined for {name}")
 
             sigma_c = mat.get("sigma_c")
-            Gc = mat.get("Gc")
+
+            if "Gc" in mat:
+                if isinstance(mat["Gc"], str):
+                    print(f"  → Gc defined as symbolic function: {mat['Gc']}")
+                    Gc_func = self.resolve_function(mat["Gc"])
+                    mat["_Gc_func"] = Gc_func
+                else:
+                    print(f"  → Gc defined as constant: {mat['Gc']}")
+            else:
+                print(f"  → k not defined for {name}")
+
             dmg_type = getattr(self, "dmg_cfg", {}).get("type")
 
             if lc:
@@ -225,6 +241,11 @@ class Spine(
                 k_func = mat["_k_func"]
                 mat["k"] = k_func(self.T)
                 print("\nk expression for", name, "→", mat["k"])
+
+            if "_Gc_func" in mat:
+                Gc_func = mat["_Gc_func"]
+                mat["Gc"] = Gc_func(self.mesh)
+                print("\nGc expression for", name, "→", mat["Gc"])
 
     def set_power(self):
         print(f"[UPDATING q_third]")

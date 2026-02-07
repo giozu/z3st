@@ -9,18 +9,21 @@
 
 SetFactory("OpenCASCADE");
 
+scale = 1;
+
 // Parameters
-Lx = 1.0;          // plate length (microns)
-Ly = 1.0;          // plate height (microns)
+Lx = 0.4 * scale;          // plate length
+Ly = 0.4 * scale;          // plate height
+ax = 0.06 * scale;         // Semi-axis X
 
 theta = 50 * Pi / 180; // Semi-dihedral angle in radiants 
-ax = 0.1072;           // Semi-axis X
 ay = ax * (1 - Cos(theta)) / Sin(theta); // Semi-axis Y coherent
 
+Printf("The value of ax (major semi-axis) is: %g", ax);
 Printf("The value of ay (minor semi-axis) is: %g", ay);
 
-h_plate = 0.0400;  // coarse mesh size
-h_cavity = 0.0015; // fine mesh size at bubble tip
+h_plate = scale * 0.00400; // coarse mesh size
+h_cavity = scale * 0.0015; // fine mesh size at bubble tip
 
 // Rectangular plate
 Rectangle(1) = {-Lx/2, -Ly/2, 0, Lx, Ly};

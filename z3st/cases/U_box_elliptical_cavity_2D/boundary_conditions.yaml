@@ -7,17 +7,11 @@ thermal:
 mechanical:
   solid:
   - type: Neumann
+    region: cavity
+    traction: 1.0
+
+  - type: Clamp_y
     region: ymin
-    traction: 1.0   # (Pa)
 
-  - type: Neumann
-    region: ymax
-    traction: 1.0   # (Pa)
-
-  - type: Dirichlet
+  - type: Clamp_x
     region: xmin
-    displacement: [0.0, 0.0]   # (m)
-
-  - type: Dirichlet
-    region: xmax
-    displacement: [0.0, 0.0]   # (m)
