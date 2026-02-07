@@ -53,7 +53,9 @@ damage:
   lc: 0.004
 
 lhr:
-- 0
+- 0.0
+- 0.0
 time:
-- 0
-n_steps: 1
+- 0.0
+- 3600.0
+n_steps: 40
