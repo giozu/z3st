@@ -12,8 +12,8 @@ SetFactory("OpenCASCADE");
 scale = 1;
 
 // Parameters
-Lx = 0.4 * scale;          // plate length
-Ly = 0.4 * scale;          // plate height
+Lx = 0.4 * scale;          // length
+Ly = 0.4 * scale;          // height
 ax = 0.06 * scale;         // Semi-axis X
 
 theta = 50 * Pi / 180; // Semi-dihedral angle in radiants 

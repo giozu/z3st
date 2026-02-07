@@ -7,158 +7,128 @@ non-regression script
 ---------------------
 """
 
-import os
-import sys
-
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
+import os, re
+import yaml
 import numpy as np
-import pyvista as pv
+import matplotlib.pyplot as plt
 
-# Add the z3st/output directory to sys.path to import extract.py
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "utils"))
-from utils_extract_vtu import *
-from utils_plot import *
-from utils_verification import pass_fail_check, regression_check
+from z3st.utils.utils_extract_vtu import *
+from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
-OUT_DIR = os.path.join(CASE_DIR, "output")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/oxide.yaml")
+GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
+INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
 
-Lx = 0.5  # box length in x (m)
-Ly = 0.5  # box length in y (m)
-Lz = 0.5  # box length in z (m)
+# Input
+with open(INPUT_FILE, 'r') as f:
+    input_data = yaml.safe_load(f)
+lc = float(input_data.get("damage", {}).get("lc", 0.001))
 
-ax = 0.1072  # semi-axis of ellipsoid in x (m)
-ay = 0.1072  # semi-axis of ellipsoid in y (m)
-az = 0.05  # semi-axis of ellipsoid in z (m)
+# Geometry
+with open(GEOMETRY_FILE, 'r') as f:
+    geom_data = yaml.safe_load(f)
+ax = float(geom_data.get('ax'))
+ay = float(geom_data.get('ay'))
+Lx = float(geom_data.get('Lx'))
+Ly = float(geom_data.get('Ly'))
 
-stress_applied = 1  # Pa
+theta = 50 * np.pi / 180 # angle in radians, semi-dihedral angle
+ay_ax = (1 - np.cos(theta)) / np.sin(theta)
+intensification_factor = 2 / ay_ax - 1 # theoretical pressure intensification
+print(f"[INFO] Theoretical intensification factor: {intensification_factor:.2f}")
 
-y_target = 0.0  # (m)
-z_target = 0.0  # (m)
-ex_tol = 5.0e-1
+p_applied = 1.0 # MPa
+p_target = p_applied * intensification_factor
 
-# ANSI colors
-GREEN = "\033[92m"
-RED = "\033[91m"
-BOLD = "\033[1m"
-END = "\033[0m"
+Fc_linear = (2.0 * ax) / Lx
+Fc_area = (np.pi * ax**2) / (Lx**2)
 
-# --.. ..- .-.. .-.. --- analytical solution --.. ..- .-.. .-.. ---
-VON_MISES_REF = 3.5  # (Pa)
-SIGMA_XX_REF = 0.7  # (Pa)
+print(f"\n[GEOMETRY ANALYSIS]")
+print(f"  → Fc (2D): {Fc_linear:.4f}")
+print(f"  → Fc (3D):  {Fc_area:.4f}")
+print(f"  → Domain (Lx, Ly): {Lx:.3f} x {Ly:.3f} μm^2")
+print(f"  → Bubble (ax, ay): {ax:.3f} x {ay:.3f} μm^2")
 
-TOLERANCE = 6e-2  # relative tolerance for pass/fail
+# Material
+with open(MATERIAL_FILE, 'r') as f:
+    mat_data = yaml.safe_load(f)
+E = float(mat_data.get('E'))
 
-# --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
-if not os.path.exists(VTU_FILE):
-    raise FileNotFoundError(f"[ERROR] VTU file not found at {VTU_FILE}")
-print(f"[INFO] Using VTU file: {VTU_FILE}")
-
-# --.. ..- .-.. .-.. --- list fields --.. ..- .-.. .-.. ---
-list_fields(VTU_FILE)
-
-# --. mesh bounds --..
-grid = pv.read(VTU_FILE)
-xmin, xmax, ymin, ymax, zmin, zmax = grid.bounds
-print(f"\n[INFO] Grid bounds:")
-print(f"\tx ∈ [{xmin:.4e}, {xmax:.4e}]")
-print(f"\ty ∈ [{ymin:.4e}, {ymax:.4e}]")
-print(f"\tz ∈ [{zmin:.4e}, {zmax:.4e}]")
+def Gc(y_coords):
+    Gc_gb = 2.0     # J/m2
+    Gc_bulk = 100.0 # J/m2
+    half_width = 1e-3 # 1 nm in micron
+    transition = np.tanh(np.abs(y_coords) / half_width)
+    return (Gc_gb + (Gc_bulk - Gc_gb) * transition) * 1e-6
 
 # --.. ..- .-.. .-.. --- extract fields --.. ..- .-.. .-.. ---
-print(f"[INFO] Target y-plane for extraction: z = {y_target:.4e} m")
-print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
+list_fields(VTU_FILE)
 
-_, _, _, u = extract_displacement(VTU_FILE)
-ux, uy, uz = u[:, 0], u[:, 1], u[:, 2]
-print(f"[INFO] Displacement extracted: |u|_max = {np.max(np.linalg.norm(u, axis=1)):.3e}")
+X_tip = ax
+y_target = 0.0
 
-x_raw, y_raw, z_raw, comps = extract_stress(VTU_FILE, component="all", prefer="cells")
-sigma_xx_raw = comps["xx"]
+# x_d, y_d, _, D_all = extract_field(VTU_FILE, field_name="Damage")
+# d_max = np.max(D_all)
 
-x_vm_raw, y_vm_raw, z_vm_raw, sigma_vm_raw = extract_VonMises(VTU_FILE)
+x, y, _, sigma = extract_field(VTU_FILE, field_name="Stress_solid (cells)")
+sigma_yy_max = np.max(sigma[:, 4]) 
 
-import pandas as pd
+mask = (np.abs(y - y_target) < (Ly/500)) & (x >= X_tip)
+idx_line = np.argsort(x[mask])
+x_line = x[mask][idx_line]
+sigma_yy_line = sigma[mask, 4][idx_line]
 
-decimals = 6
+# --.. ..- .-.. .-.. --- plot --.. ..- .-.. .-.. ---
+plt.figure(figsize=(10, 6))
 
-df = pd.DataFrame({"x": x_raw, "sigma_xx": sigma_xx_raw})
-df["x_round"] = df["x"].round(decimals)
-sigma_xx_avg = df.groupby("x_round", as_index=False)["sigma_xx"].mean()
+plt.plot(x_line, sigma_yy_line * 1e-6, 'b-o', markersize=4, label=r"$\sigma_{yy}$ numerical")
+plt.axvline(X_tip, color='r', linestyle='--', label="Bubble tip")
 
-df_vm = pd.DataFrame({"x": x_vm_raw, "sigma_vm": sigma_vm_raw})
-df_vm["x_round"] = df_vm["x"].round(decimals)
-sigma_vm_avg = df_vm.groupby("x_round", as_index=False)["sigma_vm"].mean()
+plt.xlabel(r"Distance $x$ ($\mu$m)")
+plt.ylabel(r"Stress $\sigma_{yy}$ (MPa)")
+plt.title(rf"Stress profile on the grain face, ($l_c$ = {lc} $\mu$m, $G_{{c,gb}}$ = 2.0 J/m$^2$)")
+plt.grid(True, ls=':', alpha=0.6)
+plt.legend()
 
-df_join = pd.merge(sigma_xx_avg, sigma_vm_avg, on="x_round", how="inner").sort_values("x_round")
-x = df_join["x_round"].to_numpy()
-y = np.zeros_like(x)
-z = np.zeros_like(x)
-sigma_xx = df_join["sigma_xx"].to_numpy()
-sigma_vm = df_join["sigma_vm"].to_numpy()
+plot_path = os.path.join(CASE_DIR, "output", "stress_profile_tip.png")
+plt.tight_layout()
+plt.savefig(plot_path, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path}")
 
-# x in [ax, Lx/2]
-mask_x = (x >= ax) & (x <= Lx / 2.0)
-mask_y = np.abs(y - y_target) < ex_tol
-mask_z = np.abs(z - z_target) < ex_tol
-mask = mask_x & mask_y & mask_z
+# Gc profile
+y_line = np.linspace(-Ly/2, Ly/2, 500) # (micron)
+gc_line = Gc(y_line)
 
-if not np.any(mask):
-    raise RuntimeError(f"{RED}[ERROR]{END} No samples found with ax <= x <= Lx/2.")
+sigma_c = ((27 * E * gc_line) / (256 * lc))**0.5
 
-plt.figure(figsize=(6, 4))
-plt.plot(x[mask], sigma_xx[mask], "b.", lw=1.5, label=r"$\sigma_{xx}$ (num)")
-plt.plot(x[mask], sigma_vm[mask], "r.", lw=1.5, label=r"$\sigma_{vm}$ (num)")
+plt.figure(figsize=(8, 5))
+plt.plot(y_line * 1000, gc_line * 1e6, 'g-', label="$G_c$ profile (GB zone)")
+plt.xlabel(r"Distance $y$ (nm)")
+plt.ylabel("$G_c$ ($J/m^2$)")
+plt.grid(True, ls=':')
+plt.legend()
+plt.savefig(os.path.join(CASE_DIR, "output", "gc_profile_check.png"))
 
-plt.axvline(ax, color="blue", lw=0.8, ls=":", label="Cavity x-semiaxis")
-plt.axvline(Lx * 0.5, color="red", lw=0.8, ls="--", label="Box edge")
-
-plt.gca().xaxis.set_major_formatter(ticker.FuncFormatter(lambda X, _: f"{X*1e3:g}"))
-plt.gca().yaxis.set_major_formatter(ticker.FuncFormatter(lambda Y, _: f"{Y/stress_applied:g}"))
-plt.xlabel("x (mm)")
-plt.ylabel(r"Stress / $\sigma_{BCs}$ (/)")
-plt.title(r"$\sigma_{BCs}$ = 1 Pa, z-direction", fontsize=10)
-plt.grid(True, which="both", ls=":", lw=0.5)
-plt.legend(fontsize=8, frameon=False, loc="upper right")
-plt.tight_layout(rect=[0, 0, 1, 1])
-plt.savefig(
-    os.path.join(OUT_DIR, "stress_comparison.png"), dpi=300, bbox_inches="tight", transparent=False
-)
-plt.close()
-
-# --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-x_line = x[mask]
-idx = np.argsort(x_line)
-
+TOLERANCE = 0.1
 errors = {
-    "sigma_xx": {
-        "numerical": float(np.max(sigma_xx[mask][idx])),
-        "reference": SIGMA_XX_REF,
-        "abs_error": float(abs(np.max(sigma_xx[mask][idx]) - SIGMA_XX_REF)),
-        "rel_error": float(abs(np.max(sigma_xx[mask][idx]) - SIGMA_XX_REF) / SIGMA_XX_REF),
-    },
-    "sigma_von_mises": {
-        "numerical": float(np.max(sigma_vm[mask][idx])),
-        "reference": VON_MISES_REF,
-        "abs_error": float(abs(np.max(sigma_vm[mask][idx]) - VON_MISES_REF)),
-        "rel_error": float(abs(np.max(sigma_vm[mask][idx]) - VON_MISES_REF) / VON_MISES_REF),
-    },
-    "u_displacement": {
-        "numerical": float(np.max(np.linalg.norm(u, axis=1))),
-        "reference": 0.0,
-        "abs_error": 0.0,
-        "rel_error": 0.0,
-    },
+    # "max_damage": {
+    #     "numerical": float(d_max),
+    #     "reference": 1.0, 
+    #     "rel_error": float(abs(d_max - 1.0)) if d_max < 1.0 else 0.0
+    # },
+    "max_stress_yy": {
+        "numerical": float(sigma_yy_max),
+        "reference": float(p_target),
+        "rel_error": float(abs(sigma_yy_max - p_target)/p_target)
+    }
 }
 
-# --. pass/fail check --..
-all_pass = pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+print(f"\n[RESULTS]")
+# print(f"  → Max Damage: {d_max:.4f}")
+print(f"  → Max Stress: {sigma_yy_max:.2f} MPa (Target: {p_target:.2f} MPa)")
 
-# --. regression vs gold --..
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)

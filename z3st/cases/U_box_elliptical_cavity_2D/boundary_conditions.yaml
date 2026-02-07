@@ -8,7 +8,7 @@ mechanical:
   solid:
   - type: Neumann
     region: cavity
-    traction: 1.0
+    traction: -1.0
 
   - type: Clamp_y
     region: ymin
