@@ -1,0 +1,23 @@
+thermal:
+  solid:
+  - type: Dirichlet
+    region: xmin
+    temperature: 300.0   # (K)
+
+mechanical:
+  solid:
+  - type: Neumann
+    region: ymin
+    traction: 1.0   # (Pa)
+
+  - type: Neumann
+    region: ymax
+    traction: 1.0   # (Pa)
+
+  - type: Dirichlet
+    region: xmin
+    displacement: [0.0, 0.0]   # (m)
+
+  - type: Dirichlet
+    region: xmax
+    displacement: [0.0, 0.0]   # (m)

@@ -139,7 +139,11 @@ class Spine(
                 print(f"  {k:<15} → {v} ({type(v).__name__})")
 
     def set_boundary_conditions(self):
-        print(f"[SETTING BOUNDARY CONDITIONS]")
+        print("\n")
+        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
+        print(f"--. spine - set_boundary_conditions --..")
+        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
+        print("\n")
 
         with open(self.input_file["boundary_conditions_path"], "r") as f:
             print(
