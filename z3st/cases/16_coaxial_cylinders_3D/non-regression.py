@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 20_coaxial_cylinders_3D
+Z3ST case: coaxial_cylinders_3D
 
 non-regression script
 ---------------------
@@ -9,7 +9,7 @@ non-regression script
 """
 
 import os
-
+import yaml
 import numpy as np
 
 from z3st.utils.utils_extract_vtu import *
@@ -20,20 +20,54 @@ from z3st.utils.utils_verification import *
 CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+MATERIAL_FILE_1 = os.path.join(CASE_DIR, "../../materials/ceramic.yaml")
+MATERIAL_FILE_2 = os.path.join(CASE_DIR, "../../materials/steel.yaml")
+GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
+MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
+INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
+BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
 
-# Geometry and material
-Ro1, Ri2, Ro2, Lz = 0.050, 0.060, 0.065, 0.10  # m (geometry dimensions)
-Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
-k1, E1, nu1, alpha1 = 2.5, 1.7e11, 0.3, 1.45e-5  # W/m·K, Pa, -, 1/K
-k2, E2, nu2, alpha2 = 50, 2e11, 0.3, 1.0e-5  # W/m·K, Pa, -, 1/K
-To2 = 350.0  # K          outer surface temperature
-q0, mu = 0.0, 24.0  # W/m³, 1/m  heat source, attenuation
-z_target, z_tol = Lz / 2, Lz / 10  # m          z-plane for data extraction
-LHR = 20  # (W/m)      linear heat rate
-h_g = 2000  # (W/m2-K)
+# Input
+with open(INPUT_FILE, 'r') as f:
+    input_data = yaml.safe_load(f)
 
-TOLERANCE = 5.0e-2  # -          tolerance for non-regression
+LHR = input_data['lhr'][0]
+h_g = input_data['models']['gap_conductance']['value']
 
+# Geometry
+with open(GEOMETRY_FILE, 'r') as f:
+    geom_data = yaml.safe_load(f)
+Ro1 = float(geom_data.get('outer_radius_1'))
+Ri2 = float(geom_data.get('inner_radius_2'))
+Ro2 = float(geom_data.get('outer_radius_2'))
+Lz = float(geom_data.get('Lz'))
+
+# Material
+with open(MATERIAL_FILE_1, 'r') as f:
+    mat_data_1 = yaml.safe_load(f)
+
+with open(MATERIAL_FILE_2, 'r') as f:
+    mat_data_2 = yaml.safe_load(f)
+
+k1 = 2.5 # (W/m-K)
+E1 = float(mat_data_1.get('E'))
+nu1 = float(mat_data_1.get('nu'))
+alpha1 = float(mat_data_1.get('alpha'))
+
+k2 = float(mat_data_2.get('k'))
+E2 = float(mat_data_2.get('E'))
+nu2 = float(mat_data_2.get('nu'))
+alpha2 = float(mat_data_2.get('alpha'))
+
+# Boundary conditions
+with open(BC_FILE, 'r') as f:
+    bc_data = yaml.safe_load(f)
+
+To2 = bc_data['thermal']['cyl_2'][1]['temperature']
+
+# Target
+z_target, z_tol = Lz / 2, Lz / 10  # z-plane for data extraction
+TOLERANCE = 5.0e-2  # tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_T_1(r, T_interface_1):
@@ -72,7 +106,6 @@ def analytic_T_piecewise(r):
     T_ref[mask_2] = analytic_T_2(r[mask_2])
 
     return T_ref
-
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)

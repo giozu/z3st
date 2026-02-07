@@ -9,7 +9,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  volume: ../../materials/oxide.yaml
+  volume: ../../materials/ceramic.yaml
 
 solver_settings:
   coupling: staggered

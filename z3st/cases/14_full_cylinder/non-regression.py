@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 14_full_cylinder
+Z3ST case: full_cylinder
 
 non-regression script
 -----------------------
@@ -28,7 +28,7 @@ Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
 k, E, nu, alpha = (
     2.5,
     1.7e11,
-    0.3,
+    0.29,
     1.45e-5,
 )  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
 To = 500.0  # K          outer surface temperature
