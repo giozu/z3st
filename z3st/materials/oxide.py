@@ -20,10 +20,10 @@ def Gc(mesh):
     coords = ufl.SpatialCoordinate(mesh)
     y = coords[1] 
 
-    Gc_gb = 2.0     
-    Gc_bulk = 100.0 
+    Gc_gb = 0.1
+    Gc_bulk = 100.0
     
-    half_width = 1e-3 
+    half_width = 2e-3
 
     transition = ufl.tanh(abs(y) / half_width)
     
