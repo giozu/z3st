@@ -23,7 +23,7 @@ def Gc(mesh):
     Gc_gb = 0.1
     Gc_bulk = 100.0
     
-    half_width = 2e-3
+    half_width = 10e-3
 
     transition = ufl.tanh(abs(y) / half_width)
     
