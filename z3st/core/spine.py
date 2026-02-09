@@ -248,9 +248,17 @@ class Spine(
                 mat["Gc"] = Gc_func(self.mesh)
                 print("\nGc expression for", name, "→", mat["Gc"])
 
-                # temp
+                # Calculate sigma_c from Gc using UFL/dolfinx compatible operations
                 lc = getattr(self, "dmg_cfg", {}).get("lc")
-                mat["sigma_c"] = ((27 * mat["E"] * 2.0) / (256 * lc))**0.5
+                dmg_type = getattr(self, "dmg_cfg", {}).get("type")
+                
+                if dmg_type == "AT2":
+                    mat["sigma_c"] = ufl.sqrt((27 * mat["E"] * mat["Gc"]) / (256 * lc))
+                    print(f"  - Material '{name}': sigma_c (AT2) evaluated from Gc expression")
+
+                elif dmg_type == "AT1":
+                    mat["sigma_c"] = ufl.sqrt((3 * mat["E"] * mat["Gc"]) / (8 * lc))
+                    print(f"  - Material '{name}': sigma_c (AT1) evaluated from Gc expression")
 
 
     def set_power(self):
