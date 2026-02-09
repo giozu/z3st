@@ -7,6 +7,7 @@
 import importlib
 
 import dolfinx
+import ufl
 import numpy as np
 import yaml
 from mpi4py import MPI
