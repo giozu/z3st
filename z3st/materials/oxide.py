@@ -8,22 +8,22 @@ def k(T):
         k: Thermal conductivity as a UFL expression
     """
 
-    return 2.5e-6
+    return 2.5e+6 # $pW/(micron-K)$.
 
 def Gc(mesh):
     """
     Compute the fracture toughness.
 
     Returns:
-        Gc (J/m²): Fracture toughness as a UFL expression
+        Gc: Fracture toughness as a UFL expression
     """
     coords = ufl.SpatialCoordinate(mesh)
     y = coords[1] 
 
-    Gc_gb = 0.1
-    Gc_bulk = 100.0
+    Gc_gb = 0.1     # pJ/micron²
+    Gc_bulk = 100.0 # pJ/micron²
     
-    half_width = 10e-3
+    half_width = 10e-3 # micron
 
     transition = ufl.tanh(abs(y) / half_width)
     

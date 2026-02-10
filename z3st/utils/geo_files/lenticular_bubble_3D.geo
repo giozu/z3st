@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Elliptical cavity inside a rectangular box
+//  3D elliptical cavity inside a box
 //
 //  Author: Giovanni Zullo
 //

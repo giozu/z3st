@@ -1,13 +1,13 @@
 name: oxide
 fissile: true
 
-E: 1.7e+5        # (170 GPa)
+E: 170.0e+3      # (170 GPa)
 nu: 0.32         # -
-k: materials.oxide.k # (W/micron-K)
-cp: 330.0        # (J/kg-K)
+k: materials.oxide.k # (pW/micron-K)
+cp: 330.0e+12    # (pJ/kg-K)
 alpha: 1.45e-5   # (1/K)
 T_ref: 300.0     # (K)
-rho: 11000.0e-18 # (kg/micron³)
-mu_gamma: 0.0    # Linear attenuation coefficient / macroscopic cross section of gamma rays in steels (1/micron)
-gamma_heating: 0.0 # Volumetric source due to gamma heating (W/micron³)
-Gc: materials.oxide.Gc # (J/micron²)
+rho: 1.1e-14     # (kg/micron³)
+mu_gamma: 0.0    # Linear attenuation coefficient
+gamma_heating: 0.0 # Volumetric source due to gamma heating
+Gc: materials.oxide.Gc # (pJ/micron²)
