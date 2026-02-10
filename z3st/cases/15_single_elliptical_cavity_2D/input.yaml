@@ -28,6 +28,7 @@ models:
 
 mechanical:
   solver: linear
+  order: 1
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6

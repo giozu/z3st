@@ -65,6 +65,12 @@ def run_simulation():
     Runs the simulation: gmsh, z3st, non-regression.
     Returns the numerical max stress.
     """
+    # 0. Setup Env
+    env = os.environ.copy()
+    z3st_root = os.path.abspath(os.path.join(CASE_DIR, "../../.."))
+    env["PYTHONPATH"] = z3st_root + ":" + env.get("PYTHONPATH", "")
+    print(f"[INFO] Using PYTHONPATH: {env['PYTHONPATH']}")
+
     # 1. Mesh
     print("[INFO] Running gmsh...")
     subprocess.run(["gmsh", "mesh.geo", "-2"], cwd=CASE_DIR, check=True, stdout=subprocess.DEVNULL)
@@ -73,17 +79,18 @@ def run_simulation():
     print("[INFO] Running z3st...")
 
     with open(os.path.join(CASE_DIR, "log.z3st"), "w") as log_file:
-         subprocess.run(["python3", "-m", "z3st"], cwd=CASE_DIR, check=True, stdout=log_file, stderr=log_file)
+         subprocess.run(["python3", "-m", "z3st"], cwd=CASE_DIR, check=True, stdout=log_file, stderr=log_file, env=env)
     
     # 3. Extract from non-regression.py
     print("[INFO] Extracting results...")
-    subprocess.run(["python3", "non-regression.py"], cwd=CASE_DIR, check=True)
+    subprocess.run(["python3", "non-regression.py"], cwd=CASE_DIR, check=True, env=env)
     with open(OUTPUT_JSON, 'r') as f:
         data = json.load(f)
 
     return data["results"]["max_stress_yy"]
 
 def main():
+
     thetas = [15, 20, 25, 30, 40, 50, 60]
     results = []
     
@@ -104,7 +111,14 @@ def main():
             
             # Store results
             numerical = res["numerical"]
-            reference = 1 + 2 / np.tan(np.radians(theta/2)) # Inglis
+            # Analytical solution for remote traction P=1 (Inglis)
+            # Sigma_tip = P * (2 * a/b + 1)
+            # a/b = ax/ay = 1 / tan(theta/2)
+            
+            # Analytical solution for internal pressure P=1 (Muskhelishvili)
+            # Sigma_tip = P * (2 * a/b - 1)
+            # a/b = ax/ay = 1 / tan(theta/2)
+            reference = 2 / np.tan(np.radians(theta/2)) - 1 
             error = (numerical - reference) / reference
             
             results.append({
@@ -131,7 +145,7 @@ def main():
     ref_vals = [r["reference"] for r in results]
     
     plt.figure(figsize=(8, 6))
-    plt.plot(t_vals, num_vals, 'bo-', label="Numerical (FEM)")
+    plt.plot(t_vals, num_vals, 'bo-', label="Numerical (z3st)")
     plt.plot(t_vals, ref_vals, 'r--', label="Analytical")
     plt.xlabel(r"Angle $\theta$ (degrees)")
     plt.ylabel(r"Max $\sigma_{yy}$ (MPa)")

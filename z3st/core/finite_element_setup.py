@@ -19,11 +19,15 @@ class FiniteElementSetup:
         """
 
         # --. Separate function space --..
+        mech_config = self.input_file.get("mechanical", {})
+        mech_degree = mech_config.get("order", 1)
+        print(f"Mechanical element order: {mech_degree}")
+
         self.V_t = dolfinx.fem.functionspace(
             self.mesh, ("Lagrange", 1)
         )  # scalar function space (temperature)
         self.V_m = dolfinx.fem.functionspace(
-            self.mesh, ("Lagrange", 1, (self.mesh.topology.dim,))
+            self.mesh, ("Lagrange", mech_degree, (self.mesh.topology.dim,))
         )  # vector function space (displacement)
         self.Q = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
         self.V_d = dolfinx.fem.functionspace(
