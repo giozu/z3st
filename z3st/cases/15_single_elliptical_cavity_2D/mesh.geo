@@ -16,8 +16,8 @@ Lx = 2.0 * scale;
 Ly = 2.0 * scale;
 ax = 0.06 * scale; // Semi-axis X
 
-theta = 30 * Pi / 180; // Semi-dihedral angle in radiants 
-ay = ax * (1 - Cos(theta)) / Sin(theta); // Semi-axis Y coherent
+theta = 60 * Pi / 180; // Semi-dihedral angle in radiants 
+ay = ax * (1 - Cos(theta)) / Sin(theta); // ax * tan(theta/2)
 
 Printf("The value of ax (major semi-axis) is: %g", ax);
 Printf("The value of ay (minor semi-axis) is: %g", ay);

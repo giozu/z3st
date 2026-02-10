@@ -7,5 +7,7 @@ rm -f output/non-regression.json
 rm -f output/fields.vtu
 rm -f output/*.png
 rm -f *.msh
+rm -f log.*
+rm -f *.png
 
 echo "Done. Output and temporary files deleted."
