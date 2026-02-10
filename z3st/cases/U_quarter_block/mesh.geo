@@ -45,6 +45,6 @@ Physical Volume("volume") = {1};
 
 // Mesh
 Mesh.CharacteristicLengthMax = 0.003;
-Mesh 3;
+// Mesh 3;
 
-Save "mesh.msh";
+// Save "mesh.msh";

@@ -69,5 +69,5 @@ Physical Surface("zmax") = {6};
 Physical Volume("steel") = {1};
 
 Mesh.RecombineAll = 1;
-Mesh 3;
-Save "mesh.msh";
+// Mesh 3;
+// Save "mesh.msh";

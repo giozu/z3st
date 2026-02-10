@@ -91,7 +91,7 @@ Mesh.ElementOrder = 1;      // Use linear elements
 Mesh.Optimize = 1;          // Improve mesh quality
 
 // Generate the 3D mesh
-Mesh 3;
+// Mesh 3;
 
 // Save the mesh
-Save "mesh.msh";
+// Save "mesh.msh";

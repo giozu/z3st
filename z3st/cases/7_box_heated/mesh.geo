@@ -80,7 +80,7 @@ Physical Volume("steel") = {1};
 
 // Generate structured mesh
 Mesh.RecombineAll = 1;
-Mesh 3;
+// Mesh 3;
 
 // Save mesh file
-Save "mesh.msh";
+// Save "mesh.msh";

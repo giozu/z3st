@@ -28,5 +28,5 @@ Physical Surface("cyl_1", 1) = {1};
 Physical Surface("cyl_2", 2) = {2};
 Physical Curve("contact_interface", 10) = {1};
 
-Mesh 2;
-Save "mesh.msh";
+// Mesh 2;
+// Save "mesh.msh";

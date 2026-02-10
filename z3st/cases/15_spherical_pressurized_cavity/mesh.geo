@@ -61,5 +61,5 @@ Field[2].DistMax = Lx / 4;                 // beyond this distance → SizeMax
 // set background mesh field
 Background Field = 2;
 
-Mesh 3;
-Save "mesh.msh";
+// Mesh 3;
+// Save "mesh.msh";

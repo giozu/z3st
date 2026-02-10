@@ -165,5 +165,5 @@ Physical Surface("notch_sides_y2") = {outB[2]};
 
 // Save
 Mesh.MshFileVersion = 2.2;
-Mesh 3;
-Save "mesh.msh";
+// Mesh 3;
+// Save "mesh.msh";

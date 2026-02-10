@@ -71,5 +71,5 @@ Background Field = 2;
 // Mesh generation options
 Mesh.CharacteristicLengthExtendFromBoundary = 0;
 Mesh.Algorithm = 6; // Frontal-Delaunay for better quality in 2D
-Mesh 2;
-Save "mesh.msh";
+// Mesh 2;
+// Save "mesh.msh";

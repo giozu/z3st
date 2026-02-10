@@ -44,5 +44,5 @@ Physical Curve("ymax") = {3};
 Physical Curve("xmin") = {4};
 Physical Surface("steel") = {1};
 
-Mesh 2;
-Save "mesh.msh";
+// Mesh 2;
+// Save "mesh.msh";

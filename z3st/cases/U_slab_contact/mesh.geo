@@ -52,5 +52,5 @@ Physical Curve("outer_wall", 14) = {6};
 Physical Curve("inner_wall", 15) = {4};
 
 Mesh.ElementOrder = 1;
-Mesh 2;
-Save "mesh.msh";
+// Mesh 2;
+// Save "mesh.msh";

@@ -17,7 +17,16 @@ from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
+# Find the latest VTU file
+output_dir = os.path.join(CASE_DIR, "output")
+vtu_files = [f for f in os.listdir(output_dir) if f.startswith("fields_") and f.endswith(".vtu")]
+if vtu_files:
+    # Sort and pick the last one (latest time step)
+    latest_vtu = sorted(vtu_files)[-1]
+    VTU_FILE = os.path.join(output_dir, latest_vtu)
+    print(f"[INFO] Using VTU file: {VTU_FILE}")
+else:
+    VTU_FILE = os.path.join(output_dir, "fields.vtu") # Fallback
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/oxide.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")

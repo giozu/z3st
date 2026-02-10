@@ -48,5 +48,5 @@ Physical Curve("xmin")  = {6, 8};
 Physical Curve("crack") = {3, 7};
 Physical Surface("steel") = {1};
 
-Mesh 2;
-Save "mesh.msh";
+// Mesh 2;
+// Save "mesh.msh";
