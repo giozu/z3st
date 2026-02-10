@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: box_elliptical_cavity_2D
+Z3ST case: two_elliptical_cavities_2D
 
 non-regression script
 ---------------------
