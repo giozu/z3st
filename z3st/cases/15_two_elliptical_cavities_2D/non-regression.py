@@ -147,7 +147,7 @@ errors = {
 }
 
 print(f"\n[RESULTS]")
-# print(f"  → Max Damage: {d_max:.4f}")
+print(f"  → Max Damage: {d_max:.4f}")
 print(f"  → Max Stress: {sigma_yy_max:.2f} MPa (Target: {p_target:.2f} MPa)")
 
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)

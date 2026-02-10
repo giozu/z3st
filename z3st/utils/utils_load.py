@@ -44,7 +44,7 @@ def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_his
     - n_actual (int): Actual number of steps generated.
     """
 
-    # Input validation
+    # Input points
     if len(t_points) != len(lhr_points):
         raise ValueError("t_points and lhr_points must have the same length.")
 

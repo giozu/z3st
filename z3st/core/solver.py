@@ -403,6 +403,8 @@ class Solver:
 
         D_old.x.array[:] = D_new.x.array
         
+        w = self.weight
+        
         lc = float(self.dmg_cfg["lc"])
         damage_type = self.dmg_cfg["type"]
 
@@ -430,9 +432,9 @@ class Solver:
 
             if damage_type == "AT2":
                 
-                a_d += ((self.H + 1.0) * u_d * v_d 
+                a_d += w*((self.H + 1.0) * u_d * v_d 
                 + lc**2 * ufl.inner(ufl.grad(u_d), ufl.grad(v_d))) * dx
-                L_d += self.H * v_d * dx
+                L_d += w*self.H * v_d * dx
 
             elif damage_type == "AT1":
 
@@ -445,10 +447,10 @@ class Solver:
 
                 print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, Gamma={gamma_penalty:.2e}")
 
-                a_d += (2.0 * self.H + gamma_penalty) * u_d * v_d * dx + \
+                a_d += w*(2.0 * self.H + gamma_penalty) * u_d * v_d * dx + \
                     (pref * lc) * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
                                                 
-                L_d += (2.0 * self.H - (pref / lc) + gamma_penalty * D_old) * v_d * dx
+                L_d += w*(2.0 * self.H - (pref / lc) + gamma_penalty * D_old) * v_d * dx
 
         petsc_opts_damage = self.get_solver_options(
             physics="damage",
