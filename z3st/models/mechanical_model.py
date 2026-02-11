@@ -456,10 +456,14 @@ class MechanicalModel:
             # Plane-stress reduction (x–y plane)
             if regime == "plane_stress":
 
+                # Modified Lame parameter for plane stress
+                lmbda_ps = (
+                    2 * material["G"] * material["lmbda"] / (material["lmbda"] + 2 * material["G"])
+                )
+
                 eps = self.epsilon(u)
                 sigma = (
-                    material["lmbda"] * ufl.tr(eps) * ufl.Identity(self.tdim)
-                    + 2.0 * material["G"] * eps
+                    lmbda_ps * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
                 )
 
                 s_xx = sigma[0, 0]
