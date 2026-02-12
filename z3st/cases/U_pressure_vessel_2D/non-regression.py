@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: U_pressure_vessel_2D
+Z3ST case: pressure_vessel_2D
 
 non-regression script
 ---------------------
@@ -37,14 +37,14 @@ L_cyl = 2.0  # m
 Ro_cyl = Ri + t_cyl
 Ro_head = Ri + t_head
 
-# Extraction Parameters
+# Parameters
 TOLERANCE = 1.0e-3  # m
 
 def extract_mid_cylinder(grid):
     """
     Extract stress at mid-height of cylinder (y = -L_cyl / 2).
     """
-    print(f"\n[INFO] Extracting stress at Cylinder Mid-Height (y = {-L_cyl/2})")
+    print(f"\n[INFO] Extracting stress at cylinder mid-height (y = {-L_cyl/2})")
     
     # Target Y
     y_target = -L_cyl / 2.0

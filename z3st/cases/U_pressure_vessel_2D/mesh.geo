@@ -19,8 +19,8 @@ L_cyl = 2000 * scale;           // Length of the cylindrical part
 L_taper = 150 * scale;          // Length of the transition zone (tapering)
 
 // Mesh Size
-lc = 15.0 * scale;              // general fineness
-lc_fine = 5.0 * scale;          // refinement in the transition zone
+lc = 5.0 * scale;              // general fineness
+lc_fine = 1.0 * scale;          // refinement in the transition zone
 
 // Center of curvature of the head
 Point(1) = {0, 0, 0, lc};
