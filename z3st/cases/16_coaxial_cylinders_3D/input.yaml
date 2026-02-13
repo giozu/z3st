@@ -25,7 +25,7 @@ solver_settings:
 
 models:
   thermal: true
-  mechanical: false
+  mechanical: true
   gap_conductance:
     type: Fixed
     value: 2000.0    # W/m2-K
@@ -33,8 +33,8 @@ models:
 mechanical:
   solver: linear
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-6
+  rtol: 1.0e-4
+  stag_tol: 1.0e-4
   mechanical_regime: 3D   # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
   debug: false
@@ -42,8 +42,8 @@ mechanical:
 thermal:
   solver: linear
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-8
-  stag_tol: 1.0e-8
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
 
 lhr:

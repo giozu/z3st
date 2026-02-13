@@ -58,4 +58,8 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 3
+n_steps: 10
+
+output:
+  format: "xdmf"
+  filename: "results.xdmf"

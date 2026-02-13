@@ -13,6 +13,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from z3st.utils.utils_extract_vtu import *
+from z3st.utils.utils_extract_xdmf import *
 from z3st.utils.utils_verification import *
 
 # Units of measure for micromechanics
@@ -27,13 +28,8 @@ from z3st.utils.utils_verification import *
 CASE_DIR = os.path.dirname(__file__)
 
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
-vtu_files = [f for f in os.listdir(OUTPUT_DIR) if f.startswith("fields_") and f.endswith(".vtu")]
-if vtu_files:
-    latest_vtu = sorted(vtu_files)[-1]
-    VTU_FILE = os.path.join(OUTPUT_DIR, latest_vtu)
-    print(f"[INFO] Using VTU file: {VTU_FILE}")
-else:
-    VTU_FILE = os.path.join(OUTPUT_DIR, "fields.vtu")
+XDMF_FILE = os.path.join(OUTPUT_DIR, "results.xdmf")
+print(f"[INFO] Using XDMF file: {XDMF_FILE}")
 
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/oxide.yaml")
@@ -56,7 +52,7 @@ Ly = float(geom_data.get('Ly'))
 theta = 50 * np.pi / 180 # angle in radians, semi-dihedral angle
 ay_ax = (1 - np.cos(theta)) / np.sin(theta)
 intensification_factor = 2 / ay_ax - 1 # theoretical pressure intensification
-print(f"[INFO] Theoretical intensification factor: {intensification_factor:.2f}")
+print(f"[INFO] Theoretical intensification factor (single bubble): {intensification_factor:.2f}")
 
 p_applied = 1.0 # MPa
 p_target = p_applied * intensification_factor
@@ -85,15 +81,15 @@ def Gc(y_coords):
     return (Gc_gb + (Gc_bulk - Gc_gb) * transition) * 1e-6
 
 # --.. ..- .-.. .-.. --- extract fields --.. ..- .-.. .-.. ---
-list_fields(VTU_FILE)
+list_fields_xdmf(XDMF_FILE)
 
 X_tip = ax
 y_target = 0.0
 
-x_d, y_d, _, D_all = extract_field(VTU_FILE, field_name="Damage")
+x_d, y_d, _, D_all = extract_field_xdmf(XDMF_FILE, field_name="Damage")
 d_max = np.max(D_all)
 
-x, y, _, sigma = extract_field(VTU_FILE, field_name="Stress_solid (cells)")
+x, y, _, sigma = extract_field_xdmf(XDMF_FILE, field_name="Stress_solid")
 sigma_yy_max = np.max(sigma[:, 4]) 
 
 # mask = (np.abs(y - y_target) < (Ly/500)) & (x >= X_tip)

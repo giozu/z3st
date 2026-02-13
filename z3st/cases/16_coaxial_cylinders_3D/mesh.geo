@@ -13,9 +13,9 @@ r_1_o = 0.05;       // Outer radius of the inner cylinder
 r_2_i = 0.06;       // Inner radius of the outer cylinder
 r_2_o = 0.065;      // Outer radius of the outer cylinder
 
-n_h = 20;
-n_r = 20;
-n_f = 30;
+n_h = 10;
+n_r = 15;
+n_f = 15;
 
 Point(100) = {0, 0, 0};       // Center of the bottom face
 Point(101) = {0, 0, h};       // Center of the top face

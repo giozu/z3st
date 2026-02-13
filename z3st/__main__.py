@@ -131,19 +131,32 @@ if __name__ == "__main__":
                  xdmf_file.write_function(problem.T, t)
              if problem.u:
                  xdmf_file.write_function(problem.u, t)
+             
+             # Export stress and strain (per material)
+             if problem.on.get("mechanical"):
+                 import dolfinx
+                 V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (3, 3)))
+                 for name in problem.materials:
+                     if problem.stress and name in problem.stress:
+                         stress_expr = problem.stress[name]
+                         stress_func = dolfinx.fem.Function(V_tensor, name=f"Stress_{name}")
+                         stress_func.interpolate(dolfinx.fem.Expression(stress_expr, V_tensor.element.interpolation_points))
+                         xdmf_file.write_function(stress_func, t)
+                 
+                 # Strain is global
+                 if problem.strain:
+                     strain_func = dolfinx.fem.Function(V_tensor, name="Strain")
+                     strain_func.interpolate(dolfinx.fem.Expression(problem.strain, V_tensor.element.interpolation_points))
+                     xdmf_file.write_function(strain_func, t)
+
+             if problem.D:
+                 xdmf_file.write_function(problem.D, t)
         else:
             # Fallback to VTU
             if len(times) == 1:
                 export_vtu(problem, output_dir="output")
             else:
                 export_vtu(problem, output_dir="output", filename=f"fields_{step:04d}.vtu")
-
-        # Export VTX
-        # if len(times) == 1:
-        #     export_vtx(problem, output_dir="output", filename="fields.vtu", engine="VTK")
-        # else:
-        #     export_vtx(problem, output_dir="output",
-        #             filename="fields.vtu", time=times[step], engine="VTK")
 
     if xdmf_file:
         xdmf_file.close()

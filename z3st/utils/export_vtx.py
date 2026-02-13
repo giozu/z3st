@@ -92,7 +92,27 @@ def export_vtx(problem, output_dir="output", filename="fields.vtu", time=0.0, en
     # -----------------------------------------------------------------------
     # Base fields (temperature & displacement)
     # -----------------------------------------------------------------------
-    fields = [problem.T, problem.u]
+    # Base fields (temperature & displacement)
+    fields = []
+    if problem.T: fields.append(problem.T)
+    
+    # Pad displacement to 3D for ParaView compatibility
+    if problem.u:
+        if problem.u.function_space.element.value_shape[0] < 3:
+            V_u_3d = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1, (3,)))
+            u_3d = dolfinx.fem.Function(V_u_3d, name="Displacement")
+            # Clear 3D array
+            u_3d.x.array[:] = 0.0
+            # Fill x and y components
+            nc = problem.u.function_space.element.value_shape[0]
+            for i in range(nc):
+                u_3d.x.array[i::3] = problem.u.x.array[i::nc]
+            fields.append(u_3d)
+        else:
+            fields.append(problem.u)
+            
+    if problem.D: fields.append(problem.D)
+    if problem.c: fields.append(problem.c)
 
     # -----------------------------------------------------------------------
     # Derived fields
@@ -100,14 +120,19 @@ def export_vtx(problem, output_dir="output", filename="fields.vtu", time=0.0, en
     gdim = problem.tdim
     mesh = problem.mesh
 
-    V_tensor_cells = dolfinx.fem.functionspace(mesh, ("DG", 0, (gdim, gdim)))
-    # V_tensor_points = dolfinx.fem.functionspace(mesh, ("Lagrange", 1, (gdim, gdim)))
+    # Determine shapes from expressions
+    strain_shape = problem.strain.ufl_shape
+    # stress_shape = problem.stress[next(iter(problem.materials))].ufl_shape
+    # Note: problem.T is a Function, its shape is () for scalar.
+    # problem.u is a Function, its shape is (gdim,).
+
+    V_tensor_cells = dolfinx.fem.functionspace(mesh, ("DG", 0, strain_shape))
     V_vector_cells = dolfinx.fem.functionspace(mesh, ("DG", 0, (gdim,)))
     V_scalar_cells = dolfinx.fem.functionspace(mesh, ("DG", 0))
-    # V_scalar_points = dolfinx.fem.functionspace(mesh, ("Lagrange", 1))
 
     # Strain
     strain_cells = _interpolate_expression(problem.strain, V_tensor_cells)
+    strain_cells.name = "Strain"
     fields.append(strain_cells)
 
     # Material-wise quantities
@@ -116,35 +141,41 @@ def export_vtx(problem, output_dir="output", filename="fields.vtu", time=0.0, en
         raise AttributeError("No cell tag field found (expected 'cell_tags').")
 
     for name, mat in problem.materials.items():
-        # tag = problem.label_map[name]
-        # cells = cell_tags.find(tag)
-
         # Stress (DG-0)
         stress_expr = problem.stress[name]
         stress_fun = _interpolate_expression(stress_expr, V_tensor_cells)
+        stress_fun.name = f"Stress_{name}"
         fields.append(stress_fun)
 
         # Von Mises and Hydrostatic pressure
-        stress_array = stress_fun.x.array.reshape(-1, gdim, gdim)
+        td = strain_shape[0] if strain_shape else gdim
+        stress_array = stress_fun.x.array.reshape(-1, td, td)
         vm_val = _von_mises(stress_array)
         p_val = _hydrostatic_pressure(stress_array)
 
-        vm_fun = dolfinx.fem.Function(V_scalar_cells)
+        vm_fun = dolfinx.fem.Function(V_scalar_cells, name=f"VonMises_{name}")
         vm_fun.x.array[:] = vm_val
         fields.append(vm_fun)
 
-        p_fun = dolfinx.fem.Function(V_scalar_cells)
+        p_fun = dolfinx.fem.Function(V_scalar_cells, name=f"Pressure_{name}")
         p_fun.x.array[:] = p_val
         fields.append(p_fun)
 
         # Strain energy density
         psi_cells = _interpolate_expression(problem.energy_density[name], V_scalar_cells)
+        psi_cells.name = f"StrainEnergy_{name}"
         fields.append(psi_cells)
 
         # Heat flux q = -k ∇T
-        q_vec = -mat["k"] * ufl.grad(problem.T)
-        q_fun = _interpolate_expression(q_vec, V_vector_cells)
-        fields.append(q_fun)
+        if problem.T is not None:
+            k_val = mat.get("k", 0.0)
+            if not isinstance(k_val, (int, float)) and not hasattr(k_val, "__mul__"):
+                 # k is likely a string (unresolved function)
+                 k_val = 0.0
+            
+            q_vec = -k_val * ufl.grad(problem.T)
+            q_fun = _interpolate_expression(q_vec, V_vector_cells)
+            fields.append(q_fun)
 
     # -----------------------------------------------------------------------
     # Write all fields (appending time step)

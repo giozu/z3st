@@ -89,6 +89,7 @@ for case_name in "${CASES[@]}"; do
     start_time=$(date +%s)
 
     chmod +x Allrun
+    # conda run -n z3st ./Allrun
     ./Allrun
 
     exit_code=${PIPESTATUS[0]}
