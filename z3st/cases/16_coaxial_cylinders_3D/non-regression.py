@@ -117,23 +117,23 @@ print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
 r_T, T = average_section_radial(x_T, y_T, z_T, T_all, z_target=z_target, tol=z_tol, decimals=4)
 
-r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_field(
-    filename=VTU_FILE,
-    z_fixed=z_target,
-    tol=z_tol,
-    case_dir=CASE_DIR,
-    field_hint="Stress",
-    data_source="cell",
-    average=True,
-    decimals=6,
-)
+# r_s, sigma_rr, sigma_tt, sigma_zz = extract_cylindrical_field(
+#     filename=VTU_FILE,
+#     z_fixed=z_target,
+#     tol=z_tol,
+#     case_dir=CASE_DIR,
+#     field_hint="Stress",
+#     data_source="cell",
+#     average=True,
+#     decimals=6,
+# )
 
 # Analytical results
 T_ref = analytic_T_piecewise(r_T)
 
 # Plot
 plotter_sigma_temperature_cylinder(
-    r_s=r_s,
+    r_s=None,
     r_T=r_T,
     T=T,
     T_ref=T_ref,

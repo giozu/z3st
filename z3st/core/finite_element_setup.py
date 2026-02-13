@@ -42,6 +42,12 @@ class FiniteElementSetup:
         print("Scalar function space (V_d):", self.V_d)
         print("Scalar function space (Q):", self.Q)
 
+        # --. Cluster dynamics --..
+        if self.on.get("cluster", False):
+            print("Cluster function space (V_c, CG1) initializing...")
+            self.V_c = dolfinx.fem.functionspace(self.mesh, ("CG", 1))
+
+
         # --. Mixed function spaces --..
         # P1_3 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, shape=(self.tdim,), dtype=dolfinx.default_real_type)
         # P1_1 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, dtype=dolfinx.default_real_type)

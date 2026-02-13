@@ -21,10 +21,11 @@ from z3st.models.damage_model import DamageModel
 from z3st.models.gap_model import GapModel
 from z3st.models.mechanical_model import MechanicalModel
 from z3st.models.thermal_model import ThermalModel
+from z3st.models.cluster_dynamic_model import ClusterDynamicsModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, DamageModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, DamageModel, ClusterDynamicsModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -61,6 +62,9 @@ class Spine(
         
         if self.on.get("damage", False):
             DamageModel.__init__(self)
+
+        if self.on.get("cluster", False):
+            ClusterDynamicsModel.__init__(self)
 
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
@@ -184,45 +188,54 @@ class Spine(
     def initialize_fields(self):
         print(f"[INITIALIZING FIELDS]")
 
-        self.q_third = dolfinx.fem.Function(self.V_t, name="q_third")
-        self.q_third.x.array[:] = 0.0
-        self.set_power()
+        self.q_third = None
+        self.T = None
+        self.u = None
+        self.D = None
+        self.c = None
 
         # Temperature
-        print("\nInitializing the temperature field...")
-        self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
-        for name, mat in self.materials.items():
-            print(f"  → Setting initial temperature for material: '{name}'")
-            dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
-            self.T.x.array[dofs] = mat["T_ref"]
-            print(f"    Set {len(dofs)} DOFs to {mat['T_ref']:.2f} K")
+        if self.on.get("thermal", False):
+            self.q_third = dolfinx.fem.Function(self.V_t, name="q_third")
+            self.q_third.x.array[:] = 0.0
+            self.set_power()
 
-        self.T.x.scatter_forward()
-        T_vals = self.T.x.array
-        print(
-            f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K"
-        )
+            print("\nInitializing the temperature field...")
+            self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
+            for name, mat in self.materials.items():
+                print(f"  → Setting initial temperature for material: '{name}'")
+                dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+                self.T.x.array[dofs] = mat["T_ref"]
+                print(f"    Set {len(dofs)} DOFs to {mat['T_ref']:.2f} K")
+
+            self.T.x.scatter_forward()
+            T_vals = self.T.x.array
+            print(
+                f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K"
+            )
 
         # Displacement
-        print("\nInitializing the displacement field...")
-        self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
-        self.u.x.array[:] = 0.0
-        self.u.x.scatter_forward()
-        u_vals = self.u.x.array
-        print(
-            f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m"
-        )
+        if self.on.get("mechanical", False):
+            print("\nInitializing the displacement field...")
+            self.u = dolfinx.fem.Function(self.V_m, name="Displacement")
+            self.u.x.array[:] = 0.0
+            self.u.x.scatter_forward()
+            u_vals = self.u.x.array
+            print(
+                f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m"
+            )
 
         # Temperature/displacement (mixed)
-        if not hasattr(self, "sol_mixed"):
-            print("Initializing self.sol_mixed")
-            self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
-            try:
-                print("Initialize with the current state (displacement and temperature fields)")
-                self.sol_mixed.sub(0).interpolate(self.u)
-                self.sol_mixed.sub(1).interpolate(self.T)
-            except Exception:
-                self.sol_mixed.x.array[:] = 0.0
+        if self.on.get("mechanical", False) and self.on.get("thermal", False):
+            if not hasattr(self, "sol_mixed"):
+                print("Initializing self.sol_mixed")
+                self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
+                try:
+                    print("Initialize with the current state (displacement and temperature fields)")
+                    self.sol_mixed.sub(0).interpolate(self.u)
+                    self.sol_mixed.sub(1).interpolate(self.T)
+                except Exception:
+                    self.sol_mixed.x.array[:] = 0.0
 
         # Damage variables:
         if self.on.get("damage", False):
@@ -232,14 +245,72 @@ class Spine(
             self.H = dolfinx.fem.Function(self.Q, name="CrackDrivingForce")
             self.H.x.array[:] = 0.0
 
-        print("\nComparing solution function spaces:")
-        print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
-        print(f"  Mixed-space displacement (W.sub(0)):  {self.W.sub(0).ufl_element()}")
-        print(f"  Temperature space (self.T):           {self.T.function_space.ufl_element()}")
-        print(f"  Mixed-space temperature (W.sub(1)):   {self.W.sub(1).ufl_element()}")
+        # CD variables
+        if self.on.get("cluster", False):
+            print("\nInitializing the cluster density field...")
+            self.c = dolfinx.fem.Function(self.V_c, name="ClusterDensity")
+            self.c_n = dolfinx.fem.Function(self.V_c, name="ClusterDensity_old")
+            self.c.x.array[:] = 0.0
+            self.c_n.x.array[:] = 0.0
+            
+            # --- Initial condition from input ---
+            ic_config = self.cluster_cfg.get("initial_condition", {})
+            ic_type = ic_config.get("type", "constant")
+            
+            if ic_type == "constant":
+                init_val = ic_config.get("value")
+                tag_name = ic_config.get("tag", "boundary_left")
+                if init_val is not None:
+                    try:
+                        # Try to find the specified tag
+                        tag_id = self.label_map.get(tag_name)
+                        if tag_id:
+                            # Topological search
+                            dofs_L = dolfinx.fem.locate_dofs_topological(self.V_c, self.fdim, self.facet_tags.find(tag_id))
+                            if len(dofs_L) > 0:
+                                self.c.x.array[dofs_L] = float(init_val)
+                                self.c_n.x.array[dofs_L] = float(init_val)
+                                print(f"[ClusterDynamicsModel] Set initial value c = {init_val} at {len(dofs_L)} DOFs (tag '{tag_name}').")
+                            else:
+                                print(f"[ClusterDynamicsModel] Warning: Tag '{tag_name}' found but no DOFs located.")
+                    except Exception as e:
+                        print(f"[ClusterDynamicsModel] Error applying constant initial_value: {e}")
+
+            elif ic_type == "gaussian":
+                try:
+                    mean = ic_config.get("mean", 50.0)
+                    std_dev = ic_config.get("std_dev", 5.0)
+                    amplitude = ic_config.get("amplitude", 1000.0)
+
+                    # Define Gaussian expression
+                    def gaussian_expression(x):
+                        return amplitude * np.exp( - (x[0] - mean)**2 / (2 * std_dev**2) )
+                    
+                    self.c.interpolate(gaussian_expression)
+                    self.c_n.interpolate(gaussian_expression)
+                    print(f"[ClusterDynamicsModel] Applied Gaussian IC: mean={mean}, std={std_dev}, amp={amplitude}")
+                except Exception as e:
+                    print(f"[ClusterDynamicsModel] Error applying Gaussian initial_value: {e}")
+            
+            # --- Initialize C_tot_target ---
+            try:
+                x_coord = ufl.SpatialCoordinate(self.mesh)
+                n_coord = x_coord[0]
+                flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
+                self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
+                print(f"[ClusterDynamicsModel] Initialized c (0.0). C_tot_target = {self.C_tot_target:.4e}")
+            except Exception as e:
+                print(f"[ClusterDynamicsModel] Warning: Could not calculate initial C_tot: {e}")
+                self.C_tot_target = None
+
+        print("\nSolution spaces initialized.")
+        if self.u:
+             print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
+        if self.T:
+             print(f"  Temperature space (self.T):           {self.T.function_space.ufl_element()}")
 
         for name, mat in self.materials.items():
-            if "_k_func" in mat:
+            if "_k_func" in mat and self.T:
                 k_func = mat["_k_func"]
                 mat["k"] = k_func(self.T)
                 print("\nk expression for", name, "→", mat["k"])
@@ -253,16 +324,19 @@ class Spine(
                 lc = getattr(self, "dmg_cfg", {}).get("lc")
                 dmg_type = getattr(self, "dmg_cfg", {}).get("type")
                 
-                if dmg_type == "AT2":
+                if dmg_type == "AT2" and "E" in mat:
                     mat["sigma_c"] = ufl.sqrt((27 * mat["E"] * mat["Gc"]) / (256 * lc))
                     print(f"  - Material '{name}': sigma_c (AT2) evaluated from Gc expression")
 
-                elif dmg_type == "AT1":
+                elif dmg_type == "AT1" and "E" in mat:
                     mat["sigma_c"] = ufl.sqrt((3 * mat["E"] * mat["Gc"]) / (8 * lc))
                     print(f"  - Material '{name}': sigma_c (AT1) evaluated from Gc expression")
 
 
     def set_power(self):
+        if self.q_third is None:
+            return
+
         print(f"[UPDATING q_third]")
         self.q_third.x.array[:] = 0.0
 
@@ -333,17 +407,32 @@ class Spine(
             raise ValueError(f"Unknown coupling strategy: {self.coupling}")
 
     def get_results(self):
+        if not (self.on.get("mechanical", False) or self.on.get("thermal", False)):
+            return
+
         print("Computing symbolic result fields (strain, stress, ...)")
         self.stress = {}
         self.stress_mech = {}
         self.stress_th = {}
         self.energy_density = {}
-        self.strain = self.epsilon(self.u)
+        
+        if self.on.get("mechanical", False):
+            self.strain = self.epsilon(self.u)
+        else:
+            self.strain = None
 
         for name, mat in self.materials.items():
-            self.energy_density[name] = self.elastic_energy_density(self.u, mat)
-            self.stress_mech[name] = self.sigma_mech(self.u, mat)
-            self.stress_th[name] = self.sigma_th(self.T, mat)
-            self.stress[name] = self.stress_mech[name] + self.stress_th[name]
+            if self.on.get("mechanical", False):
+                self.energy_density[name] = self.elastic_energy_density(self.u, mat)
+                self.stress_mech[name] = self.sigma_mech(self.u, mat)
             
-        return True
+            if self.on.get("thermal", False):
+                self.stress_th[name] = self.sigma_th(self.T, mat)      
+                      
+            if name in self.stress_mech and name in self.stress_th:
+                self.stress[name] = self.stress_mech[name] + self.stress_th[name]
+            elif name in self.stress_mech:
+                self.stress[name] = self.stress_mech[name]
+            elif name in self.stress_th:
+                self.stress[name] = self.stress_th[name]
+

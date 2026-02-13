@@ -46,8 +46,12 @@ if __name__ == "__main__":
     with open("input.yaml", "r") as f:
         input_file = yaml.safe_load(f)
 
-    # --. Output --..
-    os.makedirs("output", exist_ok=True)
+    # --. Output setup --..
+    output_cfg = input_file.get("output", {})
+    output_format = output_cfg.get("format", "vtu").lower()
+    output_file = output_cfg.get("filename", "fields.xdmf")
+    xdmf_file = None
+
     if os.path.exists('energies.txt'): os.remove('energies.txt')
 
     # --. Geometry --..
@@ -60,6 +64,13 @@ if __name__ == "__main__":
     # --. Problem setup --..
     problem = Spine(input_file=input_file, mesh_file=input_file["mesh_path"], geometry=geometry)
 
+    # Initialize XDMF if needed
+    if output_format == "xdmf":
+        from dolfinx.io import XDMFFile
+        full_path = os.path.join("output", output_file)
+        xdmf_file = XDMFFile(problem.mesh.comm, full_path, "w")
+        xdmf_file.write_mesh(problem.mesh)
+
     if MESH_PLOT_MODE:
         from core.mesh.plotter import MeshPlotter
 
@@ -70,9 +81,9 @@ if __name__ == "__main__":
     problem.load_materials(**loaded_materials)
 
     # --. History --..
-    t_points = input_file["time"]
-    lhr_points = input_file["lhr"]
-    n_increments = input_file["n_steps"] - 1
+    t_points = input_file.get("time")
+    lhr_points = input_file.get("lhr")
+    n_increments = input_file.get("n_steps") - 1
 
     times, lhrs, n_steps = generate_power_history(
         t_points, lhr_points, n_steps=n_increments, filename=None
@@ -96,7 +107,8 @@ if __name__ == "__main__":
         problem.set_power()
 
         # Solve
-        problem.solve(max_iters=int(input_file["solver_settings"]["max_iters"]))
+        max_iters = int(input_file.get("solver_settings", {}).get("max_iters", 100))
+        problem.solve(max_iters=max_iters)
         problem.get_results()
 
         if problem.on.get("damage"):
@@ -111,11 +123,20 @@ if __name__ == "__main__":
                     f.write("Step\tE_el\tE_frac\tE_tot\n")
                 f.write(f"{step}\t{E_el:.6e}\t{E_frac:.6e}\t{E_tot:.6e}\n")
 
-        # Export VTU
-        if len(times) == 1:
-            export_vtu(problem, output_dir="output")
+        # Export
+        if output_format == "xdmf" and xdmf_file:
+             if problem.c:
+                 xdmf_file.write_function(problem.c, t)
+             if problem.T:
+                 xdmf_file.write_function(problem.T, t)
+             if problem.u:
+                 xdmf_file.write_function(problem.u, t)
         else:
-            export_vtu(problem, output_dir="output", filename=f"fields_{step:04d}.vtu")
+            # Fallback to VTU
+            if len(times) == 1:
+                export_vtu(problem, output_dir="output")
+            else:
+                export_vtu(problem, output_dir="output", filename=f"fields_{step:04d}.vtu")
 
         # Export VTX
         # if len(times) == 1:
@@ -123,6 +144,9 @@ if __name__ == "__main__":
         # else:
         #     export_vtx(problem, output_dir="output",
         #             filename="fields.vtu", time=times[step], engine="VTK")
+
+    if xdmf_file:
+        xdmf_file.close()
 
     end_time = time.time()
     elapsed_time = end_time - start_time

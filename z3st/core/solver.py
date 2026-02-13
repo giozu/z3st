@@ -517,6 +517,80 @@ class Solver:
 
         return conv_damage, norm_dD, rel_norm_dD, prev_res_D
 
+    def _cluster_step(self, c_new, c_old, dt):
+        """
+        Solve the cluster dynamics step with rigorous mass conservation.
+        
+        Solves: ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n²
+        with v = 1.0, D = 0.5
+        
+        Enforces: C_tot = ∫ c·n dn = constant (via renormalization)
+        """
+        c_old.x.array[:] = c_new.x.array
+        
+        u_c, v_c = ufl.TrialFunction(self.V_c), ufl.TestFunction(self.V_c)
+        
+        # Parameters
+        v_vel = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.v_cluster))
+        D_diff = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.D_cluster))
+        dt_c = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(dt))
+        
+        # Variational form: Implicit Euler + Galerkin
+        # Time derivative: (c_new - c_old)/dt
+        # Advection: v * ∂c/∂n (upwind stabilization via standard Galerkin)
+        # Diffusion: D * ∂²c/∂n² (integrated by parts)
+        
+        lhs = (u_c / dt_c) * v_c * ufl.dx \
+              + v_vel * u_c.dx(0) * v_c * ufl.dx \
+              + D_diff * u_c.dx(0) * v_c.dx(0) * ufl.dx
+              
+        rhs = (c_old / dt_c) * v_c * ufl.dx
+        
+        # Solve linear system
+        problem = dolfinx.fem.petsc.LinearProblem(
+            lhs, rhs, u=c_new, 
+            petsc_options={"ksp_type": "preonly", "pc_type": "lu"},
+            petsc_options_prefix="cluster_"
+        )
+        problem.solve()
+
+        # --- MASS CONSERVATION VIA RENORMALIZATION ---
+        # Calculate total mass: C_tot = ∫ c·n dn
+        x = ufl.SpatialCoordinate(self.mesh)
+        n_coord = x[0]  # Cluster size coordinate
+        
+        # Mass of new solution (after PDE solve)
+        flux_form = dolfinx.fem.form(c_new * n_coord * ufl.dx)
+        C_tot_curr = dolfinx.fem.assemble_scalar(flux_form)
+        
+        # Renormalize to conserve mass
+        if self.C_tot_target is not None and abs(self.C_tot_target) > 1e-15:
+            if abs(C_tot_curr) > 1e-15:
+                # Calculate renormalization factor
+                factor = self.C_tot_target / C_tot_curr
+                
+                # Apply renormalization
+                c_new.x.array[:] *= factor
+                
+                # Calculate relative error
+                rel_error = abs(C_tot_curr - self.C_tot_target) / abs(self.C_tot_target)
+                
+                # Diagnostic output
+                print(f"  [Cluster] Mass conservation:")
+                print(f"    C_tot before renorm: {C_tot_curr:.6e}")
+                print(f"    C_tot target:        {self.C_tot_target:.6e}")
+                print(f"    Renorm factor:       {factor:.8f}")
+                print(f"    Relative error:      {rel_error:.2e}")
+            else:
+                print(f"  [Cluster] WARNING: C_tot_curr ≈ 0, skipping renormalization")
+        elif self.current_step == 0:
+            # First step: set target from initial condition
+            if abs(C_tot_curr) > 1e-15:
+                self.C_tot_target = C_tot_curr
+                print(f"  [Cluster] Setting C_tot_target from IC: {self.C_tot_target:.6e}")
+            else:
+                print(f"  [Cluster] WARNING: Initial C_tot ≈ 0, mass conservation disabled")
+
     def solve_staggered(
         self,
         max_iter=20,
@@ -568,6 +642,20 @@ class Solver:
         else:
             D_new = D_old = None
 
+        if self.on.get("cluster", False):
+            if self.C_tot_target is None:
+                x = ufl.SpatialCoordinate(self.mesh)
+                n_coord = x[0]
+                flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
+                self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
+                print(f"[Cluster] Initial C_tot_target calculated: {self.C_tot_target:.4e}")
+            
+            c_new = dolfinx.fem.Function(self.V_c)
+            c_new.x.array[:] = self.c.x.array
+            self.c_n.x.array[:] = self.c.x.array
+        else:
+            c_new = None
+
         prev_res_T = None
         prev_res_u = None
         prev_res_D = None
@@ -602,6 +690,16 @@ class Solver:
                 conv_mech, _, _, prev_res_u = self._mechanical_step(
                     u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
                 )
+            
+            # --. CLUSTER STEP --..
+            if self.on.get("cluster", False):
+                t_range = self.input_file["time"]
+                n_steps = int(self.input_file["n_steps"])
+                if n_steps > 0:
+                    dt = (t_range[-1] - t_range[0]) / n_steps
+                    print(f"  → Time step: {dt}")
+        
+                self._cluster_step(c_new, self.c_n, dt)
 
             # --.. GLOBAL CONVERGENCE --..
             print("\nConvergence check")
@@ -617,6 +715,9 @@ class Solver:
 
                 if self.on.get("damage", False):
                     self.D.x.array[:] = D_new.x.array
+                
+                if self.on.get("cluster", False):
+                    self.c.x.array[:] = c_new.x.array
 
                 return True
 
@@ -629,6 +730,9 @@ class Solver:
             self.u.x.array[:] = u_new.x.array
         if self.on.get("damage", False):
             self.D.x.array[:] = D_new.x.array
+            
+        if self.on.get("cluster", False):
+            self.c.x.array[:] = c_new.x.array
 
         return False
 

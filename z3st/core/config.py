@@ -39,10 +39,14 @@ class Config:
             "thermal": models.get("thermal", False),
             "mechanical": models.get("mechanical", False),
             "damage": models.get("damage", False),
+            "cluster": models.get("cluster", False),
         }
         gap_config = self.input_file.get("models", {}).get("gap_conductance", {})
         self.gap_model = gap_config.get("type", None)
         self.h_gap_value = gap_config.get("value", 0.0)
+        
+        # --. Cluster dynamics configuration --.
+        self.cluster_cfg = self.input_file.get("cluster", {})
 
         # --. Paths --..
         self.geometry_path = self.input_file.get("geometry_path", None)

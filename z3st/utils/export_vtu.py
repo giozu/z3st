@@ -77,9 +77,12 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     grid = pyvista.UnstructuredGrid(topology, cell_types, geometry)
 
     # --- Global fields (point data) ---
-    grid.point_data["Temperature"] = problem.T.x.array
-    u_vectors = problem.u.x.array.reshape(n_points, problem.tdim)
-    grid.point_data["Displacement"] = u_vectors
+    if problem.on.get("thermal", False) and problem.T:
+        grid.point_data["Temperature"] = problem.T.x.array
+    
+    if problem.on.get("mechanical", False) and problem.u:
+        u_vectors = problem.u.x.array.reshape(n_points, problem.tdim)
+        grid.point_data["Displacement"] = u_vectors
 
     # Get cell (volume) tags robustly: support both 'tags' and 'cell_tags'
     cell_tags = getattr(problem, "tags", None)
@@ -112,96 +115,111 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     V_scalar_points = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1))
 
     # --- Strain (global) ---
-    strain_symbolic = problem.strain
-    # cells
-    strain_numeric = interpolate_expression(strain_symbolic, V_tensor_cells)
-    grid.cell_data["Strain (cells)"] = strain_numeric.x.array.reshape(-1, dim * dim)
-    # points
-    strain_numeric = interpolate_expression(strain_symbolic, V_tensor_points)
-    strain_array = strain_numeric.x.array.reshape((n_points, dim, dim))
-    grid.point_data["Strain (points)"] = strain_array.reshape(n_points, dim * dim)
+    if problem.on.get("mechanical", False) and problem.strain:
+        strain_symbolic = problem.strain
+        # cells
+        strain_numeric = interpolate_expression(strain_symbolic, V_tensor_cells)
+        grid.cell_data["Strain (cells)"] = strain_numeric.x.array.reshape(-1, dim * dim)
+        # points
+        strain_numeric = interpolate_expression(strain_symbolic, V_tensor_points)
+        strain_array = strain_numeric.x.array.reshape((n_points, dim, dim))
+        grid.point_data["Strain (points)"] = strain_array.reshape(n_points, dim * dim)
 
-    # --- Per-material on CELLS: stress + Von Mises + principals + hydrostatic + heat flux ---
+    # --- Per-material fields ---
     stress_total_cells = dolfinx.fem.Function(V_tensor_cells)
     heat_flux_total_cells = dolfinx.fem.Function(V_vector_cells)
+    stress_total_points = dolfinx.fem.Function(V_tensor_points)
 
-    print("  → Projecting stress and heat flux for all materials...")
+    print("  → Projecting result fields for all materials...")
 
     for name, material in problem.materials.items():
         tag = problem.label_map[name]
-        material_cells = cell_tags.find(tag)
+        try:
+             material_cells = cell_tags.find(tag)
+        except RuntimeError:
+             continue
+        
+        if len(material_cells) == 0:
+             continue
 
-        # Stress (cells) - numeric per-material field for diagnostics/plots
-        stress_symbolic = problem.stress[name]
-        stress_expr = dolfinx.fem.Expression(
-            stress_symbolic, V_tensor_cells.element.interpolation_points
-        )
-        stress_total_cells.interpolate(stress_expr, material_cells)
+        # Stress & Mech info
+        if problem.on.get("mechanical", False) and name in problem.stress:
+            # Stress (cells)
+            stress_symbolic = problem.stress[name]
+            stress_expr = dolfinx.fem.Expression(
+                stress_symbolic, V_tensor_cells.element.interpolation_points
+            )
+            stress_total_cells.interpolate(stress_expr, material_cells)
 
-        stress_numeric = interpolate_expression(stress_symbolic, V_tensor_cells)
-        stress_cells = stress_numeric.x.array.reshape(-1, dim, dim)
-        grid.cell_data[f"Stress_{name} (cells)"] = stress_cells.reshape(-1, dim * dim)
+            stress_numeric = interpolate_expression(stress_symbolic, V_tensor_cells)
+            stress_cells = stress_numeric.x.array.reshape(-1, dim, dim)
+            grid.cell_data[f"Stress_{name} (cells)"] = stress_cells.reshape(-1, dim * dim)
 
-        # Von Mises (cells)
-        vm_cells = _von_mises(stress_cells)
-        grid.cell_data[f"VonMises_{name} (cells)"] = vm_cells
+            # Von Mises (cells)
+            vm_cells = _von_mises(stress_cells)
+            grid.cell_data[f"VonMises_{name} (cells)"] = vm_cells
 
-        # Hydrostatic pressure (cells)
-        p_cells = _hydrostatic_pressure(stress_cells)
-        grid.cell_data[f"Hydrostatic_{name} (cells)"] = p_cells
+            # Hydrostatic pressure (cells)
+            p_cells = _hydrostatic_pressure(stress_cells)
+            grid.cell_data[f"Hydrostatic_{name} (cells)"] = p_cells
+            
+            # Stress (points)
+            stress_expr_pts = dolfinx.fem.Expression(
+                stress_symbolic, V_tensor_points.element.interpolation_points
+            )
+            stress_total_points.interpolate(stress_expr_pts, material_cells)
+            
+            stress_numeric_pts = interpolate_expression(stress_symbolic, V_tensor_points)
+            stress_points = stress_numeric_pts.x.array.reshape((n_points, dim, dim))
+            grid.point_data[f"Stress_{name} (points)"] = stress_points
+            
+            # Von Mises (points)
+            vm_points = _von_mises(stress_points)
+            grid.point_data[f"VonMises_{name} (points)"] = vm_points
+
+            # Hydrostatic (points)
+            p_points = _hydrostatic_pressure(stress_points)
+            grid.point_data[f"Hydrostatic_{name} (points)"] = p_points
+
+            # Strain energy density (points)
+            if name in problem.energy_density:
+                psi_expr_pts = dolfinx.fem.Expression(
+                    problem.energy_density[name], V_scalar_points.element.interpolation_points
+                )
+                psi_fun_pts = dolfinx.fem.Function(V_scalar_points)
+                psi_fun_pts.x.array[:] = 0.0
+                psi_fun_pts.interpolate(psi_expr_pts, material_cells)
+                grid.point_data[f"StrainEnergyDensity_{name} (points)"] = psi_fun_pts.x.array.copy()
+
+                # Strain energy density (cells, DG0)
+                psi_expr_cells = dolfinx.fem.Expression(
+                    problem.energy_density[name], V_scalar_cells.element.interpolation_points
+                )
+                psi_fun_cells = dolfinx.fem.Function(V_scalar_cells)
+                psi_fun_cells.x.array[:] = 0.0
+                psi_fun_cells.interpolate(psi_expr_cells, material_cells)
+                grid.cell_data[f"StrainEnergyDensity_{name} (cells)"] = psi_fun_cells.x.array.copy()
+
 
         # Heat flux (cells) per-material
-        q_vec_symbolic = -material["k"] * ufl.grad(problem.T)
-        q_expr = dolfinx.fem.Expression(q_vec_symbolic, V_vector_cells.element.interpolation_points)
-        heat_flux_total_cells.interpolate(q_expr, material_cells)
+        if problem.on.get("thermal", False) and problem.T:
+            q_vec_symbolic = -material["k"] * ufl.grad(problem.T)
+            q_expr = dolfinx.fem.Expression(q_vec_symbolic, V_vector_cells.element.interpolation_points)
+            heat_flux_total_cells.interpolate(q_expr, material_cells)
 
     # Global (aggregated) cell fields
-    grid.cell_data["Heat flux"] = heat_flux_total_cells.x.array.reshape(-1, dim)
+    if problem.on.get("thermal", False):
+        grid.cell_data["Heat flux"] = heat_flux_total_cells.x.array.reshape(-1, dim)
 
-    # --- Per-material on POINTS: stress + Von Mises + principals + hydrostatic ---
-    stress_total_points = dolfinx.fem.Function(V_tensor_points)
+    # Cluster Dynamics
+    if problem.on.get("cluster", False) and getattr(problem, "c", None):
+         grid.point_data["ClusterDensity"] = problem.c.x.array
+         
+         # Also export the cluster density as cell average if needed?
+         # For 1D points are enough. But to be safe on visualization:
+         # grid.point_data["c"] = problem.c.x.array
 
-    for name, _ in problem.materials.items():
-        tag = problem.label_map[name]
-        material_cells = cell_tags.find(tag)
-
-        stress_symbolic = problem.stress[name]
-        stress_expr = dolfinx.fem.Expression(
-            stress_symbolic, V_tensor_points.element.interpolation_points
-        )
-        stress_total_points.interpolate(stress_expr, material_cells)
-
-        stress_numeric = interpolate_expression(stress_symbolic, V_tensor_points)
-        stress_points = stress_numeric.x.array.reshape((n_points, dim, dim))
-        grid.point_data[f"Stress_{name} (points)"] = stress_points
-
-        # Von Mises (points)
-        vm_points = _von_mises(stress_points)
-        grid.point_data[f"VonMises_{name} (points)"] = vm_points
-
-        # Hydrostatic (points)
-        p_points = _hydrostatic_pressure(stress_points)
-        grid.point_data[f"Hydrostatic_{name} (points)"] = p_points
-
-        # Strain energy density (points)
-        psi_expr_pts = dolfinx.fem.Expression(
-            problem.energy_density[name], V_scalar_points.element.interpolation_points
-        )
-        psi_fun_pts = dolfinx.fem.Function(V_scalar_points)
-        psi_fun_pts.x.array[:] = 0.0
-        psi_fun_pts.interpolate(psi_expr_pts, material_cells)
-        grid.point_data[f"StrainEnergyDensity_{name} (points)"] = psi_fun_pts.x.array.copy()
-
-        # Strain energy density (cells, DG0)
-        psi_expr_cells = dolfinx.fem.Expression(
-            problem.energy_density[name], V_scalar_cells.element.interpolation_points
-        )
-        psi_fun_cells = dolfinx.fem.Function(V_scalar_cells)
-        psi_fun_cells.x.array[:] = 0.0
-        psi_fun_cells.interpolate(psi_expr_cells, material_cells)
-        grid.cell_data[f"StrainEnergyDensity_{name} (cells)"] = psi_fun_cells.x.array.copy()
-
-    if problem.on.get("damage", False):
+    if problem.on.get("damage", False) and problem.D:
         print("  → Adding damage field to VTU...")
         grid.point_data["Damage"] = problem.D.x.array.copy()
 

@@ -47,3 +47,7 @@ lhr:
 time:
 - 0
 n_steps: 1
+
+output:
+  format: "vtu"
+  filename: "fields.vtu"
