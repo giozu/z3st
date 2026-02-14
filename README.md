@@ -165,6 +165,8 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../materials/steel.yaml
 
+regime: 2D
+
 solver_settings:
   coupling: staggered
   max_iters: 100
@@ -185,7 +187,6 @@ mechanical:
   linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-5
   stag_tol: 1.0e-5
-  mechanical_regime: "3D" # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
   debug: False
 

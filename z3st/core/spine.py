@@ -317,13 +317,13 @@ class Spine(
                         import scipy.special as sp
 
                         if (
-                            self.mech_cfg["mechanical_regime"].lower() == "axisymmetric"
-                            or self.mech_cfg["mechanical_regime"].lower() == "2d"
+                            self.regime == "axisymmetric"
+                            or self.regime == "2d"
                         ):
                             # 2D axisymmetric case, x[0] = r, x[1] = z
                             # 2D axisymmetric case, x[0] = x, x[1] = y
                             radius = x[0]
-                        elif self.mech_cfg["mechanical_regime"].lower() == "3d":
+                        elif self.regime == "3d":
                             # 3D cartesian case, x[0] = x, x[1] = y
                             radius = np.sqrt(x[0] ** 2 + x[1] ** 2)
 

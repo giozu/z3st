@@ -152,7 +152,7 @@ class MechanicalModel:
                     traction_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_val))
 
                     # normal vector according to the mechanical regime
-                    regime = self.mech_cfg["mechanical_regime"].lower()
+                    regime = self.regime
                     if regime in ["axisymmetric", "2d", "plane_stress"]:
                         n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                     else:
@@ -260,7 +260,7 @@ class MechanicalModel:
 
                 elif bc_type == "Clamp_z":
 
-                    regime = self.mech_cfg["mechanical_regime"].lower()
+                    regime = self.regime
                     if regime == "2d" or regime == "axisymmetric":
                         raise ValueError(
                             f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
@@ -331,7 +331,7 @@ class MechanicalModel:
         Returns:
             The 3x3 strain tensor.
         """
-        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+        regime = self.regime
 
         if regime == "axisymmetric":
             # u[0] is radial displacement (u_r), u[1] is axial displacement (u_z)
@@ -397,7 +397,7 @@ class MechanicalModel:
 
         # mode = material["constitutive_mode"]
         mode = material.get("constitutive_mode", "lame")
-        regime = self.mech_cfg["mechanical_regime"].lower()
+        regime = self.regime
 
         if mode == "voigt":
             # small strain
@@ -506,7 +506,7 @@ class MechanicalModel:
             dolfinx.fem.Tensor: The thermal stress tensor.
 
         """
-        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+        regime = self.regime
         dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
 
         return (

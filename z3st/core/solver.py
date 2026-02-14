@@ -92,10 +92,7 @@ class Solver:
     def _build_measures(self):
         """Build dx_tags and ds_tags measures with axisymmetric and cartesian support."""
         x = ufl.SpatialCoordinate(self.mesh)
-        try:
-            regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
-        except:
-            regime = "2d"
+        regime = self.regime
         
         # Integration weight logic:
         # - Axisymmetric: 2*pi*r
@@ -276,7 +273,7 @@ class Solver:
                 bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
                 print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
 
-                regime = self.mech_cfg.get("mechanical_regime").lower()
+                regime = self.regime
                 if regime in ["axisymmetric", "2d"]:
                     n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                 else:
@@ -297,7 +294,7 @@ class Solver:
             rho = dolfinx.default_scalar_type(material["rho"])
             g = dolfinx.default_scalar_type(self.g)
 
-            regime = self.mech_cfg.get("mechanical_regime").lower()
+            regime = self.regime
             if regime == "axisymmetric" or regime == "2d":
                 # 2D: (F_r, F_z) or (F_x, F_y)
                 body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))

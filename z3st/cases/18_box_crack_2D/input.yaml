@@ -11,6 +11,8 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../materials/high_carbon_steel.yaml
 
+regime: 2D
+
 solver_settings:
   coupling: staggered
   max_iters: 100
@@ -33,7 +35,6 @@ mechanical:
   linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  mechanical_regime: 2D   # 3D | plane_stress
   convergence: rel_norm # rel_norm | norm
 
 thermal:

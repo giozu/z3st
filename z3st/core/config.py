@@ -53,11 +53,13 @@ class Config:
         self.mesh_path = self.input_file.get("mesh_path", None)
         self.boundary_conditions_path = self.input_file.get("boundary_conditions_path", None)
         self.n_steps = self.input_file.get("n_steps", 10)
+        self.regime = self.input_file.get("regime", "2d").lower()
 
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")
         print(f"  → Boundary conditions : {self.boundary_conditions_path}")
         print(f"  → Time steps          : {self.n_steps}")
+        print(f"  → Regime              : {self.regime}")
         print(f"  → Models active       :")
         for model, active in self.on.items():
             print(f"      {model:<10} → {'ON' if active else 'OFF'}")

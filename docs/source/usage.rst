@@ -51,6 +51,8 @@ The staggered scheme alternates between thermal and mechanical solves until both
    materials:
      steel: ../../materials/steel.yaml
 
+  regime: 3D
+
    solver_settings:
      coupling: staggered
      max_iters: 100
@@ -71,7 +73,6 @@ The staggered scheme alternates between thermal and mechanical solves until both
      linear_solver: iterative_amg
      rtol: 1.0e-6
      stag_tol: 1.0e-6
-     mechanical_regime: 3D
      convergence: rel_norm
 
    thermal:
