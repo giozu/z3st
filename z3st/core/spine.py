@@ -342,16 +342,20 @@ class Spine(
 
         self.q_third.x.scatter_forward()
 
-    def solve(self, max_iters=100):
-        print(f"Current step = {self.current_step}")
-        print("\nSolver settings:")
-        print(f"  → Coupling : {self.coupling}")
+    def solve(self, max_iters=100, dt=0.0):
+        print("\n")
+        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
+        print(f"--. spine - solve --..")
+        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
+        print("\n")
 
-        if self.coupling == "monolithic":
-            self.solve_monolithic(tol=1e-6, max_iter=max_iters)
-        elif self.coupling == "staggered":
+        print(f"Current step = {self.current_step} | dt = {dt:.2e} s")
+        print(f"Coupling = {self.coupling}")
+
+        if self.coupling == "staggered":
             self.solve_staggered(
                 max_iter=max_iters,
+                dt=dt,
                 rtol_th=self.th_cfg.get("rtol", 1e-6) if self.on.get("thermal") else 1e-6,
                 rtol_mech=self.mech_cfg.get("rtol", 1e-6) if self.on.get("mechanical") else 1e-6,
                 rtol_dmg=self.dmg_cfg.get("rtol", 1e-6) if hasattr(self, 'dmg_cfg') else 1e-6,
@@ -360,7 +364,7 @@ class Spine(
                 stag_tol_dmg=self.dmg_cfg.get("stag_tol", 1e-4) if hasattr(self, 'dmg_cfg') else 1e-4
             )
         else:
-            raise ValueError(f"Unknown coupling strategy: {self.coupling}")
+            raise ValueError(f"Unknown coupling strategy: {self.coupling}. Only staggered coupling is supported.")
 
     def get_results(self):
         if not (self.on.get("mechanical", False) or self.on.get("thermal", False)):

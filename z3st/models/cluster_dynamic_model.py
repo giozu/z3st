@@ -35,11 +35,12 @@ class ClusterDynamicsModel:
         - c(n,t) is cluster density at size n and time t
         """
         # Physical parameters for advection-diffusion equation
-        self.v_cluster = 1.0  # Advection velocity (cluster growth rate)
-        self.D_cluster = 0.5  # Diffusion coefficient (cluster size fluctuations)
-        self.C_tot_target = None
+        self.v_cluster = self.cluster_cfg.get("advection_velocity", 1.0)  # Advection velocity (cluster growth rate)
+        self.D_cluster = self.cluster_cfg.get("diffusion_coefficient", 0.5)  # Diffusion coefficient (cluster size fluctuations)
 
         print("[ClusterDynamicsModel] Initialized")
+        print(f"  [ClusterDynamicsModel] Advection velocity: {self.v_cluster}")
+        print(f"  [ClusterDynamicsModel] Diffusion coefficient: {self.D_cluster}")
 
     def set_cluster_initial_conditions(self):
         """
@@ -75,34 +76,63 @@ class ClusterDynamicsModel:
                         print(f"  [ERROR] Region '{region_name}' not found in label_map.")
                 else:
                     print(f"  [ERROR] No region specified for constant IC.")
-            else:
-                print(f"  [ERROR] No value specified for constant IC.")
+
+                # Mass conservation target initialization
+                # Calculate C_tot = ∫ c(n,0) * n dn to be conserved during the simulation
+                try:
+                    x_coord = ufl.SpatialCoordinate(self.mesh)
+                    n_coord = x_coord[0] 
+                    flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
+                    current_mass = dolfinx.fem.assemble_scalar(flux_form)
+                    
+                    # Normalize to target mass
+                    target_mass = float(ic_config.get("value", 1000.0))
+                    if current_mass > 0.0:
+                        scaling_factor = target_mass / current_mass
+                        self.c.x.array[:] *= scaling_factor
+                        self.c_n.x.array[:] *= scaling_factor
+                        
+                    self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
+                    print(f"  [INFO] Initial mass target (C_tot) normalized to: {self.C_tot_target:.4e}")
+                    
+                except Exception as e:
+                    print(f"  [WARNING] Could not calculate initial C_tot: {e}")
 
         # Gaussian initial condition
         elif ic_type == "gaussian":
             try:
-                # Distribution parameters: mean size, standard deviation, peak amplitude
-                mean = ic_config.get("mean", 50.0)
-                std_dev = ic_config.get("std_dev", 5.0)
-                amplitude = ic_config.get("amplitude", 1000.0)
+                # Distribution parameters
+                mean = ic_config.get("mean", 5.0)       # Peak position
+                std_dev = ic_config.get("std_dev", 1.0) # Width
+                target_mass = float(ic_config.get("amplitude", 1000.0)) # Amplitude = total mass
 
-                # Analytical profile: c(n) = A * exp( - (n - μ)² / (2σ²) )
+                # Definition and interpolation of the analytical profile (base form)
                 def gaussian_expression(x):
-                    return amplitude * np.exp( - (x[0] - mean)**2 / (2 * std_dev**2) )
+                    return np.exp( - (x[0] - mean)**2 / (2 * std_dev**2) )
                 
-                # Interpolate the expression into the finite element function
                 self.c.interpolate(gaussian_expression)
                 self.c_n.interpolate(gaussian_expression)
-                print(f"  [INFO] Applied Gaussian IC: mean={mean}, std={std_dev}, amp={amplitude}")
+
+                # Calculation of the current mass of the interpolated profile (∫ c * n dn)
+                x_coord = ufl.SpatialCoordinate(self.mesh)
+                n_coord = x_coord[0] 
+                flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
+                current_mass = dolfinx.fem.assemble_scalar(flux_form)
+
+                # Normalization
+                if current_mass > 0.0:
+                    scaling_factor = target_mass / current_mass
+                    self.c.x.array[:] *= scaling_factor
+                    self.c_n.x.array[:] *= scaling_factor
+                    
+                    self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
+                    
+                    # Actual peak after normalization (for info)
+                    actual_peak = scaling_factor # since we had interpolated with amplitude 1.0
+                    print(f"  [INFO] Applied Gaussian IC: mean={mean}, std={std_dev}")
+                    print(f"  [INFO] Peak amplitude adjusted to {actual_peak:.2f} to fix total mass at {self.C_tot_target:.2e}")
+                else:
+                    print("  [WARNING] Initial Gaussian mass is near zero. Check mean and mesh range.")
+
             except Exception as e:
                 print(f"  [ERROR] Error applying Gaussian IC: {e}")
-
-        # Mass conservation target initialization
-        # Calculate C_tot = ∫ c(n,0) * n dn to be conserved during the simulation
-        try:
-            x_coord = ufl.SpatialCoordinate(self.mesh)
-            flux_form = dolfinx.fem.form(self.c * x_coord[0] * ufl.dx)
-            self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
-            print(f"  [INFO] Initial mass target (C_tot): {self.C_tot_target:.4e}")
-        except Exception as e:
-            print(f"  [WARNING] Could not calculate initial C_tot: {e}")

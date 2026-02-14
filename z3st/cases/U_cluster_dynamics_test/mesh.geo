@@ -10,8 +10,8 @@
 // x-coordinate represents cluster size n
 
 // Parameters
-n_ele = 10000;  // number of elements
-L = 100.0;     // domain length
+n_ele = 100;     // number of elements
+L = 100.0;       // domain length
 
 // Points
 Point(1) = {1, 0, 0};

@@ -106,11 +106,18 @@ if __name__ == "__main__":
         problem.parameters(lhr=lhr)
         problem.set_power()
 
+        # Calculate dt
+        if step == 0:
+            dt = 0.0
+        else:
+            dt = t - times[step-1]
+        
         # Solve
         max_iters = int(input_file.get("solver_settings", {}).get("max_iters", 100))
-        problem.solve(max_iters=max_iters)
+        problem.solve(max_iters=max_iters, dt=dt)
         problem.get_results()
 
+        # Writing energies.txt
         if problem.on.get("damage"):
             E_el, E_frac = problem.compute_energy_balance(problem.u)
             E_tot = E_el + E_frac

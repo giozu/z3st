@@ -525,9 +525,11 @@ class Solver:
         Solve the cluster dynamics step with rigorous mass conservation.
         
         Solves: ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n²
-        with v = 1.0, D = 0.5
-        
-        Enforces: C_tot = ∫ c·n dn = constant (via renormalization)
+
+        Case v > 0: The clusters grow. The distribution moves to the right (larger n).
+        Case v < 0: The clusters shrink (evaporation/dissolution). The distribution moves to the left (towards n=1).
+
+        C_tot = ∫ c·n dn = constant
         """
         c_old.x.array[:] = c_new.x.array
         
@@ -538,65 +540,87 @@ class Solver:
         D_diff = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.D_cluster))
         dt_c = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(dt))
         
+        # Cell size
+        num_cells = self.mesh.topology.index_map(self.mesh.topology.dim).size_global
+        coords = self.mesh.geometry.x[:, 0]
+        L_domain = coords.max() - coords.min()
+        h = L_domain / num_cells
+
+        # Péclet number
+        v = abs(self.v_cluster)
+        D = self.D_cluster
+        
+        if D > 0:
+            pe = (v * h) / (2 * D)
+        else:
+            pe = float('inf')
+
+        # Diagnostics
+        print(f"  [Cluster] Grid Diagnostics:")
+        print(f"    → Cell size h: {h:.4e}")
+        print(f"    → Peclet number Pe: {pe:.4e}")
+        
+        if pe > 1:
+            print(f"    [WARNING] Pe > 1: The system is advection-dominated. Expect numerical oscillations!")
+        else:
+            print(f"    [INFO] Pe <= 1: The system is diffusion-stable.")
+
         # Variational form: Implicit Euler + Galerkin
         # Time derivative: (c_new - c_old)/dt
-        # Advection: v * ∂c/∂n (upwind stabilization via standard Galerkin)
-        # Diffusion: D * ∂²c/∂n² (integrated by parts)
+        # Advection: v * ∂c/∂n
+        # Diffusion: D * ∂²c/∂n²
         
-        lhs = (u_c / dt_c) * v_c * ufl.dx \
-              + v_vel * u_c.dx(0) * v_c * ufl.dx \
-              + D_diff * u_c.dx(0) * v_c.dx(0) * ufl.dx
-              
-        rhs = (c_old / dt_c) * v_c * ufl.dx
-        
-        # Solve linear system
-        problem = dolfinx.fem.petsc.LinearProblem(
-            lhs, rhs, u=c_new, 
-            petsc_options={"ksp_type": "preonly", "pc_type": "lu"},
-            petsc_options_prefix="cluster_"
-        )
-        problem.solve()
+        if dt > 0:
+            lhs = (u_c / dt_c) * v_c * ufl.dx \
+                  + v_vel * u_c.dx(0) * v_c * ufl.dx \
+                  + D_diff * u_c.dx(0) * v_c.dx(0) * ufl.dx
+                  
+            rhs = (c_old / dt_c) * v_c * ufl.dx
+            
+            petsc_options = {
+                "ksp_type": "gmres",
+                "pc_type": "ilu",
+                "ksp_rtol": 1e-12,
+                "ksp_atol": 1e-15,
+                "ksp_max_it": 1000,
+                "ksp_monitor": None
+            }
 
-        # --- MASS CONSERVATION VIA RENORMALIZATION ---
-        # Calculate total mass: C_tot = ∫ c·n dn
+            problem = dolfinx.fem.petsc.LinearProblem(
+                lhs, rhs, u=c_new, 
+                petsc_options=petsc_options,
+                petsc_options_prefix="cluster_"
+            )
+
+            problem.solve()
+        else:
+            print("  [Cluster] dt=0: skipping PDE solve, using initial/current state.")
+            c_new.x.array[:] = c_old.x.array
+
+        # --- MASS CONSERVATION ---
         x = ufl.SpatialCoordinate(self.mesh)
-        n_coord = x[0]  # Cluster size coordinate
+        n_coord = x[0]
         
-        # Mass of new solution (after PDE solve)
-        flux_form = dolfinx.fem.form(c_new * n_coord * ufl.dx)
-        C_tot_curr = dolfinx.fem.assemble_scalar(flux_form)
+        C_tot_curr_new = dolfinx.fem.assemble_scalar(dolfinx.fem.form(c_new * n_coord * ufl.dx))
         
-        # Renormalize to conserve mass
         if self.C_tot_target is not None:
-            if abs(C_tot_curr) > 0.0:
-                # Calculate renormalization factor
-                factor = self.C_tot_target / C_tot_curr
+            if abs(C_tot_curr_new) > 0.0:
+                renorm_factor = self.C_tot_target / C_tot_curr_new
+                c_new.x.array[:] *= renorm_factor
                 
-                # Apply renormalization
-                c_new.x.array[:] *= factor
-                
-                # Calculate relative error
-                rel_error = abs(C_tot_curr - self.C_tot_target) / abs(self.C_tot_target)
-                
-                # Diagnostic output
-                print(f"  [Cluster] Mass conservation:")
-                print(f"    C_tot before renorm: {C_tot_curr:.6e}")
-                print(f"    C_tot target:        {self.C_tot_target:.6e}")
-                print(f"    Renorm factor:       {factor:.8f}")
-                print(f"    Relative error:      {rel_error:.2e}")
+                print(f"  [Cluster] Mass conservation: target = {self.C_tot_target:.6e}")
+                print(f"  [Cluster] Mass conservation: before = {C_tot_curr_new:.6e}")
+                print(f"  [Cluster] Mass conservation: factor = {renorm_factor:.8f}")
             else:
-                print(f"  [Cluster] WARNING: C_tot_curr = 0, skipping renormalization")
-        elif self.current_step == 0:
-            # First step: set target from initial condition
-            if abs(C_tot_curr) > 0.0:
-                self.C_tot_target = C_tot_curr
-                print(f"  [Cluster] Setting C_tot_target from IC: {self.C_tot_target:.6e}")
-            else:
-                print(f"  [Cluster] WARNING: Initial C_tot = 0, mass conservation disabled")
+                print("  [Cluster] Warning: mass is zero, cannot renormalize.")
+
+        c_max = np.max(c_new.x.array)
+        print(f"   [Diagnostics] Max density c_max: {c_max:.2f}")
 
     def solve_staggered(
         self,
         max_iter=20,
+        dt=0.0,
         stag_tol_th=1e-3,
         stag_tol_mech=1e-3,
         stag_tol_dmg=1e-3,
@@ -645,14 +669,7 @@ class Solver:
         else:
             D_new = D_old = None
 
-        if self.on.get("cluster", False):
-            if self.C_tot_target is None:
-                x = ufl.SpatialCoordinate(self.mesh)
-                n_coord = x[0]
-                flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
-                self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
-                print(f"[Cluster] Initial C_tot_target calculated: {self.C_tot_target:.4e}")
-            
+        if self.on.get("cluster", False):            
             c_new = dolfinx.fem.Function(self.V_c)
             c_new.x.array[:] = self.c.x.array
             self.c_n.x.array[:] = self.c.x.array
@@ -696,12 +713,6 @@ class Solver:
             
             # --. CLUSTER STEP --..
             if self.on.get("cluster", False):
-                t_range = self.input_file["time"]
-                n_steps = int(self.input_file["n_steps"])
-                if n_steps > 0:
-                    dt = (t_range[-1] - t_range[0]) / n_steps
-                    print(f"  → Time step: {dt}")
-        
                 self._cluster_step(c_new, self.c_n, dt)
 
             # --.. GLOBAL CONVERGENCE --..
@@ -738,228 +749,3 @@ class Solver:
             self.c.x.array[:] = c_new.x.array
 
         return False
-
-    def solve_monolithic(self, tol=1e-8, max_iter=50):
-        """
-        Monolithic thermo-mechanical solver (MVP, Phase 1).
-
-        Supported features
-        ------------------
-        - Dirichlet and Neumann boundary conditions for both thermal and mechanical problems (including Clamp_x/y/z constraints).
-        - Material thermal conductivity ``k`` can be constant or a UFL symbolic expression (already stored in ``self.materials[*]["k"]``).
-
-        Not included in this phase
-        --------------------------
-        - Robin-type gap conduction
-        - Interface projection operators
-        - "Gas" gap conductance ``h_gap``
-
-        Notes
-        -----
-        - Slip_* boundary conditions and Robin conditions are not yet implemented here.
-        - Dirichlet BCs are reconstructed on the mixed space ``W``
-
-        """
-
-        print("\n[INFO] Starting monolithic thermo-mechanical solve (Phase 1)")
-        print(f"  → Tolerance (Newton)     : {tol}")
-        print(f"  → Max iterations (Newton): {max_iter}")
-
-        # Split (initialized) mixed unknowns into mechanical (u_m) and thermal (u_t) parts
-        (u_m, u_t) = ufl.split(self.sol_mixed)
-        (v_m, v_t) = ufl.TestFunctions(self.W)
-
-        # Initialize total residual
-        F = 0
-
-        # --. VOLUME CONTRIBUTIONS: loop over materials --..
-        for label, material in self.materials.items():
-            tag = self.label_map[label]
-            dx_local = ufl.Measure(
-                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
-            )
-
-            # Material properties (may be constants or UFL expressions consistent with self.T)
-            k = material["k"]
-
-            rho = dolfinx.default_scalar_type(material["rho"])
-            g = dolfinx.default_scalar_type(self.g)
-            body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
-
-            # Volumetric heat source: global Function self.q_third
-            q_vol = self.q_third
-
-            # Thermal contribution
-            F_thermal = (k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) - q_vol * v_t) * dx_local
-            if self.on["thermal"]:
-                F += F_thermal
-
-            # Mechanical stress contributions (mechanical + thermal)
-            sigma_m = self.sigma_mech(u_m, material)
-            if self.on["thermal"]:
-                sigma_th = self.sigma_th(u_t, material)
-                sigma_tot = sigma_m + sigma_th
-            else:
-                sigma_tot = sigma_m
-
-            if self.on["mechanical"]:
-                F += (
-                    ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)
-                ) * dx_local
-
-        # Thermal Neumann BCs (heat flux) — reuse lists from set_thermal_boundary_conditions
-        for label in self.materials:
-            for bc_info in self.neumann_thermal.get(label, []):
-                ds_local = ufl.Measure(
-                    "ds",
-                    domain=self.mesh,
-                    subdomain_data=self.facet_tags,
-                    subdomain_id=bc_info["id"],
-                )
-                F -= bc_info["value"] * v_t * ds_local  # outward heat flux term
-
-        # Mechanical traction BCs — reuse lists from set_mechanical_boundary_conditions
-        for label in self.materials:
-            for bc_info in self.traction.get(label, []):
-                ds_local = ufl.Measure(
-                    "ds",
-                    domain=self.mesh,
-                    subdomain_data=self.facet_tags,
-                    subdomain_id=bc_info["id"],
-                )
-                # bc_info["value"] is already a traction vector (Constant * n), use directly
-                F -= ufl.dot(bc_info["value"], v_m) * ds_local
-
-        # --. DIRICHLET CONDITIONS on mixed space W.sub(1) (T) and W.sub(0) (u) --..
-        bcs_mixed = []
-
-        # Helper: locate DOFs on a subspace for a given facet region
-        def locate_dofs_on_sub(subspace, region_id):
-            facets = self.facet_tags.find(region_id)
-            return dolfinx.fem.locate_dofs_topological(subspace, self.fdim, facets)
-
-        # Thermal Dirichlet BCs reconstructed on W.sub(1)
-        thermal_bcs_defs = self.boundary_conditions.get("thermal", {})
-        for _, bc_list in thermal_bcs_defs.items():
-            for bc in bc_list:
-                if bc.get("type") != "Dirichlet":
-                    continue
-                region = bc.get("region")
-                Tval = bc.get("temperature", None)
-                if region is None or Tval is None:
-                    continue
-                region_id = self.label_map.get(region)
-                if region_id is None:
-                    continue
-                dofs_T = locate_dofs_on_sub(self.W.sub(1), region_id)
-                T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(Tval))
-                bcs_mixed.append(dolfinx.fem.dirichletbc(T_d, dofs_T, self.W.sub(1)))
-
-        # Mechanical Dirichlet BCs: full vector displacement or single-component clamps
-        mech_bcs_defs = self.boundary_conditions.get("mechanical", {})
-        for _, bc_list in mech_bcs_defs.items():
-            for bc in bc_list:
-                bc_type = bc.get("type")
-                region = bc.get("region")
-                if region is None or bc_type is None:
-                    continue
-                region_id = self.label_map.get(region)
-                if region_id is None:
-                    continue
-
-                if bc_type == "Dirichlet":
-                    disp = bc.get("displacement", None)
-                    if disp is None:
-                        continue
-                    # Collapse vector subspace (u) to a full FunctionSpace
-                    V_u_sub, _ = self.W.sub(0).collapse()
-                    # Create constant displacement Function
-                    vec = np.asarray(disp, dtype=dolfinx.default_scalar_type).reshape(self.tdim)
-                    u_d_fun = dolfinx.fem.Function(V_u_sub, name="u_dirichlet_const")
-                    u_d_fun.interpolate(
-                        lambda x, v=vec: np.tile(v.reshape(self.tdim, 1), (1, x.shape[1]))
-                    )
-                    # Locate DOFs mapping mixed space → collapsed space
-                    facets = self.facet_tags.find(region_id)
-                    dofs_mixed = dolfinx.fem.locate_dofs_topological(
-                        (self.W.sub(0), V_u_sub), self.fdim, facets
-                    )
-                    bcs_mixed.append(dolfinx.fem.dirichletbc(u_d_fun, dofs_mixed, self.W.sub(0)))
-
-                elif bc_type == "Clamp_x":
-                    dofs_x = locate_dofs_on_sub(self.W.sub(0).sub(0), region_id)
-                    bcs_mixed.append(
-                        dolfinx.fem.dirichletbc(
-                            dolfinx.default_scalar_type(0.0), dofs_x, self.W.sub(0).sub(0)
-                        )
-                    )
-
-                elif bc_type == "Clamp_y":
-                    dofs_y = locate_dofs_on_sub(self.W.sub(0).sub(1), region_id)
-                    bcs_mixed.append(
-                        dolfinx.fem.dirichletbc(
-                            dolfinx.default_scalar_type(0.0), dofs_y, self.W.sub(0).sub(1)
-                        )
-                    )
-
-                elif bc_type == "Clamp_z":
-                    val = float(bc.get("value", 0.0))  # allowing GPS
-                    dofs_z = locate_dofs_on_sub(self.W.sub(0).sub(2), region_id)
-                    bcs_mixed.append(
-                        dolfinx.fem.dirichletbc(
-                            dolfinx.default_scalar_type(val), dofs_z, self.W.sub(0).sub(2)
-                        )
-                    )
-
-        # -- NONLINEAR PROBLEM & SOLVER (FEniCSx ≥ 0.10.0) --
-        petsc_options = {
-            "snes_type": "newtonls",
-            "snes_linesearch_type": "none",
-            "snes_monitor": None,
-            "snes_atol": 1e-8,
-            "snes_rtol": 1e-8,
-            "snes_stol": 1e-8,
-            "ksp_type": "preonly",
-            "pc_type": "lu",
-            "pc_factor_mat_solver_type": "mumps",
-        }
-        problem = NonlinearProblem(
-            F,
-            self.sol_mixed,
-            bcs=bcs_mixed,
-            petsc_options=petsc_options,
-            petsc_options_prefix="elasticity",
-        )
-
-        print("[INFO] Solving monolithic nonlinear problem...")
-        problem.solve()
-
-        snes = problem.solver
-        iters = snes.getIterationNumber()
-        converged = snes.getConvergedReason()
-
-        if converged:
-            print(f"[INFO] Newton solver converged in {iters} iterations")
-        else:
-            print(f"[WARNING] Newton solver did not converge after {iters} iterations")
-
-        # ===== UPDATE GLOBAL STATE FIELDS =====
-        u_sol = self.sol_mixed.sub(0).collapse()
-        u_sol.name = "Displacement"
-        T_sol = self.sol_mixed.sub(1).collapse()
-        T_sol.name = "Temperature"
-
-        # Copy results back into global Functions self.u / self.T
-        try:
-            self.u.interpolate(u_sol)
-        except Exception:
-            self.u.x.array[:] = u_sol.x.array
-        try:
-            self.T.interpolate(T_sol)
-        except Exception:
-            self.T.x.array[:] = T_sol.x.array
-
-        print(f"Min/Max temperature: {self.T.x.array.min():.2f} / {self.T.x.array.max():.2f} K")
-        u_vec = self.u.x.array.reshape(-1, self.tdim)
-        umag = np.linalg.norm(u_vec, axis=1)
-        print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")

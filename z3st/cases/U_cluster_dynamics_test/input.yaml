@@ -16,16 +16,13 @@ models:
   cluster: true
 
 cluster:
-  # initial_condition:
-  #   type: gaussian
-  #   mean: 10.0
-  #   std_dev: 5.0
-  #   amplitude: 1000.0
+  advection_velocity: 1.0
+  diffusion_coefficient: 0.5
   initial_condition:
-    type: constant
-    region: left
-    value: 1000
-  conserve_mass: true
+    type: gaussian
+    mean: 1.0
+    std_dev: 1.0
+    amplitude: 1000.0
 
 output:
   format: xdmf
@@ -33,6 +30,8 @@ output:
 
 lhr: 
   - 0.0
+  - 0.0
 time:
   - 0.0
-n_steps: 1
+  - 1.0
+n_steps: 20

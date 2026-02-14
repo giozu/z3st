@@ -259,7 +259,6 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 
 ### Development roadmap
 
-* Full test and setup of the monolithic thermo-mechanical solver
 * Contact mechanics
 * Nonlinear constitutive behavior
 * Coupling with microstructure generators (e.g., Merope)
