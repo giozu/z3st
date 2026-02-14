@@ -39,25 +39,28 @@ with h5py.File('output/results.h5', 'r') as f:
             time_key = time_steps[idx]
             data = cluster_group[time_key][:].flatten()  # Flatten to 1D
             
-            # Extract time from key (format: "0_10000000000000001" -> 0.1)
+            # Extract time from key (format: "0_1000000000000001" -> 0.1)
             try:
                 time_val = float(time_key.replace('_', '.'))
             except:
                 time_val = idx * 0.1
             
-            # Only plot non-zero values
-            mask = data > 1e-10
+            # Relax mask and add diagnostics
+            mask = data >= 0 # Plot everything to see if it's there
             if np.any(mask):
-                ax.plot(x_coords[mask], data[mask], 
+                ax.plot(x_coords, data, 
                         label=f't = {time_val:.2f} s', 
                         linewidth=2.5, color=colors[i], alpha=0.8)
-                print(f"  Step {idx}: t={time_val:.2f}s, max={data.max():.2e}, non-zero points={mask.sum()}")
+                print(f"  Step {idx}: t={time_val:.2f}s, max={data.max():.2e}, avg={data.mean():.2e}")
         
         ax.set_xlabel('Cluster size n', fontsize=14, fontweight='bold')
         ax.set_ylabel('Cluster density c(n,t)', fontsize=14, fontweight='bold')
-        ax.set_title('Cluster Dynamics Evolution (v=1.0, D=0.5)', fontsize=16, fontweight='bold')
+        ax.set_title('Cluster Dynamics Evolution', fontsize=16, fontweight='bold')
         ax.grid(True, alpha=0.3, linestyle='--')
-        ax.legend(fontsize=11, loc='best', framealpha=0.9)
+        
+        # Only add legend if lines were added
+        if ax.get_legend_handles_labels()[0]:
+            ax.legend(fontsize=11, loc='best', framealpha=0.9)
         ax.set_xlim([0, 100])
         
         # Use linear scale (data doesn't span many orders of magnitude after renormalization)

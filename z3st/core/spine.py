@@ -56,13 +56,16 @@ class Spine(
         Config.__init__(self, input_file)
         FiniteElementSetup.__init__(self)
         Solver.__init__(self)
-        ThermalModel.__init__(self)
-        MechanicalModel.__init__(self)
-        GapModel.__init__(self)
-        
+
+        # Initialize models
+        if self.on.get("thermal", False):
+            ThermalModel.__init__(self)
+        if self.on.get("mechanical", False):
+            MechanicalModel.__init__(self)
+        if self.on.get("gap", False):
+            GapModel.__init__(self)
         if self.on.get("damage", False):
             DamageModel.__init__(self)
-
         if self.on.get("cluster", False):
             ClusterDynamicsModel.__init__(self)
 
@@ -174,9 +177,9 @@ class Spine(
             self.boundary_conditions = yaml.safe_load(f)
 
         if self.coupling == "staggered":
-            self.set_thermal_boundary_conditions(self.V_t)
-            self.set_mechanical_boundary_conditions(self.V_m)
-            if self.on["damage"]: self.set_damage_boundary_conditions(self.V_d)
+            if self.on.get("thermal", False): self.set_thermal_boundary_conditions(self.V_t)
+            if self.on.get("mechanical", False): self.set_mechanical_boundary_conditions(self.V_m)
+            if self.on.get("damage", False): self.set_damage_boundary_conditions(self.V_d)
         else:
             V_t_sub, V_t_map = self.W.sub(1).collapse()
             V_t_map = np.array(V_t_map, dtype=np.int32)
@@ -237,7 +240,7 @@ class Spine(
                 except Exception:
                     self.sol_mixed.x.array[:] = 0.0
 
-        # Damage variables:
+        # Damage variables
         if self.on.get("damage", False):
             print("\nInitializing the damage field...")
             self.D = dolfinx.fem.Function(self.V_d, name="Damage")
@@ -249,66 +252,19 @@ class Spine(
         if self.on.get("cluster", False):
             print("\nInitializing the cluster density field...")
             self.c = dolfinx.fem.Function(self.V_c, name="ClusterDensity")
-            self.c_n = dolfinx.fem.Function(self.V_c, name="ClusterDensity_old")
             self.c.x.array[:] = 0.0
+            self.c_n = dolfinx.fem.Function(self.V_c, name="ClusterDensity_old")
             self.c_n.x.array[:] = 0.0
-            
-            # --- Initial condition from input ---
-            ic_config = self.cluster_cfg.get("initial_condition", {})
-            ic_type = ic_config.get("type", "constant")
-            
-            if ic_type == "constant":
-                init_val = ic_config.get("value")
-                tag_name = ic_config.get("tag", "boundary_left")
-                if init_val is not None:
-                    try:
-                        # Try to find the specified tag
-                        tag_id = self.label_map.get(tag_name)
-                        if tag_id:
-                            # Topological search
-                            dofs_L = dolfinx.fem.locate_dofs_topological(self.V_c, self.fdim, self.facet_tags.find(tag_id))
-                            if len(dofs_L) > 0:
-                                self.c.x.array[dofs_L] = float(init_val)
-                                self.c_n.x.array[dofs_L] = float(init_val)
-                                print(f"[ClusterDynamicsModel] Set initial value c = {init_val} at {len(dofs_L)} DOFs (tag '{tag_name}').")
-                            else:
-                                print(f"[ClusterDynamicsModel] Warning: Tag '{tag_name}' found but no DOFs located.")
-                    except Exception as e:
-                        print(f"[ClusterDynamicsModel] Error applying constant initial_value: {e}")
 
-            elif ic_type == "gaussian":
-                try:
-                    mean = ic_config.get("mean", 50.0)
-                    std_dev = ic_config.get("std_dev", 5.0)
-                    amplitude = ic_config.get("amplitude", 1000.0)
+            print("\nSetting cluster initial conditions...")
+            self.set_cluster_initial_conditions()
 
-                    # Define Gaussian expression
-                    def gaussian_expression(x):
-                        return amplitude * np.exp( - (x[0] - mean)**2 / (2 * std_dev**2) )
-                    
-                    self.c.interpolate(gaussian_expression)
-                    self.c_n.interpolate(gaussian_expression)
-                    print(f"[ClusterDynamicsModel] Applied Gaussian IC: mean={mean}, std={std_dev}, amp={amplitude}")
-                except Exception as e:
-                    print(f"[ClusterDynamicsModel] Error applying Gaussian initial_value: {e}")
-            
-            # --- Initialize C_tot_target ---
-            try:
-                x_coord = ufl.SpatialCoordinate(self.mesh)
-                n_coord = x_coord[0]
-                flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
-                self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
-                print(f"[ClusterDynamicsModel] Initialized c (0.0). C_tot_target = {self.C_tot_target:.4e}")
-            except Exception as e:
-                print(f"[ClusterDynamicsModel] Warning: Could not calculate initial C_tot: {e}")
-                self.C_tot_target = None
+        # if self.u:
+        #      print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
+        # if self.T:
+        #      print(f"  Temperature space (self.T):           {self.T.function_space.ufl_element()}")
 
-        print("\nSolution spaces initialized.")
-        if self.u:
-             print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
-        if self.T:
-             print(f"  Temperature space (self.T):           {self.T.function_space.ufl_element()}")
-
+        # Material properties
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
                 k_func = mat["_k_func"]

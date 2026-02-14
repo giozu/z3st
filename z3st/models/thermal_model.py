@@ -24,9 +24,6 @@ class ThermalModel:
         # --. Thermal model options --..
         self.th_cfg = self.input_file.get("thermal", {})
 
-        if not self.th_cfg:
-            raise ValueError("[ThermalModel] 'thermal' missing in input.yaml.")
-
         print("[ThermalModel] options loaded from input.yaml:")
         for key, value in self.th_cfg.items():
             print(f"  {key:<20}: {value}")

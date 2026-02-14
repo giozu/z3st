@@ -3,6 +3,6 @@ echo "Executing z3st.py..."
 
 gmsh mesh.geo -1
 
-python -m z3st
+python3 -m z3st > log.txt
 
-python plot_results.py
+python3 plot_results.py

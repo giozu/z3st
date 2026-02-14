@@ -92,8 +92,11 @@ class Solver:
     def _build_measures(self):
         """Build dx_tags and ds_tags measures with axisymmetric and cartesian support."""
         x = ufl.SpatialCoordinate(self.mesh)
-        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
-
+        try:
+            regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
+        except:
+            regime = "2d"
+        
         # Integration weight logic:
         # - Axisymmetric: 2*pi*r
         # - Cartesian 2D: 1.0 (Area)
@@ -564,8 +567,8 @@ class Solver:
         C_tot_curr = dolfinx.fem.assemble_scalar(flux_form)
         
         # Renormalize to conserve mass
-        if self.C_tot_target is not None and abs(self.C_tot_target) > 1e-15:
-            if abs(C_tot_curr) > 1e-15:
+        if self.C_tot_target is not None:
+            if abs(C_tot_curr) > 0.0:
                 # Calculate renormalization factor
                 factor = self.C_tot_target / C_tot_curr
                 
@@ -582,14 +585,14 @@ class Solver:
                 print(f"    Renorm factor:       {factor:.8f}")
                 print(f"    Relative error:      {rel_error:.2e}")
             else:
-                print(f"  [Cluster] WARNING: C_tot_curr ≈ 0, skipping renormalization")
+                print(f"  [Cluster] WARNING: C_tot_curr = 0, skipping renormalization")
         elif self.current_step == 0:
             # First step: set target from initial condition
-            if abs(C_tot_curr) > 1e-15:
+            if abs(C_tot_curr) > 0.0:
                 self.C_tot_target = C_tot_curr
                 print(f"  [Cluster] Setting C_tot_target from IC: {self.C_tot_target:.6e}")
             else:
-                print(f"  [Cluster] WARNING: Initial C_tot ≈ 0, mass conservation disabled")
+                print(f"  [Cluster] WARNING: Initial C_tot = 0, mass conservation disabled")
 
     def solve_staggered(
         self,

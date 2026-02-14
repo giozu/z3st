@@ -4,6 +4,6 @@ geometry_type: interval
 Lx: 100.0  # Length in x (cluster size coordinate)
 
 labels:
-  boundary_left: 1
-  boundary_right: 2
+  left: 1
+  right: 2
   domain: 3

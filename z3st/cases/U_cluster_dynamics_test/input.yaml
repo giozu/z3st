@@ -1,48 +1,38 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.1.0 (2025)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
-materials:
-  domain: ../../materials/steel.yaml
-
 solver_settings:
   coupling: staggered
-  max_iters: 10
+  max_iters: 100
 
 models:
   cluster: true
 
-thermal:
-  solver: linear
-  linear_solver: iterative_hypre
-  rtol: 1.0e-8
-  stag_tol: 1.0e-8
-  convergence: rel_norm
-
-mechanical:
-  solver: linear
-  linear_solver: iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-6
-  mechanical_regime: 2D
-  convergence: rel_norm
-
 cluster:
+  # initial_condition:
+  #   type: gaussian
+  #   mean: 10.0
+  #   std_dev: 5.0
+  #   amplitude: 1000.0
   initial_condition:
-    type: gaussian
-    mean: 10.0
-    std_dev: 5.0
-    amplitude: 100.0
+    type: constant
+    region: left
+    value: 1000
   conserve_mass: true
 
 output:
   format: xdmf
   filename: results.xdmf
 
-lhr:
-  - 0.0
+lhr: 
   - 0.0
 time:
   - 0.0
-  - 5.0
-n_steps: 51
+n_steps: 1

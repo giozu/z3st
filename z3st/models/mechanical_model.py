@@ -20,8 +20,6 @@ class MechanicalModel:
 
         # --. Mechanical model options --..
         self.mech_cfg = self.input_file.get("mechanical", {})
-        if not self.mech_cfg:
-            raise ValueError("[MechanicalModel] 'mechanical' missing in input.yaml.")
 
         print("[MechanicalModel] options loaded from input.yaml:")
         for key, value in self.mech_cfg.items():
