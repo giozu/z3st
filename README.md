@@ -93,7 +93,9 @@ These cases serve both as:
 * **Flexible boundary conditions** — Dirichlet, Neumann, clamp, and slip BCs defined via YAML configuration files
 * **Material database** — YAML-based definitions (`materials/`) including steels, oxides, and other structural materials
 * **Geometry & mesh input** — accepts Gmsh `.msh` files or Python-generated meshes from YAML geometry descriptors; compatible with any meshing tool
-* **Built-in gap conductance model** — thermal coupling between subdomains via Robin BCs or fixed conductance
+* **Phase-field fracture solver** — solving order parameter evolution equations for crack propagation and material damage
+* **1D cluster dynamics solver** — solving advection-diffusion equations for cluster evolution and mass conservation
+* **Gap conductance model** — thermal coupling between subdomains via Robin BCs or fixed conductance
 * **YAML-driven configuration** — all parameters, materials, and boundary conditions defined externally for reproducibility
 * **Post-processing ecosystem** — Python-based tools for field extraction and visualization, fully compatible with ParaView and PyVista
 * **Fully documented API** — comprehensive Sphinx documentation under `docs/`
@@ -125,6 +127,8 @@ z3st/
 ├── models/                      # Physical models
 │   ├── thermal_model.py
 │   ├── mechanical_model.py
+│   ├── cluster_dynamic_model.py
+│   ├── damage_model.py
 │   ├── gap_model.py
 │   └── __init__.py
 │
@@ -262,7 +266,8 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 
 * Contact mechanics
 * Nonlinear constitutive behavior
-* Coupling with microstructure generators (e.g., Merope)
+* Coupling with microstructure generators
+* Advanced cluster dynamics (1D, nucleation)
 * Coupling with rate-theory codes
 
 ## Contributing
