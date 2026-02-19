@@ -70,9 +70,12 @@ def analytic_stress(epsilon):
         return sigma_trial * np.sign(epsilon)
     
     delta_eps = abs(epsilon) - (sigma_y / E)
-    Et_1d = (E * H) / (E + H)
-    
-    sigma = sigma_y + Et_1d * delta_eps
+    # Et_1d = (E * H) / (E + H)
+
+    mu = E / (2 * (1 + nu))
+    Et_3d = (E * H) / (H + 2 * mu)
+
+    sigma = sigma_y + Et_3d * delta_eps
     return sigma * np.sign(epsilon)
 
 # The boundary conditions go up to 0.0004 m displacement
