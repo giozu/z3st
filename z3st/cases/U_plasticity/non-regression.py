@@ -70,18 +70,17 @@ def analytic_stress(epsilon):
         return sigma_trial * np.sign(epsilon)
     
     delta_eps = abs(epsilon) - (sigma_y / E)
+    Et_1d = (E * H) / (E + H)
     
-    Et_3d = (E * H) / (H + 2 * mu)
-    
-    sigma = sigma_y + Et_3d * delta_eps
+    sigma = sigma_y + Et_1d * delta_eps
     return sigma * np.sign(epsilon)
 
-
-U_X_REF = np.linspace(0.0, 0.001, 21)
-STRAINS_REF = U_X_REF / Lx
+# The boundary conditions go up to 0.0004 m displacement
+U_X_REF = np.linspace(0.0, 0.0004, 21)
+STRAINS_REF = U_X_REF /Lx
 STRESSES_REF_ANALYTIC = [analytic_stress(eps) for eps in STRAINS_REF]
 
-TOLERANCE = 5e-2            # 5% relative tolerance
+TOLERANCE = 1e-3            # 1% relative tolerance
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
@@ -150,17 +149,16 @@ for e, s, sr, u, p in zip(strains, stresses, stresses_analytic_np, displacements
 
 # Plotting
 plt.figure(figsize=(8, 6))
-plt.plot(strain_ref_np, stresses_analytic_np, "k--", lw=1.5, label="Analytical (1D ideal)")
+plt.plot(strain_ref_np, stresses_analytic_np, "k--", lw=1.5, label="Analytical (1D)")
 plt.plot(strains_np, stresses_np, "r-o", lw=2, label="Numerical (Z3ST)")
 
 # Mark yield point
 eps_y = sigma_y / E
-plt.plot(eps_y, sigma_y, 'ko', markersize=8, label="Analytic Yield")
+plt.plot(eps_y, sigma_y, 'ko', markersize=8, label="Analytic yield")
 
 plt.xlabel(r"Strain $\epsilon_{xx}$ [-]")
 plt.ylabel(r"Stress $\sigma_{xx}$ [Pa]")
 plt.grid(True, linestyle=":", alpha=0.6)
-plt.title("Constraint Effects: 3D Simulation vs 1D Analytical")
 plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
@@ -207,7 +205,7 @@ errors = {
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, 0.5, OUT_JSON, CASE_DIR) # High tolerance (50%) just to run through; 3D effects are large
-# regression_check(errors, CASE_DIR)
+pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+regression_check(errors, CASE_DIR)
 
 print("\n[INFO] non-regression completed.\n")

@@ -139,12 +139,13 @@ class PlasticityModel:
             expr_ep = dolfinx.fem.Expression(ep_expr, V_ep.element.interpolation_points)
             expr_p = dolfinx.fem.Expression(p_expr, V_p.element.interpolation_points)
             
-            self.ep_n.interpolate(expr_ep, cells)
-            self.p_n.interpolate(expr_p, cells)
-            
-            # Update current state variables
+            # Update current state variables (using old _n values)
             self.ep.interpolate(expr_ep, cells)
             self.p.interpolate(expr_p, cells)
+
+            # Then update history variables from current
+            self.ep_n.x.array[:] = self.ep.x.array[:]
+            self.p_n.x.array[:] = self.p.x.array[:]
                                 
         # Sync ghost
         self.ep_n.x.scatter_forward()
