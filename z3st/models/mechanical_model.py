@@ -25,15 +25,12 @@ class MechanicalModel:
         for key, value in self.mech_cfg.items():
             print(f"  {key:<20}: {value}")
 
-    def set_mechanical_boundary_conditions(self, V_u_sub, V_u_map=None):
+    def set_mechanical_boundary_conditions(self, V_u):
         """
-        Apply mechanical boundary conditions for both staggered and mixed cases.
+        Apply mechanical boundary conditions
 
-        If V_u_map is None → staggered (non-mixed spaces).
-        If V_u_map is provided → mixed (collapsed subspace).
-
-        To do:
-        - ERROR if a region is assigned more than once
+        Parameters:
+            V_u: FunctionSpace (displacement space)
         """
         mechanical_bcs_defs = self.boundary_conditions.get("mechanical", {})
 
@@ -119,8 +116,8 @@ class MechanicalModel:
                     initial_disp = raw_value[0]
                     disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
 
-                    dofs = dolfinx.fem.locate_dofs_topological(V_u_sub, self.fdim, facets)
-                    bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u_sub)
+                    dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
+                    bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
 
                     self.dirichlet_mechanical[mat_type].append(
                         {
@@ -174,9 +171,9 @@ class MechanicalModel:
                 # --. Slip (double component-wise blocking) --..
                 elif bc_type == "Slip_x":
                     for i in [1, 2]:  # constrain u_y, u_z
-                        V_m_sub = V_u_sub.sub(i)
+                        V_m_sub = V_u.sub(i)
                         boundary_dofs = dolfinx.fem.locate_dofs_topological(
-                            (V_u_sub, V_m_sub), facet_dim, facets
+                            (V_u, V_m_sub), facet_dim, facets
                         )
                         boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
                         bc_i = dolfinx.fem.dirichletbc(
@@ -192,9 +189,9 @@ class MechanicalModel:
 
                 elif bc_type == "Slip_y":
                     for i in [0, 2]:  # constrain u_x, u_z
-                        V_m_sub = V_u_sub.sub(i)
+                        V_m_sub = V_u.sub(i)
                         boundary_dofs = dolfinx.fem.locate_dofs_topological(
-                            (V_u_sub, V_m_sub), facet_dim, facets
+                            (V_u, V_m_sub), facet_dim, facets
                         )
                         boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
                         bc_i = dolfinx.fem.dirichletbc(
@@ -210,9 +207,9 @@ class MechanicalModel:
 
                 elif bc_type == "Slip_z":
                     for i in [0, 1]:  # constrain u_x, u_y
-                        V_m_sub = V_u_sub.sub(i)
+                        V_m_sub = V_u.sub(i)
                         boundary_dofs = dolfinx.fem.locate_dofs_topological(
-                            (V_u_sub, V_m_sub), facet_dim, facets
+                            (V_u, V_m_sub), facet_dim, facets
                         )
                         boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
                         bc_i = dolfinx.fem.dirichletbc(
@@ -229,10 +226,10 @@ class MechanicalModel:
                 # --. Clamp (single component-wise blocking) --..
                 elif bc_type == "Clamp_x":
                     boundary_dofs_x = dolfinx.fem.locate_dofs_topological(
-                        V_u_sub.sub(0), self.fdim, self.facet_tags.find(region_id)
+                        V_u.sub(0), self.fdim, self.facet_tags.find(region_id)
                     )
                     bcx = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(0), boundary_dofs_x, V_u_sub.sub(0)
+                        dolfinx.default_scalar_type(0), boundary_dofs_x, V_u.sub(0)
                     )
 
                     self.dirichlet_mechanical[mat_type].append(bcx)
@@ -246,10 +243,10 @@ class MechanicalModel:
                     val = bc_info.get("value", 0.0)
 
                     boundary_dofs_y = dolfinx.fem.locate_dofs_topological(
-                        V_u_sub.sub(1), self.fdim, self.facet_tags.find(region_id)
+                        V_u.sub(1), self.fdim, self.facet_tags.find(region_id)
                     )
                     bcy = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(val), boundary_dofs_y, V_u_sub.sub(1)
+                        dolfinx.default_scalar_type(val), boundary_dofs_y, V_u.sub(1)
                     )
 
                     self.dirichlet_mechanical[mat_type].append(bcy)
@@ -271,10 +268,10 @@ class MechanicalModel:
                     val = bc_info.get("value", 0.0)
 
                     boundary_dofs_z = dolfinx.fem.locate_dofs_topological(
-                        V_u_sub.sub(2), self.fdim, self.facet_tags.find(region_id)
+                        V_u.sub(2), self.fdim, self.facet_tags.find(region_id)
                     )
                     bcz = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(val), boundary_dofs_z, V_u_sub.sub(2)
+                        dolfinx.default_scalar_type(val), boundary_dofs_z, V_u.sub(2)
                     )
                     self.dirichlet_mechanical[mat_type].append(bcz)
 
@@ -395,9 +392,13 @@ class MechanicalModel:
 
         """
 
-        # mode = material["constitutive_mode"]
         mode = material.get("constitutive_mode", "lame")
         regime = self.regime
+
+        # If plasticity is active in input.yaml, force plasticity for materials that support it
+        if self.on.get("plasticity", False) and mode == "lame" and "yield_strength" in material:
+            material["constitutive_mode"] = "plasticity"
+            mode = "plasticity"
 
         if mode == "voigt":
             # small strain
@@ -449,6 +450,9 @@ class MechanicalModel:
                     [sigma_voigt[4], sigma_voigt[3], sigma_voigt[2]],
                 ]
             )
+
+        elif mode == "plasticity":
+            sigma = self.sigma_plastic(u, material)
 
         else:
             # Plane-stress reduction (x–y plane)

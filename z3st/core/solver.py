@@ -106,9 +106,14 @@ class Solver:
         else:
             self.weight = 1.0
 
+        metadata = {}
+        if getattr(self, "q_degree", None) is not None:
+            metadata = {"quadrature_degree": self.q_degree, "quadrature_scheme": "default"}
+            print(f"  [Solver] Using quadrature degree {self.q_degree} for integration measures.")
+
         self.dx_tags = {
             tag: ufl.Measure(
-                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
+                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag, metadata=metadata
             )
             for tag in np.unique(self.cell_tags.values)
         }
@@ -729,6 +734,9 @@ class Solver:
                 
                 if self.on.get("cluster", False):
                     self.c.x.array[:] = c_new.x.array
+
+                if self.on.get("mechanical", False) and self.on.get("plasticity", False):
+                    self.update_plastic_history(u_new)
 
                 return True
 

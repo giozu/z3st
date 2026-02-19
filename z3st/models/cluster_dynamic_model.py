@@ -34,6 +34,8 @@ class ClusterDynamicsModel:
         - D = 0.5 (diffusion coefficient)
         - c(n,t) is cluster density at size n and time t
         """
+        self.cluster_cfg = self.input_file.get("cluster", {})
+
         # Physical parameters for advection-diffusion equation
         self.v_cluster = self.cluster_cfg.get("advection_velocity", 1.0)  # Advection velocity (cluster growth rate)
         self.D_cluster = self.cluster_cfg.get("diffusion_coefficient", 0.5)  # Diffusion coefficient (cluster size fluctuations)

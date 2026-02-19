@@ -22,10 +22,11 @@ from z3st.models.gap_model import GapModel
 from z3st.models.mechanical_model import MechanicalModel
 from z3st.models.thermal_model import ThermalModel
 from z3st.models.cluster_dynamic_model import ClusterDynamicsModel
+from z3st.models.plasticity_model import PlasticityModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, DamageModel, ClusterDynamicsModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, DamageModel, ClusterDynamicsModel, PlasticityModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -68,6 +69,8 @@ class Spine(
             DamageModel.__init__(self)
         if self.on.get("cluster", False):
             ClusterDynamicsModel.__init__(self)
+        if self.on.get("plasticity", False):
+            PlasticityModel.__init__(self)
 
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
@@ -176,17 +179,9 @@ class Spine(
             )
             self.boundary_conditions = yaml.safe_load(f)
 
-        if self.coupling == "staggered":
-            if self.on.get("thermal", False): self.set_thermal_boundary_conditions(self.V_t)
-            if self.on.get("mechanical", False): self.set_mechanical_boundary_conditions(self.V_m)
-            if self.on.get("damage", False): self.set_damage_boundary_conditions(self.V_d)
-        else:
-            V_t_sub, V_t_map = self.W.sub(1).collapse()
-            V_t_map = np.array(V_t_map, dtype=np.int32)
-            V_u_sub, V_u_map = self.W.sub(0).collapse()
-            V_u_map = np.array(V_u_map, dtype=np.int32)
-            self.set_thermal_boundary_conditions(V_t_sub, V_t_map)
-            self.set_mechanical_boundary_conditions(V_u_sub, V_u_map)
+        if self.on.get("thermal", False): self.set_thermal_boundary_conditions(self.V_t)
+        if self.on.get("mechanical", False): self.set_mechanical_boundary_conditions(self.V_m)
+        if self.on.get("damage", False): self.set_damage_boundary_conditions(self.V_d)
 
     def initialize_fields(self):
         print(f"[INITIALIZING FIELDS]")
@@ -227,18 +222,6 @@ class Spine(
             print(
                 f"  Initial u: min={u_vals.min():.2e} m, max={u_vals.max():.2e} m, mean={u_vals.mean():.2e} m"
             )
-
-        # Temperature/displacement (mixed)
-        if self.on.get("mechanical", False) and self.on.get("thermal", False):
-            if not hasattr(self, "sol_mixed"):
-                print("Initializing self.sol_mixed")
-                self.sol_mixed = dolfinx.fem.Function(self.W, name="MixedSolution")
-                try:
-                    print("Initialize with the current state (displacement and temperature fields)")
-                    self.sol_mixed.sub(0).interpolate(self.u)
-                    self.sol_mixed.sub(1).interpolate(self.T)
-                except Exception:
-                    self.sol_mixed.x.array[:] = 0.0
 
         # Damage variables
         if self.on.get("damage", False):

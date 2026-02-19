@@ -14,9 +14,8 @@ Version: 0.1.0 (2025)
 
 [DESCRIPTION]
 Z3ST is an open-source framework for the thermo-mechanical modelling
-of materials and multi-material domains. Built on FEniCSx, it supports
-transient simulations, complex geometries, and user-defined boundary
-conditions.
+of materials. Built on FEniCSx, it supports transient simulations, 
+complex geometries, and user-defined boundary conditions.
 """
 )
 

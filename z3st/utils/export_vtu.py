@@ -114,14 +114,19 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     V_tensor_points = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1, (dim, dim)))
     V_scalar_points = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1))
 
+    # Create metadata for quadrature if available
+    metadata = {}
+    if getattr(problem, "q_degree", None) is not None:
+        metadata = {"quadrature_degree": problem.q_degree, "quadrature_scheme": "default"}
+
     # --- Strain (global) ---
     if problem.on.get("mechanical", False) and problem.strain:
         strain_symbolic = problem.strain
         # cells
-        strain_numeric = interpolate_expression(strain_symbolic, V_tensor_cells)
+        strain_numeric = interpolate_expression(strain_symbolic, V_tensor_cells, metadata)
         grid.cell_data["Strain (cells)"] = strain_numeric.x.array.reshape(-1, dim * dim)
         # points
-        strain_numeric = interpolate_expression(strain_symbolic, V_tensor_points)
+        strain_numeric = interpolate_expression(strain_symbolic, V_tensor_points, metadata)
         strain_array = strain_numeric.x.array.reshape((n_points, dim, dim))
         grid.point_data["Strain (points)"] = strain_array.reshape(n_points, dim * dim)
 
@@ -142,16 +147,17 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
         if len(material_cells) == 0:
              continue
 
-        # Stress & Mech info
         if problem.on.get("mechanical", False) and name in problem.stress:
             # Stress (cells)
             stress_symbolic = problem.stress[name]
-            stress_expr = dolfinx.fem.Expression(
-                stress_symbolic, V_tensor_cells.element.interpolation_points
-            )
-            stress_total_cells.interpolate(stress_expr, material_cells)
-
-            stress_numeric = interpolate_expression(stress_symbolic, V_tensor_cells)
+            
+            # Use helper to ensure we handle Quadrature correctly
+            try:
+                stress_numeric = interpolate_expression(stress_symbolic, V_tensor_cells, metadata)
+            except: 
+                # Should be handled by helper, but just in case
+                stress_numeric = project_expression(stress_symbolic, V_tensor_cells, metadata)
+            
             stress_cells = stress_numeric.x.array.reshape(-1, dim, dim)
             grid.cell_data[f"Stress_{name} (cells)"] = stress_cells.reshape(-1, dim * dim)
 
@@ -164,12 +170,7 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
             grid.cell_data[f"Hydrostatic_{name} (cells)"] = p_cells
             
             # Stress (points)
-            stress_expr_pts = dolfinx.fem.Expression(
-                stress_symbolic, V_tensor_points.element.interpolation_points
-            )
-            stress_total_points.interpolate(stress_expr_pts, material_cells)
-            
-            stress_numeric_pts = interpolate_expression(stress_symbolic, V_tensor_points)
+            stress_numeric_pts = interpolate_expression(stress_symbolic, V_tensor_points, metadata)
             stress_points = stress_numeric_pts.x.array.reshape((n_points, dim, dim))
             grid.point_data[f"Stress_{name} (points)"] = stress_points
             
@@ -183,57 +184,61 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
 
             # Strain energy density (points)
             if name in problem.energy_density:
-                psi_expr_pts = dolfinx.fem.Expression(
-                    problem.energy_density[name], V_scalar_points.element.interpolation_points
-                )
-                psi_fun_pts = dolfinx.fem.Function(V_scalar_points)
-                psi_fun_pts.x.array[:] = 0.0
-                psi_fun_pts.interpolate(psi_expr_pts, material_cells)
-                grid.point_data[f"StrainEnergyDensity_{name} (points)"] = psi_fun_pts.x.array.copy()
+                try:
+                    psi_expr_pts = dolfinx.fem.Expression(
+                        problem.energy_density[name], V_scalar_points.element.interpolation_points
+                    )
+                    psi_fun_pts = dolfinx.fem.Function(V_scalar_points)
+                    psi_fun_pts.x.array[:] = 0.0
+                    psi_fun_pts.interpolate(psi_expr_pts, material_cells)
+                    grid.point_data[f"StrainEnergyDensity_{name} (points)"] = psi_fun_pts.x.array.copy()
+                except Exception as e:
+                    print(f"[WARNING] Could not interpolate StrainEnergyDensity (points) for {name}: {e}")
 
-                # Strain energy density (cells, DG0)
-                psi_expr_cells = dolfinx.fem.Expression(
-                    problem.energy_density[name], V_scalar_cells.element.interpolation_points
-                )
-                psi_fun_cells = dolfinx.fem.Function(V_scalar_cells)
-                psi_fun_cells.x.array[:] = 0.0
-                psi_fun_cells.interpolate(psi_expr_cells, material_cells)
-                grid.cell_data[f"StrainEnergyDensity_{name} (cells)"] = psi_fun_cells.x.array.copy()
-
+                try:
+                    psi_expr_cells = dolfinx.fem.Expression(
+                        problem.energy_density[name], V_scalar_cells.element.interpolation_points
+                    )
+                    psi_fun_cells = dolfinx.fem.Function(V_scalar_cells)
+                    psi_fun_cells.x.array[:] = 0.0
+                    psi_fun_cells.interpolate(psi_expr_cells, material_cells)
+                    grid.cell_data[f"StrainEnergyDensity_{name} (cells)"] = psi_fun_cells.x.array.copy()
+                except Exception:
+                    psi_projected = project_field(problem.energy_density[name], V_scalar_cells, metadata)
+                    grid.cell_data[f"StrainEnergyDensity_{name} (cells)"] = psi_projected.x.array.copy()
 
         # Heat flux (cells) per-material
         if problem.on.get("thermal", False) and problem.T:
             q_vec_symbolic = -material["k"] * ufl.grad(problem.T)
-            q_expr = dolfinx.fem.Expression(q_vec_symbolic, V_vector_cells.element.interpolation_points)
-            heat_flux_total_cells.interpolate(q_expr, material_cells)
-
-    # Global (aggregated) cell fields
-    if problem.on.get("thermal", False):
-        grid.cell_data["Heat flux"] = heat_flux_total_cells.x.array.reshape(-1, dim)
+            q_numeric = interpolate_expression(q_vec_symbolic, V_vector_cells, metadata)
+            grid.cell_data[f"HeatFlux_{name} (cells)"] = q_numeric.x.array.reshape(-1, dim)
 
     # Cluster Dynamics
     if problem.on.get("cluster", False) and getattr(problem, "c", None):
          grid.point_data["ClusterDensity"] = problem.c.x.array
-         
-         # Also export the cluster density as cell average if needed?
-         # For 1D points are enough. But to be safe on visualization:
-         # grid.point_data["c"] = problem.c.x.array
 
     if problem.on.get("damage", False) and problem.D:
         print("  → Adding damage field to VTU...")
         grid.point_data["Damage"] = problem.D.x.array.copy()
 
         # Damage
-        D_cells = dolfinx.fem.Function(V_scalar_cells)
-        D_expr = dolfinx.fem.Expression(problem.D, V_scalar_cells.element.interpolation_points)
-        D_cells.interpolate(D_expr)
-        grid.cell_data["Damage"] = D_cells.x.array.copy()
+        D_numeric = interpolate_expression(problem.D, V_scalar_cells, metadata)
+        grid.cell_data["Damage"] = D_numeric.x.array.copy()
 
         # History field
-        H_cells = dolfinx.fem.Function(V_scalar_cells)
-        H_expr = dolfinx.fem.Expression(problem.H, V_scalar_cells.element.interpolation_points)
-        H_cells.interpolate(H_expr)
-        grid.cell_data["CrackDrivingForce"] = H_cells.x.array.copy()
+        H_numeric = interpolate_expression(problem.H, V_scalar_cells, metadata)
+        grid.cell_data["CrackDrivingForce"] = H_numeric.x.array.copy()
+
+    # Plasticity fields
+    if problem.on.get("plasticity", False):
+        # Plastic strain p
+        if hasattr(problem, "p"):
+             p_projected = project_field(problem.p, V_scalar_cells, metadata)
+             grid.cell_data["CumulativePlasticStrain"] = p_projected.x.array.copy()
+             # Also save per-material if needed, but generic name is usually enough. 
+             # For legacy consistency or specific material debugging:
+             for name in problem.materials.keys():
+                  grid.cell_data[f"CumulativePlasticStrain_{name} (cells)"] = p_projected.x.array.copy()
 
     # --- Save ---
     filepath = os.path.join(output_dir, filename)
@@ -241,8 +246,45 @@ def export_vtu(problem, output_dir="output", filename="fields.vtu"):
     print(f"VTU file exported to: {filepath}")
 
 
-def interpolate_expression(symbolic_function, V):
-    expression = dolfinx.fem.Expression(symbolic_function, V.element.interpolation_points)
-    numeric_expression = dolfinx.fem.Function(V)
-    numeric_expression.interpolate(expression)
-    return numeric_expression
+def interpolate_expression(symbolic_function, V, metadata=None):
+    """
+    Interpolate UFL expression. Fallback to projection if interpolation fails (e.g. Quadrature).
+    """
+    try:
+        expression = dolfinx.fem.Expression(symbolic_function, V.element.interpolation_points)
+        numeric_expression = dolfinx.fem.Function(V)
+        numeric_expression.interpolate(expression)
+        return numeric_expression
+    except Exception as e:
+        print(f"Interpolation failed (likely Quadrature mismatch): {e}. Falling back to projection.")
+        return project_expression(symbolic_function, V, metadata)
+
+def project_field(function, V, metadata=None):
+    """
+    Project a function (e.g. Quadrature) onto space V using L2 projection.
+    """
+    u = ufl.TrialFunction(V)
+    v = ufl.TestFunction(V)
+    
+    dx = ufl.dx(metadata=metadata) if metadata else ufl.dx
+
+    a = ufl.inner(u, v) * dx
+    L = ufl.inner(function, v) * dx
+    
+    problem = dolfinx.fem.petsc.LinearProblem(a, L, petsc_options={"ksp_type": "preonly", "pc_type": "lu"}, petsc_options_prefix="proj_field")
+    return problem.solve()
+
+def project_expression(expression, V, metadata=None):
+    """
+    Project a UFL expression onto space V.
+    """
+    u = ufl.TrialFunction(V)
+    v = ufl.TestFunction(V)
+    
+    dx = ufl.dx(metadata=metadata) if metadata else ufl.dx
+
+    a = ufl.inner(u, v) * dx
+    L = ufl.inner(expression, v) * dx
+    
+    problem = dolfinx.fem.petsc.LinearProblem(a, L, petsc_options={"ksp_type": "preonly", "pc_type": "lu"}, petsc_options_prefix="proj_expr")
+    return problem.solve()

@@ -23,41 +23,51 @@ class FiniteElementSetup:
         mech_degree = mech_config.get("order", 1)
         print(f"Mechanical element order: {mech_degree}")
 
-        self.V_t = dolfinx.fem.functionspace(
-            self.mesh, ("Lagrange", 1)
-        )  # scalar function space (temperature)
-        self.V_m = dolfinx.fem.functionspace(
-            self.mesh, ("Lagrange", mech_degree, (self.mesh.topology.dim,))
-        )  # vector function space (displacement)
-        self.Q = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
-        self.V_d = dolfinx.fem.functionspace(
-            self.mesh, ("Lagrange", 1)
-        )  # scalar function space (damage variable)
-
-        # print(f"DoFs number for V_m: {self.V_m.dofmap.index_map.size_global}")
-        # print(f"DoFs number for V_t: {self.V_t.dofmap.index_map.size_global}")
-
-        print("Mechanical function space (V_m):", self.V_m)
+        # --. Temperature --..
+        self.V_t = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
         print("Thermal function space (V_t):", self.V_t)
-        print("Scalar function space (V_d):", self.V_d)
+        
+        # --. Displacement --..
+        self.V_m = dolfinx.fem.functionspace(self.mesh, ("Lagrange", mech_degree, (self.mesh.topology.dim,)))
+        print("Mechanical function space (V_m):", self.V_m)
+        
+        # --. Damage --..
+        if self.on.get("damage", False):
+            self.V_d = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
+            print("Scalar function space (V_d):", self.V_d)
+        
+        # --. Scalar field --..
+        self.Q = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
         print("Scalar function space (Q):", self.Q)
 
         # --. Cluster dynamics --..
         if self.on.get("cluster", False):
-            print("Cluster function space (V_c, CG1) initializing...")
-            self.V_c = dolfinx.fem.functionspace(self.mesh, ("CG", 1))
-
+            self.V_c = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
+            print("Cluster function space (V_c):", self.V_c)
+    
+        # --. Plasticity --..
+        if self.on.get("plasticity", False):
+            # Quadrature elements for plasticity model, to record history at integration points
+            # Heuristic: degree should ideally match the integration rule degree.
+            self.q_degree = mech_degree + 1 
+            print(f"Plasticity function spaces (V_pl_tensor, Q_pl) initializing with Quadrature degree {self.q_degree}")
+            
+            # Tensor
+            el_tensor = basix.ufl.quadrature_element(self.mesh.topology.cell_name(), value_shape=(3, 3), degree=self.q_degree)
+            self.V_pl = dolfinx.fem.functionspace(self.mesh, el_tensor)
+            
+            # Scalar
+            el_scalar = basix.ufl.quadrature_element(self.mesh.topology.cell_name(), value_shape=(), degree=self.q_degree)
+            self.Q_pl = dolfinx.fem.functionspace(self.mesh, el_scalar)
+            print("Plasticity function space (V_pl_tensor):", self.V_pl)
+            print("Plasticity function space (Q_pl):", self.Q_pl)
+        else:
+            self.q_degree = None
 
         # --. Mixed function spaces --..
         # P1_3 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, shape=(self.tdim,), dtype=dolfinx.default_real_type)
         # P1_1 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, dtype=dolfinx.default_real_type)
         # Same P1_3 and P1_1 of above, but for coherence I prefere to define the following from V_m and V_t
-        P1_3 = self.V_m.ufl_element()
-        P1_1 = self.V_t.ufl_element()
-
-        self.W = dolfinx.fem.functionspace(self.mesh, basix.ufl.mixed_element([P1_3, P1_1]))
-
-        # The following line is currently not used, self.W is used instead
-        # self.V_m_mixed, self.V_t_mixed = dolfinx.fem.functionspace(self.mesh, P1_3), dolfinx.fem.functionspace(self.mesh, P1_1)
-        # print("Mechanical function space (V_m_mixed):", self.V_m_mixed)
-        # print("Thermal function space (V_t_mixed):", self.V_t_mixed)
+        # P1_3 = self.V_m.ufl_element()
+        # P1_1 = self.V_t.ufl_element()
+        # self.W = dolfinx.fem.functionspace(self.mesh, basix.ufl.mixed_element([P1_3, P1_1]))
