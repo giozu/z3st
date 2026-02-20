@@ -45,45 +45,46 @@ rho   = float(mat_data.get('rho'))
 mu    = float(mat_data.get('mu_gamma'))
 q0    = float(mat_data.get('gamma_heating'))
 sigma_y = float(mat_data.get('yield_strength'))
-H = float(mat_data.get('hardening_modulus'))
+H     = float(mat_data.get('hardening_modulus'))
 
 with open(MESH_GEO_FILE, 'r') as f:
     content = f.read()
 nxy = int(re.search(r'nxy\s*=\s*(\d+);', content).group(1)) - 1
-nz = int(re.search(r'nz\s*=\s*(\d+);', content).group(1)) - 1
+print(f"[INFO] nFE loaded: nxy = {nxy}")
 
-print(f"[INFO] Geometry loaded: Lx = {Lx} m, Ly = {Ly} m")
-print(f"[INFO] Material loaded: E = {E:.2e} Pa, nu = {nu}")
-print(f"[INFO] nFE loaded: nxy = {nxy}, nz = {nz}")
-
-y_target, mask_tol = (Ly / 2, 1 / (2 * nz))  # m, m, m (extraction plane selection and tolerance)
+y_target, mask_tol = (Ly / 2, Ly / (2 * nxy))  # m, m (extraction line selection and tolerance)
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 def analytic_stress(epsilon):
     """
     Compute uniaxial stress for a given strain using J2 plasticity with isotropic hardening.
+    Plane strain correction: E' = E / (1 - nu^2)
+    Yielding correction: sigma_y' = sigma_y / sqrt(1 - nu + nu^2)
     """
-    mu = E / (2 * (1 + nu))
-    sigma_trial = E * abs(epsilon)
     
-    if sigma_trial <= sigma_y:
-        return sigma_trial * np.sign(epsilon)
+    E_eff = E / (1 - nu**2)
+    phi = np.sqrt(1 - nu + nu**2)
+    sigma_y_eff = sigma_y / phi
     
-    delta_eps = abs(epsilon) - (sigma_y / E)
-    # Et_1d = (E * H) / (E + H)
+    eps_y_eff = sigma_y_eff / E_eff
+    
+    if abs(epsilon) <= eps_y_eff:
+        return E_eff * epsilon
+    
+    mu_val = E / (2 * (1 + nu))
+    psi = ((2 - nu)**2) / (6 * (1 - nu + nu**2))
+    
+    Et = E_eff * (1 - (E_eff * psi) / (3 * mu_val + H))
+    
+    delta_eps = abs(epsilon) - eps_y_eff
+    sigma = (sigma_y_eff + Et * delta_eps) * np.sign(epsilon)
+    return sigma
 
-    mu = E / (2 * (1 + nu))
-    Et_3d = (E * H) / (H + 2 * mu)
-
-    sigma = sigma_y + Et_3d * delta_eps
-    return sigma * np.sign(epsilon)
-
-# The boundary conditions go up to 0.0004 m displacement
 U_X_REF = np.linspace(0.0, 0.0004, 21)
 STRAINS_REF = U_X_REF /Lx
 STRESSES_REF_ANALYTIC = [analytic_stress(eps) for eps in STRAINS_REF]
 
-TOLERANCE = 1e-3            # 1% relative tolerance
+TOLERANCE = 1e-3
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
@@ -152,12 +153,14 @@ for e, s, sr, u, p in zip(strains, stresses, stresses_analytic_np, displacements
 
 # Plotting
 plt.figure(figsize=(8, 6))
-plt.plot(strain_ref_np, stresses_analytic_np, "k--", lw=1.5, label="Analytical (1D)")
+plt.plot(strain_ref_np, stresses_analytic_np, "k--", lw=1.5, label="Analytical (2D Plane Strain)")
 plt.plot(strains_np, stresses_np, "r-o", lw=2, label="Numerical (Z3ST)")
 
 # Mark yield point
-eps_y = sigma_y / E
-plt.plot(eps_y, sigma_y, 'ko', markersize=8, label="Analytic yield")
+E_eff = E / (1 - nu**2)
+sigma_y_eff = sigma_y / np.sqrt(1 - nu + nu**2)
+eps_y_eff = sigma_y_eff / E_eff
+plt.plot(eps_y_eff, sigma_y_eff, 'ko', markersize=8, label="Analytic yield (2D)")
 
 plt.xlabel(r"Strain $\epsilon_{xx}$ [-]")
 plt.ylabel(r"Stress $\sigma_{xx}$ [Pa]")
