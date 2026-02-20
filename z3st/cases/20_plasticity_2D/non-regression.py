@@ -65,15 +65,17 @@ def analytic_stress(epsilon):
     sigma_y_eff = sigma_y / phi
     eps_y_eff = sigma_y_eff / E_eff
     
-    if abs(epsilon) <= eps_y_eff:
+    # Elastic regime
+    if epsilon <= eps_y_eff:
         return E_eff * epsilon
     
     # Plastic regime (linear isotropic hardening H)
     H_eff = H / (phi**2)
     Et_eff = (E_eff * H_eff) / (E_eff + H_eff)
     
-    delta_eps = abs(epsilon) - eps_y_eff
-    sigma = (sigma_y_eff + Et_eff * delta_eps) * np.sign(epsilon)
+    delta_eps = epsilon - eps_y_eff
+    sigma = sigma_y_eff + Et_eff * delta_eps
+
     return sigma
 
 U_X_REF = np.linspace(0.0, 0.0004, 21)
@@ -96,42 +98,28 @@ for step, vtufile in enumerate(VTU_FILES):
 
     # Stress extraction
     x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress_steel (cells)")
-    if S_all is None:
-         x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress (cells)")
          
     # Check shape/dims
-    mask = np.abs(y_S - y_target) < mask_tol
-    if S_all is not None and S_all.ndim == 2 and S_all.shape[1] >= 1:
-        s_val = float(np.mean(S_all[mask, 0]))
-    else:
-        s_val = 0.0
+    mask = (np.abs(y_S - y_target) < mask_tol)
+    s_val = float(np.mean(S_all[mask, 0]))
     stresses.append(s_val)
 
     # Displacement extraction
     x_u_all, y_u_all, z_u_all, u_all = extract_field(vtufile, field_name="Displacement")
-    if u_all is not None:
-        mask_u = np.abs(y_u_all - y_target) < mask_tol
-        u_max = np.max(u_all[mask_u, 0])
-    else:
-        u_max = 0.0
+    mask_u = np.abs(y_u_all - y_target) < mask_tol
+    u_max = np.max(u_all[mask_u, 0])
     displacements.append(u_max)
 
     # Strain extraction
     x_eps_all, y_eps_all, z_eps_all, E_all = extract_field(vtufile, field_name="Strain (cells)")
-    if E_all is not None:
-        mask_e = np.abs(y_eps_all - y_target) < mask_tol
-        eps_eng = float(np.mean(E_all[mask_e, 0]))
-    else:
-        eps_eng = 0.0
+    mask_e = np.abs(y_eps_all - y_target) < mask_tol
+    eps_eng = float(np.mean(E_all[mask_e, 0]))
     strains.append(eps_eng)
     
     # Plastic strain extraction
     x_p, y_p, z_p, P_all = extract_field(vtufile, field_name="CumulativePlasticStrain")
-    if P_all is not None:
-         p_val = float(np.mean(P_all[mask]))
-         plastic_strains.append(p_val)
-    else:
-         plastic_strains.append(0.0)
+    p_val = float(np.mean(P_all[mask]))
+    plastic_strains.append(p_val)
 
 # Curve data
 strain_ref_np = np.array(STRAINS_REF, dtype=float)
