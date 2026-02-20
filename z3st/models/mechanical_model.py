@@ -168,9 +168,62 @@ class MechanicalModel:
 
                     print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → {region_name}: {initial_val} Pa (list loaded)")
                     
+                # --. Dirichlet component-wise (x, y, z) or Clamp --..
+                elif bc_type in ["Dirichlet_x", "Dirichlet_y", "Dirichlet_z", "Clamp_x", "Clamp_y", "Clamp_z"]:
+                    
+                    # 2D/3D check for Clamp_z
+                    if bc_type == "Clamp_z" and self.regime in ["2d", "axisymmetric"]:
+                        raise ValueError(
+                            f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
+                            f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"
+                            f"        Please use 'Clamp_y' in your boundary_conditions.yaml for region '{region_name}'."
+                        )
+
+                    # Extract value: check 'displacement', then 'value', default to 0.0
+                    displacement = bc_info.get("displacement")
+                    if displacement is None:
+                        displacement = bc_info.get("value", 0.0)
+
+                    comp_map = {
+                        "Dirichlet_x": 0, "Dirichlet_y": 1, "Dirichlet_z": 2,
+                        "Clamp_x": 0, "Clamp_y": 1, "Clamp_z": 2
+                    }
+                    c_idx = comp_map[bc_type]
+                    
+                    if c_idx >= self.tdim:
+                        print(f"[ERROR] {bc_type} not valid for {self.tdim}D mesh (region '{region_name}').")
+                        sys.exit(1)
+
+                    # Interpret displacement (scalar or list of scalars)
+                    if isinstance(displacement, (int, float)):
+                        raw_value = [float(displacement)] * self.n_steps
+                    elif isinstance(displacement, list):
+                        if len(displacement) != self.n_steps:
+                            print(f"[ERROR] {bc_type} list length {len(displacement)} != n_steps {self.n_steps} (region '{region_name}').")
+                            sys.exit(1)
+                        raw_value = [float(v) for v in displacement]
+                    else:
+                        print(f"[ERROR] Invalid displacement format for {bc_type}. Must be scalar or list of scalars.")
+                        sys.exit(1)
+
+                    disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(raw_value[0]))
+                    dofs = dolfinx.fem.locate_dofs_topological(V_u.sub(c_idx), self.fdim, facets)
+                    bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u.sub(c_idx))
+
+                    self.dirichlet_mechanical[mat_type].append(
+                        {
+                            "id": region_id,
+                            "value": bc,
+                            "const": disp_const,
+                            "raw": raw_value,
+                        }
+                    )
+                    print(f"  [INFO] {bc_type} mechanical BC on '{mat_type}' → {raw_value[0]} (first step) at region '{region_name}'")
+
                 # --. Slip (double component-wise blocking) --..
                 elif bc_type == "Slip_x":
                     for i in [1, 2]:  # constrain u_y, u_z
+                        if i >= self.tdim: continue
                         V_m_sub = V_u.sub(i)
                         boundary_dofs = dolfinx.fem.locate_dofs_topological(
                             (V_u, V_m_sub), facet_dim, facets
@@ -189,6 +242,7 @@ class MechanicalModel:
 
                 elif bc_type == "Slip_y":
                     for i in [0, 2]:  # constrain u_x, u_z
+                        if i >= self.tdim: continue
                         V_m_sub = V_u.sub(i)
                         boundary_dofs = dolfinx.fem.locate_dofs_topological(
                             (V_u, V_m_sub), facet_dim, facets
@@ -207,6 +261,7 @@ class MechanicalModel:
 
                 elif bc_type == "Slip_z":
                     for i in [0, 1]:  # constrain u_x, u_y
+                        if i >= self.tdim: continue
                         V_m_sub = V_u.sub(i)
                         boundary_dofs = dolfinx.fem.locate_dofs_topological(
                             (V_u, V_m_sub), facet_dim, facets
@@ -223,65 +278,9 @@ class MechanicalModel:
                         f"  [INFO] Slip_z mechanical BC on '{mat_type}' →  u_x, u_y = 0.0 at region '{region_name}'"
                     )
 
-                # --. Clamp (single component-wise blocking) --..
-                elif bc_type == "Clamp_x":
-                    boundary_dofs_x = dolfinx.fem.locate_dofs_topological(
-                        V_u.sub(0), self.fdim, self.facet_tags.find(region_id)
-                    )
-                    bcx = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(0), boundary_dofs_x, V_u.sub(0)
-                    )
-
-                    self.dirichlet_mechanical[mat_type].append(bcx)
-
-                    print(
-                        f"  [INFO] Clamp_x mechanical BC on '{mat_type}' → Clamp_x at region '{region_name}'"
-                    )
-
-                elif bc_type == "Clamp_y":
-
-                    val = bc_info.get("value", 0.0)
-
-                    boundary_dofs_y = dolfinx.fem.locate_dofs_topological(
-                        V_u.sub(1), self.fdim, self.facet_tags.find(region_id)
-                    )
-                    bcy = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(val), boundary_dofs_y, V_u.sub(1)
-                    )
-
-                    self.dirichlet_mechanical[mat_type].append(bcy)
-
-                    print(
-                        f"  [INFO] Clamp_y mechanical BC on '{mat_type}' → Clamp_y at region '{region_name}'"
-                    )
-
-                elif bc_type == "Clamp_z":
-
-                    regime = self.regime
-                    if regime == "2d" or regime == "axisymmetric":
-                        raise ValueError(
-                            f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
-                            f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"
-                            f"        Please use 'Clamp_y' in your boundary_conditions.yaml for region '{region_name}'."
-                        )
-
-                    val = bc_info.get("value", 0.0)
-
-                    boundary_dofs_z = dolfinx.fem.locate_dofs_topological(
-                        V_u.sub(2), self.fdim, self.facet_tags.find(region_id)
-                    )
-                    bcz = dolfinx.fem.dirichletbc(
-                        dolfinx.default_scalar_type(val), boundary_dofs_z, V_u.sub(2)
-                    )
-                    self.dirichlet_mechanical[mat_type].append(bcz)
-
-                    print(
-                        f"  [INFO] Clamp_z mechanical BC on '{mat_type}' → Clamp_z at region '{region_name}'"
-                    )
-
                 else:
                     print(f"  [ERROR] Unknown mechanical BC type '{bc_type}' for '{mat_type}'.")
-                    print(f"  Available are: Dirichlet, Neumann, Clamp_x/y/z, Slip_x/y/z.")
+                    print(f"  Available are: Dirichlet, Dirichlet_x/y/z, Neumann, Clamp_x/y/z, Slip_x/y/z.")
                     sys.exit(1)
 
     def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):

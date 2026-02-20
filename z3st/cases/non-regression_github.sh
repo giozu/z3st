@@ -16,6 +16,7 @@ CASES=(
     "14_full_cylinder"
     "16_coaxial_cylinders_3D"
     "18_box_crack_2D"
+    "20_plasticity_2D"
 )
 SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 
