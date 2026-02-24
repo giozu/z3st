@@ -132,7 +132,12 @@ if __name__ == "__main__":
         # Export
         if output_format == "xdmf" and xdmf_file:
              if problem.c:
-                 xdmf_file.write_function(problem.c, t)
+                 # Interpolate DG to CG for visualization in XDMF
+                 import dolfinx
+                 V_c_cg = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1))
+                 c_cg = dolfinx.fem.Function(V_c_cg, name="ClusterDensity")
+                 c_cg.interpolate(problem.c)
+                 xdmf_file.write_function(c_cg, t)
              if problem.T:
                  xdmf_file.write_function(problem.T, t)
              if problem.u:

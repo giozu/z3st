@@ -524,7 +524,7 @@ class Solver:
 
     def _cluster_step(self, c_new, c_old, dt):
         """
-        Solve the cluster dynamics step with rigorous mass conservation.
+        Solve the cluster dynamics step with mass conservation using DG.
         
         Solves: ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n²
 
@@ -532,6 +532,10 @@ class Solver:
         Case v < 0: The clusters shrink (evaporation/dissolution). The distribution moves to the left (towards n=1).
 
         C_tot = ∫ c·n dn = constant
+        
+        DG formulation:
+        - Upwind for advection
+        - Symmetric Interior Penalty (SIPG) for diffusion
         """
         c_old.x.array[:] = c_new.x.array
         
@@ -542,64 +546,77 @@ class Solver:
         D_diff = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.D_cluster))
         dt_c = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(dt))
         
-        # Cell size
+        # Geometric info
+        n = ufl.FacetNormal(self.mesh)
+        h = ufl.CellDiameter(self.mesh)
+        h_avg = (h('+') + h('-')) / 2.0
+        
+        # Penalty parameter for SIPG (diffusion)
+        # For P1 elements, gamma = 10.0 is usually sufficient.
+        gamma = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(10.0))
+
+        # Péclet number diagnostics
         num_cells = self.mesh.topology.index_map(self.mesh.topology.dim).size_global
         coords = self.mesh.geometry.x[:, 0]
         L_domain = coords.max() - coords.min()
-        h = L_domain / num_cells
-
-        # Péclet number
+        h_cell = L_domain / num_cells
         v = abs(self.v_cluster)
         D = self.D_cluster
-        
-        if D > 0:
-            pe = (v * h) / (2 * D)
-        else:
-            pe = float('inf')
+        pe = (v * h_cell) / (2 * D) if D > 0 else float('inf')
 
-        # Diagnostics
-        print(f"  [Cluster] Grid Diagnostics:")
-        print(f"    → Cell size h: {h:.4e}")
-        print(f"    → Peclet number Pe: {pe:.4e}")
-        
+        print(f"  [Cluster DG] Peclet number Pe: {pe:.4e}")
         if pe > 1:
-            print(f"    [WARNING] Pe > 1: The system is advection-dominated. Expect numerical oscillations!")
-        else:
-            print(f"    [INFO] Pe <= 1: The system is diffusion-stable.")
+            print(f"    [INFO] Advection-dominated system. DG Upwind will provide stability.")
 
-        # Variational form: Implicit Euler + Galerkin
-        # Time derivative: (c_new - c_old)/dt
-        # Advection: v * ∂c/∂n
-        # Diffusion: D * ∂²c/∂n²
-        
+        # Variational form (Implicit uler + DG)
+        # Mass matrix (time derivative)
+        a = (u_c / dt_c) * v_c * ufl.dx
+        L = (c_old / dt_c) * v_c * ufl.dx
+
         if dt > 0:
-            lhs = (u_c / dt_c) * v_c * ufl.dx \
-                  + v_vel * u_c.dx(0) * v_c * ufl.dx \
-                  + D_diff * u_c.dx(0) * v_c.dx(0) * ufl.dx
-                  
-            rhs = (c_old / dt_c) * v_c * ufl.dx
+            # Advection term (Upwind)
+            # Volume term
+            a += - u_c * v_vel * v_c.dx(0) * ufl.dx
             
+            # Interior facets
+            v_n = v_vel * n[0]
+            a += (ufl.avg(u_c * v_vel * n[0]) * ufl.jump(v_c) \
+                 + 0.5 * abs(v_n('+')) * ufl.jump(u_c) * ufl.jump(v_c)) * ufl.dS
+            
+            # Boundary facets (outflow/inflow)
+            a += ufl.conditional(v_n > 0, v_n * u_c * v_c, 0.0) * ufl.ds
+
+            # Diffusion term (SIPG)
+            a += D_diff * u_c.dx(0) * v_c.dx(0) * ufl.dx
+            
+            # Consistency and symmetry terms on interior facets
+            a += - D_diff * ufl.avg(u_c.dx(0)) * ufl.jump(v_c, n[0]) * ufl.dS
+            a += - D_diff * ufl.avg(v_c.dx(0)) * ufl.jump(u_c, n[0]) * ufl.dS
+            
+            # Penalty term on interior facets
+            a += D_diff * (gamma / h_avg) * ufl.jump(u_c) * ufl.jump(v_c) * ufl.dS
+
+            # Solve
             petsc_options = {
                 "ksp_type": "gmres",
                 "pc_type": "ilu",
                 "ksp_rtol": 1e-12,
                 "ksp_atol": 1e-15,
                 "ksp_max_it": 1000,
-                "ksp_monitor": None
             }
 
             problem = dolfinx.fem.petsc.LinearProblem(
-                lhs, rhs, u=c_new, 
+                a, L, u=c_new, 
                 petsc_options=petsc_options,
                 petsc_options_prefix="cluster_"
             )
 
             problem.solve()
         else:
-            print("  [Cluster] dt=0: skipping PDE solve, using initial/current state.")
+            print("  [Cluster] dt=0: skipping PDE solve.")
             c_new.x.array[:] = c_old.x.array
 
-        # --- MASS CONSERVATION ---
+        # Mass conservation
         x = ufl.SpatialCoordinate(self.mesh)
         n_coord = x[0]
         
