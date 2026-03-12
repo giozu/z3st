@@ -141,3 +141,28 @@ and coupled to the mechanical problem.
    :align: center
 
    Temperature distribution with mesh overlay.
+
+
+Cluster dynamics in solids
+--------------------------
+
+This example demonstrates the simulation of cluster evolution using the **Cluster dynamics** module.
+It solves the advection-diffusion equation in the cluster size space, ensuring mass conservation and modeling the evolution of clusters.
+
+Direct links to the example:
+
+- `Cluster dynamics test <https://github.com/giozu/z3st/tree/main/z3st/cases/U_cluster_dynamics_test>`_
+
+
+Phase-field fracture in solids
+------------------------------
+
+This example shows the simulation of crack propagation using the **Phase-field fracture** (Damage) module.
+It enables the study of complex fracture patterns, including crack initiation, propagation, branching, and merging, by solving an additional evolution equation for a scalar damage field.
+
+Direct links to the examples:
+
+- `Box with initial crack (2D) <https://github.com/giozu/z3st/tree/main/z3st/cases/18_box_crack_2D>`_
+- `Single-edge notched tension test <https://github.com/giozu/z3st/tree/main/z3st/cases/19_single-edge_notched_tension_test>`_
+
+The formulation supports both **AT1** and **AT2** models, with spectral or volumetric-deviatoric splits for the crack driving force.

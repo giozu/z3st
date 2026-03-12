@@ -20,10 +20,12 @@ class Solver:
 
         self.relax_T = float(solver_settings.get("relax_T", 0.9))
         self.relax_u = float(solver_settings.get("relax_u", 0.4))
+        self.relax_D = float(solver_settings.get("relax_D", 0.4))
 
         print("  Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
+        print(f"  → Damage       : {self.relax_D}")
 
         self.relax_adaptive = bool(solver_settings.get("relax_adaptive", False))
         self.relax_growth = float(solver_settings.get("relax_growth", 1.2))
@@ -46,13 +48,15 @@ class Solver:
         """
         Returns PETSc options for the linear solver based on the physics.
 
-        physics: "thermal", "mechanical".
+        physics: "thermal", "mechanical" or "damage".
         """
-        if physics not in ["thermal", "mechanical"]:
-            raise ValueError(f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical'.")
+        if physics not in ["thermal", "mechanical", "damage"]:
+            raise ValueError(
+                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical' or 'damage'."
+            )
 
         # 1) KSP type
-        if physics in ["thermal"]:
+        if physics in ["thermal", "damage"]:
             ksp_type = "cg"  # SPD
         else:  # mechanical
             ksp_type = "gmres"  # non-symmetric
@@ -88,8 +92,8 @@ class Solver:
     def _build_measures(self):
         """Build dx_tags and ds_tags measures with axisymmetric and cartesian support."""
         x = ufl.SpatialCoordinate(self.mesh)
-        regime = self.mech_cfg.get("mechanical_regime", "3d").lower()
-
+        regime = self.regime
+        
         # Integration weight logic:
         # - Axisymmetric: 2*pi*r
         # - Cartesian 2D: 1.0 (Area)
@@ -102,9 +106,14 @@ class Solver:
         else:
             self.weight = 1.0
 
+        metadata = {}
+        if getattr(self, "q_degree", None) is not None:
+            metadata = {"quadrature_degree": self.q_degree, "quadrature_scheme": "default"}
+            print(f"  [Solver] Using quadrature degree {self.q_degree} for integration measures.")
+
         self.dx_tags = {
             tag: ufl.Measure(
-                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
+                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag, metadata=metadata
             )
             for tag in np.unique(self.cell_tags.values)
         }
@@ -240,25 +249,42 @@ class Solver:
         u_old.x.array[:] = u_new.x.array
         print("\n[INFO] Assembling mechanical problem...")
 
+        # --- update step-dependent displacement ---
+        for _, bc_list in self.dirichlet_mechanical.items():
+            for bc in bc_list:
+                # Skip BCs that are Clamp, Slip, etc. (not yet step-dependent)
+                if not isinstance(bc, dict):
+                    continue
+
+                raw = bc.get("raw", None)
+                if isinstance(raw, list):
+                    idx = min(self.current_step, len(raw) - 1)
+                    bc["const"].value = raw[idx]
+                    print(f"  [INFO] Updating Dirichlet on region {bc['id']} → {raw[idx]}")
+
         # --- update step-dependent tractions ---
         for _, bc_list in self.traction.items():
             for bc in bc_list:
                 raw = bc.get("raw", None)
-
-                # constant traction → no update
-                if isinstance(raw, (int, float)):
-                    bc["const"].value = raw
-                    continue
-
-                # list of tractions → pick current_step
+                
                 if isinstance(raw, list):
                     idx = min(self.current_step, len(raw) - 1)
-                    bc["const"].value = raw[idx]
-                    print(f"  [INFO] Updating traction on region {bc['id']} → {raw[idx]} Pa")
+                    val = raw[idx]
+                elif isinstance(raw, (int, float)):
+                    val = raw
                 else:
                     raise RuntimeError("Invalid traction 'raw' format")
 
-                bc["value"] = bc["const"] * self.normal
+                bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
+                print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
+
+                regime = self.regime
+                if regime in ["axisymmetric", "2d"]:
+                    n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
+                else:
+                    n_vec = self.normal
+                
+                bc["value"] = bc["const"] * n_vec
 
         u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
         a_m, L_m = 0, 0
@@ -273,7 +299,7 @@ class Solver:
             rho = dolfinx.default_scalar_type(material["rho"])
             g = dolfinx.default_scalar_type(self.g)
 
-            regime = self.mech_cfg.get("mechanical_regime").lower()
+            regime = self.regime
             if regime == "axisymmetric" or regime == "2d":
                 # 2D: (F_r, F_z) or (F_x, F_y)
                 body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
@@ -301,26 +327,12 @@ class Solver:
                 else:
                     F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
 
-        # Clamp_r penalties
-        for label in self.materials:
-            for bc_info in self.clamp_r[label]:
-                alpha = bc_info["penalty"]
-                val = bc_info["value"]
-                print(
-                    f"  Applying Clamp_r (weak penalty) on region id = {bc_info['id']} "
-                    f"(α = {alpha:.2e})"
-                )
-                ds = self.ds_tags[bc_info["id"]]
-                n = ufl.FacetNormal(self.mesh)
-
-                if self.mech_cfg["solver"] == "linear":
-                    a_m += w * alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
-                    if abs(val) > 1e-16:
-                        L_m += w * alpha * val * ufl.dot(v_m, n) * ds
-                else:
-                    F_m += w * alpha * ufl.dot(u_m, n) * ufl.dot(v_m, n) * ds
-                    if abs(val) > 1e-16:
-                        F_m -= w * alpha * val * ufl.dot(v_m, n) * ds
+        # --- Extract actual DirichletBC objects (handles both dict and direct BCs) ---
+        bcs_mech = [
+            bc["value"] if isinstance(bc, dict) else bc
+            for _, bc_list in self.dirichlet_mechanical.items()
+            for bc in bc_list
+        ]
 
         # Solve
         if self.mech_cfg["solver"] == "linear":
@@ -333,7 +345,7 @@ class Solver:
             problem_m = dolfinx.fem.petsc.LinearProblem(
                 a_m,
                 L_m,
-                bcs=bcs_m,
+                bcs=bcs_mech,
                 u=u_new,
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="mechanical_",
@@ -349,7 +361,7 @@ class Solver:
             problem_m = NonlinearProblem(
                 F_m,
                 u_new,
-                bcs=bcs_m,
+                bcs=bcs_mech,
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="elasticity",
             )
@@ -392,19 +404,256 @@ class Solver:
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
 
+    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, prev_res_D):
+
+        D_old.x.array[:] = D_new.x.array
+        
+        w = self.weight
+        
+        lc = float(self.dmg_cfg["lc"])
+        damage_type = self.dmg_cfg["type"]
+
+        print(f"\n[INFO] Assembling damage ({damage_type}) problem...")
+
+        u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
+        a_d, L_d = 0, 0
+
+        bcs_d = []
+        for mat_name in self.materials:
+            for bc_entry in self.dirichlet_damage.get(mat_name, []):
+                bcs_d.append(bc_entry["value"])
+
+        for label, material in self.materials.items():
+            print(
+                f"Solving damage problem for '{label}' material"
+            )
+            
+            tag = self.label_map[label]
+            dx = self.dx_tags[tag]
+
+            Gc = material["Gc"]
+            sigma_c = material["sigma_c"]
+            E = material["E"]
+
+            if damage_type == "AT2":
+                
+                a_d += w*((self.H + 1.0) * u_d * v_d 
+                + lc**2 * ufl.inner(ufl.grad(u_d), ufl.grad(v_d))) * dx
+                L_d += w*self.H * v_d * dx
+
+            elif damage_type == "AT1":
+
+                cw = 8.0 / 3.0 
+                pref = Gc / cw
+                
+                tol_ir = 0.05
+                gamma_penalty = (Gc / lc) * (27.0 / (64.0 * tol_ir**2))
+                w_act = (3.0 * Gc) / (8.0 * lc)
+
+                print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, Gamma={gamma_penalty:.2e}")
+
+                a_d += w*(2.0 * self.H + gamma_penalty) * u_d * v_d * dx + \
+                    (pref * lc) * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
+                                                
+                L_d += w*(2.0 * self.H - (pref / lc) + gamma_penalty * D_old) * v_d * dx
+
+        petsc_opts_damage = self.get_solver_options(
+            physics="damage",
+            solver_type=self.dmg_cfg["linear_solver"],
+            rtol=rtol_dmg,
+        )
+
+        problem_d = dolfinx.fem.petsc.LinearProblem(
+            a_d,
+            L_d,
+            bcs=bcs_d,
+            u=D_new,
+            petsc_options=petsc_opts_damage,
+            petsc_options_prefix="damage_",
+        )
+        problem_d.solve()
+        
+        if damage_type == "AT1":
+            # Clipping:
+            D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
+
+        # Relax
+        D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
+
+        # irreversibility
+        D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
+        D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
+
+        # Convergence
+        D_new.x.scatter_forward()
+        D_old.x.scatter_forward()
+
+        vec_D_new = D_new.x.petsc_vec
+        vec_D_old = D_old.x.petsc_vec
+
+        diff_D = vec_D_new.copy()
+        diff_D.axpy(-1.0, vec_D_old)
+
+        norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
+        norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
+        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
+
+        if self.dmg_cfg["convergence"] == "norm":
+            print(f"  ||ΔD|| = {norm_dD:.3e}")
+            conv_damage = norm_dD < stag_tol_dmg
+            res_curr = norm_dD
+        else:
+            print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
+            conv_damage = rel_norm_dD < stag_tol_dmg
+            res_curr = rel_norm_dD
+
+        if self.relax_adaptive:
+            if prev_res_D is not None:
+                if res_curr < prev_res_D:
+                    self.relax_D = min(self.relax_D * self.relax_growth, self.relax_max)
+                else:
+                    self.relax_D = max(self.relax_D * self.relax_shrink, self.relax_min)
+            prev_res_D = res_curr
+            print(f"  [adaptive] relax_D={self.relax_D:.2f}")
+
+        # Residual in L_inf norm
+        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
+        print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
+
+        return conv_damage, norm_dD, rel_norm_dD, prev_res_D
+
+    def _cluster_step(self, c_new, c_old, dt):
+        """
+        Solve the cluster dynamics step with mass conservation using DG.
+        
+        Solves: ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n²
+
+        Case v > 0: The clusters grow. The distribution moves to the right (larger n).
+        Case v < 0: The clusters shrink (evaporation/dissolution). The distribution moves to the left (towards n=1).
+
+        C_tot = ∫ c·n dn = constant
+        
+        DG formulation:
+        - Upwind for advection
+        - Symmetric Interior Penalty (SIPG) for diffusion
+        """
+        c_old.x.array[:] = c_new.x.array
+        
+        u_c, v_c = ufl.TrialFunction(self.V_c), ufl.TestFunction(self.V_c)
+        
+        # Parameters
+        v_vel = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.v_cluster))
+        D_diff = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(self.D_cluster))
+        dt_c = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(dt))
+        
+        # Geometric info
+        n = ufl.FacetNormal(self.mesh)
+        h = ufl.CellDiameter(self.mesh)
+        h_avg = (h('+') + h('-')) / 2.0
+        
+        # Penalty parameter for SIPG (diffusion)
+        # For P1 elements, gamma = 10.0 is usually sufficient.
+        gamma = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(10.0))
+
+        # Péclet number diagnostics
+        num_cells = self.mesh.topology.index_map(self.mesh.topology.dim).size_global
+        coords = self.mesh.geometry.x[:, 0]
+        L_domain = coords.max() - coords.min()
+        h_cell = L_domain / num_cells
+        v = abs(self.v_cluster)
+        D = self.D_cluster
+        pe = (v * h_cell) / (2 * D) if D > 0 else float('inf')
+
+        print(f"  [Cluster DG] Peclet number Pe: {pe:.4e}")
+        if pe > 1:
+            print(f"    [INFO] Advection-dominated system. DG Upwind will provide stability.")
+
+        # Variational form (Implicit uler + DG)
+        # Mass matrix (time derivative)
+        a = (u_c / dt_c) * v_c * ufl.dx
+        L = (c_old / dt_c) * v_c * ufl.dx
+
+        if dt > 0:
+            # Advection term (Upwind)
+            # Volume term
+            a += - u_c * v_vel * v_c.dx(0) * ufl.dx
+            
+            # Interior facets
+            v_n = v_vel * n[0]
+            a += (ufl.avg(u_c * v_vel * n[0]) * ufl.jump(v_c) \
+                 + 0.5 * abs(v_n('+')) * ufl.jump(u_c) * ufl.jump(v_c)) * ufl.dS
+            
+            # Boundary facets (outflow/inflow)
+            a += ufl.conditional(v_n > 0, v_n * u_c * v_c, 0.0) * ufl.ds
+
+            # Diffusion term (SIPG)
+            a += D_diff * u_c.dx(0) * v_c.dx(0) * ufl.dx
+            
+            # Consistency and symmetry terms on interior facets
+            a += - D_diff * ufl.avg(u_c.dx(0)) * ufl.jump(v_c, n[0]) * ufl.dS
+            a += - D_diff * ufl.avg(v_c.dx(0)) * ufl.jump(u_c, n[0]) * ufl.dS
+            
+            # Penalty term on interior facets
+            a += D_diff * (gamma / h_avg) * ufl.jump(u_c) * ufl.jump(v_c) * ufl.dS
+
+            # Solve
+            petsc_options = {
+                "ksp_type": "gmres",
+                "pc_type": "ilu",
+                "ksp_rtol": 1e-12,
+                "ksp_atol": 1e-15,
+                "ksp_max_it": 1000,
+            }
+
+            problem = dolfinx.fem.petsc.LinearProblem(
+                a, L, u=c_new, 
+                petsc_options=petsc_options,
+                petsc_options_prefix="cluster_"
+            )
+
+            problem.solve()
+        else:
+            print("  [Cluster] dt=0: skipping PDE solve.")
+            c_new.x.array[:] = c_old.x.array
+
+        # Mass conservation
+        x = ufl.SpatialCoordinate(self.mesh)
+        n_coord = x[0]
+        
+        C_tot_curr_new = dolfinx.fem.assemble_scalar(dolfinx.fem.form(c_new * n_coord * ufl.dx))
+        
+        if self.C_tot_target is not None:
+            if abs(C_tot_curr_new) > 0.0:
+                renorm_factor = self.C_tot_target / C_tot_curr_new
+                c_new.x.array[:] *= renorm_factor
+                
+                print(f"  [Cluster] Mass conservation: target = {self.C_tot_target:.6e}")
+                print(f"  [Cluster] Mass conservation: before = {C_tot_curr_new:.6e}")
+                print(f"  [Cluster] Mass conservation: factor = {renorm_factor:.8f}")
+            else:
+                print("  [Cluster] Warning: mass is zero, cannot renormalize.")
+
+        c_max = np.max(c_new.x.array)
+        print(f"   [Diagnostics] Max density c_max: {c_max:.2f}")
+
     def solve_staggered(
         self,
         max_iter=20,
+        dt=0.0,
         stag_tol_th=1e-3,
         stag_tol_mech=1e-3,
+        stag_tol_dmg=1e-3,
         rtol_th=1e-6,
         rtol_mech=1e-6,
+        rtol_dmg=1e-5,
     ):
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {stag_tol_th:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {stag_tol_mech:.1e}")
+        print(f"  → Staggering tolerance |ΔD|   : {stag_tol_dmg:.1e}")
         print(f"  → Relative tolerance th       : {rtol_th:.1e}")
         print(f"  → Relative tolerance mech     : {rtol_mech:.1e}")
+        print(f"  → Relative tolerance dmg      : {rtol_dmg:.1e}")
 
         # Build measures once
         self._build_measures()
@@ -432,8 +681,23 @@ class Solver:
             u_new = u_old = None
             bcs_m = []
 
+        if self.on.get("damage", False):
+            D_new = dolfinx.fem.Function(self.V_d)
+            D_new.x.array[:] = self.D.x.array
+            D_old = dolfinx.fem.Function(self.V_d)
+        else:
+            D_new = D_old = None
+
+        if self.on.get("cluster", False):            
+            c_new = dolfinx.fem.Function(self.V_c)
+            c_new.x.array[:] = self.c.x.array
+            self.c_n.x.array[:] = self.c.x.array
+        else:
+            c_new = None
+
         prev_res_T = None
         prev_res_u = None
+        prev_res_D = None
 
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
@@ -441,33 +705,55 @@ class Solver:
             # Defaults
             conv_th = True
             conv_mech = True
+            conv_damage = True
 
-            # --- THERMAL STEP ---
+            # --. THERMAL STEP --..
             if self.on.get("thermal", False):
-                # print("Before:", T_new.x.array[:10])
                 conv_th, _, _, prev_res_T = self._thermal_step(
                     T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
                 )
-                # print("After :", T_new.x.array[:10])
 
-            # --- MECHANICAL STEP ---
+            # --. DAMAGE STEP --..
+            if self.on.get("damage", False):
+                self.update_history(u_new) 
+                conv_damage, _, _, prev_res_D = self._damage_step(
+                    D_new,
+                    D_old,
+                    rtol_dmg,
+                    stag_tol_dmg,
+                    prev_res_D,
+                )
+
+            # --. MECHANICAL STEP --..
             if self.on.get("mechanical", False):
                 conv_mech, _, _, prev_res_u = self._mechanical_step(
                     u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
                 )
+            
+            # --. CLUSTER STEP --..
+            if self.on.get("cluster", False):
+                self._cluster_step(c_new, self.c_n, dt)
 
-            # --- OVERALL CONVERGENCE ---
+            # --.. GLOBAL CONVERGENCE --..
             print("\nConvergence check")
 
-            if conv_th and conv_mech:
+            if conv_th and conv_mech and conv_damage:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
 
-                # Commit results
                 if self.on.get("thermal", False):
                     self.T.x.array[:] = T_new.x.array
 
                 if self.on.get("mechanical", False):
                     self.u.x.array[:] = u_new.x.array
+
+                if self.on.get("damage", False):
+                    self.D.x.array[:] = D_new.x.array
+                
+                if self.on.get("cluster", False):
+                    self.c.x.array[:] = c_new.x.array
+
+                if self.on.get("mechanical", False) and self.on.get("plasticity", False):
+                    self.update_plastic_history(u_new)
 
                 return True
 
@@ -478,230 +764,10 @@ class Solver:
             self.T.x.array[:] = T_new.x.array
         if self.on.get("mechanical", False):
             self.u.x.array[:] = u_new.x.array
+        if self.on.get("damage", False):
+            self.D.x.array[:] = D_new.x.array
+            
+        if self.on.get("cluster", False):
+            self.c.x.array[:] = c_new.x.array
 
         return False
-
-    def solve_monolithic(self, tol=1e-8, max_iter=50):
-        """
-        Monolithic thermo-mechanical solver (MVP, Phase 1).
-
-        Supported features
-        ------------------
-        - Dirichlet and Neumann boundary conditions for both thermal and mechanical problems (including Clamp_x/y/z constraints).
-        - Material thermal conductivity ``k`` can be constant or a UFL symbolic expression (already stored in ``self.materials[*]["k"]``).
-
-        Not included in this phase
-        --------------------------
-        - Robin-type gap conduction
-        - Interface projection operators
-        - "Gas" gap conductance ``h_gap``
-
-        Notes
-        -----
-        - Slip_* boundary conditions and Robin conditions are not yet implemented here.
-        - Dirichlet BCs are reconstructed on the mixed space ``W``
-
-        """
-
-        print("\n[INFO] Starting monolithic thermo-mechanical solve (Phase 1)")
-        print(f"  → Tolerance (Newton)     : {tol}")
-        print(f"  → Max iterations (Newton): {max_iter}")
-
-        # Split (initialized) mixed unknowns into mechanical (u_m) and thermal (u_t) parts
-        u_m, u_t = ufl.split(self.sol_mixed)
-        v_m, v_t = ufl.TestFunctions(self.W)
-
-        # Initialize total residual
-        F = 0
-
-        # --. VOLUME CONTRIBUTIONS: loop over materials --..
-        for label, material in self.materials.items():
-            tag = self.label_map[label]
-            dx_local = ufl.Measure(
-                "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
-            )
-
-            # Material properties (may be constants or UFL expressions consistent with self.T)
-            k = material["k"]
-
-            rho = dolfinx.default_scalar_type(material["rho"])
-            g = dolfinx.default_scalar_type(self.g)
-            body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
-
-            # Volumetric heat source: global Function self.q_third
-            q_vol = self.q_third
-
-            # Thermal contribution
-            F_thermal = (k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) - q_vol * v_t) * dx_local
-            if self.on["thermal"]:
-                F += F_thermal
-
-            # Mechanical stress contributions (mechanical + thermal)
-            sigma_m = self.sigma_mech(u_m, material)
-            if self.on["thermal"]:
-                sigma_th = self.sigma_th(u_t, material)
-                sigma_tot = sigma_m + sigma_th
-            else:
-                sigma_tot = sigma_m
-
-            if self.on["mechanical"]:
-                F += (
-                    ufl.inner(sigma_tot, ufl.sym(ufl.grad(v_m))) - ufl.dot(body_force, v_m)
-                ) * dx_local
-
-        # Thermal Neumann BCs (heat flux) — reuse lists from set_thermal_boundary_conditions
-        for label in self.materials:
-            for bc_info in self.neumann_thermal.get(label, []):
-                ds_local = ufl.Measure(
-                    "ds",
-                    domain=self.mesh,
-                    subdomain_data=self.facet_tags,
-                    subdomain_id=bc_info["id"],
-                )
-                F -= bc_info["value"] * v_t * ds_local  # outward heat flux term
-
-        # Mechanical traction BCs — reuse lists from set_mechanical_boundary_conditions
-        for label in self.materials:
-            for bc_info in self.traction.get(label, []):
-                ds_local = ufl.Measure(
-                    "ds",
-                    domain=self.mesh,
-                    subdomain_data=self.facet_tags,
-                    subdomain_id=bc_info["id"],
-                )
-                # bc_info["value"] is already a traction vector (Constant * n), use directly
-                F -= ufl.dot(bc_info["value"], v_m) * ds_local
-
-        # --. DIRICHLET CONDITIONS on mixed space W.sub(1) (T) and W.sub(0) (u) --..
-        bcs_mixed = []
-
-        # Helper: locate DOFs on a subspace for a given facet region
-        def locate_dofs_on_sub(subspace, region_id):
-            facets = self.facet_tags.find(region_id)
-            return dolfinx.fem.locate_dofs_topological(subspace, self.fdim, facets)
-
-        # Thermal Dirichlet BCs reconstructed on W.sub(1)
-        thermal_bcs_defs = self.boundary_conditions.get("thermal", {})
-        for _, bc_list in thermal_bcs_defs.items():
-            for bc in bc_list:
-                if bc.get("type") != "Dirichlet":
-                    continue
-                region = bc.get("region")
-                Tval = bc.get("temperature", None)
-                if region is None or Tval is None:
-                    continue
-                region_id = self.label_map.get(region)
-                if region_id is None:
-                    continue
-                dofs_T = locate_dofs_on_sub(self.W.sub(1), region_id)
-                T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(Tval))
-                bcs_mixed.append(dolfinx.fem.dirichletbc(T_d, dofs_T, self.W.sub(1)))
-
-        # Mechanical Dirichlet BCs: full vector displacement or single-component clamps
-        mech_bcs_defs = self.boundary_conditions.get("mechanical", {})
-        for _, bc_list in mech_bcs_defs.items():
-            for bc in bc_list:
-                bc_type = bc.get("type")
-                region = bc.get("region")
-                if region is None or bc_type is None:
-                    continue
-                region_id = self.label_map.get(region)
-                if region_id is None:
-                    continue
-
-                if bc_type == "Dirichlet":
-                    disp = bc.get("displacement", None)
-                    if disp is None:
-                        continue
-                    # Collapse vector subspace (u) to a full FunctionSpace
-                    V_u_sub, _ = self.W.sub(0).collapse()
-                    # Create constant displacement Function
-                    vec = np.asarray(disp, dtype=dolfinx.default_scalar_type).reshape(self.tdim)
-                    u_d_fun = dolfinx.fem.Function(V_u_sub, name="u_dirichlet_const")
-                    u_d_fun.interpolate(
-                        lambda x, v=vec: np.tile(v.reshape(self.tdim, 1), (1, x.shape[1]))
-                    )
-                    # Locate DOFs mapping mixed space → collapsed space
-                    facets = self.facet_tags.find(region_id)
-                    dofs_mixed = dolfinx.fem.locate_dofs_topological(
-                        (self.W.sub(0), V_u_sub), self.fdim, facets
-                    )
-                    bcs_mixed.append(dolfinx.fem.dirichletbc(u_d_fun, dofs_mixed, self.W.sub(0)))
-
-                elif bc_type == "Clamp_x":
-                    dofs_x = locate_dofs_on_sub(self.W.sub(0).sub(0), region_id)
-                    bcs_mixed.append(
-                        dolfinx.fem.dirichletbc(
-                            dolfinx.default_scalar_type(0.0), dofs_x, self.W.sub(0).sub(0)
-                        )
-                    )
-
-                elif bc_type == "Clamp_y":
-                    dofs_y = locate_dofs_on_sub(self.W.sub(0).sub(1), region_id)
-                    bcs_mixed.append(
-                        dolfinx.fem.dirichletbc(
-                            dolfinx.default_scalar_type(0.0), dofs_y, self.W.sub(0).sub(1)
-                        )
-                    )
-
-                elif bc_type == "Clamp_z":
-                    val = float(bc.get("value", 0.0))  # allowing GPS
-                    dofs_z = locate_dofs_on_sub(self.W.sub(0).sub(2), region_id)
-                    bcs_mixed.append(
-                        dolfinx.fem.dirichletbc(
-                            dolfinx.default_scalar_type(val), dofs_z, self.W.sub(0).sub(2)
-                        )
-                    )
-
-        # -- NONLINEAR PROBLEM & SOLVER (FEniCSx ≥ 0.10.0) --
-        petsc_options = {
-            "snes_type": "newtonls",
-            "snes_linesearch_type": "none",
-            "snes_monitor": None,
-            "snes_atol": 1e-8,
-            "snes_rtol": 1e-8,
-            "snes_stol": 1e-8,
-            "ksp_type": "preonly",
-            "pc_type": "lu",
-            "pc_factor_mat_solver_type": "mumps",
-        }
-        problem = NonlinearProblem(
-            F,
-            self.sol_mixed,
-            bcs=bcs_mixed,
-            petsc_options=petsc_options,
-            petsc_options_prefix="elasticity",
-        )
-
-        print("[INFO] Solving monolithic nonlinear problem...")
-        problem.solve()
-
-        snes = problem.solver
-        iters = snes.getIterationNumber()
-        converged = snes.getConvergedReason()
-
-        if converged:
-            print(f"[INFO] Newton solver converged in {iters} iterations")
-        else:
-            print(f"[WARNING] Newton solver did not converge after {iters} iterations")
-
-        # ===== UPDATE GLOBAL STATE FIELDS =====
-        u_sol = self.sol_mixed.sub(0).collapse()
-        u_sol.name = "Displacement"
-        T_sol = self.sol_mixed.sub(1).collapse()
-        T_sol.name = "Temperature"
-
-        # Copy results back into global Functions self.u / self.T
-        try:
-            self.u.interpolate(u_sol)
-        except Exception:
-            self.u.x.array[:] = u_sol.x.array
-        try:
-            self.T.interpolate(T_sol)
-        except Exception:
-            self.T.x.array[:] = T_sol.x.array
-
-        print(f"Min/Max temperature: {self.T.x.array.min():.2f} / {self.T.x.array.max():.2f} K")
-        u_vec = self.u.x.array.reshape(-1, self.tdim)
-        umag = np.linalg.norm(u_vec, axis=1)
-        print(f"Min/Max displacement magnitude: {umag.min():.2e} / {umag.max():.2e}")

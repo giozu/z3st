@@ -51,6 +51,8 @@ The staggered scheme alternates between thermal and mechanical solves until both
    materials:
      steel: ../../materials/steel.yaml
 
+  regime: 2D
+
    solver_settings:
      coupling: staggered
      max_iters: 100
@@ -65,13 +67,14 @@ The staggered scheme alternates between thermal and mechanical solves until both
    models:
      thermal: true
      mechanical: true
+     damage: true
+     cluster_dynamics: false
 
    mechanical:
      solver: linear
      linear_solver: iterative_amg
      rtol: 1.0e-6
      stag_tol: 1.0e-6
-     mechanical_regime: 3D
      convergence: rel_norm
 
    thermal:
@@ -80,6 +83,15 @@ The staggered scheme alternates between thermal and mechanical solves until both
      rtol: 1.0e-6
      stag_tol: 1.0e-6
      convergence: rel_norm
+
+   damage:
+     type: AT2 # AT1 | AT2
+     solver: linear
+     linear_solver: iterative_hypre
+     rtol: 1.0e-6
+     stag_tol: 1.0e-6
+     convergence: rel_norm
+     lc: 0.002 # (m) characteristic length
 
    lhr:
    - 0
@@ -330,6 +342,22 @@ The slip boundary condition blocks motion tangential to the boundary
 while allowing displacement along the normal direction.
 It is typically used to remove rigid-body modes without fully clamping
 the structure.
+
+Damage boundary conditions
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Dirichlet
+"""""""""
+
+- Imposes a fixed damage value :math:`D \in [0, 1]`.
+- Used to prescribe initial cracks or fully damaged regions.
+- Example:
+
+  .. code-block:: yaml
+
+    - type: Dirichlet
+      region: crack
+      value: 1.0
 
 Notes:
 

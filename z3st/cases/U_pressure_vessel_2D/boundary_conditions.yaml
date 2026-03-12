@@ -1,0 +1,19 @@
+thermal:
+  steel:
+  - type: Dirichlet
+    region: inner
+    temperature: 300.0   # (K)
+
+mechanical:
+  steel:
+  - type: Clamp_x
+    region: symmetry_axis
+
+  - type: Dirichlet
+    region: bottom_boundary
+    displacement: [0.0, 0.0]
+
+  - type: Neumann
+    region: inner
+    traction: 1.0e+7   # (Pa)
+

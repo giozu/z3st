@@ -8,14 +8,18 @@ from mpi4py import MPI
 
 # from .manager import MeshManager
 # from .plotter import MeshPlotter
-from .reader import GmshMeshReader
+from .reader import GmshMeshReader, XdmfMeshReader
 
 
 def load_mesh(path: str, comm: MPI.Comm = MPI.COMM_WORLD):
     """
-    Read a mesh from a Gmsh file and return raw mesh data.
+    Read a mesh from a file (Gmsh or XDMF) and return raw mesh data.
     MeshManager initialization (with geometry info) must be done in Spine.
     """
-    reader = GmshMeshReader(comm)
+    if str(path).endswith(".xdmf") or str(path).endswith(".XDMF"):
+        reader = XdmfMeshReader(comm)
+    else:
+        reader = GmshMeshReader(comm)
+
     mesh, cell_tags, facet_tags = reader.load(path)
     return mesh, cell_tags, facet_tags

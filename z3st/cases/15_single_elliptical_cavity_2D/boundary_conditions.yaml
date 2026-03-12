@@ -1,0 +1,17 @@
+thermal:
+  solid:
+  - type: Dirichlet
+    region: xmin
+    temperature: 300.0 # (K)
+
+mechanical:
+  solid:
+  - type: Neumann
+    region: cavity
+    traction: -1.0 # (MPa)
+
+  - type: Clamp_y
+    region: ymin
+
+  - type: Clamp_x
+    region: xmin

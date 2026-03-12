@@ -58,7 +58,7 @@ Plane Surface(5) = {5};
 Line Loop(6) = {9, 10, 11, 12};
 Plane Surface(6) = {6};
 
-// Define cube volume
+// Define volume
 Surface Loop(1) = {1, 2, 3, 4, 5, 6};
 Volume(1) = {1};
 
@@ -80,7 +80,7 @@ Physical Volume("steel") = {1};
 
 // Generate structured mesh
 Mesh.RecombineAll = 1;
-Mesh 3;
+// Mesh 3;
 
 // Save mesh file
-Save "mesh.msh";
+// Save "mesh.msh";

@@ -27,6 +27,34 @@ Core Modules
    :undoc-members:
    :show-inheritance:
 
+Physics Models
+--------------
+
+.. automodule:: z3st.models.mechanical_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.thermal_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.cluster_dynamic_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.damage_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.gap_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Diagnostics
 -----------
 

@@ -24,25 +24,17 @@ class ThermalModel:
         # --. Thermal model options --..
         self.th_cfg = self.input_file.get("thermal", {})
 
-        if not self.th_cfg:
-            raise ValueError("[ThermalModel] 'thermal' missing in input.yaml.")
-
         print("[ThermalModel] options loaded from input.yaml:")
         for key, value in self.th_cfg.items():
             print(f"  {key:<20}: {value}")
 
-    def set_thermal_boundary_conditions(self, V_t, V_t_map=None):
+    def set_thermal_boundary_conditions(self, V_t):
         """
-        Apply thermal boundary conditions for both staggered and mixed cases.
-
-        If V_t_map is None → staggered (non-mixed spaces).
-        If V_t_map is provided → mixed (collapsed subspace).
+        Apply thermal boundary conditions
 
         Parameters:
-            V_t_sub: FunctionSpace (collapsed temperature space)
-            V_t_map: DoF map from mixed to collapsed (only in mixed case)
+            V_t: FunctionSpace (temperature space)
         """
-        print(f"\nSetting thermal boundary conditions...")
         thermal_bcs_defs = self.boundary_conditions.get("thermal", {})
 
         seen_regions = {}

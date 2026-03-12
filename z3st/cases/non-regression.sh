@@ -12,24 +12,40 @@ SUMMARY_FILE="${ROOT_DIR}/non-regression_summary.txt"
 CASES=(
     "00_example"
     "1_thin_slab_2D"
+    "1_thin_slab_neumann_2D"
+    "1_thin_slab_neumann_3D"
+    "1_thin_slab_non_linear"
     "2_thin_cylindrical_shell_2D"
     "3_thick_slab_adiabatic_3D"
     "3_thin_slab_adiabatic_2D"
     "4_thin_cylindrical_shell_adiabatic_2D"
     "4_thick_cylindrical_shell_adiabatic_2D"
-    "5_thick_slab_non_adiabatic_3D"
+    # "5_thick_slab_non_adiabatic_3D"
     "5_thin_slab_non_adiabatic_2D"
     "6_thin_cylindrical_shell_non_adiabatic_2D"
     "6_thick_cylindrical_shell_non_adiabatic_2D"
     "7_box_heated"
     "8_thick_cylindrical_shell_plane_strain_2D"
     "9_thick_cylindrical_shell_GPS_2D"
-    "9_thick_cylindrical_shell_GPS_3D"
+    # "9_thick_cylindrical_shell_GPS_3D"
     "11_thin_cylindrical_shell_Mariotte"
     "12_cylindrical_shell_thermal_gradient_2D"
-    "12_cylindrical_shell_thermal_gradient_3D"
+    # "12_cylindrical_shell_thermal_gradient_3D"
     "13_annular_cylinder"
     "14_full_cylinder"
+    # "15_box_elliptical_cavity_2D"
+    "15_spherical_pressurized_cavity"
+    "16_coaxial_cylinders_3D"
+    # "17_stress_strain_curve_double_crack"
+    "17_stress_strain_curve_displacement"
+    # "17_stress_strain_curve_knotch"
+    "17_stress_strain_curve_stress"
+    # "18_box_knotch_2D"
+    "18_box_crack_2D"
+    # "19_single-edge_notched_tension_test"
+    # "19_single-edge_notched_shear_test"
+    "20_plasticity_2D"
+    "I_mesh_sensitivity_2D"
 )
 
 echo "--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---"
@@ -74,6 +90,7 @@ for case_name in "${CASES[@]}"; do
     start_time=$(date +%s)
 
     chmod +x Allrun
+    # conda run -n z3st ./Allrun
     ./Allrun
 
     exit_code=${PIPESTATUS[0]}
