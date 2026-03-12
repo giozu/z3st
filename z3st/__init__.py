@@ -14,14 +14,17 @@ except metadata.PackageNotFoundError:
     __version__ = "0.1.0"
 
 from .core import solver
-from .models import gap_model, mechanical_model, thermal_model
+from .core.spine import Spine
+from .models import gap_model, mechanical_model, thermal_model, cluster_dynamic_model
 from .utils import export_vtu, plot_convergence
 
 __all__ = [
     "solver",
+    "Spine",
     "thermal_model",
     "mechanical_model",
     "gap_model",
+    "cluster_dynamic_model",
     "export_vtu",
     "plot_convergence",
 ]
@@ -29,3 +32,4 @@ __all__ = [
 Solver = solver.Solver
 Thermal = thermal_model.ThermalModel
 Mechanical = mechanical_model.MechanicalModel
+Cluster = cluster_dynamic_model.ClusterDynamicsModel

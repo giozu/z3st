@@ -1,0 +1,13 @@
+name: box_with_cavity
+geometry_type: rect
+Lx: 2.0
+Ly: 2.0
+ax: 0.06
+ay: 0.03464101615137754
+labels:
+  solid: 1
+  cavity: 2
+  ymin: 3
+  xmin: 4
+  xmax: 5
+  ymax: 6

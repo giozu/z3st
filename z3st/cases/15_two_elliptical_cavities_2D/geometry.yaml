@@ -1,0 +1,16 @@
+name: box_with_cavity
+geometry_type: rect
+
+Lx: 0.560499     # box length in x (micron)
+Ly: 0.560499     # box length in y (micron)
+
+ax: 0.10         # semi-axis of ellipsoid in x (micron)
+ay: 0.0466308    # semi-axis of ellipsoid in y (micron)
+
+labels:
+  solid: 1
+  cavity: 2
+  ymin: 3
+  xmin: 4
+  xmax: 5
+  ymax: 6

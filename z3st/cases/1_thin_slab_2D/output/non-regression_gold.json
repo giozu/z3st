@@ -20,6 +20,13 @@
             "abs_error": 3.847554012281762e-06,
             "rel_error": 7.852151045472984e-09,
             "status": "PASS"
+        },
+        "L2_error_sigma_yy": {
+            "numerical": 0.000334252388345246,
+            "reference": 0.0,
+            "abs_error": 0.000334252388345246,
+            "rel_error": 0.000334252388345246,
+            "status": "PASS"
         }
     },
     "tolerance": 0.002,

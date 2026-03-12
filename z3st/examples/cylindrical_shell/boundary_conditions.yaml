@@ -2,16 +2,16 @@ thermal:
   steel:
   - type: Dirichlet
     region: inner_radius
-    temperature: 300   # (K)
+    temperature: 300.0   # (K)
 
 mechanical:
   steel:
-  - type: Dirichlet
+  - type: Clamp_y
     region: bottom
-    displacement: [0.0, 0.0, 0.0]   # (m)
 
-  - type: Clamp_z
+  - type: Clamp_y
     region: top
+    value: -1.359155e-06   # (m)
 
   - type: Neumann
     region: inner_radius

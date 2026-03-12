@@ -13,8 +13,8 @@ Ro = 2.400;  // Outer radius (m)
 Lz = 10.00;  // Height
 
 // Divisions
-nx = 41;     // 40 radial elements
-ny = 91;     // 90 axial elements
+nx = 41;     
+ny = 91;     
 
 Point(1) = {Ri, 0, 0};
 Point(2) = {Ro, 0, 0};
@@ -45,7 +45,7 @@ Physical Curve("bottom", 3) = {1};
 Physical Curve("top", 4) = {3};
 
 // Generate the 2D mesh
-Mesh 2;
+// Mesh 2;
 
 // Save the mesh
-Save "mesh.msh";
+// Save "mesh.msh";

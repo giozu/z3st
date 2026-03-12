@@ -45,7 +45,7 @@ Physical Curve("xmin") = {4};
 Physical Surface("steel") = {1};
 
 // Meshing settings
-Mesh 2;
+// Mesh 2;
 
 // Save mesh file
-Save "mesh.msh";
+// Save "mesh.msh";

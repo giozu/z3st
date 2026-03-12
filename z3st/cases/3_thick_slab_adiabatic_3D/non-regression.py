@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 13_thick_slab_adiabatic_3D
+Z3ST case: 3_thick_slab_adiabatic_3D
 
 non-regression script
 ---------------------
-Steady-state 1D slab (Dirichlet-Neumann).
+Steady-state 3D slab (Dirichlet-Neumann).
 
 """
 

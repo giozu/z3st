@@ -7,7 +7,7 @@
 import json
 import os
 import sys
-
+import collections.abc
 import numpy as np
 
 USE_COLOR = sys.stdout.isatty()
@@ -77,7 +77,10 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
 
 def regression_check(errors, case_dir, regression_tol=1e-3):
     """
-    Compare numerical results with a non-regression_gold.json reference file.
+    This function evaluates the qualitative performance of the current run compared to the 
+    GOLD benchmark. It normalizes error data (handling both scalars and sequences) and 
+    determines if the solver's accuracy has improved or degraded, providing immediate 
+    visual feedback on the impact of recent code changes or mesh refinements.
 
     Parameters
     ----------
@@ -125,12 +128,30 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         passed = np.all(rel_diff_arr < regression_tol)
         rel_diff_display = float(np.max(rel_diff_arr))
 
+
+        # --- Accuracy trend analysis ---
+
+        # Normalize relative errors: if the error is a sequence (e.g., an error field over a mesh), 
+        # extract the maximum value to represent the 'worst-case' scenario.
+        if rel_err_now is not None and isinstance(rel_err_now, collections.abc.Sequence): # if rel_err_now is a list
+            err_now_val = float(np.max(rel_err_now))
+        else: # if rel_err_now is a scalar
+            err_now_val = rel_err_now
+
+        if rel_err_gold is not None and isinstance(rel_err_gold, collections.abc.Sequence): # if rel_err_gold is a list
+            err_gold_val = float(np.max(rel_err_gold))
+        else: # if rel_err_gold is a scalar
+            err_gold_val = rel_err_gold
+
+        # Determine if the current accuracy has improved (lower error) 
+        # or worsened (higher error) relative to the GOLD reference.
+        # This logic triggers visual indicators ('better'/'worse') in the terminal output.
         improvement = (
-            rel_err_now is not None and rel_err_gold is not None and rel_err_now < rel_err_gold
+            err_now_val is not None and err_gold_val is not None and err_now_val < err_gold_val
         )
 
         worsening = (
-            rel_err_now is not None and rel_err_gold is not None and rel_err_now > rel_err_gold
+            err_now_val is not None and err_gold_val is not None and err_now_val > err_gold_val
         )
 
         color = GREEN if passed else RED
