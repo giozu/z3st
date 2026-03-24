@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Executing z3st.py..."
+
+gmsh mesh.geo -3
+
+# conda run -n z3st python3 -m z3st
+
+# conda run -n z3st python3 non-regression.py
+
+python3 -m z3st
+
+python3 non-regression.py

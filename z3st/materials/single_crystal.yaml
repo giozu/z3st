@@ -1,0 +1,15 @@
+name: single_crystal
+
+constitutive: custom
+stress_function: "z3st.materials.single_crystal_law.single_crystal_stress"
+
+E: 200.0e9  # Young's modulus (Pa)
+nu: 0.3  # Poisson's ratio
+k: 50.0  # Thermal conductivity (W/m·K)
+cp: 400.0  # Specific heat capacity (J/kg·K)
+rho: 7800.0  # Density (kg/m³)
+alpha: 1.2e-5  # Thermal expansion coefficient (1/K)
+T_ref: 300.0  # Reference temperature (K)
+g0: 200000000.0  # Slip resistance (Pa) = 200 MPa
+gamma0: 0.001  # Reference slip rate (1/s)
+n_pow: 5.0  # Power law exponent

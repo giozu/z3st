@@ -1,0 +1,14 @@
+mesh: mesh.msh
+dimension: 3
+
+regions:
+  grain: 1
+
+labels:
+  zmin: 10
+  zmax: 11
+  ymin: 12
+  xmax: 13
+  ymax: 14
+  xmin: 15
+  grain: 1

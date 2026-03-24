@@ -48,6 +48,8 @@ Documentation Contents
 
    installation
    usage
+   physics_models
+   differentiable_features
    examples
    api
    contributing

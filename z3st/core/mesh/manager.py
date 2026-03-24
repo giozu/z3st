@@ -48,8 +48,11 @@ class MeshManager:
             log.info(f"  Tag ID: {tag}")
 
         # --. Facet tags --..
-        unique_facets = np.unique(self.facet_tags.values)
-        log.info(f"\nUnique tags found in facet data: {unique_facets}")
+        if self.facet_tags is not None:
+            unique_facets = np.unique(self.facet_tags.values)
+            log.info(f"\nUnique tags found in facet data: {unique_facets}")
+        else:
+            log.warning("No facet tags found in mesh.")
 
         # --. Label map --..
         self.label_map = self.geometry.get("labels", {})
