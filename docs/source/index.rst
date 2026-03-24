@@ -44,14 +44,31 @@ Documentation Contents
 
 .. toctree::
    :maxdepth: 2
-   :caption: User Documentation
+   :caption: Getting Started
 
    installation
+   getting_started
+   troubleshooting
+
+.. toctree::
+   :maxdepth: 2
+   :caption: User Guide
+
    usage
    physics_models
-   differentiable_features
    examples
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Advanced Features
+
+   differentiable_features
    api
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Development
+
    contributing
    license
 

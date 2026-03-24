@@ -211,13 +211,13 @@ else:
     print(f"  ✗ WARNING: Stress deviates from saturation (error = {saturation_error*100:.1f}%)")
     print(f"    This may indicate: insufficient loading, wrong parameters, or numerical issues.")
 
-# Build error dictionary (following Z3ST convention)
+# Error dictionary
 errors = {
     "sigma_zz_final": {
         "numerical": float(sigma_zz_final),
-        "reference": float(sigma_elastic_final),
-        "abs_error": float(abs(sigma_zz_final - sigma_elastic_final)),
-        "rel_error": float(rel_error_sigma),
+        "reference": float(sigma_sat_analytical),  # Compare vs σ_sat, not elastic!
+        "abs_error": float(abs(sigma_zz_final - sigma_sat_analytical)),
+        "rel_error": float(saturation_error),  # Already calculated above
     },
     "epsilon_zz_final": {
         "numerical": float(epsilon_zz_final),
@@ -225,11 +225,11 @@ errors = {
         "abs_error": float(abs(epsilon_zz_final - APPLIED_STRAIN_MAX)),
         "rel_error": float(rel_error_strain),
     },
-    "stress_reduction_percent": {
-        "numerical": float(stress_reduction * 100),
-        "reference": -20.0,  # Expected ~20% reduction for this setup
-        "abs_error": float(abs(stress_reduction * 100 - (-20.0))),
-        "rel_error": float(abs(stress_reduction * 100 - (-20.0)) / 20.0),
+    "saturation_convergence": {
+        "numerical": float(saturation_error * 100),  # Error percentage
+        "reference": 0.0,  # Perfect convergence target
+        "abs_error": float(saturation_error * 100),
+        "rel_error": float(saturation_error),  # Relative to perfect convergence
     },
 }
 

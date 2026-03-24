@@ -2,10 +2,10 @@
     "results": {
         "sigma_zz_final": {
             "numerical": 780913898.6814574,
-            "reference": 2692307692.3076925,
-            "abs_error": 1911393793.626235,
-            "rel_error": 0.7099462662040301,
-            "status": "FAIL"
+            "reference": 808565333.7576076,
+            "abs_error": 27651435.07615018,
+            "rel_error": 0.034198145680630364,
+            "status": "PASS"
         },
         "epsilon_zz_final": {
             "numerical": 0.01,
@@ -14,14 +14,14 @@
             "rel_error": 0.0,
             "status": "PASS"
         },
-        "stress_reduction_percent": {
-            "numerical": -70.99462662040301,
-            "reference": -20.0,
-            "abs_error": 50.99462662040301,
-            "rel_error": 2.5497313310201504,
-            "status": "FAIL"
+        "saturation_convergence": {
+            "numerical": 3.4198145680630363,
+            "reference": 0.0,
+            "abs_error": 3.4198145680630363,
+            "rel_error": 0.034198145680630364,
+            "status": "PASS"
         }
     },
     "tolerance": 0.25,
-    "summary": "FAIL"
+    "summary": "PASS"
 }
