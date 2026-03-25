@@ -295,7 +295,7 @@ where:
 where:
 
 - :math:`\beta_n` is the bias factor (drift velocity)
-- :math:`\D_n` is the diffusion coefficient in size space
+- :math:`D_n` is the diffusion coefficient in size space
 
 **Boundary conditions:**
 

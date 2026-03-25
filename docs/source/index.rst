@@ -1,16 +1,35 @@
 Z3ST
 ====
 
-**Z3ST** is a finite-element framework built upon the **FEniCSx** ecosystem.
-It enables thermo-mechanical and multiphysics simulations for scientific research, didactive activities, and verification workflows.
+**Z3ST** is an open-source finite-element framework built on **FEniCSx** for coupled thermo-mechanical analysis and multiphysics simulations.
 
-Z3ST aim at providing a clean and extensible interface for model definition, meshing, and solution pipelines.
-It is designed with a strong focus on:
+Designed for scientific research, engineering applications, and educational purposes, Z3ST provides a clean, modular interface for:
 
-- **Numerical reproducibility**, through non-regression testing;
-- **Ease of use**, with YAML-based configuration and automatic mesh handling;
-- **Interoperability**, leveraging standard tools like *Gmsh*, *meshio*, and *ParaView*;
-- **Scientific transparency**, through open-source code and complete documentation.
+- **Coupled thermo-mechanical simulations** with staggered solution schemes
+- **Phase-field fracture mechanics** (AT1/AT2 models)
+- **Cluster dynamics** for defect evolution in irradiated materials
+- **Multi-material domains** with complex geometries
+- **Automatic differentiation** for inverse problems and optimization
+
+Key Features
+^^^^^^^^^^^^
+
+Z3ST is designed with a strong focus on:
+
+- **Ease of use** — Full YAML-based configuration, no code modification needed
+- **Numerical reproducibility** — Comprehensive non-regression testing suite
+- **Extensibility** — Clean Python API for custom models and workflows
+- **Interoperability** — Uses standard tools (Gmsh, ParaView, FEniCSx)
+- **Scientific transparency** — Open-source with complete documentation
+
+What Makes Z3ST Different?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+1. **Zero-boilerplate simulations**: Configure everything via YAML files
+2. **Built-in material database**: Pre-defined properties for common materials
+3. **Verification-first approach**: Every feature has benchmark cases
+4. **Graduate student friendly**: Extensive documentation and examples
+5. **Research-ready**: Differentiable formulations for inverse problems
 
 Overview
 --------
@@ -48,6 +67,7 @@ Documentation Contents
 
    installation
    getting_started
+   quick_reference
    troubleshooting
 
 .. toctree::

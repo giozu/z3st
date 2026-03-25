@@ -24,6 +24,7 @@ CASE_DIR = os.path.dirname(__file__)
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(OUTPUT_DIR, "non-regression.json")
 INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
+GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 
 # Load input configuration
 with open(INPUT_FILE, 'r') as f:
@@ -40,17 +41,25 @@ g0 = float(mat_data.get('g0', 50e6))
 gamma0 = float(mat_data.get('gamma0', 0.02))
 n_pow = float(mat_data.get('n_pow', 10.0))
 
-print(f"[INFO] Material loaded: E = {E:.2e} Pa, nu = {nu}")
+# Load geometry data
+with open(GEOMETRY_FILE, 'r') as f:
+    geom_data = yaml.safe_load(f)
+
+Lz = float(geom_data.get('Lz'))
+
+print(f"\nnon-regression script")
+print(f"---------------------")
+print(f"[INFO] Material loaded from {mat_path}")
+print(f"       E = {E:.2e} Pa, nu = {nu}")
 print(f"[INFO] Plasticity params: g0 = {g0*1e-6:.1f} MPa, gamma0 = {gamma0}, n = {n_pow}")
 
-APPLIED_STRAIN_MAX = 0.01  # from boundary conditions (10 mm displacement on 1 m cube)
-TOLERANCE = 0.25  # relaxed tolerance for plasticity (25%)
+APPLIED_STRAIN_MAX = 0.01  # from boundary conditions
+TOLERANCE = 0.25
 
 # --.. ..- .-.. .-.. --- analytic functions --.. ..- .-.. .-.. ---
 def elastic_stress(epsilon, E, nu):
-    """Analytical elastic stress for constrained uniaxial loading (oedometric)."""
-    M = E * (1 - nu) / ((1 + nu) * (1 - 2 * nu))
-    return M * epsilon
+    """Analytical elastic stress for uniaxial loading."""
+    return E * epsilon
 
 
 def viscoplastic_saturation_stress(strain_rate, schmid_factor, g0, gamma0, n_pow):
@@ -81,7 +90,6 @@ def viscoplastic_saturation_stress(strain_rate, schmid_factor, g0, gamma0, n_pow
     sigma_sat = (g0 / m) * (strain_rate / (m * gamma0))**(1.0 / n_pow)
     return sigma_sat
 
-
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
 vtu_files = sorted(glob.glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
 print(f"[INFO] Processing {len(vtu_files)} VTU files...")
@@ -99,12 +107,14 @@ stresses_np = []
 
 for vtu in vtu_files:
     # Extract displacement field
-    _, _, _, disp = extract_field(vtu, "Displacement")
+    # _, _, _, disp = extract_field(vtu, "Displacement")
 
-    # Calculate strain from displacement (geometry: 1×1×1 cube)
-    uz_max = np.max(disp[:, 2])
-    uz_min = np.min(disp[:, 2])
-    epsilon_zz = (uz_max - uz_min) / 1.0  # Lz = 1.0 m
+    # Extract strain field
+    # uz_max = np.max(disp[:, 2])
+    # uz_min = np.min(disp[:, 2])
+    # epsilon_zz = (uz_max - uz_min) / Lz
+    _, _, _, strain = extract_field(vtu, "Strain (cells)")
+    epsilon_zz = np.mean(strain[:, 8])
     strains_np.append(epsilon_zz)
 
     # Extract stress field (cell data)
@@ -115,16 +125,16 @@ for vtu in vtu_files:
 strains_np = np.array(strains_np)
 stresses_np = np.array(stresses_np)
 
+# --.. ..- .-.. .-.. --- semi-analytical saturation stress --.. ..- .-.. .-.. ---
 # Analytical elastic prediction
 elastic_stresses_np = elastic_stress(strains_np, E, nu)
 
-# --.. ..- .-.. .-.. --- semi-analytical saturation stress --.. ..- .-.. .-.. ---
 # Calculate strain rate (assuming constant rate loading)
 time_total = float(input_data['time'][-1])  # Final time
 strain_rate = APPLIED_STRAIN_MAX / time_total  # ε̇ = Δε/Δt
 
 # Schmid factor for (111)[0-11] slip system under z-loading
-schmid_factor = 0.408248  # From Schmid factor calculation
+schmid_factor = 0.408248
 
 # Calculate analytical saturation stress
 sigma_sat_analytical = viscoplastic_saturation_stress(
@@ -137,9 +147,8 @@ sigma_sat_analytical = viscoplastic_saturation_stress(
 
 print(f"\n[ANALYTICAL SOLUTION]")
 print(f"  Strain rate ε̇_total:     {strain_rate:.4e} s⁻¹")
-print(f"  Schmid factor m:         {schmid_factor:.6f}")
+print(f"  Schmid factor:           {schmid_factor:.6f}")
 print(f"  Saturation stress σ_sat: {sigma_sat_analytical*1e-6:.2f} MPa")
-print(f"  (At steady state: ε̇_plastic = ε̇_total)")
 
 # --.. ..- .-.. .-.. --- plotting --.. ..- .-.. .-.. ---
 Pa_to_MPa = 1e-6
@@ -215,9 +224,9 @@ else:
 errors = {
     "sigma_zz_final": {
         "numerical": float(sigma_zz_final),
-        "reference": float(sigma_sat_analytical),  # Compare vs σ_sat, not elastic!
+        "reference": float(sigma_sat_analytical),
         "abs_error": float(abs(sigma_zz_final - sigma_sat_analytical)),
-        "rel_error": float(saturation_error),  # Already calculated above
+        "rel_error": float(saturation_error),
     },
     "epsilon_zz_final": {
         "numerical": float(epsilon_zz_final),
@@ -226,10 +235,10 @@ errors = {
         "rel_error": float(rel_error_strain),
     },
     "saturation_convergence": {
-        "numerical": float(saturation_error * 100),  # Error percentage
-        "reference": 0.0,  # Perfect convergence target
+        "numerical": float(saturation_error * 100),
+        "reference": 0.0,
         "abs_error": float(saturation_error * 100),
-        "rel_error": float(saturation_error),  # Relative to perfect convergence
+        "rel_error": float(saturation_error),
     },
 }
 

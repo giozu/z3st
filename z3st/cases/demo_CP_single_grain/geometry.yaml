@@ -1,8 +1,6 @@
 mesh: mesh.msh
-dimension: 3
 
-regions:
-  grain: 1
+Lz: 1.00
 
 labels:
   zmin: 10
