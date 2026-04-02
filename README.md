@@ -2,7 +2,7 @@
 [![DOI](https://zenodo.org/badge/648784453.svg)](https://doi.org/10.5281/zenodo.17748028)
 [![CI](https://github.com/giozu/z3st/actions/workflows/ci.yml/badge.svg)](https://github.com/giozu/z3st/actions/workflows/ci.yml)
 ![static](https://github.com/giozu/z3st/actions/workflows/static.yml/badge.svg)
-![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg)
+<!-- ![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg) -->
 
 **Z3ST** is an open-source finite-element framework for thermo-mechanical material analysis.
 Developed in **Python**, it leverages **FEniCSx** and provides a modular environment to couple heat conduction and linear elasticity in multi-material domains under stationary or transient conditions, with user-defined boundary conditions.

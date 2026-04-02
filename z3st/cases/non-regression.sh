@@ -45,6 +45,7 @@ CASES=(
     # "19_single-edge_notched_tension_test"
     # "19_single-edge_notched_shear_test"
     "20_plasticity_2D"
+    "demo_CP_single_grain"
     "I_mesh_sensitivity_2D"
 )
 

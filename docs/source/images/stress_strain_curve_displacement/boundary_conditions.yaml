@@ -1,0 +1,19 @@
+mechanical:
+  steel:
+  - region: xmin
+    type: Clamp_x
+
+  - region: xmax
+    type: Dirichlet
+    displacement:
+      - [0.0, 0.0]        # (m)
+      - [5.0e-11, 0.0]    # (m)
+      - [5.0e-9, 0.0]     # (m)
+      - [5.0e-7, 0.0]     # (m)
+      - [5.0e-5, 0.0]     # (m)
+
+thermal:
+  steel:
+  - type: Dirichlet
+    region: xmin
+    temperature: 300.0   # (K)

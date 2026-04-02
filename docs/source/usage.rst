@@ -364,6 +364,157 @@ Notes:
 - Each boundary condition is applied to a *region* defined in ``geometry.yaml``
   and associated with the corresponding physical tag in the mesh file (``.msh``).
 
+---
+
+Material Properties
+-------------------
+
+Materials in Z3ST are defined using YAML files stored in the ``materials/`` directory. Each material file specifies thermal and mechanical properties used in the simulation.
+
+Material File Format
+^^^^^^^^^^^^^^^^^^^^
+
+A typical material file contains the following properties:
+
+.. code-block:: yaml
+
+   name: vessel_steel_0
+
+   # Mechanical properties
+   E: 1.77e+11           # Young's modulus (Pa)
+   nu: 0.30              # Poisson's ratio (dimensionless)
+   alpha: 1.7e-5         # Thermal expansion coefficient (1/K)
+   T_ref: 300.0          # Reference temperature (K)
+   rho: 8000.0           # Density (kg/m³)
+
+   # Thermal properties
+   k: 48.1               # Thermal conductivity (W/m·K)
+   cp: 200.0             # Specific heat capacity (J/kg·K)
+
+   # Optional: Nuclear/radiation properties
+   mu_gamma: 24.0        # Linear attenuation coefficient (1/m)
+   gamma_heating: 0.0    # Volumetric gamma heating (W/m³)
+
+**Units Convention**:
+
+All properties must use **SI units**:
+
+- **Length**: meters (m)
+- **Mass**: kilograms (kg)
+- **Time**: seconds (s)
+- **Temperature**: Kelvin (K)
+- **Force**: Newtons (N)
+- **Pressure/Stress**: Pascals (Pa)
+- **Energy**: Joules (J)
+- **Power**: Watts (W)
+
+Property Descriptions
+^^^^^^^^^^^^^^^^^^^^^
+
+**Mechanical Properties:**
+
+- ``E`` — Young's modulus (Pa): Stiffness in linear elasticity
+- ``nu`` — Poisson's ratio (dimensionless): Lateral contraction ratio
+- ``alpha`` — Thermal expansion coefficient (1/K): Thermal strain per degree
+- ``T_ref`` — Reference temperature (K): Zero thermal strain temperature
+- ``rho`` — Density (kg/m³): Mass per unit volume
+
+**Thermal Properties:**
+
+- ``k`` — Thermal conductivity (W/m·K): Heat conduction coefficient
+- ``cp`` — Specific heat capacity (J/kg·K): Heat required to raise temperature
+
+**Advanced Properties:**
+
+- ``mu_gamma`` — Attenuation coefficient (1/m): For gamma ray heating calculations
+- ``gamma_heating`` — Volumetric heating (W/m³): Internal heat generation rate
+
+Available Materials
+^^^^^^^^^^^^^^^^^^^
+
+Z3ST includes a database of pre-defined materials in ``z3st/materials/``:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Material
+     - Description
+   * - ``vessel_steel_0.yaml``
+     - Reactor pressure vessel steel (reference properties)
+   * - ``T91.yaml``
+     - T91 ferritic-martensitic steel
+   * - ``15_15Ti.yaml``
+     - 15-15Ti austenitic stainless steel
+   * - ``austenitic_steel.yaml``
+     - Generic austenitic steel
+   * - ``ceramic.yaml``
+     - Ceramic material properties
+   * - ``h2o.yaml``
+     - Water properties
+
+Using Materials in Simulations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To use a material in your simulation, reference it in ``input.yaml``:
+
+.. code-block:: yaml
+
+   materials:
+     steel: ../../materials/vessel_steel_0.yaml
+     water: ../../materials/h2o.yaml
+
+Multiple materials can be defined for multi-material simulations.
+
+Temperature-Dependent Properties
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For temperature-dependent material properties, you can define a Python module instead of a YAML file (future enhancement), or use piecewise definitions.
+
+**Current approach** (constant properties):
+
+.. code-block:: yaml
+
+   k: 48.1  # Constant thermal conductivity
+
+**Future enhancement** (temperature-dependent):
+
+.. code-block:: python
+
+   # materials/steel_temperature_dependent.py
+   def thermal_conductivity(T):
+       """
+       Returns k(T) in W/m·K
+       """
+       return 50.0 - 0.01 * (T - 300.0)
+
+Creating Custom Materials
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To create a custom material:
+
+1. Copy an existing material file from ``z3st/materials/``
+2. Modify the properties for your material
+3. Save with a descriptive name (e.g., ``my_alloy.yaml``)
+4. Reference it in your ``input.yaml``
+
+**Example custom material**:
+
+.. code-block:: yaml
+
+   name: my_custom_alloy
+
+   # From experimental data or literature
+   E: 2.10e+11           # Young's modulus
+   nu: 0.33              # Poisson's ratio
+   k: 35.0               # Thermal conductivity
+   cp: 450.0             # Specific heat
+   alpha: 1.2e-5         # Thermal expansion
+   rho: 7850.0           # Density
+   T_ref: 293.15         # Reference temperature (20°C)
+
+---
+
 Verification cases
 ------------------
 
