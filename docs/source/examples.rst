@@ -14,13 +14,13 @@ All cases include:
 
 ---
 
-Verification Benchmarks
+Linear thermo-mechanics
 -----------------------
 
 Thin Slab: Thermo-Mechanical Coupling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/1_thin_slab_neumann_3D``
+.. **Case Directory:** ``cases/1_thin_slab_neumann_3D``
 
 This example demonstrates coupled thermo-mechanical analysis of a thin slab subjected to thermal loading.
 The case serves as a **verification benchmark** for:
@@ -77,7 +77,7 @@ The case serves as a **verification benchmark** for:
 Cylindrical Shell: Lamé Solution Verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/4_thick_cylindrical_shell_adiabatic_2D``
+.. **Case Directory:** ``cases/4_thick_cylindrical_shell_adiabatic_2D``
 
 This example verifies the mechanical solver against the **analytical Lamé solution** for a thick-walled cylindrical shell under internal pressure.
 
@@ -134,54 +134,9 @@ This example verifies the mechanical solver against the **analytical Lamé solut
 
 This case demonstrates:
 
-✅ **Exact agreement** with Lamé solution (error < 0.1%)
-✅ Correct stress state in cylindrical coordinates
-✅ Proper enforcement of plane-strain conditions
-
----
-
-Mesh Convergence Study
-^^^^^^^^^^^^^^^^^^^^^^^
-
-**Case Directory:** ``cases/I_mesh_sensitivity_2D``
-
-This example demonstrates **mesh convergence** for a 2D thermal problem, showing how solution accuracy improves with mesh refinement.
-
-**Setup:**
-
-- 2D rectangular domain with prescribed boundary conditions
-- Systematic refinement: nx = 10, 20, 40, 80 elements
-- Temperature profiles extracted along centerline
-
-**Results:**
-
-.. figure:: images/mesh_sensitivity_2D/output/convergence_study.png
-   :width: 80%
-   :align: center
-
-   Convergence plot showing error vs. mesh size (log-log scale).
-
-**Temperature Profiles at Different Mesh Resolutions:**
-
-.. figure:: images/mesh_sensitivity_2D/output/profile_nx_10.png
-   :width: 48%
-
-.. figure:: images/mesh_sensitivity_2D/output/profile_nx_20.png
-   :width: 48%
-
-.. figure:: images/mesh_sensitivity_2D/output/profile_nx_40.png
-   :width: 48%
-
-.. figure:: images/mesh_sensitivity_2D/output/profile_nx_80.png
-   :width: 48%
-
-   Temperature profiles for nx = 10, 20, 40, 80 (left to right, top to bottom).
-
-**Key Findings:**
-
-- Convergence rate: :math:`\mathcal{O}(h^2)` for P1 elements
-- Fine mesh (nx=80) achieves < 0.5% error
-- Demonstrates importance of mesh refinement for accurate results
+Agreement with Lamé solution
+Correct stress state in cylindrical coordinates
+Proper enforcement of plane-strain conditions
 
 ---
 
@@ -262,10 +217,10 @@ This advanced example demonstrates **single crystal plasticity** using **automat
 
 **Key Features:**
 
-✅ **Automatic differentiation**: UFL computes exact Jacobian symbolically
-✅ **Newton convergence**: 2 iterations per step (quadratic convergence)
-✅ **Semi-analytical verification**: Saturation stress σ_sat = 808.6 MPa (error: 12.5%)
-✅ **History variables**: Backward Euler integration with plastic strain accumulation
+**Automatic differentiation**: UFL computes exact Jacobian symbolically
+**Newton convergence**: 2 iterations per step (quadratic convergence)
+**Semi-analytical verification**: Saturation stress σ_sat = 808.6 MPa (error: 12.5%)
+**History variables**: Backward Euler integration with plastic strain accumulation
 
 **Implementation Highlight:**
 
@@ -351,98 +306,57 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 
 **Key Features:**
 
-✅ **No remeshing required**: Phase-field regularizes sharp crack
-✅ **Complex crack paths**: Handles branching and merging
-✅ **Thermodynamically consistent**: Variational formulation
-✅ **Irreversibility**: Damage can only increase
+**No remeshing required**: Phase-field regularizes sharp crack
+**Complex crack paths**: Handles branching and merging
+**Thermodynamically consistent**: Variational formulation
+**Irreversibility**: Damage can only increase
 
 ---
 
-Cluster Dynamics
-----------------
+Numerical analysis
+------------------
 
-**Case Directory:** ``cases/U_cluster_dynamics_test``
+Mesh Convergence Study
+^^^^^^^^^^^^^^^^^^^^^^^
 
-This example demonstrates **defect cluster evolution** in irradiated materials using a 1D DG solver in cluster size space.
+**Case Directory:** ``cases/I_mesh_sensitivity_2D``
 
-**Physical Model:**
+This example demonstrates **mesh convergence** for a 2D thermal problem, showing how solution accuracy improves with mesh refinement.
 
-- Advection-diffusion equation for cluster concentration :math:`c_n(x,t)`
-- Size-dependent diffusion and drift
-- Mass conservation enforcement
-- Source and sink terms for cluster reactions
+**Setup:**
 
-**Applications:**
+- 2D rectangular domain with prescribed boundary conditions
+- Systematic refinement: nx = 10, 20, 40, 80 elements
+- Temperature profiles extracted along centerline
 
-- Radiation damage in nuclear materials
-- Void swelling prediction
-- Precipitation kinetics
-- Microstructure evolution under irradiation
+**Results:**
 
----
+.. figure:: images/mesh_sensitivity_2D/output/convergence_study.png
+   :width: 80%
+   :align: center
 
-Summary of Available Cases
----------------------------
+   Convergence plot showing error vs. mesh size (log-log scale).
 
-.. list-table::
-   :header-rows: 1
-   :widths: 30 30 40
+**Temperature Profiles at Different Mesh Resolutions:**
 
-   * - Case
-     - Physics
-     - Verification Type
-   * - ``1_thin_slab_neumann_3D``
-     - Thermo-mechanical
-     - Coupled solution
-   * - ``4_thick_cylindrical_shell_adiabatic_2D``
-     - Elasticity
-     - Lamé analytical solution
-   * - ``I_mesh_sensitivity_2D``
-     - Thermal
-     - Convergence study
-   * - ``20_plasticity_2D``
-     - J2 plasticity
-     - Stress-strain curve
-   * - ``demo_CP_single_grain``
-     - Crystal plasticity
-     - Semi-analytical saturation
-   * - ``17_stress_strain_curve_displacement``
-     - Elasticity/plasticity
-     - Material characterization
-   * - ``18_box_crack_2D``
-     - Phase-field fracture
-     - Damage evolution
-   * - ``U_cluster_dynamics_test``
-     - Cluster dynamics
-     - Mass conservation
+.. figure:: images/mesh_sensitivity_2D/output/profile_nx_10.png
+   :width: 48%
+
+.. figure:: images/mesh_sensitivity_2D/output/profile_nx_20.png
+   :width: 48%
+
+.. figure:: images/mesh_sensitivity_2D/output/profile_nx_40.png
+   :width: 48%
+
+.. figure:: images/mesh_sensitivity_2D/output/profile_nx_80.png
+   :width: 48%
+
+   Temperature profiles for nx = 10, 20, 40, 80 (left to right, top to bottom).
+
+**Key Findings:**
+
+- Convergence rate: :math:`\mathcal{O}(h^2)` for P1 elements
+- Fine mesh (nx=80) achieves < 0.5% error
+- Demonstrates importance of mesh refinement for accurate results
 
 ---
-
-Running the Examples
---------------------
-
-Each case can be run using the provided ``Allrun`` script:
-
-.. code-block:: bash
-
-   cd z3st/cases/1_thin_slab_neumann_3D
-   ./Allrun
-
-Or manually:
-
-.. code-block:: bash
-
-   gmsh -3 mesh.geo              # Generate mesh
-   python3 -m z3st               # Run simulation
-   python3 non-regression.py     # Verify results
-   python3 plot_results.py       # Visualize (if available)
-
----
-
-Further Reading
----------------
-
-- **Physics models**: :doc:`physics_models` for mathematical formulations
-- **Configuration**: :doc:`usage` for YAML setup details
-- **Quick reference**: :doc:`quick_reference` for command cheat sheet
-- **API**: :doc:`api` for programmatic access
