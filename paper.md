@@ -13,14 +13,6 @@ authors:
     corresponding: true
     affiliation: 1
 
-  - name: Davide Pizzocri
-    orcid: 0000-0003-2256-8409
-    affiliation: 1
-
-  - name: Lelio Luzzi
-    orcid: 0000-0002-9754-4535
-    affiliation: 1
-
 affiliations:
  - name: Politecnico di Milano, Department of Energy, Nuclear Energy Division, Milan, Italy
    index: 1
