@@ -37,14 +37,14 @@ import pyvista as pv
 
 
 # --.. ..- .-.. .-.. --- helpers --.. ..- .-.. .-.. ---
-def _detect_field(grid, field_name):
+def _detect_field(grid, field_name, info=False):
     """Find field in VTU file, searching in point and cell data."""
     fname = field_name
     if fname in grid.point_data:
-        print(f"[INFO] Found field in point_data: '{field_name}'")
+        if info: print(f"[INFO] Found field in point_data: '{field_name}'")
         return "point", field_name
     elif fname in grid.cell_data:
-        print(f"[INFO] Found field in cell_data: '{field_name}'")
+        if info: print(f"[INFO] Found field in cell_data: '{field_name}'")
         return "cell", field_name
     raise KeyError(f"<{field_name}> field not found in VTU file.")
 
@@ -203,7 +203,7 @@ def extract_VonMises(vtu_path, return_coords=True, prefer="cells"):
         return data
 
 
-def extract_field(vtu_path, field_name, return_coords=True):
+def extract_field(vtu_path, field_name, return_coords=True, info=False):
     """
     Extract a field (scalar or vector) and coordinates from a VTU file.
 
@@ -228,7 +228,7 @@ def extract_field(vtu_path, field_name, return_coords=True):
 
     grid = pv.read(vtu_path)
 
-    loc_t, field_t = _detect_field(grid, field_name)
+    loc_t, field_t = _detect_field(grid, field_name, info=info)
     data, coords = _data_coords(grid, loc_t, field_t)
 
     if return_coords:

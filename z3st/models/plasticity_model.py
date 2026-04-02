@@ -12,24 +12,25 @@ from petsc4py import PETSc
 class PlasticityModel:
     def __init__(self):        
         """
-        Initialize internal variables for plasticity.
+        Initialize internal variables for plasticity model.
         """
 
         print("[PlasticityModel] initializer")
         self.plasticity_cfg = self.input_file.get("plasticity", {})
         
-        # Scalar function space for plastic internal variables
+        # Scalar function for cumulative plastic strain
         self.p = dolfinx.fem.Function(self.Q_pl, name="CumulativePlasticStrain")
         self.p.x.array[:] = 0.0
 
-        # Plastic strain tensor
+        # Tensor function for plastic strain tensor
         self.ep = dolfinx.fem.Function(self.V_pl, name="PlasticStrainTensor")
         self.ep.x.array[:] = 0.0
         
-        # Store previous step values
+        # Scalar function for cumulative plastic strain (old)
         self.p_n = dolfinx.fem.Function(self.Q_pl, name="CumulativePlasticStrain_old")
         self.p_n.x.array[:] = 0.0
         
+        # Tensor function for plastic strain tensor (old)
         self.ep_n = dolfinx.fem.Function(self.V_pl, name="PlasticStrainTensor_old")
         self.ep_n.x.array[:] = 0.0
         
@@ -91,34 +92,61 @@ class PlasticityModel:
         """
         Returns UFL expressions for the updated internal variables (ep_new, p_new) for the current displacement u.
         Used for updating history variables after convergence.
+
+        Supports both standard J2 plasticity and custom crystal plasticity models.
         """
-        # Re-implement return mapping logic to get the values
+        # Check if custom plasticity mode
+        mode = self.plasticity_cfg.get("mode", "j2")
+
+        if mode == "custom":
+            # Import custom function for crystal plasticity
+            import importlib
+            stress_func_path = material.get("stress_function", "")
+            module_path = ".".join(stress_func_path.split(".")[:-1])
+            module = importlib.import_module(module_path)
+
+            if hasattr(module, 'get_cp_internal_variables'):
+                get_vars_func = getattr(module, 'get_cp_internal_variables')
+                T_field = self.T if self.on.get("thermal", False) else None
+                ep_new = get_vars_func(u, T_field, material, model=self)
+
+                # Calculate p_new from ep_new
+                # NOTE: For J2 plasticity, p = sqrt(3/2 * ep:ep) is exact.
+                #       For crystal plasticity, this gives p ≈ 0.866*γ instead of p = γ.
+                #       This is acceptable if p is not used in the constitutive law.
+                #       For slip-system hardening, p should be computed as cumulative slip.
+                p_new = ufl.sqrt(1.5 * ufl.inner(ep_new, ep_new))
+                return ep_new, p_new
+            else:
+                raise AttributeError(f"Module {module_path} does not have 'get_cp_internal_variables' function")
+
+        # Standard J2 plasticity
         eps = self.epsilon(u)
         eps_el_tr = eps - self.ep_n
-        
+
         lmbda = material["lmbda"]
         mu = material["G"]
-        
+
         dim = eps.ufl_shape[0]
         I = ufl.Identity(dim)
         sigma_tr = lmbda * ufl.tr(eps_el_tr) * I + 2 * mu * eps_el_tr
-        
+
         s_tr = sigma_tr - (1./3.) * ufl.tr(sigma_tr) * I
         sigma_eq_tr = ufl.sqrt(1.5 * ufl.inner(s_tr, s_tr))
-        
+
         sigma_y = material["yield_strength"]
         H = material["hardening_modulus"]
-        
+
         sigma_y_n = sigma_y + H * self.p_n
         f_val = sigma_eq_tr - sigma_y_n
-        
+
         dp = ufl.conditional(ufl.gt(f_val, 0), f_val / (3*mu + H), 0.0)
         n_flow = ufl.conditional(ufl.gt(sigma_eq_tr, 0), s_tr / sigma_eq_tr, s_tr*0)
-        
+
         # Updated internal variables
         p_new = self.p_n + dp
         ep_new = self.ep_n + 1.5 * dp * n_flow # plastic strain increment (J2) = 3/2 * dp * n_flow
-        
+
         return ep_new, p_new
 
     def update_plastic_history(self, u):

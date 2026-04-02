@@ -201,6 +201,7 @@ class Solver:
                 petsc_options=petsc_opts_thermal,
                 petsc_options_prefix="thermal_",
             )
+            dolfinx.fem.set_bc(T_new.x.array, bcs_t)
             problem_t.solve()
         else:
             print("  [ERROR] Non-linear thermal solver not yet implemented.")
@@ -350,6 +351,7 @@ class Solver:
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="mechanical_",
             )
+            dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
             problem_m.solve()
         else:
             print("  Non-linear solver")
@@ -365,6 +367,7 @@ class Solver:
                 petsc_options=petsc_opts_mech,
                 petsc_options_prefix="elasticity",
             )
+            dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
             problem_m.solve()
 
         # Relax
@@ -647,6 +650,9 @@ class Solver:
         rtol_mech=1e-6,
         rtol_dmg=1e-5,
     ):
+        # Store dt as instance attribute for access in material models
+        self.dt = dt
+
         print(f"  → Max iterations              : {max_iter}")
         print(f"  → Staggering tolerance |ΔT|   : {stag_tol_th:.1e}")
         print(f"  → Staggering tolerance |Δu|   : {stag_tol_mech:.1e}")

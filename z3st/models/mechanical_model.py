@@ -453,6 +453,27 @@ class MechanicalModel:
         elif mode == "plasticity":
             sigma = self.sigma_plastic(u, material)
 
+        elif mode == "custom":
+            # Custom material law
+            if "stress_function" not in material:
+                raise ValueError(f"Material with constitutive_mode='custom' requires 'stress_function' field")
+
+            # Import and use the custom stress function
+            import importlib
+            stress_func_path = material["stress_function"]
+
+            try:
+                module_path, func_name = stress_func_path.rsplit(".", 1) # e.g., z3st.materials.single_crystal_law
+                module = importlib.import_module(module_path)
+                stress_func = getattr(module, func_name)
+
+                # Call custom function: sigma = f(u, T, material, model)
+                T_field = self.T if self.on.get("thermal", False) else None
+                sigma = stress_func(u, T_field, material, model=self)
+
+            except Exception as e:
+                raise RuntimeError(f"Failed to load/execute custom stress function '{stress_func_path}': {e}")
+
         else:
             # Plane-stress reduction (x–y plane)
             if regime == "plane_stress":

@@ -48,8 +48,11 @@ class MeshManager:
             log.info(f"  Tag ID: {tag}")
 
         # --. Facet tags --..
-        unique_facets = np.unique(self.facet_tags.values)
-        log.info(f"\nUnique tags found in facet data: {unique_facets}")
+        if self.facet_tags is not None:
+            unique_facets = np.unique(self.facet_tags.values)
+            log.info(f"\nUnique tags found in facet data: {unique_facets}")
+        else:
+            log.warning("No facet tags found in mesh.")
 
         # --. Label map --..
         self.label_map = self.geometry.get("labels", {})
@@ -131,4 +134,4 @@ class MeshManager:
         log.info(f"  Num cells: {self.mesh.topology.index_map(self.tdim).size_global}")
         log.info(f"  Cell tags: {set(self.cell_tags.values)}")
         log.info(f"  Facet tags: {set(self.facet_tags.values)}")
-        log.info(f"  Geometry type: {self.geometry_type}")
+        log.info(f"  Geometry type: {self.geometry.get("geometry_type", "Not specified")}")
