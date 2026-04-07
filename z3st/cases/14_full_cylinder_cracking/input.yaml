@@ -9,42 +9,55 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../materials/steel.yaml
+  uo2: uo2.yaml
 
-regime: axisymmetric
+regime: 3d
 
 solver_settings:
   coupling: staggered
-  max_iters: 100
-  relax_T: 0.9
-  relax_u: 0.4
+  max_iters: 200
+  relax_T: 0.8
+  relax_u: 0.7
   relax_adaptive: true
   relax_growth: 1.1
-  relax_shrink: 0.7
+  relax_shrink: 0.8
   relax_min: 0.05
-  relax_max: 1.0
+  relax_max: 0.95
 
 models:
   thermal: true
   mechanical: true
+  damage: true
 
 mechanical:
-  solver: nonlinear # linear | nonlinear
-  constitutive: hyperelastic
+  solver: linear
+  linear_solver: iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  convergence: rel_norm # rel_norm | norm
-  debug: false
+  convergence: rel_norm
 
 thermal:
   solver: linear
-  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-6
-  convergence: rel_norm # rel_norm | norm
+  linear_solver: iterative_hypre
+  rtol: 1.0e-7
+  stag_tol: 1.0e-7
+  convergence: rel_norm
+
+damage:
+  type: AT2
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
+  convergence: rel_norm
+  lc: 5.0e-4
+
+time:
+  - 0.0
+  - 300.0
 
 lhr:
-- 0.0
-time:
-- 0.0
-n_steps: 1
+  - 0.0
+  - 0.0
+
+n_steps: 1000

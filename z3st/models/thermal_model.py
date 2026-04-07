@@ -93,8 +93,6 @@ class ThermalModel:
                     print(
                         f"  [INFO] Dirichlet thermal BC on '{label}' → {temperature} K at region '{region_name}'"
                     )
-                    # print(f"  {type(bc)}")
-                    # print("  Applied dofs:", bc.dof_indices)
 
                 elif bc_type == "Neumann":
                     flux = bc_info.get("flux")
@@ -110,20 +108,32 @@ class ThermalModel:
                     )
 
                 elif bc_type == "Robin":
-
+                    # Two types:
+                    #   1. Gap conductance: pair + conductance from model → T_ext from another subdomain
+                    #   2. Convective: h_conv + T_ext → fixed external bulk temperature
                     pair = bc_info.get("pair")
-                    if pair is None:
-                        print(f"  [ERROR] Robin BC on '{label}' is missing 'pair'")
-                        sys.exit(1)
-                    self.robin_thermal[label].append({"id": region_id, "pair": pair})
+                    h_conv = bc_info.get("h_conv")
+                    T_ext = bc_info.get("T_ext")
 
-                    print(
-                        f"  [INFO] Robin thermal BC on '{label}' at region '{region_name}' coupled with '{pair}'"
-                    )
+                    if pair is not None:
+                        # Gap mode
+                        self.robin_thermal[label].append({"id": region_id, "pair": pair})
+                        print(f"  [INFO] Robin (gap) thermal BC on '{label}' at region '{region_name}' coupled with '{pair}'")
+                    elif h_conv is not None and T_ext is not None:
+                        # Convective mode
+                        self.robin_thermal[label].append({
+                            "id": region_id,
+                            "h_conv": float(h_conv),
+                            "T_ext": float(T_ext),
+                        })
+                        print(f"  [INFO] Robin (convective) thermal BC on '{label}' → h={h_conv} W/(m²·K), T_ext={T_ext} K at region '{region_name}'")
+                    else:
+                        print(f"  [ERROR] Robin BC on '{label}' requires either 'pair' (gap) or 'h_conv'+'T_ext' (convective).")
+                        sys.exit(1)
 
                 else:
                     print(f"  [ERROR] Unknown thermal BC type '{bc_type}' for '{label}'.")
-                    print(f"  Available are: Dirichlet, Neumann.")
+                    print(f"  Available are: Dirichlet, Neumann, Robin.")
                     sys.exit(1)
 
     def heat_flux(self, T):

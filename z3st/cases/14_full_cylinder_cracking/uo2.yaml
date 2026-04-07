@@ -1,0 +1,26 @@
+name: UO2
+
+# --- Reference: McClenny et al., JNM 565 (2022) 153719, Table 3 ---
+
+# --- Mechanical properties ---
+E: 358.0e9          # (Pa) - Young's modulus
+nu: 0.23            # (-)  - Poisson's ratio
+
+# --- Thermal properties ---
+k: 5.0              # (W/(m·K)) - Thermal conductivity
+cp: 280.0           # (J/(kg·K)) - Specific heat capacity
+rho: 10970.0        # (kg/m³) - Density
+
+# --- Thermal expansion ---
+alpha: 1.0e-5       # (1/K) - Isotropic CTE
+
+# --- Phase-field fracture properties ---
+Gc: 80.0            # (J/m²) - Critical energy release rate (= 80 MPa·mm)
+
+# --- Reference temperature (stress-free state) ---
+T_ref: 1023.15       # (K) = 750 °C — no thermal stress at this temperature
+
+# --- Initial temperature (field initialization) ---
+T_initial: 1023.15   # (K) = 750 °C — pellet uniformly hot before quench
+
+gamma_heating: 0.0

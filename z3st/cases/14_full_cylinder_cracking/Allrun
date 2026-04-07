@@ -1,0 +1,6 @@
+#!/bin/bash
+gmsh -3 mesh.geo -format msh2
+
+python3 -m z3st > log.z3st
+
+python3 non-regression.py
