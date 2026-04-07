@@ -135,6 +135,8 @@ class Solver:
         L_t = 0
 
         w = self.weight
+        dt = self.dt
+        transient = dt > 0
 
         # Volume integrals
         for label, material in self.materials.items():
@@ -143,9 +145,21 @@ class Solver:
 
             print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
             k = material["k"]
+            rho = material["rho"]
+            cp = material["cp"]
+            rho_cp = rho * cp
 
+            # Diffusion + source (always present)
             a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
             L_t += w * self.q_third * v_t * dx
+
+            # Mass term (backward Euler, only for transient)
+            # self.T holds the converged temperature from the previous time step (T^n)
+            # T_old is used for stagger relaxation only, not for backward Euler
+            if transient:
+                rho_cp_dt = rho_cp / dt
+                a_t += w * rho_cp_dt * u_t * v_t * dx
+                L_t += w * rho_cp_dt * self.T * v_t * dx
 
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
             q_vals = self.q_third.x.array[dofs]
@@ -161,29 +175,33 @@ class Solver:
                 ds_neumann = self.ds_tags[bc_info["id"]]
                 L_t += w * (-bc_info["value"]) * v_t * ds_neumann
 
-        # Gap (Robin)
+        # Robin BCs (gap or convective)
         h_gap = self.set_gap_conductance(T_new)
 
         for label in self.materials:
             for bc_info in self.robin_thermal[label]:
-                print(f"  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
                 region_id = bc_info["id"]
-                pair_region = bc_info["pair"]
-                ds_interface = self.ds_tags[region_id]
+                ds_robin = self.ds_tags[region_id]
 
-                T_other = dolfinx.fem.Function(self.V_t)
-                dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
-                dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
-                T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
+                if "pair" in bc_info:
+                    # Gap mode: h from gap model, T_ext from paired subdomain
+                    pair_region = bc_info["pair"]
+                    T_other = dolfinx.fem.Function(self.V_t)
+                    dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
+                    dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
+                    T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
 
-                a_t += w * h_gap * u_t * v_t * ds_interface
-                L_t += w * h_gap * T_other * v_t * ds_interface
+                    a_t += w * h_gap * u_t * v_t * ds_robin
+                    L_t += w * h_gap * T_other * v_t * ds_robin
+                    print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'")
 
-                print(
-                    f"  [INFO] Gap Robin BC between '{label}' "
-                    f"(region={region_id}) and '{pair_region}' "
-                    f"(region={self.label_map[pair_region]})"
-                )
+                else:
+                    # Convective mode: fixed h_conv and T_ext
+                    h_conv = bc_info["h_conv"]
+                    T_ext = bc_info["T_ext"]
+                    a_t += w * h_conv * u_t * v_t * ds_robin
+                    L_t += w * h_conv * T_ext * v_t * ds_robin
+                    print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
 
         # Solve
         if self.th_cfg["solver"] == "linear":
@@ -203,6 +221,9 @@ class Solver:
             )
             dolfinx.fem.set_bc(T_new.x.array, bcs_t)
             problem_t.solve()
+            print(f"  T_new: min={T_new.x.array.min():.2f} K, max={T_new.x.array.max():.2f} K, mean={T_new.x.array.mean():.2f} K")
+            if transient:
+                print(f"  T^n (self.T): min={self.T.x.array.min():.2f} K, max={self.T.x.array.max():.2f} K")
         else:
             print("  [ERROR] Non-linear thermal solver not yet implemented.")
 
@@ -315,8 +336,15 @@ class Solver:
                 if self.on.get("thermal", False):
                     L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
             else:
-                sigma = self.sigma_mech(u_new, material)
-                F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - ufl.dot(body_force, v_m) * dx
+                mode = material.get("constitutive_mode", "lame")
+                if mode == "hyperelastic":
+                    F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
+                    F_m -= w * ufl.dot(body_force, v_m) * dx
+                    if self.on.get("thermal", False):
+                        F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+                else:
+                    sigma = self.sigma_mech(u_new, material)
+                    F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
 
         # Traction BCs
         for label in self.materials:
@@ -354,18 +382,43 @@ class Solver:
             dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
             problem_m.solve()
         else:
-            print("  Non-linear solver")
-            petsc_opts_mech = self.get_solver_options(
-                solver_type=self.mech_cfg["linear_solver"],
-                physics="mechanical",
-                rtol=rtol_mech,
-            )
+            print("  Non-linear solver (SNES Newton)")
+            linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")
+
+            # SNES Newton options + inner linear solver
+            if linear_solver == "direct_mumps":
+                petsc_opts_mech = {
+                    "snes_type": "newtonls",
+                    "snes_linesearch_type": "basic",
+                    "snes_atol": rtol_mech,
+                    "snes_rtol": rtol_mech,
+                    "snes_max_it": int(self.mech_cfg.get("snes_max_it", 50)),
+                    "ksp_type": "preonly",
+                    "pc_type": "lu",
+                    "pc_factor_mat_solver_type": "mumps",
+                }
+            else:
+                # Iterative inner solver (AMG / HYPRE)
+                ksp_opts = self.get_solver_options(
+                    solver_type=linear_solver,
+                    physics="mechanical",
+                    rtol=rtol_mech,
+                )
+                petsc_opts_mech = {
+                    "snes_type": "newtonls",
+                    "snes_linesearch_type": "basic",
+                    "snes_atol": rtol_mech,
+                    "snes_rtol": rtol_mech,
+                    "snes_max_it": int(self.mech_cfg.get("snes_max_it", 50)),
+                    **ksp_opts,
+                }
+
             problem_m = NonlinearProblem(
                 F_m,
                 u_new,
                 bcs=bcs_mech,
                 petsc_options=petsc_opts_mech,
-                petsc_options_prefix="elasticity",
+                petsc_options_prefix="elasticity_",
             )
             dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
             problem_m.solve()

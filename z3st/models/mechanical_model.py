@@ -11,7 +11,6 @@ import numpy as np
 import ufl
 from petsc4py import PETSc
 
-
 class MechanicalModel:
     def __init__(self):
         print("[MechanicalModel] initializer")
@@ -355,6 +354,62 @@ class MechanicalModel:
             # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)
             return ufl.sym(ufl.grad(u))
 
+    def deformation_gradient(self, u):
+        """
+        Deformation gradient F = I + ∇u.
+
+        - axisymmetric: 3x3 in cylindrical (r, θ, z)
+        - 2d: 3x3 with F_zz = 1 (plane strain assumption)
+        - 3d: F = I + grad(u)
+
+        Parameters:
+            u: Displacement field.
+
+        Returns:
+            F as a ufl.variable (for use with ufl.diff).
+        """
+        regime = self.regime
+
+        if regime == "axisymmetric":
+            r = ufl.SpatialCoordinate(self.mesh)[0]
+            # F in cylindrical coordinates (r, θ, z)
+            F_def = ufl.as_tensor([
+                [1.0 + u[0].dx(0),  0.0,  u[0].dx(1)],
+                [0.0,               1.0 + u[0] / r,  0.0],
+                [u[1].dx(0),        0.0,  1.0 + u[1].dx(1)],
+            ])
+
+        elif regime == "2d":
+            # Plane strain: F_zz = 1
+            F_def = ufl.as_tensor([
+                [1.0 + u[0].dx(0),  u[0].dx(1),  0.0],
+                [u[1].dx(0),        1.0 + u[1].dx(1),  0.0],
+                [0.0,               0.0,               1.0],
+            ])
+
+        else:
+            # 3D: standard
+            d = len(u)
+            F_def = ufl.Identity(d) + ufl.grad(u)
+
+        return ufl.variable(F_def)
+
+    def epsilon_hyperelastic(self, u):
+        """
+        Green-Lagrange strain tensor for finite deformations.
+
+        E = (1/2)(FᵀF - I) = (1/2)(C - I)
+
+        Parameters:
+            u: Displacement field.
+
+        Returns:
+            Green-Lagrange strain tensor (UFL expression).
+        """
+        F_def = self.deformation_gradient(u)
+        dim = F_def.ufl_shape[0]
+        return 0.5 * (F_def.T * F_def - ufl.Identity(dim))
+
     def sigma_mech(self, u, material):
         """
         Mechanical Cauchy stress σ(u) with two selectable constitutive routes.
@@ -450,6 +505,9 @@ class MechanicalModel:
                 ]
             )
 
+        elif mode == "hyperelastic":
+            sigma = self.sigma_hyperelastic(u, material)
+
         elif mode == "plasticity":
             sigma = self.sigma_plastic(u, material)
 
@@ -512,6 +570,98 @@ class MechanicalModel:
             sigma = g_d * sigma
 
         return sigma
+
+    def psi_hyperelastic(self, u, material):
+        """
+        Neo-Hookean strain energy density for hyperelasticity.
+
+        ψ = (μ/2)(I_C - 3) - μ ln(J) + (λ/2)(ln J)²
+
+        Uses deformation_gradient() which handles axisymmetric, 2D, and 3D.
+
+        Parameters:
+            u: Displacement field.
+            material (dict): Must contain 'lmbda' and 'G'.
+
+        Returns:
+            (psi, F_var): strain energy density and the deformation gradient
+                          (as ufl.variable, needed for P = dψ/dF).
+        """
+        F_def = self.deformation_gradient(u)
+        C = ufl.variable(F_def.T * F_def)
+        Ic = ufl.variable(ufl.tr(C))
+        J = ufl.variable(ufl.det(F_def))
+
+        mu = material["G"]
+        lmbda = material["lmbda"]
+
+        # Always 3×3 tensor (axisymmetric, 2d, 3d all produce 3×3 F)
+        psi = (mu / 2) * (Ic - 3) - mu * ufl.ln(J) + (lmbda / 2) * (ufl.ln(J)) ** 2
+        return psi, F_def
+
+    def hyperelastic_residual(self, u, v, material, dx, w):
+        """
+        Hyperelastic internal force residual via energy derivative.
+
+        Uses S = 2 ∂ψ/∂C (second Piola-Kirchhoff) and E (Green-Lagrange):
+            δΠ = ∫ S : δE dx
+
+        This avoids grad(v) shape issues on 2D/axisymmetric meshes.
+
+        Parameters:
+            u: Displacement field (Function, not TrialFunction).
+            v: TestFunction.
+            material (dict): Material properties.
+            dx: Integration measure.
+            w: Integration weight (e.g. 2πr for axisymmetric).
+
+        Returns:
+            UFL form contribution for internal forces.
+        """
+        psi, F_def = self.psi_hyperelastic(u, material)
+        P = ufl.diff(psi, F_def)
+
+        regime = self.regime
+
+        if regime == "axisymmetric":
+            r = ufl.SpatialCoordinate(self.mesh)[0]
+            # δF consistent with the 3×3 deformation gradient
+            grad_v = ufl.as_tensor([
+                [v[0].dx(0),  0.0,  v[0].dx(1)],
+                [0.0,         v[0] / r,     0.0],
+                [v[1].dx(0),  0.0,  v[1].dx(1)],
+            ])
+        elif regime == "2d":
+            grad_v = ufl.as_tensor([
+                [v[0].dx(0),  v[0].dx(1),  0.0],
+                [v[1].dx(0),  v[1].dx(1),  0.0],
+                [0.0,         0.0,         0.0],
+            ])
+        else:
+            grad_v = ufl.grad(v)
+
+        return w * ufl.inner(grad_v, P) * dx
+
+    def sigma_hyperelastic(self, u, material):
+        """
+        Cauchy stress for the hyperelastic (Neo-Hookean) model.
+
+        σ = (1/J) P Fᵀ
+
+        where P = ∂ψ/∂F is the first Piola-Kirchhoff stress.
+        Returns a 3x3 tensor for all regimes (axisymmetric, 2D, 3D).
+
+        Parameters:
+            u: Displacement field.
+            material (dict): Material properties (needs 'lmbda', 'G').
+
+        Returns:
+            Cauchy stress tensor (UFL expression, 3x3).
+        """
+        psi, F_def = self.psi_hyperelastic(u, material)
+        P = ufl.diff(psi, F_def)
+        J = ufl.det(F_def)
+        return (1.0 / J) * P * F_def.T
 
     def sigma_th(self, T, material):
         """

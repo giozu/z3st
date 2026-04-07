@@ -1,0 +1,14 @@
+thermal:
+  uo2:
+  - type: Robin
+    region: contact_wall
+    h_conv: 20000.0  # (W/m²K) ceramic-water quench
+    T_ext: 263.15    # (K) = -10°C
+
+mechanical:
+  uo2:
+  - type: Clamp_z
+    region: bottom
+
+  - type: Clamp_z
+    region: top

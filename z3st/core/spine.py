@@ -203,8 +203,9 @@ class Spine(
             for name, mat in self.materials.items():
                 print(f"  → Setting initial temperature for material: '{name}'")
                 dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
-                self.T.x.array[dofs] = mat["T_ref"]
-                print(f"    Set {len(dofs)} DOFs to {mat['T_ref']:.2f} K")
+                T_init = mat.get("T_initial", mat["T_ref"])
+                self.T.x.array[dofs] = T_init
+                print(f"    Set {len(dofs)} DOFs to {T_init:.2f} K")
 
             self.T.x.scatter_forward()
             T_vals = self.T.x.array

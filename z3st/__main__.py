@@ -107,10 +107,15 @@ if __name__ == "__main__":
 
         # Calculate dt
         if step == 0:
-            dt = 0.0
+            dt = t
         else:
             dt = t - times[step-1]
-        
+
+        if dt == 0.0:
+            print(f"  → dt=0: exporting initial condition (no solve)")
+            problem.get_results()
+            continue
+
         # Solve
         max_iters = int(input_file.get("solver_settings", {}).get("max_iters", 100))
         problem.solve(max_iters=max_iters, dt=dt)
