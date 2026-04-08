@@ -242,7 +242,7 @@ class Solver:
 
         norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
         norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
+        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-6 else norm_dT
 
         if self.th_cfg["convergence"] == "norm":
             print(f"  ||ΔT|| = {norm_dT:.3e}")
@@ -255,11 +255,15 @@ class Solver:
 
         if self.relax_adaptive:
             if prev_res_T is not None:
-                if res_curr < prev_res_T:
+                ema_alpha = 0.3
+                ema_T = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_T
+                if res_curr < ema_T:
                     self.relax_T = min(self.relax_T * self.relax_growth, self.relax_max)
                 else:
                     self.relax_T = max(self.relax_T * self.relax_shrink, self.relax_min)
-            prev_res_T = res_curr
+                prev_res_T = ema_T
+            else:
+                prev_res_T = res_curr
             print(f"  [adaptive] relax_T={self.relax_T:.2f}")
 
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
@@ -438,7 +442,7 @@ class Solver:
 
         norm_du = diff_u.norm(PETSc.NormType.NORM_2)
         norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
+        rel_norm_du = norm_du / norm_u if norm_u > 1e-6 else norm_du
 
         if self.mech_cfg["convergence"] == "norm":
             print(f"  ||Δu|| = {norm_du:.3e}")
@@ -451,11 +455,15 @@ class Solver:
 
         if self.relax_adaptive:
             if prev_res_u is not None:
-                if res_curr < prev_res_u:
+                ema_alpha = 0.3
+                ema_u = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_u
+                if res_curr < ema_u:
                     self.relax_u = min(self.relax_u * self.relax_growth, self.relax_max)
                 else:
                     self.relax_u = max(self.relax_u * self.relax_shrink, self.relax_min)
-            prev_res_u = res_curr
+                prev_res_u = ema_u
+            else:
+                prev_res_u = res_curr
             print(f"  [adaptive] relax_u={self.relax_u:.2f}")
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
@@ -552,7 +560,7 @@ class Solver:
 
         norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
         norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
+        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-6 else norm_dD
 
         if self.dmg_cfg["convergence"] == "norm":
             print(f"  ||ΔD|| = {norm_dD:.3e}")
@@ -565,11 +573,15 @@ class Solver:
 
         if self.relax_adaptive:
             if prev_res_D is not None:
-                if res_curr < prev_res_D:
+                ema_alpha = 0.3
+                ema_D = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_D
+                if res_curr < ema_D:
                     self.relax_D = min(self.relax_D * self.relax_growth, self.relax_max)
                 else:
                     self.relax_D = max(self.relax_D * self.relax_shrink, self.relax_min)
-            prev_res_D = res_curr
+                prev_res_D = ema_D
+            else:
+                prev_res_D = res_curr
             print(f"  [adaptive] relax_D={self.relax_D:.2f}")
 
         # Residual in L_inf norm

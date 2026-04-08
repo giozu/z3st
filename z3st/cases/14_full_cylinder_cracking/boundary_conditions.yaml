@@ -1,14 +1,11 @@
 thermal:
   uo2:
-  - type: Robin
+  - type: Dirichlet
     region: contact_wall
-    h_conv: 20000.0  # (W/m²K) ceramic-water quench
-    T_ext: 263.15    # (K) = -10°C
+    temperature: 263.15  # (K) = -10°C, instantaneous quench
 
 mechanical:
   uo2:
-  - type: Clamp_z
+  - type: Dirichlet
     region: bottom
-
-  - type: Clamp_z
-    region: top
+    displacement: [0.0, 0.0, 0.0]
