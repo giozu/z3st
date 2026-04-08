@@ -784,21 +784,21 @@ class Solver:
                     T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
                 )
 
+            # --. MECHANICAL STEP --..
+            if self.on.get("mechanical", False):
+                conv_mech, _, _, prev_res_u = self._mechanical_step(
+                    u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
+                )
+
             # --. DAMAGE STEP --..
             if self.on.get("damage", False):
-                self.update_history(u_new) 
+                self.update_history(u_new)
                 conv_damage, _, _, prev_res_D = self._damage_step(
                     D_new,
                     D_old,
                     rtol_dmg,
                     stag_tol_dmg,
                     prev_res_D,
-                )
-
-            # --. MECHANICAL STEP --..
-            if self.on.get("mechanical", False):
-                conv_mech, _, _, prev_res_u = self._mechanical_step(
-                    u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
                 )
             
             # --. CLUSTER STEP --..
