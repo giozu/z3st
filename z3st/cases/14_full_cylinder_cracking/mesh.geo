@@ -1,8 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
 //  Gmsh GEO for a full cylinder (3D extruded circle)
-//  Contact area = 1/6 of circumference (60°) for thermal shock
-//  Ref: McClenny et al., JNM 565 (2022) 153719
 //
 //  Author: Giovanni Zullo
 //
@@ -45,7 +43,7 @@ out[] = Extrude {0, 0, H} {
 // out[2] = lateral from curve 1 (contact, 60°)
 // out[3..6] = lateral from curves 2-5 (insulated, 300°)
 Physical Volume("uo2", 10) = {out[1]};
-Physical Surface("contact_wall", 20) = {out[2]};                          // 1/6 quench
+Physical Surface("contact_wall", 20) = {out[2]};                            // 1/6 quench
 Physical Surface("insulated_wall", 21) = {out[3], out[4], out[5], out[6]};  // 5/6 insulated
 Physical Surface("bottom", 30) = {1};
 Physical Surface("top", 40) = {out[0]};

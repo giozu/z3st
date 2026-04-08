@@ -32,7 +32,7 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: direct_mumps
+  linear_solver: iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: norm
@@ -55,17 +55,9 @@ damage:
 
 time:
   - 0.0
-  - 0.05
-  - 0.5
-  - 5.0
-  - 50.0
-  - 300.0
+  - 0.1
 
 lhr:
-  - 0.0
-  - 0.0
-  - 0.0
-  - 0.0
   - 0.0
   - 0.0
 
