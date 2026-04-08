@@ -54,17 +54,11 @@ class DamageModel:
 
         if damage_type == "AT2":
 
-            # Spectral
+            # Spectral decomposition (Miehe et al.)
+            # Only tensile eigenvalues contribute to damage
             psi_pos = self.psi_miehe_spectral(u, material)
-            H = (2.0 * lc / Gc) * psi_pos
 
-            # Volumetric
-            # lam = material["lmbda"]
-            # G = material["G"]
-            # eps = self.epsilon(u)
-            # tr_eps = ufl.tr(eps)
-            # tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
-            # psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+            H = (2.0 * lc / Gc) * psi_pos
 
             return H
 
@@ -82,49 +76,84 @@ class DamageModel:
 
             return psi_pos
 
-    @staticmethod
-    def gamma_density(D, grad_D, lc):
+    def gamma_density(self, D, grad_D, lc):
 
         damage_type = self.dmg_cfg["type"]
 
         if damage_type == "AT2":
-            """Fracture energy density gamma(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)."""
+            # Fracture energy density gamma(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)
             return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
 
         elif damage_type == "AT1":
-            """
-            Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
-            """
-            
+            # Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
             return D / lc + lc * ufl.dot(grad_D, grad_D)
 
     def psi_miehe_spectral(self, u, material):
 
         lmbda = material["lmbda"]
         mu = material["G"]
-        
+
         eps = self.epsilon(u)
-                
-        eps_xx = eps[0, 0]
-        eps_yy = eps[1, 1]
-        eps_xy = eps[0, 1]
-        
-        tr_eps = eps_xx + eps_yy
-        
+        dim = eps.ufl_shape[0]
         tol = 1.0e-16
-        R = ufl.sqrt(((eps_xx - eps_yy) / 2.0)**2 + eps_xy**2 + tol)
-        
-        eig1 = tr_eps / 2.0 + R
-        eig2 = tr_eps / 2.0 - R
-        
-        # <x>_+ = (x + |x|) / 2
-        eig1_pos = 0.5 * (eig1 + abs(eig1))
-        eig2_pos = 0.5 * (eig2 + abs(eig2))
-        
-        tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
-                
-        psi_pos = (0.5 * lmbda * tr_eps_pos**2) + (mu * (eig1_pos**2 + eig2_pos**2))
-        
+
+        if dim == 2:
+            eps_xx = eps[0, 0]
+            eps_yy = eps[1, 1]
+            eps_xy = eps[0, 1]
+
+            tr_eps = eps_xx + eps_yy
+
+            R = ufl.sqrt(((eps_xx - eps_yy) / 2.0)**2 + eps_xy**2 + tol)
+
+            eig1 = tr_eps / 2.0 + R
+            eig2 = tr_eps / 2.0 - R
+
+            eig1_pos = 0.5 * (eig1 + abs(eig1))
+            eig2_pos = 0.5 * (eig2 + abs(eig2))
+
+            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+            psi_pos = (0.5 * lmbda * tr_eps_pos**2) + (mu * (eig1_pos**2 + eig2_pos**2))
+
+        else:
+            # 3D: Cardano's formula for eigenvalues of symmetric 3x3 tensor
+            e00 = eps[0, 0]; e11 = eps[1, 1]; e22 = eps[2, 2]
+            e01 = eps[0, 1]; e02 = eps[0, 2]; e12 = eps[1, 2]
+
+            tr_eps = e00 + e11 + e22
+
+            # Invariants of eps
+            I1 = tr_eps
+            I2 = (e00*e11 + e11*e22 + e00*e22
+                   - e01**2 - e02**2 - e12**2)
+            I3 = (e00*(e11*e22 - e12**2)
+                   - e01*(e01*e22 - e12*e02)
+                   + e02*(e01*e12 - e11*e02))
+
+            # Deviatoric invariants for Cardano
+            p = (I1**2 - 3.0*I2) / 9.0
+            q = (2.0*I1**3 - 9.0*I1*I2 + 27.0*I3) / 54.0
+
+            s = ufl.sqrt(p + tol)
+
+            # cos(theta) = q / s^3, clamped
+            arg = q / (s**3 + tol)
+            # Smooth clamp via conditional
+            arg_c = ufl.conditional(ufl.gt(arg, 1.0 - tol), 1.0 - tol,
+                     ufl.conditional(ufl.lt(arg, -1.0 + tol), -1.0 + tol, arg))
+            theta = ufl.acos(arg_c) / 3.0
+
+            eig1 = I1 / 3.0 + 2.0 * s * ufl.cos(theta)
+            eig2 = I1 / 3.0 + 2.0 * s * ufl.cos(theta - 2.0 * ufl.pi / 3.0)
+            eig3 = I1 / 3.0 + 2.0 * s * ufl.cos(theta + 2.0 * ufl.pi / 3.0)
+
+            eig1_pos = 0.5 * (eig1 + abs(eig1))
+            eig2_pos = 0.5 * (eig2 + abs(eig2))
+            eig3_pos = 0.5 * (eig3 + abs(eig3))
+
+            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+            psi_pos = (0.5 * lmbda * tr_eps_pos**2) + (mu * (eig1_pos**2 + eig2_pos**2 + eig3_pos**2))
+
         return psi_pos
 
     def update_history(self, u):

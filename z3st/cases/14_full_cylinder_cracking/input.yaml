@@ -18,10 +18,11 @@ solver_settings:
   max_iters: 200
   relax_T: 0.8
   relax_u: 0.7
+  relax_D: 0.4
   relax_adaptive: true
   relax_growth: 1.1
-  relax_shrink: 0.8
-  relax_min: 0.05
+  relax_shrink: 0.9
+  relax_min: 0.3
   relax_max: 0.95
 
 models:
@@ -31,10 +32,10 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  convergence: rel_norm
+  convergence: norm
 
 thermal:
   solver: linear
@@ -49,15 +50,23 @@ damage:
   linear_solver: iterative_hypre
   rtol: 1.0e-5
   stag_tol: 1.0e-5
-  convergence: rel_norm
+  convergence: norm
   lc: 5.0e-4
 
 time:
   - 0.0
+  - 0.05
+  - 0.5
+  - 5.0
+  - 50.0
   - 300.0
 
 lhr:
   - 0.0
   - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
 
-n_steps: 1000
+n_steps: 2000

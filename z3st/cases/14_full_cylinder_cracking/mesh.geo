@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a short cylinder (3D extruded circle)
+//  Gmsh GEO for a full cylinder (3D extruded circle)
 //  Contact area = 1/6 of circumference (60°) for thermal shock
 //  Ref: McClenny et al., JNM 565 (2022) 153719
 //
@@ -10,10 +10,10 @@
 
 // Parameters
 R = 10.0e-3;             // Radius (m) = 10 mm
-H = 1.0e-3;              // Height (m) = 1 mm
+H = 10.0e-3;             // Height (m) = 10 mm
 lc_outer = 2.0e-4;       // Mesh size at outer edge (m)
 lc_center = 1.5e-3;      // Mesh size at center (m)
-n_layers = 3;            // Number of layers in extrusion
+n_layers = 10;           // Number of layers in extrusion
 
 // Circle split into: 60° contact + 300° insulated
 // Contact region: from 0° to 60° (1/6 of circumference)
