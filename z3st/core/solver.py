@@ -203,6 +203,13 @@ class Solver:
                     L_t += w * h_conv * T_ext * v_t * ds_robin
                     print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
 
+        # Extract actual DirichletBC objects (handles both dict and direct BCs)
+        bcs_thermal_actual = [
+            bc["value"] if isinstance(bc, dict) else bc
+            for _, bc_list in self.dirichlet_thermal.items()
+            for bc in bc_list
+        ]
+
         # Solve
         if self.th_cfg["solver"] == "linear":
             print("  Linear solver")
@@ -228,7 +235,8 @@ class Solver:
             print("  [ERROR] Non-linear thermal solver not yet implemented.")
 
         # Relax
-        T_new.x.array[:] = self.relax_T * T_new.x.array + (1 - self.relax_T) * T_old.x.array
+        T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
+        dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
 
         # Convergenza (norma o rel_norm)
         T_new.x.scatter_forward()
@@ -242,7 +250,7 @@ class Solver:
 
         norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
         norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-6 else norm_dT
+        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-15 else norm_dT
 
         if self.th_cfg["convergence"] == "norm":
             print(f"  ||ΔT|| = {norm_dT:.3e}")
@@ -268,9 +276,7 @@ class Solver:
 
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
-    def _mechanical_step(
-        self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current
-    ):
+    def _mechanical_step(self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current):
 
         u_old.x.array[:] = u_new.x.array
         print("\n[INFO] Assembling mechanical problem...")
@@ -285,8 +291,9 @@ class Solver:
                 raw = bc.get("raw", None)
                 if isinstance(raw, list):
                     idx = min(self.current_step, len(raw) - 1)
-                    bc["const"].value = raw[idx]
-                    print(f"  [INFO] Updating Dirichlet on region {bc['id']} → {raw[idx]}")
+                    val = raw[idx]
+                    bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
+                    print(f"  [INFO] Updating Displacement Dirichlet on region {bc['id']} → {val}")
 
         # --- update step-dependent tractions ---
         for _, bc_list in self.traction.items():
@@ -410,10 +417,11 @@ class Solver:
                 )
                 petsc_opts_mech = {
                     "snes_type": "newtonls",
-                    "snes_linesearch_type": "basic",
+                    "snes_linesearch_type": "bt",
                     "snes_atol": rtol_mech,
                     "snes_rtol": rtol_mech,
-                    "snes_max_it": int(self.mech_cfg.get("snes_max_it", 50)),
+                    "snes_max_it": 100,
+                    "snes_divergence_tolerance": 1e10,
                     **ksp_opts,
                 }
 
@@ -429,6 +437,7 @@ class Solver:
 
         # Relax
         u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
+        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
 
         # Convergence
         u_new.x.scatter_forward()
@@ -442,7 +451,7 @@ class Solver:
 
         norm_du = diff_u.norm(PETSc.NormType.NORM_2)
         norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_du = norm_du / norm_u if norm_u > 1e-6 else norm_du
+        rel_norm_du = norm_du / norm_u if norm_u > 1e-15 else norm_du
 
         if self.mech_cfg["convergence"] == "norm":
             print(f"  ||Δu|| = {norm_du:.3e}")
@@ -560,7 +569,7 @@ class Solver:
 
         norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
         norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-6 else norm_dD
+        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-15 else norm_dD
 
         if self.dmg_cfg["convergence"] == "norm":
             print(f"  ||ΔD|| = {norm_dD:.3e}")
@@ -828,7 +837,7 @@ class Solver:
 
                 return True
 
-        # --- IF NOT CONVERGED ---
+        # --. IF NOT CONVERGED --..
         print("\n[WARNING] Staggered solver did not converge. Using last iteration state.")
 
         if self.on.get("thermal", False):
@@ -837,7 +846,6 @@ class Solver:
             self.u.x.array[:] = u_new.x.array
         if self.on.get("damage", False):
             self.D.x.array[:] = D_new.x.array
-            
         if self.on.get("cluster", False):
             self.c.x.array[:] = c_new.x.array
 

@@ -112,9 +112,8 @@ if __name__ == "__main__":
             dt = t - times[step-1]
 
         if dt == 0.0:
-            print(f"  → dt=0: exporting initial condition (no solve)")
+            print(f"  → dt=0: solving static step / initial condition")
             problem.get_results()
-            continue
 
         # Solve
         max_iters = int(input_file.get("solver_settings", {}).get("max_iters", 100))
