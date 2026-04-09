@@ -127,6 +127,20 @@ class Solver:
 
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
 
+        analysis = self.th_cfg.get("analysis", "stationary")
+
+        # Transient mode with dt=0: preserve IC, only apply BCs
+        if analysis == "transient" and self.dt <= 0:
+            print("\n[INFO] Transient thermal: dt=0 → preserving initial condition (applying BCs only)")
+            bcs_thermal_actual = [
+                bc["value"] if isinstance(bc, dict) else bc
+                for _, bc_list in self.dirichlet_thermal.items()
+                for bc in bc_list
+            ]
+            dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
+            T_new.x.scatter_forward()
+            return True, 0.0, 0.0, prev_res_T
+
         T_old.x.array[:] = T_new.x.array
 
         print("\n[INFO] Assembling thermal problem...")
@@ -136,7 +150,7 @@ class Solver:
 
         w = self.weight
         dt = self.dt
-        transient = dt > 0
+        transient = analysis == "transient"
 
         # Volume integrals
         for label, material in self.materials.items():
