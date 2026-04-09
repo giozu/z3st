@@ -9,9 +9,9 @@
 // Parameters
 R = 10.0e-3;             // Radius (m) = 10 mm
 H = 10.0e-3;             // Height (m) = 10 mm
-lc_outer = 5.0e-5;       // Mesh size at outer edge (m)
-lc_center = 7.0e-4;      // Mesh size at center (m)
-n_layers = 10;           // Number of layers in extrusion
+lc_outer = 4.0e-5;       // Mesh size at outer edge (m)
+lc_center = 1.0e-3;      // Mesh size at center (m)
+n_layers = 5;            // Number of layers in extrusion
 
 // Circle split into: 60° contact + 300° insulated
 // Contact region: from 0° to 60° (1/6 of circumference)
