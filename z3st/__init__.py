@@ -13,10 +13,35 @@ try:
 except metadata.PackageNotFoundError:
     __version__ = "0.1.0"
 
-from .core import solver
-from .core.spine import Spine
-from .models import gap_model, mechanical_model, thermal_model, cluster_dynamic_model
-from .utils import export_vtu, plot_convergence
+def __getattr__(name):
+    """Lazy import of heavy modules (dolfinx-dependent) to allow
+    lightweight utilities (e.g., utils_extract_vtu) to be imported
+    without requiring MPI / dolfinx at import time."""
+
+    _lazy_map = {
+        "solver": (".core", "solver"),
+        "Spine": (".core.spine", "Spine"),
+        "Solver": (".core.solver", "Solver"),
+        "thermal_model": (".models", "thermal_model"),
+        "Thermal": (".models.thermal_model", "ThermalModel"),
+        "mechanical_model": (".models", "mechanical_model"),
+        "Mechanical": (".models.mechanical_model", "MechanicalModel"),
+        "gap_model": (".models", "gap_model"),
+        "cluster_dynamic_model": (".models", "cluster_dynamic_model"),
+        "Cluster": (".models.cluster_dynamic_model", "ClusterDynamicsModel"),
+        "export_vtu": (".utils", "export_vtu"),
+        "plot_convergence": (".utils", "plot_convergence"),
+    }
+
+    if name in _lazy_map:
+        module_path, attr = _lazy_map[name]
+        import importlib
+        mod = importlib.import_module(module_path, __name__)
+        obj = getattr(mod, attr)
+        globals()[name] = obj
+        return obj
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 __all__ = [
     "solver",
@@ -28,8 +53,3 @@ __all__ = [
     "export_vtu",
     "plot_convergence",
 ]
-
-Solver = solver.Solver
-Thermal = thermal_model.ThermalModel
-Mechanical = mechanical_model.MechanicalModel
-Cluster = cluster_dynamic_model.ClusterDynamicsModel

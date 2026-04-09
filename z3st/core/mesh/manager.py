@@ -134,4 +134,4 @@ class MeshManager:
         log.info(f"  Num cells: {self.mesh.topology.index_map(self.tdim).size_global}")
         log.info(f"  Cell tags: {set(self.cell_tags.values)}")
         log.info(f"  Facet tags: {set(self.facet_tags.values)}")
-        log.info(f"  Geometry type: {self.geometry.get("geometry_type", "Not specified")}")
+        log.info(f"  Geometry type: {self.geometry.get('geometry_type', 'Not specified')}")

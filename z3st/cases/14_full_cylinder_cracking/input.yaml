@@ -54,11 +54,11 @@ damage:
   lc: 1.0e-4
 
 time:
-  - 0.0
+  - 0.005
   - 0.1
 
 lhr:
   - 0.0
   - 0.0
 
-n_steps: 2000
+n_steps: 20
