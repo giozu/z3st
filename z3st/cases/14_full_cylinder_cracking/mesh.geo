@@ -10,7 +10,7 @@
 R = 10.0e-3;             // Radius (m) = 10 mm
 H = 10.0e-3;             // Height (m) = 10 mm
 lc_outer = 5.0e-5;       // Mesh size at outer edge (m)
-lc_center = 1.5e-3;      // Mesh size at center (m)
+lc_center = 7.0e-4;      // Mesh size at center (m)
 n_layers = 10;           // Number of layers in extrusion
 
 // Circle split into: 60° contact + 300° insulated
@@ -18,9 +18,9 @@ n_layers = 10;           // Number of layers in extrusion
 Point(1) = {0, 0, 0, lc_center};                          // Center
 Point(2) = {R, 0, 0, lc_outer};                           // 0°
 Point(3) = {R*Cos(Pi/3), R*Sin(Pi/3), 0, lc_outer};       // 60°
-Point(4) = {0, R, 0, lc_outer};                           // 90°
-Point(5) = {-R, 0, 0, lc_outer};                          // 180°
-Point(6) = {0, -R, 0, lc_outer};                          // 270°
+Point(4) = {0, R, 0, lc_center};                          // 90°
+Point(5) = {-R, 0, 0, lc_center};                         // 180°
+Point(6) = {0, -R, 0, lc_center};                         // 270°
 
 // Arcs
 Circle(1) = {2, 1, 3};    // 0° → 60°  (contact, 1/6)
@@ -53,8 +53,7 @@ Mesh.Algorithm = 6;
 
 // Refine near the outer boundary
 Field[1] = Distance;
-Field[1].CurvesList = {1, 2, 3, 4, 5};
-Field[1].Sampling = 100;
+Field[1].CurvesList = {1};
 
 Field[2] = Threshold;
 Field[2].InField = 1;

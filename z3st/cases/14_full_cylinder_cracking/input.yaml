@@ -33,33 +33,33 @@ models:
 mechanical:
   solver: linear
   linear_solver: iterative_hypre
-  rtol: 1.0e-3
-  stag_tol: 1.0e-3
+  rtol: 1.0e-4
+  stag_tol: 1.0e-4
   convergence: norm
 
 thermal:
   analysis: transient
   solver: linear
   linear_solver: iterative_hypre
-  rtol: 1.0e-3
-  stag_tol: 1.0e-3
+  rtol: 1.0e-4
+  stag_tol: 1.0e-4
   convergence: rel_norm
 
 damage:
   type: AT2
   solver: linear
   linear_solver: iterative_hypre
-  rtol: 1.0e-3
-  stag_tol: 1.0e-3
+  rtol: 1.0e-4
+  stag_tol: 1.0e-4
   convergence: norm
   lc: 1.0e-4
 
 time:
   - 0.0
-  - 0.1
+  - 0.05
 
 lhr:
   - 0.0
   - 0.0
 
-n_steps: 20
+n_steps: 100
