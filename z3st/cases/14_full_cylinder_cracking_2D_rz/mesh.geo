@@ -7,8 +7,8 @@
 R = 10.0e-3;      // Radius (m)
 H = 10.0e-3;      // Height (m)
 
-lc_outer  = 1.0e-5;   // Very fine mesh near surface (0.02 mm)
-lc_center = 1.0e-4;   // Coarser near axis (0.4 mm)
+lc_outer  = 1.0e-5;   // Refined mesh near contact surface (10 um)
+lc_center = 1.0e-3;   // Coarser near axis (1 mm)
 
 Point(1) = {0, 0, 0, lc_center};
 Point(2) = {R, 0, 0, lc_outer};
@@ -42,7 +42,7 @@ Field[2].InField = 1;
 Field[2].SizeMin = lc_outer;
 Field[2].SizeMax = lc_center;
 Field[2].DistMin = 0.0;
-Field[2].DistMax = 2.0e-3; // Refine first 2mm from the surface
+Field[2].DistMax = 4.0e-3; // Match 3D refinement distance (4mm)
 
 Background Field = 2;
 Mesh.MeshSizeExtendFromBoundary = 0;

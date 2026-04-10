@@ -15,7 +15,7 @@ rho: 10970.0        # (kg/m³) - Density
 alpha: 1.0e-5       # (1/K) - Isotropic CTE
 
 # --- Phase-field fracture properties ---
-Gc: 80.0            # (J/m²) - Critical energy release rate (= 80 MPa·mm)
+Gc: 80000.0         # (J/m²) - Critical energy release rate (= 80 MPa·mm)
 
 # --- Reference temperature (stress-free state) ---
 T_ref: 1023.15       # (K) = 750 °C — no thermal stress at this temperature
