@@ -39,18 +39,18 @@ thermal:
   analysis: transient
   solver: linear
   linear_solver: iterative_hypre
-  rtol: 1.0e-7
-  stag_tol: 1.0e-4
+  rtol: 1.0e-6
+  stag_tol: 1.0e-3
   convergence: rel_norm
 
 damage:
   type: AT2
   solver: linear
   linear_solver: iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-4
+  rtol: 1.0e-5
+  stag_tol: 1.0e-3
   convergence: rel_norm
-  lc: 5.0e-5
+  lc: 4.0e-5
 
 time:
   - 0.0
@@ -60,7 +60,7 @@ lhr:
   - 0.0
   - 0.0
 
-n_steps: 50
+n_steps: 500
 
 output:
   format: xdmf
