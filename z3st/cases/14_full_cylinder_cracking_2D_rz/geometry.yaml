@@ -1,0 +1,12 @@
+type: cyl
+
+Lz: 0.01
+Ri: 0.0
+Ro: 0.01
+
+labels:
+  uo2: 10
+  contact_wall: 20
+  bottom: 30
+  top: 40
+  axis: 50
