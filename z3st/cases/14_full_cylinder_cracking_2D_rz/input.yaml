@@ -46,7 +46,7 @@ thermal:
   convergence: rel_norm
 
 damage:
-  type: AT1
+  type: AT2
   solver: linear
   linear_solver: iterative_hypre
   rtol: 1.0e-6
@@ -57,13 +57,13 @@ damage:
 
 time:
   - 0.0
-  - 1.0
+  - 0.01
 
 lhr:
   - 0.0
   - 0.0
 
-n_steps: 500
+n_steps: 20
 
 output:
   format: xdmf
