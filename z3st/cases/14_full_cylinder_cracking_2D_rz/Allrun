@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gmsh -2 mesh.geo -format msh2
+
+python3 -m z3st
