@@ -1,4 +1,7 @@
 #!/bin/bash
 
-/usr/bin/gmsh -2 mesh.geo -format msh2
-/home/giovanni/miniconda3/envs/z3st/bin/python3 -m z3st
+# /usr/bin/gmsh -2 mesh.geo -format msh2
+# /home/giovanni/miniconda3/envs/z3st/bin/python3 -m z3st
+
+gmsh -2 mesh.geo -format msh2
+python3 -m z3st > log.z3st
