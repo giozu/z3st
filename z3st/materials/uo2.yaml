@@ -9,7 +9,7 @@ rho: 10970.0        # (kg/m³) - Density
 
 alpha: 1.0e-5       # (1/K)
 
-Gc: 8000.0          # (J/m^2)
+Gc: 15000.0          # (J/m^2)
 
 T_ref: 298.15       # (K)
 T_initial: 1023.15  # (K) = 750°C, pellet uniformly hot before quench
