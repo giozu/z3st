@@ -290,7 +290,7 @@ class Spine(
                 print(f"  q_third = {q_val:.3e} W/m³ (fissile: {mat.get('fissile', False)})")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
 
-            if float(mat["gamma_heating"]) > 0.0:
+            if float(mat.get("gamma_heating", 0.0)) > 0.0:
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
 

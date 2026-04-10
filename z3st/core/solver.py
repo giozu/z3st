@@ -530,19 +530,37 @@ class Solver:
 
             elif damage_type == "AT1":
 
-                cw = 8.0 / 3.0 
-                pref = Gc / cw
-                
-                tol_ir = 0.05
-                gamma_penalty = (Gc / lc) * (27.0 / (64.0 * tol_ir**2))
-                w_act = (3.0 * Gc) / (8.0 * lc)
+                # AT1 surface energy density (Pham-Marigo-Bourdin convention):
+                #   E_s = (3*Gc/8) * integral( D/lc + lc * |grad D|^2 ) dx
+                # Variation w.r.t. D yields the strong form
+                #   -(3*Gc*lc/4) * Laplacian(D) + 2*H*D = 2*H - 3*Gc/(8*lc)
+                # The constant -3*Gc/(8*lc) on the RHS produces the sharp
+                # AT1 elastic threshold: no damage until 2H > 3*Gc/(8*lc),
+                # i.e. sigma > sigma_c.
+                #
+                # Irreversibility (D_n+1 >= D_n) is enforced after the
+                # linear solve via np.maximum(D_new, D_old). A symmetric
+                # (D - D_old)^2 penalty in the weak form would freeze
+                # D ~= D_old whenever the penalty coefficient dominates the
+                # driving force 2H, which is the typical regime in
+                # thermal-shock cases where 2H is small. The post-solve
+                # max-projection is the correct one-sided enforcement.
+                #
+                # A small Tikhonov shift (diag_shift) stabilises the linear
+                # system in cells where H = 0 (otherwise the LHS bilinear
+                # form would be just the Laplacian, which is positive
+                # semi-definite with a constant nullspace under natural BCs).
+                cw = 8.0 / 3.0
+                pref = Gc / cw                       # = 3*Gc/8  (surface density coeff)
+                grad_coeff = 2.0 * pref * lc         # = 3*Gc*lc/4 (bilinear form coeff)
+                diag_shift = 1.0e-8 * (Gc / lc)
 
-                print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, Gamma={gamma_penalty:.2e}")
+                print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, sigma_c={sigma_c:.2e}")
 
-                a_d += w*(2.0 * self.H + gamma_penalty) * u_d * v_d * dx + \
-                    (pref * lc) * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
-                                                
-                L_d += w*(2.0 * self.H - (pref / lc) + gamma_penalty * D_old) * v_d * dx
+                a_d += w*(2.0 * self.H + diag_shift) * u_d * v_d * dx + \
+                    grad_coeff * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
+
+                L_d += w*(2.0 * self.H - (pref / lc)) * v_d * dx
 
         petsc_opts_damage = self.get_solver_options(
             physics="damage",

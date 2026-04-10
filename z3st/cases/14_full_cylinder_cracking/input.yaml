@@ -9,7 +9,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  uo2: uo2.yaml
+  uo2: ../../materials/uo2.yaml
 
 regime: 3d
 
@@ -46,13 +46,14 @@ thermal:
   convergence: rel_norm
 
 damage:
-  type: AT2
+  type: AT1
   solver: linear
   linear_solver: iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
   lc: 1.0e-4
+  hybrid_constraint: true
 
 time:
   - 0.0
@@ -62,4 +63,8 @@ lhr:
   - 0.0
   - 0.0
 
-n_steps: 500
+n_steps: 30
+
+output:
+  format: xdmf
+  filename: simulation.xdmf

@@ -1,5 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-# Z3ST Case 14 - 2D Axisymmetric Version
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 mesh_path: mesh.msh
@@ -7,7 +9,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  uo2: ../14_full_cylinder_cracking/uo2.yaml
+  uo2: ../../materials/uo2.yaml
 
 regime: axisymmetric
 
@@ -44,13 +46,14 @@ thermal:
   convergence: rel_norm
 
 damage:
-  type: AT2
+  type: AT1
   solver: linear
   linear_solver: iterative_hypre
-  rtol: 1.0e-5
+  rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
-  lc: 4.0e-5
+  lc: 1.0e-4
+  hybrid_constraint: true
 
 time:
   - 0.0
