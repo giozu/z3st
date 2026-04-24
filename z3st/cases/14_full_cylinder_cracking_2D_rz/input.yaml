@@ -28,13 +28,13 @@ solver_settings:
 models:
   thermal: true
   mechanical: true
-  damage: true
+  damage: false
 
 mechanical:
   solver: linear
   linear_solver: iterative_hypre
   rtol: 1.0e-6
-  stag_tol: 1.0e-3
+  stag_tol: 1.0e-6
   convergence: rel_norm
 
 thermal:
@@ -42,7 +42,7 @@ thermal:
   solver: linear
   linear_solver: iterative_hypre
   rtol: 1.0e-6
-  stag_tol: 1.0e-3
+  stag_tol: 1.0e-6
   convergence: rel_norm
 
 damage:

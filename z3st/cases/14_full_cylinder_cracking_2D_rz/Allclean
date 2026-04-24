@@ -1,8 +1,8 @@
 #!/bin/bash
-
 echo "Cleaning current directory..."
+
 rm -rf output/
 rm -f mesh.msh
-rm -f *.tsv
 rm -f *.txt
+
 echo "Done."
