@@ -2,7 +2,7 @@ thermal:
   uo2:
   - type: Dirichlet
     region: contact_wall
-    temperature: 263.15
+    temperature: 263.15 # -10°C
 
 mechanical:
   uo2:
