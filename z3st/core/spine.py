@@ -82,19 +82,14 @@ class Spine(
         return getattr(mod, func_name)
 
     def load_materials(self, **materials):
-
-        print("\n")
-        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
-        print(f"--. spine - load_materials --..")
-        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
-        print("\n")
+        print(f"[spine.load_materials]")
 
         self.materials = {}
         
         lc = getattr(self, "dmg_cfg", {}).get("lc")
 
         for name, mat in materials.items():
-            print(f"{name.capitalize()} material loaded:")
+            print(f"Material loaded: {name}")
 
             if "E" in mat and "nu" in mat:
                 mat["E"] = float(mat["E"])
@@ -184,7 +179,7 @@ class Spine(
         if self.on.get("damage", False): self.set_damage_boundary_conditions(self.V_d)
 
     def initialize_fields(self):
-        print(f"[INITIALIZING FIELDS]")
+        print(f"[spine.initialize_fields]")
 
         self.q_third = None
         self.T = None
