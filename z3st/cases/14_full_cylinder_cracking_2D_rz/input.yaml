@@ -21,14 +21,14 @@ solver_settings:
   relax_D: 0.5
   relax_adaptive: true
   relax_growth: 1.1
-  relax_shrink: 0.9
-  relax_min: 0.1
+  relax_shrink: 0.95     # gentler than 0.9 to avoid the controller collapsing in a few oscillations
+  relax_min: 0.05        # symmetric with the 3D variant
   relax_max: 0.95
 
 models:
   thermal: true
   mechanical: true
-  damage: false
+  damage: true
 
 mechanical:
   solver: linear
@@ -52,7 +52,7 @@ damage:
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
-  lc: 1.0e-4
+  lc: 5.0e-5            # (m) = 50 um; coarsened from McClenny's 1 um, h ~ lc/2 with lc_outer = 10 um
   hybrid_constraint: true
 
 time:
