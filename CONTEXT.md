@@ -76,7 +76,7 @@ z3st/
     │   ├── steel.yaml, austenitic_steel.yaml, martensitic_steel.yaml,
     │   │ high_carbon_steel.yaml, T91.yaml, 15_15Ti.yaml,
     │   │ vessel_steel.yaml, vessel_steel_0.yaml
-    │   ├── uo2.yaml, zircaloy.yaml                (nuclear)
+    │   ├── uo2.yaml, zircaloy.yaml
     │   ├── ceramic.yaml, oxide.yaml, plastic.yaml, lead.yaml, h2o.yaml
     │   └── ceramic.py, oxide.py                    Python-side callables
     │                                               (e.g. k(T), Gc(mesh))
@@ -380,7 +380,7 @@ The framework auto-fills `lmbda`, `G`, `bulk_modulus` from `(E, ν)` at material
 Available cards (non-exhaustive):
 
 - **Steels:** `steel.yaml`, `austenitic_steel.yaml`, `martensitic_steel.yaml`, `high_carbon_steel.yaml`, `T91.yaml`, `15_15Ti.yaml`, `vessel_steel.yaml`, `vessel_steel_0.yaml`
-- **Nuclear:** `uo2.yaml` (E = 358 GPa, k = 5 W/mK, α = 1e-5/K, Gc = 15 kJ/m², T_initial = 1023 K), `zircaloy.yaml` (Zircaloy-4)
+- **Materials:** `uo2.yaml` (E = 358 GPa, k = 5 W/mK, α = 1e-5/K, Gc = 15 kJ/m², T_initial = 1023 K), `zircaloy.yaml` (Zircaloy-4)
 - **Ceramics / oxides:** `ceramic.yaml` (+ Python `ceramic.py::k(T)`), `oxide.yaml` (+ Python `oxide.py::k(T), Gc(mesh)` with grain-boundary heterogeneity via `tanh(|y|/half_width)`)
 - **Other:** `plastic.yaml`, `lead.yaml`, `h2o.yaml`
 

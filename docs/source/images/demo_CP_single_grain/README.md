@@ -325,7 +325,7 @@ For the FEniCS 2026 conference, a comparison is planned with:
 ### Why This Comparison Matters
 
 MFront is the **industry standard** for constitutive modeling in:
-- Nuclear industry (CEA, EDF)
+- Industry (CEA, EDF)
 - Aerospace (Safran, Airbus)
 - Research institutions worldwide
 

@@ -5,7 +5,7 @@
 McClenny, Butt, Abdoelatef et al.,
 *"Experimentally validated multiphysics modeling of fracture induced by
 thermal shocks in sintered UO2 pellets"*,
-Journal of Nuclear Materials **565** (2022) 153719.
+JNM **565** (2022) 153719.
 
 ### Problem Description
 A sintered UO2 fuel pellet (R = 5 mm) is heated to 750 °C in a molten salt
@@ -17,7 +17,7 @@ fracture strength (~150 MPa), radial cracks nucleate at the outer surface and
 propagate inward.
 
 This is the same physical mechanism that causes fuel pellet cracking during
-the first power ramp in a nuclear reactor — making it a directly relevant
+the first power ramp in a power reactor — making it a directly relevant
 engineering demonstration.
 
 ### Simulation Setup
