@@ -8,6 +8,7 @@
 import dolfinx
 import ufl
 import numpy as np
+from mpi4py import MPI
 from petsc4py import PETSc
 
 
@@ -28,10 +29,10 @@ class ClusterDynamicsModel:
         
         Physical model:
         ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n²
-        
+
         where:
-        - v = 1.0 (advection velocity)
-        - D = 0.5 (diffusion coefficient)
+        - v is the advection velocity (cluster.advection_velocity, default 1.0)
+        - D is the diffusion coefficient (cluster.diffusion_coefficient, default 0.5)
         - c(n,t) is cluster density at size n and time t
         """
         self.cluster_cfg = self.input_file.get("cluster", {})
@@ -83,20 +84,24 @@ class ClusterDynamicsModel:
                 # Calculate C_tot = ∫ c(n,0) * n dn to be conserved during the simulation
                 try:
                     x_coord = ufl.SpatialCoordinate(self.mesh)
-                    n_coord = x_coord[0] 
+                    n_coord = x_coord[0]
                     flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
-                    current_mass = dolfinx.fem.assemble_scalar(flux_form)
-                    
+                    current_mass = self.mesh.comm.allreduce(
+                        dolfinx.fem.assemble_scalar(flux_form), op=MPI.SUM
+                    )
+
                     # Normalize to target mass
                     target_mass = float(ic_config.get("value", 1000.0))
                     if current_mass > 0.0:
                         scaling_factor = target_mass / current_mass
                         self.c.x.array[:] *= scaling_factor
                         self.c_n.x.array[:] *= scaling_factor
-                        
-                    self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
+
+                    self.C_tot_target = self.mesh.comm.allreduce(
+                        dolfinx.fem.assemble_scalar(flux_form), op=MPI.SUM
+                    )
                     print(f"  [INFO] Initial mass target (C_tot) normalized to: {self.C_tot_target:.4e}")
-                    
+
                 except Exception as e:
                     print(f"  [WARNING] Could not calculate initial C_tot: {e}")
 
@@ -117,17 +122,21 @@ class ClusterDynamicsModel:
 
                 # Calculation of the current mass of the interpolated profile (∫ c * n dn)
                 x_coord = ufl.SpatialCoordinate(self.mesh)
-                n_coord = x_coord[0] 
+                n_coord = x_coord[0]
                 flux_form = dolfinx.fem.form(self.c * n_coord * ufl.dx)
-                current_mass = dolfinx.fem.assemble_scalar(flux_form)
+                current_mass = self.mesh.comm.allreduce(
+                    dolfinx.fem.assemble_scalar(flux_form), op=MPI.SUM
+                )
 
                 # Normalization
                 if current_mass > 0.0:
                     scaling_factor = target_mass / current_mass
                     self.c.x.array[:] *= scaling_factor
                     self.c_n.x.array[:] *= scaling_factor
-                    
-                    self.C_tot_target = dolfinx.fem.assemble_scalar(flux_form)
+
+                    self.C_tot_target = self.mesh.comm.allreduce(
+                        dolfinx.fem.assemble_scalar(flux_form), op=MPI.SUM
+                    )
                     
                     # Actual peak after normalization (for info)
                     actual_peak = scaling_factor # since we had interpolated with amplitude 1.0

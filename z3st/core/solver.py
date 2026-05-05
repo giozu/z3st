@@ -8,6 +8,7 @@ import dolfinx
 import numpy as np
 import ufl
 from dolfinx.fem.petsc import NonlinearProblem
+from mpi4py import MPI
 from petsc4py import PETSc
 
 
@@ -666,8 +667,16 @@ class Solver:
 
         # Péclet number diagnostics
         num_cells = self.mesh.topology.index_map(self.mesh.topology.dim).size_global
-        coords = self.mesh.geometry.x[:, 0]
-        L_domain = coords.max() - coords.min()
+        local_coords = self.mesh.geometry.x[:, 0]
+        if local_coords.size > 0:
+            x_min_local = float(local_coords.min())
+            x_max_local = float(local_coords.max())
+        else:
+            x_min_local = float("inf")
+            x_max_local = float("-inf")
+        x_min = self.mesh.comm.allreduce(x_min_local, op=MPI.MIN)
+        x_max = self.mesh.comm.allreduce(x_max_local, op=MPI.MAX)
+        L_domain = x_max - x_min
         h_cell = L_domain / num_cells
         v = abs(self.v_cluster)
         D = self.D_cluster
@@ -729,7 +738,10 @@ class Solver:
         x = ufl.SpatialCoordinate(self.mesh)
         n_coord = x[0]
         
-        C_tot_curr_new = dolfinx.fem.assemble_scalar(dolfinx.fem.form(c_new * n_coord * ufl.dx))
+        C_tot_curr_new = self.mesh.comm.allreduce(
+            dolfinx.fem.assemble_scalar(dolfinx.fem.form(c_new * n_coord * ufl.dx)),
+            op=MPI.SUM,
+        )
         
         if self.C_tot_target is not None:
             if abs(C_tot_curr_new) > 0.0:
@@ -742,7 +754,8 @@ class Solver:
             else:
                 print("  [Cluster] Warning: mass is zero, cannot renormalize.")
 
-        c_max = np.max(c_new.x.array)
+        c_max_local = float(np.max(c_new.x.array)) if c_new.x.array.size > 0 else float("-inf")
+        c_max = self.mesh.comm.allreduce(c_max_local, op=MPI.MAX)
         print(f"   [Diagnostics] Max density c_max: {c_max:.2f}")
 
     def solve_staggered(
