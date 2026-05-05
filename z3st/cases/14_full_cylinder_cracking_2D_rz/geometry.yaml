@@ -1,9 +1,9 @@
 name: 2D_rz_cylinder
 geometry_type: cyl
 
-Lz: 0.01 # (m), 10 cm
-Ri: 0.0  # (m), full cylinder
-Ro: 0.05 # (m), 5 cm
+Lz: 0.01 # (m) = 10 mm
+Ri: 0.0  # (m), full cylinder (axis at r=0)
+Ro: 0.01 # (m) = 10 mm
 
 labels:
   uo2: 10

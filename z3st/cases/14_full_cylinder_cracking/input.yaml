@@ -15,14 +15,14 @@ regime: 3d
 
 solver_settings:
   coupling: staggered
-  max_iters: 200
+  max_iters: 300          # raised from 200 to give the staggered loop more headroom near crack onset
   relax_T: 0.8
   relax_u: 0.7
-  relax_D: 0.5
+  relax_D: 0.3            # lowered from 0.5; damage block is the staggered bottleneck during crack growth
   relax_adaptive: true
   relax_growth: 1.1
-  relax_shrink: 0.9
-  relax_min: 0.3
+  relax_shrink: 0.95      # gentler than 0.9 to avoid the controller collapsing in a few oscillations
+  relax_min: 0.05         # lowered from 0.3 so the controller can find an equilibrium below the previous floor
   relax_max: 0.95
 
 models:
@@ -52,15 +52,15 @@ damage:
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
-  lc: 1.0e-4
+  lc: 5.0e-5            # (m) = 50 um; coarsened from McClenny's 1 um to remain tractable in 3D, h ~ lc/2 with lc_outer = 25 um
   hybrid_constraint: true
 
 time:
   - 0.0
-  - 1.0
+  - 0.1                   # focused on the cracking transient (cracks appear at t ~ 1e-2 s per McClenny Fig. 7)
 
 lhr:
   - 0.0
   - 0.0
 
-n_steps: 30
+n_steps: 50               # dt = 2 ms; full window covers nucleation + early propagation

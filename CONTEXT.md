@@ -614,6 +614,45 @@ The following capabilities are **not present** in Z3ST v0.1.0 and would need to 
 
 ---
 
+## 9c. Active work-in-progress: case 14 thermal-shock fracture (UO2)
+
+The two case-14 variants are being calibrated against McClenny et al., JNM 565 (2022) 153719, in preparation for figures in the companion paper at `~/research-manuscripts/z3st_paper/`. State as of 2026-05-05:
+
+**What was changed in the repo (already committed-ready, not yet run):**
+- `z3st/materials/uo2.yaml` — `Gc: 15000` → `Gc: 80000.0` J/m² to match McClenny Table 3 (80 MPa·mm). Only `14_full_cylinder_cracking` and `14_full_cylinder_cracking_2D_rz` load `uo2.yaml`, no other cases impacted.
+- `z3st/cases/14_full_cylinder_cracking/input.yaml` — phase-field length `lc: 1.0e-4 → 5.0e-5` (50 μm, coarsened from McClenny's 1 μm to be tractable in 3D, satisfies $h \le \ell_c/2$ at the existing `lc_outer = 25` μm mesh refinement). Solver retuned (Option A): `max_iters: 200 → 300`, `relax_D: 0.5 → 0.3`, `relax_min: 0.3 → 0.05`, `relax_shrink: 0.9 → 0.95`. Time window narrowed to `time: [0.0, 0.1]` with `n_steps: 50` (dt = 2 ms) so the cracking transient (which McClenny shows at t ~ 1e-2 s) is properly resolved.
+- `z3st/cases/14_full_cylinder_cracking/README.md` — rewritten: R = 10 mm (was wrongly stated as 5 mm), partial 1/6 contact area, Dirichlet BC at 263.15 K, `gmsh -3` invocation, McClenny parameters reconciled, ℓ deviation documented.
+- `z3st/cases/14_full_cylinder_cracking_2D_rz/input.yaml` — `damage: false → true` (was a stale debug flag), `lc: 1.0e-4 → 5.0e-5`, `relax_min: 0.1 → 0.05`, `relax_shrink: 0.9 → 0.95`.
+- `z3st/cases/14_full_cylinder_cracking_2D_rz/geometry.yaml` — `Ro: 0.05 → 0.01` (mesh.geo always used 10 mm; geometry.yaml was inconsistent), unit comments fixed.
+
+**What still needs running (do on the target machine):**
+
+```bash
+# 3D case
+cd ~/z3st/z3st/cases/14_full_cylinder_cracking/
+./Allclean                                          # wipe stale log.z3st, energies.txt, output/*.vtu
+gmsh -3 mesh.geo -format msh2
+python3 -m z3st > log.z3st
+python3 non-regression.py                           # produces output/thermal_shock_results.png and stress_evolution.png
+
+# 2D-rz case
+cd ~/z3st/z3st/cases/14_full_cylinder_cracking_2D_rz/
+./Allclean
+gmsh -2 mesh.geo -format msh2
+python3 -m z3st > log_z3st.md
+python3 non-regression.py
+```
+
+**Expected outcome:**
+- 3D case: with the retuned staggered controller, `relax_D` should not collapse to the previous floor; `E_frac` in `energies.txt` should grow monotonically across the full 50 steps (the previous run plateaued at step 73 / 199 because `relax_D` had hit its floor and the damage block stopped advancing). Two to four major radial cracks initiating at the 60° contact wedge and propagating inwards is the qualitative signature to look for, consistent with McClenny Fig. 8.
+- 2D-rz case: damage is now active so the case becomes a fully axisymmetric thermal-shock simulation; expected output is a single radial damage band emerging from the outer surface and propagating inwards (uniform azimuthal cooling cannot produce the discrete radial-crack count of the 3D case).
+
+**If the 3D run still stalls (`relax_D → relax_min` and `E_frac` plateaus):** the next escalation is to investigate whether the adaptive controller in `z3st/core/solver.py` is silently bypassing the `relax_min` clamp (the previous run showed `relax_D = 0.05` even with `relax_min = 0.3`, which is suspicious). That is a framework-level fix, not a tuning question.
+
+**Paper integration point:** `~/research-manuscripts/z3st_paper/results.tex` has a dedicated "Thermal-shock-driven cracking of a UO2 pellet" subsection (Section~\ref{sec:case14}) that already cites these parameter choices. Once the run produces converged figures (`thermal_shock_results.png`, `stress_evolution.png`, plus a damage-field snapshot from the VTU output), the figures need to be copied into `~/research-manuscripts/z3st_paper/figures/` with stable names (suggested: `case14_3D_T.png`, `case14_3D_stress.png`, `case14_3D_damage.png`, `case14_2Drz_damage.png`) and `\includegraphics{}` calls added to `results.tex`. The companion `~/research-manuscripts/z3st_paper/paper.md` lists this as an open item.
+
+---
+
 ## 10. File-level quick index
 
 | File                                          | Role                                                  |
