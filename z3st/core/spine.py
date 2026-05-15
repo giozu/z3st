@@ -115,6 +115,24 @@ class Spine(
             sigma_c = mat.get("sigma_c")
             Gc = mat.get("Gc")
 
+            # YAML quirk: scientific notation without explicit +/- in the exponent
+            # (e.g. `1.0e9`) is parsed as a *string*, not a float. Coerce defensively
+            # so users don't hit a confusing TypeError downstream. A genuine symbolic
+            # Gc string (e.g. "module.func") will fail the float() and keep its string
+            # form for the resolver below.
+            if isinstance(sigma_c, str):
+                try:
+                    sigma_c = float(sigma_c)
+                    mat["sigma_c"] = sigma_c
+                except ValueError:
+                    pass  # leave as-is (no symbolic sigma_c path is currently used)
+            if isinstance(Gc, str):
+                try:
+                    Gc = float(Gc)
+                    mat["Gc"] = Gc
+                except ValueError:
+                    pass  # genuine "module.func" symbolic path — handled below
+
             if "Gc" in mat:
                 if isinstance(mat["Gc"], str):
                     print(f"  → Gc defined as symbolic function: {mat['Gc']}")
@@ -362,7 +380,10 @@ class Spine(
 
         for name, mat in self.materials.items():
             if self.on.get("mechanical", False):
-                self.energy_density[name] = self.elastic_energy_density(self.u, mat)
+                # Elastic energy uses the elastic strain (eps - alpha*(T - T_ref)*I)
+                # so uniform thermal expansion does not appear as stored elastic energy.
+                T_field = getattr(self, "T", None) if self.on.get("thermal", False) else None
+                self.energy_density[name] = self.elastic_energy_density(self.u, mat, T=T_field)
                 self.stress_mech[name] = self.sigma_mech(self.u, mat)
             
             if self.on.get("thermal", False):

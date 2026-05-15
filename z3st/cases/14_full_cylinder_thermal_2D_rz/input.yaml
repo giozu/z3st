@@ -1,0 +1,77 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.1.0 (2025)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  uo2: ../../materials/uo2.yaml
+
+regime: axisymmetric
+
+solver_settings:
+  coupling: staggered
+  max_iters: 200
+  relax_T: 0.8
+  relax_u: 0.6
+  relax_D: 0.5
+  relax_adaptive: true
+  relax_growth: 1.1
+  relax_shrink: 0.95     # gentler than 0.9 to avoid the controller collapsing in a few oscillations
+  relax_min: 0.05        # symmetric with the 3D variant
+  relax_max: 0.95
+
+models:
+  thermal: true
+  mechanical: true
+  damage: false           # Verification case: damage is intentionally OFF. McClenny's experiment
+                          # is azimuthally asymmetric (60-deg contact wedge) and the alumina spacer
+                          # at the bottom suppressed axial cooling, so the only physically valid
+                          # axisymmetric idealization is full-circumference cooling -- which can
+                          # produce only an unphysical annular damage band, not the discrete radial
+                          # cracks of McClenny Fig. 8. Use the 2D-xy or 3D variants for cracking.
+
+mechanical:
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+
+thermal:
+  analysis: transient
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+
+# damage:                 # Damage block kept here for reference, in case someone wants to enable it
+#   type: AT1             #   damage: true above and observe the (unphysical) annular band.
+#   solver: linear        #   The case will run, the band will form at r ~ Ro, and the staggered
+#   linear_solver: iterative_hypre   # solver will diverge around step 50 once the band reaches
+#   rtol: 1.0e-6          #   D ~ 1 because the effective stiffness g(D) ~ K = 1e-6 makes the
+#   stag_tol: 1.0e-3      #   mechanical solve ill-conditioned. Don't expect a meaningful result.
+#   convergence: rel_norm
+#   lc: 5.0e-5
+#   hybrid_constraint: true
+
+time:
+  - 0.0001          # non-zero start avoids the dt=0 static-IC step that would imprint a
+                    # discontinuous T field at the boundary
+  - 0.05            # short window sufficient for the thermal verification (cold-front depth
+                    # at 0.05 s is ~0.3 mm; the analytic Bessel-series check is well exercised)
+
+lhr:
+  - 0.0
+  - 0.0
+
+n_steps: 50         # dt = 1 ms
+
+output:
+  format: vtu       # non-regression.py reads fields_*.vtu
+  filename: fields

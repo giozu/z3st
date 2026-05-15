@@ -9,9 +9,9 @@
 // Parameters
 R = 10.0e-3;             // Radius (m) = 10 mm
 H = 10.0e-3;             // Height (m) = 10 mm
-lc_outer = 2.5e-5;       // Mesh size at outer edge (m)
-lc_center = 5.0e-4;      // Mesh size at center (m)
-n_layers = 20;           // Number of layers in extrusion (REFINED)
+lc_outer = 2.5e-5;       // Mesh size at outer edge (m)  = lc/2 (lc_phase_field = 50 um)
+lc_center = 2.0e-4;      // Mesh size at center (m)      = 4*lc (was 5e-4 = 10*lc, too coarse for crack path)
+n_layers = 20;           // Number of layers in extrusion
 
 // Circle split into: 60° contact + 300° insulated
 // Contact region: from 0° to 60° (1/6 of circumference)
@@ -60,7 +60,8 @@ Field[2].InField = 1;
 Field[2].SizeMin = lc_outer;
 Field[2].SizeMax = lc_center;
 Field[2].DistMin = 0.0;
-Field[2].DistMax = 4.0e-3;
+Field[2].DistMax = 8.0e-3;       // extends fine mesh to r = 2 mm so it covers the expected crack path
+                                 // (McClenny long cracks penetrate ~half the pellet)
 
 Background Field = 2;
 Mesh.MeshSizeExtendFromBoundary = 0;

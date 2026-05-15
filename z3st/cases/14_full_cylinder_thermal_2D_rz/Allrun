@@ -4,11 +4,10 @@ cd "${0%/*}" || exit 1
 ./Allclean
 
 # Skip mesh generation if mesh.msh is already up-to-date relative to mesh.geo.
-# This saves several minutes for the 3D case. To force re-meshing, just
-# `rm mesh.msh` before ./Allrun (or change mesh.geo, which makes mesh.msh older).
+# To force re-meshing, just `rm mesh.msh` before ./Allrun (or edit mesh.geo).
 if [ ! -f mesh.msh ] || [ mesh.geo -nt mesh.msh ]; then
     echo "[Allrun] Generating mesh from mesh.geo..."
-    gmsh -3 mesh.geo -format msh2 > log_mesh.md
+    gmsh -2 mesh.geo -format msh2 > log_mesh.md
 else
     echo "[Allrun] Reusing existing mesh.msh (mesh.geo unchanged since)."
 fi

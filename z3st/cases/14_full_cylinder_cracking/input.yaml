@@ -32,7 +32,12 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps   # MUMPS handles the near-singular Jacobian in cracked cells
+                                # (g(D) ~ K = 1e-6) via partial pivoting. The 2D-xy variant
+                                # diverged with iterative_hypre at step ~22; MUMPS is the fix.
+                                # Memory footprint is heavier but tractable for this 3D mesh size.
+                                # If MUMPS runs out of memory, fall back to iterative_amg with
+                                # a tighter rtol (~1.0e-8).
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
@@ -46,9 +51,13 @@ thermal:
   convergence: rel_norm
 
 damage:
-  type: AT2
+  type: AT1                # AT1 has finite elastic threshold; suppresses AT2 smearing at coarsened lc
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps   # Same rationale as the 2D-xy variant: the AT1 mass term
+                                # 2*H = 2*psi+ varies by 7+ orders of magnitude between rim
+                                # and bulk, and BoomerAMG returns garbage residuals there.
+                                # If MUMPS hits memory limits in 3D, the next-best fallback
+                                # is iterative_amg (GAMG) with rtol=1.0e-8 and tighter stag_tol.
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
@@ -56,7 +65,8 @@ damage:
   hybrid_constraint: true
 
 time:
-  - 0.0
+  - 0.0001                # was 0.0; non-zero start avoids the dt=0 static-IC step that produced a
+                          # discontinuous T field at the boundary and spurious bulk stresses
   - 0.1                   # focused on the cracking transient (cracks appear at t ~ 1e-2 s per McClenny Fig. 7)
 
 lhr:
@@ -64,3 +74,7 @@ lhr:
   - 0.0
 
 n_steps: 50               # dt = 2 ms; full window covers nucleation + early propagation
+
+output:
+  format: vtu             # non-regression.py reads fields_*.vtu
+  filename: fields

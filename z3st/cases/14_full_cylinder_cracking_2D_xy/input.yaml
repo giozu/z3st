@@ -1,0 +1,87 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.1.0 (2025)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+# Case: 14_full_cylinder_cracking_2D_xy
+# Geometry: 2D transverse cross-section of a UO2 pellet (upper-half disc with
+# mirror symmetry on y=0). 60-degree cold contact arc on the right side.
+# Reproduces the in-plane radial-crack pattern of McClenny et al., JNM 565
+# (2022) Fig. 8 (top row) at much lower compute cost than the 3D variant.
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  uo2: ../../materials/uo2.yaml
+
+regime: 2d              # plane strain in z3st (3x3 strain tensor with zero z-components)
+
+solver_settings:
+  coupling: staggered
+  max_iters: 200
+  relax_T: 0.8
+  relax_u: 0.6
+  relax_D: 0.5                # back to default after introducing the prescribed pre-crack:
+                              # propagation from a known seed is much more docile than the
+                              # spontaneous-nucleation cascade we tried to suppress before.
+  relax_adaptive: true
+  relax_growth: 1.1
+  relax_shrink: 0.95
+  relax_min: 0.05
+  relax_max: 0.95
+
+models:
+  thermal: true
+  mechanical: true
+  damage: true
+
+mechanical:
+  solver: linear
+  linear_solver: direct_mumps   # MUMPS via partial pivoting handles the near-singular Jacobian
+                                # in cracked cells (g(D) ~ K = 1e-6). The iterative_hypre solver
+                                # diverged at step ~22 of the previous run because CG+BoomerAMG
+                                # was reporting a "converged" residual on a numerically garbage
+                                # solution. MUMPS is fast for this 2D system size.
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+
+thermal:
+  analysis: transient
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+
+damage:
+  type: AT1             # finite elastic threshold; localizes cleanly with sigma_c = 2 GPa
+  solver: linear
+  linear_solver: direct_mumps   # AT1 mass term 2*H = 2*psi+ is a physical energy density (MJ/m^3
+                                # at the cold rim, ~0 in the bulk -- 7+ orders of magnitude
+                                # coefficient heterogeneity). CG+BoomerAMG terminates on garbage
+                                # residuals at the rim, which propagate through the staggered loop
+                                # and explode E_el. MUMPS is robust on this kind of heterogeneous SPD.
+  rtol: 1.0e-6
+  stag_tol: 1.0e-3      # back to default; the prescribed pre-crack stabilizes the staggered loop.
+  convergence: rel_norm
+  lc: 5.0e-5            # 50 um
+  hybrid_constraint: true
+
+time:
+  - 0.0001              # non-zero start avoids the dt=0 static-IC step
+  - 0.1                 # full window: covers the McClenny crack-propagation phase
+
+lhr:
+  - 0.0
+  - 0.0
+
+n_steps: 100            # dt = 1 ms (back to default after the prescribed pre-crack fix)
+
+output:
+  format: vtu
+  filename: fields
