@@ -4,6 +4,96 @@
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
+import os
+import sys
+import re
+import time
+
+import yaml
+
+
+# --. Markdown stdout filter --..
+# When stdout is redirected to a file (e.g., `python -m z3st > log.md`),
+# rewrite line-by-line to produce a readable Markdown document. Pass-through
+# when the terminal is interactive. Disable explicitly with Z3ST_PLAIN_LOG=1.
+def _install_markdown_stdout():
+    if os.environ.get("Z3ST_PLAIN_LOG"):
+        return
+    if sys.stdout.isatty():
+        return
+
+    _morse_line = re.compile(r"^\s*(?:--\.\. \.\.- \.-\.\. \.-\.\. ---\s*)+$")
+    _step       = re.compile(r"^\[STEP (\d+/\d+)\]\s*(.*)$")
+    _iter       = re.compile(r"^--- Staggering iteration (\d+/\d+) ---\s*$")
+    _spine_hdr  = re.compile(r"^\s*--\. (.+) --\.\.\s*$")
+    _underscore = re.compile(r"^__([^_].*?[^_])__\s*$")
+    _tagged     = re.compile(r"^(\s*)\[(INFO|WARNING|ERROR|SUCCESS|DESCRIPTION)\](\s+.*)?$")
+
+    def transform(line):
+        # Strip CR for safety on mixed line endings.
+        s = line.rstrip("\r")
+
+        if _morse_line.match(s):
+            # `***` (not `---`) avoids setext-heading ambiguity in markdown.
+            return ""  # blank line; the divider proper is emitted as a separate token
+        m = _step.match(s)
+        if m:
+            num, rest = m.group(1), m.group(2).strip()
+            tail = f": {rest}" if rest else ""
+            return f"\n## Step {num}{tail}\n"
+        m = _iter.match(s)
+        if m:
+            return f"\n#### Iteration {m.group(1)}\n"
+        m = _spine_hdr.match(s)
+        if m:
+            return f"\n### {m.group(1).strip()}\n"
+        m = _underscore.match(s)
+        if m:
+            return f"\n### {m.group(1).strip()}\n"
+        m = _tagged.match(s)
+        if m:
+            indent, tag, body = m.group(1), m.group(2), (m.group(3) or "").strip()
+            if tag == "DESCRIPTION":
+                return f"\n## Description\n"
+            return f"{indent}**[{tag}]** {body}".rstrip()
+        return s
+
+    raw = sys.stdout
+
+    class MarkdownStream:
+        def __init__(self, raw):
+            self._raw = raw
+            self._buf = ""
+
+        def write(self, s):
+            if not s:
+                return 0
+            self._buf += s
+            parts = self._buf.split("\n")
+            self._buf = parts.pop()  # last fragment may be partial
+            for line in parts:
+                if _morse_line.match(line.rstrip("\r")):
+                    # `***` (not `---`) avoids markdown setext-heading ambiguity.
+                    self._raw.write("\n***\n\n")
+                else:
+                    self._raw.write(transform(line) + "\n")
+            return len(s)
+
+        def flush(self):
+            if self._buf:
+                self._raw.write(transform(self._buf))
+                self._buf = ""
+            self._raw.flush()
+
+        def __getattr__(self, name):
+            return getattr(self._raw, name)
+
+    sys.stdout = MarkdownStream(raw)
+
+
+_install_markdown_stdout()
+
+
 print(
     """
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
@@ -14,17 +104,10 @@ Version: 0.1.0 (2025)
 
 [DESCRIPTION]
 Z3ST is an open-source framework for the thermo-mechanical modelling
-of materials. Built on FEniCSx, it supports transient simulations, 
+of materials. Built on FEniCSx, it supports transient simulations,
 complex geometries, and user-defined boundary conditions.
 """
 )
-
-# --. Python modules --..
-import os
-import sys
-import time
-
-import yaml
 
 # --. Z3ST modules --..
 from z3st.core.spine import Spine

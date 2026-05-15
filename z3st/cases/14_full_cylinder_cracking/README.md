@@ -1,11 +1,47 @@
-# UO2 pellet thermal-shock fracture - phase-field simulation
-## z3st application case
+# UO2 pellet thermal-shock fracture - phase-field simulation (3D)
+## z3st application case (gold-standard McClenny reproducer)
+
+### Role
+
+This is the **3D, gold-standard** reproduction of the McClenny et al.
+(JNM 565, 2022) UO2 pellet thermal-shock experiment. It is the only
+case-14 variant that captures all dimensions of the experiment
+faithfully:
+
+- A 60-deg azimuthal contact wedge on the lateral surface (1/6 of the
+  total pellet surface area, matching McClenny Fig. 4).
+- Zero-flux thermal BCs on the top and bottom faces, consistent with
+  McClenny's alumina-spacer design which deliberately suppressed
+  axial cooling (their Section 3) so that heat transfer was confined
+  to the radial direction.
+- Full 3D mechanical equilibrium (no plane-strain or plane-stress
+  approximation).
+
+The 2D variants serve more limited roles:
+
+- `14_full_cylinder_cracking_2D_xy/` is the 2D plane-strain analogue
+  (transverse cross-section with the 60-deg arc). It captures the
+  Fig. 8 crack pattern at much lower compute cost. Justified by the
+  alumina-spacer's suppression of axial gradients.
+- `14_full_cylinder_thermal_2D_rz/` is a thermal + linear-elastic
+  verification case **with damage disabled**. Axisymmetric mode
+  cannot represent the 60-deg wedge, so it is unsuitable for the
+  cracking benchmark; it serves only as a verification of z3st's
+  axisymmetric thermal solver against the analytic Bessel-series
+  solution.
 
 ### Reference
 McClenny, Butt, Abdoelatef et al.,
 "Experimentally validated multiphysics modeling of fracture induced by
 thermal shocks in sintered UO2 pellets",
 Journal of Nuclear Materials 565 (2022) 153719.
+
+The phase-field formulation used here follows Ambati, Gerasimov & De Lorenzis,
+"A review on phase-field models of brittle fracture and a new fast hybrid
+formulation", Computational Mechanics 55 (2015) 383-405. The case is
+positioned as a benchmark of the Ambati hybrid model against the Miehe
+anisotropic + viscous Allen-Cahn formulation used in McClenny et al. -
+see "Phase-field formulation" below.
 
 ### Problem description
 A sintered UO2 fuel pellet (R = 10 mm, H = 10 mm) is preheated to 750 deg C in a
@@ -45,6 +81,36 @@ pattern recovered is therefore qualitatively faithful to the McClenny reference
 (radial cracks initiating at the cold contact, propagating inwards) but with
 diffuse cracks ~100 um wide rather than the ~2 um of the reference simulation.
 
+### Phase-field formulation
+McClenny et al. solve the Miehe *anisotropic* model with a rate-dependent
+Allen-Cahn evolution (their Eq. 10):
+- stress: sigma = (1-c)^2 dPsi+/de + dPsi-/de  (mechanical equation is non-linear),
+- evolution: eta dc/dt = 2(1-c) Psi+ - (Gc/l)(c - l^2 Lap c), with viscosity
+  eta = 1e-8 s/mm.
+
+Z3ST solves the Ambati *hybrid* formulation (Ambati et al. Eq. 27):
+- stress: sigma = (1-D)^2 dPsi0/de  (full energy degraded isotropically;
+  mechanical equation stays *linear*),
+- damage: -l^2 Lap D + D = (2 l / Gc)(1-D) H+, with H+ the spectral-split
+  positive elastic-energy history (Miehe split + irreversibility),
+- hybrid constraint: in cells where Psi- > Psi+, the driving force H is set
+  to zero (z3st softens Ambati's hard "D := 0" projection to "H = 0", which
+  is equivalent under monotonic loading like a thermal shock and more
+  physical under unloading).
+
+The implementation lives in `z3st/models/damage_model.py` and
+`z3st/core/solver.py::_damage_step`. The two SENT/SENS classical
+benchmarks (`cases/19_single-edge_notched_*`) verify the formulation
+against the Miehe-Ambati canonical results.
+
+The methodological point of running this case is therefore not just
+reproducing McClenny's UO2 thermal-shock crack pattern, but doing so with
+a *different and cheaper* phase-field formulation: the linear mechanical
+block of the hybrid model has roughly an order-of-magnitude lower
+per-iteration cost than the anisotropic + viscous formulation (Ambati
+Section 3.1), and Z3ST's elliptic AT2 minimisation removes the
+viscosity-tuned crack kinetics entirely.
+
 ### Boundary conditions
 - Initial: T = 1023.15 K (750 deg C) uniform
 - Thermal: Dirichlet T = 263.15 K (-10 deg C) on the 60 deg contact_wall;
@@ -61,9 +127,16 @@ diffuse cracks ~100 um wide rather than the ~2 um of the reference simulation.
 2. Stress: tensile hoop stress at the cold periphery (peaking at ~150-200 MPa
    in the early transient), compressive at the centre.
 3. Fracture: radial cracks nucleate at the cold contact and propagate inwards.
-   The number and depth of cracks depend on Gc and lc; with the present
-   parameters, two to four major radial cracks are expected, consistent with
-   the experimental observations of McClenny et al. (Fig. 8).
+   The McClenny reference (Fig. 8 and Fig. 9) reports **two long radial
+   cracks** plus a fan of shorter surface cracks distributed along the 60 deg
+   contact wedge. The two long cracks do not reach the pellet centre: they
+   are arrested by the central compression zone. In Z3ST this arrest
+   emerges from two compounding mechanisms: the Miehe spectral split sends
+   compressive eigenvalue contributions into Psi-, and the hybrid
+   constraint then sets the driving force H = 0 in cells where Psi- > Psi+.
+   Z3ST is expected to reproduce the same topology with diffuser crack
+   bands (~100 um vs ~2 um), as a consequence of the lc coarsening
+   discussed above.
 
 ### Verification steps
 1. Thermal only: compare T(r, t) on a wedge through the contact region against
@@ -88,7 +161,7 @@ python3 non-regression.py
 ### Variants
 - Full circumference quench: change `contact_wall` to cover the entire outer
   surface and remove the `insulated_wall`. The corresponding axisymmetric
-  variant lives in `14_full_cylinder_cracking_2D_rz/`.
+  variant lives in `14_full_cylinder_thermal_2D_rz/`.
 - Reactor power ramp: replace the thermal-shock BC with a volumetric source
   q''' = LHR/(pi R^2) and a coolant Robin BC on the outer surface. This gives
   the classic in-reactor pellet cracking pattern.

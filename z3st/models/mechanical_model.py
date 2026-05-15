@@ -665,39 +665,104 @@ class MechanicalModel:
 
     def sigma_th(self, T, material):
         """
-        Returns the thermal stress tensor σ_th(T) = - (3λ + 2G) α (T - T_ref) I
-        for a given temperature field T and material properties.
+        Thermal stress tensor σ_th(T) = -(3λ + 2G) α (T - T_ref) I.
 
-        Negative sign convention:
-            compressive thermal stress for T > T_ref.
+        Sign convention: compressive thermal stress for T > T_ref. The
+        (3λ + 2G) factor is the standard isotropic 3D form; for regime
+        "2d" (plane strain in z3st) the 3x3 identity contracts with
+        eps(v) which has eps_zz(v) = 0 on a 2D mesh, so the in-plane
+        coupling is naturally the plane-strain (3λ + 2G) result (the
+        eigenstrain is implicitly α(T-T_ref) on the z direction too,
+        blocked by the plane-strain constraint eps_zz = 0).
 
-        Parameters:
-            T (dolfinx.fem.Function): The temperature field.
-            material (dict): Material properties.
+        Damage coupling: when damage is active, σ_th is degraded by
+        g(D) = (1-D)^2 + K, mirroring σ_mech. Without this degradation, a
+        fully damaged cell (g(D) ~ K ~ 1e-6) loses its mechanical stiffness
+        on the LHS of the equilibrium but still feels the full thermal
+        body force on the RHS, which drives the displacement to ~1/K →
+        numerical explosion. Degrading both gives the physical limit of a
+        traction-free crack face.
 
-
-        Returns:
-            dolfinx.fem.Tensor: The thermal stress tensor.
-
+        Note on the damage driver: damage_model._thermal_eigenstrain uses
+        the "pancake" convention (eth_zz = 0) when evaluating ψ⁺. That is
+        a deliberate, independent choice that suppresses the 2D-projected
+        bulk σ_zz artifact in the damage decision only; it does not affect
+        the displacement field, which keeps the standard plane-strain
+        (3λ + 2G) thermal stress here.
         """
         regime = self.regime
         dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
 
-        return (
-            -(3 * material["lmbda"] + 2 * material["G"])
+        sigma_th = (
+            -(3.0 * material["lmbda"] + 2.0 * material["G"])
             * material["alpha"]
             * (T - material["T_ref"])
             * ufl.Identity(dim)
         )
 
-    def elastic_energy_density(self, u, material):
-        """
-        Elastic strain energy density = 1/2 * sigma_mech(u) : epsilon(u).
-        """
+        if self.on.get("damage", False):
+            sigma_th = self.degradation_function(self.D) * sigma_th
 
+        return sigma_th
+
+    def elastic_energy_density(self, u, material, T=None):
+        """
+        Elastic strain energy density.
+
+        For linear-elastic (Lame) constitutive:
+            psi_el = 0.5 * [lambda * tr(eps_el)^2 + 2G * eps_el : eps_el]
+        where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
+        (total strain minus thermal eigenstrain). When T is None or the
+        material has no thermal-expansion properties, eps_el = eps(u) and
+        we recover the previous formula.
+
+        For other constitutive modes (voigt / hyperelastic / plasticity /
+        custom), fall back to 0.5 * sigma_mech(u, material) : eps(u) on
+        total strain. Those modes don't have thermal coupling wired up in
+        z3st, so the simpler formula is used.
+
+        Why the elastic strain matters: the energy that can be released by
+        cracking is the *elastic* strain energy. Uniform thermal expansion
+        in an unconstrained body produces total strain but zero elastic
+        strain and zero releasable energy, so the bulk's psi_el should be
+        ~0. Using eps(u) directly would pollute psi_el with thermal expansion
+        and lead to spurious E_el offsets in the energies.txt diagnostic.
+        """
+        mode = material.get("constitutive_mode", "lame")
+
+        if mode == "lame":
+            eps = self.epsilon(u)
+            if T is not None and "alpha" in material and "T_ref" in material:
+                # Thermal eigenstrain. In 2D Cartesian (plane strain or plane
+                # stress), the z-component is suppressed because eps_zz is
+                # geometrically constrained / sigma_zz is zero -- including
+                # eth_zz would produce a spurious bulk psi_el. See the
+                # docstring of DamageModel._thermal_eigenstrain for the full
+                # rationale; we duplicate the logic here so that
+                # MechanicalModel does not need to import DamageModel.
+                factor = material["alpha"] * (T - material["T_ref"])
+                dim = eps.ufl_shape[0]
+                regime = str(getattr(self, "regime", "3d")).lower()
+                if regime in ("2d", "plane_stress") and dim == 3:
+                    I_inplane = ufl.as_tensor([
+                        [1.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0],
+                        [0.0, 0.0, 0.0],
+                    ])
+                    eth = factor * I_inplane
+                else:
+                    eth = factor * ufl.Identity(dim)
+                eps_el = eps - eth
+            else:
+                eps_el = eps
+            return 0.5 * (
+                material["lmbda"] * ufl.tr(eps_el) ** 2
+                + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
+            )
+
+        # Non-linear / non-Lame fallback: total-strain energy density.
         sigma = self.sigma_mech(u, material)
         eps = self.epsilon(u)
-
         return 0.5 * ufl.inner(sigma, eps)
 
     def zero_displacement(self, mesh, dofs, V):

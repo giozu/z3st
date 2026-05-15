@@ -162,6 +162,17 @@ CLI flags:
 - `--debug`       enable verbose debugging
 - `--mesh_plot`   preview surface tags with PyVista (via `core.mesh.plotter.MeshPlotter`)
 
+**Markdown log filter** (`__main__.py`, top of file). When `sys.stdout` is *not* a TTY (i.e., the user redirected output, e.g. `python -m z3st > log.md`), a line-by-line stdout shim rewrites the existing decorated output into Markdown:
+- Morse-code dividers `--.. ..- .-.. .-.. --- ...` → `***` (horizontal rule; `***` rather than `---` to avoid setext-heading ambiguity).
+- `[STEP NN/MM] rest` → `## Step NN/MM: rest`.
+- `--- Staggering iteration N/M ---` → `#### Iteration N/M`.
+- `--. foo --..` (spine section markers) → `### foo`.
+- `__Foo__` (initializer headers) → `### Foo`.
+- `[DESCRIPTION]` → `## Description`.
+- `[INFO|WARNING|ERROR|SUCCESS] body` → `**[TAG]** body`.
+
+Interactive runs are pass-through. Set `Z3ST_PLAIN_LOG=1` to force the raw, unfiltered output even when redirected. None of the solver / model / config modules were touched; the filter is a single point of intercept in `__main__.py`.
+
 ---
 
 ## 3. Core modules
@@ -430,7 +441,7 @@ The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regressio
 - `12_cylindrical_shell_thermal_gradient_2D`, `12_cylindrical_shell_thermal_gradient_3D`
 - `13_annular_cylinder`
 - `14_full_cylinder`
-- `14_full_cylinder_cracking` (3D), `14_full_cylinder_cracking_2D_rz` (axisymmetric UO₂ quench with AT2 phase-field)
+- `14_full_cylinder_cracking` (3D), `14_full_cylinder_thermal_2D_rz` (axisymmetric UO₂ quench with AT2 phase-field)
 
 **15 — Cavities and pressurised bodies**
 - `15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`
@@ -616,40 +627,79 @@ The following capabilities are **not present** in Z3ST v0.1.0 and would need to 
 
 ## 9c. Active work-in-progress: case 14 thermal-shock fracture (UO2)
 
-The two case-14 variants are being calibrated against McClenny et al., JNM 565 (2022) 153719, in preparation for figures in the companion paper at `~/research-manuscripts/z3st_paper/`. State as of 2026-05-05:
+The case-14 family is being calibrated against McClenny et al., JNM 565 (2022) 153719, in preparation for figures in the companion paper at `~/research-manuscripts/z3st_paper/`. State as of 2026-05-07.
 
-**What was changed in the repo (already committed-ready, not yet run):**
-- `z3st/materials/uo2.yaml` — `Gc: 15000` → `Gc: 80000.0` J/m² to match McClenny Table 3 (80 MPa·mm). Only `14_full_cylinder_cracking` and `14_full_cylinder_cracking_2D_rz` load `uo2.yaml`, no other cases impacted.
-- `z3st/cases/14_full_cylinder_cracking/input.yaml` — phase-field length `lc: 1.0e-4 → 5.0e-5` (50 μm, coarsened from McClenny's 1 μm to be tractable in 3D, satisfies $h \le \ell_c/2$ at the existing `lc_outer = 25` μm mesh refinement). Solver retuned (Option A): `max_iters: 200 → 300`, `relax_D: 0.5 → 0.3`, `relax_min: 0.3 → 0.05`, `relax_shrink: 0.9 → 0.95`. Time window narrowed to `time: [0.0, 0.1]` with `n_steps: 50` (dt = 2 ms) so the cracking transient (which McClenny shows at t ~ 1e-2 s) is properly resolved.
-- `z3st/cases/14_full_cylinder_cracking/README.md` — rewritten: R = 10 mm (was wrongly stated as 5 mm), partial 1/6 contact area, Dirichlet BC at 263.15 K, `gmsh -3` invocation, McClenny parameters reconciled, ℓ deviation documented.
-- `z3st/cases/14_full_cylinder_cracking_2D_rz/input.yaml` — `damage: false → true` (was a stale debug flag), `lc: 1.0e-4 → 5.0e-5`, `relax_min: 0.1 → 0.05`, `relax_shrink: 0.9 → 0.95`.
-- `z3st/cases/14_full_cylinder_cracking_2D_rz/geometry.yaml` — `Ro: 0.05 → 0.01` (mesh.geo always used 10 mm; geometry.yaml was inconsistent), unit comments fixed.
+**Three case-14 variants, each with a distinct role (verdict reached 2026-05-07 after extensive iteration and an independent NotebookLM consult):**
 
-**What still needs running (do on the target machine):**
+| Case directory | Role | Why |
+|---|---|---|
+| `14_full_cylinder_cracking/` (3D) | **Gold-standard** McClenny reproducer. | Faithfully captures the 60° azimuthal wedge AND the radial-only heat transfer (top/bottom faces zero-flux, matching McClenny's alumina-spacer design). |
+| `14_full_cylinder_cracking_2D_xy/` (2D plane strain) | **McClenny Fig. 8 reproducer** at lower compute cost. | Plane strain (no axial gradients) is consistent with the alumina spacer's role; the 60° contact arc on a transverse cross-section is exactly McClenny's 2D representation (their Fig. 8 top, Fig. A.13, Fig. A.14). Modeled as upper-half disc with mirror symmetry on y=0 (= 30° contact in the upper half). |
+| `14_full_cylinder_thermal_2D_rz/` (2D axisymmetric) | **Verification only** (thermal + linear-elastic). Damage disabled. | Axisymmetric mode mathematically prohibits azimuthal variation, so it cannot represent the 60° contact wedge. Any axisymmetric idealization (full-circumference cooling, single-face quench, etc.) either contradicts McClenny's experimental design or produces an unphysical annular damage band. Useful only to verify z3st's axisymmetric thermal solver against the analytic Bessel-series solution. |
 
+The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 notes "Insulation is placed on one side of the fuel pellet to ... eliminate axial thermal contact between the bottom of the capsule and the UO2 so that conductive radial heat transfer was the primary method of heat transfer to occur. This was intentionally designed to form a stress concentration on the contact region to induce fracturing." This means the experiment is actively radial-only by design — plane strain (2D-xy) is the *correct* dimensional reduction, and any axisymmetric variant with axial gradients (e.g. cooling only the top face) would *contradict* the experiment.
+
+**Methodological framing (the paper's contribution).** Z3ST's damage block implements the **Ambati et al. (2015) hybrid (isotropic-anisotropic) phase-field formulation** (Comput Mech 55:383-405, Eq. 27). McClenny et al. instead use the **Miehe anisotropic formulation with viscous Allen-Cahn evolution** (their Eq. 10, with viscosity `eta = 1e-8 s/mm`). The case-14 chapter is therefore not "same problem, same model, different code"; it is a benchmark that the hybrid model — whose mechanical block is **linear** and which has no viscosity-tuned kinetics — captures the same crack topology at a per-iteration cost roughly an order of magnitude lower (Ambati §3.1). The Ambati paper is checked into `z3st/cases/14_full_cylinder_cracking/`.
+
+**Implementation correspondence:** verified against the Ambati paper on 2026-05-05.
+- Eq. (27a) `sigma = (1-D)^2 dPsi0/de` ↔ `damage_model.py:30-37` `g(D) = (1-D)^2 + K`, applied to the full stress in the linear mechanical block of `solver.py::_mechanical_step`.
+- Eq. (27b) `-l^2 Lap d + d = (2l/Gc)(1-d) H+` ↔ `solver.py:528-530` AT2 weak form (`(H+1) u v + l^2 grad u . grad v = H v`), with `H = (2l/Gc) Psi+` from `damage_model.py:54` and irreversibility `H = max(H_old, H_new)` at line 252.
+- Eq. (27c) `Psi+ < Psi- => d := 0` ↔ `damage_model.py:233-245`, **softened**: Z3ST sets `H -> 0` in compression cells rather than `D -> 0`. Equivalent under monotonic loading (the thermal-shock case here); more physical than the literal Ambati projection under cyclic loading because it preserves accumulated damage. This deviation is intentional and documented in the docstring of `update_history`.
+
+**Calibration choice (uo2.yaml, 2026-05-07):**
+- The material card now declares `sigma_c: 2.0e+9 Pa` directly; `Gc` is auto-derived in `spine.py:147-149` (AT1: `Gc = (8/3)·lc·σc²/E ≈ 1490 J/m²` at `lc = 5e-5 m`). This is *not* McClenny's macrocrack-fit `Gc = 80000 J/m²` (= 80 MPa·mm, their Table 3) — that value, paired with our `lc = 50 μm`, would give an AT1 threshold `σc ≈ 14.7 GPa` that the simulation never reaches, so no damage initiates. With `σc = 2 GPa`, the threshold (`ψc ≈ 5.6 MJ/m³`) is below the surface tensile-strain energy at the rim (~10 MJ/m³ peak) but above the plane-strain bulk artifact (`(2/3)·G·α²·ΔT² ≈ 5.6 MJ/m³` from the geometrically-blocked z-thermal-expansion in 2D-xy), so damage initiates only along the cold contact arc. The trade-off: we move from McClenny's calibrated `Gc` to an alternative calibration that is consistent with the model's energetic balance for sharp-threshold AT1.
+
+**Two structural code fixes applied 2026-05-06/07 (regime-aware elastic strain in the damage driver):**
+1. The damage driving force `psi_pos` is evaluated on the *elastic* strain `eps_el = eps(u) − α·(T−T_ref)·I`, not on the total strain `eps(u)`. Without this, uniform thermal expansion in the bulk (where the body is unconstrained) produces a spurious `psi_pos` that drives damage everywhere, leading to a runaway `E_el` cascade. Fixed in `damage_model.py::psi_amor_split`, `psi_miehe_spectral`, `psi_split`, `crack_driving_force`, `update_history`; `solver.py::solve_staggered` now passes `T=T_new` to `update_history`.
+2. The thermal eigenstrain z-component is *suppressed* in 2D Cartesian regimes (`regime: 2d` or `plane_stress`). Otherwise the plane-strain constraint `eps_zz = 0` combined with `eth_zz = α·ΔT` produces `eps_el_zz = −α·ΔT`, whose deviatoric component generates a uniform bulk `psi_pos ≈ (2/3)·G·α²·ΔT² ≈ 5.6 MJ/m³` at our parameters — exactly at the AT1 threshold for `σc = 2 GPa`, causing immediate divergence. Fixed in `damage_model.py::_thermal_eigenstrain` and mirrored in `mechanical_model.py::elastic_energy_density`. Axisymmetric and 3D regimes are unaffected (their `eps_zz` is dynamic).
+3. `compute_energy_balance` now (a) uses the elastic strain for `E_el` (consistent with (1)), (b) applies the regime weight `w = 2π·r` for axisymmetric integrals.
+
+**What still needs running (the user runs these locally — do not invoke from this assistant):**
 ```bash
-# 3D case
+# 3D (gold standard)
 cd ~/z3st/z3st/cases/14_full_cylinder_cracking/
-./Allclean                                          # wipe stale log.z3st, energies.txt, output/*.vtu
-gmsh -3 mesh.geo -format msh2
-python3 -m z3st > log.z3st
-python3 non-regression.py                           # produces output/thermal_shock_results.png and stress_evolution.png
+./Allrun
 
-# 2D-rz case
-cd ~/z3st/z3st/cases/14_full_cylinder_cracking_2D_rz/
-./Allclean
-gmsh -2 mesh.geo -format msh2
-python3 -m z3st > log_z3st.md
-python3 non-regression.py
+# 2D-xy (McClenny Fig. 8 reproducer)
+cd ~/z3st/z3st/cases/14_full_cylinder_cracking_2D_xy/
+./Allrun
+
+# 2D-rz (verification only, damage off)
+cd ~/z3st/z3st/cases/14_full_cylinder_thermal_2D_rz/
+./Allrun
 ```
 
-**Expected outcome:**
-- 3D case: with the retuned staggered controller, `relax_D` should not collapse to the previous floor; `E_frac` in `energies.txt` should grow monotonically across the full 50 steps (the previous run plateaued at step 73 / 199 because `relax_D` had hit its floor and the damage block stopped advancing). Two to four major radial cracks initiating at the 60° contact wedge and propagating inwards is the qualitative signature to look for, consistent with McClenny Fig. 8.
-- 2D-rz case: damage is now active so the case becomes a fully axisymmetric thermal-shock simulation; expected output is a single radial damage band emerging from the outer surface and propagating inwards (uniform azimuthal cooling cannot produce the discrete radial-crack count of the 3D case).
+`Allrun` chains `Allclean → gmsh → python -m z3st > log_z3st.md → non-regression.py` in each case.
 
-**If the 3D run still stalls (`relax_D → relax_min` and `E_frac` plateaus):** the next escalation is to investigate whether the adaptive controller in `z3st/core/solver.py` is silently bypassing the `relax_min` clamp (the previous run showed `relax_D = 0.05` even with `relax_min = 0.3`, which is suspicious). That is a framework-level fix, not a tuning question.
+**Expected outcomes:**
+- 3D case: **two long radial cracks** plus a fan of shorter surface cracks at the 60° contact wedge (McClenny p.7). The long cracks do **not** reach the centre — arrested by the central compression zone (Amor split sends compressive hoop strain into `Psi-`; the hybrid constraint then sets `H = 0` in those cells). Crack initiation around `t ≈ 10⁻² s` per McClenny p.8. `E_frac` grows monotonically once cracks initiate. Crack bands will appear ~50× wider than McClenny's because of the lc coarsening; the topology and timing are the diagnostic targets.
+- 2D-xy case: same crack pattern as 3D, in a transverse cross-section. Modeled as upper-half disc with mirror symmetry (the 60° contact wedge appears as 30° in the upper half). Output `damage_field.png` is the direct McClenny Fig. 8 (top) reproduction; `damage_angular.png` counts discrete cracks along the outer ring; `temperature_field.png`, `stress_vm_field.png`, `stress_hoop_field.png` provide ParaView-style 2D fields for diagnostic.
+- 2D-rz case: damage is OFF. Reports thermal radial profile vs analytic Bessel series (target: <1% L2 error), thermo-elastic stress profiles, and energy balance (= elastic energy only since `E_frac = 0`). Useful for verifying the axisymmetric integration weight `2π·r`.
 
-**Paper integration point:** `~/research-manuscripts/z3st_paper/results.tex` has a dedicated "Thermal-shock-driven cracking of a UO2 pellet" subsection (Section~\ref{sec:case14}) that already cites these parameter choices. Once the run produces converged figures (`thermal_shock_results.png`, `stress_evolution.png`, plus a damage-field snapshot from the VTU output), the figures need to be copied into `~/research-manuscripts/z3st_paper/figures/` with stable names (suggested: `case14_3D_T.png`, `case14_3D_stress.png`, `case14_3D_damage.png`, `case14_2Drz_damage.png`) and `\includegraphics{}` calls added to `results.tex`. The companion `~/research-manuscripts/z3st_paper/paper.md` lists this as an open item.
+**Notes from the 2026-05-05 audit (don't repeat the previous escalation paths):**
+- The earlier suspicion that the adaptive controller silently bypasses `relax_min` was **investigated and ruled out**: `solver.py:623` `self.relax_D = max(self.relax_D * self.relax_shrink, self.relax_min)` enforces the floor correctly. The previous run that observed `relax_D = 0.05` with `relax_min = 0.3` was a configuration artefact (user-supplied initial value below the floor), not a framework bug. Do not pursue this as a code fix.
+- The two SENT/SENS classical benchmarks in `cases/19_single-edge_notched_*` are correctly configured per Miehe 2010 / Ambati §4 (E=210 GPa, ν=0.3, Gc=2700 J/m², 1 mm × 1 mm plane-strain plate, AT2, pre-crack via Dirichlet `D=1`); they serve as standalone empirical verification of the hybrid-model implementation.
+
+**Paper integration point:** `~/research-manuscripts/z3st_paper/results.tex` has a "Thermal-shock-driven cracking of a UO2 pellet" subsection (`\ref{sec:case14}`). Once the runs produce converged figures, copy them to `~/research-manuscripts/z3st_paper/figures/` as `case14_3D_T.png`, `case14_3D_stress.png`, `case14_3D_damage.png`, `case14_2Dxy_damage.png` (the 2D-xy Fig. 8 reproducer is the headline figure), and add `\includegraphics{}` calls. The chapter narrative should foreground (i) the hybrid-vs-Miehe-anisotropic formulation difference, (ii) the alumina-spacer rationale for plane-strain dimensional reduction, and (iii) the `σ_c = 2 GPa` calibration choice (consistent with the model's energetic balance at coarsened `lc`, not McClenny's macrocrack `Gc`). The companion `paper.md` tracks this as an open item.
+
+**Literature consult on phase-field thermal-shock convergence (Consensus search, 2026-05-07):**
+
+The 2D-xy disc case showed catastrophic E_el divergence around step 22 (cracking-onset transient at `t ~ 1e-2 s` per McClenny). MUMPS for both mechanical and damage solvers did not fix it — the divergence is a *staggered-iteration* pathology, not a linear-solver pathology. Key findings from the literature:
+
+- **Mandal, Bui, Wu (Comput Methods Appl Mech Eng, 2021, 128 citations)** — *Fracture of thermo-elastic solids: Phase-field modeling and new results with an efficient monolithic solver*. Reports two issues that match ours exactly: (i) length-scale sensitivity of standard PFMs (the `σ_c ~ sqrt(Gc·E/lc)` coupling we hit), and (ii) the "conventional alternating minimization solver" is slow and unstable for thermo-elastic + damage; their **monolithic BFGS** scheme is 4-5× faster and avoids the staggered pathology. They extend the **PF-CZM (Phase-Field Cohesive Zone Model) of Wu (JMPS 2017)** to thermo-elastic with a rational degradation function dependent on `E, σ_c, Gc` independently — this is the proper fix for our σ_c-vs-Gc-vs-lc trap.
+- **Chu et al. (Int J Fract, 2017, 127 citations)** — *Study the dynamic crack path in brittle material under thermal shock loading by phase field modeling*. Disc thermal-shock specifically; uses a coupled phase-field thermal-mechanical model with **staggered time integration**. Notes that crack branching/instability occurs near the compression region — relevant to the corners of our 60° contact arc.
+- **Wang et al. (Comput Mech, 2020, 107 citations)** — *Phase-field model of thermo-elastic coupled brittle fracture with explicit time integration*. Implements thermo-elastic phase-field in Abaqus/Explicit. **Explicit time integration** sidesteps the iterative-solver convergence issues entirely, at the cost of CFL-bounded `dt`. Source code freely available.
+- **Greco et al. (ArXiv, 2025)** — *AT1 fourth-order isogeometric phase-field modeling of brittle fracture*. Uses **Projected Successive Over-Relaxation** for irreversibility (different from our `np.maximum(D_new, D_old)` post-projection). Could improve stability if we ever need to revisit irreversibility enforcement.
+- **Yu et al. (Comput Mater Sci, 2023)** — *A consistent phase field model for brittle fracture with new crack driving force*. Notes that AT1 and AT2 should give similar damage evolution if the driving force is consistent; large differences point to implementation issues, not physics. Validates that our regime-aware-eigenstrain fix was the right call.
+- **Navidtehrani et al. (Materials, 2021, 106 citations)** — *Unified Abaqus implementation of the phase field fracture method using only a UMAT subroutine*. Handles AT1 / AT2 / PF-CZM with both staggered and monolithic schemes. Useful reference if we ever go monolithic.
+- **Niu et al. (Int J Numer Methods Eng, 2022)** — *Asynchronous variational integrator for the phase field approach*. Each element has its own time step, sidestepping the staggered timing issue.
+
+**Applied 2026-05-07 to `cases/14_full_cylinder_cracking_2D_xy/input.yaml`:**
+- (A) `n_steps: 100 → 500`, `time: [0.0001, 0.1] → [0.0001, 0.05]` ⇒ `dt = 0.1 ms` (10× finer; resolves the 5-ms-wide cracking-onset transient with ~50 steps instead of 5). Sub-ms `dt` is the literature norm for thermo-elastic phase-field thermal shock (Chu 2017, Wang 2020).
+- (B) `damage.stag_tol: 1.0e-3 → 1.0e-5` ⇒ forces the staggered loop to actually converge (relative change < 1e-5) before advancing time, instead of accepting a possibly-divergent iterate.
+- (C) `relax_D: 0.5 → 0.3`, `relax_growth: 1.1 → 1.05`, `relax_min: 0.05 → 0.01` ⇒ more conservative adaptive damping during the cracking-onset transient.
+
+**If A+B+C still doesn't converge,** the next step is to add a viscous Allen–Cahn term `η ∂D/∂t` to the AT1 weak form (matching what McClenny / Wang 2020 / Chu 2017 use). This requires modifying `solver.py::_damage_step` (≈20 lines). Beyond that, switching to PF-CZM (Wu 2017 / Mandal 2021) or to a monolithic solver are the major-rewrite options.
 
 ---
 

@@ -558,10 +558,10 @@ class Solver:
 
                 print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, sigma_c={sigma_c:.2e}")
 
-                a_d += w*(2.0 * self.H + diag_shift) * u_d * v_d * dx + \
-                    grad_coeff * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
+                a_d += w * (2.0 * self.H + diag_shift) * u_d * v_d * dx \
+                     + w * grad_coeff * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
 
-                L_d += w*(2.0 * self.H - (pref / lc)) * v_d * dx
+                L_d += w * (2.0 * self.H - (pref / lc)) * v_d * dx
 
         petsc_opts_damage = self.get_solver_options(
             physics="damage",
@@ -846,7 +846,11 @@ class Solver:
 
             # --. DAMAGE STEP --..
             if self.on.get("damage", False):
-                self.update_history(u_new)
+                # Pass T_new so the damage driving force uses the elastic strain
+                # (eps - alpha*(T - T_ref)*I), not the total strain. Without this,
+                # uniform thermal expansion in the bulk produces a spurious psi_pos
+                # that drives damage in unstressed regions.
+                self.update_history(u_new, T=T_new)
                 conv_damage, _, _, prev_res_D = self._damage_step(
                     D_new,
                     D_old,
