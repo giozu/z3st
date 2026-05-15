@@ -34,7 +34,11 @@ crack_length     = 2.5e-4;            // 250 um = 5 * lc; long enough to be well
 crack_R_inner    = R - crack_length;  // r-coordinate of the crack tip
 
 // Mesh sizing
-lc_outer  = 2.5e-5;                   // 25 um  (lc/2 with phase-field lc = 50 um)
+lc_outer  = 1.25e-5;                  // 12.5 um (lc/4 with phase-field lc = 50 um) -- Borden/Miehe
+                                      //  ideal resolution for AT1 phase-field bandwidth. The
+                                      //  previous lc/2 value at h=25 um was borderline; combined
+                                      //  with sigma_c=2 GPa it was enough to soften the tip cells
+                                      //  but not to advance the crack into virgin material.
 lc_center = 2.0e-4;                   // 200 um (4 lc; coarsens away from rim)
 pin_size  = 5.0e-5;                   // 50 um pin segment at (-R, 0) to fix x-translation
 
@@ -83,7 +87,9 @@ Field[2].InField   = 1;
 Field[2].SizeMin   = lc_outer;
 Field[2].SizeMax   = lc_center;
 Field[2].DistMin   = 0.0;
-Field[2].DistMax   = 8.0e-3;          // mesh stays fine through the expected crack-growth zone
+Field[2].DistMax   = 5.0e-3;          // mesh stays fine through the expected crack-growth zone
+                                      //  (~half the radius -- offsets the 4x element-density bump
+                                      //  from halving lc_outer)
 
 Background Field = 2;
 Mesh.MeshSizeExtendFromBoundary = 0;
