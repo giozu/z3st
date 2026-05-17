@@ -755,12 +755,25 @@ class MechanicalModel:
                 eps_el = eps - eth
             else:
                 eps_el = eps
-            return 0.5 * (
+            psi_el = 0.5 * (
                 material["lmbda"] * ufl.tr(eps_el) ** 2
                 + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
             )
+            # Damage degradation: mirrors sigma_mech / sigma_th. Without this
+            # weighting, cells under a prescribed D=1 BC (e.g. the notch slit
+            # of the SENT cases or the seed of case 14_*_cracking_2D_xy)
+            # absorb the displacement-controlled BC into huge strain while
+            # carrying near-zero stress -- the equilibrium is well-posed but
+            # psi_el = 0.5*E*eps^2 explodes, inflating the E_el diagnostic
+            # by orders of magnitude. (Simple g(D)*psi rather than
+            # g(D)*psi+ + psi-: small overcount in compression cells, but
+            # those don't carry significant D under the hybrid constraint.)
+            if self.on.get("damage", False):
+                psi_el = self.degradation_function(self.D) * psi_el
+            return psi_el
 
         # Non-linear / non-Lame fallback: total-strain energy density.
+        # sigma_mech is already g(D)-degraded when damage is active.
         sigma = self.sigma_mech(u, material)
         eps = self.epsilon(u)
         return 0.5 * ufl.inner(sigma, eps)
