@@ -45312,3 +45312,9498 @@ Convergence check
 
 #### Iteration 3/200
 
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.588e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 7.631e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.118e-05
+  |ΔD|_∞ = 1.889e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9085e+00 J
+  → Fracture energy : 2.5272e+00 J
+  → Total energy    : 6.4357e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0543.vtu
+
+
+## Step 545/651: t = 3.01e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 544 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.59e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.899e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.272e-03
+  |ΔD|_∞ = 4.579e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.59e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.778e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.545e-04
+  |ΔD|_∞ = 9.157e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.59e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.089e-05
+  |ΔD|_∞ = 1.831e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9100e+00 J
+  → Fracture energy : 2.5341e+00 J
+  → Total energy    : 6.4441e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0544.vtu
+
+
+## Step 546/651: t = 3.02e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 545 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.592e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.896e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.270e-03
+  |ΔD|_∞ = 4.900e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.592e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 9.735e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.539e-04
+  |ΔD|_∞ = 9.800e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.592e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.009e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.079e-05
+  |ΔD|_∞ = 1.960e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9115e+00 J
+  → Fracture energy : 2.5410e+00 J
+  → Total energy    : 6.4525e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0545.vtu
+
+
+## Step 547/651: t = 3.02e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 546 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.594e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.893e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.278e-03
+  |ΔD|_∞ = 5.021e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.594e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.476e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.557e-04
+  |ΔD|_∞ = 1.004e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.594e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.943e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.114e-05
+  |ΔD|_∞ = 2.008e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9129e+00 J
+  → Fracture energy : 2.5480e+00 J
+  → Total energy    : 6.4609e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0546.vtu
+
+
+## Step 548/651: t = 3.03e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 547 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.596e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.900e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.288e-03
+  |ΔD|_∞ = 4.867e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.596e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 7.504e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.576e-04
+  |ΔD|_∞ = 9.734e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.596e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.152e-05
+  |ΔD|_∞ = 1.947e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9141e+00 J
+  → Fracture energy : 2.5551e+00 J
+  → Total energy    : 6.4692e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0547.vtu
+
+
+## Step 549/651: t = 3.04e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 548 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.598e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.908e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.296e-03
+  |ΔD|_∞ = 4.845e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.598e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.099e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.592e-04
+  |ΔD|_∞ = 9.689e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.598e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.099e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.183e-05
+  |ΔD|_∞ = 1.938e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9152e+00 J
+  → Fracture energy : 2.5623e+00 J
+  → Total energy    : 6.4775e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0548.vtu
+
+
+## Step 550/651: t = 3.04e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 549 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.6e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.910e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.309e-03
+  |ΔD|_∞ = 5.127e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.6e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.618e-04
+  |ΔD|_∞ = 1.025e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.6e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.237e-05
+  |ΔD|_∞ = 2.051e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9162e+00 J
+  → Fracture energy : 2.5695e+00 J
+  → Total energy    : 6.4857e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0549.vtu
+
+
+## Step 551/651: t = 3.05e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 550 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.602e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.913e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.318e-03
+  |ΔD|_∞ = 5.119e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.602e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.571e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.637e-04
+  |ΔD|_∞ = 1.024e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.602e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.090e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.274e-05
+  |ΔD|_∞ = 2.047e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9171e+00 J
+  → Fracture energy : 2.5769e+00 J
+  → Total energy    : 6.4939e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0550.vtu
+
+
+## Step 552/651: t = 3.05e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 551 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.604e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.915e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.321e-03
+  |ΔD|_∞ = 4.772e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.604e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.113e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.643e-04
+  |ΔD|_∞ = 9.544e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.604e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.162e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.286e-05
+  |ΔD|_∞ = 1.909e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9179e+00 J
+  → Fracture energy : 2.5842e+00 J
+  → Total energy    : 6.5021e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0551.vtu
+
+
+## Step 553/651: t = 3.06e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 552 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.606e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.913e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.318e-03
+  |ΔD|_∞ = 5.038e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.606e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 6.257e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.636e-04
+  |ΔD|_∞ = 1.008e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.606e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.149e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.271e-05
+  |ΔD|_∞ = 2.015e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9188e+00 J
+  → Fracture energy : 2.5915e+00 J
+  → Total energy    : 6.5103e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0552.vtu
+
+
+## Step 554/651: t = 3.06e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 553 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.608e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.902e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.325e-03
+  |ΔD|_∞ = 5.203e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.608e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.651e-04
+  |ΔD|_∞ = 1.041e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.608e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.863e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.302e-05
+  |ΔD|_∞ = 2.081e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9198e+00 J
+  → Fracture energy : 2.5987e+00 J
+  → Total energy    : 6.5185e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0553.vtu
+
+
+## Step 555/651: t = 3.07e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 554 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.61e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.899e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.330e-03
+  |ΔD|_∞ = 5.050e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.61e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.536e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.659e-04
+  |ΔD|_∞ = 1.010e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.61e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.065e-19
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.318e-05
+  |ΔD|_∞ = 2.020e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9207e+00 J
+  → Fracture energy : 2.6059e+00 J
+  → Total energy    : 6.5267e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0554.vtu
+
+
+## Step 556/651: t = 3.07e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 555 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.612e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.894e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.331e-03
+  |ΔD|_∞ = 4.838e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.612e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.663e-04
+  |ΔD|_∞ = 9.676e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.612e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.325e-05
+  |ΔD|_∞ = 1.935e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9217e+00 J
+  → Fracture energy : 2.6132e+00 J
+  → Total energy    : 6.5349e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0555.vtu
+
+
+## Step 557/651: t = 3.08e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 556 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.614e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.884e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.339e-03
+  |ΔD|_∞ = 5.098e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.614e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.677e-04
+  |ΔD|_∞ = 1.020e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.614e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.355e-05
+  |ΔD|_∞ = 2.039e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9226e+00 J
+  → Fracture energy : 2.6204e+00 J
+  → Total energy    : 6.5430e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0556.vtu
+
+
+## Step 558/651: t = 3.08e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 557 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.616e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.878e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.343e-03
+  |ΔD|_∞ = 5.085e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.616e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.896e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.686e-04
+  |ΔD|_∞ = 1.017e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.616e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.821e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.371e-05
+  |ΔD|_∞ = 2.034e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9235e+00 J
+  → Fracture energy : 2.6277e+00 J
+  → Total energy    : 6.5512e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0557.vtu
+
+
+## Step 559/651: t = 3.09e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 558 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.618e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.872e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.340e-03
+  |ΔD|_∞ = 4.760e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.618e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.680e-04
+  |ΔD|_∞ = 9.520e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.618e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.360e-05
+  |ΔD|_∞ = 1.904e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9245e+00 J
+  → Fracture energy : 2.6349e+00 J
+  → Total energy    : 6.5594e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0558.vtu
+
+
+## Step 560/651: t = 3.10e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 559 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.62e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.861e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.337e-03
+  |ΔD|_∞ = 4.735e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.62e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.014e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.673e-04
+  |ΔD|_∞ = 9.470e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.62e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.014e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.347e-05
+  |ΔD|_∞ = 1.894e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9256e+00 J
+  → Fracture energy : 2.6420e+00 J
+  → Total energy    : 6.5676e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0559.vtu
+
+
+## Step 561/651: t = 3.10e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 560 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.622e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.847e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.346e-03
+  |ΔD|_∞ = 4.872e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.622e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.691e-04
+  |ΔD|_∞ = 9.744e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.622e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 7.820e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.383e-05
+  |ΔD|_∞ = 1.949e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9268e+00 J
+  → Fracture energy : 2.6491e+00 J
+  → Total energy    : 6.5758e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0560.vtu
+
+
+## Step 562/651: t = 3.11e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 561 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.624e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.842e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.360e-03
+  |ΔD|_∞ = 4.763e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.624e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.614e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.719e-04
+  |ΔD|_∞ = 9.526e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.624e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.614e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.438e-05
+  |ΔD|_∞ = 1.905e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9279e+00 J
+  → Fracture energy : 2.6561e+00 J
+  → Total energy    : 6.5840e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0561.vtu
+
+
+## Step 563/651: t = 3.11e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 562 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.626e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.842e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.379e-03
+  |ΔD|_∞ = 4.941e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.626e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.759e-04
+  |ΔD|_∞ = 9.881e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.626e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.236e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.517e-05
+  |ΔD|_∞ = 1.976e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9289e+00 J
+  → Fracture energy : 2.6633e+00 J
+  → Total energy    : 6.5922e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0562.vtu
+
+
+## Step 564/651: t = 3.12e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 563 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.628e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.848e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.440e-03
+  |ΔD|_∞ = 5.122e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.628e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 3.416e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.881e-04
+  |ΔD|_∞ = 1.024e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.628e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.762e-05
+  |ΔD|_∞ = 2.049e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9294e+00 J
+  → Fracture energy : 2.6707e+00 J
+  → Total energy    : 6.6001e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0563.vtu
+
+
+## Step 565/651: t = 3.12e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 564 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.63e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.061e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.408e-03
+  |ΔD|_∞ = 5.020e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.63e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.816e-04
+  |ΔD|_∞ = 1.004e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.63e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.631e-05
+  |ΔD|_∞ = 2.008e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9299e+00 J
+  → Fracture energy : 2.6781e+00 J
+  → Total energy    : 6.6081e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0564.vtu
+
+
+## Step 566/651: t = 3.13e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 565 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.632e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.863e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.393e-03
+  |ΔD|_∞ = 4.662e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.632e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.786e-04
+  |ΔD|_∞ = 9.324e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.632e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 6.534e-18
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.572e-05
+  |ΔD|_∞ = 1.865e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9307e+00 J
+  → Fracture energy : 2.6855e+00 J
+  → Total energy    : 6.6161e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0565.vtu
+
+
+## Step 567/651: t = 3.13e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 566 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.634e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.846e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.373e-03
+  |ΔD|_∞ = 4.768e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.634e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.746e-04
+  |ΔD|_∞ = 9.536e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.634e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.896e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.491e-05
+  |ΔD|_∞ = 1.907e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9316e+00 J
+  → Fracture energy : 2.6926e+00 J
+  → Total energy    : 6.6242e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0566.vtu
+
+
+## Step 568/651: t = 3.14e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 567 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.636e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.823e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.355e-03
+  |ΔD|_∞ = 4.848e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.636e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 3.544e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.709e-04
+  |ΔD|_∞ = 9.696e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.636e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.072e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.418e-05
+  |ΔD|_∞ = 1.939e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9328e+00 J
+  → Fracture energy : 2.6996e+00 J
+  → Total energy    : 6.6324e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0567.vtu
+
+
+## Step 569/651: t = 3.15e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 568 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.638e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.804e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.338e-03
+  |ΔD|_∞ = 5.102e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.638e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.739e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.677e-04
+  |ΔD|_∞ = 1.020e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.638e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.354e-05
+  |ΔD|_∞ = 2.041e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9340e+00 J
+  → Fracture energy : 2.7066e+00 J
+  → Total energy    : 6.6406e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0568.vtu
+
+
+## Step 570/651: t = 3.15e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 569 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.64e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.792e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.319e-03
+  |ΔD|_∞ = 5.141e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.64e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.638e-04
+  |ΔD|_∞ = 1.028e-02
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.64e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.276e-05
+  |ΔD|_∞ = 2.057e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9352e+00 J
+  → Fracture energy : 2.7136e+00 J
+  → Total energy    : 6.6488e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0569.vtu
+
+
+## Step 571/651: t = 3.16e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 570 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.642e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.785e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.285e-03
+  |ΔD|_∞ = 4.883e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.642e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.570e-04
+  |ΔD|_∞ = 9.766e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.642e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.140e-05
+  |ΔD|_∞ = 1.953e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9364e+00 J
+  → Fracture energy : 2.7206e+00 J
+  → Total energy    : 6.6570e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0570.vtu
+
+
+## Step 572/651: t = 3.16e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 571 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.644e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.774e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.226e-03
+  |ΔD|_∞ = 4.311e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.644e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 9.780e-18
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.452e-04
+  |ΔD|_∞ = 8.622e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.644e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.147e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.904e-05
+  |ΔD|_∞ = 1.724e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9380e+00 J
+  → Fracture energy : 2.7273e+00 J
+  → Total energy    : 6.6653e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0571.vtu
+
+
+## Step 573/651: t = 3.17e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 572 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.646e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.745e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.152e-03
+  |ΔD|_∞ = 3.733e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.646e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.037e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.303e-04
+  |ΔD|_∞ = 7.466e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.646e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.261e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.606e-05
+  |ΔD|_∞ = 1.493e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9401e+00 J
+  → Fracture energy : 2.7337e+00 J
+  → Total energy    : 6.6738e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0572.vtu
+
+
+## Step 574/651: t = 3.17e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 573 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.648e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.702e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.082e-03
+  |ΔD|_∞ = 3.789e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.648e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.232e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.163e-04
+  |ΔD|_∞ = 7.577e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.648e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.232e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.327e-05
+  |ΔD|_∞ = 1.515e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9428e+00 J
+  → Fracture energy : 2.7396e+00 J
+  → Total energy    : 6.6824e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0573.vtu
+
+
+## Step 575/651: t = 3.18e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 574 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.65e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.656e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.041e-03
+  |ΔD|_∞ = 3.792e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.65e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.082e-04
+  |ΔD|_∞ = 7.583e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.65e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.165e-05
+  |ΔD|_∞ = 1.517e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9459e+00 J
+  → Fracture energy : 2.7452e+00 J
+  → Total energy    : 6.6911e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0574.vtu
+
+
+## Step 576/651: t = 3.18e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 575 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.652e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.629e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.024e-03
+  |ΔD|_∞ = 3.782e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.652e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.048e-04
+  |ΔD|_∞ = 7.565e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.652e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.096e-05
+  |ΔD|_∞ = 1.513e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9491e+00 J
+  → Fracture energy : 2.7508e+00 J
+  → Total energy    : 6.6999e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0575.vtu
+
+
+## Step 577/651: t = 3.19e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 576 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.654e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.625e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.016e-03
+  |ΔD|_∞ = 3.751e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.654e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.032e-04
+  |ΔD|_∞ = 7.502e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.654e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.064e-05
+  |ΔD|_∞ = 1.500e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9521e+00 J
+  → Fracture energy : 2.7565e+00 J
+  → Total energy    : 6.7087e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0576.vtu
+
+
+## Step 578/651: t = 3.20e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 577 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.656e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.630e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.008e-03
+  |ΔD|_∞ = 3.660e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.656e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.016e-04
+  |ΔD|_∞ = 7.321e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.656e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.406e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.032e-05
+  |ΔD|_∞ = 1.464e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9551e+00 J
+  → Fracture energy : 2.7623e+00 J
+  → Total energy    : 6.7174e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0577.vtu
+
+
+## Step 579/651: t = 3.20e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 578 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.658e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.637e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.890e-04
+  |ΔD|_∞ = 3.459e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.658e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.978e-04
+  |ΔD|_∞ = 6.919e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.658e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.956e-05
+  |ΔD|_∞ = 1.384e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9580e+00 J
+  → Fracture energy : 2.7682e+00 J
+  → Total energy    : 6.7261e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0578.vtu
+
+
+## Step 580/651: t = 3.21e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 579 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.66e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.635e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.507e-04
+  |ΔD|_∞ = 3.120e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.66e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.152e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.901e-04
+  |ΔD|_∞ = 6.240e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.66e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.803e-05
+  |ΔD|_∞ = 1.248e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9610e+00 J
+  → Fracture energy : 2.7739e+00 J
+  → Total energy    : 6.7349e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0579.vtu
+
+
+## Step 581/651: t = 3.21e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 580 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.662e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.617e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.969e-04
+  |ΔD|_∞ = 2.777e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.662e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.794e-04
+  |ΔD|_∞ = 5.554e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.662e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.359e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.587e-05
+  |ΔD|_∞ = 1.111e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9645e+00 J
+  → Fracture energy : 2.7793e+00 J
+  → Total energy    : 6.7438e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0580.vtu
+
+
+## Step 582/651: t = 3.22e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 581 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.664e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.584e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.332e-04
+  |ΔD|_∞ = 2.794e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.664e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.234e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.666e-04
+  |ΔD|_∞ = 5.589e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.664e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.383e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.333e-05
+  |ΔD|_∞ = 1.118e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9685e+00 J
+  → Fracture energy : 2.7843e+00 J
+  → Total energy    : 6.7527e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0581.vtu
+
+
+## Step 583/651: t = 3.22e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 582 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.666e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.542e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.757e-04
+  |ΔD|_∞ = 2.779e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.666e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.551e-04
+  |ΔD|_∞ = 5.558e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.666e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.103e-05
+  |ΔD|_∞ = 1.112e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9730e+00 J
+  → Fracture energy : 2.7887e+00 J
+  → Total energy    : 6.7618e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0582.vtu
+
+
+## Step 584/651: t = 3.23e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 583 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.668e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.502e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.421e-04
+  |ΔD|_∞ = 2.766e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.668e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.401e-19
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.484e-04
+  |ΔD|_∞ = 5.532e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.668e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 6.926e-18
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.968e-05
+  |ΔD|_∞ = 1.106e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9779e+00 J
+  → Fracture energy : 2.7929e+00 J
+  → Total energy    : 6.7708e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0583.vtu
+
+
+## Step 585/651: t = 3.23e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 584 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.67e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.476e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.266e-04
+  |ΔD|_∞ = 2.756e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.67e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.330e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.453e-04
+  |ΔD|_∞ = 5.512e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.67e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.330e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.907e-05
+  |ΔD|_∞ = 1.102e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9830e+00 J
+  → Fracture energy : 2.7969e+00 J
+  → Total energy    : 6.7799e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0584.vtu
+
+
+## Step 586/651: t = 3.24e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 585 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.672e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.465e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.286e-04
+  |ΔD|_∞ = 2.736e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.672e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.457e-04
+  |ΔD|_∞ = 5.473e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.672e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.914e-05
+  |ΔD|_∞ = 1.095e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9880e+00 J
+  → Fracture energy : 2.8010e+00 J
+  → Total energy    : 6.7890e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0585.vtu
+
+
+## Step 587/651: t = 3.25e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 586 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.674e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.466e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.438e-04
+  |ΔD|_∞ = 2.728e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.674e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.488e-04
+  |ΔD|_∞ = 5.455e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.674e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.975e-05
+  |ΔD|_∞ = 1.091e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9929e+00 J
+  → Fracture energy : 2.8052e+00 J
+  → Total energy    : 6.7981e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0586.vtu
+
+
+## Step 588/651: t = 3.25e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 587 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.676e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.475e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.694e-04
+  |ΔD|_∞ = 2.715e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.676e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.481e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.539e-04
+  |ΔD|_∞ = 5.430e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.676e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.074e-18
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.078e-05
+  |ΔD|_∞ = 1.086e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 3.9975e+00 J
+  → Fracture energy : 2.8097e+00 J
+  → Total energy    : 6.8072e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0587.vtu
+
+
+## Step 589/651: t = 3.26e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 588 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.678e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.492e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.019e-04
+  |ΔD|_∞ = 2.738e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.678e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.703e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.604e-04
+  |ΔD|_∞ = 5.477e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.678e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.703e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.208e-05
+  |ΔD|_∞ = 1.095e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0017e+00 J
+  → Fracture energy : 2.8144e+00 J
+  → Total energy    : 6.8161e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0588.vtu
+
+
+## Step 590/651: t = 3.26e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 589 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.68e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.513e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.347e-04
+  |ΔD|_∞ = 2.796e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.68e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.669e-04
+  |ΔD|_∞ = 5.591e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.68e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.339e-05
+  |ΔD|_∞ = 1.118e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0057e+00 J
+  → Fracture energy : 2.8194e+00 J
+  → Total energy    : 6.8251e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0589.vtu
+
+
+## Step 591/651: t = 3.27e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 590 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.682e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.534e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.651e-04
+  |ΔD|_∞ = 2.825e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.682e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.576e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.730e-04
+  |ΔD|_∞ = 5.650e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.682e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.576e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.460e-05
+  |ΔD|_∞ = 1.130e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0093e+00 J
+  → Fracture energy : 2.8247e+00 J
+  → Total energy    : 6.8339e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0590.vtu
+
+
+## Step 592/651: t = 3.27e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 591 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.684e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.554e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.892e-04
+  |ΔD|_∞ = 3.103e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.684e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.651e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.778e-04
+  |ΔD|_∞ = 6.206e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.684e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.605e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.557e-05
+  |ΔD|_∞ = 1.241e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0127e+00 J
+  → Fracture energy : 2.8301e+00 J
+  → Total energy    : 6.8428e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0591.vtu
+
+
+## Step 593/651: t = 3.28e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 592 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.686e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.567e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.105e-04
+  |ΔD|_∞ = 3.349e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.686e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.821e-04
+  |ΔD|_∞ = 6.698e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.686e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.951e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.642e-05
+  |ΔD|_∞ = 1.340e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0159e+00 J
+  → Fracture energy : 2.8356e+00 J
+  → Total energy    : 6.8515e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0592.vtu
+
+
+## Step 594/651: t = 3.28e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 593 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.688e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.574e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.350e-04
+  |ΔD|_∞ = 3.524e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.688e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.870e-04
+  |ΔD|_∞ = 7.048e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.688e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.740e-05
+  |ΔD|_∞ = 1.410e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0190e+00 J
+  → Fracture energy : 2.8412e+00 J
+  → Total energy    : 6.8603e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0593.vtu
+
+
+## Step 595/651: t = 3.29e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 594 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.69e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.581e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.588e-04
+  |ΔD|_∞ = 3.584e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.69e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.918e-04
+  |ΔD|_∞ = 7.169e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.69e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.835e-05
+  |ΔD|_∞ = 1.434e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0220e+00 J
+  → Fracture energy : 2.8469e+00 J
+  → Total energy    : 6.8690e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0594.vtu
+
+
+## Step 596/651: t = 3.30e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 595 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.692e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.588e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.854e-04
+  |ΔD|_∞ = 3.543e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.692e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.971e-04
+  |ΔD|_∞ = 7.086e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.692e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.942e-05
+  |ΔD|_∞ = 1.417e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0248e+00 J
+  → Fracture energy : 2.8528e+00 J
+  → Total energy    : 6.8776e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0595.vtu
+
+
+## Step 597/651: t = 3.30e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 596 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.694e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.599e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.013e-03
+  |ΔD|_∞ = 3.705e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.694e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.274e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.025e-04
+  |ΔD|_∞ = 7.409e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.694e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.434e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.051e-05
+  |ΔD|_∞ = 1.482e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0273e+00 J
+  → Fracture energy : 2.8589e+00 J
+  → Total energy    : 6.8862e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0596.vtu
+
+
+## Step 598/651: t = 3.31e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 597 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.696e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.613e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.037e-03
+  |ΔD|_∞ = 3.802e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.696e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.614e-19
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.074e-04
+  |ΔD|_∞ = 7.604e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.696e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.147e-05
+  |ΔD|_∞ = 1.521e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0296e+00 J
+  → Fracture energy : 2.8651e+00 J
+  → Total energy    : 6.8947e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0597.vtu
+
+
+## Step 599/651: t = 3.31e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 598 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.698e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.627e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.048e-03
+  |ΔD|_∞ = 3.746e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.698e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.095e-04
+  |ΔD|_∞ = 7.492e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.698e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.776e-19
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.191e-05
+  |ΔD|_∞ = 1.498e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0317e+00 J
+  → Fracture energy : 2.8715e+00 J
+  → Total energy    : 6.9032e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0598.vtu
+
+
+## Step 600/651: t = 3.32e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 599 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.7e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.632e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.051e-03
+  |ΔD|_∞ = 3.547e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.7e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.102e-04
+  |ΔD|_∞ = 7.095e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.7e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.204e-05
+  |ΔD|_∞ = 1.419e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0338e+00 J
+  → Fracture energy : 2.8778e+00 J
+  → Total energy    : 6.9117e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0599.vtu
+
+
+## Step 601/651: t = 3.32e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 600 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.702e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.629e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.050e-03
+  |ΔD|_∞ = 3.833e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.702e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 7.319e-18
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.099e-04
+  |ΔD|_∞ = 7.665e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.702e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.490e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.199e-05
+  |ΔD|_∞ = 1.533e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0361e+00 J
+  → Fracture energy : 2.8840e+00 J
+  → Total energy    : 6.9201e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0600.vtu
+
+
+## Step 602/651: t = 3.33e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 601 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.704e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.619e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.055e-03
+  |ΔD|_∞ = 4.008e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.704e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.109e-04
+  |ΔD|_∞ = 8.016e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.704e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.247e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.218e-05
+  |ΔD|_∞ = 1.603e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0384e+00 J
+  → Fracture energy : 2.8902e+00 J
+  → Total energy    : 6.9286e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0601.vtu
+
+
+## Step 603/651: t = 3.33e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 602 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.706e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.612e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.062e-03
+  |ΔD|_∞ = 4.035e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.706e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.124e-04
+  |ΔD|_∞ = 8.069e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.706e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.248e-05
+  |ΔD|_∞ = 1.614e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0407e+00 J
+  → Fracture energy : 2.8964e+00 J
+  → Total energy    : 6.9371e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0602.vtu
+
+
+## Step 604/651: t = 3.34e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 603 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.708e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.609e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.072e-03
+  |ΔD|_∞ = 3.933e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.708e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 3.691e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.144e-04
+  |ΔD|_∞ = 7.866e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.708e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.288e-05
+  |ΔD|_∞ = 1.573e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0430e+00 J
+  → Fracture energy : 2.9026e+00 J
+  → Total energy    : 6.9456e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0603.vtu
+
+
+## Step 605/651: t = 3.35e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 604 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.71e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.610e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.084e-03
+  |ΔD|_∞ = 4.038e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.71e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.543e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.169e-04
+  |ΔD|_∞ = 8.076e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.71e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.162e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.338e-05
+  |ΔD|_∞ = 1.615e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0451e+00 J
+  → Fracture energy : 2.9089e+00 J
+  → Total energy    : 6.9540e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0604.vtu
+
+
+## Step 606/651: t = 3.35e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 605 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.712e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.616e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.097e-03
+  |ΔD|_∞ = 4.151e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.712e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.194e-04
+  |ΔD|_∞ = 8.302e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.712e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.933e-19
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.388e-05
+  |ΔD|_∞ = 1.660e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0470e+00 J
+  → Fracture energy : 2.9154e+00 J
+  → Total energy    : 6.9624e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0605.vtu
+
+
+## Step 607/651: t = 3.36e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 606 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.714e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.624e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.102e-03
+  |ΔD|_∞ = 4.108e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.714e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.204e-04
+  |ΔD|_∞ = 8.217e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.714e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.408e-05
+  |ΔD|_∞ = 1.643e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0488e+00 J
+  → Fracture energy : 2.9220e+00 J
+  → Total energy    : 6.9708e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0606.vtu
+
+
+## Step 608/651: t = 3.36e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 607 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.716e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.629e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.098e-03
+  |ΔD|_∞ = 3.873e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.716e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.034e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.196e-04
+  |ΔD|_∞ = 7.747e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.716e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.533e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.391e-05
+  |ΔD|_∞ = 1.549e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0506e+00 J
+  → Fracture energy : 2.9286e+00 J
+  → Total energy    : 6.9792e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0607.vtu
+
+
+## Step 609/651: t = 3.37e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 608 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.718e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.627e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.086e-03
+  |ΔD|_∞ = 3.830e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.718e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.172e-04
+  |ΔD|_∞ = 7.661e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.718e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.508e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.343e-05
+  |ΔD|_∞ = 1.532e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0525e+00 J
+  → Fracture energy : 2.9350e+00 J
+  → Total energy    : 6.9875e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0608.vtu
+
+
+## Step 610/651: t = 3.37e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 609 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.72e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.618e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.075e-03
+  |ΔD|_∞ = 4.128e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.72e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.149e-04
+  |ΔD|_∞ = 8.256e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.72e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.631e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.298e-05
+  |ΔD|_∞ = 1.651e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0545e+00 J
+  → Fracture energy : 2.9414e+00 J
+  → Total energy    : 6.9959e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0609.vtu
+
+
+## Step 611/651: t = 3.38e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 610 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.722e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.605e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.074e-03
+  |ΔD|_∞ = 4.297e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.722e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 9.716e-18
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.148e-04
+  |ΔD|_∞ = 8.594e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.722e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.737e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.297e-05
+  |ΔD|_∞ = 1.719e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0566e+00 J
+  → Fracture energy : 2.9476e+00 J
+  → Total energy    : 7.0043e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0610.vtu
+
+
+## Step 612/651: t = 3.38e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 611 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.724e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.600e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.080e-03
+  |ΔD|_∞ = 4.296e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.724e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 5.459e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.159e-04
+  |ΔD|_∞ = 8.591e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.724e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 3.449e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.318e-05
+  |ΔD|_∞ = 1.718e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0587e+00 J
+  → Fracture energy : 2.9540e+00 J
+  → Total energy    : 7.0127e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0611.vtu
+
+
+## Step 613/651: t = 3.39e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 612 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.726e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.603e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.087e-03
+  |ΔD|_∞ = 4.135e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.726e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.955e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.175e-04
+  |ΔD|_∞ = 8.269e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.726e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.364e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.349e-05
+  |ΔD|_∞ = 1.654e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0606e+00 J
+  → Fracture energy : 2.9604e+00 J
+  → Total energy    : 7.0210e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0612.vtu
+
+
+## Step 614/651: t = 3.40e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 613 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.728e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.608e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.096e-03
+  |ΔD|_∞ = 3.862e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.728e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.192e-04
+  |ΔD|_∞ = 7.724e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.728e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.384e-05
+  |ΔD|_∞ = 1.545e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0624e+00 J
+  → Fracture energy : 2.9669e+00 J
+  → Total energy    : 7.0293e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0613.vtu
+
+
+## Step 615/651: t = 3.40e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 614 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.73e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.615e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.100e-03
+  |ΔD|_∞ = 3.817e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.73e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.201e-04
+  |ΔD|_∞ = 7.635e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.73e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.402e-05
+  |ΔD|_∞ = 1.527e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0640e+00 J
+  → Fracture energy : 2.9735e+00 J
+  → Total energy    : 7.0376e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0614.vtu
+
+
+## Step 616/651: t = 3.41e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 615 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.732e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.622e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.099e-03
+  |ΔD|_∞ = 4.193e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.732e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.198e-04
+  |ΔD|_∞ = 8.385e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.732e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.397e-05
+  |ΔD|_∞ = 1.677e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0655e+00 J
+  → Fracture energy : 2.9802e+00 J
+  → Total energy    : 7.0458e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0615.vtu
+
+
+## Step 617/651: t = 3.41e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 616 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.734e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.621e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.097e-03
+  |ΔD|_∞ = 4.452e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.734e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.194e-04
+  |ΔD|_∞ = 8.904e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.734e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.387e-05
+  |ΔD|_∞ = 1.781e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0670e+00 J
+  → Fracture energy : 2.9870e+00 J
+  → Total energy    : 7.0540e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0616.vtu
+
+
+## Step 618/651: t = 3.42e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 617 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.736e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.623e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.079e-03
+  |ΔD|_∞ = 4.531e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.736e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.158e-04
+  |ΔD|_∞ = 9.062e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.736e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.316e-05
+  |ΔD|_∞ = 1.812e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0684e+00 J
+  → Fracture energy : 2.9938e+00 J
+  → Total energy    : 7.0622e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0617.vtu
+
+
+## Step 619/651: t = 3.42e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 618 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.738e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.619e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.040e-03
+  |ΔD|_∞ = 4.374e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.738e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.080e-04
+  |ΔD|_∞ = 8.747e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.738e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 8.070e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.160e-05
+  |ΔD|_∞ = 1.749e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0699e+00 J
+  → Fracture energy : 3.0005e+00 J
+  → Total energy    : 7.0705e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0618.vtu
+
+
+## Step 620/651: t = 3.43e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 619 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.74e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.603e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.741e-04
+  |ΔD|_∞ = 3.964e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.74e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 6.359e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.948e-04
+  |ΔD|_∞ = 7.928e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.74e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 6.359e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.896e-05
+  |ΔD|_∞ = 1.586e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0719e+00 J
+  → Fracture energy : 3.0070e+00 J
+  → Total energy    : 7.0788e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0619.vtu
+
+
+## Step 621/651: t = 3.43e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 620 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.742e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.570e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.858e-04
+  |ΔD|_∞ = 3.361e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.742e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.548e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.772e-04
+  |ΔD|_∞ = 6.722e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.742e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 4.075e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.543e-05
+  |ΔD|_∞ = 1.344e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0745e+00 J
+  → Fracture energy : 3.0129e+00 J
+  → Total energy    : 7.0874e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0620.vtu
+
+
+## Step 622/651: t = 3.44e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 621 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.744e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.522e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.824e-04
+  |ΔD|_∞ = 2.684e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.744e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.355e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.565e-04
+  |ΔD|_∞ = 5.367e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.744e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.355e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.130e-05
+  |ΔD|_∞ = 1.073e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0779e+00 J
+  → Fracture energy : 3.0182e+00 J
+  → Total energy    : 7.0961e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0621.vtu
+
+
+## Step 623/651: t = 3.44e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 622 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.746e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.464e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 6.795e-04
+  |ΔD|_∞ = 2.055e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.746e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 3.627e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.359e-04
+  |ΔD|_∞ = 4.110e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.746e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.327e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.718e-05
+  |ΔD|_∞ = 8.219e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0823e+00 J
+  → Fracture energy : 3.0227e+00 J
+  → Total energy    : 7.1050e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0622.vtu
+
+
+## Step 624/651: t = 3.45e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 623 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.748e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.407e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.863e-04
+  |ΔD|_∞ = 1.940e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.748e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.892e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.173e-04
+  |ΔD|_∞ = 3.880e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.748e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.773e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.345e-05
+  |ΔD|_∞ = 7.761e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0874e+00 J
+  → Fracture energy : 3.0266e+00 J
+  → Total energy    : 7.1140e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0623.vtu
+
+
+## Step 625/651: t = 3.46e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 624 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.75e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.359e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.127e-04
+  |ΔD|_∞ = 1.841e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.75e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 8.996e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.025e-04
+  |ΔD|_∞ = 3.682e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.75e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 8.955e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.051e-05
+  |ΔD|_∞ = 7.365e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0932e+00 J
+  → Fracture energy : 3.0299e+00 J
+  → Total energy    : 7.1232e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0624.vtu
+
+
+## Step 626/651: t = 3.46e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 625 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.752e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.320e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.603e-04
+  |ΔD|_∞ = 1.769e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.752e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 9.890e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.205e-05
+  |ΔD|_∞ = 3.539e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.0996e+00 J
+  → Fracture energy : 3.0327e+00 J
+  → Total energy    : 7.1323e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0625.vtu
+
+
+## Step 627/651: t = 3.47e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 626 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.754e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.287e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.322e-04
+  |ΔD|_∞ = 1.737e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.754e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.673e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.644e-05
+  |ΔD|_∞ = 3.474e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1063e+00 J
+  → Fracture energy : 3.0352e+00 J
+  → Total energy    : 7.1415e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0626.vtu
+
+
+## Step 628/651: t = 3.47e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 627 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.756e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.271e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.195e-04
+  |ΔD|_∞ = 1.721e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.756e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 9.269e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.391e-05
+  |ΔD|_∞ = 3.441e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1131e+00 J
+  → Fracture energy : 3.0377e+00 J
+  → Total energy    : 7.1508e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0627.vtu
+
+
+## Step 629/651: t = 3.48e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 628 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.758e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.265e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.148e-04
+  |ΔD|_∞ = 1.715e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.758e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 7.747e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.297e-05
+  |ΔD|_∞ = 3.431e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1199e+00 J
+  → Fracture energy : 3.0401e+00 J
+  → Total energy    : 7.1600e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0628.vtu
+
+
+## Step 630/651: t = 3.48e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 629 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.76e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.263e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.166e-04
+  |ΔD|_∞ = 1.728e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.76e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.017e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.331e-05
+  |ΔD|_∞ = 3.456e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1267e+00 J
+  → Fracture energy : 3.0426e+00 J
+  → Total energy    : 7.1692e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0629.vtu
+
+
+## Step 631/651: t = 3.49e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 630 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.762e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.263e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.251e-04
+  |ΔD|_∞ = 1.758e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.762e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.443e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.503e-05
+  |ΔD|_∞ = 3.516e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1334e+00 J
+  → Fracture energy : 3.0451e+00 J
+  → Total energy    : 7.1785e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0630.vtu
+
+
+## Step 632/651: t = 3.49e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 631 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.764e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.267e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.424e-04
+  |ΔD|_∞ = 1.803e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.764e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.849e-05
+  |ΔD|_∞ = 3.606e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1399e+00 J
+  → Fracture energy : 3.0478e+00 J
+  → Total energy    : 7.1877e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0631.vtu
+
+
+## Step 633/651: t = 3.50e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 632 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.766e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.273e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.552e-04
+  |ΔD|_∞ = 1.859e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.766e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 3.532e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.104e-05
+  |ΔD|_∞ = 3.719e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1463e+00 J
+  → Fracture energy : 3.0506e+00 J
+  → Total energy    : 7.1969e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0632.vtu
+
+
+## Step 634/651: t = 3.51e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 633 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.768e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.279e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 4.758e-04
+  |ΔD|_∞ = 1.921e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.768e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.961e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 9.516e-05
+  |ΔD|_∞ = 3.843e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 2 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1525e+00 J
+  → Fracture energy : 3.0537e+00 J
+  → Total energy    : 7.2061e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0633.vtu
+
+
+## Step 635/651: t = 3.51e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 634 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.77e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.288e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.031e-04
+  |ΔD|_∞ = 1.984e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.77e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.006e-04
+  |ΔD|_∞ = 3.968e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.77e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 8.091e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.012e-05
+  |ΔD|_∞ = 7.936e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1583e+00 J
+  → Fracture energy : 3.0570e+00 J
+  → Total energy    : 7.2153e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0634.vtu
+
+
+## Step 636/651: t = 3.52e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 635 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.772e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.305e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.279e-04
+  |ΔD|_∞ = 2.040e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.772e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 3.103e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.056e-04
+  |ΔD|_∞ = 4.080e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.772e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.958e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.111e-05
+  |ΔD|_∞ = 8.160e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1639e+00 J
+  → Fracture energy : 3.0605e+00 J
+  → Total energy    : 7.2245e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0635.vtu
+
+
+## Step 637/651: t = 3.52e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 636 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.774e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.317e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.562e-04
+  |ΔD|_∞ = 2.079e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.774e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.112e-04
+  |ΔD|_∞ = 4.158e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.774e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.225e-05
+  |ΔD|_∞ = 8.317e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1692e+00 J
+  → Fracture energy : 3.0643e+00 J
+  → Total energy    : 7.2336e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0636.vtu
+
+
+## Step 638/651: t = 3.53e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 637 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.776e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.331e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 5.801e-04
+  |ΔD|_∞ = 2.093e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.776e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.160e-04
+  |ΔD|_∞ = 4.187e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.776e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.321e-05
+  |ΔD|_∞ = 8.373e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1743e+00 J
+  → Fracture energy : 3.0684e+00 J
+  → Total energy    : 7.2427e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0637.vtu
+
+
+## Step 639/651: t = 3.53e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 638 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.778e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.344e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 6.089e-04
+  |ΔD|_∞ = 2.086e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.778e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 9.670e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.218e-04
+  |ΔD|_∞ = 4.171e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.778e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 9.670e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.436e-05
+  |ΔD|_∞ = 8.343e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1790e+00 J
+  → Fracture energy : 3.0727e+00 J
+  → Total energy    : 7.2517e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0638.vtu
+
+
+## Step 640/651: t = 3.54e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 639 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.78e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.359e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 6.384e-04
+  |ΔD|_∞ = 2.170e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.78e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.277e-04
+  |ΔD|_∞ = 4.341e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.78e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.554e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.553e-05
+  |ΔD|_∞ = 8.682e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1834e+00 J
+  → Fracture energy : 3.0773e+00 J
+  → Total energy    : 7.2607e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0639.vtu
+
+
+## Step 641/651: t = 3.54e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 640 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.782e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.374e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 6.691e-04
+  |ΔD|_∞ = 2.291e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.782e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.338e-04
+  |ΔD|_∞ = 4.581e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.782e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.939e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.676e-05
+  |ΔD|_∞ = 9.163e-04
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1876e+00 J
+  → Fracture energy : 3.0821e+00 J
+  → Total energy    : 7.2697e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0640.vtu
+
+
+## Step 642/651: t = 3.55e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 641 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.784e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.390e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 6.987e-04
+  |ΔD|_∞ = 2.529e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.784e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.397e-04
+  |ΔD|_∞ = 5.058e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.784e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.795e-05
+  |ΔD|_∞ = 1.012e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1914e+00 J
+  → Fracture energy : 3.0871e+00 J
+  → Total energy    : 7.2785e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0641.vtu
+
+
+## Step 643/651: t = 3.56e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 642 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.786e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.407e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.272e-04
+  |ΔD|_∞ = 2.760e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.786e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.145e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.454e-04
+  |ΔD|_∞ = 5.519e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.786e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 2.149e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 2.909e-05
+  |ΔD|_∞ = 1.104e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1950e+00 J
+  → Fracture energy : 3.0924e+00 J
+  → Total energy    : 7.2874e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0642.vtu
+
+
+## Step 644/651: t = 3.56e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 643 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.788e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.418e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.564e-04
+  |ΔD|_∞ = 2.964e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.788e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.513e-04
+  |ΔD|_∞ = 5.927e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.788e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.026e-05
+  |ΔD|_∞ = 1.185e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.1982e+00 J
+  → Fracture energy : 3.0980e+00 J
+  → Total energy    : 7.2962e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0643.vtu
+
+
+## Step 645/651: t = 3.57e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 644 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.79e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.433e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.783e-04
+  |ΔD|_∞ = 3.115e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.79e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.557e-04
+  |ΔD|_∞ = 6.231e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.79e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.266e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.113e-05
+  |ΔD|_∞ = 1.246e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.2012e+00 J
+  → Fracture energy : 3.1037e+00 J
+  → Total energy    : 7.3049e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0644.vtu
+
+
+## Step 646/651: t = 3.57e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 645 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.792e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.445e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 7.949e-04
+  |ΔD|_∞ = 3.187e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.792e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.590e-04
+  |ΔD|_∞ = 6.373e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.792e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.180e-05
+  |ΔD|_∞ = 1.275e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.2041e+00 J
+  → Fracture energy : 3.1096e+00 J
+  → Total energy    : 7.3137e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0645.vtu
+
+
+## Step 647/651: t = 3.58e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 646 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.794e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.453e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.045e-04
+  |ΔD|_∞ = 3.156e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.794e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 8.535e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.609e-04
+  |ΔD|_∞ = 6.313e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.794e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 8.535e-17
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.218e-05
+  |ΔD|_∞ = 1.263e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.2068e+00 J
+  → Fracture energy : 3.1155e+00 J
+  → Total energy    : 7.3223e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0646.vtu
+
+
+## Step 648/651: t = 3.58e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 647 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.796e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.457e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.073e-04
+  |ΔD|_∞ = 3.019e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.796e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.004e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.615e-04
+  |ΔD|_∞ = 6.038e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.796e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.229e-05
+  |ΔD|_∞ = 1.208e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.2095e+00 J
+  → Fracture energy : 3.1215e+00 J
+  → Total energy    : 7.3310e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0647.vtu
+
+
+## Step 649/651: t = 3.59e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 648 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.798e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.456e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.070e-04
+  |ΔD|_∞ = 2.990e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.798e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.614e-04
+  |ΔD|_∞ = 5.980e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.798e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.228e-05
+  |ΔD|_∞ = 1.196e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.2123e+00 J
+  → Fracture energy : 3.1274e+00 J
+  → Total energy    : 7.3396e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0648.vtu
+
+
+## Step 650/651: t = 3.59e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 649 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.8e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.452e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.090e-04
+  |ΔD|_∞ = 3.166e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.8e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.618e-04
+  |ΔD|_∞ = 6.332e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.8e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.190e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.236e-05
+  |ΔD|_∞ = 1.266e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.2151e+00 J
+  → Fracture energy : 3.1332e+00 J
+  → Total energy    : 7.3483e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0649.vtu
+
+
+## Step 651/651: t = 3.60e+03 s | LHR = 0.00e+00 W/m
+
+
+
+
+***
+
+
+### spine - solve
+
+
+***
+
+
+
+Current step = 650 | dt = 5.54e+00 s
+Coupling = staggered
+  → Max iterations              : 200
+  → Staggering tolerance |ΔT|   : 1.0e-04
+  → Staggering tolerance |Δu|   : 1.0e-05
+  → Staggering tolerance |ΔD|   : 1.0e-04
+  → Relative tolerance th       : 1.0e-06
+  → Relative tolerance mech     : 1.0e-05
+  → Relative tolerance dmg      : 1.0e-05
+
+
+#### Iteration 1/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.802e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.448e-03
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 8.157e-04
+  |ΔD|_∞ = 3.270e-02
+
+Convergence check
+
+
+#### Iteration 2/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.802e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 0.000e+00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 1.631e-04
+  |ΔD|_∞ = 6.539e-03
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 1 → [0.0, 0.0]
+  **[INFO]** Updating Displacement Dirichlet on region 3 → [1.802e-05, 0.0]
+  Building weak form, volume integrals (dx) for steel, tag = 6
+  Linear solver
+  ||Δu||/||u|| = 1.327e-16
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'steel' material
+  ||ΔD||/||D|| = 3.263e-05
+  |ΔD|_∞ = 1.308e-03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 3 iterations.
+Computing symbolic result fields (strain, stress, ...)
+  → Elastic energy  : 4.2179e+00 J
+  → Fracture energy : 3.1390e+00 J
+  → Total energy    : 7.3569e+00 J
+Exporting results to VTU file...
+  → Projecting result fields for all materials...
+  → Adding damage field to VTU...
+VTU file exported to: output/fields_0650.vtu
+
+Simulation completed in 5680.16 s
+Total time steps solved: 651
