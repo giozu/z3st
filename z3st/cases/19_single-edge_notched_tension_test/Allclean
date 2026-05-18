@@ -3,9 +3,8 @@ cd "${0%/*}" || exit 1
 
 echo "Cleaning current directory..."
 
-rm -rf output
-rm -f *.png
-rm -f log.*
-rm -f *.txt
+rm -rf output/
+rm -f log_*.md
+rm -f energies.txt
 
-echo "Done. All output and temporary files cleaned."
+echo "Done. Output and temporary files deleted (mesh preserved)."

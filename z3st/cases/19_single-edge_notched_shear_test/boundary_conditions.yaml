@@ -6,6 +6,7 @@ mechanical:
   - type: Dirichlet
     region: ymax
     displacement:
+    - [0.0, 0.0]
     - [5.02e-06, 0.0]
     - [5.04e-06, 0.0]
     - [5.06e-06, 0.0]
