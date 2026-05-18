@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a single-edge notched tension test
+//  Gmsh GEO for a single-edge notched test
 //
 //  Author: Giovanni Zullo
 //
