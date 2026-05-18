@@ -11,46 +11,34 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../materials/high_carbon_steel.yaml
 
-regime: 2D
+regime: 2d
 
 solver_settings:
   coupling: staggered
   max_iters: 200
-  relax_T: 0.9
   relax_u: 1.0
   relax_D: 0.8
   relax_adaptive: false
-  relax_growth: 1.2
-  relax_shrink: 0.8
-  relax_min: 0.05
-  relax_max: 0.95
-  
+
 models:
   thermal: false
   mechanical: true
   damage: true
 
 mechanical:
-  solver: linear # linear | non-linear
-  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
+  solver: linear
+  linear_solver: direct_mumps
   rtol: 1.0e-5
   stag_tol: 1.0e-5
-  convergence: rel_norm # rel_norm | norm
-
-thermal:
-  solver: linear # linear | non-linear
-  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-6
-  convergence: rel_norm # rel_norm | norm
+  convergence: rel_norm
 
 damage:
   type: AT2
   solver: linear
-  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
+  linear_solver: iterative_hypre
   rtol: 1.0e-5
-  stag_tol: 1.0e-5
-  convergence: rel_norm # rel_norm | norm
+  stag_tol: 1.0e-4
+  convergence: rel_norm
   lc: 4.0e-6
 
 lhr:
@@ -59,8 +47,4 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 701
-
-output:
-  format: "xdmf"
-  filename: "results.xdmf"
+n_steps: 651
