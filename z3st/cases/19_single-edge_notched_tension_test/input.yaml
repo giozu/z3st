@@ -37,7 +37,7 @@ damage:
   solver: linear
   linear_solver: iterative_hypre
   rtol: 1.0e-5
-  stag_tol: 1.0e-4
+  stag_tol: 1.0e-5
   convergence: rel_norm
   lc: 4.0e-6
 
@@ -47,4 +47,4 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 281
+n_steps: 141
