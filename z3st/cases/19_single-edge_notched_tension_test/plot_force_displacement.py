@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Force-displacement curve for SENS.
+"""Force-displacement curve for SENT.
 
 Two-stage workflow:
-  1. If `output/fields_*.vtu` files are present, extract `(step, u_x, F_x)`
+  1. If `output/fields_*.vtu` files are present, extract `(step, u_y, F_y)`
      per step and write `output/force_displacement.csv` (overwriting any
      previous version).
-  2. Always read `output/force_displacement.csv` and plot `F_x` vs `u_x`
+  2. Always read `output/force_displacement.csv` and plot `F_y` vs `u_y`
      into `output/force_displacement.png`.
 
 If no VTU files exist (e.g. after `./Allclean`), stage 1 is skipped and
@@ -49,15 +49,16 @@ if VTU_FILES:
         if not np.any(top_mask):
             continue
 
-        # u_x on top edge.
+        # u_y on top edge.
         if "Displacement" in m.point_data:
-            u_x_top = float(np.max(np.asarray(m.point_data["Displacement"])[top_mask, 0]))
+            u_y_top = float(np.max(np.asarray(m.point_data["Displacement"])[top_mask, 1]))
         else:
-            u_x_top = float("nan")
+            u_y_top = float("nan")
 
-        # F_x = integral of sigma_xy along top edge (per unit out-of-plane depth).
+        # F_y = integral of sigma_yy along top edge (per unit out-of-plane depth).
+        # Component index 4 of the row-major flattened 3x3 stress tensor.
         if "Stress_steel (points)" in m.point_data:
-            S_top = np.asarray(m.point_data["Stress_steel (points)"])[top_mask, 1]
+            S_top = np.asarray(m.point_data["Stress_steel (points)"])[top_mask, 4]
             x_top = x_pts[top_mask]
             order = np.argsort(x_top)
             F_per_depth = float(np.trapezoid(S_top[order], x_top[order]))
@@ -65,11 +66,11 @@ if VTU_FILES:
         else:
             F_kN = float("nan")
 
-        rows.append((step, u_x_top * 1e3, F_kN))
+        rows.append((step, u_y_top * 1e3, F_kN))
 
     arr = np.array(rows)
     np.savetxt(CSV_FILE, arr,
-               header="Step,u_x_top_mm,F_x_kN",
+               header="Step,u_y_top_mm,F_y_kN",
                delimiter=",", fmt=["%d", "%.6e", "%.6e"], comments="")
     print(f"[INFO] CSV saved: {CSV_FILE}  ({len(rows)} rows)")
 else:
@@ -96,9 +97,9 @@ if F_kN.size > 0:
     peak = int(np.nanargmax(F_kN))
     plt.plot(u_mm[peak], F_kN[peak], "r*", markersize=12,
              label=f"Peak: F = {F_kN[peak]:.3f} kN at u = {u_mm[peak]:.4f} mm")
-plt.xlabel(r"Top-edge displacement $u_x$ (mm)")
-plt.ylabel(r"Force $F_x$ (kN, per 1 mm depth)")
-plt.title("Force-displacement curve (cf. Ambati Fig. 13)")
+plt.xlabel(r"Top-edge displacement $u_y$ (mm)")
+plt.ylabel(r"Force $F_y$ (kN, per 1 mm depth)")
+plt.title("Force-displacement curve (cf. Ambati Fig. 9)")
 plt.grid(True, ls=":", alpha=0.6)
 plt.legend()
 plt.tight_layout()
