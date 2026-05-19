@@ -595,7 +595,7 @@ pip install -e .
 
 cd z3st/cases/00_example/
 gmsh -3 mesh.geo                    # or: ./Allrun
-python -m z3st > log.z3st
+python -m z3st > log_z3st.md
 python non-regression.py
 python ../../utils/plot_convergence.py
 ```

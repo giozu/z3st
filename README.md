@@ -49,8 +49,8 @@ Install in editable/development mode
 Then, it is possible to execute in each case folder, for instance:
   ```bash
   cd ~/z3st/z3st/cases/00_example/
-  gmsh -3 mesh.geo
-  python3 -m z3st > log.z3st
+  gmsh mesh.geo -3 > log_mesh.md
+  python3 -m z3st > log_z3st.md
   python3 non-regression.py
   python3 ../../utils/plot_convergence.py
   ```

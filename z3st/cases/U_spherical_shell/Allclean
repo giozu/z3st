@@ -8,5 +8,6 @@ rm -f output/fields.vtu
 rm -f output/*.csv
 rm -f output/*.png
 rm -f *.msh
+rm -f log_*.md
 
 echo "Done. Output and temporary files deleted."

@@ -63,7 +63,7 @@ All P0 items resolved. Remaining work is P1 (correctness / clarity) and P2 (clea
 - [ ] **PAPER-P0-3** — `main.tex:193` says case 20 has hardening `H = 20 GPa`; `materials/steel.yaml` has `hardening_modulus: 10.0e+9`.
 
 <a id="paper-p0-4"></a>
-- [ ] **PAPER-P0-4** — `main.tex:202, 215-216` describe case 9 as "2D generalised plane strain ... out-of-plane strain treated as a single global degree of freedom"; `cases/9_thick_cylindrical_shell_GPS_2D/input.yaml` actually sets `regime: axisymmetric`. The framework does not implement GPS with a global axial DoF (per CONTEXT.md §3.3). Either rename the section to "axisymmetric" or implement GPS.
+- [ ] **PAPER-P0-4** *(refined 2026-05-19)* — `main.tex:202` describes case 9 as "2D generalised plane strain ... out-of-plane strain treated as a single global degree of freedom". The case actually uses `regime: axisymmetric` with the GPS condition `ε_zz = const` **enforced via a prescribed axial-end displacement** (`Clamp_y` at `top` with value `-1.359155e-6 m = ε_zz·Lz`), not via a global Lagrange-multiplier DoF. The *physics* is a valid GPS configuration; only the implementation description is misleading. **Fix**: tighten the wording to "the out-of-plane strain is held constant across the section through a prescribed axial-end displacement". No section rename or new feature needed. Numerical side resolved separately — see [CASES-FOLLOWUP-3](#cases-followup-3).
 
 <a id="paper-p0-5"></a>
 - [ ] **PAPER-P0-5** — `main.tex:321` and `:366` quote `E_frac` ramps "0.56 J → 3.74 J"; actual `cases/14_full_cylinder_cracking_2D_xy/energies.txt` step 0 is **0.316 J**, step 1 is **0.77 J**, end is 3.737 J. `CONTEXT.md:684` (§9c) carries the same stale 0.56 J. Either re-run case 14 and update both, or fix the paper to "0.32 → 3.74 J".
@@ -109,6 +109,9 @@ All P0 items resolved. Remaining work is P1 (correctness / clarity) and P2 (clea
 
 <a id="code-p1-12"></a>
 - [ ] **CODE-P1-12** — `z3st/models/damage_model.py:103-106`: `crack_driving_force` has no `else` after the AT1 branch and returns `None` on a typo. The call site `update_history` then crashes inside `fem.Expression`. Raise `ValueError` explicitly.
+
+<a id="code-p1-13"></a>
+- [ ] **CODE-P1-13** — `z3st/core/solver.py:396` (and analogous spots) raise `KeyError: 'linear_solver'` when the `mechanical:` or `damage:` blocks omit `linear_solver`. Encountered live in case 9 on 2026-05-19. Either pick a default (e.g. `direct_mumps`) in `Config` / `Solver.__init__`, or validate early with a clear message ("'linear_solver' is required when 'solver: linear' — choose one of direct_mumps / iterative_amg / iterative_hypre"). Same likely applies to `thermal.linear_solver` and `damage.linear_solver`.
 
 ### Cases
 
@@ -202,11 +205,17 @@ These were audited and found in order — recording so we don't re-audit:
 
 ## Follow-ups (work spawned by other fixes)
 
+<a id="utils-followup-1"></a>
+- [x] **UTILS-FOLLOWUP-1** — *Resolved 2026-05-19.* Convergence plot was blank because the markdown stdout filter in `__main__.py` rewrites `[STEP NN/MM]` → `## Step NN/MM:` and `--- Staggering iteration N/M ---` → `#### Iteration N/M` whenever stdout is redirected (non-TTY), but `plot_convergence.py:35,42` regex hunted for the pre-filter markers. Patched `plot_convergence.py` to normalize either form back to the raw form at parse-time, and changed default filename `log.z3st` → `log_z3st.md`. Companion change: standardized log-file naming across the suite. Allrun now does `gmsh mesh.geo -<dim> > log_mesh.md` and `python -m z3st > log_z3st.md` in every case (43 cases edited by an audit agent; case 19 + the three case-14 cracking variants were already correct or skipped; `II_attenuation_map` and `I_mesh_sensitivity_2D` have no per-case Allrun/z3st invocation). Allclean uniformly sweeps `rm -f log_*.md`. README.md and CONTEXT.md updated to match.
+
 <a id="cases-followup-1"></a>
 - [ ] **CASES-FOLLOWUP-1** — End-to-end verification of the **[CODE-P0-1](#code-p0-1)** fix in the Gas-gap path. Touch `cases/U_coaxial_contact_2D/`: add `gap_conductance: { type: Gas, value: <prefactor> }` under `models:` in `input.yaml`; introduce a real gap (`inner_radius_2: 0.056` in `geometry.yaml` and the mirroring change in `mesh.geo`); re-mesh and run. Also write a `non-regression_gold.json` once a good run exists (folds into [CASES-P1-6](#cases-p1-6)).
 
 <a id="cases-followup-2"></a>
 - [ ] **CASES-FOLLOWUP-2** — End-to-end verification of the **[CODE-P0-2](#code-p0-2)** fix. Two sub-tasks: (i) re-run `cases/U_thick_cylindrical_shell_plane_stress/Allrun` to confirm the no-damage plane-stress path still produces a correct Lamé pressure-vessel solution after dropping the 3×3 padding (downstream consumers in `spine.py:387` and `utils/export_vtu.py` may need adjustment if they assume 3×3 σ in plane_stress); (ii) add a damage-enabled plane-stress case (no such case currently exists) to exercise the `g(D)` degradation path.
+
+<a id="cases-followup-3"></a>
+- [x] **CASES-FOLLOWUP-3** — *Resolved 2026-05-19.* Case 9 reverted to small-strain Lamé to match the analytical GPS reference; added `mechanical.linear_solver: direct_mumps` (after the framework KeyError'd on the missing key — tracked separately as [CODE-P1-13](#code-p1-13)). All six metrics now PASS vs analytical (σ_zz error 0.315% ↓ from 1.92%, well inside 0.5% tolerance). Gold re-blessed.
 
 ## Cross-references
 
