@@ -56,8 +56,8 @@ class GapModel:
                 region_id = bc_info["id"]
                 pair_region = bc_info["pair"]
 
-                dofs_here = self.locateFacetDofs(region_id, self.V_t)
-                dofs_other = self.locateFacetDofs(self.label_map[pair_region], self.V_t)
+                dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
+                dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
 
                 T_here = T_i.x.array[dofs_here]
                 T_other = T_i.x.array[dofs_other]

@@ -2,26 +2,17 @@ thermal:
   uo2:
   - type: Dirichlet
     region: contact_wall
-    temperature: 263.15  # (K) = -10 deg C, the McClenny cold-bath temperature
+    temperature: 263.15  # (K) = -10 deg C
 
 mechanical:
   uo2:
   - type: Clamp_y
-    region: symmetry     # mirror symmetry on y=0 (allows x-motion, prevents y-crossing)
+    region: symmetry
   - type: Clamp_x
-    region: pin          # 50-um pin segment at (-R, 0) to remove rigid x-translation
-                         # (far from the contact wedge, so the over-constraint there is negligible)
+    region: pin
 
 damage:
   uo2:
   - type: Dirichlet
     region: crack_seed
-    value: 1.0           # Pre-crack: D = 1 along the 250-um radial slit at theta = 15 deg.
-                         # This skips the (unstable) spontaneous-nucleation phase and lets
-                         # the thermal load drive crack PROPAGATION from a known seed --
-                         # same approach as cases/19_single-edge_notched_*. Without the
-                         # seed, the staggered hybrid scheme cascades at crack onset because
-                         # the rim cells transition abruptly from D=0 to D~1 and the
-                         # mechanical solve sees a singular Jacobian after the first
-                         # damaged cell appears. With the seed, the mechanical equilibrium
-                         # is well-posed from step 0 (the slit is "already there").
+    value: 1.0

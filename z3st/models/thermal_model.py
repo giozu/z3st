@@ -8,6 +8,7 @@ import sys
 
 import dolfinx
 import ufl
+from mpi4py import MPI
 from petsc4py import PETSc
 
 
@@ -171,6 +172,16 @@ class ThermalModel:
 
             # Assemble the volume (or area in 2D) of the subdomain
             volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx))
+
+            # assemble_scalar is per-rank partial; reduce to global sums
+            # so the per-subdomain averages below are physical, not the
+            # rank-0 share of the subdomain.
+            comm = self.mesh.comm
+            q_integral = comm.allreduce(q_integral, op=MPI.SUM)
+            qx_integral = comm.allreduce(qx_integral, op=MPI.SUM)
+            qy_integral = comm.allreduce(qy_integral, op=MPI.SUM)
+            qz_integral = comm.allreduce(qz_integral, op=MPI.SUM)
+            volume = comm.allreduce(volume, op=MPI.SUM)
 
             # Compute the average
             q_avg = q_integral / volume if volume > 0 else 0.0

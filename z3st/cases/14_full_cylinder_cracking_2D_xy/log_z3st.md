@@ -1,6 +1,6 @@
 Info    : Reading 'mesh.msh'...
-Info    : 17965 nodes
-Info    : 35948 elements
+Info    : 34152 nodes
+Info    : 68322 elements
 Info    : Done reading 'mesh.msh'
 
 
@@ -108,7 +108,7 @@ Material loaded: uo2
 
 Initializing the temperature field...
   → Setting initial temperature for material: 'uo2'
-    Set 17965 DOFs to 1023.15 K
+    Set 34152 DOFs to 1023.15 K
   Initial T: min=1023.15 K, max=1023.15 K, mean=1023.15 K
 
 Initializing the displacement field...
@@ -172,9 +172,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.170e-01
+  ||ΔT||/||T|| = 1.281e-01
   [adaptive] relax_T=0.80
 
 **[INFO]** Assembling mechanical problem...
@@ -203,9 +203,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.912e-03
+  ||ΔT||/||T|| = 7.009e-03
   [adaptive] relax_T=0.88
 
 **[INFO]** Assembling mechanical problem...
@@ -219,9 +219,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.459e-01
+  ||ΔD||/||D|| = 6.295e-01
   [adaptive] relax_D=0.55
-  |ΔD|_∞ = 3.348e-01
+  |ΔD|_∞ = 3.080e-01
 
 Convergence check
 
@@ -234,9 +234,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.741e-03
+  ||ΔT||/||T|| = 1.542e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -250,9 +250,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.658e+00
+  ||ΔD||/||D|| = 1.599e+00
   [adaptive] relax_D=0.52
-  |ΔD|_∞ = 4.326e-01
+  |ΔD|_∞ = 4.243e-01
 
 Convergence check
 
@@ -265,9 +265,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.255e-04
+  ||ΔT||/||T|| = 1.997e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -275,15 +275,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.581e-02
+  ||Δu||/||u|| = 6.582e-02
   [adaptive] relax_u=0.80
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.706e+00
+  ||ΔD||/||D|| = 2.457e+00
   [adaptive] relax_D=0.50
-  |ΔD|_∞ = 2.138e-01
+  |ΔD|_∞ = 2.116e-01
 
 Convergence check
 
@@ -296,9 +296,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.128e-05
+  ||ΔT||/||T|| = 9.987e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -312,9 +312,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.348e+00
+  ||ΔD||/||D|| = 1.989e+00
   [adaptive] relax_D=0.47
-  |ΔD|_∞ = 1.087e-01
+  |ΔD|_∞ = 1.088e-01
 
 Convergence check
 
@@ -327,9 +327,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.638e-07
+  ||ΔT||/||T|| = 4.994e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -343,9 +343,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.756e-01
+  ||ΔD||/||D|| = 1.145e+00
   [adaptive] relax_D=0.52
-  |ΔD|_∞ = 5.763e-02
+  |ΔD|_∞ = 5.802e-02
 
 Convergence check
 
@@ -358,9 +358,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.819e-08
+  ||ΔT||/||T|| = 2.497e-08
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -374,9 +374,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.702e-01
+  ||ΔD||/||D|| = 6.938e-01
   [adaptive] relax_D=0.57
-  |ΔD|_∞ = 3.430e-02
+  |ΔD|_∞ = 3.457e-02
 
 Convergence check
 
@@ -389,9 +389,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.409e-09
+  ||ΔT||/||T|| = 1.248e-09
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -405,9 +405,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.500e-01
+  ||ΔD||/||D|| = 3.689e-01
   [adaptive] relax_D=0.63
-  |ΔD|_∞ = 1.820e-02
+  |ΔD|_∞ = 1.835e-02
 
 Convergence check
 
@@ -420,9 +420,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.047e-11
+  ||ΔT||/||T|| = 6.242e-11
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -436,9 +436,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.182e-01
+  ||ΔD||/||D|| = 1.743e-01
   [adaptive] relax_D=0.69
-  |ΔD|_∞ = 8.600e-03
+  |ΔD|_∞ = 8.671e-03
 
 Convergence check
 
@@ -451,9 +451,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.524e-12
+  ||ΔT||/||T|| = 3.121e-12
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -461,15 +461,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.220e-08
+  ||Δu||/||u|| = 7.221e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.840e-02
+  ||ΔD||/||D|| = 7.141e-02
   [adaptive] relax_D=0.76
-  |ΔD|_∞ = 3.523e-03
+  |ΔD|_∞ = 3.552e-03
 
 Convergence check
 
@@ -482,9 +482,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.762e-13
+  ||ΔT||/||T|| = 1.560e-13
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -498,9 +498,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.648e-02
+  ||ΔD||/||D|| = 2.432e-02
   [adaptive] relax_D=0.84
-  |ΔD|_∞ = 1.200e-03
+  |ΔD|_∞ = 1.210e-03
 
 Convergence check
 
@@ -513,9 +513,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 8.809e-15
+  ||ΔT||/||T|| = 7.803e-15
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -529,9 +529,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.361e-03
+  ||ΔD||/||D|| = 6.435e-03
   [adaptive] relax_D=0.92
-  |ΔD|_∞ = 3.174e-04
+  |ΔD|_∞ = 3.200e-04
 
 Convergence check
 
@@ -544,9 +544,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=996.32 K
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
   T^n (self.T): min=1023.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 4.407e-16
+  ||ΔT||/||T|| = 3.901e-16
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -554,23 +554,54 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.025e-12
+  ||Δu||/||u|| = 9.026e-12
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.897e-04
+  ||ΔD||/||D|| = 1.165e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.748e-05
+  |ΔD|_∞ = 5.795e-05
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 13 iterations.
+
+#### Iteration 14/200
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for uo2, tag = 10
+  → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Linear solver
+  T_new: min=263.15 K, max=1043.42 K, mean=993.46 K
+  T^n (self.T): min=1023.15 K, max=1023.15 K
+  ||ΔT||/||T|| = 2.280e-17
+  [adaptive] relax_T=0.95
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 40 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
+  Building weak form, volume integrals (dx) for uo2, tag = 10
+  Linear solver
+  ||Δu||/||u|| = 4.497e-13
+  [adaptive] relax_u=0.95
+
+**[INFO]** Assembling damage (AT1) problem...
+Solving damage problem for 'uo2' material
+  - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
+  ||ΔD||/||D|| = 9.765e-05
+  [adaptive] relax_D=0.95
+  |ΔD|_∞ = 4.857e-06
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3571e+02 J
-  → Fracture energy : 3.1642e-01 J
-  → Total energy    : 2.3603e+02 J
+  → Elastic energy  : 2.3478e+02 J
+  → Fracture energy : 7.9499e-01 J
+  → Total energy    : 2.3557e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -612,9 +643,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=959.68 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 9.208e-02
+  T_new: min=263.15 K, max=1023.15 K, mean=953.39 K
+  T^n (self.T): min=263.15 K, max=1043.42 K
+  ||ΔT||/||T|| = 9.708e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -622,15 +653,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.397e-03
+  ||Δu||/||u|| = 1.363e-03
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.939e-01
+  ||ΔD||/||D|| = 6.348e-01
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.875e-01
+  |ΔD|_∞ = 3.878e-01
 
 Convergence check
 
@@ -643,9 +674,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=959.68 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 4.604e-03
+  T_new: min=263.15 K, max=1023.15 K, mean=953.39 K
+  T^n (self.T): min=263.15 K, max=1043.42 K
+  ||ΔT||/||T|| = 4.854e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -653,15 +684,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.424e-04
+  ||Δu||/||u|| = 1.469e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.469e-02
+  ||ΔD||/||D|| = 4.995e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.441e-02
+  |ΔD|_∞ = 3.644e-02
 
 Convergence check
 
@@ -674,9 +705,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=959.68 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.302e-04
+  T_new: min=263.15 K, max=1023.15 K, mean=953.39 K
+  T^n (self.T): min=263.15 K, max=1043.42 K
+  ||ΔT||/||T|| = 2.427e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -684,15 +715,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.083e-05
+  ||Δu||/||u|| = 1.134e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.831e-03
+  ||ΔD||/||D|| = 3.190e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.173e-03
+  |ΔD|_∞ = 3.304e-03
 
 Convergence check
 
@@ -705,9 +736,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=959.68 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.151e-05
+  T_new: min=263.15 K, max=1023.15 K, mean=953.39 K
+  T^n (self.T): min=263.15 K, max=1043.42 K
+  ||ΔT||/||T|| = 1.214e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -715,15 +746,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.279e-07
+  ||Δu||/||u|| = 7.672e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.738e-04
+  ||ΔD||/||D|| = 1.888e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.543e-04
+  |ΔD|_∞ = 2.645e-04
 
 Convergence check
 
@@ -736,9 +767,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=959.68 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.755e-07
+  T_new: min=263.15 K, max=1023.15 K, mean=953.39 K
+  T^n (self.T): min=263.15 K, max=1043.42 K
+  ||ΔT||/||T|| = 6.068e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -746,23 +777,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.573e-08
+  ||Δu||/||u|| = 4.838e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.077e-05
+  ||ΔD||/||D|| = 1.092e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.933e-05
+  |ΔD|_∞ = 1.967e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.4070e+02 J
-  → Fracture energy : 7.6716e-01 J
-  → Total energy    : 2.4146e+02 J
+  → Elastic energy  : 2.3247e+02 J
+  → Fracture energy : 2.3959e+00 J
+  → Total energy    : 2.3487e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -804,9 +835,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=939.43 K
+  T_new: min=263.15 K, max=1023.15 K, mean=930.43 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 4.289e-02
+  ||ΔT||/||T|| = 4.599e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -814,15 +845,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.904e-04
+  ||Δu||/||u|| = 6.497e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.543e-01
+  ||ΔD||/||D|| = 2.497e-01
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.294e-01
+  |ΔD|_∞ = 2.148e-01
 
 Convergence check
 
@@ -835,9 +866,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=939.43 K
+  T_new: min=263.15 K, max=1023.15 K, mean=930.43 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.145e-03
+  ||ΔT||/||T|| = 2.299e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -845,15 +876,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.447e-05
+  ||Δu||/||u|| = 5.885e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.891e-02
+  ||ΔD||/||D|| = 1.894e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.985e-02
+  |ΔD|_∞ = 1.984e-02
 
 Convergence check
 
@@ -866,9 +897,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=939.43 K
+  T_new: min=263.15 K, max=1023.15 K, mean=930.43 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.072e-04
+  ||ΔT||/||T|| = 1.150e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -876,15 +907,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.227e-06
+  ||Δu||/||u|| = 4.981e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.137e-03
+  ||ΔD||/||D|| = 1.115e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.887e-03
+  |ΔD|_∞ = 1.911e-03
 
 Convergence check
 
@@ -897,9 +928,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=939.43 K
+  T_new: min=263.15 K, max=1023.15 K, mean=930.43 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.362e-06
+  ||ΔT||/||T|| = 5.749e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -907,15 +938,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.667e-07
+  ||Δu||/||u|| = 3.574e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.874e-05
+  ||ΔD||/||D|| = 6.262e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.537e-04
+  |ΔD|_∞ = 1.565e-04
 
 Convergence check
 
@@ -928,9 +959,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=939.43 K
+  T_new: min=263.15 K, max=1023.15 K, mean=930.43 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.681e-07
+  ||ΔT||/||T|| = 2.874e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -938,23 +969,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.369e-08
+  ||Δu||/||u|| = 2.338e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.382e-06
+  ||ΔD||/||D|| = 3.651e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.137e-05
+  |ΔD|_∞ = 1.162e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5678e+02 J
-  → Fracture energy : 1.0278e+00 J
-  → Total energy    : 2.5781e+02 J
+  → Elastic energy  : 2.3261e+02 J
+  → Fracture energy : 3.2653e+00 J
+  → Total energy    : 2.3587e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -996,9 +1027,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=925.05 K
+  T_new: min=263.15 K, max=1023.15 K, mean=913.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.848e-02
+  ||ΔT||/||T|| = 3.094e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1006,15 +1037,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.655e-04
+  ||Δu||/||u|| = 4.450e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.512e-01
+  ||ΔD||/||D|| = 1.493e-01
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.744e-01
+  |ΔD|_∞ = 1.679e-01
 
 Convergence check
 
@@ -1027,9 +1058,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=925.05 K
+  T_new: min=263.15 K, max=1023.15 K, mean=913.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.424e-03
+  ||ΔT||/||T|| = 1.547e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1037,15 +1068,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.362e-05
+  ||Δu||/||u|| = 5.487e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.101e-02
+  ||ΔD||/||D|| = 1.095e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.550e-02
+  |ΔD|_∞ = 1.587e-02
 
 Convergence check
 
@@ -1058,9 +1089,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=925.05 K
+  T_new: min=263.15 K, max=1023.15 K, mean=913.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.120e-05
+  ||ΔT||/||T|| = 7.734e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1068,15 +1099,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.345e-06
+  ||Δu||/||u|| = 4.499e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.515e-04
+  ||ΔD||/||D|| = 6.177e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.444e-03
+  |ΔD|_∞ = 1.492e-03
 
 Convergence check
 
@@ -1089,9 +1120,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=925.05 K
+  T_new: min=263.15 K, max=1023.15 K, mean=913.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.560e-06
+  ||ΔT||/||T|| = 3.867e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1099,15 +1130,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.018e-07
+  ||Δu||/||u|| = 3.138e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.068e-05
+  ||ΔD||/||D|| = 3.487e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.162e-04
+  |ΔD|_∞ = 1.206e-04
 
 Convergence check
 
@@ -1120,9 +1151,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=925.05 K
+  T_new: min=263.15 K, max=1023.15 K, mean=913.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.780e-07
+  ||ΔT||/||T|| = 1.934e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1130,23 +1161,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.934e-08
+  ||Δu||/||u|| = 2.015e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.692e-06
+  ||ΔD||/||D|| = 2.116e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.536e-06
+  |ΔD|_∞ = 8.875e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.7706e+02 J
-  → Fracture energy : 1.2138e+00 J
-  → Total energy    : 2.7827e+02 J
+  → Elastic energy  : 2.3234e+02 J
+  → Fracture energy : 3.8852e+00 J
+  → Total energy    : 2.3622e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -1188,9 +1219,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=913.72 K
+  T_new: min=263.15 K, max=1023.15 K, mean=900.50 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.159e-02
+  ||ΔT||/||T|| = 2.370e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1198,15 +1229,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.274e-04
+  ||Δu||/||u|| = 4.317e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.072e-01
+  ||ΔD||/||D|| = 1.077e-01
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.479e-01
+  |ΔD|_∞ = 1.455e-01
 
 Convergence check
 
@@ -1219,9 +1250,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=913.72 K
+  T_new: min=263.15 K, max=1023.15 K, mean=900.50 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.079e-03
+  ||ΔT||/||T|| = 1.185e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1229,15 +1260,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.881e-05
+  ||Δu||/||u|| = 5.130e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.763e-03
+  ||ΔD||/||D|| = 7.771e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.374e-02
+  |ΔD|_∞ = 1.423e-02
 
 Convergence check
 
@@ -1250,9 +1281,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=913.72 K
+  T_new: min=263.15 K, max=1023.15 K, mean=900.50 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.396e-05
+  ||ΔT||/||T|| = 5.926e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1260,15 +1291,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.886e-06
+  ||Δu||/||u|| = 4.110e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.659e-04
+  ||ΔD||/||D|| = 4.324e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.240e-03
+  |ΔD|_∞ = 1.293e-03
 
 Convergence check
 
@@ -1281,9 +1312,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=913.72 K
+  T_new: min=263.15 K, max=1023.15 K, mean=900.50 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.698e-06
+  ||ΔT||/||T|| = 2.963e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1291,15 +1322,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.673e-07
+  ||Δu||/||u|| = 2.833e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.010e-05
+  ||ΔD||/||D|| = 2.491e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.749e-05
+  |ΔD|_∞ = 1.020e-04
 
 Convergence check
 
@@ -1312,9 +1343,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=913.72 K
+  T_new: min=263.15 K, max=1023.15 K, mean=900.50 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.349e-07
+  ||ΔT||/||T|| = 1.481e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1322,23 +1353,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.703e-08
+  ||Δu||/||u|| = 1.807e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.023e-06
+  ||ΔD||/||D|| = 1.550e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.057e-06
+  |ΔD|_∞ = 7.386e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9814e+02 J
-  → Fracture energy : 1.3646e+00 J
-  → Total energy    : 2.9950e+02 J
+  → Elastic energy  : 2.3202e+02 J
+  → Fracture energy : 4.3945e+00 J
+  → Total energy    : 2.3641e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -1380,9 +1411,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=904.30 K
+  T_new: min=263.15 K, max=1023.15 K, mean=889.32 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.751e-02
+  ||ΔT||/||T|| = 1.939e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1390,15 +1421,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.084e-04
+  ||Δu||/||u|| = 4.171e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.343e-02
+  ||ΔD||/||D|| = 8.428e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.368e-01
+  |ΔD|_∞ = 1.355e-01
 
 Convergence check
 
@@ -1411,9 +1442,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=904.30 K
+  T_new: min=263.15 K, max=1023.15 K, mean=889.32 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 8.754e-04
+  ||ΔT||/||T|| = 9.696e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1421,15 +1452,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.537e-05
+  ||Δu||/||u|| = 4.809e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.089e-03
+  ||ΔD||/||D|| = 6.048e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.282e-02
+  |ΔD|_∞ = 1.339e-02
 
 Convergence check
 
@@ -1442,9 +1473,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=904.30 K
+  T_new: min=263.15 K, max=1023.15 K, mean=889.32 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 4.377e-05
+  ||ΔT||/||T|| = 4.848e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1452,15 +1483,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.570e-06
+  ||Δu||/||u|| = 3.810e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.766e-04
+  ||ΔD||/||D|| = 3.388e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.125e-03
+  |ΔD|_∞ = 1.178e-03
 
 Convergence check
 
@@ -1473,9 +1504,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=904.30 K
+  T_new: min=263.15 K, max=1023.15 K, mean=889.32 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.188e-06
+  ||ΔT||/||T|| = 2.424e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1483,15 +1514,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.441e-07
+  ||Δu||/||u|| = 2.612e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.492e-05
+  ||ΔD||/||D|| = 2.004e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.688e-05
+  |ΔD|_∞ = 9.155e-05
 
 Convergence check
 
@@ -1504,9 +1535,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=904.30 K
+  T_new: min=263.15 K, max=1023.15 K, mean=889.32 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.094e-07
+  ||ΔT||/||T|| = 1.212e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1514,23 +1545,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.549e-08
+  ||Δu||/||u|| = 1.660e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.679e-06
+  ||ΔD||/||D|| = 1.269e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.195e-06
+  |ΔD|_∞ = 6.555e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.1888e+02 J
-  → Fracture energy : 1.4944e+00 J
-  → Total energy    : 3.2038e+02 J
+  → Elastic energy  : 2.3171e+02 J
+  → Fracture energy : 4.8374e+00 J
+  → Total energy    : 2.3655e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -1572,9 +1603,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=896.19 K
+  T_new: min=263.15 K, max=1023.15 K, mean=879.63 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.479e-02
+  ||ΔT||/||T|| = 1.650e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1582,15 +1613,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.048e-04
+  ||Δu||/||u|| = 4.106e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.846e-02
+  ||ΔD||/||D|| = 6.906e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.341e-01
+  |ΔD|_∞ = 1.352e-01
 
 Convergence check
 
@@ -1603,9 +1634,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=896.19 K
+  T_new: min=263.15 K, max=1023.15 K, mean=879.63 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.397e-04
+  ||ΔT||/||T|| = 8.250e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1613,15 +1644,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.309e-05
+  ||Δu||/||u|| = 4.575e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.081e-03
+  ||ΔD||/||D|| = 4.971e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.220e-02
+  |ΔD|_∞ = 1.277e-02
 
 Convergence check
 
@@ -1634,9 +1665,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=896.19 K
+  T_new: min=263.15 K, max=1023.15 K, mean=879.63 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.698e-05
+  ||ΔT||/||T|| = 4.125e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1644,15 +1675,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.350e-06
+  ||Δu||/||u|| = 3.590e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.267e-04
+  ||ΔD||/||D|| = 2.863e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.052e-03
+  |ΔD|_∞ = 1.109e-03
 
 Convergence check
 
@@ -1665,9 +1696,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=896.19 K
+  T_new: min=263.15 K, max=1023.15 K, mean=879.63 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.849e-06
+  ||ΔT||/||T|| = 2.063e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1675,15 +1706,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.278e-07
+  ||Δu||/||u|| = 2.450e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.200e-05
+  ||ΔD||/||D|| = 1.749e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.036e-05
+  |ΔD|_∞ = 8.480e-05
 
 Convergence check
 
@@ -1696,9 +1727,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=896.19 K
+  T_new: min=263.15 K, max=1023.15 K, mean=879.63 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 9.246e-08
+  ||ΔT||/||T|| = 1.031e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1706,23 +1737,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.442e-08
+  ||Δu||/||u|| = 1.554e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.480e-06
+  ||ΔD||/||D|| = 1.119e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.679e-06
+  |ΔD|_∞ = 6.009e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.4002e+02 J
-  → Fracture energy : 1.6090e+00 J
-  → Total energy    : 3.4163e+02 J
+  → Elastic energy  : 2.3142e+02 J
+  → Fracture energy : 5.2325e+00 J
+  → Total energy    : 2.3665e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -1764,9 +1795,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=889.04 K
+  T_new: min=263.15 K, max=1023.15 K, mean=871.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.285e-02
+  ||ΔT||/||T|| = 1.441e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1774,15 +1805,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.123e-04
+  ||Δu||/||u|| = 4.129e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.828e-02
+  ||ΔD||/||D|| = 5.889e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.383e-01
+  |ΔD|_∞ = 1.421e-01
 
 Convergence check
 
@@ -1795,9 +1826,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=889.04 K
+  T_new: min=263.15 K, max=1023.15 K, mean=871.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 6.424e-04
+  ||ΔT||/||T|| = 7.207e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1805,15 +1836,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.166e-05
+  ||Δu||/||u|| = 4.412e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.438e-03
+  ||ΔD||/||D|| = 4.352e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.164e-02
+  |ΔD|_∞ = 1.222e-02
 
 Convergence check
 
@@ -1826,9 +1857,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=889.04 K
+  T_new: min=263.15 K, max=1023.15 K, mean=871.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.212e-05
+  ||ΔT||/||T|| = 3.604e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1836,15 +1867,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.195e-06
+  ||Δu||/||u|| = 3.427e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.970e-04
+  ||ΔD||/||D|| = 2.660e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.952e-04
+  |ΔD|_∞ = 1.050e-03
 
 Convergence check
 
@@ -1857,9 +1888,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=889.04 K
+  T_new: min=263.15 K, max=1023.15 K, mean=871.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.606e-06
+  ||ΔT||/||T|| = 1.802e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1867,15 +1898,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.160e-07
+  ||Δu||/||u|| = 2.329e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.019e-05
+  ||ΔD||/||D|| = 1.666e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.516e-05
+  |ΔD|_∞ = 7.980e-05
 
 Convergence check
 
@@ -1888,9 +1919,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=889.04 K
+  T_new: min=263.15 K, max=1023.15 K, mean=871.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 8.030e-08
+  ||ΔT||/||T|| = 9.009e-08
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1898,23 +1929,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.363e-08
+  ||Δu||/||u|| = 1.474e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.350e-06
+  ||ΔD||/||D|| = 1.061e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.274e-06
+  |ΔD|_∞ = 5.618e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.6279e+02 J
-  → Fracture energy : 1.7113e+00 J
-  → Total energy    : 3.6450e+02 J
+  → Elastic energy  : 2.3115e+02 J
+  → Fracture energy : 5.5926e+00 J
+  → Total energy    : 2.3674e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -1956,9 +1987,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=882.65 K
+  T_new: min=263.15 K, max=1023.15 K, mean=863.30 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.138e-02
+  ||ΔT||/||T|| = 1.283e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1966,15 +1997,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.344e-04
+  ||Δu||/||u|| = 4.229e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.145e-02
+  ||ΔD||/||D|| = 5.349e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.491e-01
+  |ΔD|_∞ = 1.518e-01
 
 Convergence check
 
@@ -1987,9 +2018,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=882.65 K
+  T_new: min=263.15 K, max=1023.15 K, mean=863.30 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.689e-04
+  ||ΔT||/||T|| = 6.415e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -1997,15 +2028,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.097e-05
+  ||Δu||/||u|| = 4.294e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.045e-03
+  ||ΔD||/||D|| = 4.203e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.235e-02
+  |ΔD|_∞ = 1.271e-02
 
 Convergence check
 
@@ -2018,9 +2049,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=882.65 K
+  T_new: min=263.15 K, max=1023.15 K, mean=863.30 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.845e-05
+  ||ΔT||/||T|| = 3.208e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2028,15 +2059,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.088e-06
+  ||Δu||/||u|| = 3.299e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.785e-04
+  ||ΔD||/||D|| = 2.713e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.382e-04
+  |ΔD|_∞ = 9.928e-04
 
 Convergence check
 
@@ -2049,9 +2080,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=882.65 K
+  T_new: min=263.15 K, max=1023.15 K, mean=863.30 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.422e-06
+  ||ΔT||/||T|| = 1.604e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2059,15 +2090,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.074e-07
+  ||Δu||/||u|| = 2.233e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.896e-05
+  ||ΔD||/||D|| = 1.705e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.062e-05
+  |ΔD|_∞ = 7.489e-05
 
 Convergence check
 
@@ -2080,9 +2111,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=882.65 K
+  T_new: min=263.15 K, max=1023.15 K, mean=863.30 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.111e-08
+  ||ΔT||/||T|| = 8.019e-08
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2090,23 +2121,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.303e-08
+  ||Δu||/||u|| = 1.409e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.258e-06
+  ||ΔD||/||D|| = 1.068e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.940e-06
+  |ΔD|_∞ = 5.256e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.8786e+02 J
-  → Fracture energy : 1.8041e+00 J
-  → Total energy    : 3.8966e+02 J
+  → Elastic energy  : 2.3087e+02 J
+  → Fracture energy : 5.9307e+00 J
+  → Total energy    : 2.3680e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -2148,9 +2179,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=876.85 K
+  T_new: min=263.15 K, max=1023.15 K, mean=856.26 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.023e-02
+  ||ΔT||/||T|| = 1.158e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2158,15 +2189,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.772e-04
+  ||Δu||/||u|| = 4.459e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.688e-02
+  ||ΔD||/||D|| = 5.195e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.617e-01
+  |ΔD|_∞ = 1.614e-01
 
 Convergence check
 
@@ -2179,9 +2210,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=876.85 K
+  T_new: min=263.15 K, max=1023.15 K, mean=856.26 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.113e-04
+  ||ΔT||/||T|| = 5.792e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2189,15 +2220,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.104e-05
+  ||Δu||/||u|| = 4.210e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.799e-03
+  ||ΔD||/||D|| = 4.295e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.360e-02
+  |ΔD|_∞ = 1.392e-02
 
 Convergence check
 
@@ -2210,9 +2241,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=876.85 K
+  T_new: min=263.15 K, max=1023.15 K, mean=856.26 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.557e-05
+  ||ΔT||/||T|| = 2.896e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2220,15 +2251,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.019e-06
+  ||Δu||/||u|| = 3.188e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.665e-04
+  ||ΔD||/||D|| = 2.864e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.232e-04
+  |ΔD|_∞ = 9.509e-04
 
 Convergence check
 
@@ -2241,9 +2272,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=876.85 K
+  T_new: min=263.15 K, max=1023.15 K, mean=856.26 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.278e-06
+  ||ΔT||/||T|| = 1.448e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2251,15 +2282,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.008e-07
+  ||Δu||/||u|| = 2.147e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.806e-05
+  ||ΔD||/||D|| = 1.802e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.629e-05
+  |ΔD|_∞ = 7.039e-05
 
 Convergence check
 
@@ -2272,9 +2303,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=876.85 K
+  T_new: min=263.15 K, max=1023.15 K, mean=856.26 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 6.391e-08
+  ||ΔT||/||T|| = 7.240e-08
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2282,23 +2313,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.257e-08
+  ||Δu||/||u|| = 1.353e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.187e-06
+  ||ΔD||/||D|| = 1.111e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.622e-06
+  |ΔD|_∞ = 4.929e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.1622e+02 J
-  → Fracture energy : 1.8904e+00 J
-  → Total energy    : 4.1811e+02 J
+  → Elastic energy  : 2.3056e+02 J
+  → Fracture energy : 6.2621e+00 J
+  → Total energy    : 2.3682e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -2340,9 +2371,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=871.54 K
+  T_new: min=263.15 K, max=1023.15 K, mean=849.78 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 9.297e-03
+  ||ΔT||/||T|| = 1.057e-02
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2350,15 +2381,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.013e-04
+  ||Δu||/||u|| = 4.823e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.341e-02
+  ||ΔD||/||D|| = 5.073e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.693e-01
+  |ΔD|_∞ = 1.650e-01
 
 Convergence check
 
@@ -2371,9 +2402,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=871.54 K
+  T_new: min=263.15 K, max=1023.15 K, mean=849.78 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 4.649e-04
+  ||ΔT||/||T|| = 5.287e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2381,15 +2412,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.069e-05
+  ||Δu||/||u|| = 4.138e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.630e-03
+  ||ΔD||/||D|| = 4.306e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.463e-02
+  |ΔD|_∞ = 1.448e-02
 
 Convergence check
 
@@ -2402,9 +2433,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=871.54 K
+  T_new: min=263.15 K, max=1023.15 K, mean=849.78 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.324e-05
+  ||ΔT||/||T|| = 2.643e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2412,15 +2443,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.942e-06
+  ||Δu||/||u|| = 3.074e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.571e-04
+  ||ΔD||/||D|| = 2.927e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.990e-04
+  |ΔD|_∞ = 1.014e-03
 
 Convergence check
 
@@ -2433,9 +2464,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=871.54 K
+  T_new: min=263.15 K, max=1023.15 K, mean=849.78 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.162e-06
+  ||ΔT||/||T|| = 1.322e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2443,15 +2474,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.944e-07
+  ||Δu||/||u|| = 2.059e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.730e-05
+  ||ΔD||/||D|| = 1.850e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.245e-05
+  |ΔD|_∞ = 6.527e-05
 
 Convergence check
 
@@ -2464,9 +2495,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=871.54 K
+  T_new: min=263.15 K, max=1023.15 K, mean=849.78 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.811e-08
+  ||ΔT||/||T|| = 6.609e-08
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2474,23 +2505,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.213e-08
+  ||Δu||/||u|| = 1.295e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.126e-06
+  ||ΔD||/||D|| = 1.134e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.302e-06
+  |ΔD|_∞ = 4.568e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.5130e+02 J
-  → Fracture energy : 1.9711e+00 J
-  → Total energy    : 4.5327e+02 J
+  → Elastic energy  : 2.3024e+02 J
+  → Fracture energy : 6.5868e+00 J
+  → Total energy    : 2.3682e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -2532,9 +2563,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=866.64 K
+  T_new: min=263.15 K, max=1023.15 K, mean=843.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 8.531e-03
+  ||ΔT||/||T|| = 9.737e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2542,15 +2573,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.875e-04
+  ||Δu||/||u|| = 5.628e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.134e-02
+  ||ΔD||/||D|| = 4.801e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.711e-01
+  |ΔD|_∞ = 1.624e-01
 
 Convergence check
 
@@ -2563,9 +2594,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=866.64 K
+  T_new: min=263.15 K, max=1023.15 K, mean=843.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 4.266e-04
+  ||ΔT||/||T|| = 4.869e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2573,15 +2604,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.924e-05
+  ||Δu||/||u|| = 4.181e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.528e-03
+  ||ΔD||/||D|| = 4.118e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.494e-02
+  |ΔD|_∞ = 1.438e-02
 
 Convergence check
 
@@ -2594,9 +2625,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=866.64 K
+  T_new: min=263.15 K, max=1023.15 K, mean=843.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.133e-05
+  ||ΔT||/||T|| = 2.434e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2604,15 +2635,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.832e-06
+  ||Δu||/||u|| = 2.986e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.500e-04
+  ||ΔD||/||D|| = 2.828e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.044e-03
+  |ΔD|_∞ = 1.012e-03
 
 Convergence check
 
@@ -2625,9 +2656,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=866.64 K
+  T_new: min=263.15 K, max=1023.15 K, mean=843.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.066e-06
+  ||ΔT||/||T|| = 1.217e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2635,15 +2666,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.871e-07
+  ||Δu||/||u|| = 1.976e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.668e-05
+  ||ΔD||/||D|| = 1.794e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.628e-05
+  |ΔD|_∞ = 6.483e-05
 
 Convergence check
 
@@ -2656,9 +2687,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=866.64 K
+  T_new: min=263.15 K, max=1023.15 K, mean=843.79 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.332e-08
+  ||ΔT||/||T|| = 6.086e-08
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2666,23 +2697,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.167e-08
+  ||Δu||/||u|| = 1.237e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.076e-06
+  ||ΔD||/||D|| = 1.099e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.993e-06
+  |ΔD|_∞ = 4.190e-06
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.8693e+02 J
-  → Fracture energy : 2.0484e+00 J
-  → Total energy    : 4.8898e+02 J
+  → Elastic energy  : 2.2991e+02 J
+  → Fracture energy : 6.8913e+00 J
+  → Total energy    : 2.3680e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -2724,9 +2755,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=862.08 K
+  T_new: min=263.15 K, max=1023.15 K, mean=838.20 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.887e-03
+  ||ΔT||/||T|| = 9.032e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2734,15 +2765,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.970e-04
+  ||Δu||/||u|| = 6.712e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.957e-02
+  ||ΔD||/||D|| = 4.369e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.683e-01
+  |ΔD|_∞ = 1.529e-01
 
 Convergence check
 
@@ -2755,9 +2786,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=862.08 K
+  T_new: min=263.15 K, max=1023.15 K, mean=838.20 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.944e-04
+  ||ΔT||/||T|| = 4.516e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2765,15 +2796,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.826e-05
+  ||Δu||/||u|| = 4.356e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.403e-03
+  ||ΔD||/||D|| = 3.758e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.496e-02
+  |ΔD|_∞ = 1.374e-02
 
 Convergence check
 
@@ -2786,9 +2817,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=862.08 K
+  T_new: min=263.15 K, max=1023.15 K, mean=838.20 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.972e-05
+  ||ΔT||/||T|| = 2.258e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2796,15 +2827,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.731e-06
+  ||Δu||/||u|| = 2.942e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.404e-04
+  ||ΔD||/||D|| = 2.590e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.052e-03
+  |ΔD|_∞ = 9.826e-04
 
 Convergence check
 
@@ -2817,9 +2848,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=862.08 K
+  T_new: min=263.15 K, max=1023.15 K, mean=838.20 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 9.859e-07
+  ||ΔT||/||T|| = 1.129e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2827,23 +2858,54 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.799e-07
+  ||Δu||/||u|| = 1.907e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.591e-05
+  ||ΔD||/||D|| = 1.647e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.762e-05
+  |ΔD|_∞ = 6.406e-05
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 4 iterations.
+
+#### Iteration 5/200
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for uo2, tag = 10
+  → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Linear solver
+  T_new: min=263.15 K, max=1023.15 K, mean=838.20 K
+  T^n (self.T): min=263.15 K, max=1023.15 K
+  ||ΔT||/||T|| = 5.645e-08
+  [adaptive] relax_T=0.95
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 40 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
+  Building weak form, volume integrals (dx) for uo2, tag = 10
+  Linear solver
+  ||Δu||/||u|| = 1.184e-08
+  [adaptive] relax_u=0.95
+
+**[INFO]** Assembling damage (AT1) problem...
+Solving damage problem for 'uo2' material
+  - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
+  ||ΔD||/||D|| = 1.009e-06
+  [adaptive] relax_D=0.95
+  |ΔD|_∞ = 3.950e-06
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.2435e+02 J
-  → Fracture energy : 2.1239e+00 J
-  → Total energy    : 5.2648e+02 J
+  → Elastic energy  : 2.2959e+02 J
+  → Fracture energy : 7.1645e+00 J
+  → Total energy    : 2.3675e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -2885,9 +2947,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=857.83 K
+  T_new: min=263.15 K, max=1023.15 K, mean=832.96 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.338e-03
+  ||ΔT||/||T|| = 8.429e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2895,15 +2957,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.846e-04
+  ||Δu||/||u|| = 6.342e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.721e-02
+  ||ΔD||/||D|| = 3.839e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.613e-01
+  |ΔD|_∞ = 1.441e-01
 
 Convergence check
 
@@ -2916,9 +2978,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=857.83 K
+  T_new: min=263.15 K, max=1023.15 K, mean=832.96 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.669e-04
+  ||ΔT||/||T|| = 4.214e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2926,15 +2988,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.639e-05
+  ||Δu||/||u|| = 4.063e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.208e-03
+  ||ΔD||/||D|| = 3.304e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.448e-02
+  |ΔD|_∞ = 1.293e-02
 
 Convergence check
 
@@ -2947,9 +3009,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=857.83 K
+  T_new: min=263.15 K, max=1023.15 K, mean=832.96 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.835e-05
+  ||ΔT||/||T|| = 2.107e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2957,15 +3019,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.593e-06
+  ||Δu||/||u|| = 2.749e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.263e-04
+  ||ΔD||/||D|| = 2.280e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.032e-03
+  |ΔD|_∞ = 9.205e-04
 
 Convergence check
 
@@ -2978,9 +3040,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=857.83 K
+  T_new: min=263.15 K, max=1023.15 K, mean=832.96 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 9.173e-07
+  ||ΔT||/||T|| = 1.054e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -2988,23 +3050,54 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.711e-07
+  ||Δu||/||u|| = 1.789e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.490e-05
+  ||ΔD||/||D|| = 1.452e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.649e-05
+  |ΔD|_∞ = 6.060e-05
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 4 iterations.
+
+#### Iteration 5/200
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for uo2, tag = 10
+  → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Linear solver
+  T_new: min=263.15 K, max=1023.15 K, mean=832.96 K
+  T^n (self.T): min=263.15 K, max=1023.15 K
+  ||ΔT||/||T|| = 5.268e-08
+  [adaptive] relax_T=0.95
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 40 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
+  Building weak form, volume integrals (dx) for uo2, tag = 10
+  Linear solver
+  ||Δu||/||u|| = 1.115e-08
+  [adaptive] relax_u=0.95
+
+**[INFO]** Assembling damage (AT1) problem...
+Solving damage problem for 'uo2' material
+  - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
+  ||ΔD||/||D|| = 8.907e-07
+  [adaptive] relax_D=0.95
+  |ΔD|_∞ = 3.771e-06
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 5 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.6333e+02 J
-  → Fracture energy : 2.1953e+00 J
-  → Total energy    : 5.6553e+02 J
+  → Elastic energy  : 2.2930e+02 J
+  → Fracture energy : 7.4019e+00 J
+  → Total energy    : 2.3670e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -3046,9 +3139,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=853.84 K
+  T_new: min=263.15 K, max=1023.15 K, mean=828.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 6.864e-03
+  ||ΔT||/||T|| = 7.906e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3056,15 +3149,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.812e-04
+  ||Δu||/||u|| = 5.493e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.462e-02
+  ||ΔD||/||D|| = 3.317e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.722e-01
+  |ΔD|_∞ = 1.443e-01
 
 Convergence check
 
@@ -3077,9 +3170,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=853.84 K
+  T_new: min=263.15 K, max=1023.15 K, mean=828.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.432e-04
+  ||ΔT||/||T|| = 3.953e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3087,15 +3180,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.485e-05
+  ||Δu||/||u|| = 3.652e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.995e-03
+  ||ΔD||/||D|| = 2.860e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.524e-02
+  |ΔD|_∞ = 1.289e-02
 
 Convergence check
 
@@ -3108,9 +3201,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=853.84 K
+  T_new: min=263.15 K, max=1023.15 K, mean=828.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.716e-05
+  ||ΔT||/||T|| = 1.977e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3118,15 +3211,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.467e-06
+  ||Δu||/||u|| = 2.540e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.111e-04
+  ||ΔD||/||D|| = 1.974e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.079e-03
+  |ΔD|_∞ = 9.212e-04
 
 Convergence check
 
@@ -3139,9 +3232,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=853.84 K
+  T_new: min=263.15 K, max=1023.15 K, mean=828.04 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 8.580e-07
+  ||ΔT||/||T|| = 9.883e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3149,23 +3242,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.628e-07
+  ||Δu||/||u|| = 1.676e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.386e-05
+  ||ΔD||/||D|| = 1.258e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.924e-05
+  |ΔD|_∞ = 5.972e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.0470e+02 J
-  → Fracture energy : 2.2614e+00 J
-  → Total energy    : 6.0696e+02 J
+  → Elastic energy  : 2.2904e+02 J
+  → Fracture energy : 7.6060e+00 J
+  → Total energy    : 2.3665e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -3207,9 +3300,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=850.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=823.38 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 6.450e-03
+  ||ΔT||/||T|| = 7.449e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3217,15 +3310,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.381e-04
+  ||Δu||/||u|| = 4.109e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.235e-02
+  ||ΔD||/||D|| = 2.870e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.795e-01
+  |ΔD|_∞ = 1.459e-01
 
 Convergence check
 
@@ -3238,9 +3331,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=850.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=823.38 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.225e-04
+  ||ΔT||/||T|| = 3.724e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3248,15 +3341,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.229e-05
+  ||Δu||/||u|| = 3.133e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.810e-03
+  ||ΔD||/||D|| = 2.478e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.592e-02
+  |ΔD|_∞ = 1.318e-02
 
 Convergence check
 
@@ -3269,9 +3362,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=850.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=823.38 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.612e-05
+  ||ΔT||/||T|| = 1.862e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3279,15 +3372,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.318e-06
+  ||Δu||/||u|| = 2.322e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.979e-04
+  ||ΔD||/||D|| = 1.711e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.137e-03
+  |ΔD|_∞ = 9.425e-04
 
 Convergence check
 
@@ -3300,9 +3393,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=850.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=823.38 K
   T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 8.062e-07
+  ||ΔT||/||T|| = 9.311e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3310,23 +3403,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.541e-07
+  ||Δu||/||u|| = 1.571e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.293e-05
+  ||ΔD||/||D|| = 1.092e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.397e-05
+  |ΔD|_∞ = 6.164e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.4495e+02 J
-  → Fracture energy : 2.3222e+00 J
-  → Total energy    : 6.4727e+02 J
+  → Elastic energy  : 2.2881e+02 J
+  → Fracture energy : 7.7829e+00 J
+  → Total energy    : 2.3659e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -3368,9 +3461,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=846.51 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 6.085e-03
+  T_new: min=263.15 K, max=1023.16 K, mean=818.97 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 7.045e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3378,15 +3471,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 4.019e-04
+  ||Δu||/||u|| = 3.218e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.025e-02
+  ||ΔD||/||D|| = 2.526e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.813e-01
+  |ΔD|_∞ = 1.458e-01
 
 Convergence check
 
@@ -3399,9 +3492,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=846.51 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 3.042e-04
+  T_new: min=263.15 K, max=1023.16 K, mean=818.97 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 3.522e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3409,15 +3502,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.019e-05
+  ||Δu||/||u|| = 2.840e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.635e-03
+  ||ΔD||/||D|| = 2.189e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.633e-02
+  |ΔD|_∞ = 1.328e-02
 
 Convergence check
 
@@ -3430,9 +3523,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=846.51 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.521e-05
+  T_new: min=263.15 K, max=1023.16 K, mean=818.97 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 1.761e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3446,9 +3539,9 @@ Convergence check
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.853e-04
+  ||ΔD||/||D|| = 1.511e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.174e-03
+  |ΔD|_∞ = 9.553e-04
 
 Convergence check
 
@@ -3461,9 +3554,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.15 K, mean=846.51 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.606e-07
+  T_new: min=263.15 K, max=1023.16 K, mean=818.97 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 8.806e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3471,23 +3564,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.467e-07
+  ||Δu||/||u|| = 1.503e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.206e-05
+  ||ΔD||/||D|| = 9.633e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.651e-05
+  |ΔD|_∞ = 6.228e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.8234e+02 J
-  → Fracture energy : 2.3787e+00 J
-  → Total energy    : 6.8472e+02 J
+  → Elastic energy  : 2.2859e+02 J
+  → Fracture energy : 7.9390e+00 J
+  → Total energy    : 2.3653e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -3529,9 +3622,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=843.14 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 5.761e-03
+  T_new: min=263.15 K, max=1023.16 K, mean=814.78 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 6.685e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3539,15 +3632,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.730e-04
+  ||Δu||/||u|| = 2.975e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.798e-02
+  ||ΔD||/||D|| = 2.286e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.765e-01
+  |ΔD|_∞ = 1.499e-01
 
 Convergence check
 
@@ -3560,9 +3653,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=843.14 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 2.880e-04
+  T_new: min=263.15 K, max=1023.16 K, mean=814.78 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 3.342e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3570,15 +3663,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.844e-05
+  ||Δu||/||u|| = 2.744e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.449e-03
+  ||ΔD||/||D|| = 1.987e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.600e-02
+  |ΔD|_∞ = 1.327e-02
 
 Convergence check
 
@@ -3591,9 +3684,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=843.14 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 1.440e-05
+  T_new: min=263.15 K, max=1023.16 K, mean=814.78 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 1.671e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3601,15 +3694,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.084e-06
+  ||Δu||/||u|| = 2.131e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.724e-04
+  ||ΔD||/||D|| = 1.372e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.162e-03
+  |ΔD|_∞ = 9.619e-04
 
 Convergence check
 
@@ -3622,9 +3715,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=843.14 K
-  T^n (self.T): min=263.15 K, max=1023.15 K
-  ||ΔT||/||T|| = 7.201e-07
+  T_new: min=263.15 K, max=1023.16 K, mean=814.78 K
+  T^n (self.T): min=263.15 K, max=1023.16 K
+  ||ΔT||/||T|| = 8.356e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3632,23 +3725,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.400e-07
+  ||Δu||/||u|| = 1.460e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.120e-05
+  ||ΔD||/||D|| = 8.731e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.653e-05
+  |ΔD|_∞ = 6.292e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.1620e+02 J
-  → Fracture energy : 2.4309e+00 J
-  → Total energy    : 7.1863e+02 J
+  → Elastic energy  : 2.2839e+02 J
+  → Fracture energy : 8.0795e+00 J
+  → Total energy    : 2.3647e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -3690,9 +3783,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=839.92 K
+  T_new: min=263.15 K, max=1023.16 K, mean=810.78 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.471e-03
+  ||ΔT||/||T|| = 6.362e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3700,15 +3793,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.514e-04
+  ||Δu||/||u|| = 2.905e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.571e-02
+  ||ΔD||/||D|| = 2.113e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.646e-01
+  |ΔD|_∞ = 1.577e-01
 
 Convergence check
 
@@ -3721,9 +3814,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=839.92 K
+  T_new: min=263.15 K, max=1023.16 K, mean=810.78 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.735e-04
+  ||ΔT||/||T|| = 3.181e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3731,15 +3824,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.708e-05
+  ||Δu||/||u|| = 2.689e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.257e-03
+  ||ΔD||/||D|| = 1.841e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.506e-02
+  |ΔD|_∞ = 1.402e-02
 
 Convergence check
 
@@ -3752,9 +3845,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=839.92 K
+  T_new: min=263.15 K, max=1023.16 K, mean=810.78 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.368e-05
+  ||ΔT||/||T|| = 1.591e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3762,15 +3855,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.995e-06
+  ||Δu||/||u|| = 2.082e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.589e-04
+  ||ΔD||/||D|| = 1.272e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.104e-03
+  |ΔD|_∞ = 9.873e-04
 
 Convergence check
 
@@ -3783,9 +3876,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=839.92 K
+  T_new: min=263.15 K, max=1023.16 K, mean=810.78 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.838e-07
+  ||ΔT||/||T|| = 7.953e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3793,23 +3886,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.342e-07
+  ||Δu||/||u|| = 1.423e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.031e-05
+  ||ΔD||/||D|| = 8.088e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.339e-05
+  |ΔD|_∞ = 6.313e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.4653e+02 J
-  → Fracture energy : 2.4789e+00 J
-  → Total energy    : 7.4901e+02 J
+  → Elastic energy  : 2.2820e+02 J
+  → Fracture energy : 8.2085e+00 J
+  → Total energy    : 2.3641e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -3851,9 +3944,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=836.86 K
+  T_new: min=263.15 K, max=1023.16 K, mean=806.96 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.209e-03
+  ||ΔT||/||T|| = 6.071e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3861,15 +3954,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.347e-04
+  ||Δu||/||u|| = 2.893e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.338e-02
+  ||ΔD||/||D|| = 1.960e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.567e-01
+  |ΔD|_∞ = 1.622e-01
 
 Convergence check
 
@@ -3882,9 +3975,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=836.86 K
+  T_new: min=263.15 K, max=1023.16 K, mean=806.96 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.605e-04
+  ||ΔT||/||T|| = 3.036e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3892,15 +3985,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.603e-05
+  ||Δu||/||u|| = 2.647e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.060e-03
+  ||ΔD||/||D|| = 1.715e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.394e-02
+  |ΔD|_∞ = 1.446e-02
 
 Convergence check
 
@@ -3913,9 +4006,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=836.86 K
+  T_new: min=263.15 K, max=1023.16 K, mean=806.96 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.302e-05
+  ||ΔT||/||T|| = 1.518e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3923,15 +4016,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.922e-06
+  ||Δu||/||u|| = 2.037e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.451e-04
+  ||ΔD||/||D|| = 1.187e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.025e-03
+  |ΔD|_∞ = 1.027e-03
 
 Convergence check
 
@@ -3944,9 +4037,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=836.86 K
+  T_new: min=263.15 K, max=1023.16 K, mean=806.96 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.512e-07
+  ||ΔT||/||T|| = 7.589e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -3954,23 +4047,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.294e-07
+  ||Δu||/||u|| = 1.389e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.402e-06
+  ||ΔD||/||D|| = 7.541e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.874e-05
+  |ΔD|_∞ = 6.607e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.7553e+02 J
-  → Fracture energy : 2.5229e+00 J
-  → Total energy    : 7.7805e+02 J
+  → Elastic energy  : 2.2801e+02 J
+  → Fracture energy : 8.3278e+00 J
+  → Total energy    : 2.3634e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -4012,9 +4105,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=833.93 K
+  T_new: min=263.15 K, max=1023.16 K, mean=803.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.973e-03
+  ||ΔT||/||T|| = 5.807e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4022,15 +4115,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 3.107e-04
+  ||Δu||/||u|| = 2.838e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.121e-02
+  ||ΔD||/||D|| = 1.813e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.514e-01
+  |ΔD|_∞ = 1.566e-01
 
 Convergence check
 
@@ -4043,9 +4136,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=833.93 K
+  T_new: min=263.15 K, max=1023.16 K, mean=803.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.487e-04
+  ||ΔT||/||T|| = 2.904e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4053,15 +4146,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.490e-05
+  ||Δu||/||u|| = 2.597e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.871e-03
+  ||ΔD||/||D|| = 1.594e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.357e-02
+  |ΔD|_∞ = 1.410e-02
 
 Convergence check
 
@@ -4074,9 +4167,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=833.93 K
+  T_new: min=263.15 K, max=1023.16 K, mean=803.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.243e-05
+  ||ΔT||/||T|| = 1.452e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4084,15 +4177,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.853e-06
+  ||Δu||/||u|| = 1.992e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.318e-04
+  ||ΔD||/||D|| = 1.104e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.611e-04
+  |ΔD|_∞ = 9.992e-04
 
 Convergence check
 
@@ -4105,9 +4198,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=833.93 K
+  T_new: min=263.15 K, max=1023.16 K, mean=803.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.216e-07
+  ||ΔT||/||T|| = 7.259e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4115,23 +4208,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.251e-07
+  ||Δu||/||u|| = 1.356e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.545e-06
+  ||ΔD||/||D|| = 7.001e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.267e-05
+  |ΔD|_∞ = 6.464e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.0261e+02 J
-  → Fracture energy : 2.5632e+00 J
-  → Total energy    : 8.0518e+02 J
+  → Elastic energy  : 2.2783e+02 J
+  → Fracture energy : 8.4388e+00 J
+  → Total energy    : 2.3627e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -4173,9 +4266,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=831.12 K
+  T_new: min=263.15 K, max=1023.16 K, mean=799.80 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.758e-03
+  ||ΔT||/||T|| = 5.567e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4183,15 +4276,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.893e-04
+  ||Δu||/||u|| = 2.776e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.914e-02
+  ||ΔD||/||D|| = 1.685e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.439e-01
+  |ΔD|_∞ = 1.503e-01
 
 Convergence check
 
@@ -4204,9 +4297,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=831.12 K
+  T_new: min=263.15 K, max=1023.16 K, mean=799.80 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.379e-04
+  ||ΔT||/||T|| = 2.783e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4214,15 +4307,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.391e-05
+  ||Δu||/||u|| = 2.553e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.691e-03
+  ||ΔD||/||D|| = 1.487e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.300e-02
+  |ΔD|_∞ = 1.363e-02
 
 Convergence check
 
@@ -4235,9 +4328,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=831.12 K
+  T_new: min=263.15 K, max=1023.16 K, mean=799.80 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.189e-05
+  ||ΔT||/||T|| = 1.392e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4245,15 +4338,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.792e-06
+  ||Δu||/||u|| = 1.954e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.192e-04
+  ||ΔD||/||D|| = 1.032e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.248e-04
+  |ΔD|_∞ = 9.745e-04
 
 Convergence check
 
@@ -4266,9 +4359,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=831.12 K
+  T_new: min=263.15 K, max=1023.16 K, mean=799.80 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.947e-07
+  ||ΔT||/||T|| = 6.958e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4276,23 +4369,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.211e-07
+  ||Δu||/||u|| = 1.328e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.743e-06
+  ||ΔD||/||D|| = 6.544e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.929e-05
+  |ΔD|_∞ = 6.344e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.2806e+02 J
-  → Fracture energy : 2.6004e+00 J
-  → Total energy    : 8.3066e+02 J
+  → Elastic energy  : 2.2766e+02 J
+  → Fracture energy : 8.5429e+00 J
+  → Total energy    : 2.3620e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -4334,9 +4427,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=828.43 K
+  T_new: min=263.15 K, max=1023.16 K, mean=796.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.561e-03
+  ||ΔT||/||T|| = 5.346e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4344,15 +4437,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.710e-04
+  ||Δu||/||u|| = 2.721e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.727e-02
+  ||ΔD||/||D|| = 1.564e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.343e-01
+  |ΔD|_∞ = 1.411e-01
 
 Convergence check
 
@@ -4365,9 +4458,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=828.43 K
+  T_new: min=263.15 K, max=1023.16 K, mean=796.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.281e-04
+  ||ΔT||/||T|| = 2.673e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4375,15 +4468,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.305e-05
+  ||Δu||/||u|| = 2.513e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.530e-03
+  ||ΔD||/||D|| = 1.389e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.223e-02
+  |ΔD|_∞ = 1.287e-02
 
 Convergence check
 
@@ -4396,9 +4489,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=828.43 K
+  T_new: min=263.15 K, max=1023.16 K, mean=796.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.140e-05
+  ||ΔT||/||T|| = 1.337e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4406,15 +4499,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.738e-06
+  ||Δu||/||u|| = 1.920e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.080e-04
+  ||ΔD||/||D|| = 9.684e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.729e-04
+  |ΔD|_∞ = 9.278e-04
 
 Convergence check
 
@@ -4427,9 +4520,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=828.43 K
+  T_new: min=263.15 K, max=1023.16 K, mean=796.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.702e-07
+  ||ΔT||/||T|| = 6.683e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4437,23 +4530,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.176e-07
+  ||Δu||/||u|| = 1.302e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.018e-06
+  ||ΔD||/||D|| = 6.163e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.656e-05
+  |ΔD|_∞ = 6.088e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.5251e+02 J
-  → Fracture energy : 2.6349e+00 J
-  → Total energy    : 8.5514e+02 J
+  → Elastic energy  : 2.2749e+02 J
+  → Fracture energy : 8.6409e+00 J
+  → Total energy    : 2.3613e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -4495,9 +4588,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=825.84 K
+  T_new: min=263.15 K, max=1023.16 K, mean=793.19 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.381e-03
+  ||ΔT||/||T|| = 5.144e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4505,15 +4598,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.535e-04
+  ||Δu||/||u|| = 2.684e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.562e-02
+  ||ΔD||/||D|| = 1.468e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.269e-01
+  |ΔD|_∞ = 1.316e-01
 
 Convergence check
 
@@ -4526,9 +4619,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=825.84 K
+  T_new: min=263.15 K, max=1023.16 K, mean=793.19 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.190e-04
+  ||ΔT||/||T|| = 2.572e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4536,15 +4629,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.228e-05
+  ||Δu||/||u|| = 2.481e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.386e-03
+  ||ΔD||/||D|| = 1.310e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.163e-02
+  |ΔD|_∞ = 1.209e-02
 
 Convergence check
 
@@ -4557,9 +4650,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=825.84 K
+  T_new: min=263.15 K, max=1023.16 K, mean=793.19 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.095e-05
+  ||ΔT||/||T|| = 1.286e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4567,15 +4660,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.690e-06
+  ||Δu||/||u|| = 1.890e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.807e-05
+  ||ΔD||/||D|| = 9.170e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.315e-04
+  |ΔD|_∞ = 8.755e-04
 
 Convergence check
 
@@ -4588,9 +4681,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=825.84 K
+  T_new: min=263.15 K, max=1023.16 K, mean=793.19 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.476e-07
+  ||ΔT||/||T|| = 6.430e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4598,23 +4691,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.145e-07
+  ||Δu||/||u|| = 1.280e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.387e-06
+  ||ΔD||/||D|| = 5.853e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.380e-05
+  |ΔD|_∞ = 5.734e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.7584e+02 J
-  → Fracture energy : 2.6667e+00 J
-  → Total energy    : 8.7851e+02 J
+  → Elastic energy  : 2.2732e+02 J
+  → Fracture energy : 8.7345e+00 J
+  → Total energy    : 2.3606e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -4656,9 +4749,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=823.35 K
+  T_new: min=263.15 K, max=1023.16 K, mean=790.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.214e-03
+  ||ΔT||/||T|| = 4.957e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4666,15 +4759,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.391e-04
+  ||Δu||/||u|| = 2.671e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.410e-02
+  ||ΔD||/||D|| = 1.391e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.198e-01
+  |ΔD|_∞ = 1.225e-01
 
 Convergence check
 
@@ -4687,9 +4780,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=823.35 K
+  T_new: min=263.15 K, max=1023.16 K, mean=790.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.107e-04
+  ||ΔT||/||T|| = 2.478e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4697,15 +4790,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.167e-05
+  ||Δu||/||u|| = 2.455e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.257e-03
+  ||ΔD||/||D|| = 1.251e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.103e-02
+  |ΔD|_∞ = 1.133e-02
 
 Convergence check
 
@@ -4718,9 +4811,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=823.35 K
+  T_new: min=263.15 K, max=1023.16 K, mean=790.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.054e-05
+  ||ΔT||/||T|| = 1.239e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4728,15 +4821,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.650e-06
+  ||Δu||/||u|| = 1.863e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.934e-05
+  ||ΔD||/||D|| = 8.800e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.010e-04
+  |ΔD|_∞ = 8.295e-04
 
 Convergence check
 
@@ -4749,9 +4842,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=823.35 K
+  T_new: min=263.15 K, max=1023.16 K, mean=790.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.268e-07
+  ||ΔT||/||T|| = 6.196e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4759,23 +4852,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.119e-07
+  ||Δu||/||u|| = 1.259e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.838e-06
+  ||ΔD||/||D|| = 5.630e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.246e-05
+  |ΔD|_∞ = 5.489e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.9822e+02 J
-  → Fracture energy : 2.6965e+00 J
-  → Total energy    : 9.0091e+02 J
+  → Elastic energy  : 2.2716e+02 J
+  → Fracture energy : 8.8244e+00 J
+  → Total energy    : 2.3598e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -4817,9 +4910,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=820.94 K
+  T_new: min=263.15 K, max=1023.16 K, mean=787.05 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.061e-03
+  ||ΔT||/||T|| = 4.784e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4827,15 +4920,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.284e-04
+  ||Δu||/||u|| = 2.660e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.279e-02
+  ||ΔD||/||D|| = 1.339e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.110e-01
+  |ΔD|_∞ = 1.142e-01
 
 Convergence check
 
@@ -4848,9 +4941,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=820.94 K
+  T_new: min=263.15 K, max=1023.16 K, mean=787.05 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.030e-04
+  ||ΔT||/||T|| = 2.392e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4858,15 +4951,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.120e-05
+  ||Δu||/||u|| = 2.432e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.147e-03
+  ||ΔD||/||D|| = 1.208e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.031e-02
+  |ΔD|_∞ = 1.062e-02
 
 Convergence check
 
@@ -4879,9 +4972,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=820.94 K
+  T_new: min=263.15 K, max=1023.16 K, mean=787.05 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.015e-05
+  ||ΔT||/||T|| = 1.196e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4889,15 +4982,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.618e-06
+  ||Δu||/||u|| = 1.839e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.196e-05
+  ||ΔD||/||D|| = 8.518e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.478e-04
+  |ΔD|_∞ = 7.783e-04
 
 Convergence check
 
@@ -4910,9 +5003,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=820.94 K
+  T_new: min=263.15 K, max=1023.16 K, mean=787.05 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.076e-07
+  ||ΔT||/||T|| = 5.980e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4920,23 +5013,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.096e-07
+  ||Δu||/||u|| = 1.240e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.374e-06
+  ||ΔD||/||D|| = 5.464e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.880e-05
+  |ΔD|_∞ = 5.150e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.2007e+02 J
-  → Fracture energy : 2.7247e+00 J
-  → Total energy    : 9.2279e+02 J
+  → Elastic energy  : 2.2700e+02 J
+  → Fracture energy : 8.9109e+00 J
+  → Total energy    : 2.3591e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -4978,9 +5071,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=818.62 K
+  T_new: min=263.15 K, max=1023.16 K, mean=784.13 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.918e-03
+  ||ΔT||/||T|| = 4.623e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -4988,15 +5081,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.213e-04
+  ||Δu||/||u|| = 2.662e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.173e-02
+  ||ΔD||/||D|| = 1.292e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.024e-01
+  |ΔD|_∞ = 1.075e-01
 
 Convergence check
 
@@ -5009,9 +5102,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=818.62 K
+  T_new: min=263.15 K, max=1023.16 K, mean=784.13 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.959e-04
+  ||ΔT||/||T|| = 2.311e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5019,15 +5112,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.085e-05
+  ||Δu||/||u|| = 2.412e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.058e-03
+  ||ΔD||/||D|| = 1.175e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.520e-03
+  |ΔD|_∞ = 1.011e-02
 
 Convergence check
 
@@ -5040,9 +5133,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=818.62 K
+  T_new: min=263.15 K, max=1023.16 K, mean=784.13 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 9.795e-06
+  ||ΔT||/||T|| = 1.156e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5050,15 +5143,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.591e-06
+  ||Δu||/||u|| = 1.816e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.610e-05
+  ||ΔD||/||D|| = 8.327e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.978e-04
+  |ΔD|_∞ = 7.467e-04
 
 Convergence check
 
@@ -5071,9 +5164,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=818.62 K
+  T_new: min=263.15 K, max=1023.16 K, mean=784.13 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.898e-07
+  ||ΔT||/||T|| = 5.779e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5081,23 +5174,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.077e-07
+  ||Δu||/||u|| = 1.222e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.010e-06
+  ||ΔD||/||D|| = 5.354e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.615e-05
+  |ΔD|_∞ = 4.966e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.4170e+02 J
-  → Fracture energy : 2.7515e+00 J
-  → Total energy    : 9.4445e+02 J
+  → Elastic energy  : 2.2684e+02 J
+  → Fracture energy : 8.9951e+00 J
+  → Total energy    : 2.3584e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -5139,9 +5232,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=816.38 K
+  T_new: min=263.15 K, max=1023.16 K, mean=781.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.785e-03
+  ||ΔT||/||T|| = 4.473e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5149,15 +5242,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.170e-04
+  ||Δu||/||u|| = 2.676e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.085e-02
+  ||ΔD||/||D|| = 1.262e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.749e-02
+  |ΔD|_∞ = 9.779e-02
 
 Convergence check
 
@@ -5170,9 +5263,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=816.38 K
+  T_new: min=263.15 K, max=1023.16 K, mean=781.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.893e-04
+  ||ΔT||/||T|| = 2.237e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5180,15 +5273,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.059e-05
+  ||Δu||/||u|| = 2.395e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.892e-04
+  ||ΔD||/||D|| = 1.152e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.173e-03
+  |ΔD|_∞ = 9.303e-03
 
 Convergence check
 
@@ -5201,9 +5294,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=816.38 K
+  T_new: min=263.15 K, max=1023.16 K, mean=781.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 9.464e-06
+  ||ΔT||/||T|| = 1.118e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5211,15 +5304,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.569e-06
+  ||Δu||/||u|| = 1.795e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.153e-05
+  ||ΔD||/||D|| = 8.197e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.735e-04
+  |ΔD|_∞ = 6.878e-04
 
 Convergence check
 
@@ -5232,9 +5325,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=816.38 K
+  T_new: min=263.15 K, max=1023.16 K, mean=781.31 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.732e-07
+  ||ΔT||/||T|| = 5.592e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5242,23 +5335,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.060e-07
+  ||Δu||/||u|| = 1.205e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.723e-06
+  ||ΔD||/||D|| = 5.286e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.447e-05
+  |ΔD|_∞ = 4.569e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.6337e+02 J
-  → Fracture energy : 2.7769e+00 J
-  → Total energy    : 9.6614e+02 J
+  → Elastic energy  : 2.2668e+02 J
+  → Fracture energy : 9.0775e+00 J
+  → Total energy    : 2.3576e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -5300,9 +5393,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=814.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=778.58 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.662e-03
+  ||ΔT||/||T|| = 4.334e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5310,15 +5403,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.149e-04
+  ||Δu||/||u|| = 2.694e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.023e-02
+  ||ΔD||/||D|| = 1.230e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 9.049e-02
+  |ΔD|_∞ = 9.171e-02
 
 Convergence check
 
@@ -5331,9 +5424,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=814.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=778.58 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.831e-04
+  ||ΔT||/||T|| = 2.167e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5341,15 +5434,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.040e-05
+  ||Δu||/||u|| = 2.379e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.419e-04
+  ||ΔD||/||D|| = 1.133e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.565e-03
+  |ΔD|_∞ = 8.812e-03
 
 Convergence check
 
@@ -5362,9 +5455,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=814.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=778.58 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 9.154e-06
+  ||ΔT||/||T|| = 1.083e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5372,15 +5465,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.550e-06
+  ||Δu||/||u|| = 1.775e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.845e-05
+  ||ΔD||/||D|| = 8.094e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.277e-04
+  |ΔD|_∞ = 6.661e-04
 
 Convergence check
 
@@ -5393,9 +5486,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=814.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=778.58 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.577e-07
+  ||ΔT||/||T|| = 5.417e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5403,23 +5496,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.045e-07
+  ||Δu||/||u|| = 1.189e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.529e-06
+  ||ΔD||/||D|| = 5.234e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.187e-05
+  |ΔD|_∞ = 4.519e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.8529e+02 J
-  → Fracture energy : 2.8012e+00 J
-  → Total energy    : 9.8809e+02 J
+  → Elastic energy  : 2.2653e+02 J
+  → Fracture energy : 9.1589e+00 J
+  → Total energy    : 2.3569e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -5461,9 +5554,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=812.11 K
+  T_new: min=263.15 K, max=1023.16 K, mean=775.93 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.546e-03
+  ||ΔT||/||T|| = 4.203e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5471,15 +5564,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.144e-04
+  ||Δu||/||u|| = 2.696e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.763e-03
+  ||ΔD||/||D|| = 1.202e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.666e-02
+  |ΔD|_∞ = 9.114e-02
 
 Convergence check
 
@@ -5492,9 +5585,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=812.11 K
+  T_new: min=263.15 K, max=1023.16 K, mean=775.93 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.773e-04
+  ||ΔT||/||T|| = 2.101e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5502,15 +5595,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.025e-05
+  ||Δu||/||u|| = 2.356e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.078e-04
+  ||ΔD||/||D|| = 1.111e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.243e-03
+  |ΔD|_∞ = 8.772e-03
 
 Convergence check
 
@@ -5523,9 +5616,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=812.11 K
+  T_new: min=263.15 K, max=1023.16 K, mean=775.93 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 8.865e-06
+  ||ΔT||/||T|| = 1.051e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5533,15 +5626,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.533e-06
+  ||Δu||/||u|| = 1.752e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.620e-05
+  ||ΔD||/||D|| = 7.971e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.106e-04
+  |ΔD|_∞ = 6.588e-04
 
 Convergence check
 
@@ -5554,9 +5647,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=812.11 K
+  T_new: min=263.15 K, max=1023.16 K, mean=775.93 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.433e-07
+  ||ΔT||/||T|| = 5.253e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5564,23 +5657,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.032e-07
+  ||Δu||/||u|| = 1.172e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.383e-06
+  ||ΔD||/||D|| = 5.168e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.065e-05
+  |ΔD|_∞ = 4.452e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0077e+03 J
-  → Fracture energy : 2.8246e+00 J
-  → Total energy    : 1.0106e+03 J
+  → Elastic energy  : 2.2637e+02 J
+  → Fracture energy : 9.2388e+00 J
+  → Total energy    : 2.3561e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -5622,9 +5715,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=810.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=773.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.438e-03
+  ||ΔT||/||T|| = 4.080e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5632,15 +5725,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.149e-04
+  ||Δu||/||u|| = 2.681e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.422e-03
+  ||ΔD||/||D|| = 1.168e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 8.107e-02
+  |ΔD|_∞ = 8.947e-02
 
 Convergence check
 
@@ -5653,9 +5746,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=810.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=773.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.719e-04
+  ||ΔT||/||T|| = 2.040e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5663,15 +5756,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.014e-05
+  ||Δu||/||u|| = 2.331e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.839e-04
+  ||ΔD||/||D|| = 1.086e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.743e-03
+  |ΔD|_∞ = 8.654e-03
 
 Convergence check
 
@@ -5684,9 +5777,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=810.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=773.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 8.594e-06
+  ||ΔT||/||T|| = 1.020e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5694,15 +5787,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.518e-06
+  ||Δu||/||u|| = 1.729e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.461e-05
+  ||ΔD||/||D|| = 7.819e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.727e-04
+  |ΔD|_∞ = 6.482e-04
 
 Convergence check
 
@@ -5715,9 +5808,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=810.07 K
+  T_new: min=263.15 K, max=1023.16 K, mean=773.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.297e-07
+  ||ΔT||/||T|| = 5.100e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5725,23 +5818,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.020e-07
+  ||Δu||/||u|| = 1.156e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.279e-06
+  ||ΔD||/||D|| = 5.085e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.845e-05
+  |ΔD|_∞ = 4.391e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0308e+03 J
-  → Fracture energy : 2.8472e+00 J
-  → Total energy    : 1.0337e+03 J
+  → Elastic energy  : 2.2622e+02 J
+  → Fracture energy : 9.3170e+00 J
+  → Total energy    : 2.3554e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -5783,9 +5876,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=808.10 K
+  T_new: min=263.15 K, max=1023.16 K, mean=770.86 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.336e-03
+  ||ΔT||/||T|| = 3.965e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5793,15 +5886,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.153e-04
+  ||Δu||/||u|| = 2.650e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.193e-03
+  ||ΔD||/||D|| = 1.135e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.903e-02
+  |ΔD|_∞ = 8.806e-02
 
 Convergence check
 
@@ -5814,9 +5907,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=808.10 K
+  T_new: min=263.15 K, max=1023.16 K, mean=770.86 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.668e-04
+  ||ΔT||/||T|| = 1.982e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5824,15 +5917,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.003e-05
+  ||Δu||/||u|| = 2.302e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.699e-04
+  ||ΔD||/||D|| = 1.059e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.594e-03
+  |ΔD|_∞ = 8.529e-03
 
 Convergence check
 
@@ -5845,9 +5938,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=808.10 K
+  T_new: min=263.15 K, max=1023.16 K, mean=770.86 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 8.340e-06
+  ||ΔT||/||T|| = 9.911e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5855,15 +5948,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.504e-06
+  ||Δu||/||u|| = 1.706e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.373e-05
+  ||ΔD||/||D|| = 7.648e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.653e-04
+  |ΔD|_∞ = 6.434e-04
 
 Convergence check
 
@@ -5876,9 +5969,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=808.10 K
+  T_new: min=263.15 K, max=1023.16 K, mean=770.86 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.170e-07
+  ||ΔT||/||T|| = 4.956e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5886,23 +5979,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.008e-07
+  ||Δu||/||u|| = 1.140e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.221e-06
+  ||ΔD||/||D|| = 4.988e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.776e-05
+  |ΔD|_∞ = 4.361e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0544e+03 J
-  → Fracture energy : 2.8692e+00 J
-  → Total energy    : 1.0572e+03 J
+  → Elastic energy  : 2.2607e+02 J
+  → Fracture energy : 9.3933e+00 J
+  → Total energy    : 2.3546e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -5944,9 +6037,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=806.18 K
+  T_new: min=263.15 K, max=1023.16 K, mean=768.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.240e-03
+  ||ΔT||/||T|| = 3.856e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5954,15 +6047,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.165e-04
+  ||Δu||/||u|| = 2.615e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.117e-03
+  ||ΔD||/||D|| = 1.097e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.503e-02
+  |ΔD|_∞ = 8.381e-02
 
 Convergence check
 
@@ -5975,9 +6068,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=806.18 K
+  T_new: min=263.15 K, max=1023.16 K, mean=768.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.620e-04
+  ||ΔT||/||T|| = 1.928e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -5985,15 +6078,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.995e-05
+  ||Δu||/||u|| = 2.273e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.640e-04
+  ||ΔD||/||D|| = 1.029e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.227e-03
+  |ΔD|_∞ = 8.185e-03
 
 Convergence check
 
@@ -6006,9 +6099,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=806.18 K
+  T_new: min=263.15 K, max=1023.16 K, mean=768.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 8.100e-06
+  ||ΔT||/||T|| = 9.639e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6016,15 +6109,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.491e-06
+  ||Δu||/||u|| = 1.683e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.334e-05
+  ||ΔD||/||D|| = 7.467e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.419e-04
+  |ΔD|_∞ = 6.176e-04
 
 Convergence check
 
@@ -6037,9 +6130,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=806.18 K
+  T_new: min=263.15 K, max=1023.16 K, mean=768.43 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.050e-07
+  ||ΔT||/||T|| = 4.820e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6047,23 +6140,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.977e-08
+  ||Δu||/||u|| = 1.124e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.192e-06
+  ||ΔD||/||D|| = 4.884e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.651e-05
+  |ΔD|_∞ = 4.177e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0781e+03 J
-  → Fracture energy : 2.8906e+00 J
-  → Total energy    : 1.0810e+03 J
+  → Elastic energy  : 2.2592e+02 J
+  → Fracture energy : 9.4680e+00 J
+  → Total energy    : 2.3539e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -6105,9 +6198,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=804.31 K
+  T_new: min=263.15 K, max=1023.16 K, mean=766.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.150e-03
+  ||ΔT||/||T|| = 3.753e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6115,15 +6208,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.184e-04
+  ||Δu||/||u|| = 2.582e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.076e-03
+  ||ΔD||/||D|| = 1.060e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 7.188e-02
+  |ΔD|_∞ = 8.332e-02
 
 Convergence check
 
@@ -6136,9 +6229,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=804.31 K
+  T_new: min=263.15 K, max=1023.16 K, mean=766.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.575e-04
+  ||ΔT||/||T|| = 1.877e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6146,15 +6239,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.987e-05
+  ||Δu||/||u|| = 2.243e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.626e-04
+  ||ΔD||/||D|| = 9.986e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.963e-03
+  |ΔD|_∞ = 8.080e-03
 
 Convergence check
 
@@ -6167,9 +6260,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=804.31 K
+  T_new: min=263.15 K, max=1023.16 K, mean=766.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 7.874e-06
+  ||ΔT||/||T|| = 9.383e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6177,15 +6270,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.479e-06
+  ||Δu||/||u|| = 1.660e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.330e-05
+  ||ΔD||/||D|| = 7.269e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.201e-04
+  |ΔD|_∞ = 6.072e-04
 
 Convergence check
 
@@ -6198,9 +6291,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=804.31 K
+  T_new: min=263.15 K, max=1023.16 K, mean=766.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.937e-07
+  ||ΔT||/||T|| = 4.691e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6208,23 +6301,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.870e-08
+  ||Δu||/||u|| = 1.108e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.188e-06
+  ||ΔD||/||D|| = 4.767e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.482e-05
+  |ΔD|_∞ = 4.095e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1021e+03 J
-  → Fracture energy : 2.9119e+00 J
-  → Total energy    : 1.1050e+03 J
+  → Elastic energy  : 2.2577e+02 J
+  → Fracture energy : 9.5408e+00 J
+  → Total energy    : 2.3532e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -6266,9 +6359,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=802.49 K
+  T_new: min=263.15 K, max=1023.16 K, mean=763.77 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.064e-03
+  ||ΔT||/||T|| = 3.656e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6276,15 +6369,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.198e-04
+  ||Δu||/||u|| = 2.545e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.135e-03
+  ||ΔD||/||D|| = 1.021e-02
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.959e-02
+  |ΔD|_∞ = 8.227e-02
 
 Convergence check
 
@@ -6297,9 +6390,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=802.49 K
+  T_new: min=263.15 K, max=1023.16 K, mean=763.77 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.532e-04
+  ||ΔT||/||T|| = 1.828e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6307,15 +6400,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.972e-05
+  ||Δu||/||u|| = 2.213e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.677e-04
+  ||ΔD||/||D|| = 9.647e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.767e-03
+  |ΔD|_∞ = 7.960e-03
 
 Convergence check
 
@@ -6328,9 +6421,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=802.49 K
+  T_new: min=263.15 K, max=1023.16 K, mean=763.77 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 7.661e-06
+  ||ΔT||/||T|| = 9.140e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6338,15 +6431,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.462e-06
+  ||Δu||/||u|| = 1.638e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.366e-05
+  ||ΔD||/||D|| = 7.042e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.093e-04
+  |ΔD|_∞ = 6.006e-04
 
 Convergence check
 
@@ -6359,9 +6452,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=802.49 K
+  T_new: min=263.15 K, max=1023.16 K, mean=763.77 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.831e-07
+  ||ΔT||/||T|| = 4.570e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6369,23 +6462,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.745e-08
+  ||Δu||/||u|| = 1.093e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.208e-06
+  ||ΔD||/||D|| = 4.631e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.438e-05
+  |ΔD|_∞ = 4.074e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1265e+03 J
-  → Fracture energy : 2.9335e+00 J
-  → Total energy    : 1.1295e+03 J
+  → Elastic energy  : 2.2563e+02 J
+  → Fracture energy : 9.6114e+00 J
+  → Total energy    : 2.3524e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -6427,9 +6520,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=800.72 K
+  T_new: min=263.15 K, max=1023.16 K, mean=761.53 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.984e-03
+  ||ΔT||/||T|| = 3.564e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6437,15 +6530,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.212e-04
+  ||Δu||/||u|| = 2.511e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.193e-03
+  ||ΔD||/||D|| = 9.830e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.592e-02
+  |ΔD|_∞ = 8.079e-02
 
 Convergence check
 
@@ -6458,9 +6551,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=800.72 K
+  T_new: min=263.15 K, max=1023.16 K, mean=761.53 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.492e-04
+  ||ΔT||/||T|| = 1.782e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6468,15 +6561,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.956e-05
+  ||Δu||/||u|| = 2.185e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.734e-04
+  ||ΔD||/||D|| = 9.335e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.411e-03
+  |ΔD|_∞ = 7.888e-03
 
 Convergence check
 
@@ -6489,9 +6582,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=800.72 K
+  T_new: min=263.15 K, max=1023.16 K, mean=761.53 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 7.459e-06
+  ||ΔT||/||T|| = 8.911e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6499,15 +6592,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.445e-06
+  ||Δu||/||u|| = 1.617e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.406e-05
+  ||ΔD||/||D|| = 6.833e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.848e-04
+  |ΔD|_∞ = 5.955e-04
 
 Convergence check
 
@@ -6520,9 +6613,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=800.72 K
+  T_new: min=263.15 K, max=1023.16 K, mean=761.53 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.730e-07
+  ||ΔT||/||T|| = 4.455e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6530,23 +6623,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.617e-08
+  ||Δu||/||u|| = 1.079e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.233e-06
+  ||ΔD||/||D|| = 4.502e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.292e-05
+  |ΔD|_∞ = 4.030e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1517e+03 J
-  → Fracture energy : 2.9553e+00 J
-  → Total energy    : 1.1546e+03 J
+  → Elastic energy  : 2.2549e+02 J
+  → Fracture energy : 9.6807e+00 J
+  → Total energy    : 2.3517e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -6588,9 +6681,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=799.00 K
+  T_new: min=263.15 K, max=1023.16 K, mean=759.35 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.907e-03
+  ||ΔT||/||T|| = 3.477e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6598,15 +6691,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.220e-04
+  ||Δu||/||u|| = 2.472e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.133e-03
+  ||ΔD||/||D|| = 9.442e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.430e-02
+  |ΔD|_∞ = 7.946e-02
 
 Convergence check
 
@@ -6619,9 +6712,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=799.00 K
+  T_new: min=263.15 K, max=1023.16 K, mean=759.35 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.454e-04
+  ||ΔT||/||T|| = 1.739e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6629,15 +6722,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.938e-05
+  ||Δu||/||u|| = 2.156e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.702e-04
+  ||ΔD||/||D|| = 8.986e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.298e-03
+  |ΔD|_∞ = 7.748e-03
 
 Convergence check
 
@@ -6650,9 +6743,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=799.00 K
+  T_new: min=263.15 K, max=1023.16 K, mean=759.35 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 7.268e-06
+  ||ΔT||/||T|| = 8.693e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6660,15 +6753,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.427e-06
+  ||Δu||/||u|| = 1.596e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.398e-05
+  ||ΔD||/||D|| = 6.593e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.751e-04
+  |ΔD|_∞ = 5.875e-04
 
 Convergence check
 
@@ -6681,9 +6774,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=799.00 K
+  T_new: min=263.15 K, max=1023.16 K, mean=759.35 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.634e-07
+  ||ΔT||/||T|| = 4.346e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6691,23 +6784,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.488e-08
+  ||Δu||/||u|| = 1.065e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.233e-06
+  ||ΔD||/||D|| = 4.353e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.210e-05
+  |ΔD|_∞ = 4.000e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1779e+03 J
-  → Fracture energy : 2.9772e+00 J
-  → Total energy    : 1.1809e+03 J
+  → Elastic energy  : 2.2535e+02 J
+  → Fracture energy : 9.7485e+00 J
+  → Total energy    : 2.3509e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -6749,9 +6842,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=797.32 K
+  T_new: min=263.15 K, max=1023.16 K, mean=757.22 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.835e-03
+  ||ΔT||/||T|| = 3.394e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6759,15 +6852,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.213e-04
+  ||Δu||/||u|| = 2.418e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 9.008e-03
+  ||ΔD||/||D|| = 9.022e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.355e-02
+  |ΔD|_∞ = 7.600e-02
 
 Convergence check
 
@@ -6780,9 +6873,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=797.32 K
+  T_new: min=263.15 K, max=1023.16 K, mean=757.22 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.417e-04
+  ||ΔT||/||T|| = 1.697e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6790,15 +6883,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.917e-05
+  ||Δu||/||u|| = 2.124e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.611e-04
+  ||ΔD||/||D|| = 8.622e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.179e-03
+  |ΔD|_∞ = 7.405e-03
 
 Convergence check
 
@@ -6811,9 +6904,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=797.32 K
+  T_new: min=263.15 K, max=1023.16 K, mean=757.22 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 7.087e-06
+  ||ΔT||/||T|| = 8.486e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6821,15 +6914,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.409e-06
+  ||Δu||/||u|| = 1.574e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.337e-05
+  ||ΔD||/||D|| = 6.344e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.645e-04
+  |ΔD|_∞ = 5.611e-04
 
 Convergence check
 
@@ -6842,9 +6935,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=797.32 K
+  T_new: min=263.15 K, max=1023.16 K, mean=757.22 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.543e-07
+  ||ΔT||/||T|| = 4.243e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6852,23 +6945,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.360e-08
+  ||Δu||/||u|| = 1.051e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.196e-06
+  ||ΔD||/||D|| = 4.198e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.141e-05
+  |ΔD|_∞ = 3.806e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2053e+03 J
-  → Fracture energy : 2.9990e+00 J
-  → Total energy    : 1.2083e+03 J
+  → Elastic energy  : 2.2521e+02 J
+  → Fracture energy : 9.8142e+00 J
+  → Total energy    : 2.3502e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -6910,9 +7003,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=795.68 K
+  T_new: min=263.15 K, max=1023.16 K, mean=755.14 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.766e-03
+  ||ΔT||/||T|| = 3.316e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6920,15 +7013,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.186e-04
+  ||Δu||/||u|| = 2.361e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.896e-03
+  ||ΔD||/||D|| = 8.647e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.557e-02
+  |ΔD|_∞ = 7.521e-02
 
 Convergence check
 
@@ -6941,9 +7034,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=795.68 K
+  T_new: min=263.15 K, max=1023.16 K, mean=755.14 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.383e-04
+  ||ΔT||/||T|| = 1.658e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6951,15 +7044,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.892e-05
+  ||Δu||/||u|| = 2.091e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.483e-04
+  ||ΔD||/||D|| = 8.272e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.423e-03
+  |ΔD|_∞ = 7.337e-03
 
 Convergence check
 
@@ -6972,9 +7065,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=795.68 K
+  T_new: min=263.15 K, max=1023.16 K, mean=755.14 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.914e-06
+  ||ΔT||/||T|| = 8.289e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -6982,15 +7075,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.390e-06
+  ||Δu||/||u|| = 1.553e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.240e-05
+  ||ΔD||/||D|| = 6.096e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.855e-04
+  |ΔD|_∞ = 5.589e-04
 
 Convergence check
 
@@ -7003,9 +7096,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=795.68 K
+  T_new: min=263.15 K, max=1023.16 K, mean=755.14 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.457e-07
+  ||ΔT||/||T|| = 4.144e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7013,23 +7106,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.231e-08
+  ||Δu||/||u|| = 1.037e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.132e-06
+  ||ΔD||/||D|| = 4.040e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.288e-05
+  |ΔD|_∞ = 3.816e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2332e+03 J
-  → Fracture energy : 3.0206e+00 J
-  → Total energy    : 1.2363e+03 J
+  → Elastic energy  : 2.2507e+02 J
+  → Fracture energy : 9.8780e+00 J
+  → Total energy    : 2.3495e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -7071,9 +7164,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=794.08 K
+  T_new: min=263.15 K, max=1023.16 K, mean=753.10 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.700e-03
+  ||ΔT||/||T|| = 3.240e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7081,15 +7174,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.151e-04
+  ||Δu||/||u|| = 2.311e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.652e-03
+  ||ΔD||/||D|| = 8.263e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.637e-02
+  |ΔD|_∞ = 7.311e-02
 
 Convergence check
 
@@ -7102,9 +7195,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=794.08 K
+  T_new: min=263.15 K, max=1023.16 K, mean=753.10 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.350e-04
+  ||ΔT||/||T|| = 1.620e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7112,15 +7205,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.864e-05
+  ||Δu||/||u|| = 2.061e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.266e-04
+  ||ΔD||/||D|| = 7.954e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.471e-03
+  |ΔD|_∞ = 7.098e-03
 
 Convergence check
 
@@ -7133,9 +7226,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=794.08 K
+  T_new: min=263.15 K, max=1023.16 K, mean=753.10 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.750e-06
+  ||ΔT||/||T|| = 8.101e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7143,15 +7236,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.370e-06
+  ||Δu||/||u|| = 1.533e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.090e-05
+  ||ΔD||/||D|| = 5.880e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.893e-04
+  |ΔD|_∞ = 5.388e-04
 
 Convergence check
 
@@ -7164,9 +7257,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=794.08 K
+  T_new: min=263.15 K, max=1023.16 K, mean=753.10 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.375e-07
+  ||ΔT||/||T|| = 4.051e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7174,23 +7267,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.101e-08
+  ||Δu||/||u|| = 1.024e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.037e-06
+  ||ΔD||/||D|| = 3.906e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.320e-05
+  |ΔD|_∞ = 3.695e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2611e+03 J
-  → Fracture energy : 3.0417e+00 J
-  → Total energy    : 1.2641e+03 J
+  → Elastic energy  : 2.2494e+02 J
+  → Fracture energy : 9.9399e+00 J
+  → Total energy    : 2.3488e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -7232,9 +7325,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=792.52 K
+  T_new: min=263.15 K, max=1023.16 K, mean=751.12 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.637e-03
+  ||ΔT||/||T|| = 3.169e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7242,15 +7335,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.121e-04
+  ||Δu||/||u|| = 2.266e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.356e-03
+  ||ΔD||/||D|| = 7.984e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.502e-02
+  |ΔD|_∞ = 7.293e-02
 
 Convergence check
 
@@ -7263,9 +7356,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=792.52 K
+  T_new: min=263.15 K, max=1023.16 K, mean=751.12 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.319e-04
+  ||ΔT||/||T|| = 1.584e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7273,15 +7366,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.839e-05
+  ||Δu||/||u|| = 2.033e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.001e-04
+  ||ΔD||/||D|| = 7.683e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.393e-03
+  |ΔD|_∞ = 7.115e-03
 
 Convergence check
 
@@ -7294,9 +7387,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=792.52 K
+  T_new: min=263.15 K, max=1023.16 K, mean=751.12 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.594e-06
+  ||ΔT||/||T|| = 7.922e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7304,15 +7397,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.351e-06
+  ||Δu||/||u|| = 1.513e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.901e-05
+  ||ΔD||/||D|| = 5.686e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.864e-04
+  |ΔD|_∞ = 5.352e-04
 
 Convergence check
 
@@ -7325,9 +7418,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=792.52 K
+  T_new: min=263.15 K, max=1023.16 K, mean=751.12 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.297e-07
+  ||ΔT||/||T|| = 3.961e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7335,23 +7428,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.978e-08
+  ||Δu||/||u|| = 1.011e-07
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.915e-06
+  ||ΔD||/||D|| = 3.782e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.316e-05
+  |ΔD|_∞ = 3.607e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2887e+03 J
-  → Fracture energy : 3.0624e+00 J
-  → Total energy    : 1.2917e+03 J
+  → Elastic energy  : 2.2480e+02 J
+  → Fracture energy : 1.0000e+01 J
+  → Total energy    : 2.3480e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -7393,9 +7486,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=790.99 K
+  T_new: min=263.15 K, max=1023.16 K, mean=749.18 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.578e-03
+  ||ΔT||/||T|| = 3.101e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7403,15 +7496,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.094e-04
+  ||Δu||/||u|| = 2.225e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 8.060e-03
+  ||ΔD||/||D|| = 7.687e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.568e-02
+  |ΔD|_∞ = 7.089e-02
 
 Convergence check
 
@@ -7424,9 +7517,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=790.99 K
+  T_new: min=263.15 K, max=1023.16 K, mean=749.18 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.289e-04
+  ||ΔT||/||T|| = 1.550e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7434,15 +7527,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.814e-05
+  ||Δu||/||u|| = 2.006e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.740e-04
+  ||ΔD||/||D|| = 7.417e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.403e-03
+  |ΔD|_∞ = 6.925e-03
 
 Convergence check
 
@@ -7455,9 +7548,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=790.99 K
+  T_new: min=263.15 K, max=1023.16 K, mean=749.18 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.444e-06
+  ||ΔT||/||T|| = 7.752e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7465,15 +7558,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.333e-06
+  ||Δu||/||u|| = 1.495e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.714e-05
+  ||ΔD||/||D|| = 5.498e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.809e-04
+  |ΔD|_∞ = 5.237e-04
 
 Convergence check
 
@@ -7486,9 +7579,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=790.99 K
+  T_new: min=263.15 K, max=1023.16 K, mean=749.18 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.222e-07
+  ||ΔT||/||T|| = 3.876e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7496,23 +7589,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.859e-08
+  ||Δu||/||u|| = 9.994e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.790e-06
+  ||ΔD||/||D|| = 3.663e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.284e-05
+  |ΔD|_∞ = 3.552e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3162e+03 J
-  → Fracture energy : 3.0827e+00 J
-  → Total energy    : 1.3193e+03 J
+  → Elastic energy  : 2.2467e+02 J
+  → Fracture energy : 1.0059e+01 J
+  → Total energy    : 2.3473e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -7554,9 +7647,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=789.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=747.28 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.521e-03
+  ||ΔT||/||T|| = 3.035e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7564,15 +7657,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.061e-04
+  ||Δu||/||u|| = 2.184e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.792e-03
+  ||ΔD||/||D|| = 7.417e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.547e-02
+  |ΔD|_∞ = 7.093e-02
 
 Convergence check
 
@@ -7585,9 +7678,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=789.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=747.28 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.260e-04
+  ||ΔT||/||T|| = 1.518e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7595,15 +7688,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.789e-05
+  ||Δu||/||u|| = 1.981e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.470e-04
+  ||ΔD||/||D|| = 7.182e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.371e-03
+  |ΔD|_∞ = 6.939e-03
 
 Convergence check
 
@@ -7616,9 +7709,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=789.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=747.28 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.302e-06
+  ||ΔT||/||T|| = 7.588e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7626,15 +7719,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.316e-06
+  ||Δu||/||u|| = 1.478e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.509e-05
+  ||ΔD||/||D|| = 5.338e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.793e-04
+  |ΔD|_∞ = 5.216e-04
 
 Convergence check
 
@@ -7647,9 +7740,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=789.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=747.28 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.151e-07
+  ||ΔT||/||T|| = 3.794e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7657,23 +7750,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.742e-08
+  ||Δu||/||u|| = 9.880e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.654e-06
+  ||ΔD||/||D|| = 3.563e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.234e-05
+  |ΔD|_∞ = 3.509e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3436e+03 J
-  → Fracture energy : 3.1024e+00 J
-  → Total energy    : 1.3467e+03 J
+  → Elastic energy  : 2.2454e+02 J
+  → Fracture energy : 1.0116e+01 J
+  → Total energy    : 2.3466e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -7715,9 +7808,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=788.04 K
+  T_new: min=263.15 K, max=1023.16 K, mean=745.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.466e-03
+  ||ΔT||/||T|| = 2.973e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7725,15 +7818,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 2.024e-04
+  ||Δu||/||u|| = 2.150e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.467e-03
+  ||ΔD||/||D|| = 7.167e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.333e-02
+  |ΔD|_∞ = 7.107e-02
 
 Convergence check
 
@@ -7746,9 +7839,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=788.04 K
+  T_new: min=263.15 K, max=1023.16 K, mean=745.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.233e-04
+  ||ΔT||/||T|| = 1.486e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7756,15 +7849,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.763e-05
+  ||Δu||/||u|| = 1.958e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.170e-04
+  ||ΔD||/||D|| = 6.942e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.222e-03
+  |ΔD|_∞ = 6.970e-03
 
 Convergence check
 
@@ -7777,9 +7870,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=788.04 K
+  T_new: min=263.15 K, max=1023.16 K, mean=745.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.166e-06
+  ||ΔT||/||T|| = 7.432e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7787,15 +7880,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.298e-06
+  ||Δu||/||u|| = 1.461e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.292e-05
+  ||ΔD||/||D|| = 5.169e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.713e-04
+  |ΔD|_∞ = 5.270e-04
 
 Convergence check
 
@@ -7808,9 +7901,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=788.04 K
+  T_new: min=263.15 K, max=1023.16 K, mean=745.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.083e-07
+  ||ΔT||/||T|| = 3.716e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7818,23 +7911,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.627e-08
+  ||Δu||/||u|| = 9.773e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.513e-06
+  ||ΔD||/||D|| = 3.456e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.196e-05
+  |ΔD|_∞ = 3.570e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3708e+03 J
-  → Fracture energy : 3.1214e+00 J
-  → Total energy    : 1.3739e+03 J
+  → Elastic energy  : 2.2442e+02 J
+  → Fracture energy : 1.0172e+01 J
+  → Total energy    : 2.3459e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -7876,9 +7969,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=786.61 K
+  T_new: min=263.15 K, max=1023.16 K, mean=743.60 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.414e-03
+  ||ΔT||/||T|| = 2.913e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7886,15 +7979,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.980e-04
+  ||Δu||/||u|| = 2.125e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 7.148e-03
+  ||ΔD||/||D|| = 6.917e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.217e-02
+  |ΔD|_∞ = 7.025e-02
 
 Convergence check
 
@@ -7907,9 +8000,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=786.61 K
+  T_new: min=263.15 K, max=1023.16 K, mean=743.60 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.207e-04
+  ||ΔT||/||T|| = 1.457e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7917,15 +8010,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.736e-05
+  ||Δu||/||u|| = 1.938e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.877e-04
+  ||ΔD||/||D|| = 6.731e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 6.116e-03
+  |ΔD|_∞ = 6.885e-03
 
 Convergence check
 
@@ -7938,9 +8031,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=786.61 K
+  T_new: min=263.15 K, max=1023.16 K, mean=743.60 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 6.035e-06
+  ||ΔT||/||T|| = 7.283e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7948,15 +8041,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.280e-06
+  ||Δu||/||u|| = 1.446e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.082e-05
+  ||ΔD||/||D|| = 5.023e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.643e-04
+  |ΔD|_∞ = 5.225e-04
 
 Convergence check
 
@@ -7969,9 +8062,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=786.61 K
+  T_new: min=263.15 K, max=1023.16 K, mean=743.60 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 3.018e-07
+  ||ΔT||/||T|| = 3.641e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -7979,23 +8072,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.514e-08
+  ||Δu||/||u|| = 9.672e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.376e-06
+  ||ΔD||/||D|| = 3.364e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.158e-05
+  |ΔD|_∞ = 3.556e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3977e+03 J
-  → Fracture energy : 3.1397e+00 J
-  → Total energy    : 1.4009e+03 J
+  → Elastic energy  : 2.2429e+02 J
+  → Fracture energy : 1.0226e+01 J
+  → Total energy    : 2.3452e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -8037,9 +8130,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=785.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=741.82 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.364e-03
+  ||ΔT||/||T|| = 2.856e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8047,15 +8140,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.935e-04
+  ||Δu||/||u|| = 2.099e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.872e-03
+  ||ΔD||/||D|| = 6.720e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.990e-02
+  |ΔD|_∞ = 6.746e-02
 
 Convergence check
 
@@ -8068,9 +8161,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=785.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=741.82 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.182e-04
+  ||ΔT||/||T|| = 1.428e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8078,15 +8171,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.710e-05
+  ||Δu||/||u|| = 1.918e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.611e-04
+  ||ΔD||/||D|| = 6.548e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.877e-03
+  |ΔD|_∞ = 6.578e-03
 
 Convergence check
 
@@ -8099,9 +8192,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=785.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=741.82 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.910e-06
+  ||ΔT||/||T|| = 7.139e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8109,15 +8202,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.263e-06
+  ||Δu||/||u|| = 1.432e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.885e-05
+  ||ΔD||/||D|| = 4.892e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.465e-04
+  |ΔD|_∞ = 4.996e-04
 
 Convergence check
 
@@ -8130,9 +8223,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=785.21 K
+  T_new: min=263.15 K, max=1023.16 K, mean=741.82 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.955e-07
+  ||ΔT||/||T|| = 3.570e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8140,23 +8233,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.404e-08
+  ||Δu||/||u|| = 9.574e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.243e-06
+  ||ΔD||/||D|| = 3.280e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.043e-05
+  |ΔD|_∞ = 3.409e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4243e+03 J
-  → Fracture energy : 3.1576e+00 J
-  → Total energy    : 1.4275e+03 J
+  → Elastic energy  : 2.2417e+02 J
+  → Fracture energy : 1.0279e+01 J
+  → Total energy    : 2.3445e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -8198,9 +8291,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=783.85 K
+  T_new: min=263.15 K, max=1023.16 K, mean=740.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.316e-03
+  ||ΔT||/||T|| = 2.801e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8208,15 +8301,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.897e-04
+  ||Δu||/||u|| = 2.070e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.577e-03
+  ||ΔD||/||D|| = 6.519e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.772e-02
+  |ΔD|_∞ = 6.458e-02
 
 Convergence check
 
@@ -8229,9 +8322,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=783.85 K
+  T_new: min=263.15 K, max=1023.16 K, mean=740.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.158e-04
+  ||ΔT||/||T|| = 1.400e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8239,15 +8332,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.685e-05
+  ||Δu||/||u|| = 1.898e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.334e-04
+  ||ΔD||/||D|| = 6.355e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.638e-03
+  |ΔD|_∞ = 6.359e-03
 
 Convergence check
 
@@ -8260,9 +8353,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=783.85 K
+  T_new: min=263.15 K, max=1023.16 K, mean=740.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.791e-06
+  ||ΔT||/||T|| = 7.002e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8270,15 +8363,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.246e-06
+  ||Δu||/||u|| = 1.417e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.684e-05
+  ||ΔD||/||D|| = 4.759e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.241e-04
+  |ΔD|_∞ = 4.831e-04
 
 Convergence check
 
@@ -8291,9 +8384,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=783.85 K
+  T_new: min=263.15 K, max=1023.16 K, mean=740.07 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.895e-07
+  ||ΔT||/||T|| = 3.501e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8301,23 +8394,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.298e-08
+  ||Δu||/||u|| = 9.476e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.112e-06
+  ||ΔD||/||D|| = 3.198e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.906e-05
+  |ΔD|_∞ = 3.288e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4506e+03 J
-  → Fracture energy : 3.1750e+00 J
-  → Total energy    : 1.4538e+03 J
+  → Elastic energy  : 2.2405e+02 J
+  → Fracture energy : 1.0330e+01 J
+  → Total energy    : 2.3438e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -8359,9 +8452,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=782.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=738.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.270e-03
+  ||ΔT||/||T|| = 2.748e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8369,15 +8462,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.858e-04
+  ||Δu||/||u|| = 2.039e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.285e-03
+  ||ΔD||/||D|| = 6.300e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.522e-02
+  |ΔD|_∞ = 6.435e-02
 
 Convergence check
 
@@ -8390,9 +8483,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=782.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=738.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.135e-04
+  ||ΔT||/||T|| = 1.374e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8400,15 +8493,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.661e-05
+  ||Δu||/||u|| = 1.877e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.064e-04
+  ||ΔD||/||D|| = 6.175e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.485e-03
+  |ΔD|_∞ = 6.361e-03
 
 Convergence check
 
@@ -8421,9 +8514,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=782.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=738.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.676e-06
+  ||ΔT||/||T|| = 6.869e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8431,15 +8524,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.230e-06
+  ||Δu||/||u|| = 1.403e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.486e-05
+  ||ΔD||/||D|| = 4.636e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.179e-04
+  |ΔD|_∞ = 4.818e-04
 
 Convergence check
 
@@ -8452,9 +8545,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=782.50 K
+  T_new: min=263.15 K, max=1023.16 K, mean=738.36 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.838e-07
+  ||ΔT||/||T|| = 3.435e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8462,23 +8555,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.197e-08
+  ||Δu||/||u|| = 9.382e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.984e-06
+  ||ΔD||/||D|| = 3.121e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.848e-05
+  |ΔD|_∞ = 3.264e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4766e+03 J
-  → Fracture energy : 3.1919e+00 J
-  → Total energy    : 1.4798e+03 J
+  → Elastic energy  : 2.2393e+02 J
+  → Fracture energy : 1.0379e+01 J
+  → Total energy    : 2.3430e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -8520,9 +8613,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=781.19 K
+  T_new: min=263.15 K, max=1023.16 K, mean=736.68 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.226e-03
+  ||ΔT||/||T|| = 2.697e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8530,15 +8623,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.814e-04
+  ||Δu||/||u|| = 2.011e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 6.016e-03
+  ||ΔD||/||D|| = 6.136e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.343e-02
+  |ΔD|_∞ = 6.442e-02
 
 Convergence check
 
@@ -8551,9 +8644,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=781.19 K
+  T_new: min=263.15 K, max=1023.16 K, mean=736.68 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.113e-04
+  ||ΔT||/||T|| = 1.348e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8561,15 +8654,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.636e-05
+  ||Δu||/||u|| = 1.858e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.794e-04
+  ||ΔD||/||D|| = 6.013e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.310e-03
+  |ΔD|_∞ = 6.390e-03
 
 Convergence check
 
@@ -8582,9 +8675,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=781.19 K
+  T_new: min=263.15 K, max=1023.16 K, mean=736.68 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.565e-06
+  ||ΔT||/||T|| = 6.742e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8592,15 +8685,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.214e-06
+  ||Δu||/||u|| = 1.389e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.286e-05
+  ||ΔD||/||D|| = 4.516e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.056e-04
+  |ΔD|_∞ = 4.867e-04
 
 Convergence check
 
@@ -8613,9 +8706,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=781.19 K
+  T_new: min=263.15 K, max=1023.16 K, mean=736.68 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.783e-07
+  ||ΔT||/||T|| = 3.371e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8623,23 +8716,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.098e-08
+  ||Δu||/||u|| = 9.292e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.851e-06
+  ||ΔD||/||D|| = 3.043e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.773e-05
+  |ΔD|_∞ = 3.316e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5021e+03 J
-  → Fracture energy : 3.2081e+00 J
-  → Total energy    : 1.5053e+03 J
+  → Elastic energy  : 2.2381e+02 J
+  → Fracture energy : 1.0428e+01 J
+  → Total energy    : 2.3423e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -8681,9 +8774,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=779.90 K
+  T_new: min=263.15 K, max=1023.16 K, mean=735.03 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.184e-03
+  ||ΔT||/||T|| = 2.648e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8691,15 +8784,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.772e-04
+  ||Δu||/||u|| = 1.980e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.744e-03
+  ||ΔD||/||D|| = 5.934e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.087e-02
+  |ΔD|_∞ = 6.262e-02
 
 Convergence check
 
@@ -8712,9 +8805,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=779.90 K
+  T_new: min=263.15 K, max=1023.16 K, mean=735.03 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.092e-04
+  ||ΔT||/||T|| = 1.324e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8722,15 +8815,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.612e-05
+  ||Δu||/||u|| = 1.839e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.539e-04
+  ||ΔD||/||D|| = 5.831e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 5.054e-03
+  |ΔD|_∞ = 6.224e-03
 
 Convergence check
 
@@ -8743,9 +8836,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=779.90 K
+  T_new: min=263.15 K, max=1023.16 K, mean=735.03 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.459e-06
+  ||ΔT||/||T|| = 6.620e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8753,15 +8846,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.199e-06
+  ||Δu||/||u|| = 1.376e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.100e-05
+  ||ΔD||/||D|| = 4.388e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.869e-04
+  |ΔD|_∞ = 4.760e-04
 
 Convergence check
 
@@ -8774,9 +8867,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=779.90 K
+  T_new: min=263.15 K, max=1023.16 K, mean=735.03 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.730e-07
+  ||ΔT||/||T|| = 3.310e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8784,23 +8877,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.001e-08
+  ||Δu||/||u|| = 9.205e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.727e-06
+  ||ΔD||/||D|| = 2.961e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.651e-05
+  |ΔD|_∞ = 3.259e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5272e+03 J
-  → Fracture energy : 3.2239e+00 J
-  → Total energy    : 1.5304e+03 J
+  → Elastic energy  : 2.2369e+02 J
+  → Fracture energy : 1.0476e+01 J
+  → Total energy    : 2.3416e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -8842,9 +8935,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=778.63 K
+  T_new: min=263.15 K, max=1023.16 K, mean=733.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.143e-03
+  ||ΔT||/||T|| = 2.601e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8852,15 +8945,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.734e-04
+  ||Δu||/||u|| = 1.946e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.489e-03
+  ||ΔD||/||D|| = 5.722e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.831e-02
+  |ΔD|_∞ = 5.938e-02
 
 Convergence check
 
@@ -8873,9 +8966,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=778.63 K
+  T_new: min=263.15 K, max=1023.16 K, mean=733.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.071e-04
+  ||ΔT||/||T|| = 1.300e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8883,15 +8976,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.590e-05
+  ||Δu||/||u|| = 1.819e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.298e-04
+  ||ΔD||/||D|| = 5.639e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.785e-03
+  |ΔD|_∞ = 5.900e-03
 
 Convergence check
 
@@ -8904,9 +8997,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=778.63 K
+  T_new: min=263.15 K, max=1023.16 K, mean=733.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.357e-06
+  ||ΔT||/||T|| = 6.502e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8914,15 +9007,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.185e-06
+  ||Δu||/||u|| = 1.363e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.922e-05
+  ||ΔD||/||D|| = 4.252e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.687e-04
+  |ΔD|_∞ = 4.525e-04
 
 Convergence check
 
@@ -8935,9 +9028,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=778.63 K
+  T_new: min=263.15 K, max=1023.16 K, mean=733.42 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.679e-07
+  ||ΔT||/||T|| = 3.251e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -8945,23 +9038,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.910e-08
+  ||Δu||/||u|| = 9.120e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.609e-06
+  ||ΔD||/||D|| = 2.875e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.538e-05
+  |ΔD|_∞ = 3.108e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5518e+03 J
-  → Fracture energy : 3.2391e+00 J
-  → Total energy    : 1.5551e+03 J
+  → Elastic energy  : 2.2357e+02 J
+  → Fracture energy : 1.0522e+01 J
+  → Total energy    : 2.3409e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -9003,9 +9096,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=777.39 K
+  T_new: min=263.15 K, max=1023.16 K, mean=731.83 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.104e-03
+  ||ΔT||/||T|| = 2.556e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9013,15 +9106,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.694e-04
+  ||Δu||/||u|| = 1.913e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.241e-03
+  ||ΔD||/||D|| = 5.540e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.644e-02
+  |ΔD|_∞ = 5.652e-02
 
 Convergence check
 
@@ -9034,9 +9127,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=777.39 K
+  T_new: min=263.15 K, max=1023.16 K, mean=731.83 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.052e-04
+  ||ΔT||/||T|| = 1.278e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9044,15 +9137,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.568e-05
+  ||Δu||/||u|| = 1.800e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 5.056e-04
+  ||ΔD||/||D|| = 5.463e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.598e-03
+  |ΔD|_∞ = 5.650e-03
 
 Convergence check
 
@@ -9065,9 +9158,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=777.39 K
+  T_new: min=263.15 K, max=1023.16 K, mean=731.83 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.259e-06
+  ||ΔT||/||T|| = 6.389e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9075,15 +9168,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.171e-06
+  ||Δu||/||u|| = 1.350e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.742e-05
+  ||ΔD||/||D|| = 4.126e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.533e-04
+  |ΔD|_∞ = 4.329e-04
 
 Convergence check
 
@@ -9096,9 +9189,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=777.39 K
+  T_new: min=263.15 K, max=1023.16 K, mean=731.83 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.629e-07
+  ||ΔT||/||T|| = 3.194e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9106,23 +9199,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.821e-08
+  ||Δu||/||u|| = 9.036e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.491e-06
+  ||ΔD||/||D|| = 2.793e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.440e-05
+  |ΔD|_∞ = 2.965e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5760e+03 J
-  → Fracture energy : 3.2538e+00 J
-  → Total energy    : 1.5793e+03 J
+  → Elastic energy  : 2.2346e+02 J
+  → Fracture energy : 1.0567e+01 J
+  → Total energy    : 2.3402e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -9164,9 +9257,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=776.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=730.27 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.066e-03
+  ||ΔT||/||T|| = 2.512e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9174,15 +9267,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.654e-04
+  ||Δu||/||u|| = 1.883e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.998e-03
+  ||ΔD||/||D|| = 5.362e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.531e-02
+  |ΔD|_∞ = 5.477e-02
 
 Convergence check
 
@@ -9195,9 +9288,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=776.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=730.27 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.033e-04
+  ||ΔT||/||T|| = 1.256e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9205,15 +9298,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.546e-05
+  ||Δu||/||u|| = 1.782e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.832e-04
+  ||ΔD||/||D|| = 5.295e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.498e-03
+  |ΔD|_∞ = 5.481e-03
 
 Convergence check
 
@@ -9226,9 +9319,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=776.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=730.27 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.164e-06
+  ||ΔT||/||T|| = 6.280e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9236,15 +9329,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.157e-06
+  ||Δu||/||u|| = 1.337e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.579e-05
+  ||ΔD||/||D|| = 4.004e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.407e-04
+  |ΔD|_∞ = 4.213e-04
 
 Convergence check
 
@@ -9257,9 +9350,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=776.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=730.27 K
   T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.582e-07
+  ||ΔT||/||T|| = 3.140e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9267,23 +9360,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.736e-08
+  ||Δu||/||u|| = 8.954e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.384e-06
+  ||ΔD||/||D|| = 2.714e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.308e-05
+  |ΔD|_∞ = 2.896e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5997e+03 J
-  → Fracture energy : 3.2681e+00 J
-  → Total energy    : 1.6029e+03 J
+  → Elastic energy  : 2.2334e+02 J
+  → Fracture energy : 1.0612e+01 J
+  → Total energy    : 2.3396e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -9325,9 +9418,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=774.98 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.029e-03
+  T_new: min=263.15 K, max=1023.17 K, mean=728.74 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 2.470e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9335,15 +9428,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.618e-04
+  ||Δu||/||u|| = 1.858e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.846e-03
+  ||ΔD||/||D|| = 5.199e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.396e-02
+  |ΔD|_∞ = 5.241e-02
 
 Convergence check
 
@@ -9356,9 +9449,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=774.98 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.015e-04
+  T_new: min=263.15 K, max=1023.17 K, mean=728.74 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 1.235e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9366,15 +9459,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.526e-05
+  ||Δu||/||u|| = 1.764e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.672e-04
+  ||ΔD||/||D|| = 5.147e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.371e-03
+  |ΔD|_∞ = 5.245e-03
 
 Convergence check
 
@@ -9387,9 +9480,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=774.98 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 5.073e-06
+  T_new: min=263.15 K, max=1023.17 K, mean=728.74 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 6.174e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9397,15 +9490,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.144e-06
+  ||Δu||/||u|| = 1.325e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.455e-05
+  ||ΔD||/||D|| = 3.898e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.320e-04
+  |ΔD|_∞ = 4.041e-04
 
 Convergence check
 
@@ -9418,9 +9511,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=774.98 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.536e-07
+  T_new: min=263.15 K, max=1023.17 K, mean=728.74 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 3.087e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9428,23 +9521,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.654e-08
+  ||Δu||/||u|| = 8.875e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.298e-06
+  ||ΔD||/||D|| = 2.644e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.253e-05
+  |ΔD|_∞ = 2.786e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6229e+03 J
-  → Fracture energy : 3.2821e+00 J
-  → Total energy    : 1.6262e+03 J
+  → Elastic energy  : 2.2323e+02 J
+  → Fracture energy : 1.0655e+01 J
+  → Total energy    : 2.3389e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -9486,9 +9579,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=773.80 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.994e-03
+  T_new: min=263.15 K, max=1023.17 K, mean=727.23 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 2.429e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9496,15 +9589,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.594e-04
+  ||Δu||/||u|| = 1.833e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.703e-03
+  ||ΔD||/||D|| = 5.049e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.280e-02
+  |ΔD|_∞ = 5.067e-02
 
 Convergence check
 
@@ -9517,9 +9610,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=773.80 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 9.969e-05
+  T_new: min=263.15 K, max=1023.17 K, mean=727.23 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 1.214e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9527,15 +9620,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.509e-05
+  ||Δu||/||u|| = 1.748e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.529e-04
+  ||ΔD||/||D|| = 5.005e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.260e-03
+  |ΔD|_∞ = 5.094e-03
 
 Convergence check
 
@@ -9548,9 +9641,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=773.80 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.985e-06
+  T_new: min=263.15 K, max=1023.17 K, mean=727.23 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 6.072e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9558,15 +9651,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.132e-06
+  ||Δu||/||u|| = 1.314e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.347e-05
+  ||ΔD||/||D|| = 3.795e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.242e-04
+  |ΔD|_∞ = 3.912e-04
 
 Convergence check
 
@@ -9579,9 +9672,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=773.80 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.492e-07
+  T_new: min=263.15 K, max=1023.17 K, mean=727.23 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 3.036e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9589,23 +9682,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.575e-08
+  ||Δu||/||u|| = 8.798e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.226e-06
+  ||ΔD||/||D|| = 2.578e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.206e-05
+  |ΔD|_∞ = 2.709e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6459e+03 J
-  → Fracture energy : 3.2958e+00 J
-  → Total energy    : 1.6492e+03 J
+  → Elastic energy  : 2.2312e+02 J
+  → Fracture energy : 1.0697e+01 J
+  → Total energy    : 2.3382e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -9647,9 +9740,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=772.65 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.960e-03
+  T_new: min=263.15 K, max=1023.17 K, mean=725.76 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 2.389e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9657,15 +9750,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.579e-04
+  ||Δu||/||u|| = 1.807e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.555e-03
+  ||ΔD||/||D|| = 4.895e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.155e-02
+  |ΔD|_∞ = 4.931e-02
 
 Convergence check
 
@@ -9678,9 +9771,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=772.65 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 9.799e-05
+  T_new: min=263.15 K, max=1023.17 K, mean=725.76 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 1.195e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9688,15 +9781,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.493e-05
+  ||Δu||/||u|| = 1.731e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.392e-04
+  ||ΔD||/||D|| = 4.861e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.135e-03
+  |ΔD|_∞ = 4.972e-03
 
 Convergence check
 
@@ -9709,9 +9802,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=772.65 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.899e-06
+  T_new: min=263.15 K, max=1023.17 K, mean=725.76 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 5.974e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9719,15 +9812,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.120e-06
+  ||Δu||/||u|| = 1.302e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.248e-05
+  ||ΔD||/||D|| = 3.689e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.152e-04
+  |ΔD|_∞ = 3.843e-04
 
 Convergence check
 
@@ -9740,9 +9833,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.16 K, mean=772.65 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.450e-07
+  T_new: min=263.15 K, max=1023.17 K, mean=725.76 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 2.987e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9750,23 +9843,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.499e-08
+  ||Δu||/||u|| = 8.725e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.162e-06
+  ||ΔD||/||D|| = 2.508e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.148e-05
+  |ΔD|_∞ = 2.667e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6688e+03 J
-  → Fracture energy : 3.3093e+00 J
-  → Total energy    : 1.6721e+03 J
+  → Elastic energy  : 2.2301e+02 J
+  → Fracture energy : 1.0739e+01 J
+  → Total energy    : 2.3375e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -9808,9 +9901,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=771.51 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 1.927e-03
+  T_new: min=263.15 K, max=1023.17 K, mean=724.30 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 2.351e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9818,15 +9911,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.569e-04
+  ||Δu||/||u|| = 1.780e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.428e-03
+  ||ΔD||/||D|| = 4.759e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.983e-02
+  |ΔD|_∞ = 4.737e-02
 
 Convergence check
 
@@ -9839,9 +9932,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=771.51 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 9.635e-05
+  T_new: min=263.15 K, max=1023.17 K, mean=724.30 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 1.176e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9849,15 +9942,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.479e-05
+  ||Δu||/||u|| = 1.715e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.267e-04
+  ||ΔD||/||D|| = 4.728e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.960e-03
+  |ΔD|_∞ = 4.784e-03
 
 Convergence check
 
@@ -9870,9 +9963,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=771.51 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 4.817e-06
+  T_new: min=263.15 K, max=1023.17 K, mean=724.30 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 5.878e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9880,15 +9973,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.110e-06
+  ||Δu||/||u|| = 1.291e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.155e-05
+  ||ΔD||/||D|| = 3.591e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.021e-04
+  |ΔD|_∞ = 3.715e-04
 
 Convergence check
 
@@ -9901,9 +9994,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=771.51 K
-  T^n (self.T): min=263.15 K, max=1023.16 K
-  ||ΔT||/||T|| = 2.409e-07
+  T_new: min=263.15 K, max=1023.17 K, mean=724.30 K
+  T^n (self.T): min=263.15 K, max=1023.17 K
+  ||ΔT||/||T|| = 2.939e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9911,23 +10004,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.427e-08
+  ||Δu||/||u|| = 8.653e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.100e-06
+  ||ΔD||/||D|| = 2.443e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.062e-05
+  |ΔD|_∞ = 2.579e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6915e+03 J
-  → Fracture energy : 3.3224e+00 J
-  → Total energy    : 1.6948e+03 J
+  → Elastic energy  : 2.2290e+02 J
+  → Fracture energy : 1.0780e+01 J
+  → Total energy    : 2.3368e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -9969,9 +10062,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=770.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=722.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.895e-03
+  ||ΔT||/||T|| = 2.315e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -9979,15 +10072,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.560e-04
+  ||Δu||/||u|| = 1.756e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.299e-03
+  ||ΔD||/||D|| = 4.627e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.920e-02
+  |ΔD|_∞ = 4.617e-02
 
 Convergence check
 
@@ -10000,9 +10093,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=770.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=722.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 9.476e-05
+  ||ΔT||/||T|| = 1.157e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10010,15 +10103,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.466e-05
+  ||Δu||/||u|| = 1.700e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.153e-04
+  ||ΔD||/||D|| = 4.602e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.972e-03
+  |ΔD|_∞ = 4.718e-03
 
 Convergence check
 
@@ -10031,9 +10124,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=770.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=722.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.738e-06
+  ||ΔT||/||T|| = 5.786e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10041,15 +10134,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.099e-06
+  ||Δu||/||u|| = 1.281e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.071e-05
+  ||ΔD||/||D|| = 3.498e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.072e-04
+  |ΔD|_∞ = 3.678e-04
 
 Convergence check
 
@@ -10062,9 +10155,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=770.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=722.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.369e-07
+  ||ΔT||/||T|| = 2.893e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10072,23 +10165,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.356e-08
+  ||Δu||/||u|| = 8.584e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.043e-06
+  ||ΔD||/||D|| = 2.381e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.121e-05
+  |ΔD|_∞ = 2.557e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7140e+03 J
-  → Fracture energy : 3.3353e+00 J
-  → Total energy    : 1.7173e+03 J
+  → Elastic energy  : 2.2279e+02 J
+  → Fracture energy : 1.0820e+01 J
+  → Total energy    : 2.3361e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -10130,9 +10223,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=769.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=721.47 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.864e-03
+  ||ΔT||/||T|| = 2.279e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10140,15 +10233,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.550e-04
+  ||Δu||/||u|| = 1.736e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.233e-03
+  ||ΔD||/||D|| = 4.502e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.995e-02
+  |ΔD|_∞ = 4.587e-02
 
 Convergence check
 
@@ -10161,9 +10254,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=769.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=721.47 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 9.322e-05
+  ||ΔT||/||T|| = 1.139e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10171,15 +10264,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.453e-05
+  ||Δu||/||u|| = 1.685e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.073e-04
+  ||ΔD||/||D|| = 4.478e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.042e-03
+  |ΔD|_∞ = 4.685e-03
 
 Convergence check
 
@@ -10192,9 +10285,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=769.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=721.47 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.661e-06
+  ||ΔT||/||T|| = 5.697e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10202,15 +10295,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.089e-06
+  ||Δu||/||u|| = 1.271e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.005e-05
+  ||ΔD||/||D|| = 3.406e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.127e-04
+  |ΔD|_∞ = 3.655e-04
 
 Convergence check
 
@@ -10223,9 +10316,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=769.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=721.47 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.330e-07
+  ||ΔT||/||T|| = 2.849e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10233,23 +10326,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.288e-08
+  ||Δu||/||u|| = 8.516e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.995e-06
+  ||ΔD||/||D|| = 2.320e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.161e-05
+  |ΔD|_∞ = 2.544e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7362e+03 J
-  → Fracture energy : 3.3481e+00 J
-  → Total energy    : 1.7396e+03 J
+  → Elastic energy  : 2.2269e+02 J
+  → Fracture energy : 1.0859e+01 J
+  → Total energy    : 2.3355e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -10291,9 +10384,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=768.22 K
+  T_new: min=263.15 K, max=1023.17 K, mean=720.08 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.835e-03
+  ||ΔT||/||T|| = 2.244e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10301,15 +10394,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.536e-04
+  ||Δu||/||u|| = 1.718e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.151e-03
+  ||ΔD||/||D|| = 4.378e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.999e-02
+  |ΔD|_∞ = 4.487e-02
 
 Convergence check
 
@@ -10322,9 +10415,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=768.22 K
+  T_new: min=263.15 K, max=1023.17 K, mean=720.08 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 9.173e-05
+  ||ΔT||/||T|| = 1.122e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10332,15 +10425,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.440e-05
+  ||Δu||/||u|| = 1.672e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.992e-04
+  ||ΔD||/||D|| = 4.366e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.037e-03
+  |ΔD|_∞ = 4.579e-03
 
 Convergence check
 
@@ -10353,9 +10446,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=768.22 K
+  T_new: min=263.15 K, max=1023.17 K, mean=720.08 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.586e-06
+  ||ΔT||/||T|| = 5.611e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10363,15 +10456,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.079e-06
+  ||Δu||/||u|| = 1.261e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.943e-05
+  ||ΔD||/||D|| = 3.324e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.123e-04
+  |ΔD|_∞ = 3.575e-04
 
 Convergence check
 
@@ -10384,9 +10477,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=768.22 K
+  T_new: min=263.15 K, max=1023.17 K, mean=720.08 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.293e-07
+  ||ΔT||/||T|| = 2.805e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10394,23 +10487,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.219e-08
+  ||Δu||/||u|| = 8.451e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.953e-06
+  ||ΔD||/||D|| = 2.266e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.159e-05
+  |ΔD|_∞ = 2.492e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7582e+03 J
-  → Fracture energy : 3.3608e+00 J
-  → Total energy    : 1.7615e+03 J
+  → Elastic energy  : 2.2258e+02 J
+  → Fracture energy : 1.0898e+01 J
+  → Total energy    : 2.3348e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -10452,9 +10545,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=767.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=718.72 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.806e-03
+  ||ΔT||/||T|| = 2.211e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10462,15 +10555,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.515e-04
+  ||Δu||/||u|| = 1.699e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 4.040e-03
+  ||ΔD||/||D|| = 4.265e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.996e-02
+  |ΔD|_∞ = 4.321e-02
 
 Convergence check
 
@@ -10483,9 +10576,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=767.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=718.72 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 9.029e-05
+  ||ΔT||/||T|| = 1.105e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10493,15 +10586,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.425e-05
+  ||Δu||/||u|| = 1.658e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.885e-04
+  ||ΔD||/||D|| = 4.250e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.043e-03
+  |ΔD|_∞ = 4.406e-03
 
 Convergence check
 
@@ -10514,9 +10607,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=767.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=718.72 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.514e-06
+  ||ΔT||/||T|| = 5.527e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10524,15 +10617,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.069e-06
+  ||Δu||/||u|| = 1.251e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.867e-05
+  ||ΔD||/||D|| = 3.236e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.116e-04
+  |ΔD|_∞ = 3.442e-04
 
 Convergence check
 
@@ -10545,9 +10638,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=767.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=718.72 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.257e-07
+  ||ΔT||/||T|| = 2.764e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10555,23 +10648,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.153e-08
+  ||Δu||/||u|| = 8.387e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.903e-06
+  ||ΔD||/||D|| = 2.207e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.143e-05
+  |ΔD|_∞ = 2.401e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7797e+03 J
-  → Fracture energy : 3.3732e+00 J
-  → Total energy    : 1.7831e+03 J
+  → Elastic energy  : 2.2248e+02 J
+  → Fracture energy : 1.0936e+01 J
+  → Total energy    : 2.3341e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -10613,9 +10706,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=766.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=717.38 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.778e-03
+  ||ΔT||/||T|| = 2.178e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10623,15 +10716,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.488e-04
+  ||Δu||/||u|| = 1.679e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.886e-03
+  ||ΔD||/||D|| = 4.143e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.010e-02
+  |ΔD|_∞ = 4.095e-02
 
 Convergence check
 
@@ -10644,9 +10737,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=766.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=717.38 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.889e-05
+  ||ΔT||/||T|| = 1.089e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10654,15 +10747,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.409e-05
+  ||Δu||/||u|| = 1.644e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.743e-04
+  ||ΔD||/||D|| = 4.134e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.062e-03
+  |ΔD|_∞ = 4.222e-03
 
 Convergence check
 
@@ -10675,9 +10768,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=766.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=717.38 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.445e-06
+  ||ΔT||/||T|| = 5.446e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10685,15 +10778,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.058e-06
+  ||Δu||/||u|| = 1.241e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.768e-05
+  ||ΔD||/||D|| = 3.150e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.139e-04
+  |ΔD|_∞ = 3.310e-04
 
 Convergence check
 
@@ -10706,9 +10799,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=766.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=717.38 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.222e-07
+  ||ΔT||/||T|| = 2.723e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10716,23 +10809,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.088e-08
+  ||Δu||/||u|| = 8.324e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.840e-06
+  ||ΔD||/||D|| = 2.150e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.164e-05
+  |ΔD|_∞ = 2.312e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8008e+03 J
-  → Fracture energy : 3.3852e+00 J
-  → Total energy    : 1.8042e+03 J
+  → Elastic energy  : 2.2237e+02 J
+  → Fracture energy : 1.0973e+01 J
+  → Total energy    : 2.3334e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -10774,9 +10867,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=765.08 K
+  T_new: min=263.15 K, max=1023.17 K, mean=716.06 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.751e-03
+  ||ΔT||/||T|| = 2.147e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10784,15 +10877,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.462e-04
+  ||Δu||/||u|| = 1.659e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.717e-03
+  ||ΔD||/||D|| = 4.023e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.965e-02
+  |ΔD|_∞ = 4.046e-02
 
 Convergence check
 
@@ -10805,9 +10898,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=765.08 K
+  T_new: min=263.15 K, max=1023.17 K, mean=716.06 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.754e-05
+  ||ΔT||/||T|| = 1.073e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10815,15 +10908,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.395e-05
+  ||Δu||/||u|| = 1.631e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.585e-04
+  ||ΔD||/||D|| = 4.017e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 4.020e-03
+  |ΔD|_∞ = 4.176e-03
 
 Convergence check
 
@@ -10836,9 +10929,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=765.08 K
+  T_new: min=263.15 K, max=1023.17 K, mean=716.06 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.377e-06
+  ||ΔT||/||T|| = 5.367e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10846,15 +10939,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.049e-06
+  ||Δu||/||u|| = 1.232e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.656e-05
+  ||ΔD||/||D|| = 3.062e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.113e-04
+  |ΔD|_∞ = 3.279e-04
 
 Convergence check
 
@@ -10867,9 +10960,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=765.08 K
+  T_new: min=263.15 K, max=1023.17 K, mean=716.06 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.188e-07
+  ||ΔT||/||T|| = 2.684e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10877,23 +10970,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 7.027e-08
+  ||Δu||/||u|| = 8.264e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.770e-06
+  ||ΔD||/||D|| = 2.090e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.151e-05
+  |ΔD|_∞ = 2.294e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8214e+03 J
-  → Fracture energy : 3.3968e+00 J
-  → Total energy    : 1.8248e+03 J
+  → Elastic energy  : 2.2227e+02 J
+  → Fracture energy : 1.1010e+01 J
+  → Total energy    : 2.3328e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -10935,9 +11028,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=764.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=714.76 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.725e-03
+  ||ΔT||/||T|| = 2.116e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10945,15 +11038,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.437e-04
+  ||Δu||/||u|| = 1.640e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.582e-03
+  ||ΔD||/||D|| = 3.905e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.859e-02
+  |ΔD|_∞ = 3.966e-02
 
 Convergence check
 
@@ -10966,9 +11059,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=764.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=714.76 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.623e-05
+  ||ΔT||/||T|| = 1.058e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -10976,15 +11069,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.381e-05
+  ||Δu||/||u|| = 1.618e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.473e-04
+  ||ΔD||/||D|| = 3.900e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.917e-03
+  |ΔD|_∞ = 4.095e-03
 
 Convergence check
 
@@ -10997,9 +11090,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=764.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=714.76 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.311e-06
+  ||ΔT||/||T|| = 5.291e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11007,15 +11100,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.040e-06
+  ||Δu||/||u|| = 1.223e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.578e-05
+  ||ΔD||/||D|| = 2.974e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.039e-04
+  |ΔD|_∞ = 3.220e-04
 
 Convergence check
 
@@ -11028,9 +11121,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=764.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=714.76 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.156e-07
+  ||ΔT||/||T|| = 2.646e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11038,23 +11131,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.970e-08
+  ||Δu||/||u|| = 8.205e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.719e-06
+  ||ΔD||/||D|| = 2.030e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.105e-05
+  |ΔD|_∞ = 2.256e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8414e+03 J
-  → Fracture energy : 3.4082e+00 J
-  → Total energy    : 1.8448e+03 J
+  → Elastic energy  : 2.2217e+02 J
+  → Fracture energy : 1.1046e+01 J
+  → Total energy    : 2.3321e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -11096,9 +11189,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=763.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=713.48 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.699e-03
+  ||ΔT||/||T|| = 2.087e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11106,15 +11199,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.415e-04
+  ||Δu||/||u|| = 1.622e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.495e-03
+  ||ΔD||/||D|| = 3.800e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.709e-02
+  |ΔD|_∞ = 3.838e-02
 
 Convergence check
 
@@ -11127,9 +11220,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=763.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=713.48 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.495e-05
+  ||ΔT||/||T|| = 1.043e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11137,15 +11230,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.368e-05
+  ||Δu||/||u|| = 1.606e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.382e-04
+  ||ΔD||/||D|| = 3.798e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.768e-03
+  |ΔD|_∞ = 3.965e-03
 
 Convergence check
 
@@ -11158,9 +11251,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=763.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=713.48 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.248e-06
+  ||ΔT||/||T|| = 5.217e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11168,15 +11261,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.031e-06
+  ||Δu||/||u|| = 1.214e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.509e-05
+  ||ΔD||/||D|| = 2.897e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.928e-04
+  |ΔD|_∞ = 3.122e-04
 
 Convergence check
 
@@ -11189,9 +11282,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=763.07 K
+  T_new: min=263.15 K, max=1023.17 K, mean=713.48 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.124e-07
+  ||ΔT||/||T|| = 2.608e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11199,23 +11292,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.913e-08
+  ||Δu||/||u|| = 8.147e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.673e-06
+  ||ΔD||/||D|| = 1.979e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.032e-05
+  |ΔD|_∞ = 2.191e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8610e+03 J
-  → Fracture energy : 3.4194e+00 J
-  → Total energy    : 1.8644e+03 J
+  → Elastic energy  : 2.2207e+02 J
+  → Fracture energy : 1.1081e+01 J
+  → Total energy    : 2.3315e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -11257,9 +11350,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=762.09 K
+  T_new: min=263.15 K, max=1023.17 K, mean=712.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.674e-03
+  ||ΔT||/||T|| = 2.058e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11267,15 +11360,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.394e-04
+  ||Δu||/||u|| = 1.605e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.390e-03
+  ||ΔD||/||D|| = 3.732e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.636e-02
+  |ΔD|_∞ = 3.665e-02
 
 Convergence check
 
@@ -11288,9 +11381,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=762.09 K
+  T_new: min=263.15 K, max=1023.17 K, mean=712.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.372e-05
+  ||ΔT||/||T|| = 1.029e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11298,15 +11391,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.355e-05
+  ||Δu||/||u|| = 1.593e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.290e-04
+  ||ΔD||/||D|| = 3.724e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.701e-03
+  |ΔD|_∞ = 3.789e-03
 
 Convergence check
 
@@ -11319,9 +11412,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=762.09 K
+  T_new: min=263.15 K, max=1023.17 K, mean=712.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.186e-06
+  ||ΔT||/||T|| = 5.145e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11329,15 +11422,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.022e-06
+  ||Δu||/||u|| = 1.206e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.446e-05
+  ||ΔD||/||D|| = 2.839e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.864e-04
+  |ΔD|_∞ = 2.987e-04
 
 Convergence check
 
@@ -11350,9 +11443,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=762.09 K
+  T_new: min=263.15 K, max=1023.17 K, mean=712.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.093e-07
+  ||ΔT||/||T|| = 2.572e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11360,23 +11453,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.857e-08
+  ||Δu||/||u|| = 8.090e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.632e-06
+  ||ΔD||/||D|| = 1.939e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.976e-05
+  |ΔD|_∞ = 2.099e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8801e+03 J
-  → Fracture energy : 3.4303e+00 J
-  → Total energy    : 1.8835e+03 J
+  → Elastic energy  : 2.2197e+02 J
+  → Fracture energy : 1.1116e+01 J
+  → Total energy    : 2.3308e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -11418,9 +11511,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=761.12 K
+  T_new: min=263.15 K, max=1023.17 K, mean=710.97 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.650e-03
+  ||ΔT||/||T|| = 2.030e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11428,15 +11521,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.375e-04
+  ||Δu||/||u|| = 1.588e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.310e-03
+  ||ΔD||/||D|| = 3.659e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.591e-02
+  |ΔD|_∞ = 3.511e-02
 
 Convergence check
 
@@ -11449,9 +11542,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=761.12 K
+  T_new: min=263.15 K, max=1023.17 K, mean=710.97 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.252e-05
+  ||ΔT||/||T|| = 1.015e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11459,15 +11552,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.343e-05
+  ||Δu||/||u|| = 1.581e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.209e-04
+  ||ΔD||/||D|| = 3.652e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.664e-03
+  |ΔD|_∞ = 3.618e-03
 
 Convergence check
 
@@ -11480,9 +11573,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=761.12 K
+  T_new: min=263.15 K, max=1023.17 K, mean=710.97 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.126e-06
+  ||ΔT||/||T|| = 5.075e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11490,15 +11583,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.014e-06
+  ||Δu||/||u|| = 1.197e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.383e-05
+  ||ΔD||/||D|| = 2.783e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.843e-04
+  |ΔD|_∞ = 2.854e-04
 
 Convergence check
 
@@ -11511,9 +11604,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=761.12 K
+  T_new: min=263.15 K, max=1023.17 K, mean=710.97 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.063e-07
+  ||ΔT||/||T|| = 2.537e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11521,23 +11614,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.803e-08
+  ||Δu||/||u|| = 8.032e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.591e-06
+  ||ΔD||/||D|| = 1.900e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.967e-05
+  |ΔD|_∞ = 2.007e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8988e+03 J
-  → Fracture energy : 3.4412e+00 J
-  → Total energy    : 1.9023e+03 J
+  → Elastic energy  : 2.2187e+02 J
+  → Fracture energy : 1.1150e+01 J
+  → Total energy    : 2.3302e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -11579,9 +11672,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=760.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=709.75 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.627e-03
+  ||ΔT||/||T|| = 2.003e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11589,15 +11682,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.360e-04
+  ||Δu||/||u|| = 1.572e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.220e-03
+  ||ΔD||/||D|| = 3.578e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.524e-02
+  |ΔD|_∞ = 3.446e-02
 
 Convergence check
 
@@ -11610,9 +11703,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=760.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=709.75 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.135e-05
+  ||ΔT||/||T|| = 1.001e-04
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11620,15 +11713,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.331e-05
+  ||Δu||/||u|| = 1.569e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.122e-04
+  ||ΔD||/||D|| = 3.573e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.602e-03
+  |ΔD|_∞ = 3.587e-03
 
 Convergence check
 
@@ -11641,9 +11734,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=760.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=709.75 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.067e-06
+  ||ΔT||/||T|| = 5.007e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11651,15 +11744,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.006e-06
+  ||Δu||/||u|| = 1.188e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.320e-05
+  ||ΔD||/||D|| = 2.725e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.802e-04
+  |ΔD|_∞ = 2.841e-04
 
 Convergence check
 
@@ -11672,9 +11765,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=760.17 K
+  T_new: min=263.15 K, max=1023.17 K, mean=709.75 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.034e-07
+  ||ΔT||/||T|| = 2.503e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11682,23 +11775,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.750e-08
+  ||Δu||/||u|| = 7.977e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.549e-06
+  ||ΔD||/||D|| = 1.861e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.943e-05
+  |ΔD|_∞ = 2.002e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9173e+03 J
-  → Fracture energy : 3.4517e+00 J
-  → Total energy    : 1.9208e+03 J
+  → Elastic energy  : 2.2177e+02 J
+  → Fracture energy : 1.1184e+01 J
+  → Total energy    : 2.3295e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -11740,9 +11833,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=759.23 K
+  T_new: min=263.15 K, max=1023.17 K, mean=708.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.604e-03
+  ||ΔT||/||T|| = 1.976e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11750,15 +11843,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.343e-04
+  ||Δu||/||u|| = 1.557e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.112e-03
+  ||ΔD||/||D|| = 3.493e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.424e-02
+  |ΔD|_∞ = 3.393e-02
 
 Convergence check
 
@@ -11771,9 +11864,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=759.23 K
+  T_new: min=263.15 K, max=1023.17 K, mean=708.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 8.021e-05
+  ||ΔT||/||T|| = 9.881e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11781,15 +11874,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.320e-05
+  ||Δu||/||u|| = 1.558e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.024e-04
+  ||ΔD||/||D|| = 3.489e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.506e-03
+  |ΔD|_∞ = 3.548e-03
 
 Convergence check
 
@@ -11802,9 +11895,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=759.23 K
+  T_new: min=263.15 K, max=1023.17 K, mean=708.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 4.011e-06
+  ||ΔT||/||T|| = 4.941e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11812,15 +11905,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.983e-07
+  ||Δu||/||u|| = 1.180e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.250e-05
+  ||ΔD||/||D|| = 2.661e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.734e-04
+  |ΔD|_∞ = 2.813e-04
 
 Convergence check
 
@@ -11833,9 +11926,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=759.23 K
+  T_new: min=263.15 K, max=1023.17 K, mean=708.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.005e-07
+  ||ΔT||/||T|| = 2.470e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11843,23 +11936,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.700e-08
+  ||Δu||/||u|| = 7.923e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.504e-06
+  ||ΔD||/||D|| = 1.818e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.900e-05
+  |ΔD|_∞ = 1.984e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9355e+03 J
-  → Fracture energy : 3.4620e+00 J
-  → Total energy    : 1.9390e+03 J
+  → Elastic energy  : 2.2167e+02 J
+  → Fracture energy : 1.1217e+01 J
+  → Total energy    : 2.3289e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -11901,9 +11994,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=758.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=707.34 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.582e-03
+  ||ΔT||/||T|| = 1.951e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11911,15 +12004,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.327e-04
+  ||Δu||/||u|| = 1.542e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 3.020e-03
+  ||ΔD||/||D|| = 3.406e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.286e-02
+  |ΔD|_∞ = 3.329e-02
 
 Convergence check
 
@@ -11932,9 +12025,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=758.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=707.34 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.911e-05
+  ||ΔT||/||T|| = 9.753e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11942,15 +12035,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.310e-05
+  ||Δu||/||u|| = 1.546e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.947e-04
+  ||ΔD||/||D|| = 3.402e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.370e-03
+  |ΔD|_∞ = 3.483e-03
 
 Convergence check
 
@@ -11963,9 +12056,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=758.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=707.34 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.956e-06
+  ||ΔT||/||T|| = 4.876e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -11973,15 +12066,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.911e-07
+  ||Δu||/||u|| = 1.172e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.196e-05
+  ||ΔD||/||D|| = 2.596e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.634e-04
+  |ΔD|_∞ = 2.764e-04
 
 Convergence check
 
@@ -11994,9 +12087,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=758.30 K
+  T_new: min=263.15 K, max=1023.17 K, mean=707.34 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.978e-07
+  ||ΔT||/||T|| = 2.438e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12004,23 +12097,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.653e-08
+  ||Δu||/||u|| = 7.870e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.469e-06
+  ||ΔD||/||D|| = 1.775e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.836e-05
+  |ΔD|_∞ = 1.952e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9533e+03 J
-  → Fracture energy : 3.4722e+00 J
-  → Total energy    : 1.9568e+03 J
+  → Elastic energy  : 2.2157e+02 J
+  → Fracture energy : 1.1250e+01 J
+  → Total energy    : 2.3282e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -12062,9 +12155,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=757.39 K
+  T_new: min=263.15 K, max=1023.17 K, mean=706.17 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.561e-03
+  ||ΔT||/||T|| = 1.925e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12072,15 +12165,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.311e-04
+  ||Δu||/||u|| = 1.527e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.973e-03
+  ||ΔD||/||D|| = 3.318e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.200e-02
+  |ΔD|_∞ = 3.271e-02
 
 Convergence check
 
@@ -12093,9 +12186,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=757.39 K
+  T_new: min=263.15 K, max=1023.17 K, mean=706.17 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.804e-05
+  ||ΔT||/||T|| = 9.627e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12103,15 +12196,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.300e-05
+  ||Δu||/||u|| = 1.535e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.890e-04
+  ||ΔD||/||D|| = 3.316e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.274e-03
+  |ΔD|_∞ = 3.388e-03
 
 Convergence check
 
@@ -12124,9 +12217,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=757.39 K
+  T_new: min=263.15 K, max=1023.17 K, mean=706.17 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.902e-06
+  ||ΔT||/||T|| = 4.814e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12134,15 +12227,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.843e-07
+  ||Δu||/||u|| = 1.164e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.149e-05
+  ||ΔD||/||D|| = 2.532e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.538e-04
+  |ΔD|_∞ = 2.691e-04
 
 Convergence check
 
@@ -12155,9 +12248,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=757.39 K
+  T_new: min=263.15 K, max=1023.17 K, mean=706.17 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.951e-07
+  ||ΔT||/||T|| = 2.407e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12165,23 +12258,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.607e-08
+  ||Δu||/||u|| = 7.818e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.437e-06
+  ||ΔD||/||D|| = 1.733e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.756e-05
+  |ΔD|_∞ = 1.902e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9707e+03 J
-  → Fracture energy : 3.4823e+00 J
-  → Total energy    : 1.9742e+03 J
+  → Elastic energy  : 2.2148e+02 J
+  → Fracture energy : 1.1282e+01 J
+  → Total energy    : 2.3276e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -12223,9 +12316,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=756.49 K
+  T_new: min=263.15 K, max=1023.17 K, mean=705.01 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.540e-03
+  ||ΔT||/||T|| = 1.901e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12233,15 +12326,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.298e-04
+  ||Δu||/||u|| = 1.511e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.925e-03
+  ||ΔD||/||D|| = 3.251e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.181e-02
+  |ΔD|_∞ = 3.199e-02
 
 Convergence check
 
@@ -12254,9 +12347,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=756.49 K
+  T_new: min=263.15 K, max=1023.17 K, mean=705.01 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.700e-05
+  ||ΔT||/||T|| = 9.505e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12264,15 +12357,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.291e-05
+  ||Δu||/||u|| = 1.524e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.838e-04
+  ||ΔD||/||D|| = 3.255e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.263e-03
+  |ΔD|_∞ = 3.311e-03
 
 Convergence check
 
@@ -12285,9 +12378,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=756.49 K
+  T_new: min=263.15 K, max=1023.17 K, mean=705.01 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.850e-06
+  ||ΔT||/||T|| = 4.753e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12295,15 +12388,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.776e-07
+  ||Δu||/||u|| = 1.157e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.110e-05
+  ||ΔD||/||D|| = 2.487e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.537e-04
+  |ΔD|_∞ = 2.605e-04
 
 Convergence check
 
@@ -12316,9 +12409,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=756.49 K
+  T_new: min=263.15 K, max=1023.17 K, mean=705.01 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.925e-07
+  ||ΔT||/||T|| = 2.376e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12326,23 +12419,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.563e-08
+  ||Δu||/||u|| = 7.768e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.410e-06
+  ||ΔD||/||D|| = 1.702e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.757e-05
+  |ΔD|_∞ = 1.836e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9877e+03 J
-  → Fracture energy : 3.4923e+00 J
-  → Total energy    : 1.9912e+03 J
+  → Elastic energy  : 2.2138e+02 J
+  → Fracture energy : 1.1314e+01 J
+  → Total energy    : 2.3270e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -12384,9 +12477,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=755.60 K
+  T_new: min=263.15 K, max=1023.17 K, mean=703.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.520e-03
+  ||ΔT||/||T|| = 1.877e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12394,15 +12487,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.287e-04
+  ||Δu||/||u|| = 1.496e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.885e-03
+  ||ΔD||/||D|| = 3.209e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.156e-02
+  |ΔD|_∞ = 3.101e-02
 
 Convergence check
 
@@ -12415,9 +12508,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=755.60 K
+  T_new: min=263.15 K, max=1023.17 K, mean=703.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.598e-05
+  ||ΔT||/||T|| = 9.386e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12425,15 +12518,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.282e-05
+  ||Δu||/||u|| = 1.513e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.801e-04
+  ||ΔD||/||D|| = 3.206e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.243e-03
+  |ΔD|_∞ = 3.209e-03
 
 Convergence check
 
@@ -12446,9 +12539,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=755.60 K
+  T_new: min=263.15 K, max=1023.17 K, mean=703.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.799e-06
+  ||ΔT||/||T|| = 4.693e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12456,13 +12549,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.712e-07
+  ||Δu||/||u|| = 1.149e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.082e-05
+  ||ΔD||/||D|| = 2.448e-05
   [adaptive] relax_D=0.95
   |ΔD|_∞ = 2.528e-04
 
@@ -12477,9 +12570,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=755.60 K
+  T_new: min=263.15 K, max=1023.17 K, mean=703.87 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.899e-07
+  ||ΔT||/||T|| = 2.347e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12487,23 +12580,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.521e-08
+  ||Δu||/||u|| = 7.717e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.391e-06
+  ||ΔD||/||D|| = 1.674e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.756e-05
+  |ΔD|_∞ = 1.773e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0043e+03 J
-  → Fracture energy : 3.5023e+00 J
-  → Total energy    : 2.0078e+03 J
+  → Elastic energy  : 2.2129e+02 J
+  → Fracture energy : 1.1346e+01 J
+  → Total energy    : 2.3263e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -12545,9 +12638,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=754.72 K
+  T_new: min=263.15 K, max=1023.17 K, mean=702.74 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.500e-03
+  ||ΔT||/||T|| = 1.854e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12555,15 +12648,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.278e-04
+  ||Δu||/||u|| = 1.483e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.857e-03
+  ||ΔD||/||D|| = 3.156e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.124e-02
+  |ΔD|_∞ = 3.072e-02
 
 Convergence check
 
@@ -12576,9 +12669,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=754.72 K
+  T_new: min=263.15 K, max=1023.17 K, mean=702.74 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.499e-05
+  ||ΔT||/||T|| = 9.271e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12586,15 +12679,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.274e-05
+  ||Δu||/||u|| = 1.503e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.768e-04
+  ||ΔD||/||D|| = 3.153e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.215e-03
+  |ΔD|_∞ = 3.165e-03
 
 Convergence check
 
@@ -12607,9 +12700,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=754.72 K
+  T_new: min=263.15 K, max=1023.17 K, mean=702.74 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.749e-06
+  ||ΔT||/||T|| = 4.635e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12617,15 +12710,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.649e-07
+  ||Δu||/||u|| = 1.141e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.056e-05
+  ||ΔD||/||D|| = 2.407e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.512e-04
+  |ΔD|_∞ = 2.480e-04
 
 Convergence check
 
@@ -12638,9 +12731,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=754.72 K
+  T_new: min=263.15 K, max=1023.17 K, mean=702.74 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.875e-07
+  ||ΔT||/||T|| = 2.318e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12648,23 +12741,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.478e-08
+  ||Δu||/||u|| = 7.668e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.373e-06
+  ||ΔD||/||D|| = 1.646e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.748e-05
+  |ΔD|_∞ = 1.757e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0206e+03 J
-  → Fracture energy : 3.5122e+00 J
-  → Total energy    : 2.0241e+03 J
+  → Elastic energy  : 2.2119e+02 J
+  → Fracture energy : 1.1377e+01 J
+  → Total energy    : 2.3257e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -12706,9 +12799,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.86 K
+  T_new: min=263.15 K, max=1023.17 K, mean=701.62 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.480e-03
+  ||ΔT||/||T|| = 1.832e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12716,15 +12809,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.271e-04
+  ||Δu||/||u|| = 1.472e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.806e-03
+  ||ΔD||/||D|| = 3.106e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.080e-02
+  |ΔD|_∞ = 3.107e-02
 
 Convergence check
 
@@ -12737,9 +12830,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.86 K
+  T_new: min=263.15 K, max=1023.17 K, mean=701.62 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.402e-05
+  ||ΔT||/||T|| = 9.158e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12747,15 +12840,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.266e-05
+  ||Δu||/||u|| = 1.493e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.724e-04
+  ||ΔD||/||D|| = 3.103e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.174e-03
+  |ΔD|_∞ = 3.202e-03
 
 Convergence check
 
@@ -12768,9 +12861,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.86 K
+  T_new: min=263.15 K, max=1023.17 K, mean=701.62 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.701e-06
+  ||ΔT||/||T|| = 4.579e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12778,15 +12871,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.588e-07
+  ||Δu||/||u|| = 1.134e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.025e-05
+  ||ΔD||/||D|| = 2.369e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.484e-04
+  |ΔD|_∞ = 2.501e-04
 
 Convergence check
 
@@ -12799,9 +12892,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.86 K
+  T_new: min=263.15 K, max=1023.17 K, mean=701.62 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.851e-07
+  ||ΔT||/||T|| = 2.289e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12809,23 +12902,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.437e-08
+  ||Δu||/||u|| = 7.621e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.353e-06
+  ||ΔD||/||D|| = 1.620e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.732e-05
+  |ΔD|_∞ = 1.740e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0365e+03 J
-  → Fracture energy : 3.5219e+00 J
-  → Total energy    : 2.0401e+03 J
+  → Elastic energy  : 2.2110e+02 J
+  → Fracture energy : 1.1408e+01 J
+  → Total energy    : 2.3251e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -12867,9 +12960,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.01 K
+  T_new: min=263.15 K, max=1023.17 K, mean=700.52 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.462e-03
+  ||ΔT||/||T|| = 1.810e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12877,15 +12970,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.265e-04
+  ||Δu||/||u|| = 1.463e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.746e-03
+  ||ΔD||/||D|| = 3.059e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.019e-02
+  |ΔD|_∞ = 3.112e-02
 
 Convergence check
 
@@ -12898,9 +12991,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.01 K
+  T_new: min=263.15 K, max=1023.17 K, mean=700.52 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.309e-05
+  ||ΔT||/||T|| = 9.048e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12908,15 +13001,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.258e-05
+  ||Δu||/||u|| = 1.484e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.669e-04
+  ||ΔD||/||D|| = 3.052e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.114e-03
+  |ΔD|_∞ = 3.207e-03
 
 Convergence check
 
@@ -12929,9 +13022,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.01 K
+  T_new: min=263.15 K, max=1023.17 K, mean=700.52 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.654e-06
+  ||ΔT||/||T|| = 4.524e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12939,15 +13032,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.530e-07
+  ||Δu||/||u|| = 1.127e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.986e-05
+  ||ΔD||/||D|| = 2.329e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.441e-04
+  |ΔD|_∞ = 2.508e-04
 
 Convergence check
 
@@ -12960,9 +13053,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=753.01 K
+  T_new: min=263.15 K, max=1023.17 K, mean=700.52 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.827e-07
+  ||ΔT||/||T|| = 2.262e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -12970,23 +13063,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.397e-08
+  ||Δu||/||u|| = 7.575e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.329e-06
+  ||ΔD||/||D|| = 1.592e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.704e-05
+  |ΔD|_∞ = 1.747e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0522e+03 J
-  → Fracture energy : 3.5315e+00 J
-  → Total energy    : 2.0558e+03 J
+  → Elastic energy  : 2.2101e+02 J
+  → Fracture energy : 1.1438e+01 J
+  → Total energy    : 2.3245e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -13028,9 +13121,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=752.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=699.44 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.443e-03
+  ||ΔT||/||T|| = 1.788e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13038,15 +13131,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.258e-04
+  ||Δu||/||u|| = 1.454e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.694e-03
+  ||ΔD||/||D|| = 3.000e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.937e-02
+  |ΔD|_∞ = 3.081e-02
 
 Convergence check
 
@@ -13059,9 +13152,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=752.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=699.44 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.217e-05
+  ||ΔT||/||T|| = 8.940e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13069,15 +13162,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.251e-05
+  ||Δu||/||u|| = 1.475e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.628e-04
+  ||ΔD||/||D|| = 2.996e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.031e-03
+  |ΔD|_∞ = 3.176e-03
 
 Convergence check
 
@@ -13090,9 +13183,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=752.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=699.44 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.608e-06
+  ||ΔT||/||T|| = 4.470e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13100,15 +13193,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.474e-07
+  ||Δu||/||u|| = 1.121e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.959e-05
+  ||ΔD||/||D|| = 2.287e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.380e-04
+  |ΔD|_∞ = 2.486e-04
 
 Convergence check
 
@@ -13121,9 +13214,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=752.16 K
+  T_new: min=263.15 K, max=1023.17 K, mean=699.44 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.804e-07
+  ||ΔT||/||T|| = 2.235e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13131,23 +13224,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.359e-08
+  ||Δu||/||u|| = 7.531e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.312e-06
+  ||ΔD||/||D|| = 1.565e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.664e-05
+  |ΔD|_∞ = 1.734e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0677e+03 J
-  → Fracture energy : 3.5409e+00 J
-  → Total energy    : 2.0712e+03 J
+  → Elastic energy  : 2.2092e+02 J
+  → Fracture energy : 1.1468e+01 J
+  → Total energy    : 2.3238e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -13189,9 +13282,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=751.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=698.36 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.426e-03
+  ||ΔT||/||T|| = 1.767e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13199,15 +13292,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.251e-04
+  ||Δu||/||u|| = 1.445e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.675e-03
+  ||ΔD||/||D|| = 2.941e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.936e-02
+  |ΔD|_∞ = 3.015e-02
 
 Convergence check
 
@@ -13220,9 +13313,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=751.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=698.36 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.128e-05
+  ||ΔT||/||T|| = 8.835e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13230,15 +13323,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.244e-05
+  ||Δu||/||u|| = 1.467e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.607e-04
+  ||ΔD||/||D|| = 2.941e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.019e-03
+  |ΔD|_∞ = 3.109e-03
 
 Convergence check
 
@@ -13251,9 +13344,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=751.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=698.36 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.564e-06
+  ||ΔT||/||T|| = 4.418e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13261,15 +13354,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.418e-07
+  ||Δu||/||u|| = 1.115e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.940e-05
+  ||ΔD||/||D|| = 2.246e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.350e-04
+  |ΔD|_∞ = 2.437e-04
 
 Convergence check
 
@@ -13282,9 +13375,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=751.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=698.36 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.782e-07
+  ||ΔT||/||T|| = 2.209e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13292,23 +13385,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.322e-08
+  ||Δu||/||u|| = 7.489e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.297e-06
+  ||ΔD||/||D|| = 1.536e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.628e-05
+  |ΔD|_∞ = 1.701e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0828e+03 J
-  → Fracture energy : 3.5503e+00 J
-  → Total energy    : 2.0864e+03 J
+  → Elastic energy  : 2.2082e+02 J
+  → Fracture energy : 1.1498e+01 J
+  → Total energy    : 2.3232e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -13350,9 +13443,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=750.51 K
+  T_new: min=263.15 K, max=1023.17 K, mean=697.31 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.408e-03
+  ||ΔT||/||T|| = 1.747e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13360,15 +13453,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.244e-04
+  ||Δu||/||u|| = 1.435e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.651e-03
+  ||ΔD||/||D|| = 2.896e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.954e-02
+  |ΔD|_∞ = 2.986e-02
 
 Convergence check
 
@@ -13381,9 +13474,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=750.51 K
+  T_new: min=263.15 K, max=1023.17 K, mean=697.31 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 7.040e-05
+  ||ΔT||/||T|| = 8.733e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13391,15 +13484,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.237e-05
+  ||Δu||/||u|| = 1.459e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.580e-04
+  ||ΔD||/||D|| = 2.892e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.043e-03
+  |ΔD|_∞ = 3.084e-03
 
 Convergence check
 
@@ -13412,9 +13505,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=750.51 K
+  T_new: min=263.15 K, max=1023.17 K, mean=697.31 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.520e-06
+  ||ΔT||/||T|| = 4.366e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13422,15 +13515,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.363e-07
+  ||Δu||/||u|| = 1.108e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.920e-05
+  ||ΔD||/||D|| = 2.207e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.374e-04
+  |ΔD|_∞ = 2.410e-04
 
 Convergence check
 
@@ -13443,9 +13536,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=750.51 K
+  T_new: min=263.15 K, max=1023.17 K, mean=697.31 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.760e-07
+  ||ΔT||/||T|| = 2.183e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13453,23 +13546,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.284e-08
+  ||Δu||/||u|| = 7.448e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.283e-06
+  ||ΔD||/||D|| = 1.509e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.648e-05
+  |ΔD|_∞ = 1.676e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0978e+03 J
-  → Fracture energy : 3.5597e+00 J
-  → Total energy    : 2.1013e+03 J
+  → Elastic energy  : 2.2073e+02 J
+  → Fracture energy : 1.1527e+01 J
+  → Total energy    : 2.3226e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -13511,9 +13604,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=749.70 K
+  T_new: min=263.15 K, max=1023.17 K, mean=696.26 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.391e-03
+  ||ΔT||/||T|| = 1.727e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13521,15 +13614,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.236e-04
+  ||Δu||/||u|| = 1.424e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.610e-03
+  ||ΔD||/||D|| = 2.851e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.960e-02
+  |ΔD|_∞ = 2.988e-02
 
 Convergence check
 
@@ -13542,9 +13635,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=749.70 K
+  T_new: min=263.15 K, max=1023.17 K, mean=696.26 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.955e-05
+  ||ΔT||/||T|| = 8.633e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13552,15 +13645,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.229e-05
+  ||Δu||/||u|| = 1.450e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.547e-04
+  ||ΔD||/||D|| = 2.847e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.053e-03
+  |ΔD|_∞ = 3.091e-03
 
 Convergence check
 
@@ -13573,9 +13666,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=749.70 K
+  T_new: min=263.15 K, max=1023.17 K, mean=696.26 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.478e-06
+  ||ΔT||/||T|| = 4.317e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13583,15 +13676,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.308e-07
+  ||Δu||/||u|| = 1.102e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.897e-05
+  ||ΔD||/||D|| = 2.172e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.386e-04
+  |ΔD|_∞ = 2.421e-04
 
 Convergence check
 
@@ -13604,9 +13697,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=749.70 K
+  T_new: min=263.15 K, max=1023.17 K, mean=696.26 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.739e-07
+  ||ΔT||/||T|| = 2.158e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13614,23 +13707,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.247e-08
+  ||Δu||/||u|| = 7.407e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.268e-06
+  ||ΔD||/||D|| = 1.486e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.660e-05
+  |ΔD|_∞ = 1.687e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1125e+03 J
-  → Fracture energy : 3.5690e+00 J
-  → Total energy    : 2.1161e+03 J
+  → Elastic energy  : 2.2064e+02 J
+  → Fracture energy : 1.1557e+01 J
+  → Total energy    : 2.3220e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -13672,9 +13765,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.90 K
+  T_new: min=263.15 K, max=1023.17 K, mean=695.23 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.374e-03
+  ||ΔT||/||T|| = 1.707e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13682,15 +13775,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.228e-04
+  ||Δu||/||u|| = 1.414e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.579e-03
+  ||ΔD||/||D|| = 2.805e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.955e-02
+  |ΔD|_∞ = 2.959e-02
 
 Convergence check
 
@@ -13703,9 +13796,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.90 K
+  T_new: min=263.15 K, max=1023.17 K, mean=695.23 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.872e-05
+  ||ΔT||/||T|| = 8.536e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13713,15 +13806,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.222e-05
+  ||Δu||/||u|| = 1.442e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.512e-04
+  ||ΔD||/||D|| = 2.798e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.050e-03
+  |ΔD|_∞ = 3.066e-03
 
 Convergence check
 
@@ -13734,9 +13827,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.90 K
+  T_new: min=263.15 K, max=1023.17 K, mean=695.23 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.436e-06
+  ||ΔT||/||T|| = 4.268e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13744,15 +13837,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.254e-07
+  ||Δu||/||u|| = 1.096e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.870e-05
+  ||ΔD||/||D|| = 2.134e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.387e-04
+  |ΔD|_∞ = 2.406e-04
 
 Convergence check
 
@@ -13765,9 +13858,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.90 K
+  T_new: min=263.15 K, max=1023.17 K, mean=695.23 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.718e-07
+  ||ΔT||/||T|| = 2.134e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13775,23 +13868,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.211e-08
+  ||Δu||/||u|| = 7.367e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.251e-06
+  ||ΔD||/||D|| = 1.459e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.664e-05
+  |ΔD|_∞ = 1.680e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1270e+03 J
-  → Fracture energy : 3.5782e+00 J
-  → Total energy    : 2.1306e+03 J
+  → Elastic energy  : 2.2055e+02 J
+  → Fracture energy : 1.1585e+01 J
+  → Total energy    : 2.3214e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -13833,9 +13926,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=694.21 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.358e-03
+  ||ΔT||/||T|| = 1.688e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13843,15 +13936,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.220e-04
+  ||Δu||/||u|| = 1.404e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.530e-03
+  ||ΔD||/||D|| = 2.751e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.943e-02
+  |ΔD|_∞ = 2.916e-02
 
 Convergence check
 
@@ -13864,9 +13957,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=694.21 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.791e-05
+  ||ΔT||/||T|| = 8.440e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13874,15 +13967,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.215e-05
+  ||Δu||/||u|| = 1.434e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.466e-04
+  ||ΔD||/||D|| = 2.745e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.040e-03
+  |ΔD|_∞ = 3.027e-03
 
 Convergence check
 
@@ -13895,9 +13988,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=694.21 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.396e-06
+  ||ΔT||/||T|| = 4.220e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13905,15 +13998,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.202e-07
+  ||Δu||/||u|| = 1.090e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.838e-05
+  ||ΔD||/||D|| = 2.093e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.382e-04
+  |ΔD|_∞ = 2.379e-04
 
 Convergence check
 
@@ -13926,9 +14019,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=748.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=694.21 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.698e-07
+  ||ΔT||/||T|| = 2.110e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -13936,23 +14029,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.176e-08
+  ||Δu||/||u|| = 7.328e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.231e-06
+  ||ΔD||/||D|| = 1.431e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.662e-05
+  |ΔD|_∞ = 1.664e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1414e+03 J
-  → Fracture energy : 3.5871e+00 J
-  → Total energy    : 2.1450e+03 J
+  → Elastic energy  : 2.2046e+02 J
+  → Fracture energy : 1.1614e+01 J
+  → Total energy    : 2.3208e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -13994,9 +14087,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=747.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=693.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.342e-03
+  ||ΔT||/||T|| = 1.669e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14004,15 +14097,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.212e-04
+  ||Δu||/||u|| = 1.394e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.473e-03
+  ||ΔD||/||D|| = 2.697e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.921e-02
+  |ΔD|_∞ = 2.875e-02
 
 Convergence check
 
@@ -14025,9 +14118,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=747.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=693.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.712e-05
+  ||ΔT||/||T|| = 8.347e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14035,15 +14128,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.209e-05
+  ||Δu||/||u|| = 1.426e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.415e-04
+  ||ΔD||/||D|| = 2.691e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.017e-03
+  |ΔD|_∞ = 2.986e-03
 
 Convergence check
 
@@ -14056,9 +14149,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=747.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=693.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.356e-06
+  ||ΔT||/||T|| = 4.174e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14066,15 +14159,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.153e-07
+  ||Δu||/||u|| = 1.085e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.802e-05
+  ||ΔD||/||D|| = 2.052e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.366e-04
+  |ΔD|_∞ = 2.351e-04
 
 Convergence check
 
@@ -14087,9 +14180,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=747.33 K
+  T_new: min=263.15 K, max=1023.17 K, mean=693.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.678e-07
+  ||ΔT||/||T|| = 2.087e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14097,23 +14190,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.143e-08
+  ||Δu||/||u|| = 7.289e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.208e-06
+  ||ΔD||/||D|| = 1.403e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.653e-05
+  |ΔD|_∞ = 1.647e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1555e+03 J
-  → Fracture energy : 3.5959e+00 J
-  → Total energy    : 2.1591e+03 J
+  → Elastic energy  : 2.2038e+02 J
+  → Fracture energy : 1.1642e+01 J
+  → Total energy    : 2.3202e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -14155,9 +14248,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=746.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=692.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.327e-03
+  ||ΔT||/||T|| = 1.651e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14165,15 +14258,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.206e-04
+  ||Δu||/||u|| = 1.385e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.421e-03
+  ||ΔD||/||D|| = 2.652e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.877e-02
+  |ΔD|_∞ = 2.824e-02
 
 Convergence check
 
@@ -14186,9 +14279,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=746.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=692.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.635e-05
+  ||ΔT||/||T|| = 8.256e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14196,15 +14289,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.203e-05
+  ||Δu||/||u|| = 1.418e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.372e-04
+  ||ΔD||/||D|| = 2.647e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.971e-03
+  |ΔD|_∞ = 2.934e-03
 
 Convergence check
 
@@ -14217,9 +14310,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=746.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=692.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.317e-06
+  ||ΔT||/||T|| = 4.128e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14227,15 +14320,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.107e-07
+  ||Δu||/||u|| = 1.079e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.772e-05
+  ||ΔD||/||D|| = 2.018e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.332e-04
+  |ΔD|_∞ = 2.312e-04
 
 Convergence check
 
@@ -14248,9 +14341,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=746.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=692.20 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.659e-07
+  ||ΔT||/||T|| = 2.064e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14258,23 +14351,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.112e-08
+  ||Δu||/||u|| = 7.251e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.189e-06
+  ||ΔD||/||D|| = 1.379e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.630e-05
+  |ΔD|_∞ = 1.622e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1694e+03 J
-  → Fracture energy : 3.6046e+00 J
-  → Total energy    : 2.1730e+03 J
+  → Elastic energy  : 2.2029e+02 J
+  → Fracture energy : 1.1669e+01 J
+  → Total energy    : 2.3196e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -14316,9 +14409,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.79 K
+  T_new: min=263.15 K, max=1023.17 K, mean=691.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.312e-03
+  ||ΔT||/||T|| = 1.633e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14326,15 +14419,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.200e-04
+  ||Δu||/||u|| = 1.376e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.410e-03
+  ||ΔD||/||D|| = 2.618e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.830e-02
+  |ΔD|_∞ = 2.762e-02
 
 Convergence check
 
@@ -14347,9 +14440,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.79 K
+  T_new: min=263.15 K, max=1023.17 K, mean=691.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.559e-05
+  ||ΔT||/||T|| = 8.167e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14357,15 +14450,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.197e-05
+  ||Δu||/||u|| = 1.411e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.358e-04
+  ||ΔD||/||D|| = 2.607e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.910e-03
+  |ΔD|_∞ = 2.870e-03
 
 Convergence check
 
@@ -14378,9 +14471,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.79 K
+  T_new: min=263.15 K, max=1023.17 K, mean=691.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.280e-06
+  ||ΔT||/||T|| = 4.084e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14388,15 +14481,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.062e-07
+  ||Δu||/||u|| = 1.073e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.760e-05
+  ||ΔD||/||D|| = 1.986e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.279e-04
+  |ΔD|_∞ = 2.263e-04
 
 Convergence check
 
@@ -14409,9 +14502,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.79 K
+  T_new: min=263.15 K, max=1023.17 K, mean=691.22 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.640e-07
+  ||ΔT||/||T|| = 2.042e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14419,23 +14512,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.081e-08
+  ||Δu||/||u|| = 7.213e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.179e-06
+  ||ΔD||/||D|| = 1.357e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.594e-05
+  |ΔD|_∞ = 1.589e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1831e+03 J
-  → Fracture energy : 3.6133e+00 J
-  → Total energy    : 2.1867e+03 J
+  → Elastic energy  : 2.2020e+02 J
+  → Fracture energy : 1.1697e+01 J
+  → Total energy    : 2.3190e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -14477,9 +14570,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.04 K
+  T_new: min=263.15 K, max=1023.17 K, mean=690.24 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.297e-03
+  ||ΔT||/||T|| = 1.616e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14487,15 +14580,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.195e-04
+  ||Δu||/||u|| = 1.367e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.403e-03
+  ||ΔD||/||D|| = 2.571e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.864e-02
+  |ΔD|_∞ = 2.686e-02
 
 Convergence check
 
@@ -14508,9 +14601,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.04 K
+  T_new: min=263.15 K, max=1023.17 K, mean=690.24 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.485e-05
+  ||ΔT||/||T|| = 8.080e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14518,15 +14611,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.191e-05
+  ||Δu||/||u|| = 1.403e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.346e-04
+  ||ΔD||/||D|| = 2.564e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.949e-03
+  |ΔD|_∞ = 2.790e-03
 
 Convergence check
 
@@ -14539,9 +14632,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.04 K
+  T_new: min=263.15 K, max=1023.17 K, mean=690.24 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.243e-06
+  ||ΔT||/||T|| = 4.040e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14549,15 +14642,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 9.016e-07
+  ||Δu||/||u|| = 1.068e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.749e-05
+  ||ΔD||/||D|| = 1.954e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.299e-04
+  |ΔD|_∞ = 2.202e-04
 
 Convergence check
 
@@ -14570,9 +14663,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=745.04 K
+  T_new: min=263.15 K, max=1023.17 K, mean=690.24 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.621e-07
+  ||ΔT||/||T|| = 2.020e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14580,23 +14673,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.050e-08
+  ||Δu||/||u|| = 7.176e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.171e-06
+  ||ΔD||/||D|| = 1.336e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.595e-05
+  |ΔD|_∞ = 1.547e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1967e+03 J
-  → Fracture energy : 3.6220e+00 J
-  → Total energy    : 2.2003e+03 J
+  → Elastic energy  : 2.2012e+02 J
+  → Fracture energy : 1.1723e+01 J
+  → Total energy    : 2.3184e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -14638,9 +14731,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=744.29 K
+  T_new: min=263.15 K, max=1023.17 K, mean=689.28 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.283e-03
+  ||ΔT||/||T|| = 1.599e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14648,15 +14741,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.189e-04
+  ||Δu||/||u|| = 1.360e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.369e-03
+  ||ΔD||/||D|| = 2.531e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.894e-02
+  |ΔD|_∞ = 2.596e-02
 
 Convergence check
 
@@ -14669,9 +14762,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=744.29 K
+  T_new: min=263.15 K, max=1023.17 K, mean=689.28 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.413e-05
+  ||ΔT||/||T|| = 7.995e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14679,15 +14772,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.185e-05
+  ||Δu||/||u|| = 1.396e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.316e-04
+  ||ΔD||/||D|| = 2.525e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.982e-03
+  |ΔD|_∞ = 2.695e-03
 
 Convergence check
 
@@ -14700,9 +14793,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=744.29 K
+  T_new: min=263.15 K, max=1023.17 K, mean=689.28 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.207e-06
+  ||ΔT||/||T|| = 3.997e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14710,15 +14803,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.972e-07
+  ||Δu||/||u|| = 1.062e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.729e-05
+  ||ΔD||/||D|| = 1.926e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.328e-04
+  |ΔD|_∞ = 2.127e-04
 
 Convergence check
 
@@ -14731,9 +14824,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=744.29 K
+  T_new: min=263.15 K, max=1023.17 K, mean=689.28 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.603e-07
+  ||ΔT||/||T|| = 1.999e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14741,23 +14834,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 6.020e-08
+  ||Δu||/||u|| = 7.141e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.158e-06
+  ||ΔD||/||D|| = 1.317e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.618e-05
+  |ΔD|_∞ = 1.495e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2100e+03 J
-  → Fracture energy : 3.6306e+00 J
-  → Total energy    : 2.2136e+03 J
+  → Elastic energy  : 2.2003e+02 J
+  → Fracture energy : 1.1750e+01 J
+  → Total energy    : 2.3178e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -14799,9 +14892,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=743.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=688.33 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.268e-03
+  ||ΔT||/||T|| = 1.582e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14809,15 +14902,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.183e-04
+  ||Δu||/||u|| = 1.354e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.343e-03
+  ||ΔD||/||D|| = 2.489e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.908e-02
+  |ΔD|_∞ = 2.546e-02
 
 Convergence check
 
@@ -14830,9 +14923,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=743.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=688.33 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.342e-05
+  ||ΔT||/||T|| = 7.911e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14840,15 +14933,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.179e-05
+  ||Δu||/||u|| = 1.390e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.293e-04
+  ||ΔD||/||D|| = 2.489e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.999e-03
+  |ΔD|_∞ = 2.644e-03
 
 Convergence check
 
@@ -14861,9 +14954,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=743.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=688.33 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.171e-06
+  ||ΔT||/||T|| = 3.956e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14871,15 +14964,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.927e-07
+  ||Δu||/||u|| = 1.057e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.713e-05
+  ||ΔD||/||D|| = 1.900e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.344e-04
+  |ΔD|_∞ = 2.105e-04
 
 Convergence check
 
@@ -14892,9 +14985,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=743.56 K
+  T_new: min=263.15 K, max=1023.17 K, mean=688.33 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.586e-07
+  ||ΔT||/||T|| = 1.978e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14902,23 +14995,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.990e-08
+  ||Δu||/||u|| = 7.107e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.148e-06
+  ||ΔD||/||D|| = 1.300e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.631e-05
+  |ΔD|_∞ = 1.489e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2232e+03 J
-  → Fracture energy : 3.6391e+00 J
-  → Total energy    : 2.2268e+03 J
+  → Elastic energy  : 2.1994e+02 J
+  → Fracture energy : 1.1776e+01 J
+  → Total energy    : 2.3172e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -14960,9 +15053,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.83 K
+  T_new: min=263.15 K, max=1023.17 K, mean=687.39 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.255e-03
+  ||ΔT||/||T|| = 1.566e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -14970,15 +15063,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.176e-04
+  ||Δu||/||u|| = 1.348e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.312e-03
+  ||ΔD||/||D|| = 2.462e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.910e-02
+  |ΔD|_∞ = 2.543e-02
 
 Convergence check
 
@@ -14991,9 +15084,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.83 K
+  T_new: min=263.15 K, max=1023.17 K, mean=687.39 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.273e-05
+  ||ΔT||/||T|| = 7.830e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15001,15 +15094,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.173e-05
+  ||Δu||/||u|| = 1.383e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.265e-04
+  ||ΔD||/||D|| = 2.459e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 3.002e-03
+  |ΔD|_∞ = 2.680e-03
 
 Convergence check
 
@@ -15022,9 +15115,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.83 K
+  T_new: min=263.15 K, max=1023.17 K, mean=687.39 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.137e-06
+  ||ΔT||/||T|| = 3.915e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15032,15 +15125,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.882e-07
+  ||Δu||/||u|| = 1.052e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.693e-05
+  ||ΔD||/||D|| = 1.876e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.348e-04
+  |ΔD|_∞ = 2.133e-04
 
 Convergence check
 
@@ -15053,9 +15146,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.83 K
+  T_new: min=263.15 K, max=1023.17 K, mean=687.39 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.568e-07
+  ||ΔT||/||T|| = 1.957e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15063,23 +15156,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.959e-08
+  ||Δu||/||u|| = 7.073e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.136e-06
+  ||ΔD||/||D|| = 1.284e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.636e-05
+  |ΔD|_∞ = 1.508e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2362e+03 J
-  → Fracture energy : 3.6476e+00 J
-  → Total energy    : 2.2398e+03 J
+  → Elastic energy  : 2.1986e+02 J
+  → Fracture energy : 1.1802e+01 J
+  → Total energy    : 2.3166e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -15121,9 +15214,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=686.46 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.241e-03
+  ||ΔT||/||T|| = 1.550e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15131,15 +15224,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.168e-04
+  ||Δu||/||u|| = 1.342e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.279e-03
+  ||ΔD||/||D|| = 2.439e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.895e-02
+  |ΔD|_∞ = 2.580e-02
 
 Convergence check
 
@@ -15152,9 +15245,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=686.46 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.206e-05
+  ||ΔT||/||T|| = 7.750e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15162,15 +15255,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.167e-05
+  ||Δu||/||u|| = 1.377e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.232e-04
+  ||ΔD||/||D|| = 2.437e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.988e-03
+  |ΔD|_∞ = 2.715e-03
 
 Convergence check
 
@@ -15183,9 +15276,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=686.46 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.103e-06
+  ||ΔT||/||T|| = 3.875e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15193,15 +15286,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.835e-07
+  ||Δu||/||u|| = 1.048e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.670e-05
+  ||ΔD||/||D|| = 1.860e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.339e-04
+  |ΔD|_∞ = 2.159e-04
 
 Convergence check
 
@@ -15214,9 +15307,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=742.11 K
+  T_new: min=263.15 K, max=1023.17 K, mean=686.46 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.551e-07
+  ||ΔT||/||T|| = 1.938e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15224,23 +15317,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.929e-08
+  ||Δu||/||u|| = 7.040e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.121e-06
+  ||ΔD||/||D|| = 1.273e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.631e-05
+  |ΔD|_∞ = 1.525e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2490e+03 J
-  → Fracture energy : 3.6559e+00 J
-  → Total energy    : 2.2527e+03 J
+  → Elastic energy  : 2.1978e+02 J
+  → Fracture energy : 1.1828e+01 J
+  → Total energy    : 2.3160e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -15282,9 +15375,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=741.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=685.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.228e-03
+  ||ΔT||/||T|| = 1.534e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15292,15 +15385,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.159e-04
+  ||Δu||/||u|| = 1.337e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.235e-03
+  ||ΔD||/||D|| = 2.413e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.857e-02
+  |ΔD|_∞ = 2.614e-02
 
 Convergence check
 
@@ -15313,9 +15406,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=741.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=685.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.140e-05
+  ||ΔT||/||T|| = 7.672e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15323,15 +15416,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.160e-05
+  ||Δu||/||u|| = 1.371e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.193e-04
+  ||ΔD||/||D|| = 2.416e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.949e-03
+  |ΔD|_∞ = 2.745e-03
 
 Convergence check
 
@@ -15344,9 +15437,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=741.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=685.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.070e-06
+  ||ΔT||/||T|| = 3.836e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15354,15 +15447,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.787e-07
+  ||Δu||/||u|| = 1.043e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.643e-05
+  ||ΔD||/||D|| = 1.845e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.310e-04
+  |ΔD|_∞ = 2.181e-04
 
 Convergence check
 
@@ -15375,9 +15468,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=741.40 K
+  T_new: min=263.15 K, max=1023.17 K, mean=685.54 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.535e-07
+  ||ΔT||/||T|| = 1.918e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15385,23 +15478,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.897e-08
+  ||Δu||/||u|| = 7.007e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.104e-06
+  ||ΔD||/||D|| = 1.264e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.612e-05
+  |ΔD|_∞ = 1.540e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2618e+03 J
-  → Fracture energy : 3.6640e+00 J
-  → Total energy    : 2.2655e+03 J
+  → Elastic energy  : 2.1969e+02 J
+  → Fracture energy : 1.1854e+01 J
+  → Total energy    : 2.3155e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -15443,9 +15536,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.69 K
+  T_new: min=263.15 K, max=1023.17 K, mean=684.63 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.215e-03
+  ||ΔT||/||T|| = 1.519e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15453,15 +15546,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.150e-04
+  ||Δu||/||u|| = 1.331e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.196e-03
+  ||ΔD||/||D|| = 2.401e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.791e-02
+  |ΔD|_∞ = 2.645e-02
 
 Convergence check
 
@@ -15474,9 +15567,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.69 K
+  T_new: min=263.15 K, max=1023.17 K, mean=684.63 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.075e-05
+  ||ΔT||/||T|| = 7.595e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15484,15 +15577,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.153e-05
+  ||Δu||/||u|| = 1.365e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.166e-04
+  ||ΔD||/||D|| = 2.400e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.880e-03
+  |ΔD|_∞ = 2.770e-03
 
 Convergence check
 
@@ -15505,9 +15598,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.69 K
+  T_new: min=263.15 K, max=1023.17 K, mean=684.63 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.037e-06
+  ||ΔT||/||T|| = 3.798e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15515,15 +15608,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.739e-07
+  ||Δu||/||u|| = 1.038e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.626e-05
+  ||ΔD||/||D|| = 1.832e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.259e-04
+  |ΔD|_∞ = 2.198e-04
 
 Convergence check
 
@@ -15536,9 +15629,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.69 K
+  T_new: min=263.15 K, max=1023.17 K, mean=684.63 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.519e-07
+  ||ΔT||/||T|| = 1.899e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15546,23 +15639,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.866e-08
+  ||Δu||/||u|| = 6.975e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.093e-06
+  ||ΔD||/||D|| = 1.254e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.578e-05
+  |ΔD|_∞ = 1.550e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2745e+03 J
-  → Fracture energy : 3.6721e+00 J
-  → Total energy    : 2.2782e+03 J
+  → Elastic energy  : 2.1961e+02 J
+  → Fracture energy : 1.1880e+01 J
+  → Total energy    : 2.3149e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -15604,9 +15697,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.00 K
+  T_new: min=263.15 K, max=1023.18 K, mean=683.73 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.202e-03
+  ||ΔT||/||T|| = 1.504e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15614,15 +15707,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.140e-04
+  ||Δu||/||u|| = 1.326e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.202e-03
+  ||ΔD||/||D|| = 2.379e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.732e-02
+  |ΔD|_∞ = 2.668e-02
 
 Convergence check
 
@@ -15635,9 +15728,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.00 K
+  T_new: min=263.15 K, max=1023.18 K, mean=683.73 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 6.011e-05
+  ||ΔT||/||T|| = 7.520e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15645,15 +15738,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.146e-05
+  ||Δu||/||u|| = 1.358e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.162e-04
+  ||ΔD||/||D|| = 2.385e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.814e-03
+  |ΔD|_∞ = 2.786e-03
 
 Convergence check
 
@@ -15666,9 +15759,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.00 K
+  T_new: min=263.15 K, max=1023.18 K, mean=683.73 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 3.006e-06
+  ||ΔT||/||T|| = 3.760e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15676,15 +15769,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.690e-07
+  ||Δu||/||u|| = 1.033e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.619e-05
+  ||ΔD||/||D|| = 1.823e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.193e-04
+  |ΔD|_∞ = 2.207e-04
 
 Convergence check
 
@@ -15697,9 +15790,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=740.00 K
+  T_new: min=263.15 K, max=1023.18 K, mean=683.73 K
   T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.503e-07
+  ||ΔT||/||T|| = 1.880e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15707,23 +15800,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.835e-08
+  ||Δu||/||u|| = 6.943e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.087e-06
+  ||ΔD||/||D|| = 1.248e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.529e-05
+  |ΔD|_∞ = 1.555e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2871e+03 J
-  → Fracture energy : 3.6804e+00 J
-  → Total energy    : 2.2908e+03 J
+  → Elastic energy  : 2.1952e+02 J
+  → Fracture energy : 1.1906e+01 J
+  → Total energy    : 2.3143e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -15765,9 +15858,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=739.31 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.190e-03
+  T_new: min=263.15 K, max=1023.18 K, mean=682.84 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.489e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15775,15 +15868,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.131e-04
+  ||Δu||/||u|| = 1.321e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.191e-03
+  ||ΔD||/||D|| = 2.372e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.747e-02
+  |ΔD|_∞ = 2.663e-02
 
 Convergence check
 
@@ -15796,9 +15889,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=739.31 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 5.949e-05
+  T_new: min=263.15 K, max=1023.18 K, mean=682.84 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 7.447e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15806,15 +15899,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.139e-05
+  ||Δu||/||u|| = 1.352e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.150e-04
+  ||ΔD||/||D|| = 2.372e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.833e-03
+  |ΔD|_∞ = 2.774e-03
 
 Convergence check
 
@@ -15827,9 +15920,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=739.31 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.975e-06
+  T_new: min=263.15 K, max=1023.18 K, mean=682.84 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 3.723e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15837,15 +15930,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.642e-07
+  ||Δu||/||u|| = 1.028e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.610e-05
+  ||ΔD||/||D|| = 1.812e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.211e-04
+  |ΔD|_∞ = 2.194e-04
 
 Convergence check
 
@@ -15858,9 +15951,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=739.31 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.487e-07
+  T_new: min=263.15 K, max=1023.18 K, mean=682.84 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.862e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15868,23 +15961,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.804e-08
+  ||Δu||/||u|| = 6.911e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.082e-06
+  ||ΔD||/||D|| = 1.240e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.535e-05
+  |ΔD|_∞ = 1.544e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2996e+03 J
-  → Fracture energy : 3.6886e+00 J
-  → Total energy    : 2.3033e+03 J
+  → Elastic energy  : 2.1944e+02 J
+  → Fracture energy : 1.1931e+01 J
+  → Total energy    : 2.3137e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -15926,9 +16019,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=738.63 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.178e-03
+  T_new: min=263.15 K, max=1023.18 K, mean=681.95 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.475e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15936,15 +16029,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.122e-04
+  ||Δu||/||u|| = 1.316e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.175e-03
+  ||ΔD||/||D|| = 2.355e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.755e-02
+  |ΔD|_∞ = 2.619e-02
 
 Convergence check
 
@@ -15957,9 +16050,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=738.63 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 5.888e-05
+  T_new: min=263.15 K, max=1023.18 K, mean=681.95 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 7.375e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15967,15 +16060,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.132e-05
+  ||Δu||/||u|| = 1.347e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.137e-04
+  ||ΔD||/||D|| = 2.359e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.844e-03
+  |ΔD|_∞ = 2.722e-03
 
 Convergence check
 
@@ -15988,9 +16081,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=738.63 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.944e-06
+  T_new: min=263.15 K, max=1023.18 K, mean=681.95 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 3.687e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -15998,15 +16091,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.596e-07
+  ||Δu||/||u|| = 1.024e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.601e-05
+  ||ΔD||/||D|| = 1.804e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.222e-04
+  |ΔD|_∞ = 2.150e-04
 
 Convergence check
 
@@ -16019,9 +16112,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=738.63 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.472e-07
+  T_new: min=263.15 K, max=1023.18 K, mean=681.95 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.844e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16029,23 +16122,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.774e-08
+  ||Δu||/||u|| = 6.880e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.076e-06
+  ||ΔD||/||D|| = 1.235e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.546e-05
+  |ΔD|_∞ = 1.513e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3120e+03 J
-  → Fracture energy : 3.6968e+00 J
-  → Total energy    : 2.3157e+03 J
+  → Elastic energy  : 2.1936e+02 J
+  → Fracture energy : 1.1957e+01 J
+  → Total energy    : 2.3131e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -16087,9 +16180,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.95 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.166e-03
+  T_new: min=263.15 K, max=1023.18 K, mean=681.08 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.461e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16097,15 +16190,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.114e-04
+  ||Δu||/||u|| = 1.313e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.172e-03
+  ||ΔD||/||D|| = 2.333e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.750e-02
+  |ΔD|_∞ = 2.577e-02
 
 Convergence check
 
@@ -16118,9 +16211,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.95 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 5.829e-05
+  T_new: min=263.15 K, max=1023.18 K, mean=681.08 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 7.304e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16128,15 +16221,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.126e-05
+  ||Δu||/||u|| = 1.341e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.129e-04
+  ||ΔD||/||D|| = 2.338e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.841e-03
+  |ΔD|_∞ = 2.703e-03
 
 Convergence check
 
@@ -16149,9 +16242,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.95 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.914e-06
+  T_new: min=263.15 K, max=1023.18 K, mean=681.08 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 3.652e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16159,15 +16252,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.551e-07
+  ||Δu||/||u|| = 1.020e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.593e-05
+  ||ΔD||/||D|| = 1.789e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.223e-04
+  |ΔD|_∞ = 2.141e-04
 
 Convergence check
 
@@ -16180,9 +16273,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.95 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.457e-07
+  T_new: min=263.15 K, max=1023.18 K, mean=681.08 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.826e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16190,23 +16283,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.745e-08
+  ||Δu||/||u|| = 6.850e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.070e-06
+  ||ΔD||/||D|| = 1.226e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.548e-05
+  |ΔD|_∞ = 1.508e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3242e+03 J
-  → Fracture energy : 3.7050e+00 J
-  → Total energy    : 2.3279e+03 J
+  → Elastic energy  : 2.1928e+02 J
+  → Fracture energy : 1.1982e+01 J
+  → Total energy    : 2.3126e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -16248,9 +16341,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.28 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.154e-03
+  T_new: min=263.15 K, max=1023.18 K, mean=680.22 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.447e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16258,15 +16351,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.108e-04
+  ||Δu||/||u|| = 1.310e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.155e-03
+  ||ΔD||/||D|| = 2.307e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.734e-02
+  |ΔD|_∞ = 2.600e-02
 
 Convergence check
 
@@ -16279,9 +16372,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.28 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 5.770e-05
+  T_new: min=263.15 K, max=1023.18 K, mean=680.22 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 7.235e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16289,15 +16382,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.120e-05
+  ||Δu||/||u|| = 1.336e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.113e-04
+  ||ΔD||/||D|| = 2.316e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.827e-03
+  |ΔD|_∞ = 2.727e-03
 
 Convergence check
 
@@ -16310,9 +16403,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.28 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.885e-06
+  T_new: min=263.15 K, max=1023.18 K, mean=680.22 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 3.617e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16320,15 +16413,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.509e-07
+  ||Δu||/||u|| = 1.015e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.582e-05
+  ||ΔD||/||D|| = 1.773e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.214e-04
+  |ΔD|_∞ = 2.160e-04
 
 Convergence check
 
@@ -16341,9 +16434,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=737.28 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.443e-07
+  T_new: min=263.15 K, max=1023.18 K, mean=680.22 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.809e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16351,23 +16444,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.717e-08
+  ||Δu||/||u|| = 6.822e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.063e-06
+  ||ΔD||/||D|| = 1.216e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.544e-05
+  |ΔD|_∞ = 1.521e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3364e+03 J
-  → Fracture energy : 3.7132e+00 J
-  → Total energy    : 2.3401e+03 J
+  → Elastic energy  : 2.1919e+02 J
+  → Fracture energy : 1.2007e+01 J
+  → Total energy    : 2.3120e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -16409,9 +16502,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=736.62 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.143e-03
+  T_new: min=263.15 K, max=1023.18 K, mean=679.36 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.433e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16419,15 +16512,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.101e-04
+  ||Δu||/||u|| = 1.308e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.127e-03
+  ||ΔD||/||D|| = 2.280e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.704e-02
+  |ΔD|_∞ = 2.600e-02
 
 Convergence check
 
@@ -16440,9 +16533,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=736.62 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 5.713e-05
+  T_new: min=263.15 K, max=1023.18 K, mean=679.36 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 7.167e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16450,15 +16543,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.115e-05
+  ||Δu||/||u|| = 1.332e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.089e-04
+  ||ΔD||/||D|| = 2.291e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.797e-03
+  |ΔD|_∞ = 2.727e-03
 
 Convergence check
 
@@ -16471,9 +16564,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=736.62 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.856e-06
+  T_new: min=263.15 K, max=1023.18 K, mean=679.36 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 3.583e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16481,15 +16574,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.470e-07
+  ||Δu||/||u|| = 1.012e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.566e-05
+  ||ΔD||/||D|| = 1.755e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.194e-04
+  |ΔD|_∞ = 2.161e-04
 
 Convergence check
 
@@ -16502,9 +16595,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=736.62 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.428e-07
+  T_new: min=263.15 K, max=1023.18 K, mean=679.36 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.792e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16512,23 +16605,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.691e-08
+  ||Δu||/||u|| = 6.794e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.052e-06
+  ||ΔD||/||D|| = 1.203e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.531e-05
+  |ΔD|_∞ = 1.523e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3484e+03 J
-  → Fracture energy : 3.7212e+00 J
-  → Total energy    : 2.3521e+03 J
+  → Elastic energy  : 2.1911e+02 J
+  → Fracture energy : 1.2031e+01 J
+  → Total energy    : 2.3115e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -16570,9 +16663,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=735.97 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.131e-03
+  T_new: min=263.15 K, max=1023.18 K, mean=678.52 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.420e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16580,15 +16673,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.094e-04
+  ||Δu||/||u|| = 1.305e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.103e-03
+  ||ΔD||/||D|| = 2.250e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.654e-02
+  |ΔD|_∞ = 2.581e-02
 
 Convergence check
 
@@ -16601,9 +16694,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=735.97 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 5.657e-05
+  T_new: min=263.15 K, max=1023.18 K, mean=678.52 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 7.100e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16611,15 +16704,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.110e-05
+  ||Δu||/||u|| = 1.327e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.067e-04
+  ||ΔD||/||D|| = 2.262e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.748e-03
+  |ΔD|_∞ = 2.707e-03
 
 Convergence check
 
@@ -16632,9 +16725,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=735.97 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.828e-06
+  T_new: min=263.15 K, max=1023.18 K, mean=678.52 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 3.550e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16642,15 +16735,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.431e-07
+  ||Δu||/||u|| = 1.008e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.550e-05
+  ||ΔD||/||D|| = 1.734e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.157e-04
+  |ΔD|_∞ = 2.147e-04
 
 Convergence check
 
@@ -16663,9 +16756,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.17 K, mean=735.97 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.414e-07
+  T_new: min=263.15 K, max=1023.18 K, mean=678.52 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.775e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16673,23 +16766,23 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.665e-08
+  ||Δu||/||u|| = 6.768e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.042e-06
+  ||ΔD||/||D|| = 1.189e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.507e-05
+  |ΔD|_∞ = 1.513e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3603e+03 J
-  → Fracture energy : 3.7292e+00 J
-  → Total energy    : 2.3640e+03 J
+  → Elastic energy  : 2.1903e+02 J
+  → Fracture energy : 1.2056e+01 J
+  → Total energy    : 2.3109e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
@@ -16731,9 +16824,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.18 K, mean=735.32 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.120e-03
+  T_new: min=263.15 K, max=1023.18 K, mean=677.68 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.407e-03
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16741,15 +16834,15 @@ Coupling = staggered
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.086e-04
+  ||Δu||/||u|| = 1.302e-04
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.096e-03
+  ||ΔD||/||D|| = 2.216e-03
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.584e-02
+  |ΔD|_∞ = 2.545e-02
 
 Convergence check
 
@@ -16762,9 +16855,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.18 K, mean=735.32 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 5.602e-05
+  T_new: min=263.15 K, max=1023.18 K, mean=677.68 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 7.035e-05
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16772,15 +16865,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.104e-05
+  ||Δu||/||u|| = 1.323e-05
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 2.059e-04
+  ||ΔD||/||D|| = 2.235e-04
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.676e-03
+  |ΔD|_∞ = 2.670e-03
 
 Convergence check
 
@@ -16793,9 +16886,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.18 K, mean=735.32 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 2.801e-06
+  T_new: min=263.15 K, max=1023.18 K, mean=677.68 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 3.517e-06
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16803,15 +16896,15 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 8.391e-07
+  ||Δu||/||u|| = 1.004e-06
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.542e-05
+  ||ΔD||/||D|| = 1.715e-05
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 2.102e-04
+  |ΔD|_∞ = 2.118e-04
 
 Convergence check
 
@@ -16824,9 +16917,9 @@ Convergence check
   Building weak form, volume integrals (dx) for uo2, tag = 10
   → q_third[uo2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
-  T_new: min=263.15 K, max=1023.18 K, mean=735.32 K
-  T^n (self.T): min=263.15 K, max=1023.17 K
-  ||ΔT||/||T|| = 1.400e-07
+  T_new: min=263.15 K, max=1023.18 K, mean=677.68 K
+  T^n (self.T): min=263.15 K, max=1023.18 K
+  ||ΔT||/||T|| = 1.759e-07
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -16834,27 +16927,27 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 30 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.639e-08
+  ||Δu||/||u|| = 6.742e-08
   [adaptive] relax_u=0.95
 
 **[INFO]** Assembling damage (AT1) problem...
 Solving damage problem for 'uo2' material
   - Material 'uo2': AT1 solve. Gc=3.72e+02, sigma_c=1.00e+09
-  ||ΔD||/||D|| = 1.036e-06
+  ||ΔD||/||D|| = 1.177e-06
   [adaptive] relax_D=0.95
-  |ΔD|_∞ = 1.470e-05
+  |ΔD|_∞ = 1.494e-05
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3720e+03 J
-  → Fracture energy : 3.7372e+00 J
-  → Total energy    : 2.3757e+03 J
+  → Elastic energy  : 2.1895e+02 J
+  → Fracture energy : 1.2080e+01 J
+  → Total energy    : 2.3103e+02 J
 Exporting results to VTU file...
   → Projecting result fields for all materials...
   → Adding damage field to VTU...
 VTU file exported to: output/fields_0099.vtu
 
-Simulation completed in 311.31 s
+Simulation completed in 508.07 s
 Total time steps solved: 100

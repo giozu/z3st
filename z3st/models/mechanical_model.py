@@ -533,10 +533,9 @@ class MechanicalModel:
                 raise RuntimeError(f"Failed to load/execute custom stress function '{stress_func_path}': {e}")
 
         else:
-            # Plane-stress reduction (x–y plane)
+            # Plane-stress reduction (x–y plane).
             if regime == "plane_stress":
 
-                # Modified Lame parameter for plane stress
                 lmbda_ps = (
                     2 * material["G"] * material["lmbda"] / (material["lmbda"] + 2 * material["G"])
                 )
@@ -544,17 +543,6 @@ class MechanicalModel:
                 eps = self.epsilon(u)
                 sigma = (
                     lmbda_ps * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
-                )
-
-                s_xx = sigma[0, 0]
-                s_xy = sigma[0, 1]
-                s_yy = sigma[1, 1]
-                return ufl.as_tensor(
-                    [
-                        [s_xx, s_xy, 0.0],
-                        [s_xy, s_yy, 0.0],
-                        [0.0, 0.0, 0.0],
-                    ]
                 )
 
             # Default isotropic Lamé
@@ -605,8 +593,6 @@ class MechanicalModel:
 
         Uses S = 2 ∂ψ/∂C (second Piola-Kirchhoff) and E (Green-Lagrange):
             δΠ = ∫ S : δE dx
-
-        This avoids grad(v) shape issues on 2D/axisymmetric meshes.
 
         Parameters:
             u: Displacement field (Function, not TrialFunction).

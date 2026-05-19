@@ -6,8 +6,5 @@ echo "Cleaning current directory..."
 rm -rf output/
 rm -f log_*.md log.z3st
 rm -f energies.txt
-# mesh.msh is intentionally NOT removed -- it's an input, regenerated only if
-# mesh.geo changes. For a full deep-clean (incl. the mesh), run `rm -f *.msh`
-# manually.
 
 echo "Done. Output and temporary files deleted (mesh preserved)."
