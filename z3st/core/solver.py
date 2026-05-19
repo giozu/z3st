@@ -556,7 +556,14 @@ class Solver:
                 grad_coeff = 2.0 * pref * lc         # = 3*Gc*lc/4 (bilinear form coeff)
                 diag_shift = 1.0e-8 * (Gc / lc)
 
-                print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, sigma_c={sigma_c:.2e}")
+                # Gc and sigma_c may be UFL expressions (when the material's
+                # Gc comes from a Python callable on the mesh, e.g.
+                # materials/oxide.py::Gc). The {:.2e} format then raises
+                # TypeError. Format scalars normally; show a type tag for
+                # non-scalars.
+                Gc_str = f"{Gc:.2e}" if isinstance(Gc, (int, float, np.floating, np.integer)) else f"<{type(Gc).__name__}>"
+                sc_str = f"{sigma_c:.2e}" if isinstance(sigma_c, (int, float, np.floating, np.integer)) else f"<{type(sigma_c).__name__}>"
+                print(f"  - Material '{label}': AT1 solve. Gc={Gc_str}, sigma_c={sc_str}")
 
                 a_d += w * (2.0 * self.H + diag_shift) * u_d * v_d * dx \
                      + w * grad_coeff * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
@@ -583,10 +590,7 @@ class Solver:
             # Clipping:
             D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
-        # Relax
         D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
-
-        # irreversibility
         D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 

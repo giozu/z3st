@@ -36,6 +36,11 @@ CASES=(
     # "15_box_elliptical_cavity_2D"
     "15_spherical_pressurized_cavity"
     "16_coaxial_cylinders_3D"
+    # The following are present on disk but currently lack a
+    # non-regression_gold.json (CASES-P1-6 / CASES-FOLLOWUP-5).
+    # Uncomment after blessing a gold for each.
+    # "15_single_elliptical_cavity_2D"
+    # "15_two_elliptical_cavities_2D"
     # "17_stress_strain_curve_double_crack"
     "17_stress_strain_curve_displacement"
     # "17_stress_strain_curve_knotch"

@@ -8,6 +8,21 @@
 
 set -e
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+
+# CI case-inclusion policy (see CONTEXT.md §6 / punch_list.md CASES-P1-5):
+# This list is a tight subset of the local non-regression.sh suite, chosen
+# for fast CI turnaround under the dolfinx/dolfinx:stable container budget.
+# Each case here:
+#   - has a stable output/non-regression_gold.json,
+#   - runs in well under one minute,
+#   - exercises one physics path that's not covered by another listed case
+#     (linear elasticity, axisymmetric thermal, 3D thermal, volumetric
+#     heating, multi-material with Robin pair gap, 2D damage, J2 plasticity,
+#     custom-plasticity hook).
+# Active WIP cases (14_full_cylinder_cracking, 14_full_cylinder_cracking_2D_xy,
+# 14_full_cylinder_thermal_2D_rz, 19_single-edge_notched_*) are intentionally
+# excluded — they are too long for CI and their golds are still being
+# blessed. Run them locally via cases/non-regression.sh.
 CASES=(
     "1_thin_slab_2D"
     "2_thin_cylindrical_shell_2D"

@@ -48,9 +48,8 @@ class FiniteElementSetup:
     
         # --. Plasticity --..
         if self.on.get("plasticity", False):
-            # Quadrature elements for plasticity model, to record history at integration points
-            # Heuristic: degree should ideally match the integration rule degree.
-            self.q_degree = mech_degree + 1 
+            
+            self.q_degree = 2 * mech_degree + 1
             print(f"Plasticity function spaces (V_pl_tensor, Q_pl) initializing with Quadrature degree {self.q_degree}")
             
             # Tensor

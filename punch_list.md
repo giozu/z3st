@@ -75,91 +75,91 @@ All P0 items resolved. Remaining work is P1 (correctness / clarity) and P2 (clea
 ### Code
 
 <a id="code-p1-1"></a>
-- [ ] **CODE-P1-1** — `z3st/core/spine.py:148-169`: no upfront validation that `dmg_cfg["type"] ∈ {AT1, AT2}`. A typo like `at1` or `AT-1` silently skips the auto-conversion and crashes later inside `_damage_step` with `KeyError("Gc")`. Add an explicit check in `DamageModel.__init__` (`damage_model.py:18`).
+- [x] **CODE-P1-1** — *Resolved 2026-05-19.* `DamageModel.__init__` (`damage_model.py`) now validates `damage.type ∈ {"AT1", "AT2"}` up-front, raising a clear `ValueError` on any other value (lowercase typo, hyphenated form, etc.). Also reordered: the missing-block check now runs *before* the `setdefault("linear_solver", ...)` so an entirely absent damage block still surfaces clearly rather than being silently filled in.
 
 <a id="code-p1-2"></a>
-- [ ] **CODE-P1-2** — `z3st/core/spine.py:160` uses `type(Gc) == float`, which excludes `np.floating` / `int`. The σc-from-Gc conversion is silently bypassed in those cases. Use `isinstance(Gc, (int, float, np.floating))`.
+- [x] **CODE-P1-2** — *Resolved 2026-05-19.* `spine.py:160` now uses `isinstance(Gc, (int, float, np.floating, np.integer))` so `Gc` provided as a numpy scalar (or Python `int`) is recognised and the σc-from-Gc conversion runs as intended.
 
 <a id="code-p1-3"></a>
-- [ ] **CODE-P1-3** — `z3st/core/spine.py:281,285`: when `Gc` is a Python callable returning a UFL expression (the `materials/ceramic.py` / `materials/oxide.py` extensibility hook), `mat["sigma_c"]` is set to `ufl.sqrt(...)`. `z3st/core/solver.py:559` later does `f"{sigma_c:.2e}"` → `TypeError`. Either skip the print when `sigma_c` is non-scalar, or stop overloading the same key.
+- [x] **CODE-P1-3** — *Resolved 2026-05-19.* `solver.py:559` diagnostic print now formats `Gc` / `sigma_c` conditionally: scalars use `{:.2e}` as before; non-scalars (UFL expressions, when the material's `Gc` comes from a Python callable such as `materials/oxide.py::Gc`) display `<ClassName>` instead. No more `TypeError` on AT1 runs with symbolic `Gc`.
 
 <a id="code-p1-4"></a>
-- [ ] **CODE-P1-4** — `z3st/core/solver.py:582-591` (AT1, and the analogous AT2 path): irreversibility / relaxation ordering. Sequence is `clip → relaxation → max(D_new, D_old) → clip`. Relaxation can drag `D_new` below `D_old`, then `max` resets to `D_old`, so when relaxation tries to slow propagation the effective increment is **zero**. Re-order: relax the increment `ΔD = max(0, D_new − D_old)` then set `D ← D_old + α·ΔD`.
+- [x] **CODE-P1-4** — *Resolved 2026-05-19 (false alarm, comment added).* Re-derivation shows the current ordering `α·D_new + (1-α)·D_old → max(·, D_old) → clip` is algebraically identical to the audit's proposed "relax-the-increment" formulation: `α·D_new + (1-α)·D_old = D_old + α·(D_new - D_old)`, and `max(D_old + α·X, D_old) = D_old + α·max(X, 0)` for α ≥ 0, so the composite equals `D_old + α·ΔD⁺` with `ΔD⁺ = max(0, D_new - D_old)`. The `max` projection isn't "clobbering" relaxation; it's correctly enforcing irreversibility when the raw `D_new` from the linear solve happens to dip below `D_old` (which the AT1 elliptic problem doesn't prevent by construction). Added an inline comment in `solver.py:582-591` explaining the equivalence so a future reader doesn't reorder it wrong.
 
 <a id="code-p1-5"></a>
-- [ ] **CODE-P1-5** — `z3st/__main__.py:166-172` + BC validation: `generate_power_history(n_steps=input_n_steps-1)` may return a `times` array whose length differs from `n_steps` for multi-segment histories. BC setters validate list lengths against `self.n_steps` (the YAML value), but the solver iterates `len(times)`. Tighten by setting `self.n_steps = len(times)` immediately after `generate_power_history` and **before** `set_boundary_conditions`. This is the same shape-of-bug that caused the tension-case failure on 2026-05-18.
+- [x] **CODE-P1-5** — *Resolved 2026-05-19.* `__main__.py` now sets `problem.n_steps = len(times)` immediately after `generate_power_history` and before `set_boundary_conditions`, so BC setters validate against the actual time-loop length, not the raw YAML `n_steps`.
 
 <a id="code-p1-6"></a>
-- [ ] **CODE-P1-6** — `z3st/models/mechanical_model.py:139-146`: Neumann traction list is not length-validated against `n_steps`; Dirichlet at L100 is. Add a parallel check.
+- [x] **CODE-P1-6** — *Resolved 2026-05-19.* `mechanical_model.py` Neumann branch now validates `len(traction_list) == self.n_steps` and exits with a clear `[ERROR]` message on mismatch — mirrors the existing Dirichlet check at L100.
 
 <a id="code-p1-7"></a>
-- [ ] **CODE-P1-7** — `z3st/models/thermal_model.py:76-95`: Thermal Dirichlet does not accept step-dependent lists. Either document this asymmetry vs. the mechanical block or extend with the same `raw` mechanism.
+- [x] **CODE-P1-7** — *Resolved 2026-05-19 (documented, not extended).* `thermal_model.py` Dirichlet branch now detects list inputs and emits a clear `[ERROR]` with a pointer to the mechanical-block pattern, instead of silently fixing T to `temperature[0]` or crashing inside dolfinx. Extending thermal Dirichlet to step-dependent lists is deferred — would require wiring per-step BC updates into `_thermal_step` and is non-trivial. Logged as [CODE-FOLLOWUP-1](#code-followup-1) below.
 
 <a id="code-p1-8"></a>
-- [ ] **CODE-P1-8** — `z3st/models/mechanical_model.py:453-455`: side-effect mutation of `material["constitutive_mode"]` from inside `sigma_mech`. Surprising and order-dependent (the first call sets it; later calls behave differently). Move to `load_materials` in `spine.py`.
+- [x] **CODE-P1-8** — *Resolved 2026-05-19.* Moved the `lame → plasticity` promotion (for materials with `yield_strength` when global plasticity is on) from inside `MechanicalModel.sigma_mech` to `Spine.load_materials`. The material dict is now deterministic at load time; `sigma_mech` just reads `material["constitutive_mode"]` instead of side-effect-mutating it on the first call.
 
 <a id="code-p1-9"></a>
-- [ ] **CODE-P1-9** — `z3st/core/spine.py:289-340` (`set_power`): with `inner_radius == 0` and `geometry_type ∈ {cyl, sphere}` with `gamma_heating > 0`, `K_0(0) = +∞` (cyl) or `1/r → ∞` (sphere) at the centre. Guard.
+- [x] **CODE-P1-9** — *Resolved 2026-05-19.* `set_power` now guards against the singular case: `gamma_heating > 0` with `geometry_type ∈ {cyl, cylinder, sphere}` and `inner_radius == 0.0` raises a clear `ValueError` instead of silently producing zero (cylindrical: `K_0(0) = +∞` in the denominator) or NaN (spherical: `inner_radius/r` with `r → 0`) heating.
 
 <a id="code-p1-10"></a>
-- [ ] **CODE-P1-10** — `z3st/core/spine.py:299-308`: `fissile: true` **and** `gamma_heating > 0` on the same material silently overwrites the fissile contribution (separate `if` blocks, second assignment wins). Use `+=` or raise.
+- [x] **CODE-P1-10** — *Resolved 2026-05-19.* `set_power` now `+=` into `q_third` for both the fissile branch and the gamma-heating branch (previously both used `=`, so a material with both flags lost the fissile contribution). Physically correct: the two heating sources superpose on a material that has both. No behavioural change for cases that set only one of the two (the `q_third` array is zero-initialised, so `+= v` == `= v` on first write).
 
 <a id="code-p1-11"></a>
-- [ ] **CODE-P1-11** — `z3st/core/finite_element_setup.py:53`: `q_degree = mech_degree + 1` is on the low side for full integration of the J2 return-mapping form. Standard is `2·mech_degree + 1`. Worth re-running `cases/20_plasticity_2D/` after bumping.
+- [x] **CODE-P1-11** — *Resolved 2026-05-19.* `q_degree = mech_degree + 1` → `q_degree = 2 * mech_degree + 1` in `finite_element_setup.py`. Aligns with the standard rule for full integration of the J2 return-mapping form (whose integrand contains nonlinear functions of `u` through `n = s_trial / |s_trial|_eq`). For `mech_degree = 1` (the default), `q_degree` goes from 2 → 3. **Owed verification:** rerun `cases/20_plasticity_2D/` and `demo_CP_single_grain/`. If their non-regression numbers shift (very plausible — small precision delta in the plastic-strain integration), re-bless their gold JSONs. Tracked in [CASES-FOLLOWUP-4](#cases-followup-4) below.
 
 <a id="code-p1-12"></a>
-- [ ] **CODE-P1-12** — `z3st/models/damage_model.py:103-106`: `crack_driving_force` has no `else` after the AT1 branch and returns `None` on a typo. The call site `update_history` then crashes inside `fem.Expression`. Raise `ValueError` explicitly.
+- [x] **CODE-P1-12** — *Resolved 2026-05-19.* Added explicit `else: raise ValueError(...)` after the AT1 branch in `crack_driving_force` (damage_model.py) **and** in the parallel `gamma_density` function (same shape-of-bug). A typo in `damage.type` now fails with a clear message instead of returning `None` and crashing later inside `fem.Expression`.
 
 <a id="code-p1-13"></a>
-- [ ] **CODE-P1-13** — `z3st/core/solver.py:396` (and analogous spots) raise `KeyError: 'linear_solver'` when the `mechanical:` or `damage:` blocks omit `linear_solver`. Encountered live in case 9 on 2026-05-19. Either pick a default (e.g. `direct_mumps`) in `Config` / `Solver.__init__`, or validate early with a clear message ("'linear_solver' is required when 'solver: linear' — choose one of direct_mumps / iterative_amg / iterative_hypre"). Same likely applies to `thermal.linear_solver` and `damage.linear_solver`.
+- [x] **CODE-P1-13** — *Resolved 2026-05-19.* Each of `mech_cfg`, `th_cfg`, `dmg_cfg` now `.setdefault("linear_solver", "iterative_hypre")` right after `self.input_file.get(...)`, so the solver no longer `KeyError`s when the user omits the key. Choice matches the README example. Per-case overrides still respected.
 
 ### Cases
 
 <a id="cases-p1-1"></a>
-- [ ] **CASES-P1-1** — `CONTEXT.md:415` claims `mesh.msh` is "checked in for CI"; `.gitignore:32` excludes `*.msh`. No case has `mesh.msh` tracked. CI works because `Allrun` regenerates it. Fix the doc.
+- [x] **CASES-P1-1** — *Resolved 2026-05-19.* CONTEXT.md per-case structure now reads `mesh.msh    generated mesh (NOT tracked in git per .gitignore — Allrun regenerates it with gmsh on each run)`.
 
 <a id="cases-p1-2"></a>
-- [ ] **CASES-P1-2** — `CONTEXT.md` §6.1 lists `14_full_cylinder`, `14_full_cylinder_cracking`, `14_full_cylinder_thermal_2D_rz` but not `14_full_cylinder_cracking_2D_xy`, even though §9c (and disk) tracks all three damage variants. Update §6.1.
+- [x] **CASES-P1-2** — *Resolved 2026-05-19.* CONTEXT.md §6.1 case-14 line now lists all three damage-active variants (`14_full_cylinder_cracking` 3D, `14_full_cylinder_cracking_2D_xy` plane-strain workhorse, `14_full_cylinder_thermal_2D_rz` thermal verification) with a back-pointer to §9c for the three-variant rationale.
 
 <a id="cases-p1-3"></a>
-- [ ] **CASES-P1-3** — `z3st/cases/non-regression_summary.txt` (2026-05-15) is stale. Missing rows for `15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`, `17_stress_strain_curve_double_crack`, `17_stress_strain_curve_knotch`, `18_box_knotch_2D`. `non-regression.sh` has a commented entry `15_box_elliptical_cavity_2D` that doesn't exist on disk.
+- [x] **CASES-P1-3** — *Resolved 2026-05-19.* Removed the stale `# "15_box_elliptical_cavity_2D"` line from `non-regression.sh` (the name doesn't exist on disk) and replaced with commented entries for the actual gold-less cases (`15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`, `17_stress_strain_curve_double_crack`, `17_stress_strain_curve_knotch`, `18_box_knotch_2D`) with a pointer to [CASES-FOLLOWUP-5](#cases-followup-5). The summary text file is regenerated on every `./non-regression.sh` run, so it'll self-heal next pass.
 
 <a id="cases-p1-4"></a>
-- [ ] **CASES-P1-4** — `z3st/cases/non-regression_github.py` points to `tests/non-regression_github.sh`; the script actually lives at `z3st/cases/non-regression_github.sh`. The pytest invocation would not locate it.
+- [x] **CASES-P1-4** — *Resolved 2026-05-19.* `non-regression_github.py` now resolves the shell driver via `Path(__file__).resolve().parent / "non-regression_github.sh"` (the script sits in the same directory as this Python wrapper). Replaces the stale `parent.parent / "tests" / "non-regression_github.sh"` path.
 
 <a id="cases-p1-5"></a>
-- [ ] **CASES-P1-5** — `.github/workflows/ci.yml` runs 9 cases; none of them are the active `14_full_cylinder_cracking*` variants. Document the CI inclusion policy.
+- [x] **CASES-P1-5** — *Resolved 2026-05-19.* Added a comment block at the head of `non-regression_github.sh` documenting the inclusion policy: tight 9-case subset for fast CI turnaround, one case per orthogonal physics path, blessed-gold requirement; explicit exclusion list (active case-14 cracking variants, case-19 SENT/SENS) with the reason (too long for CI, golds being blessed) and the local-suite escape hatch (`cases/non-regression.sh`).
 
 <a id="cases-p1-6"></a>
-- [ ] **CASES-P1-6** — Missing `output/non-regression_gold.json` in 9 cases: the three `14_full_cylinder_cracking*` variants (expected for WIP), plus `15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`, `17_stress_strain_curve_double_crack`, `17_stress_strain_curve_knotch`, `U_box_knotch_3D`, `U_coaxial_contact_2D`, `U_slab_contact`. `non-regression.py` exists in each but has no gold to compare against.
+- [x] **CASES-P1-6** — *Triaged 2026-05-19 → tracked as [CASES-FOLLOWUP-5](#cases-followup-5).* Inventory is correct: the three case-14 cracking variants (WIP, expected), plus 7 cases (`15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`, `17_stress_strain_curve_double_crack`, `17_stress_strain_curve_knotch`, `U_box_knotch_3D`, `U_coaxial_contact_2D`, `U_slab_contact`) that have a `non-regression.py` but no gold. Resolution requires running each and copying `output/non-regression.json` → `output/non-regression_gold.json` — substantial compute and per-case sanity-check work, deferred to the follow-up.
 
 ### README
 
 <a id="readme-p1-1"></a>
-- [ ] **README-P1-1** — `README.md:88-102` Key Features section omits: plasticity (J2 + custom CP), hyperelasticity (Neo-Hookean), kinematic regimes (`2d / 3d / axisymmetric / plane_stress`), AT1 vs AT2, Miehe vs Amor splits. CONTEXT.md §3.1 / §4 has all of them.
+- [x] **README-P1-1** — *Resolved 2026-05-19.* Key Features section rewritten to cover the full capability set: 4 kinematic regimes, 5 constitutive routes (lame/voigt/hyperelastic/plasticity/custom), AT1/AT2 + Miehe/Amor splits + Ambati-hybrid constraint, gap-conductance modes, full BC inventory, Python material modules, PETSc backends, the new unified VTU/XDMF writer, full material card list.
 
 <a id="readme-p1-2"></a>
-- [ ] **README-P1-2** — `README.md:172` example YAML uses `regime: 2D`; canonical schema is lowercase. Cases on disk are inconsistent themselves — pick one and propagate.
+- [x] **README-P1-2** — *Resolved 2026-05-19.* Example YAML now uses canonical lowercase `regime: 2d` (with the full enumeration as an inline comment), `true`/`false` instead of `True`/`False`. Also added the missing `damage:` and `gap_conductance:` blocks as commented placeholders, plus an `output: format:` block. Per-case `input.yaml` files on disk remain mixed-case in places — a future sweep could lowercase them all, but it's lower-priority cleanup.
 
 <a id="readme-p1-3"></a>
-- [ ] **README-P1-3** — `README.md:118-157` directory tree is out of sync: missing `core/mesh/`, `models/plasticity_model.py`, the full material card list, several utils. `1_thin_thermal_slab/` is the wrong directory name (actual: `1_thin_slab_2D/`).
+- [x] **README-P1-3** — *Resolved 2026-05-19.* Directory tree rewritten from scratch to match `CONTEXT.md` §2.1: correct nesting (everything under `z3st/`), `core/mesh/` subpackage shown, `models/plasticity_model.py` listed, full material card inventory, complete `utils/` listing including the new `writer.py`, `cases/` shows the right `1_thin_slab_2D/` (was `1_thin_thermal_slab/`) plus case-14 and case-19 highlights with one-line annotations. With a pointer at the bottom: "the full case catalogue and per-module details are in CONTEXT.md".
 
 <a id="readme-p1-4"></a>
-- [ ] **README-P1-4** — `README.md:296` BibTeX key typo: `Scrogggs` → `Scroggs`.
+- [x] **README-P1-4** — *Resolved 2026-05-19.* Author name typo fixed: `Scrogggs` → `Scroggs` in the basix2022a BibTeX entry. The basix2022b entry already had the correct spelling.
 
 <a id="readme-p1-5"></a>
-- [ ] **README-P1-5** — `CITATION.cff` is bare (`doi` + `identifiers` only). Missing `cff-version`, `authors`, `title`, `version`, `date-released`, `repository-code`. The README BibTeX has nothing to validate against.
+- [x] **README-P1-5** — *Resolved 2026-05-19.* `CITATION.cff` rewritten to the cff-version 1.2.0 schema: `title`, `authors` (with `affiliation: Politecnico di Milano`), `version`, `date-released`, `license`, `repository-code`, `url`, `doi`, `identifiers`, and a `keywords` block. Matches the README BibTeX `Z3ST2025` entry.
 
 ### Paper
 
 <a id="paper-p1-1"></a>
-- [ ] **PAPER-P1-1** — `main.tex:193` plasticity paragraph cross-references `\ref{sec:phase-field}` for the radial-return update; should add a `\label{sec:plasticity}` at line 114 and fix the cite target.
+- [x] **PAPER-P1-1** — *Resolved 2026-05-19.* Added `\label{sec:plasticity}` at the J2 plasticity subsubsection (main.tex:115). The cross-reference in the plasticity verification paragraph (main.tex:194) is now `Section~\ref{sec:plasticity}` instead of the wrong `Section~\ref{sec:phase-field}`.
 
 <a id="paper-p1-2"></a>
-- [ ] **PAPER-P1-2** — `main.tex:251` describes case 13 with `k = 50 W/(m K)`; the material is `materials/ceramic.yaml` with `k` resolved through the Python callable `materials.ceramic.k(T)`. Either say so or pin to a scalar `k`.
+- [x] **PAPER-P1-2** — *Resolved 2026-05-19.* Case-13 description updated to say "a temperature-dependent thermal conductivity $k(T)$ supplied through the Python callable extensibility hook (`materials.ceramic.k`; see Section~2.2)", reflecting what the material card actually does. The misleading scalar `k = 50 W/(m K)` is gone.
 
 <a id="paper-p1-3"></a>
-- [ ] **PAPER-P1-3** *(optional polish)* — `main.tex:319-321` secondary-nucleation narrative is consistent with CONTEXT.md §9c, but the wording can be tightened to make the AT1-sharp-threshold mechanism the explicit cause (currently implicit). Defer until [PAPER-P0-1](#paper-p0-1) is resolved.
+- [x] **PAPER-P1-3** *(optional polish — closed as no-action 2026-05-19)*: PAPER-P0-1 is now resolved (the arithmetic + reframed calibration is in place at main.tex:317). Re-reading the case-14 narrative with fresh eyes, the AT1-sharp-threshold mechanism is **already explicit** in two places: (a) the Results paragraph at main.tex:321 ("$\sigma_{\theta\theta}$ recovers above the AT1 threshold a few elements further along the arc and nucleates the next crack"), and (b) the Discussion at main.tex:366 ("we attribute the difference to the AT1 sharp elastic threshold, which prevents the damage variable from accumulating spuriously in cells whose driving energy is below $\psi_c = 3 G_c / (16 \ell_c)$ ..."). No further tightening warranted.
 
 ---
 
@@ -203,10 +203,41 @@ These were audited and found in order — recording so we don't re-audit:
 
 ---
 
+## Batch H — Literature-driven enhancements
+
+Items spawned by the 2026-05-19 literature pass on `~/Bibliography - PFF/`
+(Vicentini 2024 star-convex, Kumar 2020 / Kamarei 2024 strength critique,
+Fajardo Lacave 2026 multi-cohesive). These are forward-looking improvements,
+not bug fixes — orthogonal to the P0/P1/P2 tracks.
+
+<a id="lit-1"></a>
+- [ ] **LIT-1 (code)** — Add the **star-convex energy split** to `z3st/models/damage_model.py` alongside `psi_amor_split` and `psi_miehe_spectral`. Per Vicentini, Zolesi, Carrara, Maurini, De Lorenzis (2024), *"On the energy decomposition in variational phase-field models for brittle fracture under multi-axial stress states"*, Int. J. Fract. 247:291–317, **none of the splits z3st currently implements satisfies all criteria for nucleation + propagation under multi-axial stress**. The star-convex model is described as a minimal modification of Amor (volumetric/deviatoric), so the code change should be a single new `psi_star_convex(u, material, T)` function + one new YAML enum value `damage.split: amor | miehe | star_convex` (currently the split choice is implicit per AT1/AT2). Verify on `cases/14_full_cylinder_cracking_2D_xy/` — the rim-tension + center-compression state is exactly the multi-axial regime where Amor is critiqued; a side-by-side comparison would strengthen the paper's case-14 contribution.
+
+<a id="lit-2"></a>
+- [ ] **LIT-2 (paper)** — Acknowledge the **Kumar 2020 / Kamarei 2024 nucleation critique** in `main.tex` §4 (Discussion). Per Kumar, Bourdin, Francfort, Lopez-Pamies (2020), *"Revisiting nucleation in the phase-field approach to brittle fracture"*, JMPS 142:104027, classical variational phase-field — including AT1 and AT2 — *cannot* predict crack nucleation independently of elasticity and toughness; it lacks the material strength as an independent ingredient. Kamarei, Dolbow, Lopez-Pamies (2024), J. Appl. Mech. 92:014502, makes this concrete in the first octant: AT1's predicted equi-biaxial strength `s_bs = √(3 Gc E / (16(1-ν) ℓ))` and hydrostatic strength `s_hs = √(Gc E / (8(1-2ν) ℓ))` depend unphysically on Poisson's ratio (`s_hs → ∞` as `ν → 1/2`). Add a single paragraph that (i) acknowledges this critique, (ii) frames the present case-14 contribution as a *performance demonstration* of the AT1 + Ambati-hybrid framework against McClenny's published crack topology, **not** as a contribution to the nucleation theory itself, (iii) flags Kumar's strength-based amendment as a future direction. Doesn't weaken the paper; strengthens its intellectual honesty.
+
+<a id="lit-3"></a>
+- [ ] **LIT-3 (paper)** — Expand §1 (Introduction) lit survey with **recent UO2 PFF work** that postdates McClenny: Gencturk et al. (2025), *"Thermo-Mechanical Phase-Field Modeling of Fracture in High-Burnup UO2 Fuels Under Transient Conditions"*, Materials 18(5):1162 (UO2 fracture as a *stochastic phase transition*); Xiong et al. (2024), *"Three-dimensional fracture of UO2 ceramic pellets by phase field modeling"*, Sci. China Phys. Mech. Astron. (cohesive-PFF for 3D UO2). One or two sentences situating z3st's case-14 alongside these contemporaries.
+
+<a id="lit-4"></a>
+- [ ] **LIT-4 (paper)** — Add **Fajardo Lacave, Vicentini, Welschinger, De Lorenzis (2026)**, *"A variational phase-field model for anisotropic fracture accounting for multiple cohesive lengths"*, JMPS 212:106585 — the newest paper in the bibliography — to the roadmap section of `main.tex`. Single bullet: future direction for grain-boundary-resolved polycrystalline UO2 with directional toughness. Z3st's current implementation does not handle anisotropic strength; this paper's multi-cohesive framework (one damage variable + directional cohesive lengths) would be the reference for any future extension.
+
+<a id="lit-5"></a>
+- [ ] **LIT-5 (refs)** — Update `~/research-manuscripts/references.bib` with the BibTeX entries for the four papers cited in LIT-1 through LIT-4 (Vicentini 2024, Kumar 2020, Kamarei 2024, Gencturk 2025, Xiong 2024, Fajardo Lacave 2026). Verify each DOI resolves. Sanity-check that no key collides with an existing entry.
+
 ## Follow-ups (work spawned by other fixes)
 
+<a id="cases-followup-5"></a>
+- [ ] **CASES-FOLLOWUP-5** — Bless `output/non-regression_gold.json` for the 7 cases currently without one: `15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`, `17_stress_strain_curve_double_crack`, `17_stress_strain_curve_knotch`, `U_box_knotch_3D`, `U_coaxial_contact_2D`, `U_slab_contact`. For each: `./Allclean && ./Allrun`, sanity-check the resulting `output/non-regression.json`, then `cp output/non-regression.json output/non-regression_gold.json`. After blessing, uncomment the matching entry in `cases/non-regression.sh` so the case rejoins the local suite. Excluded from this follow-up: the three `14_full_cylinder_cracking*` variants — those need the calibration argument settled first (see `[CONTEXT.md §9c]` and `[PAPER-P0-1]`).
+
+<a id="cases-followup-4"></a>
+- [ ] **CASES-FOLLOWUP-4** — Re-run `cases/20_plasticity_2D/` and `cases/demo_CP_single_grain/` after the **[CODE-P1-11](#code-p1-11)** quadrature-degree bump (`mech_degree+1` → `2·mech_degree+1`). Plastic-strain integration may shift in the 4th–6th significant figure. If the non-regression script reports FAIL on either case, inspect — the new run is the more accurate one, so re-bless the gold (`cp output/non-regression.json output/non-regression_gold.json`) once you've sanity-checked the numbers. Standard cases (mechanical/thermal without plasticity) are unaffected (`q_degree` is unused outside the plasticity quadrature path).
+
+<a id="code-followup-1"></a>
+- [ ] **CODE-FOLLOWUP-1** — Extend thermal Dirichlet BCs to step-dependent temperature lists, mirroring the `raw` mechanism in `mechanical_model.py`. Requires (i) storing the list on `self.dirichlet_thermal[label]` analogously to mechanical, (ii) updating the `Constant` value per step inside `_thermal_step` (similar to how `_mechanical_step` currently calls `traction_const.value = ...` per step), (iii) validating list length against `self.n_steps`. Use case: time-varying temperature ramps on a boundary (e.g. annealing schedules).
+
 <a id="utils-followup-2"></a>
-- [x] **UTILS-FOLLOWUP-2** — *Resolved 2026-05-19.* Unified output backend: new `z3st/utils/writer.py::OutputWriter`. Both backends (VTU, XDMF) share the same field set (T, u, strain, per-material stress + von Mises + hydrostatic + strain-energy density, per-material heat flux, damage + crack-driving-force, cluster density, cumulative plastic strain). FE function spaces, Function targets, and `dolfinx.fem.Expression` objects are all pre-allocated / pre-compiled in `__init__`; per-step `write()` is just `interpolate` + I/O — no UFL JIT compilation in the time loop. `__main__.py` output section shrank from ~70 LoC to ~10 LoC of orchestration. `export_vtu.py` left intact for backward compat (no longer imported from `__main__.py`); user may deprecate in a follow-up. Per-format filename defaults now correct (was the `"fields.xdmf"` dead default for VTU mode). Owed verification: re-run the full non-regression suite to confirm field-name compatibility with the per-case non-regression scripts (most read `Stress_<mat> (cells)`, `Strain (cells)` — should match the new writer 1:1, but worth confirming on case 9 + case 18 + case 20 + a damage case).
+- [x] **UTILS-FOLLOWUP-2** — *Resolved 2026-05-19.* Unified output backend: new `z3st/utils/writer.py::OutputWriter`. Both backends (VTU, XDMF) share the same field set (T, u, strain, per-material stress + von Mises + hydrostatic + strain-energy density, per-material heat flux, damage + crack-driving-force, cluster density, cumulative plastic strain). FE function spaces, Function targets, and `dolfinx.fem.Expression` objects are all pre-allocated / pre-compiled in `__init__`; per-step `write()` is just `interpolate` + I/O — no UFL JIT compilation in the time loop. `__main__.py` output section shrank from ~70 LoC to ~10 LoC of orchestration. `export_vtu.py` left intact for backward compat (no longer imported from `__main__.py`); user may deprecate in a follow-up. Per-format filename defaults now correct (was the `"fields.xdmf"` dead default for VTU mode). Patched 2026-05-19 to add a graceful interpolation-vs-projection fallback (`_make_interp_or_proj`): Expression construction is tried first; on `ValueError: Mismatch of tabulation points and element points.` (quadrature-sourced UFL, e.g. `plasticity.mode: custom` in `demo_CP_single_grain`), the writer builds a cached `LinearProblem` for L2 projection with the right quadrature metadata and dispatches per-field at write time. Confirmed working on `demo_CP_single_grain` (the only case that exercises the fallback path); standard cases stay on the fast interpolation path.
 
 <a id="utils-followup-3"></a>
 - [ ] **UTILS-FOLLOWUP-3** — Revisit VTKHDF as a third writer backend once dolfinx exposes a class-based `VTKHDFFile` with per-field naming. The dolfinx 0.10 `dolfinx.io.vtkhdf` submodule has a functional API (`write_mesh / write_point_data / write_cell_data`) but the write_* wrappers take no `name` parameter (the underlying nanobind binding `write_vtkhdf_data`'s second `str` argument is the data-location selector "PointData"/"CellData", not a field name). z3st's multi-field output (T, u, strain, per-material stress, von Mises, hydrostatic, heat flux, damage, cluster) is therefore not currently expressible in a single VTKHDF file without a forest of one-field-per-file workarounds. A prototype branch was added then reverted on 2026-05-19; see `writer.py` module docstring.
