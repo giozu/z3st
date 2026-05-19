@@ -236,6 +236,8 @@ thermal:
 #   convergence: rel_norm
 #   lc: 1.0e-4
 #   hybrid_constraint: true
+#   split: amor                    # amor | miehe | star_convex (optional override; default = Amor for AT1, Miehe for AT2)
+#   gamma_star: 0.0                # star-convex only: model parameter ≥ -1 controlling σ_c⁻/σ_c⁺ ratio; 0 ≡ Amor
 
 lhr:
   - 0
