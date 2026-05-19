@@ -500,7 +500,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 1
   Applying mechanical traction on subdomain id = 2
   Linear solver
-  ||Δu||/||u|| = 3.349e-15
+  ||Δu||/||u|| = 8.240e-17
   [adaptive] relax_u=1.00
 
 Convergence check

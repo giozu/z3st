@@ -19,6 +19,8 @@ class MechanicalModel:
 
         # --. Mechanical model options --..
         self.mech_cfg = self.input_file.get("mechanical", {})
+        # Default linear-solver backend; user can override in input.yaml.
+        self.mech_cfg.setdefault("linear_solver", "iterative_hypre")
 
         print("[MechanicalModel] options loaded from input.yaml:")
         for key, value in self.mech_cfg.items():
@@ -134,11 +136,17 @@ class MechanicalModel:
                 # --. Neumann --..
                 elif bc_type == "Neumann":
                     traction_value = bc_info.get("traction")
-                    
+
                     # Handling list
                     if isinstance(traction_value, list):
                         raw_value = traction_value
-                        initial_val = float(traction_value[0]) # starting from step 0
+                        if len(raw_value) != self.n_steps:
+                            print(
+                                f"[ERROR] Neumann traction list length {len(raw_value)} "
+                                f"!= n_steps {self.n_steps} for region '{region_name}'."
+                            )
+                            sys.exit(1)
+                        initial_val = float(traction_value[0])  # starting from step 0
                     # Scalar
                     else:
                         raw_value = [traction_value] * self.n_steps
@@ -446,13 +454,13 @@ class MechanicalModel:
 
         """
 
+        # The constitutive_mode promotion (lame -> plasticity for materials
+        # with yield_strength when plasticity is on) lives in
+        # spine.py::load_materials so the material dict is deterministic at
+        # load time. By the time sigma_mech is called the mode is already
+        # the final one; we just read it.
         mode = material.get("constitutive_mode", "lame")
         regime = self.regime
-
-        # If plasticity is active in input.yaml, force plasticity for materials that support it
-        if self.on.get("plasticity", False) and mode == "lame" and "yield_strength" in material:
-            material["constitutive_mode"] = "plasticity"
-            mode = "plasticity"
 
         if mode == "voigt":
             # small strain

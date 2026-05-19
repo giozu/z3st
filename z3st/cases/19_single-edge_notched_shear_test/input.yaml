@@ -47,5 +47,5 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 901
+n_steps: 151
 

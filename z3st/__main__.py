@@ -163,6 +163,8 @@ if __name__ == "__main__":
         t_points, lhr_points, n_steps=n_increments, filename=None
     )
 
+    problem.n_steps = len(times)
+
     # --. Initialize problem --..
     problem.parameters(lhr=lhrs[0])
     problem.initialize_fields()

@@ -356,5 +356,5 @@ Computing symbolic result fields (strain, stress, ...)
   → Fracture energy : 4.0841e+03 J
   → Total energy    : 3.9035e+04 J
 
-Simulation completed in 15.14 s
+Simulation completed in 15.35 s
 Total time steps solved: 1

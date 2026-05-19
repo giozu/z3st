@@ -45,7 +45,7 @@ Mechanical element order: 1
 Thermal function space (V_t): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []))
 Mechanical function space (V_m): FunctionSpace(<Mesh #0>, blocked element (Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []), (3,)))
 Scalar function space (Q): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []))
-Plasticity function spaces (V_pl_tensor, Q_pl) initializing with Quadrature degree 2
+Plasticity function spaces (V_pl_tensor, Q_pl) initializing with Quadrature degree 3
 Plasticity function space (V_pl_tensor): FunctionSpace(<Mesh #0>, blocked element (QuadratureElement(hexahedron, array([[0.21132487, 0.21132487, 0.21132487],       [0.21132487, 0.21132487, 0.78867513],       [0.21132487, 0.78867513, 0.21132487],       [0.21132487, 0.78867513, 0.78867513],       [0.78867513, 0.21132487, 0.21132487],       [0.78867513, 0.21132487, 0.78867513],       [0.78867513, 0.78867513, 0.21132487],       [0.78867513, 0.78867513, 0.78867513]]), array([0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]), IdentityPullback()), (3, 3)))
 Plasticity function space (Q_pl): FunctionSpace(<Mesh #0>, QuadratureElement(hexahedron, array([[0.21132487, 0.21132487, 0.21132487],       [0.21132487, 0.21132487, 0.78867513],       [0.21132487, 0.78867513, 0.21132487],       [0.21132487, 0.78867513, 0.78867513],       [0.78867513, 0.21132487, 0.21132487],       [0.78867513, 0.21132487, 0.78867513],       [0.78867513, 0.78867513, 0.21132487],       [0.78867513, 0.78867513, 0.78867513]]), array([0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]), IdentityPullback()))
 [Solver] initializer
@@ -161,7 +161,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -205,7 +205,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -262,7 +262,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -319,7 +319,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -376,7 +376,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -433,7 +433,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -490,7 +490,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -547,7 +547,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -604,7 +604,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -661,7 +661,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -718,7 +718,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -775,7 +775,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -832,7 +832,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -889,7 +889,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -946,7 +946,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1003,7 +1003,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1060,7 +1060,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1117,7 +1117,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1174,7 +1174,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1231,7 +1231,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1288,7 +1288,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1345,7 +1345,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1402,7 +1402,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1459,7 +1459,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1516,7 +1516,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1573,7 +1573,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1630,7 +1630,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1687,7 +1687,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1744,7 +1744,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1801,7 +1801,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1858,7 +1858,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1915,7 +1915,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -1972,7 +1972,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2029,7 +2029,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2086,7 +2086,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2143,7 +2143,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2200,7 +2200,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2257,7 +2257,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2314,7 +2314,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2371,7 +2371,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2428,7 +2428,7 @@ Coupling = staggered
   → Relative tolerance th       : 1.0e-06
   → Relative tolerance mech     : 1.0e-07
   → Relative tolerance dmg      : 1.0e-06
-  [Solver] Using quadrature degree 2 for integration measures.
+  [Solver] Using quadrature degree 3 for integration measures.
 
 
 #### Iteration 1/50
@@ -2460,5 +2460,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 27.69 s
+Simulation completed in 2.42 s
 Total time steps solved: 41

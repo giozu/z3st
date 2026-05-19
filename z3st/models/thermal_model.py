@@ -24,6 +24,8 @@ class ThermalModel:
 
         # --. Thermal model options --..
         self.th_cfg = self.input_file.get("thermal", {})
+        # Default linear-solver backend; user can override in input.yaml.
+        self.th_cfg.setdefault("linear_solver", "iterative_hypre")
 
         print("[ThermalModel] options loaded from input.yaml:")
         for key, value in self.th_cfg.items():
@@ -79,6 +81,20 @@ class ThermalModel:
                     if temperature is None:
                         print(
                             f"  [ERROR] Dirichlet BC on '{label}' for region '{region_name}' has no temperature."
+                        )
+                        sys.exit(1)
+
+                    # Step-dependent temperature lists are not yet supported by
+                    # the thermal block (the mechanical block does support them
+                    # via the ``raw`` mechanism). Reject the input up-front with
+                    # a clear message instead of silently fixing T to the first
+                    # element or crashing inside dolfinx.
+                    if isinstance(temperature, list):
+                        print(
+                            f"  [ERROR] Thermal Dirichlet BC on '{label}' for region '{region_name}' "
+                            f"was given a list of length {len(temperature)}, but step-dependent "
+                            f"temperatures are not yet supported. Use a constant scalar; see "
+                            f"mechanical_model.py for the planned extension pattern."
                         )
                         sys.exit(1)
 

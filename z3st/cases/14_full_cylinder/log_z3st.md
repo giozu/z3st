@@ -75,7 +75,7 @@ Material loaded: oxide
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7f4ed8137ba0> (function)
+  _k_func         → <function k at 0x7b7decde3c40> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -91,7 +91,7 @@ Material loaded: oxide
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
-  q_third = 9.947e+04 W/m³ (fissile: True)
+  q_third += 9.947e+04 W/m³ (fissile: True)
   Heat flux = 1.989e+03 W/m2
 
 Initializing the temperature field...
@@ -126,7 +126,7 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third = 9.947e+04 W/m³ (fissile: True)
+  q_third += 9.947e+04 W/m³ (fissile: True)
   Heat flux = 1.989e+03 W/m2
   → dt=0: solving static step / initial condition
 Computing symbolic result fields (strain, stress, ...)
@@ -496,5 +496,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 17 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 3.32 s
+Simulation completed in 3.41 s
 Total time steps solved: 1

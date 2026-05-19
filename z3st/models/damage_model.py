@@ -17,9 +17,25 @@ class DamageModel:
 
         # --. Damage model options --..
         self.dmg_cfg = self.input_file.get("damage", {})
-
         if not self.dmg_cfg:
-            raise ValueError("'damage' entry missing in input.yaml.")
+            raise ValueError("'damage' entry missing in input.yaml (but damage model is enabled).")
+
+        # Default linear-solver backend; user can override in input.yaml.
+        # Done after the missing-block check so an entirely absent damage
+        # block still surfaces clearly rather than being silently filled in.
+        self.dmg_cfg.setdefault("linear_solver", "iterative_hypre")
+
+        # Validate damage type up-front. Without this, a typo like 'at1' or
+        # 'AT-1' silently skips the Gc<->sigma_c auto-conversion in
+        # spine.py::load_materials and the run crashes later inside
+        # _damage_step with a confusing KeyError('Gc') or 'Unknown damage
+        # type'.
+        dmg_type = self.dmg_cfg.get("type")
+        if dmg_type not in ("AT1", "AT2"):
+            raise ValueError(
+                f"damage.type must be 'AT1' or 'AT2'; got {dmg_type!r}. "
+                f"Set damage.type in input.yaml accordingly."
+            )
 
         print("Options loaded from input.yaml:")
         for key, value in self.dmg_cfg.items():
@@ -105,6 +121,11 @@ class DamageModel:
             return (2.0 * lc / Gc) * psi_pos
         elif damage_type == "AT1":
             return psi_pos
+        else:
+            raise ValueError(
+                f"Unknown damage type '{damage_type}'; expected 'AT1' or 'AT2'. "
+                f"Set damage.type in input.yaml accordingly."
+            )
 
     def gamma_density(self, D, grad_D, lc):
 
@@ -117,6 +138,11 @@ class DamageModel:
         elif damage_type == "AT1":
             # Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
             return D / lc + lc * ufl.dot(grad_D, grad_D)
+        else:
+            raise ValueError(
+                f"Unknown damage type '{damage_type}'; expected 'AT1' or 'AT2'. "
+                f"Set damage.type in input.yaml accordingly."
+            )
 
     def psi_miehe_spectral(self, u, material, T=None):
         """

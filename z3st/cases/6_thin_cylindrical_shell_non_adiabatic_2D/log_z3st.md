@@ -430,7 +430,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.290e-07
+  ||Δu||/||u|| = 5.299e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -438,5 +438,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 7.92 s
+Simulation completed in 8.40 s
 Total time steps solved: 1

@@ -409,7 +409,7 @@ Each case folder is self-contained:
 ├── geometry.yaml geometry definition + label ↔ tag map
 ├── boundary_conditions.yaml  thermal / mechanical / damage BCs
 ├── mesh.geo      Gmsh input
-├── mesh.msh      generated mesh (checked in for CI)
+├── mesh.msh      generated mesh (NOT tracked in git per .gitignore — Allrun regenerates it with gmsh on each run)
 ├── non-regression.py         post-run comparison vs. output/non-regression_gold.json
 └── output/                   auto-generated VTU/XDMF + plots
 ```
@@ -441,7 +441,7 @@ The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regressio
 - `12_cylindrical_shell_thermal_gradient_2D`, `12_cylindrical_shell_thermal_gradient_3D`
 - `13_annular_cylinder`
 - `14_full_cylinder`
-- `14_full_cylinder_cracking` (3D), `14_full_cylinder_thermal_2D_rz` (axisymmetric UO₂ quench with AT2 phase-field)
+- `14_full_cylinder_cracking` (3D gold-standard McClenny reproducer), `14_full_cylinder_cracking_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the workhorse for the paper's case-14 chapter), `14_full_cylinder_thermal_2D_rz` (axisymmetric thermal verification, damage off). See §9c for the full three-variant rationale.
 
 **15 — Cavities and pressurised bodies**
 - `15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`
