@@ -13,7 +13,7 @@ Ly = 0.001;
 Dn = 0.0005;
 
 lc_damage = 0.000004;
-h_fine = lc_damage / 5.0;
+h_fine = lc_damage / 7.0;
 h_coarse = Lx / 75;
 
 // Corner points

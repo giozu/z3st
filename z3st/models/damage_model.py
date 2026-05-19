@@ -8,6 +8,7 @@
 import dolfinx
 import numpy as np
 import ufl
+from mpi4py import MPI
 
 
 class DamageModel:
@@ -373,6 +374,13 @@ class DamageModel:
                 raise ValueError(f"Unknown damage type '{damage_type}'")
 
             E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * w * dx))
+
+        # assemble_scalar returns per-rank partial sums; reduce so every
+        # rank returns the same global value and downstream callers see
+        # the physical energy (not the rank-0 share).
+        comm = self.mesh.comm
+        E_el = comm.allreduce(E_el, op=MPI.SUM)
+        E_frac = comm.allreduce(E_frac, op=MPI.SUM)
 
         return E_el, E_frac
 

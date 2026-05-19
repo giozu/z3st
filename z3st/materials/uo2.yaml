@@ -10,20 +10,6 @@ rho: 10970.0        # (kg/m³) - Density
 alpha: 1.0e-5       # (1/K)
 
 sigma_c: 1.0e+9     # (Pa) - phase-field tensile strength threshold; Gc auto-derived in spine.py
-                    #         from sigma_c, lc, E (AT1: Gc = (8/3)*lc*sigma_c^2/E).
-                    #         Calibration choice: at 2 GPa, only the singular crack-tip
-                    #         concentration crossed the AT1 threshold psi_c = 5.6 MJ/m^3; once the
-                    #         immediate tip cells softened, the next-shell driving force collapsed
-                    #         (crack-tip shielding) and the prescribed seed stalled after ~50-100
-                    #         um of propagation. At 1 GPa: Gc = 93 J/m^2, psi_c = 0.35 MJ/m^3 --
-                    #         the cold-rim tensile band easily exceeds it, sustaining propagation.
-                    #         The earlier worry that 1 GPa would trigger spurious bulk damage from
-                    #         the plane-strain Amor-split deviatoric component is moot now that the
-                    #         regime-aware eigenstrain fix in damage_model.py::_thermal_eigenstrain
-                    #         zeroes ε_th_zz in 2D Cartesian (the artifact lived in the zz-deviator).
-# Gc: 80000.0       # (J/m^2) - McClenny et al. JNM 565 (2022) 153719, Table 3 (80 MPa-mm).
-                    #            Disabled in favor of sigma_c above; spine.py would prefer
-                    #            sigma_c anyway (see spine.py:131).
 
 T_ref: 298.15       # (K)
 T_initial: 1023.15  # (K) = 750°C, pellet uniformly hot before quench

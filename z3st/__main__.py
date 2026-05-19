@@ -211,10 +211,13 @@ if __name__ == "__main__":
             print(f"  → Fracture energy : {E_frac:.4e} J")
             print(f"  → Total energy    : {E_el + E_frac:.4e} J")
 
-            with open("energies.txt", "a") as f:
-                if step == 0:
-                    f.write("Step\tE_el\tE_frac\tE_tot\n")
-                f.write(f"{step}\t{E_el:.6e}\t{E_frac:.6e}\t{E_tot:.6e}\n")
+            # Only rank 0 writes the file; all ranks hold the same
+            # (already-MPI-reduced) energy values from compute_energy_balance.
+            if problem.mesh.comm.rank == 0:
+                with open("energies.txt", "a") as f:
+                    if step == 0:
+                        f.write("Step\tE_el\tE_frac\tE_tot\n")
+                    f.write(f"{step}\t{E_el:.6e}\t{E_frac:.6e}\t{E_tot:.6e}\n")
 
         # Export
         if output_format == "xdmf" and xdmf_file:
