@@ -130,6 +130,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Dirichlet mechanical BC on 'steel' → [0.0, 0.0, 0.0] at region 'ymin'
   **[INFO]** Constant Dirichlet vector (3D) → [0.0, 0.0, 0.0]
   **[INFO]** Dirichlet mechanical BC on 'steel' → [0.0, 0.0, 0.0] at region 'ymax'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -405,9 +406,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 9 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 14.82 s
+Simulation completed in 11.04 s
 Total time steps solved: 1

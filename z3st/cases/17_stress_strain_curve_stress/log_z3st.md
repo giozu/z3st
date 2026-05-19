@@ -108,6 +108,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_x mechanical BC on 'steel' → 0.0 (first step) at region 'xmin'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'ymin'
   **[INFO]** Neumann mechanical BC on 'steel' → xmax: 0.0 Pa (list loaded)
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/5: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -155,9 +156,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 1 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0000.vtu
 
 
 ## Step 02/5: t = 2.50e+00 s | LHR = 0.00e+00 W/m
@@ -315,9 +313,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 8 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0001.vtu
 
 
 ## Step 03/5: t = 5.00e+00 s | LHR = 0.00e+00 W/m
@@ -443,9 +438,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0002.vtu
 
 
 ## Step 04/5: t = 7.50e+00 s | LHR = 0.00e+00 W/m
@@ -571,9 +563,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0003.vtu
 
 
 ## Step 05/5: t = 1.00e+01 s | LHR = 0.00e+00 W/m
@@ -699,9 +688,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0004.vtu
 
-Simulation completed in 1.92 s
+Simulation completed in 1.31 s
 Total time steps solved: 5

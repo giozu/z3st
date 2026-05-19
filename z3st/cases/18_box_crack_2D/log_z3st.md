@@ -122,6 +122,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
 
 Setting damage boundary conditions...
   **[INFO]** Dirichlet damage BC on 'steel' → D = 1.0 at region 'crack'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -354,10 +355,6 @@ Computing symbolic result fields (strain, stress, ...)
   → Elastic energy  : 3.4951e+04 J
   → Fracture energy : 4.0841e+03 J
   → Total energy    : 3.9035e+04 J
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-  → Adding damage field to VTU...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 19.65 s
+Simulation completed in 15.14 s
 Total time steps solved: 1

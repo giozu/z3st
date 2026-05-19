@@ -79,7 +79,7 @@ Material loaded: volume
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7e0b48c3bb00> (function)
+  _k_func         → <function k at 0x7c5b95a73ba0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -123,6 +123,7 @@ k expression for volume → 2.5
 Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Dirichlet thermal BC on 'volume' → 500.0 K at region 'outer'
   **[INFO]** Clamp_y mechanical BC on 'volume' → 0.0 (first step) at region 'bottom'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 5.00e+02 W/m
@@ -444,9 +445,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 2.92 s
+Simulation completed in 2.04 s
 Total time steps solved: 1

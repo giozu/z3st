@@ -122,6 +122,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'bottom'
   **[INFO]** Neumann mechanical BC on 'steel' → inner_radius: 0.0 Pa (list loaded)
   **[INFO]** Neumann mechanical BC on 'steel' → outer_radius: 0.0 Pa (list loaded)
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -492,9 +493,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 2.33 s
+Simulation completed in 1.63 s
 Total time steps solved: 1

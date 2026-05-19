@@ -118,6 +118,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Dirichlet thermal BC on 'steel' → 573.0 K at region 'xmin'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'ymin'
   **[INFO]** Clamp_x mechanical BC on 'steel' → 0.0 (first step) at region 'xmin'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -414,9 +415,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 11 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 3.72 s
+Simulation completed in 2.90 s
 Total time steps solved: 1

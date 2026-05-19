@@ -108,6 +108,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_x mechanical BC on 'steel' → 0.0 (first step) at region 'xmin'
   **[INFO]** Step-dependent Dirichlet list (2D), length 5
   **[INFO]** Dirichlet mechanical BC on 'steel' → [0.0, 0.0] at region 'xmax'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/5: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -153,9 +154,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 1 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0000.vtu
 
 
 ## Step 02/5: t = 2.50e+00 s | LHR = 0.00e+00 W/m
@@ -290,16 +288,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-11, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 7.083e-07
+  ||Δu||/||u|| = 7.098e-07
   [adaptive] relax_u=0.95
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 8 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0001.vtu
 
 
 ## Step 03/5: t = 5.00e+00 s | LHR = 0.00e+00 W/m
@@ -392,7 +387,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-09, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 6.055e-06
+  ||Δu||/||u|| = 6.058e-06
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -406,16 +401,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-09, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.027e-07
+  ||Δu||/||u|| = 3.044e-07
   [adaptive] relax_u=0.95
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0002.vtu
 
 
 ## Step 04/5: t = 7.50e+00 s | LHR = 0.00e+00 W/m
@@ -522,16 +514,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-07, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.029e-07
+  ||Δu||/||u|| = 3.019e-07
   [adaptive] relax_u=0.95
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0003.vtu
 
 
 ## Step 05/5: t = 1.00e+01 s | LHR = 0.00e+00 W/m
@@ -624,7 +613,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-05, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 6.057e-06
+  ||Δu||/||u|| = 6.056e-06
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -645,9 +634,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields_0004.vtu
 
-Simulation completed in 18.60 s
+Simulation completed in 14.02 s
 Total time steps solved: 5

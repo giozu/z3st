@@ -109,6 +109,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_x mechanical BC on 'steel' → 0.0 (first step) at region 'xmin'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'ymin'
   **[INFO]** Clamp_z mechanical BC on 'steel' → 0.0 (first step) at region 'zmin'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -354,16 +355,13 @@ Convergence check
   Building weak form, volume integrals (dx) for steel, tag = 7
   Applying mechanical traction on subdomain id = 3
   Linear solver
-  ||Δu||/||u|| = 1.938e-13
+  ||Δu||/||u|| = 1.967e-13
   [adaptive] relax_u=1.00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 2.39 s
+Simulation completed in 1.81 s
 Total time steps solved: 1
