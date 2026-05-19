@@ -9,6 +9,6 @@ rm -f output/*.png
 rm -f output/*.csv
 rm -f *.msh
 rm -f *.png
-rm -f log.*
+rm -f log_*.md
 
 echo "Done. All output and temporary files cleaned."

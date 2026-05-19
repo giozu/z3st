@@ -24,20 +24,28 @@ import matplotlib.pyplot as plt
 import yaml
 import numpy as np
 
-def parse_convergence_log(logfile: str = "log.z3st"):
+def parse_convergence_log(logfile: str = "log_z3st.md"):
     if not os.path.exists(logfile):
         raise FileNotFoundError(f"File '{logfile}' not found.")
 
     with open(logfile, "r") as f:
         content = f.read()
 
+    # The __main__.py markdown stdout filter rewrites the step/iteration
+    # markers when stdout is not a TTY. Normalize either form back to the
+    # raw form so the regexes below match both.
+    content = re.sub(r"^## Step\s+(\d+)/(\d+):.*$",
+                     r"[STEP \1/\2]", content, flags=re.MULTILINE)
+    content = re.sub(r"^#### Iteration\s+(\d+)/(\d+)\s*$",
+                     r"--- Staggering iteration \1/\2 ---", content, flags=re.MULTILINE)
+
     steps_data = []
     step_blocks = re.split(r"\[STEP\s+(\d+)/\d+\]", content)
-    
+
     for i in range(1, len(step_blocks), 2):
         step_num = step_blocks[i]
         step_text = step_blocks[i+1]
-        
+
         pattern = re.compile(
             r"--- Staggering iteration\s+(\d+)/\d+\s+---"
             r"(?:.*?\|\|ΔT\|\|\s*/\s*\|\|T\|\|\s*=\s*([0-9.eE+-]+))?"
@@ -114,7 +122,7 @@ def plot_convergence(steps_data, save_path="convergence.png"):
     print(f"[INFO] Convergence plot saved as '{save_path}'")
 
 def main():
-    logfile = sys.argv[1] if len(sys.argv) > 1 else "log.z3st"
+    logfile = sys.argv[1] if len(sys.argv) > 1 else "log_z3st.md"
     try:
         print(f"Reading log file: {logfile}")
         data = parse_convergence_log(logfile)
