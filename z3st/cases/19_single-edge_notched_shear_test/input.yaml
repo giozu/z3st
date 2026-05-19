@@ -40,7 +40,9 @@ damage:
   stag_tol: 1.0e-5
   convergence: rel_norm
   lc: 4.0e-6
+  hybrid_constraint: true
   split: star_convex
+  gamma_star: 0.0
 
 lhr:
 - 0.0
