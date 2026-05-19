@@ -20,6 +20,14 @@ Naming conventions (preserved from the previous code path):
   - VTU, ``n_steps == 1``                : ``output/<basename>.vtu``
   - VTU, ``n_steps > 1``                 : ``output/<basename>_NNNN.vtu``
   - XDMF                                 : single ``output/<basename>.xdmf`` + ``.h5``
+
+A ``vtkhdf`` backend was prototyped against dolfinx 0.10 but reverted: the
+0.10 ``dolfinx.io.vtkhdf`` submodule exposes a functional API
+(``write_mesh / write_point_data / write_cell_data``) that has no
+field-name parameter, so writing the many named z3st fields (T, u, strain,
+per-material stress, von Mises, hydrostatic, heat flux, ...) into a single
+file is not currently expressible. Revisit when dolfinx ships a class-based
+``VTKHDFFile`` with per-field naming.
 """
 
 import os
@@ -74,12 +82,15 @@ class OutputWriter:
         suffix (``n_steps > 1``) or use the plain basename (``n_steps == 1``).
     """
 
+    _DEFAULT_EXT = {"vtu": ".vtu", "xdmf": ".xdmf"}
+
     def __init__(self, problem, output_format="vtu", output_dir="output",
                  filename=None, n_steps=1):
         fmt = output_format.lower()
         if fmt not in ("vtu", "xdmf"):
             raise ValueError(
-                f"Unsupported output format '{output_format}'; expected 'vtu' or 'xdmf'."
+                f"Unsupported output format '{output_format}'; expected 'vtu' or 'xdmf'. "
+                "('vtkhdf' was prototyped but reverted — see module docstring.)"
             )
 
         self.problem = problem
@@ -89,7 +100,7 @@ class OutputWriter:
         os.makedirs(output_dir, exist_ok=True)
 
         if filename is None:
-            filename = "fields.xdmf" if fmt == "xdmf" else "fields.vtu"
+            filename = f"fields{self._DEFAULT_EXT[fmt]}"
         self.filename = filename
 
         # The UFL expressions we pre-compile below live on problem.strain,
@@ -150,12 +161,8 @@ class OutputWriter:
         if on.get("mechanical", False) and problem.strain is not None:
             self._strain_fn_cells = dolfinx.fem.Function(self.V_tensor_cells, name="Strain")
             self._strain_fn_points = dolfinx.fem.Function(self.V_tensor_points, name="Strain")
-            self._strain_expr_cells = dolfinx.fem.Expression(
-                problem.strain, self.V_tensor_cells.element.interpolation_points
-            )
-            self._strain_expr_points = dolfinx.fem.Expression(
-                problem.strain, self.V_tensor_points.element.interpolation_points
-            )
+            self._strain_expr_cells = self._make_interp_or_proj(problem.strain, self.V_tensor_cells)
+            self._strain_expr_points = self._make_interp_or_proj(problem.strain, self.V_tensor_points)
 
         # Per-material stress, strain-energy density, heat flux
         for name, material in problem.materials.items():
@@ -166,11 +173,11 @@ class OutputWriter:
                 self._stress_fn_points[name] = dolfinx.fem.Function(
                     self.V_tensor_points, name=f"Stress_{name}"
                 )
-                self._stress_expr_cells[name] = dolfinx.fem.Expression(
-                    problem.stress[name], self.V_tensor_cells.element.interpolation_points
+                self._stress_expr_cells[name] = self._make_interp_or_proj(
+                    problem.stress[name], self.V_tensor_cells
                 )
-                self._stress_expr_points[name] = dolfinx.fem.Expression(
-                    problem.stress[name], self.V_tensor_points.element.interpolation_points
+                self._stress_expr_points[name] = self._make_interp_or_proj(
+                    problem.stress[name], self.V_tensor_points
                 )
 
                 if name in problem.energy_density:
@@ -180,13 +187,11 @@ class OutputWriter:
                     self._psi_fn_points[name] = dolfinx.fem.Function(
                         self.V_scalar_points, name=f"StrainEnergyDensity_{name}"
                     )
-                    self._psi_expr_cells[name] = dolfinx.fem.Expression(
-                        problem.energy_density[name],
-                        self.V_scalar_cells.element.interpolation_points,
+                    self._psi_expr_cells[name] = self._make_interp_or_proj(
+                        problem.energy_density[name], self.V_scalar_cells
                     )
-                    self._psi_expr_points[name] = dolfinx.fem.Expression(
-                        problem.energy_density[name],
-                        self.V_scalar_points.element.interpolation_points,
+                    self._psi_expr_points[name] = self._make_interp_or_proj(
+                        problem.energy_density[name], self.V_scalar_points
                     )
 
             if on.get("thermal", False) and getattr(problem, "T", None) is not None:
@@ -194,34 +199,30 @@ class OutputWriter:
                 self._heatflux_fn[name] = dolfinx.fem.Function(
                     self.V_vector_cells, name=f"HeatFlux_{name}"
                 )
-                self._heatflux_expr[name] = dolfinx.fem.Expression(
-                    q_expr, self.V_vector_cells.element.interpolation_points
+                self._heatflux_expr[name] = self._make_interp_or_proj(
+                    q_expr, self.V_vector_cells
                 )
 
         # Damage + crack-driving-force, cell projections
         if on.get("damage", False) and getattr(problem, "D", None) is not None:
             self._D_cell_fn = dolfinx.fem.Function(self.V_scalar_cells, name="Damage")
-            self._D_cell_expr = dolfinx.fem.Expression(
-                problem.D, self.V_scalar_cells.element.interpolation_points
-            )
+            self._D_cell_expr = self._make_interp_or_proj(problem.D, self.V_scalar_cells)
             if getattr(problem, "H", None) is not None:
                 self._H_cell_fn = dolfinx.fem.Function(
                     self.V_scalar_cells, name="CrackDrivingForce"
                 )
-                self._H_cell_expr = dolfinx.fem.Expression(
-                    problem.H, self.V_scalar_cells.element.interpolation_points
-                )
+                self._H_cell_expr = self._make_interp_or_proj(problem.H, self.V_scalar_cells)
 
         # Cluster: pre-allocated CG1 Function for XDMF visualisation.
         if on.get("cluster", False) and getattr(problem, "c", None) is not None:
             self._c_cg_fn = dolfinx.fem.Function(self.V_c_cg, name="ClusterDensity")
 
         # XDMF: open file once and write mesh header.
-        self._xdmf = None
+        self._ts_file = None
         if self.format == "xdmf":
             full_path = os.path.join(self.output_dir, self.filename)
-            self._xdmf = XDMFFile(self.mesh.comm, full_path, "w")
-            self._xdmf.write_mesh(self.mesh)
+            self._ts_file = XDMFFile(self.mesh.comm, full_path, "w")
+            self._ts_file.write_mesh(self.mesh)
 
     # -----------------------------------------------------------------------
     # Public API
@@ -231,15 +232,15 @@ class OutputWriter:
         """Refresh all interpolated Functions and write the current state."""
         self._refresh()
         if self.format == "xdmf":
-            self._write_xdmf(t)
+            self._write_timeseries(t)
         else:
             self._write_vtu(step)
 
     def close(self):
-        """Close the underlying XDMFFile, if any. Safe to call repeatedly."""
-        if self._xdmf is not None:
-            self._xdmf.close()
-            self._xdmf = None
+        """Close the underlying time-series file, if any. Safe to call repeatedly."""
+        if self._ts_file is not None:
+            self._ts_file.close()
+            self._ts_file = None
 
     def __enter__(self):
         return self
@@ -252,52 +253,101 @@ class OutputWriter:
     # Internal
     # -----------------------------------------------------------------------
 
+    # ---------- field-update helpers ----------
+
+    def _make_interp_or_proj(self, ufl_expr, V):
+        """Build either a ``dolfinx.fem.Expression`` (for interpolation) or a
+        cached ``LinearProblem`` (for L2 projection), depending on whether the
+        UFL expression can be directly interpolated into ``V``.
+
+        Quadrature-sourced expressions (e.g. plasticity in ``custom`` mode,
+        where the stress depends on quadrature internal variables) fail at
+        ``Expression`` construction with::
+
+            ValueError: Mismatch of tabulation points and element points.
+
+        For those we fall back to projection. The fallback path costs one
+        linear solve per write() call, which is acceptable here because the
+        ``LinearProblem`` matrix is assembled once and re-used per step.
+        """
+        try:
+            return dolfinx.fem.Expression(ufl_expr, V.element.interpolation_points)
+        except Exception as e:
+            print(
+                f"[OutputWriter] interpolation not available for field on "
+                f"{V.ufl_element()} ({type(e).__name__}); falling back to L2 projection."
+            )
+            u_tr = ufl.TrialFunction(V)
+            v = ufl.TestFunction(V)
+            dx = ufl.dx(metadata=self._metadata) if self._metadata else ufl.dx
+            a = ufl.inner(u_tr, v) * dx
+            L = ufl.inner(ufl_expr, v) * dx
+            return dolfinx.fem.petsc.LinearProblem(
+                a, L,
+                petsc_options={"ksp_type": "preonly", "pc_type": "lu"},
+                petsc_options_prefix=f"z3st_proj_{id(ufl_expr):x}_",
+            )
+
+    @staticmethod
+    def _refresh_into(target_fn, source):
+        """Update ``target_fn`` from a pre-prepared source (Expression or
+        cached projection LinearProblem)."""
+        if isinstance(source, dolfinx.fem.Expression):
+            target_fn.interpolate(source)
+        else:
+            # LinearProblem path. solve() returns its internal Function;
+            # copy its values into our pre-allocated target.
+            result = source.solve()
+            target_fn.x.array[:] = result.x.array[:]
+
     def _refresh(self):
-        """Interpolate every pre-compiled Expression into its target Function."""
+        """Refresh every interpolated/projected Function from its source."""
         if self._strain_expr_cells is not None:
-            self._strain_fn_cells.interpolate(self._strain_expr_cells)
-            self._strain_fn_points.interpolate(self._strain_expr_points)
+            self._refresh_into(self._strain_fn_cells, self._strain_expr_cells)
+            self._refresh_into(self._strain_fn_points, self._strain_expr_points)
 
-        for name, expr in self._stress_expr_cells.items():
-            self._stress_fn_cells[name].interpolate(expr)
-            self._stress_fn_points[name].interpolate(self._stress_expr_points[name])
+        for name, src in self._stress_expr_cells.items():
+            self._refresh_into(self._stress_fn_cells[name], src)
+            self._refresh_into(self._stress_fn_points[name], self._stress_expr_points[name])
 
-        for name, expr in self._psi_expr_cells.items():
-            self._psi_fn_cells[name].interpolate(expr)
-            self._psi_fn_points[name].interpolate(self._psi_expr_points[name])
+        for name, src in self._psi_expr_cells.items():
+            self._refresh_into(self._psi_fn_cells[name], src)
+            self._refresh_into(self._psi_fn_points[name], self._psi_expr_points[name])
 
-        for name, expr in self._heatflux_expr.items():
-            self._heatflux_fn[name].interpolate(expr)
+        for name, src in self._heatflux_expr.items():
+            self._refresh_into(self._heatflux_fn[name], src)
 
         if self._D_cell_expr is not None:
-            self._D_cell_fn.interpolate(self._D_cell_expr)
+            self._refresh_into(self._D_cell_fn, self._D_cell_expr)
         if self._H_cell_expr is not None:
-            self._H_cell_fn.interpolate(self._H_cell_expr)
+            self._refresh_into(self._H_cell_fn, self._H_cell_expr)
 
         # Cluster: DG1 → CG1 Function-to-Function interpolation for XDMF/VTU.
         if self._c_cg_fn is not None:
             self._c_cg_fn.interpolate(self.problem.c)
 
-    def _write_xdmf(self, t):
+    def _write_timeseries(self, t):
+        """Append the current state to the open XDMF file at time ``t``."""
         p = self.problem
         on = p.on
+        write = self._ts_file.write_function
 
         if on.get("thermal", False) and p.T is not None:
-            self._xdmf.write_function(p.T, t)
+            write(p.T, t)
         if on.get("mechanical", False) and p.u is not None:
-            self._xdmf.write_function(p.u, t)
+            write(p.u, t)
         if self._strain_fn_cells is not None:
-            self._xdmf.write_function(self._strain_fn_cells, t)
+            write(self._strain_fn_cells, t)
         for fn in self._stress_fn_cells.values():
-            self._xdmf.write_function(fn, t)
+            write(fn, t)
         for fn in self._psi_fn_cells.values():
-            self._xdmf.write_function(fn, t)
+            write(fn, t)
         for fn in self._heatflux_fn.values():
-            self._xdmf.write_function(fn, t)
+            write(fn, t)
         if on.get("damage", False) and p.D is not None:
-            self._xdmf.write_function(p.D, t)
+            write(p.D, t)
         if self._c_cg_fn is not None:
-            self._xdmf.write_function(self._c_cg_fn, t)
+            write(self._c_cg_fn, t)
 
     def _write_vtu(self, step):
         p = self.problem

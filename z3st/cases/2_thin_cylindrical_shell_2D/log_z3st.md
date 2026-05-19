@@ -117,6 +117,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Dirichlet thermal BC on 'steel' → 490.0 K at region 'inner_radius'
   **[INFO]** Dirichlet thermal BC on 'steel' → 480.0 K at region 'outer_radius'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'bottom'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -428,16 +429,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.353e-07
+  ||Δu||/||u|| = 5.290e-07
   [adaptive] relax_u=0.95
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 13.55 s
+Simulation completed in 10.37 s
 Total time steps solved: 1

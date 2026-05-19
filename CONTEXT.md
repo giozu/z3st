@@ -538,7 +538,7 @@ lhr:   [0.0, 0.0]
 n_steps: 20
 
 output:
-  format: xdmf                 # xdmf | vtu
+  format: xdmf                 # vtu | xdmf  (vtkhdf prototyped but reverted; dolfinx 0.10's vtkhdf submodule lacks per-field naming)
   filename: simulation.xdmf
 ```
 

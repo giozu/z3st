@@ -123,6 +123,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'top'
   **[INFO]** Neumann mechanical BC on 'steel' → inner_radius: -1000000.0 Pa (list loaded)
   **[INFO]** Neumann mechanical BC on 'steel' → outer_radius: 0.0 Pa (list loaded)
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
@@ -499,16 +500,13 @@ Convergence check
   Applying mechanical traction on subdomain id = 1
   Applying mechanical traction on subdomain id = 2
   Linear solver
-  ||Δu||/||u|| = 2.750e-16
+  ||Δu||/||u|| = 3.349e-15
   [adaptive] relax_u=1.00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 1.39 s
+Simulation completed in 0.94 s
 Total time steps solved: 1

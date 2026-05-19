@@ -80,7 +80,7 @@ Material loaded: cyl_1
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7ba40c9efd80> (function)
+  _k_func         → <function k at 0x7385e070f7e0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -161,6 +161,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Neumann mechanical BC on 'cyl_2' → inner_2: -2000000.0 Pa (list loaded)
   **[INFO]** Neumann mechanical BC on 'cyl_2' → outer_2: -5000000.0 Pa (list loaded)
   **[INFO]** Clamp_z mechanical BC on 'cyl_2' → 0.0 (first step) at region 'top_2'
+Computing symbolic result fields (strain, stress, ...)
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 2.00e+01 W/m
@@ -798,9 +799,6 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-VTU file exported to: output/fields.vtu
 
-Simulation completed in 60.68 s
+Simulation completed in 48.38 s
 Total time steps solved: 1

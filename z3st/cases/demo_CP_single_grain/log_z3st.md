@@ -106,11 +106,6 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Constant Dirichlet vector (3D) → [0.0, 0.0, 0.0]
   **[INFO]** Dirichlet mechanical BC on 'grain' → [0.0, 0.0, 0.0] at region 'zmin'
   **[INFO]** Dirichlet_z mechanical BC on 'grain' → 0.0 (first step) at region 'zmax'
-
-
-## Step 01/41: t = 0.00e+00 s | LHR = 0.00e+00 W/m
-
-  → dt=0: solving static step / initial condition
 Computing symbolic result fields (strain, stress, ...)
 
 ======================================================================
@@ -136,6 +131,14 @@ For uniaxial stress σ_zz:
   Resolved shear stress: τ = 0.408248 × σ_zz
 ======================================================================
 
+[OutputWriter] interpolation not available for field on blocked element (Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []), (3, 3)) (ValueError); falling back to L2 projection.
+[OutputWriter] interpolation not available for field on Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []) (ValueError); falling back to L2 projection.
+
+
+## Step 01/41: t = 0.00e+00 s | LHR = 0.00e+00 W/m
+
+  → dt=0: solving static step / initial condition
+Computing symbolic result fields (strain, stress, ...)
 
 
 
@@ -176,10 +179,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 1 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0000.vtu
 
 
 ## Step 02/41: t = 5.00e-02 s | LHR = 0.00e+00 W/m
@@ -237,10 +236,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0001.vtu
 
 
 ## Step 03/41: t = 1.00e-01 s | LHR = 0.00e+00 W/m
@@ -298,10 +293,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0002.vtu
 
 
 ## Step 04/41: t = 1.50e-01 s | LHR = 0.00e+00 W/m
@@ -359,10 +350,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0003.vtu
 
 
 ## Step 05/41: t = 2.00e-01 s | LHR = 0.00e+00 W/m
@@ -420,10 +407,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0004.vtu
 
 
 ## Step 06/41: t = 2.50e-01 s | LHR = 0.00e+00 W/m
@@ -481,10 +464,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0005.vtu
 
 
 ## Step 07/41: t = 3.00e-01 s | LHR = 0.00e+00 W/m
@@ -535,17 +514,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 11 → 0.0015
   Building weak form, volume integrals (dx) for grain, tag = 1
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.134e-15
+  ||Δu||/||u|| = 2.115e-15
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0006.vtu
 
 
 ## Step 08/41: t = 3.50e-01 s | LHR = 0.00e+00 W/m
@@ -603,10 +578,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0007.vtu
 
 
 ## Step 09/41: t = 4.00e-01 s | LHR = 0.00e+00 W/m
@@ -664,10 +635,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0008.vtu
 
 
 ## Step 10/41: t = 4.50e-01 s | LHR = 0.00e+00 W/m
@@ -725,10 +692,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0009.vtu
 
 
 ## Step 11/41: t = 5.00e-01 s | LHR = 0.00e+00 W/m
@@ -786,10 +749,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0010.vtu
 
 
 ## Step 12/41: t = 5.50e-01 s | LHR = 0.00e+00 W/m
@@ -847,10 +806,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0011.vtu
 
 
 ## Step 13/41: t = 6.00e-01 s | LHR = 0.00e+00 W/m
@@ -908,10 +863,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0012.vtu
 
 
 ## Step 14/41: t = 6.50e-01 s | LHR = 0.00e+00 W/m
@@ -969,10 +920,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0013.vtu
 
 
 ## Step 15/41: t = 7.00e-01 s | LHR = 0.00e+00 W/m
@@ -1030,10 +977,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0014.vtu
 
 
 ## Step 16/41: t = 7.50e-01 s | LHR = 0.00e+00 W/m
@@ -1091,10 +1034,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0015.vtu
 
 
 ## Step 17/41: t = 8.00e-01 s | LHR = 0.00e+00 W/m
@@ -1145,17 +1084,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 11 → 0.004
   Building weak form, volume integrals (dx) for grain, tag = 1
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 5.539e-14
+  ||Δu||/||u|| = 5.540e-14
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0016.vtu
 
 
 ## Step 18/41: t = 8.50e-01 s | LHR = 0.00e+00 W/m
@@ -1213,10 +1148,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0017.vtu
 
 
 ## Step 19/41: t = 9.00e-01 s | LHR = 0.00e+00 W/m
@@ -1274,10 +1205,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0018.vtu
 
 
 ## Step 20/41: t = 9.50e-01 s | LHR = 0.00e+00 W/m
@@ -1335,10 +1262,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0019.vtu
 
 
 ## Step 21/41: t = 1.00e+00 s | LHR = 0.00e+00 W/m
@@ -1396,10 +1319,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0020.vtu
 
 
 ## Step 22/41: t = 1.05e+00 s | LHR = 0.00e+00 W/m
@@ -1457,10 +1376,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0021.vtu
 
 
 ## Step 23/41: t = 1.10e+00 s | LHR = 0.00e+00 W/m
@@ -1518,10 +1433,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0022.vtu
 
 
 ## Step 24/41: t = 1.15e+00 s | LHR = 0.00e+00 W/m
@@ -1579,10 +1490,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0023.vtu
 
 
 ## Step 25/41: t = 1.20e+00 s | LHR = 0.00e+00 W/m
@@ -1640,10 +1547,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0024.vtu
 
 
 ## Step 26/41: t = 1.25e+00 s | LHR = 0.00e+00 W/m
@@ -1701,10 +1604,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0025.vtu
 
 
 ## Step 27/41: t = 1.30e+00 s | LHR = 0.00e+00 W/m
@@ -1762,10 +1661,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0026.vtu
 
 
 ## Step 28/41: t = 1.35e+00 s | LHR = 0.00e+00 W/m
@@ -1823,10 +1718,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0027.vtu
 
 
 ## Step 29/41: t = 1.40e+00 s | LHR = 0.00e+00 W/m
@@ -1884,10 +1775,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0028.vtu
 
 
 ## Step 30/41: t = 1.45e+00 s | LHR = 0.00e+00 W/m
@@ -1945,10 +1832,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0029.vtu
 
 
 ## Step 31/41: t = 1.50e+00 s | LHR = 0.00e+00 W/m
@@ -2006,10 +1889,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0030.vtu
 
 
 ## Step 32/41: t = 1.55e+00 s | LHR = 0.00e+00 W/m
@@ -2067,10 +1946,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0031.vtu
 
 
 ## Step 33/41: t = 1.60e+00 s | LHR = 0.00e+00 W/m
@@ -2128,10 +2003,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0032.vtu
 
 
 ## Step 34/41: t = 1.65e+00 s | LHR = 0.00e+00 W/m
@@ -2189,10 +2060,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0033.vtu
 
 
 ## Step 35/41: t = 1.70e+00 s | LHR = 0.00e+00 W/m
@@ -2250,10 +2117,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0034.vtu
 
 
 ## Step 36/41: t = 1.75e+00 s | LHR = 0.00e+00 W/m
@@ -2311,10 +2174,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0035.vtu
 
 
 ## Step 37/41: t = 1.80e+00 s | LHR = 0.00e+00 W/m
@@ -2372,10 +2231,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0036.vtu
 
 
 ## Step 38/41: t = 1.85e+00 s | LHR = 0.00e+00 W/m
@@ -2433,10 +2288,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0037.vtu
 
 
 ## Step 39/41: t = 1.90e+00 s | LHR = 0.00e+00 W/m
@@ -2494,10 +2345,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0038.vtu
 
 
 ## Step 40/41: t = 1.95e+00 s | LHR = 0.00e+00 W/m
@@ -2555,10 +2402,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0039.vtu
 
 
 ## Step 41/41: t = 2.00e+00 s | LHR = 0.00e+00 W/m
@@ -2616,10 +2459,6 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
-Exporting results to VTU file...
-  → Projecting result fields for all materials...
-Interpolation failed (likely Quadrature mismatch): Mismatch of tabulation points and element points.. Falling back to projection.
-VTU file exported to: output/fields_0040.vtu
 
-Simulation completed in 8.07 s
+Simulation completed in 27.69 s
 Total time steps solved: 41
