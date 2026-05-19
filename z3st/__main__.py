@@ -111,8 +111,8 @@ complex geometries, and user-defined boundary conditions.
 
 # --. Z3ST modules --..
 from z3st.core.spine import Spine
-from z3st.utils.export_vtu import export_vtu
 from z3st.utils.utils_load import generate_power_history, load
+from z3st.utils.writer import OutputWriter
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
@@ -128,11 +128,10 @@ if __name__ == "__main__":
     with open("input.yaml", "r") as f:
         input_file = yaml.safe_load(f)
 
-    # --. Output setup --..
+    # --. Output config (writer is instantiated below, after get_results) --..
     output_cfg = input_file.get("output", {})
     output_format = output_cfg.get("format", "vtu").lower()
-    output_file = output_cfg.get("filename", "fields.xdmf")
-    xdmf_file = None
+    output_filename = output_cfg.get("filename")  # None → writer picks per-format default
 
     if os.path.exists('energies.txt'): os.remove('energies.txt')
 
@@ -146,15 +145,8 @@ if __name__ == "__main__":
     # --. Problem setup --..
     problem = Spine(input_file=input_file, mesh_file=input_file["mesh_path"], geometry=geometry)
 
-    # Initialize XDMF if needed
-    if output_format == "xdmf":
-        from dolfinx.io import XDMFFile
-        full_path = os.path.join("output", output_file)
-        xdmf_file = XDMFFile(problem.mesh.comm, full_path, "w")
-        xdmf_file.write_mesh(problem.mesh)
-
     if MESH_PLOT_MODE:
-        from core.mesh.plotter import MeshPlotter
+        from z3st.core.mesh.plotter import MeshPlotter
 
         label_map = getattr(problem, "label_map", {})
         plotter = MeshPlotter(problem.mesh, problem.facet_tags, label_map)
@@ -175,6 +167,18 @@ if __name__ == "__main__":
     problem.parameters(lhr=lhrs[0])
     problem.initialize_fields()
     problem.set_boundary_conditions()
+
+    # Populate symbolic stress / strain / energy_density UFL expressions, then
+    # construct the writer (which compiles those expressions to dolfinx
+    # Expression objects exactly once).
+    problem.get_results()
+    writer = OutputWriter(
+        problem,
+        output_format=output_format,
+        output_dir="output",
+        filename=output_filename,
+        n_steps=len(times),
+    )
 
     # --. Time loop --..
     start_time = time.time()
@@ -219,48 +223,10 @@ if __name__ == "__main__":
                         f.write("Step\tE_el\tE_frac\tE_tot\n")
                     f.write(f"{step}\t{E_el:.6e}\t{E_frac:.6e}\t{E_tot:.6e}\n")
 
-        # Export
-        if output_format == "xdmf" and xdmf_file:
-             if problem.c:
-                 # Interpolate DG to CG for visualization in XDMF
-                 import dolfinx
-                 V_c_cg = dolfinx.fem.functionspace(problem.mesh, ("Lagrange", 1))
-                 c_cg = dolfinx.fem.Function(V_c_cg, name="ClusterDensity")
-                 c_cg.interpolate(problem.c)
-                 xdmf_file.write_function(c_cg, t)
-             if problem.T:
-                 xdmf_file.write_function(problem.T, t)
-             if problem.u:
-                 xdmf_file.write_function(problem.u, t)
-             
-             # Export stress and strain (per material)
-             if problem.on.get("mechanical"):
-                 import dolfinx
-                 V_tensor = dolfinx.fem.functionspace(problem.mesh, ("DG", 0, (3, 3)))
-                 for name in problem.materials:
-                     if problem.stress and name in problem.stress:
-                         stress_expr = problem.stress[name]
-                         stress_func = dolfinx.fem.Function(V_tensor, name=f"Stress_{name}")
-                         stress_func.interpolate(dolfinx.fem.Expression(stress_expr, V_tensor.element.interpolation_points))
-                         xdmf_file.write_function(stress_func, t)
-                 
-                 # Strain is global
-                 if problem.strain:
-                     strain_func = dolfinx.fem.Function(V_tensor, name="Strain")
-                     strain_func.interpolate(dolfinx.fem.Expression(problem.strain, V_tensor.element.interpolation_points))
-                     xdmf_file.write_function(strain_func, t)
+        # Export converged step (writer handles both VTU and XDMF, same field set).
+        writer.write(t=t, step=step)
 
-             if problem.D:
-                 xdmf_file.write_function(problem.D, t)
-        else:
-            # Fallback to VTU
-            if len(times) == 1:
-                export_vtu(problem, output_dir="output")
-            else:
-                export_vtu(problem, output_dir="output", filename=f"fields_{step:04d}.vtu")
-
-    if xdmf_file:
-        xdmf_file.close()
+    writer.close()
 
     end_time = time.time()
     elapsed_time = end_time - start_time
