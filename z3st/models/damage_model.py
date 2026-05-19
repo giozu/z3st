@@ -269,23 +269,106 @@ class DamageModel:
 
         return psi_pos, psi_neg
 
+    def psi_star_convex(self, u, material, T=None):
+        """
+        Star-convex energy split (Vicentini, Zolesi, Carrara, Maurini, De
+        Lorenzis 2024 — Int. J. Fract. 247:291-317, Eqs. (38)-(39)).
+
+        A one-parameter generalisation of the Amor volumetric/deviatoric
+        split:
+
+            psi_pos = G |dev(eps_el)|^2
+                      + (lambda/2) [<tr eps_el>_+^2 - gamma_star <tr eps_el>_-^2]
+            psi_neg = (1 + gamma_star) (lambda/2) <tr eps_el>_-^2
+
+        gamma_star >= -1 controls the compressive-vs-tensile critical-stress
+        asymmetry. The standard Amor split is recovered at gamma_star = 0;
+        gamma_star > 0 raises the compressive strength relative to tensile
+        and introduces a strain-space asymptote below which compressive
+        loading cannot grow damage further (Vicentini et al. 2024 Fig. 7).
+
+        Per Vicentini et al. 2024 Table 2, the star-convex model satisfies
+        all five criteria for an ideal multi-axial energy decomposition
+        (strain-hardening, stress-softening, tens./compr. asymmetry,
+        flexibility, crack-like residual stress) — none of the other
+        decompositions in z3st (Amor, Miehe spectral) achieve full
+        flexibility.
+
+        gamma_star is read from ``self.dmg_cfg["gamma_star"]`` (i.e. the
+        ``damage:`` block of input.yaml, alongside ``lc`` and
+        ``hybrid_constraint``) and defaults to 0.0 (silently reduces to
+        Amor). It is intentionally a *model* parameter, not a material
+        property: the same energy-split machinery is shared across every
+        material in the simulation.
+
+        Note: z3st's Amor implementation uses the Lame parameter ``lambda``
+        rather than the n-dimensional bulk modulus ``K_n``; star-convex
+        mirrors that convention so that ``gamma_star = 0`` recovers
+        ``psi_amor_split`` exactly.
+        """
+        lam = material["lmbda"]
+        G = material["G"]
+        gamma_star = float(self.dmg_cfg.get("gamma_star", 0.0))
+
+        eps = self.epsilon(u)
+        dim = eps.ufl_shape[0]
+
+        eth = self._thermal_eigenstrain(dim, material, T)
+        if eth is not None:
+            eps = eps - eth
+
+        tr_eps = ufl.tr(eps)
+        tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+        tr_eps_neg = 0.5 * (tr_eps - abs(tr_eps))
+
+        psi_pos = (
+            G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+            + 0.5 * lam * (tr_eps_pos**2 - gamma_star * tr_eps_neg**2)
+        )
+        psi_neg = (1.0 + gamma_star) * 0.5 * lam * tr_eps_neg**2
+
+        return psi_pos, psi_neg
+
     def psi_split(self, u, material, T=None):
         """
-        Dispatch to the elastic energy split matching the active damage model:
-        Miehe spectral for AT2, Amor volumetric/deviatoric for AT1.
+        Dispatch to the elastic energy split.
+
+        Selection priority:
+          1. ``damage.split: amor | miehe | star_convex`` in input.yaml
+             (explicit override).
+          2. Default (no ``split`` key): AT2 -> Miehe spectral, AT1 -> Amor
+             volumetric/deviatoric. This preserves z3st's historical pairing.
+
         Returns (psi_pos, psi_neg) in physical units (J/m^3).
 
         T (optional): the current temperature field. When provided, the split
         is evaluated on the elastic (mechanical) strain so thermal expansion
         does not contribute spuriously.
         """
-        damage_type = self.dmg_cfg["type"]
-        if damage_type == "AT2":
-            return self.psi_miehe_spectral(u, material, T=T)
-        elif damage_type == "AT1":
+        split_choice = self.dmg_cfg.get("split")
+
+        if split_choice is None:
+            # Historical default: split inferred from damage type.
+            damage_type = self.dmg_cfg["type"]
+            if damage_type == "AT2":
+                return self.psi_miehe_spectral(u, material, T=T)
+            elif damage_type == "AT1":
+                return self.psi_amor_split(u, material, T=T)
+            else:
+                raise ValueError(f"Unknown damage type '{damage_type}'")
+
+        split_choice = str(split_choice).lower()
+        if split_choice == "amor":
             return self.psi_amor_split(u, material, T=T)
+        elif split_choice == "miehe":
+            return self.psi_miehe_spectral(u, material, T=T)
+        elif split_choice == "star_convex":
+            return self.psi_star_convex(u, material, T=T)
         else:
-            raise ValueError(f"Unknown damage type '{damage_type}'")
+            raise ValueError(
+                f"Unknown damage.split '{split_choice}'; expected "
+                f"'amor', 'miehe', or 'star_convex'."
+            )
 
     def update_history(self, u, T=None):
         """

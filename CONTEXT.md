@@ -325,9 +325,10 @@ Phase-field fracture with two variational models:
   `H = ψ⁺` (physical, J/m³).
   Amor (volumetric/deviatoric) split.
 
-Elastic-energy splits:
+Elastic-energy splits (selectable via `damage.split: amor | miehe | star_convex`; if absent, defaults to Amor for AT1 and Miehe for AT2 — the historical pairing):
 - `psi_miehe_spectral(u, mat)` — 2D closed-form + 3D via Cardano's formula with smooth clamping.
 - `psi_amor_split(u, mat)` — `ψ⁺ = ½ λ ⟨tr ε⟩₊² + G dev(ε):dev(ε)`; `ψ⁻ = ½ λ ⟨tr ε⟩₋²`.
+- `psi_star_convex(u, mat)` — Vicentini, Zolesi, Carrara, Maurini, De Lorenzis 2024 (Int. J. Fract. 247:291-317). One-parameter generalisation of Amor controlled by `dmg_cfg["gamma_star"]` (a *model* parameter in the `damage:` block, default 0 → reduces to Amor; intentionally not a per-material property). `ψ⁺ = G|dev ε|² + (λ/2)[⟨tr ε⟩₊² − γ⋆⟨tr ε⟩₋²]`, `ψ⁻ = (1+γ⋆)(λ/2)⟨tr ε⟩₋²`. Satisfies all five criteria in the Vicentini 2024 Table 2 (the other splits do not). `γ⋆ > 0` raises the compressive-vs-tensile critical-stress ratio.
 
 `update_history(u)` — vectorised, per-material update of the history field `H` on DG0. Supports **Ambati-Gerasimov-De Lorenzis hybrid constraint** (`dmg_cfg.hybrid_constraint`, default `True`): where `ψ⁻ > ψ⁺` locally, contribution to H is set to 0 to suppress crack growth in compression.
 
@@ -532,6 +533,10 @@ damage:
   convergence: rel_norm
   lc: 1.0e-4
   hybrid_constraint: true
+  # split: star_convex          # optional; amor | miehe | star_convex.
+                                # When star_convex, optionally set gamma_star >= -1
+                                # (defaults to 0 -> reduces to Amor exactly).
+  # gamma_star: 1.0             # star-convex model parameter; see damage_model.py::psi_star_convex
 
 time:  [0.0, 0.01]
 lhr:   [0.0, 0.0]
