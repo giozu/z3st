@@ -173,6 +173,16 @@ CLI flags:
 
 Interactive runs are pass-through. Set `Z3ST_PLAIN_LOG=1` to force the raw, unfiltered output even when redirected. None of the solver / model / config modules were touched; the filter is a single point of intercept in `__main__.py`.
 
+**Hot-reload of input.yaml parameters** (`__main__.py`, `_reload_hot_params`). At the start of each time step, `__main__.py` re-reads `input.yaml` and propagates allow-listed parameter changes in-place into the in-memory config dicts (which are shared by reference with `problem.dmg_cfg` / `mech_cfg` / `th_cfg`, so the changes are immediately visible to the solver on the next step). The user can edit `input.yaml` mid-run and changes apply at the next step boundary (latency ≤ one step's wall-time). A one-line notice is printed when a value actually changes; silent on no-change steps. The reload is robust to mid-edit reads (transient `yaml.YAMLError` / `FileNotFoundError` → silent skip; the previous values stay in effect).
+
+Allow-listed (hot-reloadable):
+- `damage.{stag_tol, rtol, hybrid_constraint, gamma_star}`
+- `mechanical.{stag_tol, rtol}`
+- `thermal.{stag_tol, rtol}`
+- `solver_settings.{max_iters, relax_T, relax_u, relax_D, relax_adaptive, relax_growth, relax_shrink, relax_min, relax_max}`
+
+NOT hot-reloadable (intentionally — would invalidate pre-allocated FE structures or pre-compiled UFL Expressions): mesh / geometry / BC paths, materials, regime, `models.*` toggles, `damage.{type, lc, split}`, `mechanical.constitutive`, `plasticity.mode`, time history / `n_steps`. Edits to these are silently ignored mid-run; restart the simulation to apply them.
+
 ---
 
 ## 3. Core modules

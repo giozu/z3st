@@ -13,6 +13,7 @@ the script simply re-renders the plot from the saved CSV.
 """
 
 import os
+import sys
 from glob import glob
 
 import matplotlib.pyplot as plt
@@ -20,9 +21,16 @@ import numpy as np
 import pyvista as pv
 import yaml
 
-CASE_DIR   = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(CASE_DIR, "output")
+CASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+if len(sys.argv) > 1:
+    arg = sys.argv[1]
+    OUTPUT_DIR = arg if os.path.isabs(arg) else os.path.join(CASE_DIR, arg)
+else:
+    OUTPUT_DIR = os.path.join(CASE_DIR, "output")
+
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+print(f"[INFO] Using OUTPUT_DIR = {OUTPUT_DIR}")
 VTU_FILES  = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
 CSV_FILE   = os.path.join(OUTPUT_DIR, "force_displacement.csv")
 PNG_FILE   = os.path.join(OUTPUT_DIR, "force_displacement.png")

@@ -116,6 +116,57 @@ from z3st.utils.writer import OutputWriter
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
+
+# ─── Hot-reload of input.yaml parameters ──────────────────────────────
+# Some run-time parameters can be safely changed mid-simulation: the user
+# edits input.yaml, and the next time-step picks up the new value. The
+# allow-list below covers tolerances, iteration limits, relaxation factors,
+# and a couple of split-controlling damage params. Anything outside this
+# list (mesh, regime, models, materials, time history, n_steps, damage.type
+# / split / lc, mechanical.constitutive, ...) is intentionally NOT reloaded
+# because changing it mid-run would invalidate pre-allocated FE structures
+# or pre-compiled UFL Expressions held by the OutputWriter.
+_MISSING = object()
+_HOT_RELOAD_ALLOWLIST = {
+    "damage":          ("stag_tol", "rtol", "hybrid_constraint", "gamma_star"),
+    "mechanical":      ("stag_tol", "rtol"),
+    "thermal":         ("stag_tol", "rtol"),
+    "solver_settings": (
+        "max_iters",
+        "relax_T", "relax_u", "relax_D",
+        "relax_adaptive", "relax_growth", "relax_shrink",
+        "relax_min", "relax_max",
+    ),
+}
+
+
+def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
+    """Re-read input.yaml and propagate allow-listed parameter changes
+    in-place into ``input_file`` (and, by reference-sharing, into
+    ``problem.dmg_cfg`` / ``mech_cfg`` / ``th_cfg``). Silent on read
+    errors (a mid-edit file may be transiently malformed). Prints a
+    one-line notice only when a value actually changes."""
+    try:
+        with open(input_path, "r") as f:
+            new_input = yaml.safe_load(f)
+    except (FileNotFoundError, yaml.YAMLError):
+        return  # mid-edit; skip this cycle silently
+
+    if not isinstance(new_input, dict):
+        return
+
+    for block, keys in _HOT_RELOAD_ALLOWLIST.items():
+        new_block = new_input.get(block)
+        old_block = input_file.get(block)
+        if not isinstance(new_block, dict) or not isinstance(old_block, dict):
+            continue
+        for key in keys:
+            new_val = new_block.get(key, _MISSING)
+            old_val = old_block.get(key, _MISSING)
+            if new_val is not _MISSING and new_val != old_val:
+                old_block[key] = new_val
+                print(f"  [hot-reload] {block}.{key}: {old_val} → {new_val}")
+
 # ---------------------------------------------------------------
 # MAIN EXECUTION BLOCK
 # ---------------------------------------------------------------
@@ -185,8 +236,20 @@ if __name__ == "__main__":
     # --. Time loop --..
     start_time = time.time()
 
+    print(
+        "\n[INFO] Hot-reload of allow-listed input.yaml parameters is active. "
+        "Edit input.yaml during the run; changes apply at the next step boundary. "
+        "Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, "
+        "mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, "
+        "solver_settings.{max_iters,relax_*}."
+    )
+
     for step, (t, lhr) in enumerate(zip(times, lhrs)):
         print(f"\n[STEP {step+1:02d}/{len(times)}] t = {t:.2e} s | LHR = {lhr:.2e} W/m")
+
+        # Hot-reload: pick up any in-flight edits to input.yaml. No-op when
+        # the file is unchanged (no print in that case).
+        _reload_hot_params(problem, "input.yaml", input_file)
 
         problem.current_step = step
 
