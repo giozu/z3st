@@ -125,6 +125,8 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Neumann mechanical BC on 'steel' → outer_radius: 0.0 Pa (list loaded)
 Computing symbolic result fields (strain, stress, ...)
 
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
+
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
 
@@ -500,7 +502,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 1
   Applying mechanical traction on subdomain id = 2
   Linear solver
-  ||Δu||/||u|| = 3.711e-17
+  ||Δu||/||u|| = 2.659e-16
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -508,5 +510,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.43 s
+Simulation completed in 15.88 s
 Total time steps solved: 1

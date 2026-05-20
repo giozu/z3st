@@ -134,6 +134,8 @@ For uniaxial stress σ_zz:
 [OutputWriter] interpolation not available for field on blocked element (Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []), (3, 3)) (ValueError); falling back to L2 projection.
 [OutputWriter] interpolation not available for field on Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []) (ValueError); falling back to L2 projection.
 
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
+
 
 ## Step 01/41: t = 0.00e+00 s | LHR = 0.00e+00 W/m
 
@@ -2460,5 +2462,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.42 s
+Simulation completed in 3.00 s
 Total time steps solved: 41

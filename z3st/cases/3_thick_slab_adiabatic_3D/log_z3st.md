@@ -121,6 +121,8 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_z mechanical BC on 'steel' → 0.0 (first step) at region 'zmin'
 Computing symbolic result fields (strain, stress, ...)
 
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
+
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
 
@@ -345,5 +347,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 8 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 5.57 s
+Simulation completed in 6.85 s
 Total time steps solved: 1

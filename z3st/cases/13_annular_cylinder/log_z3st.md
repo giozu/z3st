@@ -79,7 +79,7 @@ Material loaded: volume
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7902c471fc40> (function)
+  _k_func         → <function k at 0x70d4bbd17ce0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -124,6 +124,8 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Dirichlet thermal BC on 'volume' → 500.0 K at region 'outer'
   **[INFO]** Clamp_y mechanical BC on 'volume' → 0.0 (first step) at region 'bottom'
 Computing symbolic result fields (strain, stress, ...)
+
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 5.00e+02 W/m
@@ -446,5 +448,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.21 s
+Simulation completed in 3.02 s
 Total time steps solved: 1

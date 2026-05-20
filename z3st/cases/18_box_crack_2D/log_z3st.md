@@ -124,6 +124,8 @@ Setting damage boundary conditions...
   **[INFO]** Dirichlet damage BC on 'steel' → D = 1.0 at region 'crack'
 Computing symbolic result fields (strain, stress, ...)
 
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
+
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
 
@@ -356,5 +358,5 @@ Computing symbolic result fields (strain, stress, ...)
   → Fracture energy : 4.0841e+03 J
   → Total energy    : 3.9035e+04 J
 
-Simulation completed in 15.35 s
+Simulation completed in 19.18 s
 Total time steps solved: 1

@@ -110,6 +110,8 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Dirichlet mechanical BC on 'steel' → [0.0, 0.0] at region 'xmax'
 Computing symbolic result fields (strain, stress, ...)
 
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
+
 
 ## Step 01/5: t = 0.00e+00 s | LHR = 0.00e+00 W/m
 
@@ -288,7 +290,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-11, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 7.078e-07
+  ||Δu||/||u|| = 7.075e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -401,7 +403,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-09, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.016e-07
+  ||Δu||/||u|| = 3.003e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -500,7 +502,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-07, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 6.058e-06
+  ||Δu||/||u|| = 6.059e-06
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -514,7 +516,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-07, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.030e-07
+  ||Δu||/||u|| = 3.029e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -613,7 +615,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-05, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 6.058e-06
+  ||Δu||/||u|| = 6.059e-06
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -627,7 +629,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-05, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.008e-07
+  ||Δu||/||u|| = 3.018e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -635,5 +637,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 14.42 s
+Simulation completed in 18.19 s
 Total time steps solved: 5

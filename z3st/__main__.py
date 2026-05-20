@@ -139,13 +139,36 @@ _HOT_RELOAD_ALLOWLIST = {
     ),
 }
 
+# ``solver_settings`` values are cached on the Spine instance as plain
+# attributes at ``Solver.__init__`` time (e.g. ``self.relax_D``), and the
+# staggered loop reads those attributes directly — NOT the
+# ``self.solver_settings`` dict. So for a hot-reload to actually reach
+# the solver, we must additionally ``setattr`` on the Spine. The cast
+# matches the type imposed by ``Solver.__init__``. (``max_iters`` is
+# re-read from ``input_file`` per step in the time loop, so attribute
+# propagation is redundant but harmless.)
+_SOLVER_SETTINGS_CASTS = {
+    "max_iters":      int,
+    "relax_T":        float,
+    "relax_u":        float,
+    "relax_D":        float,
+    "relax_adaptive": bool,
+    "relax_growth":   float,
+    "relax_shrink":   float,
+    "relax_min":      float,
+    "relax_max":      float,
+}
+
 
 def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
     """Re-read input.yaml and propagate allow-listed parameter changes
     in-place into ``input_file`` (and, by reference-sharing, into
-    ``problem.dmg_cfg`` / ``mech_cfg`` / ``th_cfg``). Silent on read
-    errors (a mid-edit file may be transiently malformed). Prints a
-    one-line notice only when a value actually changes."""
+    ``problem.dmg_cfg`` / ``mech_cfg`` / ``th_cfg``). For
+    ``solver_settings`` keys, also ``setattr`` on the Spine instance
+    (those values are cached as plain attributes by ``Solver.__init__``
+    and not re-read from the dict at each step). Silent on read errors
+    (a mid-edit file may be transiently malformed). Prints a one-line
+    notice only when a value actually changes."""
     try:
         with open(input_path, "r") as f:
             new_input = yaml.safe_load(f)
@@ -163,9 +186,19 @@ def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
         for key in keys:
             new_val = new_block.get(key, _MISSING)
             old_val = old_block.get(key, _MISSING)
-            if new_val is not _MISSING and new_val != old_val:
-                old_block[key] = new_val
-                print(f"  [hot-reload] {block}.{key}: {old_val} → {new_val}")
+            if new_val is _MISSING or new_val == old_val:
+                continue
+            old_block[key] = new_val
+            # Solver-settings values are also cached as plain attributes on
+            # the Spine instance — propagate so the change actually reaches
+            # the solver's staggered loop on the next iteration.
+            if block == "solver_settings" and hasattr(problem, key):
+                caster = _SOLVER_SETTINGS_CASTS.get(key, lambda v: v)
+                try:
+                    setattr(problem, key, caster(new_val))
+                except (TypeError, ValueError):
+                    pass  # keep the previous attribute value silently
+            print(f"  [hot-reload] {block}.{key}: {old_val} → {new_val}")
 
 # ---------------------------------------------------------------
 # MAIN EXECUTION BLOCK
