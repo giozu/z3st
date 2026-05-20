@@ -111,6 +111,8 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_z mechanical BC on 'steel' → 0.0 (first step) at region 'zmin'
 Computing symbolic result fields (strain, stress, ...)
 
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
+
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 0.00e+00 W/m
 
@@ -355,7 +357,7 @@ Convergence check
   Building weak form, volume integrals (dx) for steel, tag = 7
   Applying mechanical traction on subdomain id = 3
   Linear solver
-  ||Δu||/||u|| = 9.758e-14
+  ||Δu||/||u|| = 7.760e-14
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -363,5 +365,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 1.85 s
+Simulation completed in 2.44 s
 Total time steps solved: 1

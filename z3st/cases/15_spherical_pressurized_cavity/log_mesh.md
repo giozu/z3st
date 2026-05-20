@@ -1,5 +1,5 @@
-Info    : Running '/home/giovanni/miniconda3/envs/z3st/bin/gmsh mesh.geo -3' [Gmsh 4.14.1, 1 node, max. 1 thread]
-Info    : Started on Tue May 19 16:13:45 2026
+Info    : Running '/home/giovanni/.local/bin/gmsh mesh.geo -3' [Gmsh 4.14.1, 1 node, max. 1 thread]
+Info    : Started on Wed May 20 18:30:50 2026
 Info    : Reading 'mesh.geo'...
 Info    : Done reading 'mesh.geo'
 Info    : Meshing 1D...
@@ -16,7 +16,7 @@ Info    : [ 80%] Meshing curve 24 (Line)
 Info    : [ 90%] Meshing curve 25 (Line)
 Info    : [ 90%] Meshing curve 26 (Line)
 Info    : [100%] Meshing curve 27 (Line)
-Info    : Done meshing 1D (Wall 0.0455203s, CPU 0.045202s)
+Info    : Done meshing 1D (Wall 0.06856s, CPU 0.06856s)
 Info    : Meshing 2D...
 Info    : [  0%] Meshing surface 7 (BSpline surface, Frontal-Delaunay)
 Info    : [ 20%] Meshing surface 8 (Plane, Frontal-Delaunay)
@@ -25,16 +25,16 @@ Info    : [ 50%] Meshing surface 10 (Plane, Frontal-Delaunay)
 Info    : [ 60%] Meshing surface 11 (Plane, Frontal-Delaunay)
 Info    : [ 80%] Meshing surface 12 (Plane, Frontal-Delaunay)
 Info    : [ 90%] Meshing surface 13 (Plane, Frontal-Delaunay)
-Info    : Done meshing 2D (Wall 0.242817s, CPU 0.242802s)
+Info    : Done meshing 2D (Wall 0.279904s, CPU 0.279674s)
 Info    : Meshing 3D...
 Info    : 3D Meshing 1 volume with 1 connected component
 Info    : Tetrahedrizing 6333 nodes...
-Info    : Done tetrahedrizing 6341 nodes (Wall 0.0764887s, CPU 0.073747s)
+Info    : Done tetrahedrizing 6341 nodes (Wall 0.0758898s, CPU 0.075889s)
 Info    : Reconstructing mesh...
 Info    :  - Creating surface mesh
 Info    :  - Identifying boundary edges
 Info    :  - Recovering boundary
-Info    : Done reconstructing mesh (Wall 0.15465s, CPU 0.147587s)
+Info    : Done reconstructing mesh (Wall 0.154074s, CPU 0.154072s)
 Info    : Found volume 1
 Info    : Found void region
 Info    : It. 0 - 0 nodes created - worst tet radius 20.8304 (nodes removed 0 0)
@@ -77,9 +77,9 @@ Info    : It. 18000 - 18000 nodes created - worst tet radius 1.00636 (nodes remo
 Info    : 3D refinement terminated (24659 nodes total):
 Info    :  - 3 Delaunay cavities modified for star shapeness
 Info    :  - 0 nodes could not be inserted
-Info    :  - 136201 tetrahedra created in 1.1198 sec. (121629 tets/s)
+Info    :  - 136201 tetrahedra created in 1.33429 sec. (102077 tets/s)
 Info    : 0 node relocations
-Info    : Done meshing 3D (Wall 1.96407s, CPU 1.95636s)
+Info    : Done meshing 3D (Wall 2.283s, CPU 2.2821s)
 Info    : Optimizing mesh...
 Info    : Optimizing volume 1
 Info    : Optimization starts (volume = 0.999732) with worst = 0.00215295 / average = 0.775544:
@@ -93,8 +93,8 @@ Info    : 0.60 < quality < 0.70 :     14328 elements
 Info    : 0.70 < quality < 0.80 :     34328 elements
 Info    : 0.80 < quality < 0.90 :     47878 elements
 Info    : 0.90 < quality < 1.00 :     24378 elements
-Info    : 2470 edge swaps, 68 node relocations (volume = 0.999732): worst = 0.126774 / average = 0.786752 (Wall 0.0814088s, CPU 0.081279s)
-Info    : 2483 edge swaps, 68 node relocations (volume = 0.999732): worst = 0.300038 / average = 0.786797 (Wall 0.100423s, CPU 0.100293s)
+Info    : 2470 edge swaps, 68 node relocations (volume = 0.999732): worst = 0.126774 / average = 0.786752 (Wall 0.0969049s, CPU 0.096896s)
+Info    : 2483 edge swaps, 68 node relocations (volume = 0.999732): worst = 0.300038 / average = 0.786797 (Wall 0.119602s, CPU 0.119595s)
 Info    : No ill-shaped tets in the mesh :-)
 Info    : 0.00 < quality < 0.10 :         0 elements
 Info    : 0.10 < quality < 0.20 :         0 elements
@@ -106,8 +106,8 @@ Info    : 0.60 < quality < 0.70 :     14178 elements
 Info    : 0.70 < quality < 0.80 :     34866 elements
 Info    : 0.80 < quality < 0.90 :     48216 elements
 Info    : 0.90 < quality < 1.00 :     24206 elements
-Info    : Done optimizing mesh (Wall 0.337004s, CPU 0.326162s)
+Info    : Done optimizing mesh (Wall 0.361496s, CPU 0.359223s)
 Info    : 24660 nodes 146947 elements
 Info    : Writing 'mesh.msh'...
 Info    : Done writing 'mesh.msh'
-Info    : Stopped on Tue May 19 16:13:48 2026 (From start: Wall 2.9849s, CPU 3.48543s)
+Info    : Stopped on Wed May 20 18:30:54 2026 (From start: Wall 3.51168s, CPU 3.83502s)

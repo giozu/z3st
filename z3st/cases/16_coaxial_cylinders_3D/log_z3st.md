@@ -80,7 +80,7 @@ Material loaded: cyl_1
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x78a023b9b880> (function)
+  _k_func         → <function k at 0x7ce6ed65fb00> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -162,6 +162,8 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Neumann mechanical BC on 'cyl_2' → outer_2: -5000000.0 Pa (list loaded)
   **[INFO]** Clamp_z mechanical BC on 'cyl_2' → 0.0 (first step) at region 'top_2'
 Computing symbolic result fields (strain, stress, ...)
+
+**[INFO]** Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
 
 
 ## Step 01/1: t = 0.00e+00 s | LHR = 2.00e+01 W/m
@@ -800,5 +802,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 49.27 s
+Simulation completed in 59.91 s
 Total time steps solved: 1
