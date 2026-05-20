@@ -274,6 +274,9 @@ paper's empirical and pedagogical content.
 
 ## Follow-ups (work spawned by other fixes)
 
+<a id="code-feature-1"></a>
+- [x] **CODE-FEATURE-1** — *Resolved 2026-05-20.* Implemented hot-reload of allow-listed `input.yaml` parameters: at the start of each time step, `__main__.py::_reload_hot_params` re-reads `input.yaml`, compares against the in-memory config dicts, and propagates any allowlisted changes in-place (shared by reference with `problem.dmg_cfg` / `mech_cfg` / `th_cfg` so the solver sees the new value on the next step). User can edit `input.yaml` mid-run to retune tolerances, iteration limits, relaxation factors, hybrid constraint, or γ⋆; changes apply at the next step boundary (latency ≤ one step). Robust to mid-edit reads (transient `yaml.YAMLError` / `FileNotFoundError` → silent skip). Documented in `CONTEXT.md` §2.3. Mesh / geometry / regime / model toggles / `damage.type`/`lc`/`split` / time history / `n_steps` are *not* hot-reloadable and edits to them are silently ignored mid-run.
+
 <a id="cases-followup-6"></a>
 - [ ] **CASES-FOLLOWUP-6** — Verify the star-convex split ([LIT-1](#lit-1)) on `cases/14_full_cylinder_cracking_2D_xy/`. (i) ✅ Baseline (Amor) preserved as `output_amor_baseline/`. (ii) ✅ Sanity: `damage.split: star_convex` with `damage.gamma_star = 0` (or absent) matches the Amor baseline — confirmed 2026-05-19. (iii) ⏳ Sweep `damage.gamma_star ∈ {0.5, 1.0, 5.0}` (set in the `damage:` block of `input.yaml`, *not* in `uo2.yaml` — γ⋆ is a model parameter, like `lc`). For each run, record damage field, crack count, E_el / E_frac trajectories. Side-by-side comparison vs. Amor + hybrid is a paper-worthy data point (feeds the LIT-2 narrative).
 

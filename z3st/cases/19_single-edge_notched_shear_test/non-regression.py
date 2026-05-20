@@ -170,6 +170,12 @@ if H_arr is not None:
 
 
 # ----- global energy balance from energies.txt ------------------------------
+# NOTE: the same plot is reproduced by `plot_energy_balance.py` as a
+# standalone script that accepts an `OUTPUT_DIR` positional argument. Use
+# that script for post-hoc plotting against a saved backup directory
+# (e.g. output_starconvex_g00/) without disturbing the live-run state at
+# the case root. The block below is preserved here so a single
+# `./Allrun` end-to-end pipeline still produces every diagnostic.
 energy_file = os.path.join(CASE_DIR, "energies.txt")
 if os.path.exists(energy_file):
     data = np.genfromtxt(energy_file, names=True, skip_header=0)

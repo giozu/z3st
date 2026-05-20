@@ -1,14 +1,10 @@
 #!/bin/bash
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-# sweep_gamma.sh — γ⋆ sweep for the star-convex phase-field study.
+# sweep_gamma.sh - gamma_star sweep for the star-convex phase-field study.
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 #
-# Designed for cases/19_single-edge_notched_shear_test/ but works in any
-# damage case whose input.yaml has `split: star_convex` and a `gamma_star:`
-# line under the `damage:` block.
-#
-# Idempotent: skips γ⋆ values whose ./output_starconvex_<tag>/ already
-# exists, so it's safe to re-run after a partial sweep.
+# Idempotent: skips gamma_star values whose ./output_starconvex_<tag>/ already
+# exists.
 #
 # Usage:
 #   chmod +x sweep_gamma.sh
@@ -20,7 +16,6 @@ CASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$CASE_DIR"
 
 # ─── Sweep configuration ────────────────────────────────────────
-# Edit these arrays to change the sweep.
 GAMMA_VALUES=("0.0" "1.0" "5.0")
 GAMMA_TAGS=("g00"  "g1"   "g5")
 # ────────────────────────────────────────────────────────────────
@@ -75,6 +70,8 @@ for i in "${!GAMMA_VALUES[@]}"; do
     sed -i "s/^\([[:space:]]*\)gamma_star:.*/\1gamma_star: ${val}/" input.yaml
     echo "[sweep_gamma] Set: $(grep gamma_star: input.yaml | head -1 | sed 's/^[[:space:]]*//')"
 
+    fd_file="force_displacement_starconvex_${tag}.png"
+
     # Clean + run.
     ./Allclean
     start=$(date +%s)
@@ -82,13 +79,25 @@ for i in "${!GAMMA_VALUES[@]}"; do
     elapsed=$(( $(date +%s) - start ))
     echo "[sweep_gamma] Run finished in ${elapsed}s"
 
+    # Generate force-displacement curve from the fresh output/fields_*.vtu.
+    # Non-fatal: a missing stress field or other plot-script issue should not
+    # abort the rest of the sweep — surface the warning and continue.
+    if [[ -f plot_force_displacement.py ]]; then
+        python3 plot_force_displacement.py \
+            || echo "[sweep_gamma] WARNING: plot_force_displacement.py failed (sweep continuing)"
+    fi
+
     # Preserve outputs + diagnostics + the input.yaml that produced them.
+    # The force_displacement.{csv,png} pair lives inside output/ already and
+    # therefore travels along with `cp -r output`. A tagged copy of the PNG
+    # at the case root makes side-by-side comparison easy.
     cp -r output "$out_dir"
-    [[ -f energies.txt    ]] && cp energies.txt    "$energies_file"
-    [[ -f convergence.png ]] && cp convergence.png "$conv_file"
-    [[ -f log_z3st.md     ]] && cp log_z3st.md     "$log_file"
+    [[ -f energies.txt                       ]] && cp energies.txt                       "$energies_file"
+    [[ -f convergence.png                    ]] && cp convergence.png                    "$conv_file"
+    [[ -f log_z3st.md                        ]] && cp log_z3st.md                        "$log_file"
+    [[ -f output/force_displacement.png      ]] && cp output/force_displacement.png      "$fd_file"
     cp input.yaml "$out_dir/input.yaml.snapshot"
-    echo "[sweep_gamma] Saved: $out_dir/  $energies_file  ($conv_file)  ($log_file)"
+    echo "[sweep_gamma] Saved: $out_dir/  $energies_file  ($conv_file)  ($log_file)  ($fd_file)"
 done
 
 # Restore original input.yaml (with whatever gamma_star value it had before the sweep).
