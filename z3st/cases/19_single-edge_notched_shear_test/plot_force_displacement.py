@@ -31,17 +31,41 @@ else:
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 print(f"[INFO] Using OUTPUT_DIR = {OUTPUT_DIR}")
-VTU_FILES  = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
-CSV_FILE   = os.path.join(OUTPUT_DIR, "force_displacement.csv")
-PNG_FILE   = os.path.join(OUTPUT_DIR, "force_displacement.png")
+VTU_FILES   = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
+CSV_FILE    = os.path.join(OUTPUT_DIR, "force_displacement.csv")
+PNG_FILE    = os.path.join(OUTPUT_DIR, "force_displacement.png")
+
+# Streaming file written per-step by diagnostics.py (if installed). Prefer
+# this if it exists — it avoids the slow VTU re-extraction stage.
+# Look in OUTPUT_DIR first (for snapshotted backup directories) then at
+# CASE_DIR (live-run location, mirrors energies.txt convention).
+_stream_candidates = [
+    os.path.join(OUTPUT_DIR, "force_displacement.txt"),
+    os.path.join(CASE_DIR,   "force_displacement.txt"),
+]
+STREAM_FILE = next((p for p in _stream_candidates if os.path.exists(p)), None)
 
 with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
     geom = yaml.safe_load(f)
 Lx, Ly = float(geom["Lx"]), float(geom["Ly"])
 
 
-# ----- Stage 1: extract per-step (u, F) from VTUs and write CSV -------------
-if VTU_FILES:
+# ----- Stage 1: get per-step (u, F) data into CSV_FILE ----------------------
+# Preference order:
+#   1. Streaming file from diagnostics.py (cheap - just transcode tab->comma)
+#   2. Post-hoc VTU extraction (slow - needs to read every fields_*.vtu)
+#   3. Existing CSV from a previous run
+if STREAM_FILE is not None:
+    print(f"[INFO] Streaming file found: {STREAM_FILE}")
+    print( "[INFO] (skipping VTU extraction; remove the streaming file to force re-extraction)")
+    data_stream = np.genfromtxt(STREAM_FILE, delimiter="\t", skip_header=1)
+    if data_stream.ndim == 1:
+        data_stream = data_stream.reshape(1, -1)
+    np.savetxt(CSV_FILE, data_stream,
+               header="Step,u_x_top_mm,F_x_kN",
+               delimiter=",", fmt=["%d", "%.6e", "%.6e"], comments="")
+    print(f"[INFO] CSV synced from streaming file: {CSV_FILE}  ({len(data_stream)} rows)")
+elif VTU_FILES:
     print(f"[INFO] Extracting (u, F) per step from {len(VTU_FILES)} VTU files...")
     top_tol = Ly / 200.0
     rows = []

@@ -96,6 +96,11 @@ for i in "${!GAMMA_VALUES[@]}"; do
     [[ -f convergence.png                    ]] && cp convergence.png                    "$conv_file"
     [[ -f log_z3st.md                        ]] && cp log_z3st.md                        "$log_file"
     [[ -f output/force_displacement.png      ]] && cp output/force_displacement.png      "$fd_file"
+    # Streaming force-displacement file from diagnostics.py (if installed).
+    # Snapshotted into the per-tag output dir AND tagged at the case root so
+    # that plot_force_displacement.py can find it post-hoc via either path.
+    [[ -f force_displacement.txt             ]] && cp force_displacement.txt             "$out_dir/force_displacement.txt"
+    [[ -f force_displacement.txt             ]] && cp force_displacement.txt             "force_displacement_starconvex_${tag}.txt"
     cp input.yaml "$out_dir/input.yaml.snapshot"
     echo "[sweep_gamma] Saved: $out_dir/  $energies_file  ($conv_file)  ($log_file)  ($fd_file)"
 done

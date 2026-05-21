@@ -266,6 +266,27 @@ if __name__ == "__main__":
         n_steps=len(times),
     )
 
+    # --. Optional case-local diagnostics module --..
+    # A case can drop a ``diagnostics.py`` in its working directory exposing
+    # a function ``per_step(problem, step, t) -> None`` that runs after every
+    # solve. Useful for streaming derived quantities (e.g. force-displacement,
+    # slip rate, integrated reactions) that would otherwise require post-hoc
+    # VTU extraction.
+    case_diagnostics = None
+    if os.path.isfile(os.path.join(os.getcwd(), "diagnostics.py")):
+        try:
+            sys.path.insert(0, os.getcwd())
+            import diagnostics as case_diagnostics
+            sys.path.pop(0)
+            if not hasattr(case_diagnostics, "per_step"):
+                print("[WARNING] diagnostics.py found but exports no 'per_step' function; ignoring.")
+                case_diagnostics = None
+            else:
+                print("[INFO] Loaded case-local diagnostics module ('diagnostics.py').")
+        except Exception as e:
+            print(f"[WARNING] Could not load case-local diagnostics.py: {e}")
+            case_diagnostics = None
+
     # --. Time loop --..
     start_time = time.time()
 
@@ -323,6 +344,13 @@ if __name__ == "__main__":
 
         # Export converged step (writer handles both VTU and XDMF, same field set).
         writer.write(t=t, step=step)
+
+        # Case-local per-step diagnostics (see top of __main__ where it's loaded).
+        if case_diagnostics is not None:
+            try:
+                case_diagnostics.per_step(problem, step, t)
+            except Exception as e:
+                print(f"[WARNING] diagnostics.per_step failed at step {step}: {e}")
 
     writer.close()
 
