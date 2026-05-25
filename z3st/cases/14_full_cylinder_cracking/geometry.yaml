@@ -1,0 +1,12 @@
+name: cylinder
+geometry_type: cyl
+
+Ro: 0.01    # outer radius (m) = 10 mm
+Lz: 0.01    # height (m) = 10 mm
+
+labels:
+  uo2: 10
+  contact_wall: 20
+  insulated_wall: 21
+  bottom: 30
+  top: 40

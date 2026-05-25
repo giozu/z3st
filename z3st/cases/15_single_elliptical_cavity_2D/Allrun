@@ -3,9 +3,9 @@ cd "${0%/*}" || exit 1  # Run from this directory
 
 echo "Executing z3st.py..."
 
-gmsh mesh.geo -2
+gmsh mesh.geo -2 > log_mesh.md
 
-python3 -m z3st > log.z3st
+python3 -m z3st > log_z3st.md
 
 python3 non-regression.py
 

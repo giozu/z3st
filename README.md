@@ -48,16 +48,16 @@ Install in editable/development mode
 
 Then, it is possible to execute in each case folder, for instance:
   ```bash
-  cd ~/z3st/cases/00_example/
-  gmsh -3 mesh.geo
-  python3 -m z3st > log.z3st
+  cd ~/z3st/z3st/cases/00_example/
+  gmsh mesh.geo -3 > log_mesh.md
+  python3 -m z3st > log_z3st.md
   python3 non-regression.py
   python3 ../../utils/plot_convergence.py
   ```
 
 Or, with less instructions:
   ```bash
-  cd ~/z3st/cases/00_example/
+  cd ~/z3st/z3st/cases/00_example/
   ./Allrun
   ```
 
@@ -87,74 +87,94 @@ These cases serve both as:
 
 ## Key features
 
-* **Coupled thermo-mechanical solver** — heat conduction and linear elasticity with staggered coupling
-* **Multi-material domains** — multiple materials with independent thermal and mechanical properties
-* **Volumetric heating** — arbitrary, spatially dependent internal heat sources (e.g., γ-heating, user-defined functions)
-* **Flexible boundary conditions** — Dirichlet, Neumann, clamp, and slip BCs defined via YAML configuration files
-* **Material database** — YAML-based definitions (`materials/`) including steels, oxides, and other structural materials
-* **Geometry & mesh input** — accepts Gmsh `.msh` files or Python-generated meshes from YAML geometry descriptors; compatible with any meshing tool
-* **Phase-field fracture solver** — solving order parameter evolution equations for crack propagation and material damage
-* **1D cluster dynamics solver** — solving advection-diffusion equations for cluster evolution and mass conservation
-* **Gap conductance model** — thermal coupling between subdomains via Robin BCs or fixed conductance
-* **YAML-driven configuration** — all parameters, materials, and boundary conditions defined externally for reproducibility
-* **Post-processing ecosystem** — Python-based tools for field extraction and visualization, fully compatible with ParaView and PyVista
-* **Fully documented API** — comprehensive Sphinx documentation under `docs/`
+* **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling and adaptive relaxation
+* **Multi-regime kinematics** — `2d` plane strain, `3d`, `axisymmetric`, and `plane_stress` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
+* **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
+* **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral or Amor volumetric/deviatoric energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
+* **Multi-material domains** — independent thermal, mechanical, and damage properties per material; per-cell-tag integration measures handle interfaces naturally
+* **Volumetric heating** — fissile (LHR/area), analytic γ-heating decay in rectangular / cylindrical / spherical geometry, or arbitrary user-defined `q'''(x)`
+* **Flexible boundary conditions** — thermal (Dirichlet / Neumann / Robin with convective or gap-coupled mode), mechanical (Dirichlet vector / per-component / Neumann / Clamp / Slip), damage (Dirichlet); step-dependent value histories on mechanical BCs
+* **Gap conductance model** — `Fixed` or `Gas` (`k_gas = c·10⁻⁴·T_gap^0.79`); paired facet groups, mean centroid gap-size computed once via SciPy cKDTree
+* **1D cluster dynamics** — defect-cluster size-distribution solver: implicit-Euler DG1 with upwind interior-facet flux and SIPG diffusion, with mass-conservation rescaling
+* **Python material modules** — temperature-dependent `k(T)`, spatially-graded `Gc(x)`, user-supplied stress functions, all loaded via `importlib` at runtime
+* **Material database** — YAML-based cards (`materials/`): UO₂, multiple steel families (austenitic, martensitic, high-carbon, T91, 15-15Ti, vessel), Zircaloy, ceramics, oxides, plastic, lead, H₂O
+* **Mesh input** — Gmsh `.msh` files or YAML-driven mesh builder; reusable Gmsh templates under `utils/geo_files/`
+* **YAML-driven configuration** — three plain-text files per case (`input.yaml`, `geometry.yaml`, `boundary_conditions.yaml`); reproducible, diffable, version-controllable
+* **Parallel performance** — PETSc with MUMPS / GAMG / HYPRE BoomerAMG, MPI via `MPI.COMM_WORLD`
+* **Post-processing ecosystem** — VTU and XDMF time-series output through a unified writer that pre-compiles all interpolation expressions once at setup; ParaView- and PyVista-compatible
+* **Continuous integration** — per-case `non-regression.py` vs. version-controlled gold JSON, summarised on every commit via GitHub Actions
+* **Documented API** — Sphinx sources under `docs/source/`, built by GitHub Actions
 
 ---
 
 ## Directory structure
 
 ```bash
-
-z3st/
-├── LICENSE
+z3st/                                # repository root
+├── LICENSE                          # Apache 2.0
 ├── README.md
-├── ...
-│
-├── z3st/                        # Python package (entry point, CLI)
-│   ├── __main__.py
-│   ├── __init__.py
-│
-├── core/                        # FEM core
-│   ├── config.py
-│   ├── mesh.py
-│   ├── solver.py
-│   ├── spine.py
-│   ├── finite_element_setup.py
-│   ├── diagnostic.py
-│   └── __init__.py
-│
-├── models/                      # Physical models
-│   ├── thermal_model.py
-│   ├── mechanical_model.py
-│   ├── cluster_dynamic_model.py
-│   ├── damage_model.py
-│   ├── gap_model.py
-│   └── __init__.py
-│
-├── materials/                   # Material databases (YAML + helpers)
-│   ├── steel.yaml
-│   ├── ...
-│   └── __init__.py
-│
-├── utils/                       # Post-processing and helpers
-│   ├── export_vtu.py
-│   ├── plot_convergence.py
-│   ├── ...
-│   └── __init__.py
-│
-├── cases/                       # Verification and demonstration cases
-│   ├── 1_thin_thermal_slab/
-│   ├── ...
-│   ├── non-regression.sh
-│   └── non-regression_summary.txt
-│
-└── docs/                        # Sphinx documentation (built by GitHub Actions)
-    ├── Makefile
-    ├── source/
-    └── build/                   # auto-generated, not committed
-
+├── CITATION.cff
+├── CONTEXT.md                       # design + work-log document
+├── pyproject.toml / setup.py
+├── z3st_env.yml                     # Conda env recipe (FEniCSx + deps)
+├── docs/                            # Sphinx documentation
+│   ├── Makefile
+│   └── source/
+├── .github/workflows/
+│   ├── ci.yml                       # non-regression CI
+│   └── static.yml                   # Sphinx docs build
+└── z3st/                            # Python package
+    ├── __main__.py                  # CLI entry point
+    ├── __init__.py                  # lazy-import facade
+    ├── core/                        # FEM core
+    │   ├── config.py                # YAML parser
+    │   ├── spine.py                 # top-level Spine driver
+    │   ├── solver.py                # staggered solver, PETSc options
+    │   ├── finite_element_setup.py  # V_t / V_m / V_d / V_c / V_pl / Q
+    │   ├── diagnostic.py
+    │   └── mesh/                    # Gmsh loader, MeshManager, PyVista preview
+    │       ├── reader.py
+    │       ├── manager.py
+    │       └── plotter.py
+    ├── models/                      # physics mixins plugged into Spine
+    │   ├── thermal_model.py
+    │   ├── mechanical_model.py      # lame / voigt / hyperelastic / plasticity / custom
+    │   ├── damage_model.py          # AT1 / AT2, Miehe / Amor splits, hybrid constraint
+    │   ├── plasticity_model.py      # J2 + custom CP hook
+    │   ├── gap_model.py             # Fixed / Gas gap conductance
+    │   └── cluster_dynamic_model.py # 1D advection–diffusion (DG + SIPG + upwind)
+    ├── materials/                   # YAML cards + Python callables
+    │   ├── steel.yaml, austenitic_steel.yaml, ..., vessel_steel.yaml
+    │   ├── uo2.yaml, zircaloy.yaml
+    │   ├── ceramic.yaml, oxide.yaml, plastic.yaml, lead.yaml, h2o.yaml
+    │   └── ceramic.py, oxide.py     # k(T), Gc(mesh) callables
+    ├── utils/                       # post-processing + helpers
+    │   ├── writer.py                # unified VTU / XDMF OutputWriter
+    │   ├── export_vtu.py            # legacy VTU writer (backward compat)
+    │   ├── mesh_builder.py
+    │   ├── plot_convergence.py
+    │   ├── utils_extract_vtu.py     # field extraction from VTU
+    │   ├── utils_extract_xdmf.py    # same for XDMF
+    │   ├── utils_load.py            # YAML loader + power-history generator
+    │   ├── utils_plot.py            # 1D / radial plots
+    │   ├── utils_verification.py    # analytical benchmarks
+    │   ├── output.py                # stdout / JSON helpers
+    │   ├── z-gui.py                 # interactive PyVista viewer
+    │   └── geo_files/               # reusable Gmsh templates
+    ├── examples/                    # minimal didactic setups
+    └── cases/                       # ~50 verification / validation / demo cases
+        ├── 00_example/              # tutorial: uniaxial steel block 3D
+        ├── 1_thin_slab_2D/          # first thermal slab
+        ├── ...
+        ├── 14_full_cylinder_cracking_2D_xy/   # UO2 thermal-shock + AT1 (paper flagship)
+        ├── 19_single-edge_notched_*/          # SENT / SENS phase-field benchmarks
+        ├── 20_plasticity_2D/
+        ├── demo_CP_single_grain/             # custom crystal-plasticity demo
+        ├── non-regression.sh / .py / _github.sh   # regression infrastructure
+        └── non-regression_summary.txt
 ```
+
+The full case catalogue and per-module details are in `CONTEXT.md`.
 
 ---
 
@@ -169,43 +189,64 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../materials/steel.yaml
 
-regime: 2D
+regime: 2d                       # 2d | 3d | axisymmetric | plane_stress
 
 solver_settings:
   coupling: staggered
   max_iters: 100
   relax_T: 0.9
   relax_u: 0.7
-  relax_adaptive: True
+  relax_adaptive: true
   relax_growth: 1.2
   relax_shrink: 0.8
   relax_min: 0.05
   relax_max: 0.95
 
 models:
-  thermal: True
-  mechanical: True
+  thermal: true
+  mechanical: true
+  # damage: true                  # enable phase-field fracture
+  # plasticity: true              # enable J2 (or custom via plasticity.mode)
+  # cluster: true                 # enable 1D cluster dynamics
+  # gap_conductance:              # Robin pair-coupled gap on interfaces
+  #   type: Fixed                 # or Gas
+  #   value: 5000.0
 
 mechanical:
-  solver: linear
-  linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
+  solver: linear                  # linear | nonlinear (SNES Newton, for hyperelastic / custom)
+  linear_solver: iterative_hypre  # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-5
   stag_tol: 1.0e-5
-  convergence: rel_norm # rel_norm | norm
-  debug: False
+  convergence: rel_norm           # rel_norm | norm
 
 thermal:
+  analysis: stationary            # stationary | transient (backward Euler)
   solver: linear
-  linear_solver: iterative_amg # direct_mumps | iterative_amg | iterative_hypre
+  linear_solver: iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  convergence: rel_norm # rel_norm | norm
+  convergence: rel_norm
+
+# damage:                          # uncomment when damage is on
+#   type: AT2                      # AT1 | AT2
+#   solver: linear
+#   linear_solver: iterative_hypre
+#   rtol: 1.0e-6
+#   stag_tol: 1.0e-3
+#   convergence: rel_norm
+#   lc: 1.0e-4
+#   hybrid_constraint: true
+#   split: amor                    # amor | miehe | star_convex (optional override; default = Amor for AT1, Miehe for AT2)
+#   gamma_star: 0.0                # star-convex only: model parameter ≥ -1 controlling σ_c⁻/σ_c⁺ ratio; 0 ≡ Amor
 
 lhr:
   - 0
 time:
   - 0
 n_steps: 1
+
+output:
+  format: vtu                     # vtu | xdmf
 ```
 
 ---
@@ -294,7 +335,7 @@ Z3ST is built on the **FEniCSx** ecosystem. Recommended citations include:
 
 ```bibtex
 @article{basix2022a,
-  author  = {Scrogggs, M. W. and Dokken, J. S. and Richardson, C. N. and Wells, G. N.},
+  author  = {Scroggs, M. W. and Dokken, J. S. and Richardson, C. N. and Wells, G. N.},
   title   = {Construction of arbitrary order finite element degree-of-freedom maps on polygonal and polyhedral cell meshes},
   journal = {ACM Transactions on Mathematical Software},
   volume  = {48},

@@ -8,6 +8,7 @@ import sys
 
 import dolfinx
 import ufl
+from mpi4py import MPI
 from petsc4py import PETSc
 
 
@@ -23,6 +24,8 @@ class ThermalModel:
 
         # --. Thermal model options --..
         self.th_cfg = self.input_file.get("thermal", {})
+        # Default linear-solver backend; user can override in input.yaml.
+        self.th_cfg.setdefault("linear_solver", "iterative_hypre")
 
         print("[ThermalModel] options loaded from input.yaml:")
         for key, value in self.th_cfg.items():
@@ -81,6 +84,20 @@ class ThermalModel:
                         )
                         sys.exit(1)
 
+                    # Step-dependent temperature lists are not yet supported by
+                    # the thermal block (the mechanical block does support them
+                    # via the ``raw`` mechanism). Reject the input up-front with
+                    # a clear message instead of silently fixing T to the first
+                    # element or crashing inside dolfinx.
+                    if isinstance(temperature, list):
+                        print(
+                            f"  [ERROR] Thermal Dirichlet BC on '{label}' for region '{region_name}' "
+                            f"was given a list of length {len(temperature)}, but step-dependent "
+                            f"temperatures are not yet supported. Use a constant scalar; see "
+                            f"mechanical_model.py for the planned extension pattern."
+                        )
+                        sys.exit(1)
+
                     T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
 
                     # locate dofs
@@ -93,8 +110,6 @@ class ThermalModel:
                     print(
                         f"  [INFO] Dirichlet thermal BC on '{label}' → {temperature} K at region '{region_name}'"
                     )
-                    # print(f"  {type(bc)}")
-                    # print("  Applied dofs:", bc.dof_indices)
 
                 elif bc_type == "Neumann":
                     flux = bc_info.get("flux")
@@ -110,20 +125,32 @@ class ThermalModel:
                     )
 
                 elif bc_type == "Robin":
-
+                    # Two types:
+                    #   1. Gap conductance: pair + conductance from model → T_ext from another subdomain
+                    #   2. Convective: h_conv + T_ext → fixed external bulk temperature
                     pair = bc_info.get("pair")
-                    if pair is None:
-                        print(f"  [ERROR] Robin BC on '{label}' is missing 'pair'")
-                        sys.exit(1)
-                    self.robin_thermal[label].append({"id": region_id, "pair": pair})
+                    h_conv = bc_info.get("h_conv")
+                    T_ext = bc_info.get("T_ext")
 
-                    print(
-                        f"  [INFO] Robin thermal BC on '{label}' at region '{region_name}' coupled with '{pair}'"
-                    )
+                    if pair is not None:
+                        # Gap mode
+                        self.robin_thermal[label].append({"id": region_id, "pair": pair})
+                        print(f"  [INFO] Robin (gap) thermal BC on '{label}' at region '{region_name}' coupled with '{pair}'")
+                    elif h_conv is not None and T_ext is not None:
+                        # Convective mode
+                        self.robin_thermal[label].append({
+                            "id": region_id,
+                            "h_conv": float(h_conv),
+                            "T_ext": float(T_ext),
+                        })
+                        print(f"  [INFO] Robin (convective) thermal BC on '{label}' → h={h_conv} W/(m²·K), T_ext={T_ext} K at region '{region_name}'")
+                    else:
+                        print(f"  [ERROR] Robin BC on '{label}' requires either 'pair' (gap) or 'h_conv'+'T_ext' (convective).")
+                        sys.exit(1)
 
                 else:
                     print(f"  [ERROR] Unknown thermal BC type '{bc_type}' for '{label}'.")
-                    print(f"  Available are: Dirichlet, Neumann.")
+                    print(f"  Available are: Dirichlet, Neumann, Robin.")
                     sys.exit(1)
 
     def heat_flux(self, T):
@@ -161,6 +188,16 @@ class ThermalModel:
 
             # Assemble the volume (or area in 2D) of the subdomain
             volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx))
+
+            # assemble_scalar is per-rank partial; reduce to global sums
+            # so the per-subdomain averages below are physical, not the
+            # rank-0 share of the subdomain.
+            comm = self.mesh.comm
+            q_integral = comm.allreduce(q_integral, op=MPI.SUM)
+            qx_integral = comm.allreduce(qx_integral, op=MPI.SUM)
+            qy_integral = comm.allreduce(qy_integral, op=MPI.SUM)
+            qz_integral = comm.allreduce(qz_integral, op=MPI.SUM)
+            volume = comm.allreduce(volume, op=MPI.SUM)
 
             # Compute the average
             q_avg = q_integral / volume if volume > 0 else 0.0

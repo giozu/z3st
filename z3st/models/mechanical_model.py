@@ -11,7 +11,6 @@ import numpy as np
 import ufl
 from petsc4py import PETSc
 
-
 class MechanicalModel:
     def __init__(self):
         print("[MechanicalModel] initializer")
@@ -20,6 +19,8 @@ class MechanicalModel:
 
         # --. Mechanical model options --..
         self.mech_cfg = self.input_file.get("mechanical", {})
+        # Default linear-solver backend; user can override in input.yaml.
+        self.mech_cfg.setdefault("linear_solver", "iterative_hypre")
 
         print("[MechanicalModel] options loaded from input.yaml:")
         for key, value in self.mech_cfg.items():
@@ -135,11 +136,17 @@ class MechanicalModel:
                 # --. Neumann --..
                 elif bc_type == "Neumann":
                     traction_value = bc_info.get("traction")
-                    
+
                     # Handling list
                     if isinstance(traction_value, list):
                         raw_value = traction_value
-                        initial_val = float(traction_value[0]) # starting from step 0
+                        if len(raw_value) != self.n_steps:
+                            print(
+                                f"[ERROR] Neumann traction list length {len(raw_value)} "
+                                f"!= n_steps {self.n_steps} for region '{region_name}'."
+                            )
+                            sys.exit(1)
+                        initial_val = float(traction_value[0])  # starting from step 0
                     # Scalar
                     else:
                         raw_value = [traction_value] * self.n_steps
@@ -355,6 +362,62 @@ class MechanicalModel:
             # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)
             return ufl.sym(ufl.grad(u))
 
+    def deformation_gradient(self, u):
+        """
+        Deformation gradient F = I + ∇u.
+
+        - axisymmetric: 3x3 in cylindrical (r, θ, z)
+        - 2d: 3x3 with F_zz = 1 (plane strain assumption)
+        - 3d: F = I + grad(u)
+
+        Parameters:
+            u: Displacement field.
+
+        Returns:
+            F as a ufl.variable (for use with ufl.diff).
+        """
+        regime = self.regime
+
+        if regime == "axisymmetric":
+            r = ufl.SpatialCoordinate(self.mesh)[0]
+            # F in cylindrical coordinates (r, θ, z)
+            F_def = ufl.as_tensor([
+                [1.0 + u[0].dx(0),  0.0,  u[0].dx(1)],
+                [0.0,               1.0 + u[0] / r,  0.0],
+                [u[1].dx(0),        0.0,  1.0 + u[1].dx(1)],
+            ])
+
+        elif regime == "2d":
+            # Plane strain: F_zz = 1
+            F_def = ufl.as_tensor([
+                [1.0 + u[0].dx(0),  u[0].dx(1),  0.0],
+                [u[1].dx(0),        1.0 + u[1].dx(1),  0.0],
+                [0.0,               0.0,               1.0],
+            ])
+
+        else:
+            # 3D: standard
+            d = len(u)
+            F_def = ufl.Identity(d) + ufl.grad(u)
+
+        return ufl.variable(F_def)
+
+    def epsilon_hyperelastic(self, u):
+        """
+        Green-Lagrange strain tensor for finite deformations.
+
+        E = (1/2)(FᵀF - I) = (1/2)(C - I)
+
+        Parameters:
+            u: Displacement field.
+
+        Returns:
+            Green-Lagrange strain tensor (UFL expression).
+        """
+        F_def = self.deformation_gradient(u)
+        dim = F_def.ufl_shape[0]
+        return 0.5 * (F_def.T * F_def - ufl.Identity(dim))
+
     def sigma_mech(self, u, material):
         """
         Mechanical Cauchy stress σ(u) with two selectable constitutive routes.
@@ -391,13 +454,13 @@ class MechanicalModel:
 
         """
 
+        # The constitutive_mode promotion (lame -> plasticity for materials
+        # with yield_strength when plasticity is on) lives in
+        # spine.py::load_materials so the material dict is deterministic at
+        # load time. By the time sigma_mech is called the mode is already
+        # the final one; we just read it.
         mode = material.get("constitutive_mode", "lame")
         regime = self.regime
-
-        # If plasticity is active in input.yaml, force plasticity for materials that support it
-        if self.on.get("plasticity", False) and mode == "lame" and "yield_strength" in material:
-            material["constitutive_mode"] = "plasticity"
-            mode = "plasticity"
 
         if mode == "voigt":
             # small strain
@@ -450,6 +513,9 @@ class MechanicalModel:
                 ]
             )
 
+        elif mode == "hyperelastic":
+            sigma = self.sigma_hyperelastic(u, material)
+
         elif mode == "plasticity":
             sigma = self.sigma_plastic(u, material)
 
@@ -475,10 +541,9 @@ class MechanicalModel:
                 raise RuntimeError(f"Failed to load/execute custom stress function '{stress_func_path}': {e}")
 
         else:
-            # Plane-stress reduction (x–y plane)
+            # Plane-stress reduction (x–y plane).
             if regime == "plane_stress":
 
-                # Modified Lame parameter for plane stress
                 lmbda_ps = (
                     2 * material["G"] * material["lmbda"] / (material["lmbda"] + 2 * material["G"])
                 )
@@ -486,17 +551,6 @@ class MechanicalModel:
                 eps = self.epsilon(u)
                 sigma = (
                     lmbda_ps * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
-                )
-
-                s_xx = sigma[0, 0]
-                s_xy = sigma[0, 1]
-                s_yy = sigma[1, 1]
-                return ufl.as_tensor(
-                    [
-                        [s_xx, s_xy, 0.0],
-                        [s_xy, s_yy, 0.0],
-                        [0.0, 0.0, 0.0],
-                    ]
                 )
 
             # Default isotropic Lamé
@@ -513,41 +567,209 @@ class MechanicalModel:
 
         return sigma
 
-    def sigma_th(self, T, material):
+    def psi_hyperelastic(self, u, material):
         """
-        Returns the thermal stress tensor σ_th(T) = - (3λ + 2G) α (T - T_ref) I
-        for a given temperature field T and material properties.
+        Neo-Hookean strain energy density for hyperelasticity.
 
-        Negative sign convention:
-            compressive thermal stress for T > T_ref.
+        ψ = (μ/2)(I_C - 3) - μ ln(J) + (λ/2)(ln J)²
+
+        Uses deformation_gradient() which handles axisymmetric, 2D, and 3D.
 
         Parameters:
-            T (dolfinx.fem.Function): The temperature field.
-            material (dict): Material properties.
-
+            u: Displacement field.
+            material (dict): Must contain 'lmbda' and 'G'.
 
         Returns:
-            dolfinx.fem.Tensor: The thermal stress tensor.
+            (psi, F_var): strain energy density and the deformation gradient
+                          (as ufl.variable, needed for P = dψ/dF).
+        """
+        F_def = self.deformation_gradient(u)
+        C = ufl.variable(F_def.T * F_def)
+        Ic = ufl.variable(ufl.tr(C))
+        J = ufl.variable(ufl.det(F_def))
 
+        mu = material["G"]
+        lmbda = material["lmbda"]
+
+        # Always 3×3 tensor (axisymmetric, 2d, 3d all produce 3×3 F)
+        psi = (mu / 2) * (Ic - 3) - mu * ufl.ln(J) + (lmbda / 2) * (ufl.ln(J)) ** 2
+        return psi, F_def
+
+    def hyperelastic_residual(self, u, v, material, dx, w):
+        """
+        Hyperelastic internal force residual via energy derivative.
+
+        Uses S = 2 ∂ψ/∂C (second Piola-Kirchhoff) and E (Green-Lagrange):
+            δΠ = ∫ S : δE dx
+
+        Parameters:
+            u: Displacement field (Function, not TrialFunction).
+            v: TestFunction.
+            material (dict): Material properties.
+            dx: Integration measure.
+            w: Integration weight (e.g. 2πr for axisymmetric).
+
+        Returns:
+            UFL form contribution for internal forces.
+        """
+        psi, F_def = self.psi_hyperelastic(u, material)
+        P = ufl.diff(psi, F_def)
+
+        regime = self.regime
+
+        if regime == "axisymmetric":
+            r = ufl.SpatialCoordinate(self.mesh)[0]
+            # δF consistent with the 3×3 deformation gradient
+            grad_v = ufl.as_tensor([
+                [v[0].dx(0),  0.0,  v[0].dx(1)],
+                [0.0,         v[0] / r,     0.0],
+                [v[1].dx(0),  0.0,  v[1].dx(1)],
+            ])
+        elif regime == "2d":
+            grad_v = ufl.as_tensor([
+                [v[0].dx(0),  v[0].dx(1),  0.0],
+                [v[1].dx(0),  v[1].dx(1),  0.0],
+                [0.0,         0.0,         0.0],
+            ])
+        else:
+            grad_v = ufl.grad(v)
+
+        return w * ufl.inner(grad_v, P) * dx
+
+    def sigma_hyperelastic(self, u, material):
+        """
+        Cauchy stress for the hyperelastic (Neo-Hookean) model.
+
+        σ = (1/J) P Fᵀ
+
+        where P = ∂ψ/∂F is the first Piola-Kirchhoff stress.
+        Returns a 3x3 tensor for all regimes (axisymmetric, 2D, 3D).
+
+        Parameters:
+            u: Displacement field.
+            material (dict): Material properties (needs 'lmbda', 'G').
+
+        Returns:
+            Cauchy stress tensor (UFL expression, 3x3).
+        """
+        psi, F_def = self.psi_hyperelastic(u, material)
+        P = ufl.diff(psi, F_def)
+        J = ufl.det(F_def)
+        return (1.0 / J) * P * F_def.T
+
+    def sigma_th(self, T, material):
+        """
+        Thermal stress tensor σ_th(T) = -(3λ + 2G) α (T - T_ref) I.
+
+        Sign convention: compressive thermal stress for T > T_ref. The
+        (3λ + 2G) factor is the standard isotropic 3D form; for regime
+        "2d" (plane strain in z3st) the 3x3 identity contracts with
+        eps(v) which has eps_zz(v) = 0 on a 2D mesh, so the in-plane
+        coupling is naturally the plane-strain (3λ + 2G) result (the
+        eigenstrain is implicitly α(T-T_ref) on the z direction too,
+        blocked by the plane-strain constraint eps_zz = 0).
+
+        Damage coupling: when damage is active, σ_th is degraded by
+        g(D) = (1-D)^2 + K, mirroring σ_mech. Without this degradation, a
+        fully damaged cell (g(D) ~ K ~ 1e-6) loses its mechanical stiffness
+        on the LHS of the equilibrium but still feels the full thermal
+        body force on the RHS, which drives the displacement to ~1/K →
+        numerical explosion. Degrading both gives the physical limit of a
+        traction-free crack face.
+
+        Note on the damage driver: damage_model._thermal_eigenstrain uses
+        the "pancake" convention (eth_zz = 0) when evaluating ψ⁺. That is
+        a deliberate, independent choice that suppresses the 2D-projected
+        bulk σ_zz artifact in the damage decision only; it does not affect
+        the displacement field, which keeps the standard plane-strain
+        (3λ + 2G) thermal stress here.
         """
         regime = self.regime
         dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
 
-        return (
-            -(3 * material["lmbda"] + 2 * material["G"])
+        sigma_th = (
+            -(3.0 * material["lmbda"] + 2.0 * material["G"])
             * material["alpha"]
             * (T - material["T_ref"])
             * ufl.Identity(dim)
         )
 
-    def elastic_energy_density(self, u, material):
-        """
-        Elastic strain energy density = 1/2 * sigma_mech(u) : epsilon(u).
-        """
+        if self.on.get("damage", False):
+            sigma_th = self.degradation_function(self.D) * sigma_th
 
+        return sigma_th
+
+    def elastic_energy_density(self, u, material, T=None):
+        """
+        Elastic strain energy density.
+
+        For linear-elastic (Lame) constitutive:
+            psi_el = 0.5 * [lambda * tr(eps_el)^2 + 2G * eps_el : eps_el]
+        where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
+        (total strain minus thermal eigenstrain). When T is None or the
+        material has no thermal-expansion properties, eps_el = eps(u) and
+        we recover the previous formula.
+
+        For other constitutive modes (voigt / hyperelastic / plasticity /
+        custom), fall back to 0.5 * sigma_mech(u, material) : eps(u) on
+        total strain. Those modes don't have thermal coupling wired up in
+        z3st, so the simpler formula is used.
+
+        Why the elastic strain matters: the energy that can be released by
+        cracking is the *elastic* strain energy. Uniform thermal expansion
+        in an unconstrained body produces total strain but zero elastic
+        strain and zero releasable energy, so the bulk's psi_el should be
+        ~0. Using eps(u) directly would pollute psi_el with thermal expansion
+        and lead to spurious E_el offsets in the energies.txt diagnostic.
+        """
+        mode = material.get("constitutive_mode", "lame")
+
+        if mode == "lame":
+            eps = self.epsilon(u)
+            if T is not None and "alpha" in material and "T_ref" in material:
+                # Thermal eigenstrain. In 2D Cartesian (plane strain or plane
+                # stress), the z-component is suppressed because eps_zz is
+                # geometrically constrained / sigma_zz is zero -- including
+                # eth_zz would produce a spurious bulk psi_el. See the
+                # docstring of DamageModel._thermal_eigenstrain for the full
+                # rationale; we duplicate the logic here so that
+                # MechanicalModel does not need to import DamageModel.
+                factor = material["alpha"] * (T - material["T_ref"])
+                dim = eps.ufl_shape[0]
+                regime = str(getattr(self, "regime", "3d")).lower()
+                if regime in ("2d", "plane_stress") and dim == 3:
+                    I_inplane = ufl.as_tensor([
+                        [1.0, 0.0, 0.0],
+                        [0.0, 1.0, 0.0],
+                        [0.0, 0.0, 0.0],
+                    ])
+                    eth = factor * I_inplane
+                else:
+                    eth = factor * ufl.Identity(dim)
+                eps_el = eps - eth
+            else:
+                eps_el = eps
+            psi_el = 0.5 * (
+                material["lmbda"] * ufl.tr(eps_el) ** 2
+                + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
+            )
+            # Damage degradation: mirrors sigma_mech / sigma_th. Without this
+            # weighting, cells under a prescribed D=1 BC (e.g. the notch slit
+            # of the SENT cases or the seed of case 14_*_cracking_2D_xy)
+            # absorb the displacement-controlled BC into huge strain while
+            # carrying near-zero stress -- the equilibrium is well-posed but
+            # psi_el = 0.5*E*eps^2 explodes, inflating the E_el diagnostic
+            # by orders of magnitude. (Simple g(D)*psi rather than
+            # g(D)*psi+ + psi-: small overcount in compression cells, but
+            # those don't carry significant D under the hybrid constraint.)
+            if self.on.get("damage", False):
+                psi_el = self.degradation_function(self.D) * psi_el
+            return psi_el
+
+        # Non-linear / non-Lame fallback: total-strain energy density.
+        # sigma_mech is already g(D)-degraded when damage is active.
         sigma = self.sigma_mech(u, material)
         eps = self.epsilon(u)
-
         return 0.5 * ufl.inner(sigma, eps)
 
     def zero_displacement(self, mesh, dofs, V):

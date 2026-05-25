@@ -391,7 +391,7 @@ A typical material file contains the following properties:
    k: 48.1               # Thermal conductivity (W/m·K)
    cp: 200.0             # Specific heat capacity (J/kg·K)
 
-   # Optional: Nuclear/radiation properties
+   # Optional: Radiation properties
    mu_gamma: 24.0        # Linear attenuation coefficient (1/m)
    gamma_heating: 0.0    # Volumetric gamma heating (W/m³)
 

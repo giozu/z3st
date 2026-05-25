@@ -82,19 +82,14 @@ class Spine(
         return getattr(mod, func_name)
 
     def load_materials(self, **materials):
-
-        print("\n")
-        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
-        print(f"--. spine - load_materials --..")
-        print("--.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---")
-        print("\n")
+        print(f"[spine.load_materials]")
 
         self.materials = {}
         
         lc = getattr(self, "dmg_cfg", {}).get("lc")
 
         for name, mat in materials.items():
-            print(f"{name.capitalize()} material loaded:")
+            print(f"Material loaded: {name}")
 
             if "E" in mat and "nu" in mat:
                 mat["E"] = float(mat["E"])
@@ -120,6 +115,24 @@ class Spine(
             sigma_c = mat.get("sigma_c")
             Gc = mat.get("Gc")
 
+            # YAML quirk: scientific notation without explicit +/- in the exponent
+            # (e.g. `1.0e9`) is parsed as a *string*, not a float. Coerce defensively
+            # so users don't hit a confusing TypeError downstream. A genuine symbolic
+            # Gc string (e.g. "module.func") will fail the float() and keep its string
+            # form for the resolver below.
+            if isinstance(sigma_c, str):
+                try:
+                    sigma_c = float(sigma_c)
+                    mat["sigma_c"] = sigma_c
+                except ValueError:
+                    pass  # leave as-is (no symbolic sigma_c path is currently used)
+            if isinstance(Gc, str):
+                try:
+                    Gc = float(Gc)
+                    mat["Gc"] = Gc
+                except ValueError:
+                    pass  # genuine "module.func" symbolic path — handled below
+
             if "Gc" in mat:
                 if isinstance(mat["Gc"], str):
                     print(f"  → Gc defined as symbolic function: {mat['Gc']}")
@@ -144,7 +157,7 @@ class Spine(
 
                     mat["Gc"] = float(Gc)
 
-                elif Gc is not None and type(Gc) == float:
+                elif Gc is not None and isinstance(Gc, (int, float, np.floating, np.integer)):
                     if dmg_type == "AT2":
                         sigma_c = ((27 * mat["E"] * Gc) / (256 * lc))**0.5
                         print(f"  - Material '{name}': sigma_c (AT2) from Gc = {Gc:.2f} J/m2")
@@ -160,6 +173,12 @@ class Spine(
             print(f"  → constitutive model: {constitutive_mode}")
             if constitutive_mode == "voigt" and mat.get("C_matrix") is not None:
                 print("    using user-provided C_matrix (6x6)")
+
+            if self.on.get("plasticity", False) and constitutive_mode == "lame" \
+                    and "yield_strength" in mat:
+                mat["constitutive_mode"] = "plasticity"
+                constitutive_mode = "plasticity"
+                print(f"  → constitutive model promoted to: plasticity (yield_strength present)")
 
             self.materials[name] = mat
             for k in sorted(mat.keys()):
@@ -184,7 +203,7 @@ class Spine(
         if self.on.get("damage", False): self.set_damage_boundary_conditions(self.V_d)
 
     def initialize_fields(self):
-        print(f"[INITIALIZING FIELDS]")
+        print(f"[spine.initialize_fields]")
 
         self.q_third = None
         self.T = None
@@ -203,8 +222,9 @@ class Spine(
             for name, mat in self.materials.items():
                 print(f"  → Setting initial temperature for material: '{name}'")
                 dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
-                self.T.x.array[dofs] = mat["T_ref"]
-                print(f"    Set {len(dofs)} DOFs to {mat['T_ref']:.2f} K")
+                T_init = mat.get("T_initial", mat["T_ref"])
+                self.T.x.array[dofs] = T_init
+                print(f"    Set {len(dofs)} DOFs to {T_init:.2f} K")
 
             self.T.x.scatter_forward()
             T_vals = self.T.x.array
@@ -285,11 +305,30 @@ class Spine(
             if mat.get("fissile", False):
                 print("Fissile material")
                 q_val = self.lhr / self.area
-                self.q_third.x.array[dofs] = q_val
-                print(f"  q_third = {q_val:.3e} W/m³ (fissile: {mat.get('fissile', False)})")
+                # Accumulate: if multiple sources are configured on the same
+                # material (e.g. fissile + gamma_heating below), they should
+                # add — not overwrite.
+                self.q_third.x.array[dofs] += q_val
+                print(f"  q_third += {q_val:.3e} W/m³ (fissile: {mat.get('fissile', False)})")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
 
-            if float(mat["gamma_heating"]) > 0.0:
+            if float(mat.get("gamma_heating", 0.0)) > 0.0:
+                # Cylindrical and spherical gamma-decay correlations use
+                # `inner_radius` as the reference surface. If it is zero
+                # we'd hit K_0(0) = +inf (cyl) or 1/r at r=0 (sphere); the
+                # spurious result is silent zero or NaN heating. Surface up.
+                if (
+                    self.geometry_type in ("cyl", "cylinder", "sphere")
+                    and float(getattr(self, "inner_radius", 0.0) or 0.0) == 0.0
+                ):
+                    raise ValueError(
+                        f"Material '{name}' has gamma_heating > 0 with "
+                        f"geometry_type='{self.geometry_type}' and inner_radius == 0. "
+                        f"The decay correlation requires a non-zero inner radius "
+                        f"as the reference surface; set inner_radius > 0 in geometry.yaml "
+                        f"or use geometry_type='rect'."
+                    )
+
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
 
@@ -321,7 +360,9 @@ class Spine(
 
                 f_func = dolfinx.fem.Function(self.V_t)
                 f_func.interpolate(f)
-                self.q_third.x.array[dofs] = f_func.x.array[dofs]
+                # Accumulate (see CODE-P1-10): allows fissile + gamma_heating
+                # on the same material to combine rather than overwrite.
+                self.q_third.x.array[dofs] += f_func.x.array[dofs]
 
         self.q_third.x.scatter_forward()
 
@@ -366,7 +407,10 @@ class Spine(
 
         for name, mat in self.materials.items():
             if self.on.get("mechanical", False):
-                self.energy_density[name] = self.elastic_energy_density(self.u, mat)
+                # Elastic energy uses the elastic strain (eps - alpha*(T - T_ref)*I)
+                # so uniform thermal expansion does not appear as stored elastic energy.
+                T_field = getattr(self, "T", None) if self.on.get("thermal", False) else None
+                self.energy_density[name] = self.elastic_energy_density(self.u, mat, T=T_field)
                 self.stress_mech[name] = self.sigma_mech(self.u, mat)
             
             if self.on.get("thermal", False):

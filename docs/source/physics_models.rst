@@ -17,7 +17,7 @@ Thermal Model
 
 The thermal model solves the **heat conduction equation** with support for:
 
-- Volumetric heat sources (e.g., nuclear heating, internal dissipation)
+- Volumetric heat sources (e.g., heating, internal dissipation)
 - Temperature-dependent thermal conductivity
 - Robin-type boundary conditions for gap conductance between subdomains
 - Dirichlet and Neumann boundary conditions
@@ -268,7 +268,7 @@ Cluster Dynamics Model
 
 The cluster dynamics model simulates **defect cluster evolution** in irradiated materials by solving a **1D advection-diffusion equation** in size space.
 
-This model is particularly relevant for nuclear materials under neutron irradiation, where point defects (vacancies and interstitials) agglomerate into clusters of varying sizes.
+This model is particularly relevant for materials under neutron irradiation, where point defects (vacancies and interstitials) agglomerate into clusters of varying sizes.
 
 Mathematical Formulation
 ^^^^^^^^^^^^^^^^^^^^^^^^

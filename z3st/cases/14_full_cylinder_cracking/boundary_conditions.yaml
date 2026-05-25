@@ -1,0 +1,11 @@
+thermal:
+  uo2:
+  - type: Dirichlet
+    region: contact_wall
+    temperature: 263.15  # (K) = -10°C, instantaneous quench
+
+mechanical:
+  uo2:
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]
