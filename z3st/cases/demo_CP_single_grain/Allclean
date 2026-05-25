@@ -5,6 +5,7 @@ echo "Cleaning current directory..."
 rm -f output/*.vtu
 rm -f output/*.png
 rm -f output/non-regression.json
-rm -f *.msh *.vtk *.vtu log.z3st
+rm -f *.msh *.vtk *.vtu
+rm -f log_*.md
 
 echo "Done. Output and temporary files deleted."

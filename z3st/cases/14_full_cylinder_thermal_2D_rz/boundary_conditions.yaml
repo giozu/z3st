@@ -1,0 +1,12 @@
+thermal:
+  uo2:
+  - type: Dirichlet
+    region: contact_wall
+    temperature: 263.15 # -10°C
+
+mechanical:
+  uo2:
+  - type: Clamp_y
+    region: bottom
+  - type: Clamp_x
+    region: axis

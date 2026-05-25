@@ -8,6 +8,7 @@
 import dolfinx
 import numpy as np
 import ufl
+from mpi4py import MPI
 
 
 class DamageModel:
@@ -16,9 +17,25 @@ class DamageModel:
 
         # --. Damage model options --..
         self.dmg_cfg = self.input_file.get("damage", {})
-
         if not self.dmg_cfg:
-            raise ValueError("'damage' entry missing in input.yaml.")
+            raise ValueError("'damage' entry missing in input.yaml (but damage model is enabled).")
+
+        # Default linear-solver backend; user can override in input.yaml.
+        # Done after the missing-block check so an entirely absent damage
+        # block still surfaces clearly rather than being silently filled in.
+        self.dmg_cfg.setdefault("linear_solver", "iterative_hypre")
+
+        # Validate damage type up-front. Without this, a typo like 'at1' or
+        # 'AT-1' silently skips the Gc<->sigma_c auto-conversion in
+        # spine.py::load_materials and the run crashes later inside
+        # _damage_step with a confusing KeyError('Gc') or 'Unknown damage
+        # type'.
+        dmg_type = self.dmg_cfg.get("type")
+        if dmg_type not in ("AT1", "AT2"):
+            raise ValueError(
+                f"damage.type must be 'AT1' or 'AT2'; got {dmg_type!r}. "
+                f"Set damage.type in input.yaml accordingly."
+            )
 
         print("Options loaded from input.yaml:")
         for key, value in self.dmg_cfg.items():
@@ -36,158 +53,444 @@ class DamageModel:
         """
         return (1 - D) ** 2 + K
 
-    def crack_driving_force(self, u, material):
-        """
-        Compute the dimensionless driving force H for the damage formulations
-        """
+    def _thermal_eigenstrain(self, dim, material, T):
+        """Return the thermal eigenstrain tensor used in the damage driver.
 
-        # Material properties
-        lam = material["lmbda"]
-        G = material["G"]
-        E = material["E"]
+        Returns None if T is missing or the material has no thermal-expansion
+        properties. The damage driving force must be evaluated on the
+        ELASTIC (mechanical) strain eps_el = eps(u) - eth, not on the total
+        strain eps(u). Otherwise uniform thermal expansion in the bulk
+        produces a spurious psi_pos that drives damage everywhere.
+
+        Regime-dependent z-component handling:
+
+        - In 3D and axisymmetric, every diagonal strain component is
+          dynamic (computed from u). The full isotropic eigenstrain
+          alpha*(T-T_ref)*I is correct.
+
+        - In 2D Cartesian PLANE STRAIN (regime: 2d in z3st), eps_zz is
+          forced to 0 by the geometric constraint. Subtracting a non-zero
+          eth_zz = alpha*(T-T_ref) would create eps_el_zz = -alpha*(T-T_ref),
+          whose deviatoric component injects a spurious psi_pos
+          (= (2/3) * G * alpha^2 * dT^2) throughout the bulk -- about
+          5.6 MJ/m^3 for UO2 at dT = 760 K, right at the AT1 threshold for
+          sigma_c = 2 GPa. This is a 2D-approximation artifact (the
+          uniform sigma_zz from blocked z-thermal-expansion is a real
+          stress in an infinite cylinder but cannot drive radial cracks).
+          We therefore zero out the z-component of eth in plane strain.
+
+        - PLANE STRESS (regime: plane_stress) has sigma_zz = 0 by
+          construction, so the z-thermal-expansion creates no real stress
+          either. Same treatment.
+        """
+        if T is None or "alpha" not in material or "T_ref" not in material:
+            return None
+        factor = material["alpha"] * (T - material["T_ref"])
+
+        regime = str(getattr(self, "regime", "3d")).lower()
+        if regime in ("2d", "plane_stress") and dim == 3:
+            # Eigenstrain active in the in-plane components only.
+            I_inplane = ufl.as_tensor([
+                [1.0, 0.0, 0.0],
+                [0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0],
+            ])
+            return factor * I_inplane
+
+        return factor * ufl.Identity(dim)
+
+    def crack_driving_force(self, u, material, T=None):
+        """
+        Compute the driving force H stored in self.H for the active damage model.
+
+        AT2: H = (2*lc/Gc) * psi_pos     (dimensionless, normalized form)
+        AT1: H = psi_pos                 (physical energy density, J/m^3)
+
+        If T is provided, the elastic strain (total strain minus thermal
+        eigenstrain) is used in the split, so thermal expansion does not
+        appear as a damage driver.
+        """
 
         lc = float(self.dmg_cfg["lc"])
-        sigma_c = material["sigma_c"]
         Gc = material["Gc"]
-
         damage_type = self.dmg_cfg["type"]
 
+        psi_pos, _ = self.psi_split(u, material, T=T)
+
         if damage_type == "AT2":
-
-            # Spectral
-            psi_pos = self.psi_miehe_spectral(u, material)
-            H = (2.0 * lc / Gc) * psi_pos
-
-            # Volumetric
-            # lam = material["lmbda"]
-            # G = material["G"]
-            # eps = self.epsilon(u)
-            # tr_eps = ufl.tr(eps)
-            # tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
-            # psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
-
-            return H
-
+            return (2.0 * lc / Gc) * psi_pos
         elif damage_type == "AT1":
-            
-            # Definitions
-            eps = self.epsilon(u)
-            
-            # Volumetric-Deviatoric Split (Amor et al.)
-            tr_eps = ufl.tr(eps)
-            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps)) # Macauley bracket pos
-            
-            # No cracking under pure hydrostatic compression
-            psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
-
             return psi_pos
+        else:
+            raise ValueError(
+                f"Unknown damage type '{damage_type}'; expected 'AT1' or 'AT2'. "
+                f"Set damage.type in input.yaml accordingly."
+            )
 
-    @staticmethod
-    def gamma_density(D, grad_D, lc):
+    def gamma_density(self, D, grad_D, lc):
 
         damage_type = self.dmg_cfg["type"]
 
         if damage_type == "AT2":
-            """Fracture energy density gamma(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)."""
+            # Fracture energy density gamma(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)
             return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
 
         elif damage_type == "AT1":
-            """
-            Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
-            """
-            
+            # Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
             return D / lc + lc * ufl.dot(grad_D, grad_D)
+        else:
+            raise ValueError(
+                f"Unknown damage type '{damage_type}'; expected 'AT1' or 'AT2'. "
+                f"Set damage.type in input.yaml accordingly."
+            )
 
-    def psi_miehe_spectral(self, u, material):
+    def psi_miehe_spectral(self, u, material, T=None):
+        """
+        Miehe spectral split of the elastic strain energy density.
+
+        Returns the tuple (psi_pos, psi_neg) with
+            psi_pos = (lambda/2) <tr eps_el>_+^2 + mu * sum_i <eps_el_i>_+^2
+            psi_neg = (lambda/2) <tr eps_el>_-^2 + mu * sum_i <eps_el_i>_-^2
+        where <.>_+ and <.>_- are the positive and negative parts and
+        eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic (mechanical)
+        strain (the total strain when T is None or thermal props are absent).
+        """
 
         lmbda = material["lmbda"]
         mu = material["G"]
-        
+
         eps = self.epsilon(u)
-                
-        eps_xx = eps[0, 0]
-        eps_yy = eps[1, 1]
-        eps_xy = eps[0, 1]
-        
-        tr_eps = eps_xx + eps_yy
-        
+        dim = eps.ufl_shape[0]
         tol = 1.0e-16
-        R = ufl.sqrt(((eps_xx - eps_yy) / 2.0)**2 + eps_xy**2 + tol)
-        
-        eig1 = tr_eps / 2.0 + R
-        eig2 = tr_eps / 2.0 - R
-        
-        # <x>_+ = (x + |x|) / 2
-        eig1_pos = 0.5 * (eig1 + abs(eig1))
-        eig2_pos = 0.5 * (eig2 + abs(eig2))
-        
+
+        # Subtract thermal eigenstrain so the split sees the elastic strain only.
+        eth = self._thermal_eigenstrain(dim, material, T)
+        if eth is not None:
+            eps = eps - eth
+
+        if dim == 2:
+            eps_xx = eps[0, 0]
+            eps_yy = eps[1, 1]
+            eps_xy = eps[0, 1]
+
+            tr_eps = eps_xx + eps_yy
+
+            R = ufl.sqrt(((eps_xx - eps_yy) / 2.0)**2 + eps_xy**2 + tol)
+
+            eig1 = tr_eps / 2.0 + R
+            eig2 = tr_eps / 2.0 - R
+
+            eig1_pos = 0.5 * (eig1 + abs(eig1))
+            eig2_pos = 0.5 * (eig2 + abs(eig2))
+            eig1_neg = 0.5 * (eig1 - abs(eig1))
+            eig2_neg = 0.5 * (eig2 - abs(eig2))
+
+            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+            tr_eps_neg = 0.5 * (tr_eps - abs(tr_eps))
+
+            psi_pos = (0.5 * lmbda * tr_eps_pos**2) + (mu * (eig1_pos**2 + eig2_pos**2))
+            psi_neg = (0.5 * lmbda * tr_eps_neg**2) + (mu * (eig1_neg**2 + eig2_neg**2))
+
+        else:
+            # 3D: Cardano's formula for eigenvalues of symmetric 3x3 tensor
+            e00 = eps[0, 0]; e11 = eps[1, 1]; e22 = eps[2, 2]
+            e01 = eps[0, 1]; e02 = eps[0, 2]; e12 = eps[1, 2]
+
+            tr_eps = e00 + e11 + e22
+
+            # Invariants of eps
+            I1 = tr_eps
+            I2 = (e00*e11 + e11*e22 + e00*e22
+                   - e01**2 - e02**2 - e12**2)
+            I3 = (e00*(e11*e22 - e12**2)
+                   - e01*(e01*e22 - e12*e02)
+                   + e02*(e01*e12 - e11*e02))
+
+            # Deviatoric invariants for Cardano
+            p = (I1**2 - 3.0*I2) / 9.0
+            q = (2.0*I1**3 - 9.0*I1*I2 + 27.0*I3) / 54.0
+
+            s = ufl.sqrt(p + tol)
+
+            # cos(theta) = q / s^3, clamped
+            arg = q / (s**3 + tol)
+            # Smooth clamp via conditional
+            arg_c = ufl.conditional(ufl.gt(arg, 1.0 - tol), 1.0 - tol,
+                     ufl.conditional(ufl.lt(arg, -1.0 + tol), -1.0 + tol, arg))
+            theta = ufl.acos(arg_c) / 3.0
+
+            eig1 = I1 / 3.0 + 2.0 * s * ufl.cos(theta)
+            eig2 = I1 / 3.0 + 2.0 * s * ufl.cos(theta - 2.0 * ufl.pi / 3.0)
+            eig3 = I1 / 3.0 + 2.0 * s * ufl.cos(theta + 2.0 * ufl.pi / 3.0)
+
+            eig1_pos = 0.5 * (eig1 + abs(eig1))
+            eig2_pos = 0.5 * (eig2 + abs(eig2))
+            eig3_pos = 0.5 * (eig3 + abs(eig3))
+            eig1_neg = 0.5 * (eig1 - abs(eig1))
+            eig2_neg = 0.5 * (eig2 - abs(eig2))
+            eig3_neg = 0.5 * (eig3 - abs(eig3))
+
+            tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+            tr_eps_neg = 0.5 * (tr_eps - abs(tr_eps))
+
+            psi_pos = (0.5 * lmbda * tr_eps_pos**2) + (mu * (eig1_pos**2 + eig2_pos**2 + eig3_pos**2))
+            psi_neg = (0.5 * lmbda * tr_eps_neg**2) + (mu * (eig1_neg**2 + eig2_neg**2 + eig3_neg**2))
+
+        return psi_pos, psi_neg
+
+    def psi_amor_split(self, u, material, T=None):
+        """
+        Amor (volumetric/deviatoric) split of the elastic strain energy density.
+
+        Returns (psi_pos, psi_neg) with
+            psi_pos = (lambda/2) <tr eps_el>_+^2 + mu * dev(eps_el):dev(eps_el)
+            psi_neg = (lambda/2) <tr eps_el>_-^2
+        where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
+        (total strain when T is None). Note: this uses lambda rather than
+        the n-dimensional bulk modulus K_n. Same convention as the existing
+        AT1 driving force in z3st.
+        """
+        lam = material["lmbda"]
+        G = material["G"]
+        eps = self.epsilon(u)
+        dim = eps.ufl_shape[0]
+
+        # Subtract thermal eigenstrain so the split sees the elastic strain only.
+        eth = self._thermal_eigenstrain(dim, material, T)
+        if eth is not None:
+            eps = eps - eth
+
+        tr_eps = ufl.tr(eps)
         tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
-                
-        psi_pos = (0.5 * lmbda * tr_eps_pos**2) + (mu * (eig1_pos**2 + eig2_pos**2))
-        
-        return psi_pos
+        tr_eps_neg = 0.5 * (tr_eps - abs(tr_eps))
 
-    def update_history(self, u):
+        psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+        psi_neg = 0.5 * lam * tr_eps_neg**2
+
+        return psi_pos, psi_neg
+
+    def psi_star_convex(self, u, material, T=None):
         """
-        Vectorized function (faster), to update the field H (crack driving force)
-        Handles irreversibility:  H_n+1 = max(H_old, H_new) without loops over cells.
-        
+        Star-convex energy split (Vicentini, Zolesi, Carrara, Maurini, De
+        Lorenzis 2024 — Int. J. Fract. 247:291-317, Eqs. (38)-(39)).
+
+        A one-parameter generalisation of the Amor volumetric/deviatoric
+        split:
+
+            psi_pos = G |dev(eps_el)|^2
+                      + (lambda/2) [<tr eps_el>_+^2 - gamma_star <tr eps_el>_-^2]
+            psi_neg = (1 + gamma_star) (lambda/2) <tr eps_el>_-^2
+
+        gamma_star >= -1 controls the compressive-vs-tensile critical-stress
+        asymmetry. The standard Amor split is recovered at gamma_star = 0;
+        gamma_star > 0 raises the compressive strength relative to tensile
+        and introduces a strain-space asymptote below which compressive
+        loading cannot grow damage further (Vicentini et al. 2024 Fig. 7).
+
+        Per Vicentini et al. 2024 Table 2, the star-convex model satisfies
+        all five criteria for an ideal multi-axial energy decomposition
+        (strain-hardening, stress-softening, tens./compr. asymmetry,
+        flexibility, crack-like residual stress) — none of the other
+        decompositions in z3st (Amor, Miehe spectral) achieve full
+        flexibility.
+
+        gamma_star is read from ``self.dmg_cfg["gamma_star"]`` (i.e. the
+        ``damage:`` block of input.yaml, alongside ``lc`` and
+        ``hybrid_constraint``) and defaults to 0.0 (silently reduces to
+        Amor). It is intentionally a *model* parameter, not a material
+        property: the same energy-split machinery is shared across every
+        material in the simulation.
+
+        Note: z3st's Amor implementation uses the Lame parameter ``lambda``
+        rather than the n-dimensional bulk modulus ``K_n``; star-convex
+        mirrors that convention so that ``gamma_star = 0`` recovers
+        ``psi_amor_split`` exactly.
         """
-        
+        lam = material["lmbda"]
+        G = material["G"]
+        gamma_star = float(self.dmg_cfg.get("gamma_star", 0.0))
+
+        eps = self.epsilon(u)
+        dim = eps.ufl_shape[0]
+
+        eth = self._thermal_eigenstrain(dim, material, T)
+        if eth is not None:
+            eps = eps - eth
+
+        tr_eps = ufl.tr(eps)
+        tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
+        tr_eps_neg = 0.5 * (tr_eps - abs(tr_eps))
+
+        psi_pos = (
+            G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+            + 0.5 * lam * (tr_eps_pos**2 - gamma_star * tr_eps_neg**2)
+        )
+        psi_neg = (1.0 + gamma_star) * 0.5 * lam * tr_eps_neg**2
+
+        return psi_pos, psi_neg
+
+    def psi_split(self, u, material, T=None):
+        """
+        Dispatch to the elastic energy split.
+
+        Selection priority:
+          1. ``damage.split: amor | miehe | star_convex`` in input.yaml
+             (explicit override).
+          2. Default (no ``split`` key): AT2 -> Miehe spectral, AT1 -> Amor
+             volumetric/deviatoric. This preserves z3st's historical pairing.
+
+        Returns (psi_pos, psi_neg) in physical units (J/m^3).
+
+        T (optional): the current temperature field. When provided, the split
+        is evaluated on the elastic (mechanical) strain so thermal expansion
+        does not contribute spuriously.
+        """
+        split_choice = self.dmg_cfg.get("split")
+
+        if split_choice is None:
+            # Historical default: split inferred from damage type.
+            damage_type = self.dmg_cfg["type"]
+            if damage_type == "AT2":
+                return self.psi_miehe_spectral(u, material, T=T)
+            elif damage_type == "AT1":
+                return self.psi_amor_split(u, material, T=T)
+            else:
+                raise ValueError(f"Unknown damage type '{damage_type}'")
+
+        split_choice = str(split_choice).lower()
+        if split_choice == "amor":
+            return self.psi_amor_split(u, material, T=T)
+        elif split_choice == "miehe":
+            return self.psi_miehe_spectral(u, material, T=T)
+        elif split_choice == "star_convex":
+            return self.psi_star_convex(u, material, T=T)
+        else:
+            raise ValueError(
+                f"Unknown damage.split '{split_choice}'; expected "
+                f"'amor', 'miehe', or 'star_convex'."
+            )
+
+    def update_history(self, u, T=None):
+        """
+        Vectorized update of the crack driving force history field self.H.
+
+        AT2 enforces irreversibility:  H_{n+1} = max(H_n, H_new).
+        AT1 stores the current value (irreversibility is enforced on D itself).
+
+        Hybrid (Ambati et al. 2015) constraint:
+            if dmg_cfg["hybrid_constraint"] is True (default), then in cells where
+            psi_neg > psi_pos the new contribution to H is set to zero, so the
+            damage field cannot grow in compression-dominated regions. For
+            monotonic loads (e.g. thermal shock) this matches Eq. (27c) of the
+            paper. It is conservative under unloading: it suppresses crack
+            re-opening rather than enforcing pointwise crack closure.
+        """
+
         Q = self.Q
-
-        # Temporary array, storing H of this step
         H_new_array = np.zeros_like(self.H.x.array)
+
+        use_hybrid_constraint = self.dmg_cfg.get("hybrid_constraint", True)
+
+        psi_pos_fn = dolfinx.fem.Function(Q) if use_hybrid_constraint else None
+        psi_neg_fn = dolfinx.fem.Function(Q) if use_hybrid_constraint else None
+        tmp_func = dolfinx.fem.Function(Q)
 
         for label, material in self.materials.items():
             tag = self.label_map[label]
-            
-            # Finding cells of this material
-            entities = self.cell_tags.find(tag)
-            if len(entities) == 0: continue
-            
-            H_expr = self.crack_driving_force(u, material)
-            expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points)
 
-            tmp_func = dolfinx.fem.Function(Q)
+            entities = self.cell_tags.find(tag)
+            if len(entities) == 0:
+                continue
+
+            H_expr = self.crack_driving_force(u, material, T=T)
+            expr = dolfinx.fem.Expression(H_expr, Q.element.interpolation_points)
             tmp_func.interpolate(expr, entities)
-            
+
             dofs = dolfinx.fem.locate_dofs_topological(Q, self.mesh.topology.dim, entities)
-            
             H_new_array[dofs] = tmp_func.x.array[dofs]
 
+            if use_hybrid_constraint:
+                psi_pos_expr, psi_neg_expr = self.psi_split(u, material, T=T)
+
+                expr_pos = dolfinx.fem.Expression(psi_pos_expr, Q.element.interpolation_points)
+                expr_neg = dolfinx.fem.Expression(psi_neg_expr, Q.element.interpolation_points)
+
+                psi_pos_fn.interpolate(expr_pos, entities)
+                psi_neg_fn.interpolate(expr_neg, entities)
+
+                # Cells where the negative-energy part dominates: suppress damage growth.
+                local_dofs = dofs
+                neg_mask = psi_neg_fn.x.array[local_dofs] > psi_pos_fn.x.array[local_dofs]
+                H_new_array[local_dofs[neg_mask]] = 0.0
+
         damage_type = self.dmg_cfg["type"]
-        
+
         if damage_type == "AT1":
             self.H.x.array[:] = H_new_array
         elif damage_type == "AT2":
             self.H.x.array[:] = np.maximum(self.H.x.array, H_new_array)
-        
+
         self.H.x.scatter_forward()
 
     def compute_energy_balance(self, u):
         """
-        Compute the energy component to verify the conservation law.
+        Compute total elastic and fracture energies for the conservation diagnostic.
+
+        Surface (fracture) energy density:
+            AT2:  gamma = (Gc/2) * (D^2/lc + lc * |grad D|^2)
+            AT1:  gamma = (3*Gc/8) * (D/lc + lc * |grad D|^2)
+
+        Both integrals use the regime-dependent integration weight
+        (`self.weight = 2*pi*r` for axisymmetric, 1 otherwise) so that the
+        reported energies are true volume integrals and not per-(r,z)-area
+        proxies. Without this factor, an axisymmetric run reports energies
+        that are off by ~pi*R compared to the real 3D-volume value.
+
+        The elastic-energy density is evaluated on the elastic strain
+        (eps(u) - alpha*(T - T_ref)*I), so uniform thermal expansion in the
+        bulk does not produce a spurious E_el offset.
         """
         E_el = 0.0
         E_frac = 0.0
         damage_type = self.dmg_cfg["type"]
-        lc = self.dmg_cfg.get("lc") # characteristic length
+        lc = self.dmg_cfg.get("lc")
+
+        # Integration weight: 2*pi*r for axisymmetric, 1 elsewhere.
+        # _build_measures sets self.weight when solve_staggered runs; fall
+        # back to 1.0 if compute_energy_balance is called before any solve.
+        w = getattr(self, "weight", 1.0)
+
+        grad_D2 = ufl.dot(ufl.grad(self.D), ufl.grad(self.D))
+
+        T_field = getattr(self, "T", None)
 
         for label, mat in self.materials.items():
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
-            
-            # 1. Elastic energy (already degraded by damage)
-            E_el += dolfinx.fem.assemble_scalar(dolfinx.fem.form(self.elastic_energy_density(u, mat) * dx))
-            
-            Gc = mat["Gc"]
-            sigma_c = mat["sigma_c"]
-            print(f"Fracture energy ({self.dmg_cfg['type']}): Gc = {Gc} J")
 
-            gamma = (Gc / 2.0) * ((self.D**2 / lc) + lc * ufl.dot(ufl.grad(self.D), ufl.grad(self.D)))
-            E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * dx))
-                
+            # 1. Elastic energy (degraded by damage), evaluated on eps_el.
+            E_el += dolfinx.fem.assemble_scalar(
+                dolfinx.fem.form(self.elastic_energy_density(u, mat, T=T_field) * w * dx)
+            )
+
+            # 2. Fracture energy.
+            Gc = mat["Gc"]
+            if damage_type == "AT2":
+                gamma = (Gc / 2.0) * (self.D**2 / lc + lc * grad_D2)
+            elif damage_type == "AT1":
+                gamma = (3.0 * Gc / 8.0) * (self.D / lc + lc * grad_D2)
+            else:
+                raise ValueError(f"Unknown damage type '{damage_type}'")
+
+            E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * w * dx))
+
+        # assemble_scalar returns per-rank partial sums; reduce so every
+        # rank returns the same global value and downstream callers see
+        # the physical energy (not the rank-0 share).
+        comm = self.mesh.comm
+        E_el = comm.allreduce(E_el, op=MPI.SUM)
+        E_frac = comm.allreduce(E_frac, op=MPI.SUM)
+
         return E_el, E_frac
 
     def set_damage_boundary_conditions(self, V_damage):

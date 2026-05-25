@@ -3,10 +3,10 @@ cd "${0%/*}" || exit 1
 
 echo "Executing z3st.py..."
 
-gmsh mesh.geo -2
+gmsh mesh.geo -2 > log_mesh.md
 
-python3 -m z3st > z3st.log
+python3 -m z3st > log_z3st.md
 
 python3 non-regression.py
 
-python3 ../../utils/plot_convergence.py z3st.log
+python3 ../../utils/plot_convergence.py log_z3st.md

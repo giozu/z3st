@@ -1,0 +1,13 @@
+name: disc_2D_xy
+geometry_type: cyl     # transverse cross-section of a cylindrical pellet (used for analytic refs)
+
+Ro: 0.01               # outer radius (m) = 10 mm
+Lz: 1.0                # placeholder; not used for 2D plane-strain integration
+
+labels:
+  uo2: 10
+  contact_wall: 20     # 60-deg cold quench arc (upper half: 0 to +30 deg, split at the crack mouth)
+  insulated_wall: 21   # rest of the upper perimeter
+  pin: 30              # 50-um Clamp_x segment at (-R, 0)
+  symmetry: 40         # y=0 mirror plane (Clamp_y)
+  crack_seed: 50       # 250-um radial pre-crack slit at theta=15 deg; Dirichlet D=1 applied here

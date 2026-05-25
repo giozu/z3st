@@ -1,212 +1,211 @@
 #!/usr/bin/env python3
-# --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
+"""Quick diagnostic for the SENS shear test.
+
+Processes only the **last** available VTU file (no per-step loop), so it
+runs in a few seconds and is safe to invoke while the simulation is still
+writing new steps. Generates the ParaView-style field plots of the final
+state (damage, sigma_xy, sigma_xx, sigma_vm, crack-driving force) plus the
+global energy balance read directly from energies.txt.
+
+For per-step diagnostics (F-u curve, damage evolution panels), use a
+separate post-processing script after the simulation completes.
 """
-Z3ST case: single-edge notched shear test
 
-non-regression script
----------------------
-
-This script processes multiple VTU files (fields_0000.vtu, ...),
-extracts σ and ε for each step, and reconstructs the stress-strain curve.
-"""
-
-import os, yaml, re
-import numpy as np
+import os
+import re
 from glob import glob
+
 import matplotlib.pyplot as plt
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+import matplotlib.tri as mtri
+import numpy as np
+import pyvista as pv
+import yaml
 
-# --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
+# ----- configuration --------------------------------------------------------
+CASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
-VTU_FILES = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
+VTU_FILES  = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
+if not VTU_FILES:
+    raise FileNotFoundError(f"No VTU files found in {OUTPUT_DIR}")
+LAST_VTU = VTU_FILES[-1]
 
-INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/high_carbon_steel.yaml")
-GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
-BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
-MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    cfg = yaml.safe_load(f)
+mat_rel = list(cfg["materials"].values())[0]
+MATERIAL_FILE = os.path.normpath(os.path.join(CASE_DIR, mat_rel))
 
-# Geometry, material, boundary conditions:
-with open(INPUT_FILE, 'r') as f:
-    input_data = yaml.safe_load(f)
-dmg_cfg = input_data.get("damage", {})
-lc = float(dmg_cfg["lc"])
+dmg_cfg  = cfg.get("damage", {})
+lc       = float(dmg_cfg["lc"])
+dmg_type = str(dmg_cfg.get("type", "AT2")).upper()
 
-with open(GEOMETRY_FILE, 'r') as f:
-    geom_data = yaml.safe_load(f)
-Lx = float(geom_data.get('Lx'))
-Ly = float(geom_data.get('Ly'))
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Lx, Ly = float(geom["Lx"]), float(geom["Ly"])
 
-with open(MATERIAL_FILE, 'r') as f:
-    mat_data = yaml.safe_load(f)
-E  = float(mat_data.get('E'))
-nu = float(mat_data.get('nu'))
-Gc = float(mat_data.get('Gc'))
-sigma_c = np.sqrt(E * Gc / lc)**0.5
+with open(MATERIAL_FILE) as f:
+    mat = yaml.safe_load(f)
+E, nu, Gc = float(mat["E"]), float(mat["nu"]), float(mat["Gc"])
 
-with open(MESH_GEO_FILE, 'r') as f:
-    content = f.read()
-Dn = float(re.search(rf'Dn\s*=\s*([\d\.]+);', content).group(1))
+# AT2/AT1 analytical sigma_c (matches spine.py reconciliation at material load).
+if dmg_type == "AT2":
+    sigma_c = float(np.sqrt(27.0 / 256.0 * Gc * E / lc))
+elif dmg_type == "AT1":
+    sigma_c = float(np.sqrt(3.0 / 8.0 * Gc * E / lc))
+else:
+    raise ValueError(f"Unknown damage type: {dmg_type}")
 
-print(f"[INFO] Geometry loaded: Lx = {Lx} m, Ly = {Ly} m")
-print(f"[INFO] Material loaded: E = {E:.2e} Pa, nu = {nu}")
-print(f"[INFO]                : sigma_c = {sigma_c:.2e} Pa")
-print(f"[INFO]                : Gc = {Gc:.2e} J/m2")
-print(f"[INFO] Dn loaded      : Dn = {Dn}")
+with open(os.path.join(CASE_DIR, "mesh.geo")) as f:
+    Dn = float(re.search(r"Dn\s*=\s*([\d\.eE+-]+)", f.read()).group(1))
 
-# geometry and material
-x_target, mask_tol = (Dn, 1 / (2 * 40)) # m, m, m (extraction line selection and tolerance)
+print(f"[INFO] Case      : {os.path.basename(CASE_DIR)}")
+print(f"[INFO] Last VTU  : {os.path.basename(LAST_VTU)}  (of {len(VTU_FILES)} files)")
+print(f"[INFO] Geometry  : Lx = {Lx*1e3:.3f} mm, Ly = {Ly*1e3:.3f} mm, Dn = {Dn*1e3:.3f} mm")
+print(f"[INFO] Material  : {os.path.basename(MATERIAL_FILE)} (E={E:.2e} Pa, nu={nu}, Gc={Gc} J/m^2)")
+print(f"[INFO] Phase-fld : {dmg_type}, lc = {lc*1e6:.2f} um -> sigma_c = {sigma_c/1e9:.3f} GPa")
 
-# --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
-# Fracture energy, initial value
-crack_length = Dn  # m
-E_frac_i = Gc * crack_length
-print(f'Theoretical initial fracture energy = {E_frac_i} J')
 
-TOLERANCE = 1e-2            # relative tolerance for pass/fail
+# ----- ParaView-style 2D field plots (last VTU only) ------------------------
+def _build_triangulation(pv_mesh):
+    pts = pv_mesh.points
+    x, y = pts[:, 0], pts[:, 1]
+    cells = pv_mesh.cells_dict
+    if 5 in cells:
+        tri = np.asarray(cells[5])
+    elif 9 in cells:
+        q = np.asarray(cells[9])
+        tri = np.vstack([q[:, [0, 1, 2]], q[:, [0, 2, 3]]])
+    else:
+        tri = None
+    return (mtri.Triangulation(x, y, tri) if tri is not None and len(tri) > 0
+            else mtri.Triangulation(x, y)), x, y
 
-# --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-strains = []
-stresses = []
-displacements = []
-d_max_list = []
-h_max_list = []
 
-for step, vtufile in enumerate(VTU_FILES):
-    print(f"\n[STEP {step}] Processing {os.path.basename(vtufile)}")
+def _draw_notch(ax):
+    ax.plot([0.0, Dn], [Ly / 2.0, Ly / 2.0], color="cyan", linewidth=2.5,
+            label=f"Pre-crack slit (0 -- {Dn*1e3:.2f} mm at y = Ly/2)")
 
-    # Stress extraction - usa vtufile (minuscolo)
-    x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress_steel (cells)")
-    mask = np.abs(x_S - x_target) < mask_tol
-    stresses.append(float(np.mean(S_all[mask, 4])))
 
-    # Displacement extraction
-    x_u_all, y_u_all, z_u_all, u_all = extract_field(vtufile, field_name="Displacement")
-    mask_u = np.abs(x_u_all - x_target) < mask_tol
-    u_max = np.max(u_all[mask_u, 1])
-    displacements.append(u_max)
+def plot_field(triang, field, *, output_path, title, cbar_label, cmap, vmin, vmax):
+    levels = np.linspace(vmin, vmax, 41)
+    fig, ax = plt.subplots(figsize=(7.5, 6.5))
+    cf = ax.tricontourf(triang, field, levels=levels, cmap=cmap, vmin=vmin, vmax=vmax, extend="both")
+    ax.triplot(triang, color="black", linewidth=0.05, alpha=0.3)
+    _draw_notch(ax)
+    ax.legend(loc="upper right", fontsize=8)
+    fig.colorbar(cf, ax=ax, label=cbar_label)
+    ax.set_xlabel("x (m)")
+    ax.set_ylabel("y (m)")
+    ax.set_aspect("equal")
+    ax.set_title(title)
+    ax.set_xlim(-0.05 * Lx, 1.05 * Lx)
+    ax.set_ylim(-0.05 * Ly, 1.05 * Ly)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=200)
+    plt.close(fig)
 
-    # Strain extraction
-    x_eps_all, y_eps_all, z_eps_all, E_all = extract_field(vtufile, field_name="Strain (cells)")
-    mask_e = np.abs(x_eps_all - x_target) < mask_tol
-    eps_eng = float(np.mean(E_all[mask_e, 4]))
-    strains.append(eps_eng)
 
-    # Damage
-    x_d, y_d, _, D_all = extract_field(vtufile, field_name="Damage")
-    d_max_list.append(np.max(D_all))
+def von_mises(s):
+    sxx, sxy, sxz = s[:, 0], s[:, 1], s[:, 2]
+    syy, syz      = s[:, 4], s[:, 5]
+    szz           = s[:, 8]
+    return np.sqrt(0.5 * ((sxx - syy) ** 2 + (syy - szz) ** 2 + (szz - sxx) ** 2
+                          + 6.0 * (sxy ** 2 + syz ** 2 + sxz ** 2)))
 
-    # Crack driving force
-    _, _, _, H_all = extract_field(vtufile, field_name="CrackDrivingForce")
-    h_max_list.append(np.max(H_all))
 
-# Stress–strain curve output
-strains_np = np.array(strains, dtype=float)
-stresses_np = np.array(stresses, dtype=float)
-displ_x_np = np.array(displacements, dtype=float)
+def _get(pv_mesh, names):
+    for n in names:
+        if n in pv_mesh.point_data:
+            return np.asarray(pv_mesh.point_data[n])
+    return None
 
-print("\n--. stress-strain-displacement values --..")
-for e, s, u in zip(strains, stresses, displacements):
-    print(f"ε_yy = {e:.3e}\tσ_yy = {s:.3e}\tu_x = {u:.3e}")
 
-# --.. ..- .-.. .-.. --- plotting --.. ..- .-.. .-.. ---
-# crack profile
-plt.figure(figsize=(8, 6))
+m = pv.read(LAST_VTU)
+triang, _, _ = _build_triangulation(m)
+src = os.path.basename(LAST_VTU)
 
-x_line = Dn / 2.0
-tol_x = Lx / 100.0
-yc = Ly / 2.0
+D_field = _get(m, ["Damage", "damage", "D"])
+if D_field is not None:
+    plot_field(triang, D_field.reshape(-1),
+               output_path=os.path.join(OUTPUT_DIR, "damage_field.png"),
+               title=f"Damage field D (Ambati Fig. 12 hybrid reproducer)  -- {src}",
+               cbar_label="Damage D", cmap="hot_r", vmin=0.0, vmax=1.0)
+    print("[INFO] damage_field.png saved")
+    print(f"          max D = {float(np.max(D_field)):.4f}")
 
-colors = plt.cm.jet(np.linspace(0, 1, len(VTU_FILES)))
+S = _get(m, ["Stress_steel (points)", "Stress (points)"])
+if S is not None and S.ndim == 2 and S.shape[1] >= 9:
+    vm = von_mises(S) / 1e6
+    vm_hi = max(float(np.nanpercentile(vm, 99.0)), 1.0)
+    plot_field(triang, vm,
+               output_path=os.path.join(OUTPUT_DIR, "stress_vm_field.png"),
+               title="Von Mises equivalent stress (99th-pct clip)",
+               cbar_label="sigma_vm (MPa)", cmap="viridis", vmin=0.0, vmax=vm_hi)
+    print("[INFO] stress_vm_field.png saved")
 
-for i, vtufile in enumerate(VTU_FILES):
-    print(vtufile)
-    x_d, y_d, _, D_all = extract_field(vtufile, field_name="Damage")
-    mask_line = np.abs(x_d - x_line) < tol_x
-    
-    if np.any(mask_line):
-        y_coords = y_d[mask_line]
-        d_values = D_all[mask_line]
-        
-        sort_idx = np.argsort(y_coords)
-        y_plot = y_coords[sort_idx]
-        d_plot = d_values[sort_idx]
-        
-        label = f"Step {i}"
-        plt.plot(y_plot, d_plot, color=colors[i], lw=1.5, label=label, alpha=0.8)
+    sxy = S[:, 1] / 1e6
+    sxy_abs = max(float(np.nanpercentile(np.abs(sxy), 99.0)), 1.0)
+    plot_field(triang, sxy,
+               output_path=os.path.join(OUTPUT_DIR, "stress_xy_field.png"),
+               title="Shear stress sigma_xy (Mode-II driver)",
+               cbar_label="sigma_xy (MPa)", cmap="seismic", vmin=-sxy_abs, vmax=+sxy_abs)
+    print("[INFO] stress_xy_field.png saved")
 
-d_analytical = np.exp(-np.abs(y_plot - yc) / lc)
-plt.plot(y_plot, d_analytical, "k--", lw=2, label=r"Theoretical $\exp(-|y-y_c|/l_c)$", zorder=10)
+    sxx = S[:, 0] / 1e6
+    sxx_abs = max(float(np.nanpercentile(np.abs(sxx), 99.0)), 1.0)
+    plot_field(triang, sxx,
+               output_path=os.path.join(OUTPUT_DIR, "stress_xx_field.png"),
+               title="Normal stress sigma_xx (shear-diagonal pattern)",
+               cbar_label="sigma_xx (MPa)", cmap="seismic", vmin=-sxx_abs, vmax=+sxx_abs)
+    print("[INFO] stress_xx_field.png saved")
 
-plt.xlabel("Coordinate (m)")
-plt.ylabel("Damage $D$ (/)")
-plt.title(f"Evolution of the crack profile at $x={x_line:.3f}$ m, $l_c = {lc}$ m")
-plt.grid(True, ls=':', alpha=0.6)
-plt.legend(loc='upper right', fontsize='small', ncol=2)
-plt.tight_layout()
-# plt.show()
-plt.savefig(os.path.join(OUTPUT_DIR, "crack_profile_evolution.png"))
-print(f"[INFO] crack_profile_evolution.png saved showing {len(VTU_FILES)} steps.")
+H_arr = _get(m, ["CrackDrivingForce", "crack_driving_force", "H"])
+if H_arr is not None:
+    H_arr = H_arr.reshape(-1)
+    H_hi = max(float(np.nanpercentile(H_arr, 99.0)), 1e-30)
+    plot_field(triang, H_arr,
+               output_path=os.path.join(OUTPUT_DIR, "crack_driving_force_field.png"),
+               title="Crack-driving force H (non-dim. AT2: H = (2 lc/Gc) psi+)",
+               cbar_label="H", cmap="magma", vmin=0.0, vmax=H_hi)
+    print("[INFO] crack_driving_force_field.png saved")
 
-# energy balance
-energy_file = os.path.join("energies.txt")
+
+# ----- global energy balance from energies.txt ------------------------------
+# NOTE: the same plot is reproduced by `plot_energy_balance.py` as a
+# standalone script that accepts an `OUTPUT_DIR` positional argument. Use
+# that script for post-hoc plotting against a saved backup directory
+# (e.g. output_starconvex_g00/) without disturbing the live-run state at
+# the case root. The block below is preserved here so a single
+# `./Allrun` end-to-end pipeline still produces every diagnostic.
+energy_file = os.path.join(CASE_DIR, "energies.txt")
 if os.path.exists(energy_file):
     data = np.genfromtxt(energy_file, names=True, skip_header=0)
-    
+    # Total expected E_frac at Ambati's hybrid arrest = Gc * (Dn + arc), where
+    # arc ~= 0.55 mm is the additional propagated length from the notch tip
+    # to the arrest point (estimated from Ambati Fig. 12d, p.398). The Dn
+    # contribution is the Gamma-convergent fracture energy of the prescribed
+    # D = 1 BC on the notch slit, already counted in E_frac from step 0.
+    ambati_arc       = 0.55e-3
+    ambati_total_len = Dn + ambati_arc
+    E_frac_notch     = Gc * Dn
+    E_frac_target    = Gc * ambati_total_len
     plt.figure(figsize=(8, 5))
-    plt.plot(data['Step'], data['E_el'], 'b-o', label='Elastic Energy ($E_{el}$)')
-    plt.plot(data['Step'], data['E_frac'], 'r-s', label='Fracture Energy ($E_{frac}$)')
-    plt.plot(data['Step'], data['E_tot'], 'k--', label='Total Energy ($E_{tot}$)')
-    
-    plt.xlabel('Step')
-    plt.ylabel('Energy (J)')
-    plt.title('Z3ST: Global energy balance')
-    plt.grid(True, ls=':', alpha=0.6)
-    plt.legend()
+    plt.plot(data["Step"], data["E_el"],   "b-o", markersize=3, label=r"Elastic $E_{el}$")
+    plt.plot(data["Step"], data["E_frac"], "r-s", markersize=3, label=r"Fracture $E_{frac}$")
+    plt.plot(data["Step"], data["E_tot"],  "k--", lw=1.5, label=r"Total $E_{tot}$")
+    plt.axhline(E_frac_notch, color="gray", ls="--", alpha=0.5,
+                label=rf"Gc * Dn = {E_frac_notch:.2f} J (notch baseline, step 0)")
+    plt.axhline(E_frac_target, color="gray", ls=":", alpha=0.7,
+                label=rf"Gc * (Dn + 0.55 mm) = {E_frac_target:.2f} J (Ambati Fig. 12d total)")
+    plt.xlabel("Step")
+    plt.ylabel("Energy (J)")
+    plt.title("Global energy balance")
+    plt.grid(True, ls=":", alpha=0.6)
+    plt.legend(loc="upper left", fontsize="small")
     plt.tight_layout()
-    plt.savefig(os.path.join(OUTPUT_DIR, "energy_balance.png"))
+    plt.savefig(os.path.join(OUTPUT_DIR, "energy_balance.png"), dpi=200)
+    plt.close()
     print("[INFO] energy_balance.png saved")
-
-# Sigma-epsilon
-plt.figure(figsize=(7, 5))
-plt.plot(strains, stresses, "--o", lw=2, label="Numerical")
-plt.xlabel(r"strain $\epsilon_{yy}$ (/)")
-plt.ylabel(r"stress $\sigma_{yy}$ (Pa)")
-plt.grid(True)
-plt.title("Stress-strain curve")
-plt.yscale("linear")
-plt.legend()
-plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
-print("[INFO] stress_strain_curve.png saved\n")
-
-# Damage
-steps = np.arange(len(VTU_FILES))
-
-fig, ax1 = plt.subplots(figsize=(9, 6))
-
-ax1.set_xlabel('Step')
-ax1.set_ylabel('Damage $D$ / History $H$', color='tab:red')
-lns1 = ax1.plot(steps, d_max_list, 'r-o', lw=2, label='Max Damage $D$')
-lns2 = ax1.plot(steps, h_max_list / np.max(h_max_list) if np.max(h_max_list)>0 else h_max_list, 
-                'g--', lw=1.5, label='Normalized $H$')
-ax1.set_ylim(-0.05, 1.1)
-ax1.tick_params(axis='y', labelcolor='tab:red')
-ax1.grid(True, ls=':', alpha=0.6)
-
-ax2 = ax1.twinx()
-ax2.set_ylabel(r'Stress $\sigma_{yy}$ (MPa)', color='tab:blue')
-lns3 = ax2.plot(steps, np.array(stresses)*1e-6, 'b-s', lw=2, label=r'$\sigma_{yy}$ Mean at Tip')
-ax2.axhline(sigma_c * 1e-6, color='black', ls=':', alpha=0.4, label=r'Critical $\sigma_c$')
-ax2.tick_params(axis='y', labelcolor='tab:blue')
-
-lns = lns1 + lns2 + lns3
-labs = [l.get_label() for l in lns]
-ax1.legend(lns, labs, loc='center left', frameon=True, shadow=True)
-
-plt.title(f"Z3ST: Crack initiation & softening\nNotch tip evolution (x={x_target:.3f}m)")
-fig.tight_layout()
-plt.savefig(os.path.join(OUTPUT_DIR, "damage_evolution.png"), dpi=300)
+    print(f"          final  E_el = {data['E_el'][-1]:.3f} J, "
+          f"E_frac = {data['E_frac'][-1]:.3f} J  (step {int(data['Step'][-1])})")
+else:
+    print(f"[WARN] {energy_file} not found; skipping energy plot.")

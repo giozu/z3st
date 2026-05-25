@@ -6,6 +6,6 @@ echo "Cleaning current directory..."
 rm -rf output
 rm -f *.msh
 rm -f *.png
-rm -f log.*
+rm -f log_*.md
 
 echo "Done. Output and temporary files deleted."

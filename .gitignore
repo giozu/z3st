@@ -26,6 +26,7 @@ non-regression.json
 # --. Data / results / figures --..
 *.csv
 *.png
+*.pdf
 
 # --. Mesh and simulation outputs --..
 *.msh

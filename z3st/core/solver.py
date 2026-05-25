@@ -8,6 +8,7 @@ import dolfinx
 import numpy as np
 import ufl
 from dolfinx.fem.petsc import NonlinearProblem
+from mpi4py import MPI
 from petsc4py import PETSc
 
 
@@ -127,6 +128,20 @@ class Solver:
 
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
 
+        analysis = self.th_cfg.get("analysis", "stationary")
+
+        # Transient mode with dt=0: preserve IC, only apply BCs
+        if analysis == "transient" and self.dt <= 0:
+            print("\n[INFO] Transient thermal: dt=0 → preserving initial condition (applying BCs only)")
+            bcs_thermal_actual = [
+                bc["value"] if isinstance(bc, dict) else bc
+                for _, bc_list in self.dirichlet_thermal.items()
+                for bc in bc_list
+            ]
+            dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
+            T_new.x.scatter_forward()
+            return True, 0.0, 0.0, prev_res_T
+
         T_old.x.array[:] = T_new.x.array
 
         print("\n[INFO] Assembling thermal problem...")
@@ -135,6 +150,8 @@ class Solver:
         L_t = 0
 
         w = self.weight
+        dt = self.dt
+        transient = analysis == "transient"
 
         # Volume integrals
         for label, material in self.materials.items():
@@ -143,9 +160,21 @@ class Solver:
 
             print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
             k = material["k"]
+            rho = material["rho"]
+            cp = material["cp"]
+            rho_cp = rho * cp
 
+            # Diffusion + source (always present)
             a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
             L_t += w * self.q_third * v_t * dx
+
+            # Mass term (backward Euler, only for transient)
+            # self.T holds the converged temperature from the previous time step (T^n)
+            # T_old is used for stagger relaxation only, not for backward Euler
+            if transient:
+                rho_cp_dt = rho_cp / dt
+                a_t += w * rho_cp_dt * u_t * v_t * dx
+                L_t += w * rho_cp_dt * self.T * v_t * dx
 
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
             q_vals = self.q_third.x.array[dofs]
@@ -161,29 +190,40 @@ class Solver:
                 ds_neumann = self.ds_tags[bc_info["id"]]
                 L_t += w * (-bc_info["value"]) * v_t * ds_neumann
 
-        # Gap (Robin)
+        # Robin BCs (gap or convective)
         h_gap = self.set_gap_conductance(T_new)
 
         for label in self.materials:
             for bc_info in self.robin_thermal[label]:
-                print(f"  Applying thermal Robin BC on subdomain id = {bc_info['id']}")
                 region_id = bc_info["id"]
-                pair_region = bc_info["pair"]
-                ds_interface = self.ds_tags[region_id]
+                ds_robin = self.ds_tags[region_id]
 
-                T_other = dolfinx.fem.Function(self.V_t)
-                dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
-                dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
-                T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
+                if "pair" in bc_info:
+                    # Gap mode: h from gap model, T_ext from paired subdomain
+                    pair_region = bc_info["pair"]
+                    T_other = dolfinx.fem.Function(self.V_t)
+                    dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
+                    dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
+                    T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
 
-                a_t += w * h_gap * u_t * v_t * ds_interface
-                L_t += w * h_gap * T_other * v_t * ds_interface
+                    a_t += w * h_gap * u_t * v_t * ds_robin
+                    L_t += w * h_gap * T_other * v_t * ds_robin
+                    print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'")
 
-                print(
-                    f"  [INFO] Gap Robin BC between '{label}' "
-                    f"(region={region_id}) and '{pair_region}' "
-                    f"(region={self.label_map[pair_region]})"
-                )
+                else:
+                    # Convective mode: fixed h_conv and T_ext
+                    h_conv = bc_info["h_conv"]
+                    T_ext = bc_info["T_ext"]
+                    a_t += w * h_conv * u_t * v_t * ds_robin
+                    L_t += w * h_conv * T_ext * v_t * ds_robin
+                    print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
+
+        # Extract actual DirichletBC objects (handles both dict and direct BCs)
+        bcs_thermal_actual = [
+            bc["value"] if isinstance(bc, dict) else bc
+            for _, bc_list in self.dirichlet_thermal.items()
+            for bc in bc_list
+        ]
 
         # Solve
         if self.th_cfg["solver"] == "linear":
@@ -203,11 +243,15 @@ class Solver:
             )
             dolfinx.fem.set_bc(T_new.x.array, bcs_t)
             problem_t.solve()
+            print(f"  T_new: min={T_new.x.array.min():.2f} K, max={T_new.x.array.max():.2f} K, mean={T_new.x.array.mean():.2f} K")
+            if transient:
+                print(f"  T^n (self.T): min={self.T.x.array.min():.2f} K, max={self.T.x.array.max():.2f} K")
         else:
             print("  [ERROR] Non-linear thermal solver not yet implemented.")
 
         # Relax
-        T_new.x.array[:] = self.relax_T * T_new.x.array + (1 - self.relax_T) * T_old.x.array
+        T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
+        dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
 
         # Convergenza (norma o rel_norm)
         T_new.x.scatter_forward()
@@ -221,7 +265,7 @@ class Solver:
 
         norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
         norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-12 else norm_dT
+        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-15 else norm_dT
 
         if self.th_cfg["convergence"] == "norm":
             print(f"  ||ΔT|| = {norm_dT:.3e}")
@@ -234,18 +278,20 @@ class Solver:
 
         if self.relax_adaptive:
             if prev_res_T is not None:
-                if res_curr < prev_res_T:
+                ema_alpha = 0.3
+                ema_T = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_T
+                if res_curr < ema_T:
                     self.relax_T = min(self.relax_T * self.relax_growth, self.relax_max)
                 else:
                     self.relax_T = max(self.relax_T * self.relax_shrink, self.relax_min)
-            prev_res_T = res_curr
+                prev_res_T = ema_T
+            else:
+                prev_res_T = res_curr
             print(f"  [adaptive] relax_T={self.relax_T:.2f}")
 
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
-    def _mechanical_step(
-        self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current
-    ):
+    def _mechanical_step(self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current):
 
         u_old.x.array[:] = u_new.x.array
         print("\n[INFO] Assembling mechanical problem...")
@@ -260,8 +306,9 @@ class Solver:
                 raw = bc.get("raw", None)
                 if isinstance(raw, list):
                     idx = min(self.current_step, len(raw) - 1)
-                    bc["const"].value = raw[idx]
-                    print(f"  [INFO] Updating Dirichlet on region {bc['id']} → {raw[idx]}")
+                    val = raw[idx]
+                    bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
+                    print(f"  [INFO] Updating Displacement Dirichlet on region {bc['id']} → {val}")
 
         # --- update step-dependent tractions ---
         for _, bc_list in self.traction.items():
@@ -315,8 +362,15 @@ class Solver:
                 if self.on.get("thermal", False):
                     L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
             else:
-                sigma = self.sigma_mech(u_new, material)
-                F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - ufl.dot(body_force, v_m) * dx
+                mode = material.get("constitutive_mode", "lame")
+                if mode == "hyperelastic":
+                    F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
+                    F_m -= w * ufl.dot(body_force, v_m) * dx
+                    if self.on.get("thermal", False):
+                        F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+                else:
+                    sigma = self.sigma_mech(u_new, material)
+                    F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
 
         # Traction BCs
         for label in self.materials:
@@ -354,24 +408,51 @@ class Solver:
             dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
             problem_m.solve()
         else:
-            print("  Non-linear solver")
-            petsc_opts_mech = self.get_solver_options(
-                solver_type=self.mech_cfg["linear_solver"],
-                physics="mechanical",
-                rtol=rtol_mech,
-            )
+            print("  Non-linear solver (SNES Newton)")
+            linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")
+
+            # SNES Newton options + inner linear solver
+            if linear_solver == "direct_mumps":
+                petsc_opts_mech = {
+                    "snes_type": "newtonls",
+                    "snes_linesearch_type": "basic",
+                    "snes_atol": rtol_mech,
+                    "snes_rtol": rtol_mech,
+                    "snes_max_it": int(self.mech_cfg.get("snes_max_it", 50)),
+                    "ksp_type": "preonly",
+                    "pc_type": "lu",
+                    "pc_factor_mat_solver_type": "mumps",
+                }
+            else:
+                # Iterative inner solver (AMG / HYPRE)
+                ksp_opts = self.get_solver_options(
+                    solver_type=linear_solver,
+                    physics="mechanical",
+                    rtol=rtol_mech,
+                )
+                petsc_opts_mech = {
+                    "snes_type": "newtonls",
+                    "snes_linesearch_type": "bt",
+                    "snes_atol": rtol_mech,
+                    "snes_rtol": rtol_mech,
+                    "snes_max_it": 100,
+                    "snes_divergence_tolerance": 1e10,
+                    **ksp_opts,
+                }
+
             problem_m = NonlinearProblem(
                 F_m,
                 u_new,
                 bcs=bcs_mech,
                 petsc_options=petsc_opts_mech,
-                petsc_options_prefix="elasticity",
+                petsc_options_prefix="elasticity_",
             )
             dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
             problem_m.solve()
 
         # Relax
         u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
+        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
 
         # Convergence
         u_new.x.scatter_forward()
@@ -385,7 +466,7 @@ class Solver:
 
         norm_du = diff_u.norm(PETSc.NormType.NORM_2)
         norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_du = norm_du / norm_u if norm_u > 1e-12 else norm_du
+        rel_norm_du = norm_du / norm_u if norm_u > 1e-15 else norm_du
 
         if self.mech_cfg["convergence"] == "norm":
             print(f"  ||Δu|| = {norm_du:.3e}")
@@ -398,11 +479,15 @@ class Solver:
 
         if self.relax_adaptive:
             if prev_res_u is not None:
-                if res_curr < prev_res_u:
+                ema_alpha = 0.3
+                ema_u = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_u
+                if res_curr < ema_u:
                     self.relax_u = min(self.relax_u * self.relax_growth, self.relax_max)
                 else:
                     self.relax_u = max(self.relax_u * self.relax_shrink, self.relax_min)
-            prev_res_u = res_curr
+                prev_res_u = ema_u
+            else:
+                prev_res_u = res_curr
             print(f"  [adaptive] relax_u={self.relax_u:.2f}")
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
@@ -446,19 +531,44 @@ class Solver:
 
             elif damage_type == "AT1":
 
-                cw = 8.0 / 3.0 
-                pref = Gc / cw
-                
-                tol_ir = 0.05
-                gamma_penalty = (Gc / lc) * (27.0 / (64.0 * tol_ir**2))
-                w_act = (3.0 * Gc) / (8.0 * lc)
+                # AT1 surface energy density (Pham-Marigo-Bourdin convention):
+                #   E_s = (3*Gc/8) * integral( D/lc + lc * |grad D|^2 ) dx
+                # Variation w.r.t. D yields the strong form
+                #   -(3*Gc*lc/4) * Laplacian(D) + 2*H*D = 2*H - 3*Gc/(8*lc)
+                # The constant -3*Gc/(8*lc) on the RHS produces the sharp
+                # AT1 elastic threshold: no damage until 2H > 3*Gc/(8*lc),
+                # i.e. sigma > sigma_c.
+                #
+                # Irreversibility (D_n+1 >= D_n) is enforced after the
+                # linear solve via np.maximum(D_new, D_old). A symmetric
+                # (D - D_old)^2 penalty in the weak form would freeze
+                # D ~= D_old whenever the penalty coefficient dominates the
+                # driving force 2H, which is the typical regime in
+                # thermal-shock cases where 2H is small. The post-solve
+                # max-projection is the correct one-sided enforcement.
+                #
+                # A small Tikhonov shift (diag_shift) stabilises the linear
+                # system in cells where H = 0 (otherwise the LHS bilinear
+                # form would be just the Laplacian, which is positive
+                # semi-definite with a constant nullspace under natural BCs).
+                cw = 8.0 / 3.0
+                pref = Gc / cw                       # = 3*Gc/8  (surface density coeff)
+                grad_coeff = 2.0 * pref * lc         # = 3*Gc*lc/4 (bilinear form coeff)
+                diag_shift = 1.0e-8 * (Gc / lc)
 
-                print(f"  - Material '{label}': AT1 solve. Gc={Gc:.2e}, Gamma={gamma_penalty:.2e}")
+                # Gc and sigma_c may be UFL expressions (when the material's
+                # Gc comes from a Python callable on the mesh, e.g.
+                # materials/oxide.py::Gc). The {:.2e} format then raises
+                # TypeError. Format scalars normally; show a type tag for
+                # non-scalars.
+                Gc_str = f"{Gc:.2e}" if isinstance(Gc, (int, float, np.floating, np.integer)) else f"<{type(Gc).__name__}>"
+                sc_str = f"{sigma_c:.2e}" if isinstance(sigma_c, (int, float, np.floating, np.integer)) else f"<{type(sigma_c).__name__}>"
+                print(f"  - Material '{label}': AT1 solve. Gc={Gc_str}, sigma_c={sc_str}")
 
-                a_d += w*(2.0 * self.H + gamma_penalty) * u_d * v_d * dx + \
-                    (pref * lc) * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
-                                                
-                L_d += w*(2.0 * self.H - (pref / lc) + gamma_penalty * D_old) * v_d * dx
+                a_d += w * (2.0 * self.H + diag_shift) * u_d * v_d * dx \
+                     + w * grad_coeff * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
+
+                L_d += w * (2.0 * self.H - (pref / lc)) * v_d * dx
 
         petsc_opts_damage = self.get_solver_options(
             physics="damage",
@@ -480,10 +590,7 @@ class Solver:
             # Clipping:
             D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
-        # Relax
         D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
-
-        # irreversibility
         D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
@@ -499,7 +606,7 @@ class Solver:
 
         norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
         norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-12 else norm_dD
+        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-15 else norm_dD
 
         if self.dmg_cfg["convergence"] == "norm":
             print(f"  ||ΔD|| = {norm_dD:.3e}")
@@ -512,11 +619,15 @@ class Solver:
 
         if self.relax_adaptive:
             if prev_res_D is not None:
-                if res_curr < prev_res_D:
+                ema_alpha = 0.3
+                ema_D = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_D
+                if res_curr < ema_D:
                     self.relax_D = min(self.relax_D * self.relax_growth, self.relax_max)
                 else:
                     self.relax_D = max(self.relax_D * self.relax_shrink, self.relax_min)
-            prev_res_D = res_curr
+                prev_res_D = ema_D
+            else:
+                prev_res_D = res_curr
             print(f"  [adaptive] relax_D={self.relax_D:.2f}")
 
         # Residual in L_inf norm
@@ -560,8 +671,16 @@ class Solver:
 
         # Péclet number diagnostics
         num_cells = self.mesh.topology.index_map(self.mesh.topology.dim).size_global
-        coords = self.mesh.geometry.x[:, 0]
-        L_domain = coords.max() - coords.min()
+        local_coords = self.mesh.geometry.x[:, 0]
+        if local_coords.size > 0:
+            x_min_local = float(local_coords.min())
+            x_max_local = float(local_coords.max())
+        else:
+            x_min_local = float("inf")
+            x_max_local = float("-inf")
+        x_min = self.mesh.comm.allreduce(x_min_local, op=MPI.MIN)
+        x_max = self.mesh.comm.allreduce(x_max_local, op=MPI.MAX)
+        L_domain = x_max - x_min
         h_cell = L_domain / num_cells
         v = abs(self.v_cluster)
         D = self.D_cluster
@@ -623,7 +742,10 @@ class Solver:
         x = ufl.SpatialCoordinate(self.mesh)
         n_coord = x[0]
         
-        C_tot_curr_new = dolfinx.fem.assemble_scalar(dolfinx.fem.form(c_new * n_coord * ufl.dx))
+        C_tot_curr_new = self.mesh.comm.allreduce(
+            dolfinx.fem.assemble_scalar(dolfinx.fem.form(c_new * n_coord * ufl.dx)),
+            op=MPI.SUM,
+        )
         
         if self.C_tot_target is not None:
             if abs(C_tot_curr_new) > 0.0:
@@ -636,7 +758,8 @@ class Solver:
             else:
                 print("  [Cluster] Warning: mass is zero, cannot renormalize.")
 
-        c_max = np.max(c_new.x.array)
+        c_max_local = float(np.max(c_new.x.array)) if c_new.x.array.size > 0 else float("-inf")
+        c_max = self.mesh.comm.allreduce(c_max_local, op=MPI.MAX)
         print(f"   [Diagnostics] Max density c_max: {c_max:.2f}")
 
     def solve_staggered(
@@ -719,21 +842,25 @@ class Solver:
                     T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
                 )
 
+            # --. MECHANICAL STEP --..
+            if self.on.get("mechanical", False):
+                conv_mech, _, _, prev_res_u = self._mechanical_step(
+                    u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
+                )
+
             # --. DAMAGE STEP --..
             if self.on.get("damage", False):
-                self.update_history(u_new) 
+                # Pass T_new so the damage driving force uses the elastic strain
+                # (eps - alpha*(T - T_ref)*I), not the total strain. Without this,
+                # uniform thermal expansion in the bulk produces a spurious psi_pos
+                # that drives damage in unstressed regions.
+                self.update_history(u_new, T=T_new)
                 conv_damage, _, _, prev_res_D = self._damage_step(
                     D_new,
                     D_old,
                     rtol_dmg,
                     stag_tol_dmg,
                     prev_res_D,
-                )
-
-            # --. MECHANICAL STEP --..
-            if self.on.get("mechanical", False):
-                conv_mech, _, _, prev_res_u = self._mechanical_step(
-                    u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
                 )
             
             # --. CLUSTER STEP --..
@@ -763,7 +890,7 @@ class Solver:
 
                 return True
 
-        # --- IF NOT CONVERGED ---
+        # --. IF NOT CONVERGED --..
         print("\n[WARNING] Staggered solver did not converge. Using last iteration state.")
 
         if self.on.get("thermal", False):
@@ -772,7 +899,6 @@ class Solver:
             self.u.x.array[:] = u_new.x.array
         if self.on.get("damage", False):
             self.D.x.array[:] = D_new.x.array
-            
         if self.on.get("cluster", False):
             self.c.x.array[:] = c_new.x.array
 
