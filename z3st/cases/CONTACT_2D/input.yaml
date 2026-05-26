@@ -45,7 +45,7 @@ thermal:
   convergence: rel_norm # rel_norm | norm
 
 lhr:
-- 0.0
+- 0.0     # load history ratio (LHR) at time 0.0
 time:
 - 0.0
 n_steps: 1

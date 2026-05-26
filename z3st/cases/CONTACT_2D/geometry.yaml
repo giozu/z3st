@@ -1,13 +1,19 @@
-name: cylindrical_shell
+name: contact_2d
 geometry_type: cyl
 
-Ri: 0.02 # inner radius (m)
-Ro: 0.03 # outer radius (m)
-Lz: 0.50 # height (m)
+Lx_ext: 0.2 # (m)
+Ly_ext: 0.3 # (m)
+Lx_int: 0.19 # (m)
+Ly_int: 0.29 # (m)
 
 labels:
-  inner_radius: 1
-  outer_radius: 2
-  bottom: 3
-  top: 4
-  steel: 10
+  inner_radius_o: 1
+  outer_radius_o: 2
+  bottom_o: 3
+  top_o: 4
+  inner_radius_in: 5
+  outer_radius_in: 6
+  bottom_in: 7
+  top_in: 8
+  steel_o: 10
+  steel_i: 11

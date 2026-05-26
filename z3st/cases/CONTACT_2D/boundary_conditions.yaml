@@ -1,22 +1,22 @@
 thermal:
   steel:
   - type: Dirichlet
-    region: inner_radius
+    region: inner_radius_o
     temperature: 300.0   # (K)
 
 mechanical:
   steel:
   - type: Clamp_y
-    region: bottom
+    region: bottom_o
 
   - type: Clamp_y
-    region: top
+    region: top_o
     value: -1.359155e-06   # (m)
 
   - type: Neumann
-    region: inner_radius
+    region: inner_radius_o
     traction: -1.0e+6   # (Pa)
 
   - type: Neumann
-    region: outer_radius
+    region: outer_radius_o
     traction: 0.0   # (Pa)
