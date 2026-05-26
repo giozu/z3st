@@ -1,7 +1,7 @@
 Info    : Reading 'mesh.msh'...
-Info    : 18 entities
-Info    : 3069 nodes
-Info    : 3452 elements
+Info    : 26 entities
+Info    : 6498 nodes
+Info    : 10594 elements
 Info    : Done reading 'mesh.msh'
 
 
