@@ -43,7 +43,7 @@ Plane Surface(1) = {1, 2};
 Plane Surface(2) = {2};
 
 // === Maillage structuré ===
-nx = 81;  // Divisions en X (comme dans ton exemple)
+nx = 81;  // Divisions en X 
 ny = 81;  // Divisions en Y
 
 // Transfinite pour les lignes extérieures
@@ -51,11 +51,14 @@ Transfinite Line{1, 3} = nx;
 Transfinite Line{2, 4} = ny;
 
 // Transfinite pour les lignes intérieures
-Transfinite Line{5, 7} = nx - 20;  // 21 divisions
-Transfinite Line{6, 8} = ny - 40;  // 41 divisions
+Transfinite Line{5, 7} = nx - 20;  
+Transfinite Line{6, 8} = ny - 40;  
 
 // Transfinite pour les surfaces
-Transfinite Surface{1};
+// La surface 1 contient un trou (boucle intérieure) et ne peut pas
+// être marquée `Transfinite Surface` (elle a 8 "coins").
+// On garde le transfinite uniquement pour la surface intérieure.
+//Transfinite Surface{1};
 Transfinite Surface{2};
 
 // Recombine pour obtenir des quadrilatères
@@ -63,8 +66,16 @@ Recombine Surface{1};
 Recombine Surface{2};
 
 // === Groupes physiques ===
-Physical Surface("domaine_exterieur", 10) = {1};  // Zone entre les rectangles
-Physical Surface("rectangle_interieur", 11) = {2}; // Rectangle intérieur maillé
+Physical Surface("steel_o", 10) = {1};  // Zone entre les rectangles
+Physical Surface("steel_i", 11) = {2}; // Rectangle intérieur maillé
+Physical Curve("inner_radius_o", 1) = {4};
+Physical Curve("outer_radius_o", 2) = {2};
+Physical Curve("bottom_o", 3) = {1};
+Physical Curve("top_o", 4) = {3};
+Physical Curve("inner_radius_in", 5) = {8};
+Physical Curve("outer_radius_in", 6) = {6};
+Physical Curve("bottom_in", 7) = {5};
+Physical Curve("top_in", 8) = {7};
 
 // === Génération du maillage ===
 Mesh 2;
