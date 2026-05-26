@@ -1,7 +1,7 @@
 thermal:
   steel:
   - type: Dirichlet
-    region: inner_radius_o
+    region: left_radius_o
     temperature: 300.0   # (K)
 
 mechanical:
@@ -14,9 +14,41 @@ mechanical:
     value: -1.359155e-06   # (m)
 
   - type: Neumann
-    region: inner_radius_o
+    region: left_radius_o
     traction: -1.0e+6   # (Pa)
 
   - type: Neumann
-    region: outer_radius_o
+    region: right_radius_o
+    traction: 0.0   # (Pa)
+  
+  - type: Neumann
+    region: bottom_mid_o
+    traction: 0.0   # (Pa)
+  
+  - type: Neumann
+    region: top_mid_o
+    traction: 0.0   # (Pa)    
+
+  - type: Neumann
+    region: left_radius_in
+    traction: 0.0   # (Pa)
+  
+  - type: Neumann  
+    region: right_radius_in
+    traction: 0.0   # (Pa)  
+
+  - type: Neumann
+    region: bottom_in
+    traction: -0.0   # (Pa)
+  
+  - type: Neumann
+    region: top_in
+    traction: -0.0   # (Pa) 
+
+  - type: Neumann
+    region: left_mid_in
+    traction: 0.0   # (Pa)    
+
+  - type: Neumann
+    region: right_mid_in
     traction: 0.0   # (Pa)

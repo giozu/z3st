@@ -5,16 +5,16 @@ Z3ST case: thick_cylindrical_shell_GPS_2D
 
 non-regression script
 ---------------------
-Analytical non-regression for a 2D thick-walled cylindrical shell under
+Analytical non-regression for two cylindrical shells in contact under
 internal (Pi) and external (Po) pressure.
 Reference is the Lamé solution under generalized plane strain.
-
 """
 
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
@@ -25,12 +25,27 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.50  # m          inner and outer radius, height
+geometry_path = os.path.join(CASE_DIR, "geometry.yaml")
+with open(geometry_path, "r") as f:
+    geom = yaml.safe_load(f)
+
+Lx_ext = float(geom.get("Lx_ext", 0.20))
+Ly_ext = float(geom.get("Ly_ext", 0.30))
+Lx_int = float(geom.get("Lx_int", 0.19))
+Ly_int = float(geom.get("Ly_int", 0.29))
+Lx_mid = float(geom.get("Lx_mid", 0.095))
+Ly_mid = float(geom.get("Ly_mid", 0.145))
+
+Ri = Lx_int / 2.0
+Ro = Lx_ext / 2.0
+
+t = Ro - Ri
+slenderness = Ri / t if t != 0 else np.nan
+z_target = Ly_ext / 2.0
+z_tol = 0.01
+
 Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
 E, nu = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
-t = Ro - Ri  # m          wall thickness
-slenderness = Ri / t  # -          slenderness ratio
-z_target, z_tol = Lz / 2, 0.01  # m          z-plane for data extraction
 
 TOLERANCE = 5.0e-3  # -          tolerance for non-regression
 
@@ -90,7 +105,7 @@ sigma_zz_ana_L = sigma_zz_ana_L * np.ones_like(r_s)
 
 epsilon_rr_ana_L = epsilon_rr_ref(r_s)
 epsilon_tt_ana_L = epsilon_tt_ref(r_s)
-epsilon_zz_ana_L = np.ones_like(r_s) * eps_zz_GPS  # generalized plane strain
+epsilon_zz_ana_L = np.ones_like(r_s) * eps_zz_GPS
 
 # Average stress
 sigma_zz_ana_M = sigma_zz_ana_M * np.ones_like(r_s)
@@ -103,91 +118,46 @@ sigma_zz_avg = 2 / (Ro**2 - Ri**2) * np.trapezoid(sigma_zz * r_s, r_s)
 Pa_to_MPa = 1e-6
 
 plt.figure(figsize=(10, 7))
-
-# Stress
 ax1 = plt.gca()
-ax1.plot(
-    r_s, sigma_rr * Pa_to_MPa, "ro", label=r"Num. $\sigma_{rr}$ (Radial)", markersize=4, alpha=0.6
-)
+ax1.plot(r_s, sigma_rr * Pa_to_MPa, "ro", label=r"Num. $\sigma_{rr}$ (Radial)", markersize=4, alpha=0.6)
 ax1.plot(r_s, sigma_rr_ana_L * Pa_to_MPa, "r-", label=r"Ana. $\sigma_{rr}$ (Radial)", linewidth=1.5)
-ax1.plot(
-    r_s,
-    sigma_tt * Pa_to_MPa,
-    "go",
-    label=r"Num. $\sigma_{\theta\theta}$ (Hoop)",
-    markersize=4,
-    alpha=0.6,
-)
-ax1.plot(
-    r_s,
-    sigma_tt_ana_L * Pa_to_MPa,
-    "g-",
-    label=r"Ana. $\sigma_{\theta\theta}$ (Hoop)",
-    linewidth=1.5,
-)
-ax1.plot(
-    r_s, sigma_zz * Pa_to_MPa, "bo", label=r"Num. $\sigma_{zz}$ (Axial)", markersize=4, alpha=0.6
-)
+ax1.plot(r_s, sigma_tt * Pa_to_MPa, "go", label=r"Num. $\sigma_{\theta\theta}$ (Hoop)", markersize=4, alpha=0.6)
+ax1.plot(r_s, sigma_tt_ana_L * Pa_to_MPa, "g-", label=r"Ana. $\sigma_{\theta\theta}$ (Hoop)", linewidth=1.5)
+ax1.plot(r_s, sigma_zz * Pa_to_MPa, "bo", label=r"Num. $\sigma_{zz}$ (Axial)", markersize=4, alpha=0.6)
 ax1.plot(r_s, sigma_zz_ana_L * Pa_to_MPa, "b-", label=r"Ana. $\sigma_{zz}$ (Axial)", linewidth=1.5)
-
 ax1.set_xlabel("Radius (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
 ax1.grid(True, linestyle="--", alpha=0.7)
-
 plt.legend()
 plt.tight_layout()
-
 plot_path = os.path.join(CASE_DIR, "output", "stress_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
 
-
-# Plot
 plt.figure(figsize=(10, 7))
-
-# Strain
 ax1 = plt.gca()
 ax1.plot(r_s, epsilon_rr, "ro", label=r"Num. $\varepsilon_{rr}$ (Radial)", markersize=4, alpha=0.6)
 ax1.plot(r_s, epsilon_rr_ana_L, "r-", label=r"Ana. $\varepsilon_{rr}$ (Radial)", linewidth=1.5)
-ax1.plot(
-    r_s,
-    epsilon_tt,
-    "go",
-    label=r"Num. $\varepsilon_{\theta\theta}$ (Hoop)",
-    markersize=4,
-    alpha=0.6,
-)
-ax1.plot(
-    r_s, epsilon_tt_ana_L, "g-", label=r"Ana. $\varepsilon_{\theta\theta}$ (Hoop)", linewidth=1.5
-)
+ax1.plot(r_s, epsilon_tt, "go", label=r"Num. $\varepsilon_{\theta\theta}$ (Hoop)", markersize=4, alpha=0.6)
+ax1.plot(r_s, epsilon_tt_ana_L, "g-", label=r"Ana. $\varepsilon_{\theta\theta}$ (Hoop)", linewidth=1.5)
 ax1.plot(r_s, epsilon_zz, "bo", label=r"Num. $\varepsilon_{zz}$ (Axial)", markersize=4, alpha=0.6)
 ax1.plot(r_s, epsilon_zz_ana_L, "b-", label=r"Ana. $\varepsilon_{zz}$ (Axial)", linewidth=1.5)
-
 ax1.set_xlabel("Radius (m)", fontsize=12)
 ax1.set_ylabel("Strain (/)", fontsize=12)
 ax1.grid(True, linestyle="--", alpha=0.7)
-
 plt.legend()
 plt.tight_layout()
-
 plot_path = os.path.join(CASE_DIR, "output", "strain_comparison.png")
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
-
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 err_rr = np.sqrt(np.mean((sigma_rr - sigma_rr_ana_L) ** 2)) / np.sqrt(np.mean(sigma_rr_ana_L**2))
 err_tt = np.sqrt(np.mean((sigma_tt - sigma_tt_ana_L) ** 2)) / np.sqrt(np.mean(sigma_tt_ana_L**2))
 err_zz = np.sqrt(np.mean((sigma_zz - sigma_zz_ana_L) ** 2)) / np.sqrt(np.mean(sigma_zz_ana_L**2))
-err_eps_rr = np.sqrt(np.mean((epsilon_rr - epsilon_rr_ana_L) ** 2)) / np.sqrt(
-    np.mean(epsilon_rr_ana_L**2)
-)
-err_eps_tt = np.sqrt(np.mean((epsilon_tt - epsilon_tt_ana_L) ** 2)) / np.sqrt(
-    np.mean(epsilon_tt_ana_L**2)
-)
-err_eps_zz = np.sqrt(np.mean((epsilon_zz - epsilon_zz_ana_L) ** 2)) / np.sqrt(
-    np.mean(epsilon_zz_ana_L**2)
-)
+err_eps_rr = np.sqrt(np.mean((epsilon_rr - epsilon_rr_ana_L) ** 2)) / np.sqrt(np.mean(epsilon_rr_ana_L**2))
+err_eps_tt = np.sqrt(np.mean((epsilon_tt - epsilon_tt_ana_L) ** 2)) / np.sqrt(np.mean(epsilon_tt_ana_L**2))
+err_eps_zz = np.sqrt(np.mean((epsilon_zz - epsilon_zz_ana_L) ** 2)) / np.sqrt(np.mean(epsilon_zz_ana_L**2))
 
 errors = {
     "L2_error_sigma_rr": {
