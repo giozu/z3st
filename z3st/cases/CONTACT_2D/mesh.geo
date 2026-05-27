@@ -79,8 +79,6 @@ Transfinite Line{10, 12} = mid_ny;
 // Transfinite pour la surface centrale
 Transfinite Surface{3};
 
-// Recombine pour obtenir des quadrilatères sur la surface centrale
-Recombine Surface{3};
 
 // === Groupes physiques ===
 

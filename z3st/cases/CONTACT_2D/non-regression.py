@@ -36,17 +36,24 @@ Ly_int = float(geom.get("Ly_int", 0.29))
 Lx_mid = float(geom.get("Lx_mid", 0.095))
 Ly_mid = float(geom.get("Ly_mid", 0.145))
 
-Ri = Lx_int / 2.0
-Ro = Lx_ext / 2.0
+Ri = Lx_mid / 2.0
+Ro = Lx_int / 2.0
+t = Lx_ext - Lx_int
+slenderness = Ly_ext / t if t != 0 else np.nan
 
-t = Ro - Ri
-slenderness = Ri / t if t != 0 else np.nan
-z_target = Ly_ext / 2.0
-z_tol = 0.01
+# This case is a 2D plane stress/strain problem in the XY plane.
+# The VTU mesh has z = 0 for all points, so the mid-plane should be
+# selected in the y direction, not z.
+y_target = Ly_ext / 2.0
+y_tol = 0.01
+Lz = float(geom.get("Lz", Ly_ext))
 
 Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
 E, nu = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
-
+P_gap= (Ro-Ri)/((1/E) * ( (Ro**2+Ri**2)/(Ro**2-Ri**2) + nu) + (1-nu)/E)  # (Pa)    
+for i in range(1,5) :    
+    print("\n")
+print(P_gap)
 TOLERANCE = 5.0e-3  # -          tolerance for non-regression
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
@@ -75,12 +82,12 @@ sigma_zz_ana_M = Pi * Ri / (2 * t)
 list_fields(VTU_FILE)
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
+print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
 
 # Numerical results
 # Stress
-x_S, z_S, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
-mask = np.abs(z_S - z_target) < z_tol
+x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+mask = np.abs(y_S - y_target) < y_tol
 sort_idx = np.argsort(x_S[mask])
 
 r_s = x_S[mask][sort_idx]
@@ -90,14 +97,13 @@ sigma_tt = S_all[mask, 4][sort_idx]
 sigma_zz = S_all[mask, 8][sort_idx]
 
 # Strain
-x_E, z_E, _, E_all = extract_field(VTU_FILE, field_name="Strain (cells)")
-mask = np.abs(z_E - z_target) < z_tol
+x_E, y_E, z_E, E_all = extract_field(VTU_FILE, field_name="Strain (cells)")
+mask = np.abs(y_E - y_target) < y_tol
 sort_idx = np.argsort(x_E[mask])
 
 epsilon_rr = E_all[mask, 0][sort_idx]
 epsilon_tt = E_all[mask, 4][sort_idx]
 epsilon_zz = E_all[mask, 8][sort_idx]
-
 # Analytical results
 sigma_rr_ana_L = A - B / r_s**2
 sigma_tt_ana_L = A + B / r_s**2
@@ -107,7 +113,7 @@ epsilon_rr_ana_L = epsilon_rr_ref(r_s)
 epsilon_tt_ana_L = epsilon_tt_ref(r_s)
 epsilon_zz_ana_L = np.ones_like(r_s) * eps_zz_GPS
 
-# Average stress
+# Average stres
 sigma_zz_ana_M = sigma_zz_ana_M * np.ones_like(r_s)
 
 sigma_rr_avg = 2 / (Ro**2 - Ri**2) * np.trapezoid(sigma_rr * r_s, r_s)
@@ -202,4 +208,4 @@ errors = {
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 regression_check(errors, CASE_DIR)
 
-print("\n[INFO] Non-regression completed.\n")
+print("\n[INFO]Non-regression completed.\n")
