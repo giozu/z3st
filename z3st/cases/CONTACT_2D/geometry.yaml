@@ -7,6 +7,9 @@ Lx_int: 0.019 # (m)
 Ly_int: 0.299 # (m)
 Lx_mid: 0.015 # (m)
 Ly_mid: 0.25 # (m)
+Lz: 0.3 # (m)
+Ri: 0.0075 # inner radius (m)
+Ro: 0.0095 # outer radius (m)
 
 labels:
   left_radius_o: 1

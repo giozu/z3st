@@ -9,9 +9,9 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../materials/steel.yaml
+  steel_o: ../../materials/steel.yaml
+  steel_mid: ../../materials/steel.yaml
 
-regime: axisymmetric
 
 solver_settings:
   coupling: staggered
