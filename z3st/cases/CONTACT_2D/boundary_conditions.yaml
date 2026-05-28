@@ -24,11 +24,11 @@ mechanical:
   steel_mid:
   - type: Clamp_y
     region: bottom_mid
-    traction: 0.0   # (Pa)
+    value: 0.0   # (m)
   
   - type: Clamp_y
     region: top_mid
-    traction: 0.0   # (Pa)    
+    value: 0.0   # (m)    
 
   - type: Neumann
     region: left_mid
@@ -47,9 +47,9 @@ mechanical:
     traction: 0.0   # (Pa) 
 
   - type: Neumann
-    region: left_in
+    region: left_radius_in
     traction: 75346260   # (Pa)    
 
   - type: Neumann
-    region: right_in
+    region: right_radius_in
     traction: 75346260   # (Pa)
