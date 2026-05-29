@@ -1,5 +1,5 @@
 Info    : Running '/home/turgis/miniconda3/envs/z3st/bin/gmsh mesh.geo -2' [Gmsh 4.15.2, 1 node, max. 1 thread]
-Info    : Started on Tue May 26 16:13:48 2026
+Info    : Started on Fri May 29 10:44:24 2026
 Info    : Reading 'mesh.geo'...
 Info    : Meshing 1D...
 Info    : [  0%] Meshing curve 1 (Line)
@@ -14,20 +14,20 @@ Info    : [ 70%] Meshing curve 9 (Line)
 Info    : [ 80%] Meshing curve 10 (Line)
 Info    : [ 90%] Meshing curve 11 (Line)
 Info    : [100%] Meshing curve 12 (Line)
-Info    : Done meshing 1D (Wall 0.00174993s, CPU 0.000689s)
+Info    : Done meshing 1D (Wall 0.00424832s, CPU 0.00425s)
 Info    : Meshing 2D...
 Info    : [  0%] Meshing surface 1 (Plane, Frontal-Delaunay)
 Info    : [ 60%] Meshing surface 3 (Transfinite)
-Info    : Done meshing 2D (Wall 0.220255s, CPU 0.20586s)
-Info    : 6498 nodes 10606 elements
+Info    : Done meshing 2D (Wall 0.446161s, CPU 0.436258s)
+Info    : 6498 nodes 13006 elements
 Info    : Writing 'mesh.msh'...
 Info    : Done writing 'mesh.msh'
 Info    : Done reading 'mesh.geo'
 Info    : Meshing 2D...
 Info    : [  0%] Meshing surface 1 (Plane, Frontal-Delaunay)
 Info    : [ 60%] Meshing surface 3 (Transfinite)
-Info    : Done meshing 2D (Wall 0.212697s, CPU 0.212696s)
-Info    : 6498 nodes 10606 elements
+Info    : Done meshing 2D (Wall 0.455233s, CPU 0.455214s)
+Info    : 6498 nodes 13006 elements
 Info    : Writing 'mesh.msh'...
 Info    : Done writing 'mesh.msh'
-Info    : Stopped on Tue May 26 16:13:49 2026 (From start: Wall 0.517125s, CPU 1.07242s)
+Info    : Stopped on Fri May 29 10:44:25 2026 (From start: Wall 1.14155s, CPU 1.59684s)
