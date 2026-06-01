@@ -1,0 +1,10 @@
+name: bar_1d
+geometry_type: rect
+
+Lx: 1.000   # bar length (m)
+Ly: 0.0     # placeholder, unused in 1D
+
+labels:
+  xmin: 1
+  xmax: 2
+  steel: 3
