@@ -115,7 +115,15 @@ class MechanicalModel:
 
                     # --- create constant ---
                     initial_disp = raw_value[0]
-                    disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
+                    # On a 1D mesh V_u is built with a blocked element of shape
+                    # (1,), which dolfinx treats as a scalar function space.
+                    # The Constant must then be rank-0, not a length-1 vector,
+                    # otherwise dirichletbc raises "Rank mismatch between
+                    # Constant and function space".
+                    if self.tdim == 1:
+                        disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp[0]))
+                    else:
+                        disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
 
                     dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
                     bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
@@ -157,7 +165,15 @@ class MechanicalModel:
 
                     # normal vector according to the mechanical regime
                     regime = self.regime
-                    if regime in ["axisymmetric", "2d", "plane_stress"]:
+                    if self.mgr.tdim == 1:
+                        # 1D mesh: V_m has one component; the test function v_m
+                        # is rank-1 of size 1, so the traction n_vec must be a
+                        # 1-vector. self.normal still has gdim = 3 entries
+                        # because gmsh stores 3D node coords; we only keep the
+                        # axial component (which is the only physically
+                        # meaningful one on a line).
+                        n_vec = ufl.as_vector([self.normal[0]])
+                    elif regime in ["axisymmetric", "2d", "plane_stress"]:
                         n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                     else:
                         n_vec = self.normal
@@ -214,8 +230,17 @@ class MechanicalModel:
                         sys.exit(1)
 
                     disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(raw_value[0]))
-                    dofs = dolfinx.fem.locate_dofs_topological(V_u.sub(c_idx), self.fdim, facets)
-                    bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u.sub(c_idx))
+                    # On a 1D mesh V_u has a single component (shape (1,)) and
+                    # dolfinx refuses V_u.sub(0) -- "Cannot extract subsystem...
+                    # no subsystems". Since the check at line ~200 already
+                    # rejects Clamp_y / Clamp_z for tdim==1, the only valid
+                    # component is c_idx == 0, which IS V_u itself.
+                    if self.tdim == 1:
+                        dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
+                        bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
+                    else:
+                        dofs = dolfinx.fem.locate_dofs_topological(V_u.sub(c_idx), self.fdim, facets)
+                        bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u.sub(c_idx))
 
                     self.dirichlet_mechanical[mat_type].append(
                         {
@@ -357,6 +382,21 @@ class MechanicalModel:
             eps_xy = 0.5 * (u[0].dx(1) + u[1].dx(0))
 
             return ufl.as_tensor([[eps_xx, eps_xy, 0.0], [eps_xy, eps_yy, 0.0], [0.0, 0.0, 0.0]])
+
+        elif self.mgr.tdim == 1:
+            # 1D mesh: u is a single-component vector (axial displacement only).
+            # gmsh always stores 3D node coordinates so the mesh has gdim = 3
+            # even when tdim = 1, and ufl.grad(u) returns a (1, 3) tensor that
+            # cannot be symmetrized directly. The only meaningful component is
+            # the axial derivative, computed explicitly. The full strain tensor
+            # is returned padded to 3x3 (axial component in [0,0], zeros
+            # elsewhere) so it is compatible with the rest of the pipeline:
+            # sigma_mech downstream uses ufl.Identity(eps.ufl_shape[0]) = I_3
+            # and the writer expects 3x3 tensors.
+            eps_xx = u[0].dx(0)
+            return ufl.as_tensor([[eps_xx, 0.0, 0.0],
+                                  [0.0,    0.0, 0.0],
+                                  [0.0,    0.0, 0.0]])
 
         else:
             # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)

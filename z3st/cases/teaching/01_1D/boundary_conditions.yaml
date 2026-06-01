@@ -1,0 +1,9 @@
+mechanical:
+  steel:
+  - type: Dirichlet
+    region: xmin
+    displacement: [0.0]
+
+  - type: Neumann
+    region: xmax
+    traction: 1.0e+8     # P (Pa) = 100 MPa, tensile

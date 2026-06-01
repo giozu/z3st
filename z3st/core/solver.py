@@ -327,11 +327,13 @@ class Solver:
                 print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
 
                 regime = self.regime
-                if regime in ["axisymmetric", "2d"]:
+                if self.mgr.tdim == 1:
+                    n_vec = ufl.as_vector([self.normal[0]])
+                elif regime in ["axisymmetric", "2d"]:
                     n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                 else:
                     n_vec = self.normal
-                
+
                 bc["value"] = bc["const"] * n_vec
 
         u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
@@ -348,7 +350,9 @@ class Solver:
             g = dolfinx.default_scalar_type(self.g)
 
             regime = self.regime
-            if regime == "axisymmetric" or regime == "2d":
+            if self.mgr.tdim == 1:
+                body_force = dolfinx.fem.Constant(self.mesh, (-rho * g,))
+            elif regime == "axisymmetric" or regime == "2d":
                 # 2D: (F_r, F_z) or (F_x, F_y)
                 body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
             else:
