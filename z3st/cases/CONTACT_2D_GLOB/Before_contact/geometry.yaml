@@ -1,0 +1,28 @@
+name: contact_2d
+geometry_type: cyl
+
+Lx_ext: 0.03 # (m)
+Ly_ext: 0.50 # (m)
+Lx_int: 0.028 # (m)
+Ly_int: 0.499 # (m)
+Lx_mid: 0.025 # (m)
+Ly_mid: 0.45 # (m)
+Lz: 0.5 # (m)
+Ri: 0.0125 # inner radius (m)
+Ro: 0.225 # outer radius (m)
+
+labels:
+  left_radius_o: 1
+  right_radius_o: 2
+  bottom_o: 3
+  top_o: 4
+  left_radius_in: 5
+  right_radius_in: 6
+  bottom_in: 7
+  top_in: 8
+  left_mid: 9
+  bottom_mid: 10
+  right_mid: 11
+  top_mid: 12
+  steel_o: 13
+  steel_mid: 14
