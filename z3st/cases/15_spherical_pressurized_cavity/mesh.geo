@@ -9,16 +9,16 @@
 SetFactory("OpenCASCADE");
 
 // --- Parameters ---
-Lx = 1.0;          // box length  (m)
-Ly = 1.0;          // box width   (m)
-Lz = 1.0;          // box height  (m)
+Lx = 120e-6;          // box length  (m)
+Ly = 120e-6;          // box width   (m)
+Lz = 120e-6;          // box height  (m)
 
-ax  = 0.04;        // ellipse semi-axis X (m)
-ay  = 0.04;        // ellipse semi-axis Y (m)
-az  = 0.04;        // ellipse semi-axis Y (m)
+ax  = 7.9e-6;        // ellipse semi-axis X (m)
+ay  = 7.9e-6;        // ellipse semi-axis Y (m)
+az  = 7.9e-6;        // ellipse semi-axis Z (m)
 
-h_box = 0.0500;    // target element size (m)
-h_sph = 0.0025;    // target element size (m)
+h_box = 10.0e-6;   // target element size far from cavity (m)
+h_sph = 0.25e-6;    // target element size at cavity surface (m)
 
 Point(1) = { 0, 0, 0 };       // center
 

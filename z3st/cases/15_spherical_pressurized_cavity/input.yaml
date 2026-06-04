@@ -9,9 +9,9 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  solid: ../../materials/steel.yaml
+  solid: ../../materials/uo2.yaml
 
-regime: 3D
+regime: 3d
 
 solver_settings:
   coupling: staggered
@@ -25,8 +25,9 @@ solver_settings:
   relax_max: 1.0
 
 models:
-  thermal: true
+  thermal: false
   mechanical: true
+  damage: true
 
 mechanical:
   solver: linear
@@ -44,8 +45,20 @@ thermal:
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
 
+damage:
+  type: AT1
+  solver: linear
+  linear_solver: iterative_amg
+  lc: 5.0e-7
+  hybrid_constraint: true
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+
 lhr:
-- 0
+- 0.0
+- 0.0
 time:
-- 0
-n_steps: 1
+- 0.0
+- 1.0
+n_steps: 50
