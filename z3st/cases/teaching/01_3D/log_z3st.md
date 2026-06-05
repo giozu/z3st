@@ -47,7 +47,7 @@ Mechanical function space (V_m): FunctionSpace(<Mesh #0>, blocked element (Basix
 Scalar function space (Q): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []))
 [Solver] initializer
   Applied relaxation factor:
-  → Temperature  : 1.0
+  → Temperature  : 0.9
   → Displacement : 1.0
   → Damage       : 0.4
   Adaptive relaxation disabled
@@ -172,5 +172,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 0.14 s
+Simulation completed in 0.15 s
 Total time steps solved: 1

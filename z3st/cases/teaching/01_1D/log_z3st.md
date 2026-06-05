@@ -1,7 +1,7 @@
 Info    : Reading 'mesh.msh'...
 Info    : 3 entities
-Info    : 4 nodes
-Info    : 5 elements
+Info    : 6 nodes
+Info    : 7 elements
 Info    : Done reading 'mesh.msh'
 
 
@@ -28,7 +28,7 @@ complex geometries, and user-defined boundary conditions.
   → Mesh                : mesh.msh
   → Boundary conditions : boundary_conditions.yaml
   → Time steps          : 1
-  → Regime              : 3d
+  → Regime              : 1d
   → Models active       :
       thermal    → OFF
       mechanical → ON
@@ -47,7 +47,7 @@ Mechanical function space (V_m): FunctionSpace(<Mesh #0>, blocked element (Basix
 Scalar function space (Q): FunctionSpace(<Mesh #0>, Basix element (P, interval, 0, gll_warped, unset, True, float64, []))
 [Solver] initializer
   Applied relaxation factor:
-  → Temperature  : 1.0
+  → Temperature  : 0.9
   → Displacement : 1.0
   → Damage       : 0.4
   Adaptive relaxation disabled
@@ -167,5 +167,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 0.11 s
+Simulation completed in 0.20 s
 Total time steps solved: 1
