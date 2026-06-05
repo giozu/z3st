@@ -1,0 +1,3 @@
+# These talk figures must be tracked even though the repo root ignores *.png
+# (they are inputs to slides.tex, not regenerable build artifacts).
+!*.png

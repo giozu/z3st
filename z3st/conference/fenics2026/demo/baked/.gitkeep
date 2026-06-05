@@ -1,0 +1,3 @@
+# Pre-rendered case-14 crack frames land here (case14_crack.*.png, case14_hero.png).
+# They are intentionally git-ignored (regenerable): bake them before the
+# conference with  ./open_paraview.sh --render
