@@ -176,3 +176,91 @@ git fetch -p
 # Delete all local branches that no longer exist on remote
 git fetch -p
 git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -D
+```
+
+---
+
+## Writing commit messages
+
+Write every commit message as a **categorised, conventional commit** instead of
+vague notes like `minor`, `update`, or `did this`. The category makes the history
+skimmable, groups related work, and lets tools generate changelogs.
+
+**Format**
+
+```text
+type(scope): short summary in the imperative mood
+
+Optional body: explain WHY the change was made (and any context a
+reviewer needs), wrapped at ~72 columns. Describe intent, not just the diff.
+
+Optional footer: BREAKING CHANGE: ... , or issue refs like "Closes #12".
+```
+
+**Types** (pick the one that best describes the change)
+
+| Type       | Use it for                                              | Example |
+|------------|---------------------------------------------------------|---------|
+| `feat`     | a new capability or model                               | `feat(mechanical): add axisymmetric regime` |
+| `fix`      | a bug fix                                               | `fix(damage): degrade thermal stress by g(D)` |
+| `docs`     | documentation only                                      | `docs: add equations to physics_models page` |
+| `refactor` | code change that neither fixes a bug nor adds a feature | `refactor: extract staggered loop into solver` |
+| `perf`     | a performance improvement                               | `perf(gap): cache cKDTree centroid distances` |
+| `test`     | adding or updating tests / non-regression cases         | `test: add non-regression for SEN shear` |
+| `build`    | build system, packaging, or dependencies                | `build: pin dolfinx 0.10 in z3st_env.yml` |
+| `ci`       | CI / workflow configuration                             | `ci: deploy docs to Pages on push to main` |
+| `chore`    | housekeeping with no src/test logic change (logs, etc.) | `chore: regenerate case logs` |
+| `style`    | formatting only (whitespace, black, isort)              | `style: format mechanical_model with black` |
+| `revert`   | reverting a previous commit                             | `revert: feat: add cluster dynamics solver` |
+
+**Optional scope** in parentheses names the area touched: `fix(thermal):`,
+`feat(damage):`, `docs(cases):`. Omit it when the change is broad.
+
+**Rules of thumb**
+
+- Use the **imperative mood**: "add", not "added" / "adds".
+- Summary in lower case, **no trailing period**, aim for ≤ 50 characters.
+- One logical change per commit; put the *why* in the body.
+- Breaking change: append `!` to the type (`feat!: ...`) or add a
+  `BREAKING CHANGE:` footer.
+- Retire `minor:` / `update:` — map them to a real type (usually `chore`,
+  `docs`, or `fix`).
+
+**Good examples (from this project's style)**
+
+```text
+feat(damage): add hybrid constraint and gamma_star option
+fix(docs): render math with MathJax, drop imgmath
+docs: document crystal plasticity and gap conductance models
+refactor: move force-displacement streaming into a diagnostics hook
+chore: regenerate non-regression logs for the cylinder cases
+```
+
+---
+
+## Writing pull requests
+
+- **Title**: use the same `type: summary` convention (e.g.
+  `fix(docs): render equations with MathJax`). For the recurring
+  `develop -> main` release sync, a plain `Develop` title is fine — it matches
+  this repo's history.
+- **Body**: a short structured summary, e.g.
+
+  ```text
+  ## Summary
+  One or two lines on what this PR does and why.
+
+  ## Cause            (for fixes)
+  What was actually wrong.
+
+  ## Changes / Fix
+  - bullet the notable changes
+  - mention new cases, models, or docs
+
+  ## Verification
+  How it was checked (tests pass, built locally, figures regenerated).
+  ```
+
+- Link issues with `Closes #N` / `Refs #N` so they auto-close on merge.
+- Keep one theme per PR where practical; a large `develop -> main` sync is the
+  exception and should summarise the highlights by category.
