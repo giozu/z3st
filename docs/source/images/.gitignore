@@ -1,0 +1,3 @@
+# docs figures must be tracked despite the repo-root *.png ignore
+!*.png
+!**/*.png
