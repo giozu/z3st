@@ -1,0 +1,394 @@
+% =====================================================================
+% Z3ST -- FEniCS 2026 conference talk (10-minute oral)
+% Giovanni Zullo, Politecnico di Milano
+% Build:  latexmk -pdf slides.tex      (or)   pdflatex slides.tex  x2
+% Theme:  metropolis (installed under texlive). pdflatex-compatible;
+%         falls back to default fonts (Fira not required).
+% =====================================================================
+\documentclass[aspectratio=169,11pt]{beamer}
+
+\usetheme{metropolis}
+\metroset{block=fill, numbering=fraction, progressbar=foot}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, fit, backgrounds}
+
+% ----- colour palette ------------------------------------------------
+\definecolor{z3blue}{HTML}{1F6FB2}
+\definecolor{z3teal}{HTML}{2A9D8F}
+\definecolor{z3amber}{HTML}{E9A23B}
+\definecolor{z3grey}{HTML}{5A5A5A}
+\setbeamercolor{frametitle}{bg=z3blue}
+\setbeamercolor{progress bar}{fg=z3amber}
+\setbeamercolor{alerted text}{fg=z3teal}
+
+% ----- code listing style -------------------------------------------
+\lstdefinestyle{py}{
+  language=Python,
+  basicstyle=\ttfamily\scriptsize,
+  keywordstyle=\color{z3blue}\bfseries,
+  commentstyle=\color{z3grey}\itshape,
+  stringstyle=\color{z3teal},
+  showstringspaces=false,
+  columns=fullflexible,
+  keepspaces=true,
+  morekeywords={ufl, dolfinx},
+}
+\lstset{style=py}
+
+\title{Z3ST}
+\subtitle{A FEniCSx framework for multiscale thermo-mechanical analysis\\with automatic differentiation}
+\author{Giovanni Zullo}
+\institute{Politecnico di Milano}
+\date{FEniCS 2026 -- Paris, 17--19 June 2026}
+
+\begin{document}
+
+% ---------------------------------------------------------------- 1
+\maketitle
+
+% ---------------------------------------------------------------- 2
+\begin{frame}{The problem we keep meeting}
+  Engineering components fail where \alert{heat, deformation and fracture meet}:
+  nuclear fuel pellets, thermal-shock cracking, welds, additive parts.
+
+  \vspace{0.6em}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Heavy multiphysics codes}\\(MOOSE, BISON)
+      \begin{itemize}
+        \item validated, production-grade
+        \item large, hard to extend quickly
+        \item weak-form changes are costly
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{FEniCSx}
+      \begin{itemize}
+        \item expressive weak forms in UFL
+        \item symbolic differentiation built in
+        \item but: no turnkey coupled\\ thermo-mechanical-fracture driver
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.6em}
+  \begin{block}{Z3ST}
+    A small, open framework that turns FEniCSx into a \alert{configuration-driven}
+    solver for coupled thermo-mechanics, plasticity and phase-field fracture --
+    with the constitutive physics written as \alert{energies}, not hand-coded tangents.
+  \end{block}
+\end{frame}
+
+% ---------------------------------------------------------------- 3
+\begin{frame}{Design at a glance: one driver, many regimes}
+  \begin{columns}[T]
+    \begin{column}{0.54\textwidth}
+      A single driver, \texttt{Spine}, composes the physics as mixins:
+      \begin{itemize}
+        \item thermal $\;+\;$ mechanical $\;+\;$ damage
+        \item plasticity $\;+\;$ cluster dynamics $\;+\;$ gap
+      \end{itemize}
+      \vspace{0.4em}
+      Everything else is \alert{data}:
+      \begin{itemize}
+        \item geometry, BCs, materials, solver $\to$ \texttt{input.yaml}
+        \item \alert{material-agnostic} (any solid): properties are constants
+              or \alert{Python functions}, e.g.\ $k(T)$
+        \item regimes \texttt{1D / 2D / 3D / axisym. / plane-stress}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \centering
+      \begin{tikzpicture}[font=\scriptsize, node distance=4mm,
+        box/.style={draw, rounded corners, fill=z3blue!10, minimum width=26mm, align=center, inner sep=3pt}]
+        \node[box] (yaml) {\texttt{input.yaml}\\geometry $\cdot$ BCs $\cdot$ materials};
+        \node[box, fill=z3amber!20, below=of yaml] (spine) {\texttt{Spine} driver\\thermal $\cdot$ mech $\cdot$ damage\\plasticity $\cdot$ cluster $\cdot$ gap};
+        \node[box, fill=z3teal!15, below=of spine] (solve) {staggered solve\\(UFL $\to$ dolfinx kernels)};
+        \node[box, below=of solve] (out) {VTU / XDMF\\force--displacement\\diagnostics};
+        \draw[-{Stealth}] (yaml) -- (spine);
+        \draw[-{Stealth}] (spine) -- (solve);
+        \draw[-{Stealth}] (solve) -- (out);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 4
+\begin{frame}[fragile]{The core idea: write the energy, get everything else}
+  Constitutive models are entered as a \alert{strain-energy density}. UFL's
+  automatic differentiation produces the stress and the consistent tangent.
+
+  \vspace{0.4em}
+  \begin{lstlisting}
+F   = ufl.variable(I + grad(u))                  # deformation gradient
+psi = (mu/2)*(Ic - 3) - mu*ufl.ln(J) \
+      + (lmbda/2)*ufl.ln(J)**2                    # neo-Hookean energy
+
+P   = ufl.diff(psi, F)                            # 1st Piola-Kirchhoff = d psi / d F
+R   = ufl.inner(grad(v), P) * dx                  # residual
+Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also AD
+  \end{lstlisting}
+
+  \vspace{0.2em}
+  \begin{itemize}
+    \item one line, \texttt{P = ufl.diff(psi, F)}, replaces a hand-derived stress tensor
+    \item the Newton tangent comes from \texttt{ufl.derivative} -- no analytic Jacobian
+    \item one path for all: elasticity, hyperelasticity, J2 \alert{and crystal} plasticity, phase-field
+    \item even slip-system crystal viscoplasticity gets its exact Jacobian from AD
+  \end{itemize}
+\end{frame}
+
+% ---------------------------------------------------------------- 5
+\begin{frame}{Coupled thermo-mechanics, solved in a staggered loop}
+  \begin{columns}[T]
+    \begin{column}{0.56\textwidth}
+      Per load step, the driver alternates until each field converges:
+      \begin{enumerate}
+        \item \textbf{thermal} $\;\rho c_p \dot T = \nabla\!\cdot(k(T)\nabla T) + q'''$
+        \item \textbf{mechanical} $\;\nabla\!\cdot\sigma = 0$, with thermal eigenstrain\\
+              $\varepsilon_{el} = \varepsilon(u) - \alpha\,(T-T_{ref})\,I$
+        \item \textbf{damage} driven by $\psi^+(\varepsilon_{el})$, irreversible
+      \end{enumerate}
+      \vspace{0.5em}
+      \alert{Adaptive relaxation}: per-field factors grow when the residual
+      shrinks, shrink when it oscillates -- robust without a monolithic Newton.
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \centering
+      \begin{tikzpicture}[font=\scriptsize, node distance=5mm,
+        s/.style={draw, rounded corners, minimum width=22mm, align=center, inner sep=3pt}]
+        \node[s, fill=z3amber!20] (t) {thermal $T$};
+        \node[s, fill=z3blue!12, below=of t] (m) {mechanical $u$};
+        \node[s, fill=z3teal!15, below=of m] (d) {damage $D$};
+        \draw[-{Stealth}] (t) -- (m);
+        \draw[-{Stealth}] (m) -- (d);
+        \draw[-{Stealth}, z3grey] (d.east) to[bend left=60] node[right=1pt]{until conv.} (t.east);
+      \end{tikzpicture}
+      \vspace{0.6em}
+
+      {\scriptsize Damage degrades \alert{both} elastic and thermal-stress terms
+      via a consistent $g(D)$ -- essential for tractable thermal-shock fracture.}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 6
+\begin{frame}{Coupled multi-physics -- and across separate bodies}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Coupled physics in one solve}
+      \begin{itemize}
+        \item thermal $+$ mechanical $+$ damage / phase-field, two-way coupled
+        \item temperature drives thermal strain and stress
+        \item damage degrades both the elastic \alert{and} the thermal-stress terms
+        \item phase-field: AT1 / AT2, Miehe / Amor, hybrid
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{Heat across bodies: gap conductance}
+      \begin{itemize}
+        \item heat crosses a gap between \alert{separate bodies / regions}
+        \item $h_{gap}(T_{gap})$ as a thermal interface condition
+        \item e.g. fuel pellet $\to$ cladding -- essential for fuel-performance modelling
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.7em}
+  \begin{block}{}
+    \footnotesize
+    \alert{New / exploratory:} cluster dynamics -- defect-population evolution in
+    cluster-size space ($\partial_t c = -v\,\partial_n c + D\,\partial_{nn} c$).
+    Implemented, not yet investigated; a path towards a genuine micro-to-continuum link.
+  \end{block}
+\end{frame}
+
+% ---------------------------------------------------------------- 7
+\begin{frame}{Verified, reproducible, and easy to drive}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Verified -- every solver, every physics}
+      \begin{itemize}
+        \item $\sim$50 cases, each checked numerically against an \alert{analytical} solution
+        \item thermal, mechanical, plasticity, fracture -- all covered
+        \item re-run on \alert{every commit} (CI)
+      \end{itemize}
+      \vspace{0.4em}
+      \textbf{Teaching cases}
+      \begin{itemize}
+        \item 1D bar on a line mesh and the same bar in full 3D
+        \item identical $u(L)=PL/E$ -- regime selection, not re-meshing
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{Made for experiments}
+      \begin{itemize}
+        \item \alert{hot reload}: edit tolerances / relaxation mid-run
+        \item per-step force--displacement streaming
+        \item matrix diagnostics, structured logs
+      \end{itemize}
+      \vspace{0.5em}
+      \centering
+      \includegraphics[width=0.82\textwidth]{figures/convergence_study.png}\\
+      {\scriptsize $L_2$ error at the theoretical rates ($T$: 2, $\sigma$: 1)}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 8
+\begin{frame}{Hero case: thermal-shock cracking of a UO\textsubscript{2} pellet}
+  \begin{columns}[T]
+    \begin{column}{0.34\textwidth}
+      A cold-contact wedge cools the rim of a hot disc; the tensile hoop-stress
+      ring it sets up drives \alert{discrete radial cracks} -- as observed in a
+      real UO\textsubscript{2} pellet.
+      \vspace{0.4em}
+      \begin{itemize}\small
+        \item 2D plane-strain half-disc, mirror symmetry
+        \item AT1 $+$ Amor $+$ hybrid
+        \item fully coupled $T \to \varepsilon_{el} \to D$
+      \end{itemize}
+      \vspace{0.3em}
+      {\scriptsize One \texttt{input.yaml}; every ingredient on the previous slides
+      meets here.}
+    \end{column}
+    \begin{column}{0.66\textwidth}
+      \centering
+      \includegraphics[width=0.47\textwidth]{figures/case14_temperature.png}\hfill
+      \includegraphics[width=0.47\textwidth]{figures/case14_hoop.png}\\[2pt]
+      \includegraphics[width=0.47\textwidth]{figures/case14_damage.png}\hfill
+      \includegraphics[width=0.47\textwidth]{figures/case14_experiment.png}\\[1pt]
+      {\scriptsize top: cold wedge $\to$ tensile hoop-stress ring \quad\textbar\quad
+       bottom: \alert{simulated} cracks vs a \alert{real} UO\textsubscript{2} cross-section}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 9
+\begin{frame}{Open, and runnable on your laptop}
+  \begin{columns}[T]
+    \begin{column}{0.58\textwidth}
+      \textbf{Z3ST is}
+      \begin{itemize}
+        \item energy-first constitutive modelling via UFL AD
+        \item coupled multi-physics, across bodies (gap conductance)
+        \item plasticity (J2 + crystal) and phase-field fracture
+        \item YAML-driven, material-agnostic, verified
+      \end{itemize}
+      \vspace{0.6em}
+      \textbf{Get it}
+      \begin{itemize}
+        \item \texttt{github.com/giozu/z3st} \quad(Apache-2.0)
+        \item docs: \texttt{giozu.github.io/z3st}
+        \item DOI: \texttt{10.5281/zenodo.17748028}
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.42\textwidth}
+      \begin{block}{See it live}
+        Come to the \alert{software demonstration} at the poster session --
+        I will run a coupled case end to end on my laptop, and tune it while it solves.
+      \end{block}
+      \vspace{0.4em}
+      \centering
+      {\scriptsize Giovanni Zullo \\ Politecnico di Milano \\ \texttt{giovanni.zullo@polimi.it}}
+    \end{column}
+  \end{columns}
+  \vspace{0.5em}
+  \centering
+  \alert{\large Thank you -- questions welcome.}
+\end{frame}
+
+% ---------------------------------------------------------------- backup
+\appendix
+\begin{frame}[fragile]{Backup: the staggered solver, in one screen}
+\begin{lstlisting}
+for iteration in range(max_iter):
+    conv_th,   _ = self._thermal_step(...)       # k(T), q''' , transient
+    conv_mech, _ = self._mechanical_step(...)    # eigenstrain, g(D)*sigma
+    self.update_history(u_new, T=T_new)          # phase-field driver psi+
+    conv_dmg,  _ = self._damage_step(...)        # irreversible D
+    if conv_th and conv_mech and conv_dmg:
+        return True                              # step converged
+\end{lstlisting}
+\vspace{0.3em}
+{\scriptsize Adaptive per-field relaxation (grow / shrink on residual trend) keeps the
+fixed-point iteration stable across linear elasticity through thermal-shock fracture.}
+\end{frame}
+
+\begin{frame}{Backup: constitutive models available}
+  \centering
+  \begin{tabular}{@{}ll@{}}
+    \toprule
+    Model & Path \\
+    \midrule
+    Isotropic elasticity (Lam\'e) & $\sigma = \lambda\,\mathrm{tr}(\varepsilon)I + 2G\varepsilon$ \\
+    Anisotropic (Voigt) & $\sigma = C:\varepsilon$, optional 6$\times$6 $C$ \\
+    Hyperelasticity (neo-Hookean) & $P = \partial_F \psi$ (AD) \\
+    J2 plasticity (macroscopic) & return mapping, linear hardening \\
+    Crystal plasticity (single grain) & slip-system viscoplasticity, AD Jacobian \\
+    Phase-field damage & AT1 / AT2, Miehe / Amor, hybrid \\
+    Custom & user Python stress callable (e.g. the CP law) \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Backup: plasticity, verified against theory}
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/j2_stress_strain.png}\\
+      {\scriptsize J2 (macroscopic): numerical vs analytical 2D plane strain}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/cp_stress_strain.png}\\
+      {\scriptsize crystal plasticity (single grain): saturates to the analytical $\sigma_{sat}$}
+    \end{column}
+  \end{columns}
+  \vspace{0.3em}
+  \centering
+  {\scriptsize same AD path, two scales -- the slip-system Jacobian is differentiated automatically}
+\end{frame}
+
+\begin{frame}{Backup: coupled thermo-mechanics, verified}
+  \centering
+  \includegraphics[height=0.74\textheight]{figures/thin_slab_stress_temperature.png}\\
+  {\scriptsize thin slab: temperature and thermal stress, numerical vs analytical, across the thickness}
+\end{frame}
+
+\begin{frame}{Backup: single-edge-notched shear -- a Miehe (2010) reproducer}
+  \begin{columns}[T]
+    \begin{column}{0.33\textwidth}\centering
+      \includegraphics[width=\textwidth]{figures/sen_shear_ux.png}\\
+      {\scriptsize imposed shear $u_x = 15\,\mu$m}
+    \end{column}
+    \begin{column}{0.33\textwidth}\centering
+      \includegraphics[width=\textwidth]{figures/sen_shear_damage.png}\\
+      {\scriptsize phase-field damage: the curved crack path}
+    \end{column}
+    \begin{column}{0.33\textwidth}\centering
+      \includegraphics[width=\textwidth]{figures/sen_shear_vonmises.png}\\
+      {\scriptsize von Mises stress at the crack tip}
+    \end{column}
+  \end{columns}
+  \vspace{0.3em}
+  \centering
+  {\scriptsize mechanics $+$ phase-field damage; the curved crack reproduces
+  Miehe et al., \textit{Comput. Methods Appl. Mech. Engrg.} 199 (2010) 2765--2778}
+\end{frame}
+
+\begin{frame}{Backup: hero case verified against McClenny (2022)}
+  \centering
+  \includegraphics[width=0.92\textwidth]{figures/case14_results.png}\\[2pt]
+  {\scriptsize radial $T$ profile, $T$ history at the contact rim, damage penetration -- cf.\ McClenny, \textit{J.\ Nucl.\ Mater.} 565 (2022), Fig.\ 7b}\\[5pt]
+  \includegraphics[width=0.6\textwidth]{figures/case14_damage_angular.png}\\[-1pt]
+  {\scriptsize angular damage scan: \alert{discrete peaks = individual radial cracks}, confined to the cold-contact wedge}
+\end{frame}
+
+\end{document}
