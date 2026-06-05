@@ -220,7 +220,7 @@ The model uses UFL's ``ufl.variable()`` and ``ufl.diff()`` to automatically comp
 
 .. math::
 
-   \frac{\partial \gamma_{\dot}}{\partial \tau} = \frac{n \gamma_0}{g_0} \left(\frac{\tau}{g_0}\right)^{n-1}
+   \frac{\partial \dot{\gamma}}{\partial \tau} = \frac{n \gamma_0}{g_0} \left(\frac{\tau}{g_0}\right)^{n-1}
 
 This eliminates **hundreds of lines** of error-prone manual derivative code!
 
