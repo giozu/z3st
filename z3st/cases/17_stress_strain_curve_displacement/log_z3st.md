@@ -290,7 +290,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-11, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 7.075e-07
+  ||Δu||/||u|| = 7.082e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -389,7 +389,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-09, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 6.058e-06
+  ||Δu||/||u|| = 6.062e-06
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -403,7 +403,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-09, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.003e-07
+  ||Δu||/||u|| = 3.031e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -502,7 +502,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-07, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 6.059e-06
+  ||Δu||/||u|| = 6.058e-06
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -516,7 +516,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-07, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.029e-07
+  ||Δu||/||u|| = 3.051e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -615,7 +615,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-05, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 6.059e-06
+  ||Δu||/||u|| = 6.060e-06
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -629,7 +629,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → [5e-05, 0.0]
   Building weak form, volume integrals (dx) for steel, tag = 5
   Linear solver
-  ||Δu||/||u|| = 3.018e-07
+  ||Δu||/||u|| = 3.030e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -637,5 +637,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 18.19 s
+Simulation completed in 28.44 s
 Total time steps solved: 5

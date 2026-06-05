@@ -115,7 +115,15 @@ class MechanicalModel:
 
                     # --- create constant ---
                     initial_disp = raw_value[0]
-                    disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
+                    # On a 1D mesh V_u is built with a blocked element of shape
+                    # (1,), which dolfinx treats as a scalar function space.
+                    # The Constant must then be rank-0, not a length-1 vector,
+                    # otherwise dirichletbc raises "Rank mismatch between
+                    # Constant and function space".
+                    if self.tdim == 1:
+                        disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp[0]))
+                    else:
+                        disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
 
                     dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
                     bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
@@ -157,7 +165,15 @@ class MechanicalModel:
 
                     # normal vector according to the mechanical regime
                     regime = self.regime
-                    if regime in ["axisymmetric", "2d", "plane_stress"]:
+                    if self.mgr.tdim == 1:
+                        # 1D mesh: V_m has one component; the test function v_m
+                        # is rank-1 of size 1, so the traction n_vec must be a
+                        # 1-vector. self.normal still has gdim = 3 entries
+                        # because gmsh stores 3D node coords; we only keep the
+                        # axial component (which is the only physically
+                        # meaningful one on a line).
+                        n_vec = ufl.as_vector([self.normal[0]])
+                    elif regime in ["axisymmetric", "2d", "plane_stress"]:
                         n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                     else:
                         n_vec = self.normal
@@ -214,8 +230,17 @@ class MechanicalModel:
                         sys.exit(1)
 
                     disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(raw_value[0]))
-                    dofs = dolfinx.fem.locate_dofs_topological(V_u.sub(c_idx), self.fdim, facets)
-                    bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u.sub(c_idx))
+                    # On a 1D mesh V_u has a single component (shape (1,)) and
+                    # dolfinx refuses V_u.sub(0) -- "Cannot extract subsystem...
+                    # no subsystems". Since the check at line ~200 already
+                    # rejects Clamp_y / Clamp_z for tdim==1, the only valid
+                    # component is c_idx == 0, which IS V_u itself.
+                    if self.tdim == 1:
+                        dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
+                        bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
+                    else:
+                        dofs = dolfinx.fem.locate_dofs_topological(V_u.sub(c_idx), self.fdim, facets)
+                        bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u.sub(c_idx))
 
                     self.dirichlet_mechanical[mat_type].append(
                         {
@@ -357,6 +382,21 @@ class MechanicalModel:
             eps_xy = 0.5 * (u[0].dx(1) + u[1].dx(0))
 
             return ufl.as_tensor([[eps_xx, eps_xy, 0.0], [eps_xy, eps_yy, 0.0], [0.0, 0.0, 0.0]])
+
+        elif self.mgr.tdim == 1:
+            # 1D mesh: u is a single-component vector (axial displacement only).
+            # gmsh always stores 3D node coordinates so the mesh has gdim = 3
+            # even when tdim = 1, and ufl.grad(u) returns a (1, 3) tensor that
+            # cannot be symmetrized directly. The only meaningful component is
+            # the axial derivative, computed explicitly. The full strain tensor
+            # is returned padded to 3x3 (axial component in [0,0], zeros
+            # elsewhere) so it is compatible with the rest of the pipeline:
+            # sigma_mech downstream uses ufl.Identity(eps.ufl_shape[0]) = I_3
+            # and the writer expects 3x3 tensors.
+            eps_xx = u[0].dx(0)
+            return ufl.as_tensor([[eps_xx, 0.0, 0.0],
+                                  [0.0,    0.0, 0.0],
+                                  [0.0,    0.0, 0.0]])
 
         else:
             # Default symmetric gradient: 0.5 * (grad(u) + grad(u).T)
@@ -553,6 +593,15 @@ class MechanicalModel:
                     lmbda_ps * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
                 )
 
+            # True 1D structural element (line mesh): uniaxial *stress* state,
+            # sigma_yy = sigma_zz = 0. The axial stiffness is therefore the
+            # engineering Young's modulus E, giving sigma_11 = E eps_11.
+            # epsilon() returns the 3x3 strain padded with only eps_xx != 0, so
+            # E * eps has only sigma_xx = E eps_xx and zero transverse stress.
+            elif regime == "1d":
+                eps = self.epsilon(u)
+                sigma = material["E"] * eps
+
             # Default isotropic Lamé
             elif regime == "3d" or regime == "axisymmetric" or regime == "2d":
                 eps = self.epsilon(u)
@@ -685,10 +734,20 @@ class MechanicalModel:
         (3λ + 2G) thermal stress here.
         """
         regime = self.regime
-        dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
+
+        if regime == "1d":
+            # Engineering 1D bar: a fully restrained line element develops the
+            # uniaxial thermal stress -E alpha (T - T_ref), consistent with the
+            # sigma = E eps constitutive law used in sigma_mech for regime 1d
+            # (NOT the 3D (3 lambda + 2G) bulk factor).
+            coeff = material["E"]
+            dim = 1
+        else:
+            coeff = 3.0 * material["lmbda"] + 2.0 * material["G"]
+            dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
 
         sigma_th = (
-            -(3.0 * material["lmbda"] + 2.0 * material["G"])
+            -coeff
             * material["alpha"]
             * (T - material["T_ref"])
             * ufl.Identity(dim)
@@ -749,10 +808,17 @@ class MechanicalModel:
                 eps_el = eps - eth
             else:
                 eps_el = eps
-            psi_el = 0.5 * (
-                material["lmbda"] * ufl.tr(eps_el) ** 2
-                + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
-            )
+            if str(getattr(self, "regime", "3d")).lower() == "1d":
+                # Engineering 1D bar: psi_el = 0.5 E eps_xx^2, consistent with
+                # the sigma = E eps law used for regime 1d. eps_el is the 3x3
+                # padded strain with only the [0,0] component non-zero, so
+                # inner(eps_el, eps_el) = eps_xx^2.
+                psi_el = 0.5 * material["E"] * ufl.inner(eps_el, eps_el)
+            else:
+                psi_el = 0.5 * (
+                    material["lmbda"] * ufl.tr(eps_el) ** 2
+                    + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
+                )
             # Damage degradation: mirrors sigma_mech / sigma_th. Without this
             # weighting, cells under a prescribed D=1 BC (e.g. the notch slit
             # of the SENT cases or the seed of case 14_*_cracking_2D_xy)

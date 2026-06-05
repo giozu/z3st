@@ -1,0 +1,15 @@
+name: bar_3d
+geometry_type: rect
+
+Lx: 1.000   # bar length (m)
+Ly: 0.050   # cross-section width (m)
+Lz: 0.050   # cross-section height (m)
+
+labels:
+  zmin: 1
+  ymin: 2
+  xmax: 3
+  ymax: 4
+  xmin: 5
+  zmax: 6
+  steel: 7

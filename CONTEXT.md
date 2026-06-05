@@ -8,7 +8,7 @@
 - **Continuous integration:** GitHub Actions (`.github/workflows/ci.yml`, `static.yml`)
 - **Docs:** Sphinx sources under `docs/source/`, built by GitHub Actions
 - **Python:** ≥ 3.10 (pyproject.toml)
-- **Runtime dependencies:** `numpy`, `scipy`, `pandas`, `matplotlib`, `pyvista≥0.42`, `meshio`, `pyyaml`, `gmsh` + (external) **dolfinx / FEniCSx / basix / UFL / PETSc / MPI** provided by the Conda env `z3st_env.yml`.
+- **Runtime dependencies:** `numpy`, `scipy`, `sympy`, `pandas`, `matplotlib`, `pyvista≥0.42`, `meshio`, `pyyaml`, `gmsh` + (external) **dolfinx / FEniCSx / basix / UFL / PETSc / MPI** provided by the Conda env `z3st_env.yml`.
 
 ---
 
