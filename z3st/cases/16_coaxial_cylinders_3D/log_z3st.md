@@ -80,7 +80,7 @@ Material loaded: cyl_1
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7ce6ed65fb00> (function)
+  _k_func         → <function k at 0x7fa4d97339c0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -802,5 +802,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 59.91 s
+Simulation completed in 91.25 s
 Total time steps solved: 1

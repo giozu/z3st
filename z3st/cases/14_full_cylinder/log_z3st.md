@@ -75,7 +75,7 @@ Material loaded: oxide
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7360b897fce0> (function)
+  _k_func         → <function k at 0x7f4d52063ce0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -498,5 +498,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 17 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 4.44 s
+Simulation completed in 9.64 s
 Total time steps solved: 1

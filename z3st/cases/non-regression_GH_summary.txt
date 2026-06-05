@@ -1,0 +1,11 @@
+Z3ST non-regression summary - Fri Jun  5 11:53:20 CEST 2026
+
+Case: 1_thin_slab_2D -> OK
+Case: 2_thin_cylindrical_shell_2D -> OK
+Case: 3_thick_slab_adiabatic_3D -> OK
+Case: 7_box_heated -> OK
+Case: 14_full_cylinder -> OK
+Case: 16_coaxial_cylinders_3D -> OK
+Case: 18_box_crack_2D -> OK
+Case: 20_plasticity_2D -> OK
+Case: demo_CP_single_grain -> OK

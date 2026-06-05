@@ -357,7 +357,7 @@ Convergence check
   Building weak form, volume integrals (dx) for steel, tag = 7
   Applying mechanical traction on subdomain id = 3
   Linear solver
-  ||Δu||/||u|| = 7.760e-14
+  ||Δu||/||u|| = 1.510e-13
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -365,5 +365,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.44 s
+Simulation completed in 1.64 s
 Total time steps solved: 1

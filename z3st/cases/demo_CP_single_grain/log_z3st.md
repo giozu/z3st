@@ -516,7 +516,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 11 → 0.0015
   Building weak form, volume integrals (dx) for grain, tag = 1
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.115e-15
+  ||Δu||/||u|| = 2.119e-15
 
 Convergence check
 
@@ -1086,7 +1086,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 11 → 0.004
   Building weak form, volume integrals (dx) for grain, tag = 1
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 5.540e-14
+  ||Δu||/||u|| = 5.543e-14
 
 Convergence check
 
@@ -2462,5 +2462,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 3.00 s
+Simulation completed in 9.43 s
 Total time steps solved: 41
