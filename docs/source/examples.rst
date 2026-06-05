@@ -152,8 +152,8 @@ This example demonstrates **J2 (von Mises) plasticity** with isotropic hardening
 
 **Material Model:**
 
-- Elastic regime: E = 200 GPa, ν = 0.3
-- Yield stress: σ_y = 400 MPa
+- Elastic regime: :math:`E = 200\,\mathrm{GPa}`, :math:`\nu = 0.3`
+- Yield stress: :math:`\sigma_y = 400\,\mathrm{MPa}`
 - Hardening: Isotropic (linear or nonlinear)
 
 **Loading:**
@@ -172,8 +172,8 @@ This example demonstrates **J2 (von Mises) plasticity** with isotropic hardening
 
 **Physical Behavior:**
 
-1. **Elastic loading** (0 → σ_y): Linear response
-2. **Yielding** at σ = σ_y: Deviation from linearity
+1. **Elastic loading** (:math:`0 \to \sigma_y`): Linear response
+2. **Yielding** at :math:`\sigma = \sigma_y`: Deviation from linearity
 3. **Plastic flow** with hardening: Continued load bearing beyond yield
 4. **Strain accumulation**: Permanent plastic deformation
 
@@ -190,22 +190,22 @@ This advanced example demonstrates **single crystal plasticity** using **automat
 
 - FCC crystal structure
 - Active slip system: (111)[0-11]
-- Schmid factor: μ = 0.408
+- Schmid factor: :math:`\mu = 0.408`
 - Power-law viscoplasticity: :math:`\dot{\gamma} = \gamma_0 |\tau/g_0|^n \text{sign}(\tau)`
 
 **Material Parameters:**
 
-- E = 200 GPa
-- ν = 0.3
-- Reference slip rate: γ₀ = 0.001 s⁻¹
-- Critical resolved shear stress: g₀ = 200 MPa
-- Power law exponent: n = 5
+- :math:`E = 200\,\mathrm{GPa}`
+- :math:`\nu = 0.3`
+- Reference slip rate: :math:`\dot{\gamma}_0 = 0.001\,\mathrm{s}^{-1}`
+- Critical resolved shear stress: :math:`g_0 = 200\,\mathrm{MPa}`
+- Power law exponent: :math:`n = 5`
 
 **Loading:**
 
 - Uniaxial tension along z-axis
 - 21 displacement steps to 0.5% strain
-- Strain rate: 0.005 s⁻¹
+- Strain rate: :math:`0.005\,\mathrm{s}^{-1}`
 
 **Results:**
 
@@ -213,13 +213,13 @@ This advanced example demonstrates **single crystal plasticity** using **automat
    :width: 80%
    :align: center
 
-   Crystal plasticity stress-strain curve showing elastic response, yielding (τ = g₀), and viscoplastic flow approaching saturation stress.
+   Crystal plasticity stress-strain curve showing elastic response, yielding (:math:`\tau = g_0`), and viscoplastic flow approaching saturation stress.
 
 **Key Features:**
 
 **Automatic differentiation**: UFL computes exact Jacobian symbolically
 **Newton convergence**: 2 iterations per step (quadratic convergence)
-**Semi-analytical verification**: Saturation stress σ_sat = 808.6 MPa (error: 12.5%)
+**Semi-analytical verification**: Saturation stress :math:`\sigma_{sat} = 808.6\,\mathrm{MPa}` (error: 12.5%)
 **History variables**: Backward Euler integration with plastic strain accumulation
 
 **Implementation Highlight:**
@@ -278,9 +278,9 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 **Model:**
 
 - AT2 phase-field model
-- Characteristic length: lc = 0.002 m
-- Critical energy release rate: Gc
-- Degradation function: g(D) = (1-D)² + k_res
+- Characteristic length: :math:`\ell_c = 0.002\,\mathrm{m}`
+- Critical energy release rate: :math:`G_c`
+- Degradation function: :math:`g(D) = (1-D)^2 + k_{res}`
 
 **Results:**
 
@@ -288,7 +288,7 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
    :width: 70%
    :align: center
 
-   Damage field evolution showing crack propagation (D = 0: intact, D = 1: fully damaged).
+   Damage field evolution showing crack propagation (:math:`D = 0`: intact, :math:`D = 1`: fully damaged).
 
 .. figure:: images/box_crack_2D/damage_stress_profile.png
    :width: 85%
@@ -298,7 +298,7 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 
 **Physical Behavior:**
 
-1. **Initial state**: Pre-cracked geometry with D = 1 in notch
+1. **Initial state**: Pre-cracked geometry with :math:`D = 1` in notch
 2. **Loading**: Tensile displacement applied incrementally
 3. **Crack growth**: Damage field D evolves from crack tip
 4. **Stress release**: Stresses drop behind advancing crack front
@@ -310,6 +310,87 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 **Complex crack paths**: Handles branching and merging
 **Thermodynamically consistent**: Variational formulation
 **Irreversibility**: Damage can only increase
+
+---
+
+Single-Edge-Notched Shear Test (Miehe 2010 benchmark)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Case Directory:** ``cases/19_single-edge_notched_shear_test``
+
+A standard phase-field-fracture benchmark: a square specimen with a horizontal
+pre-notch is loaded in shear. The curved crack path that develops reproduces the
+result of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010)
+2765--2778 -- the foundational phase-field paper.
+
+**Setup:**
+
+- Coupled mechanics + phase-field damage (steel)
+- Horizontal pre-notch on the left edge
+- Imposed horizontal displacement :math:`u_x = 15\,\mu\mathrm{m}`
+
+**Results:**
+
+.. figure:: images/sen_shear/SENS_ux.png
+   :width: 48%
+
+.. figure:: images/sen_shear/SENS_damage_final.png
+   :width: 48%
+
+   Imposed shear displacement (left) and the resulting curved crack path (right).
+
+.. figure:: images/sen_shear/SENS_vonMises.png
+   :width: 55%
+   :align: center
+
+   Von Mises stress concentration at the propagating crack tip.
+
+---
+
+UO\ :sub:`2` Pellet Thermal-Shock Cracking (McClenny 2022)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Case Directory:** ``cases/14_full_cylinder_cracking_2D_xy``
+
+The fully coupled showpiece, in which thermal, mechanical, and phase-field damage
+all meet. A 2D plane-strain transverse cross-section of a UO\ :sub:`2` pellet has
+a cold-contact wedge on its rim; the tensile hoop-stress ring drives discrete
+radial cracks. It reproduces McClenny et al., *J. Nucl. Mater.* 565 (2022).
+
+**Model:**
+
+- AT1 crack density + Amor split + Ambati hybrid constraint
+- Fully coupled :math:`T \to \boldsymbol{\varepsilon}_{el} \to D`
+- 2D plane-strain half-disc with mirror symmetry
+
+**Results -- fields:**
+
+.. figure:: images/full_cylinder_cracking/temperature_field.png
+   :width: 48%
+
+.. figure:: images/full_cylinder_cracking/stress_hoop_field.png
+   :width: 48%
+
+   Cold-contact wedge cools the rim (left); the tensile hoop-stress ring it sets
+   up drives the cracking (right).
+
+**Results -- simulation against experiment:**
+
+.. figure:: images/full_cylinder_cracking/damage_field.png
+   :width: 48%
+
+.. figure:: images/full_cylinder_cracking/UO2_damage_sample.png
+   :width: 48%
+
+   Simulated damage with discrete radial cracks (left) against a cross-section of
+   a real cracked UO\ :sub:`2` pellet (right).
+
+.. figure:: images/full_cylinder_cracking/thermal_shock_results.png
+   :width: 90%
+   :align: center
+
+   Quantitative verification: radial temperature profile, temperature history at
+   the contact rim, and damage penetration, against McClenny Fig. 7b.
 
 ---
 
@@ -326,7 +407,7 @@ This example demonstrates **mesh convergence** for a 2D thermal problem, showing
 **Setup:**
 
 - 2D rectangular domain with prescribed boundary conditions
-- Systematic refinement: nx = 10, 20, 40, 80 elements
+- Systematic refinement: :math:`n_x = 10, 20, 40, 80` elements
 - Temperature profiles extracted along centerline
 
 **Results:**
