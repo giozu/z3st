@@ -11,7 +11,7 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../../materials/steel.yaml
 
-regime: 3d
+regime: 1d
 
 solver_settings:
   coupling: staggered

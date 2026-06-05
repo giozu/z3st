@@ -593,6 +593,15 @@ class MechanicalModel:
                     lmbda_ps * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
                 )
 
+            # True 1D structural element (line mesh): uniaxial *stress* state,
+            # sigma_yy = sigma_zz = 0. The axial stiffness is therefore the
+            # engineering Young's modulus E, giving sigma_11 = E eps_11.
+            # epsilon() returns the 3x3 strain padded with only eps_xx != 0, so
+            # E * eps has only sigma_xx = E eps_xx and zero transverse stress.
+            elif regime == "1d":
+                eps = self.epsilon(u)
+                sigma = material["E"] * eps
+
             # Default isotropic Lamé
             elif regime == "3d" or regime == "axisymmetric" or regime == "2d":
                 eps = self.epsilon(u)
@@ -725,10 +734,20 @@ class MechanicalModel:
         (3λ + 2G) thermal stress here.
         """
         regime = self.regime
-        dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
+
+        if regime == "1d":
+            # Engineering 1D bar: a fully restrained line element develops the
+            # uniaxial thermal stress -E alpha (T - T_ref), consistent with the
+            # sigma = E eps constitutive law used in sigma_mech for regime 1d
+            # (NOT the 3D (3 lambda + 2G) bulk factor).
+            coeff = material["E"]
+            dim = 1
+        else:
+            coeff = 3.0 * material["lmbda"] + 2.0 * material["G"]
+            dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
 
         sigma_th = (
-            -(3.0 * material["lmbda"] + 2.0 * material["G"])
+            -coeff
             * material["alpha"]
             * (T - material["T_ref"])
             * ufl.Identity(dim)
@@ -789,10 +808,17 @@ class MechanicalModel:
                 eps_el = eps - eth
             else:
                 eps_el = eps
-            psi_el = 0.5 * (
-                material["lmbda"] * ufl.tr(eps_el) ** 2
-                + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
-            )
+            if str(getattr(self, "regime", "3d")).lower() == "1d":
+                # Engineering 1D bar: psi_el = 0.5 E eps_xx^2, consistent with
+                # the sigma = E eps law used for regime 1d. eps_el is the 3x3
+                # padded strain with only the [0,0] component non-zero, so
+                # inner(eps_el, eps_el) = eps_xx^2.
+                psi_el = 0.5 * material["E"] * ufl.inner(eps_el, eps_el)
+            else:
+                psi_el = 0.5 * (
+                    material["lmbda"] * ufl.tr(eps_el) ** 2
+                    + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
+                )
             # Damage degradation: mirrors sigma_mech / sigma_th. Without this
             # weighting, cells under a prescribed D=1 BC (e.g. the notch slit
             # of the SENT cases or the seed of case 14_*_cracking_2D_xy)

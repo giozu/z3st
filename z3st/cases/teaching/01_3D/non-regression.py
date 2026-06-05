@@ -82,7 +82,7 @@ print(f"[INFO] Mesh      : nx x ny x nz = {nx} x {ny} x {nz} hex elements")
 
 TOLERANCE = 1e-4
 
-# --.. ..- .-.. .-.. --- analytical reference (engineering bar) ----------------
+# --.. ..- .-.. .-.. --- analytical reference (engineering bar) --.. ..- .-.. .-.. ---
 sigma_xx_ref = P
 sigma_yy_ref = 0.0
 sigma_zz_ref = 0.0
@@ -144,18 +144,18 @@ if side_mask.any():
 Pa_to_MPa = 1e-6
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
+# The transverse and shear stresses (sigma_yy, sigma_zz, sigma_xy) are all ~0
+# (free Poisson contraction -> uniaxial stress) and overlap, so plot a single
+# representative series to avoid clutter.
 ax1.plot(x_s, sigma_xx * Pa_to_MPa, "bo-", label=r"FE $\sigma_{xx}$",
          markersize=6, alpha=0.8)
-ax1.plot(x_s, sigma_yy * Pa_to_MPa, "rs-", label=r"FE $\sigma_{yy}$",
-         markersize=6, alpha=0.8)
-ax1.plot(x_s, sigma_zz * Pa_to_MPa, "m^-", label=r"FE $\sigma_{zz}$",
-         markersize=6, alpha=0.8)
-ax1.plot(x_s, sigma_xy * Pa_to_MPa, "gv-", label=r"FE $\sigma_{xy}$",
-         markersize=6, alpha=0.8)
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, "rs-",
+         label=r"FE $\sigma_{yy}=\sigma_{zz}=\sigma_{xy}$",
+         markersize=5, alpha=0.8)
 ax1.axhline(P * Pa_to_MPa, color="k", linestyle="--", linewidth=1.2,
             label=rf"Analytic $\sigma_{{xx}} = P = {P*Pa_to_MPa:.0f}$ MPa")
-ax1.axhline(0.0, color="grey", linestyle=":", linewidth=0.8,
-            label=r"Analytic $\sigma_{yy}=\sigma_{zz}=\sigma_{xy}=0$")
+ax1.axhline(0.0, color="grey", linestyle=":", linewidth=0.9,
+            label=r"Analytic transverse/shear $= 0$ (uniaxial stress)")
 ax1.set_xlabel("x (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
 ax1.set_title("Stress along the bar axis (y=Ly/2, z=Lz/2)", fontsize=12)
@@ -173,9 +173,9 @@ ax2.legend(loc="best")
 ax2.grid(True, linestyle="--", alpha=0.6)
 
 fig.suptitle(
-    rf"1D bar in tension (3D hex mesh)  |  $P$ = {P*Pa_to_MPa:.0f} MPa,  "
-    rf"$L$ = {Lx} m,  $E$ = {E*1e-9:.0f} GPa,  $\nu$ = {nu}",
-    fontsize=13,
+    rf"1D bar in tension — regime: 3d (engineering bar)  |  "
+    rf"$P$ = {P*Pa_to_MPa:.0f} MPa,  $L$ = {Lx} m,  $E$ = {E*1e-9:.0f} GPa,  $\nu$ = {nu}",
+    fontsize=12,
 )
 plt.tight_layout()
 

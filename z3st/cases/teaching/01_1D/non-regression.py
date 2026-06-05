@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: teaching/01_1D  --  1D bar in uniaxial tension on a true 1D mesh.
+Z3ST case: teaching/01_1D  --  1D bar in uniaxial tension on a true 1D mesh,
+solved with the proper structural 1D regime (regime: 1d).
 
 Reference: Bower, "Applied Mechanics of Solids" (CRC, 2010),
 ch. 7.2 + ch. 8.1.5.
@@ -9,38 +10,41 @@ ch. 7.2 + ch. 8.1.5.
 What the FE actually solves
 ---------------------------
 The mesh has tdim = 1 (line elements). The displacement function space is a
-1-component vector field u(x) = u_x(x). The strain tensor is therefore
-non-zero only in the axial direction:
-    eps_xx = du_x/dx,   eps_yy = eps_zz = eps_xy = eps_xz = eps_yz = 0
-There is no transverse motion modelled at all, so the bar is *implicitly
-constrained* in y and z (think: a 1D fibre inside an infinitely rigid sleeve).
+1-component vector field u(x) = u_x(x), so the only kinematic strain is
+    eps_xx = du_x/dx,   eps_yy = eps_zz = eps_xy = eps_xz = eps_yz = 0 .
 
-Applying the 3D isotropic Hooke's law sigma = lambda tr(eps) I + 2G eps to
-this constrained strain gives:
-    sigma_xx = (lambda + 2G) eps_xx
-    sigma_yy = sigma_zz = lambda eps_xx      (Poisson reaction stresses)
+With regime: 1d, z3st uses the engineering bar constitutive law -- a uniaxial
+*stress* state in which the transverse stresses are taken to be zero:
+    sigma_xx = E eps_xx
+    sigma_yy = sigma_zz = 0
     sigma_xy = sigma_yz = sigma_xz = 0
 
 With sigma_xx = P (the applied traction):
-    eps_xx     = P / (lambda + 2G)
-    sigma_yy   = sigma_zz = nu/(1 - nu) * P
-    u_x(x)     = eps_xx * x
-    u_x(L)     = P * L / (lambda + 2G)
+    eps_xx   = P / E
+    u_x(x)   = eps_xx * x
+    u_x(L)   = P * L / E
 
-Equivalent in (E, nu): lambda + 2G = E (1 - nu) / [(1 + nu)(1 - 2nu)].
 For E = 200 GPa, nu = 0.3:
-    lambda + 2G = 269.23 GPa
-    nu/(1 - nu) = 0.4286 -> sigma_yy = sigma_zz = 42.86 MPa
-    u_x(L = 1 m, P = 100 MPa) = 0.3714 mm
+    u_x(L = 1 m, P = 100 MPa) = P L / E = 1e8 * 1 / 2e11 = 0.5000 mm
+    sigma_yy = sigma_zz = 0
 
-This is *not* the engineering bar formula u_x = P L / E that Bower's ch. 7.2
-hand-derives -- that one assumes free transverse contraction (sigma_yy =
-sigma_zz = 0). The engineering bar is recovered in case 01_3D, where the
-mesh is truly 3D and the transverse Poisson contraction is free.
+This is exactly Bower's engineering bar formula u_x = P L / E (ch. 7.2),
+and it matches case 01_3D, where the same answer is recovered on a genuinely
+3D mesh that lets the transverse Poisson contraction happen freely. A proper
+1D bar element and a 3D bar in uniaxial tension agree.
 
-The pedagogical pair (01_1D vs 01_3D) shows that a "1D" mesh in FE software
-is not the same as the engineering 1D model -- it carries an implicit lateral
-constraint that bumps the axial stiffness from E to (lambda + 2G).
+Contrast with regime: 3d on the SAME line mesh
+----------------------------------------------
+If this case is run under regime: 3d instead, the 1D (transversely blocked)
+strain is fed into the full 3D Hooke law sigma = lambda tr(eps) I + 2G eps,
+which gives the laterally-*constrained* modulus:
+    sigma_xx = (lambda + 2G) eps_xx,  sigma_yy = sigma_zz = nu/(1-nu) P,
+    u_x(L)   = P L / (lambda + 2G) = 0.3714 mm   (E = 200 GPa, nu = 0.3).
+That constrained result is an artifact of reusing the 3D constitutive law on a
+mesh with no transverse degrees of freedom (a fibre in a rigid sleeve), not
+the engineering bar. The pair (regime: 1d vs regime: 3d) on this one mesh is
+the pedagogical point: the regime, not the mesh dimension alone, decides which
+axial modulus -- E or lambda + 2G -- the element carries.
 """
 
 import os
@@ -80,10 +84,10 @@ with open(MATERIAL_FILE, "r") as f:
 E = float(mat_data.get("E"))
 nu = float(mat_data.get("nu"))
 
-# Lame parameters derived the same way z3st does (see spine.py:97-98).
+# Lame parameters derived the same way z3st does (see spine.py:97-98)
 lmbda = E * nu / ((1.0 + nu) * (1.0 - 2.0 * nu))
 G = E / (2.0 * (1.0 + nu))
-M_constrained = lmbda + 2.0 * G                # axial "constrained" modulus
+M_constrained = lmbda + 2.0 * G
 
 with open(BC_FILE, "r") as f:
     bc_data = yaml.safe_load(f)
@@ -101,24 +105,25 @@ with open(MESH_GEO_FILE, "r") as f:
 # therefore (nx - 1).
 nx = int(re.search(r"nx\s*=\s*(\d+);", content).group(1)) - 1   # line elements
 
-print(f"[INFO] Geometry  : Lx = {Lx} m (true 1D mesh)")
+print(f"[INFO] Geometry  : Lx = {Lx} m (true 1D mesh, regime: 1d)")
 print(f"[INFO] Material  : E = {E:.2e} Pa, nu = {nu}")
 print(f"[INFO]            lambda = {lmbda:.3e}, G = {G:.3e}, "
-      f"lambda + 2G = {M_constrained:.3e} Pa")
+      f"lambda + 2G = {M_constrained:.3e} Pa (constrained modulus, regime: 3d)")
 print(f"[INFO] Load      : P = {P:.2e} Pa ({P * 1e-6:.1f} MPa)")
 print(f"[INFO] Mesh      : nx = {nx} line elements")
 
 TOLERANCE = 1e-4
 
-# --.. ..- .-.. .-.. --- analytical reference (constrained bar) ----------------
+# --.. ..- .-.. .-.. --- analytical reference (engineering bar, regime: 1d) ----
+# Uniaxial stress state: sigma_xx = E eps_xx, sigma_yy = sigma_zz = 0.
 sigma_xx_ref = P
-sigma_yy_ref = nu / (1.0 - nu) * P             # = lambda * eps_xx
-sigma_zz_ref = sigma_yy_ref
-eps_xx_ref = P / M_constrained
+sigma_yy_ref = 0.0
+sigma_zz_ref = 0.0
+eps_xx_ref = P / E
 u_xL_ref = eps_xx_ref * Lx
 
-print(f"[INFO] Constrained-bar ref: eps_xx = {eps_xx_ref:.4e}, "
-      f"u_x(L) = {u_xL_ref * 1e3:.4f} mm, "
+print(f"[INFO] Engineering-bar ref: eps_xx = {eps_xx_ref:.4e}, "
+      f"u_x(L) = P L / E = {u_xL_ref * 1e3:.4f} mm, "
       f"sigma_yy = sigma_zz = {sigma_yy_ref * 1e-6:.2f} MPa")
 
 # --.. ..- .-.. .-.. --- inspect VTU --.. ..- .-.. .-.. ---
@@ -127,7 +132,7 @@ list_fields(VTU_FILE)
 # --.. ..- .-.. .-.. --- extract FE fields --.. ..- .-.. .-.. ---
 # Stress is per-cell. On a 1D mesh every cell is on the "axis", so we just
 # extract everything and sort by x.
-x_S, _y_S, _z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+x_S, _, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
 sort_idx = np.argsort(x_S)
 x_s = x_S[sort_idx]
 sigma_xx = S_all[sort_idx, 0]
@@ -136,7 +141,7 @@ sigma_zz = S_all[sort_idx, 8]
 
 # Displacement is per-node. On a 1D mesh u_vec is a 1D array of shape
 # (n_nodes,) -- the single axial component. On 2D/3D it would be 2D.
-x_n, _y_n, _z_n, u_vec = extract_displacement(VTU_FILE)
+x_n, _, _, u_vec = extract_displacement(VTU_FILE)
 u_x = u_vec if u_vec.ndim == 1 else u_vec[:, 0]
 sort_n = np.argsort(x_n)
 x_n_sorted = x_n[sort_n]
@@ -152,27 +157,27 @@ print(f"[INFO] FE tip disp: u_x(L) = {u_xL_num * 1e3:.6f} mm "
 Pa_to_MPa = 1e-6
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
+# sigma_yy and sigma_zz are identically zero in regime: 1d (uniaxial stress)
+# and overlap exactly, so plot them as a single series to avoid clutter.
 ax1.plot(x_s, sigma_xx * Pa_to_MPa, "bo-", label=r"FE $\sigma_{xx}$",
          markersize=6, alpha=0.8)
-ax1.plot(x_s, sigma_yy * Pa_to_MPa, "rs-", label=r"FE $\sigma_{yy}$",
-         markersize=6, alpha=0.8)
-ax1.plot(x_s, sigma_zz * Pa_to_MPa, "m^-", label=r"FE $\sigma_{zz}$",
-         markersize=6, alpha=0.8)
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, "rs-", label=r"FE $\sigma_{yy}=\sigma_{zz}$",
+         markersize=5, alpha=0.8)
 ax1.axhline(P * Pa_to_MPa, color="k", linestyle="--", linewidth=1.2,
             label=rf"Analytic $\sigma_{{xx}} = P = {P*Pa_to_MPa:.0f}$ MPa")
-ax1.axhline(sigma_yy_ref * Pa_to_MPa, color="r", linestyle=":", linewidth=1.0,
-            label=rf"Analytic $\sigma_{{yy}}=\sigma_{{zz}}=\frac{{\nu}}{{1-\nu}}P"
-                  rf"={sigma_yy_ref*Pa_to_MPa:.1f}$ MPa")
+ax1.axhline(0.0, color="grey", linestyle=":", linewidth=0.9,
+            label=r"Analytic $\sigma_{yy}=\sigma_{zz}=0$ (uniaxial stress)")
 ax1.set_xlabel("x (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
-ax1.set_title("Stress along the bar (1D mesh)", fontsize=13)
+ax1.set_title(r"Stress along the bar — uniaxial stress ($\sigma_{xx}=E\,\varepsilon_{xx}$)",
+              fontsize=12)
 ax1.legend(loc="best", fontsize=9)
 ax1.grid(True, linestyle="--", alpha=0.6)
 
 ax2.plot(x_n_sorted, u_x_sorted * 1e3, "bo", label=r"FE $u_x$", markersize=7)
 x_dense = np.linspace(0.0, Lx, 200)
 ax2.plot(x_dense, eps_xx_ref * x_dense * 1e3, "k--", linewidth=1.5,
-         label=r"Analytic $u_x = P\,x/(\lambda+2G)$")
+         label=r"Analytic $u_x = P\,x/E$")
 ax2.set_xlabel("x (m)", fontsize=12)
 ax2.set_ylabel(r"$u_x$ (mm)", fontsize=12)
 ax2.set_title("Axial displacement along the bar", fontsize=13)
@@ -180,9 +185,9 @@ ax2.legend(loc="best")
 ax2.grid(True, linestyle="--", alpha=0.6)
 
 fig.suptitle(
-    rf"1D bar in tension (true 1D mesh)  |  $P$ = {P*Pa_to_MPa:.0f} MPa,  "
-    rf"$L$ = {Lx} m,  $E$ = {E*1e-9:.0f} GPa,  $\nu$ = {nu}",
-    fontsize=13,
+    rf"1D bar in tension — regime: 1d (engineering bar, $\sigma=E\varepsilon$)  |  "
+    rf"$P$ = {P*Pa_to_MPa:.0f} MPa,  $L$ = {Lx} m,  $E$ = {E*1e-9:.0f} GPa,  $\nu$ = {nu}",
+    fontsize=12,
 )
 plt.tight_layout()
 
@@ -196,11 +201,11 @@ sigma_yy_err = float(np.max(np.abs(sigma_yy - sigma_yy_ref)) / P)
 sigma_zz_err = float(np.max(np.abs(sigma_zz - sigma_zz_ref)) / P)
 u_xL_err = float(abs(u_xL_num - u_xL_ref) / u_xL_ref)
 
-print("\n[RESULT] Relative errors vs constrained-bar analytical:")
+print("\n[RESULT] Relative errors vs engineering-bar analytical (regime: 1d):")
 print(f"   sigma_xx ~ P                    : {sigma_xx_err:.3e}")
-print(f"   sigma_yy ~ nu/(1-nu)*P          : {sigma_yy_err:.3e}")
-print(f"   sigma_zz ~ nu/(1-nu)*P          : {sigma_zz_err:.3e}")
-print(f"   u_x(L)  ~ P*L / (lambda + 2G)   : {u_xL_err:.3e}")
+print(f"   sigma_yy ~ 0                    : {sigma_yy_err:.3e}")
+print(f"   sigma_zz ~ 0                    : {sigma_zz_err:.3e}")
+print(f"   u_x(L)  ~ P*L / E               : {u_xL_err:.3e}")
 
 errors = {
     "sigma_xx_max_err": {
@@ -229,18 +234,19 @@ errors = {
     },
 }
 
-# --.. ..- .-.. .-.. --- stiffness matrix extraction ------------------------
+# --.. ..- .-.. .-.. --- stiffness matrix extraction --.. ..- .-.. .-.. --
 # Re-assemble the global stiffness matrix using exactly the same mesh, function
-# space and bilinear form that z3st used during the run. With the default
+# space and bilinear form that z3st used during the run. With
 # nx = 11 (10 line elements) you get an 11x11 tridiagonal matrix; with nx = 1
 # (gmsh clamps to 2 nodes -> 1 line element) you get the canonical 2x2 K_e
 # from Bower ch. 7.2 / 8.1.5:
 #
-#     K_e = (lambda + 2G) / L_e * [[+1, -1], [-1, +1]]
+#     K_e = E / L_e * [[+1, -1], [-1, +1]]
 #
-# This block is purely diagnostic / pedagogical -- it does not affect the
-# pass/fail of the case, but it makes z3st's FE assembly visible and lets the
-# student verify it by hand against the textbook formula.
+# (the engineering-bar element stiffness, regime: 1d). This block is purely
+# diagnostic / pedagogical -- it does not affect the pass/fail of the case, but
+# it makes z3st's FE assembly visible and lets the student verify it by hand
+# against the textbook formula.
 
 print("\n" + "=" * 72)
 print("Stiffness matrix extraction (Bower ch. 7.2 / 8.1.5)")
@@ -258,9 +264,10 @@ n_dofs = V.dofmap.index_map.size_local * V.dofmap.bs
 print(f"V_m   : {V.ufl_element()}")
 print(f"#dofs : {n_dofs}")
 
-# Same bilinear form z3st builds on a 1D mesh: see our tdim==1 patch in
-# models/mechanical_model.py::epsilon (3x3 padded strain with only eps_xx),
-# combined with the default lame branch (lambda * tr(eps) * I + 2G * eps).
+# Same bilinear form z3st builds on a 1D mesh under regime: 1d: the tdim==1
+# patch in models/mechanical_model.py::epsilon returns the 3x3 padded strain
+# with only eps_xx, and the regime == "1d" branch of sigma_mech applies the
+# engineering law sigma = E * eps. Hence a(u, v) = E * u_x' * v_x'.
 u_tr = ufl.TrialFunction(V)
 v_te = ufl.TestFunction(V)
 
@@ -270,7 +277,7 @@ def _epsilon_1d(w):
                           [0.0,        0.0, 0.0]])
 
 eps_u = _epsilon_1d(u_tr)
-sigma_u = lmbda * ufl.tr(eps_u) * ufl.Identity(3) + 2.0 * G * eps_u
+sigma_u = E * eps_u
 a_form = dolfinx.fem.form(ufl.inner(sigma_u, _epsilon_1d(v_te)) * ufl.dx(domain=mesh))
 
 K_petsc = assemble_matrix(a_form)
@@ -290,24 +297,24 @@ print("Dof -> coordinate (sorted by x):")
 for i in order:
     print(f"   dof {i:2d}  ->  x = {dof_coords[i, 0]:.4f} m")
 
-# Pretty-print K in element-stiffness units (M/L_e_uniform).
-# For a uniform mesh, h = Lx / n_elements, so the "natural unit" of K is M/h.
+# Pretty-print K in element-stiffness units (E/L_e_uniform).
+# For a uniform mesh, h = Lx / n_elements, so the "natural unit" of K is E/h.
 n_elements = mesh.topology.index_map(mesh.topology.dim).size_local
 h = Lx / n_elements
-unit = M_constrained / h
+unit = E / h
 print()
 print(f"Element length h        = Lx / N = {Lx} / {n_elements} = {h:.4f} m")
-print(f"Element stiffness unit  = (lambda + 2G) / h = {unit:.4e} N/m^2")
+print(f"Element stiffness unit  = E / h = {unit:.4e} N/m^2")
 
 print(f"\nGlobal stiffness K (raw, N/m^2):")
 with np.printoptions(precision=4, linewidth=120, suppress=True):
     if n_dofs <= 12:
         print(K)
     else:
-        print(f"  [{n_dofs}x{n_dofs} matrix omitted; showing K * h / M instead]")
+        print(f"  [{n_dofs}x{n_dofs} matrix omitted; showing K * h / E instead]")
 
-print(f"\nNormalised K * h / (lambda + 2G)   (analytical: 1 elem -> [[+1,-1],[-1,+1]];")
-print(f"                                                 N elems -> tridiag with +2 on inner diag, -1 off):")
+print(f"\nNormalised K * h / E   (analytical: 1 elem -> [[+1,-1],[-1,+1]];")
+print(f"                                     N elems -> tridiag with +2 on inner diag, -1 off):")
 K_norm = K / unit
 with np.printoptions(precision=4, linewidth=120, suppress=True):
     print(K_norm)
@@ -325,14 +332,14 @@ if n_dofs == 2:
     K_analytic = unit * np.array([[+1.0, -1.0],
                                   [-1.0, +1.0]])
     err = float(np.max(np.abs(K - K_analytic)))
-    print(f"\n[1 element] Closed-form K_e = (lambda+2G)/L_e * [[+1,-1],[-1,+1]]:")
+    print(f"\n[1 element] Closed-form K_e = E/L_e * [[+1,-1],[-1,+1]]:")
     with np.printoptions(precision=4, linewidth=120, suppress=True):
         print(K_analytic)
     print(f"   Max |K_FE - K_analytic| = {err:.3e}")
 
 print("=" * 72)
 
-# --.. ..- .-.. .-.. --- shape functions visualisation -----------------------
+# --.. ..- .-.. .-.. --- shape functions visualisation --.. ..- .-.. .-.. ---
 # The Lagrange P1 shape functions N_i(x) are the "hat functions" that the FE
 # uses as a basis. They are never built explicitly in z3st/dolfinx -- basix
 # evaluates them on the fly during assembly. But we can recover N_i by setting
@@ -417,7 +424,7 @@ kron_err = float(np.max(np.abs(N_at_nodes - np.eye(n_dofs))))
 print(f"       Kronecker delta check at exact node coords: "
       f"max |N_i(x_j) - delta_ij| = {kron_err:.3e}")
 
-# --.. ..- .-.. .-.. --- displacement reconstruction via N_i u_i -------------
+# --.. ..- .-.. .-.. --- displacement reconstruction via N_i u_i --.. ..- .-.. .-.. ---
 # Show that the FE displacement u_x(x) is literally a weighted sum of the
 # shape functions, with weights = nodal displacements u_i. This is the
 # Galerkin trial-function representation u(x) = sum_i u_i N_i(x).
@@ -459,9 +466,9 @@ for i in range(n_dofs):
 ax.plot(xs_sample, u_reconstructed * 1e3, "k-", linewidth=2.5,
         label=r"$u_x(x) = \sum_i u_i\, N_i(x)$  (sum)")
 
-# Analytical reference (constrained-bar PL/M * x)
+# Analytical reference (engineering-bar PL/E * x)
 ax.plot(xs_sample, eps_xx_ref * xs_sample * 1e3, "r--", linewidth=1.5,
-        alpha=0.8, label=r"Analytical  $u_x = P\,x/(\lambda+2G)$")
+        alpha=0.8, label=r"Analytical  $u_x = P\,x/E$")
 
 # Mark nodes
 for i in range(n_dofs):
