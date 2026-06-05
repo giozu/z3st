@@ -79,7 +79,7 @@ Material loaded: volume
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x70d4bbd17ce0> (function)
+  _k_func         → <function k at 0x7f7c9458fce0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -411,7 +411,7 @@ Convergence check
   → q_third[volume](W/m3) min = 1.00e+05, max = 1.00e+05, mean = 1.00e+05
   Linear solver
   T_new: min=500.00 K, max=515.18 K, mean=509.86 K
-  ||ΔT||/||T|| = 7.915e-15
+  ||ΔT||/||T|| = 7.913e-15
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -433,7 +433,7 @@ Convergence check
   → q_third[volume](W/m3) min = 1.00e+05, max = 1.00e+05, mean = 1.00e+05
   Linear solver
   T_new: min=500.00 K, max=515.18 K, mean=509.86 K
-  ||ΔT||/||T|| = 4.249e-16
+  ||ΔT||/||T|| = 4.260e-16
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -448,5 +448,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 3.02 s
+Simulation completed in 5.38 s
 Total time steps solved: 1

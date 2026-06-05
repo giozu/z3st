@@ -1,5 +1,5 @@
-Info    : Running '/home/giovanni/.local/bin/gmsh mesh.geo -3' [Gmsh 4.14.1, 1 node, max. 1 thread]
-Info    : Started on Wed May 20 18:29:24 2026
+Info    : Running '/home/giovanni/miniconda3/envs/z3st/bin/gmsh mesh.geo -3' [Gmsh 4.14.1, 1 node, max. 1 thread]
+Info    : Started on Fri Jun  5 12:05:50 2026
 Info    : Reading 'mesh.geo'...
 Info    : Done reading 'mesh.geo'
 Info    : Meshing 1D...
@@ -15,7 +15,7 @@ Info    : [ 70%] Meshing curve 9 (Line)
 Info    : [ 80%] Meshing curve 10 (Line)
 Info    : [ 90%] Meshing curve 11 (Line)
 Info    : [100%] Meshing curve 12 (Line)
-Info    : Done meshing 1D (Wall 0.000487641s, CPU 0.004115s)
+Info    : Done meshing 1D (Wall 0.000697725s, CPU 0.000191s)
 Info    : Meshing 2D...
 Info    : [  0%] Meshing surface 1 (Transfinite)
 Info    : [ 20%] Meshing surface 2 (Transfinite)
@@ -23,13 +23,13 @@ Info    : [ 40%] Meshing surface 3 (Transfinite)
 Info    : [ 60%] Meshing surface 4 (Transfinite)
 Info    : [ 70%] Meshing surface 5 (Transfinite)
 Info    : [ 90%] Meshing surface 6 (Transfinite)
-Info    : Done meshing 2D (Wall 0.000528082s, CPU 0.002137s)
+Info    : Done meshing 2D (Wall 0.00104589s, CPU 0.000332s)
 Info    : Meshing 3D...
 Info    : Meshing volume 1 (Transfinite)
-Info    : Done meshing 3D (Wall 0.0178606s, CPU 0.059622s)
+Info    : Done meshing 3D (Wall 0.0225855s, CPU 0.018816s)
 Info    : Optimizing mesh...
-Info    : Done optimizing mesh (Wall 0.000158657s, CPU 9e-06s)
+Info    : Done optimizing mesh (Wall 0.000151811s, CPU 5.5e-05s)
 Info    : 8000 nodes 9261 elements
 Info    : Writing 'mesh.msh'...
 Info    : Done writing 'mesh.msh'
-Info    : Stopped on Wed May 20 18:29:24 2026 (From start: Wall 0.0656748s, CPU 0.372826s)
+Info    : Stopped on Fri Jun  5 12:05:50 2026 (From start: Wall 0.0835431s, CPU 0.351837s)

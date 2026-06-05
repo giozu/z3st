@@ -425,7 +425,7 @@ Convergence check
   → q_third[steel](W/m3) min = 1.24e+02, max = 2.00e+06, mean = 2.27e+05
   Linear solver
   T_new: min=490.00 K, max=539.38 K, mean=522.13 K
-  ||ΔT||/||T|| = 4.284e-16
+  ||ΔT||/||T|| = 4.288e-16
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -440,5 +440,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 3.06 s
+Simulation completed in 7.13 s
 Total time steps solved: 1

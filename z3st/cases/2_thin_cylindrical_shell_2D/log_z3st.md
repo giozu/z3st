@@ -402,7 +402,7 @@ Convergence check
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=480.00 K, max=490.00 K, mean=484.96 K
-  ||ΔT||/||T|| = 7.161e-15
+  ||ΔT||/||T|| = 7.162e-15
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -424,14 +424,14 @@ Convergence check
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=480.00 K, max=490.00 K, mean=484.96 K
-  ||ΔT||/||T|| = 3.614e-16
+  ||ΔT||/||T|| = 3.610e-16
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 5.388e-07
+  ||Δu||/||u|| = 5.380e-07
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -439,5 +439,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 13.57 s
+Simulation completed in 17.71 s
 Total time steps solved: 1

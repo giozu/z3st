@@ -438,7 +438,7 @@ Convergence check
   Applying flux on subdomain id = 2
   Linear solver
   T_new: min=490.00 K, max=562.48 K, mean=554.29 K
-  ||ΔT||/||T|| = 4.452e-16
+  ||ΔT||/||T|| = 4.430e-16
   [adaptive] relax_T=0.95
 
 **[INFO]** Assembling mechanical problem...
@@ -453,5 +453,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.66 s
+Simulation completed in 2.39 s
 Total time steps solved: 1
