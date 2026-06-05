@@ -27,8 +27,6 @@ through a staggered solution scheme with adaptive relaxation.
    :local:
    :depth: 1
 
-----
-
 Thermal Model
 -------------
 
@@ -83,8 +81,6 @@ Implemented in :class:`z3st.models.thermal_model.ThermalModel`.
 
    Coupled thermo-mechanical thin slab: temperature and thermal stress through
    the thickness, numerical (markers) against the analytical solution (lines).
-
-----
 
 Mechanical Model
 ----------------
@@ -288,8 +284,6 @@ theory.
    Crystal plasticity (single grain): the Z3ST response saturates towards the
    analytical saturation stress :math:`\sigma_{sat}`.
 
-----
-
 Phase-Field Damage (Fracture Mechanics)
 ---------------------------------------
 
@@ -366,8 +360,6 @@ Implemented in :class:`z3st.models.damage_model.DamageModel`.
    Single-edge-notched shear test (steel): the curved crack path reproduces the
    benchmark of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010).
 
-----
-
 .. _gap-conductance:
 
 Gap Conductance Model
@@ -390,8 +382,6 @@ per simulation with a SciPy cKDTree query. The gap pair is declared through the
 specialised contact element is required. This is the capability that makes Z3ST
 **multi-body** -- for example, heat transfer from a fuel pellet to its cladding.
 Implemented in :class:`z3st.models.gap_model.GapModel`.
-
-----
 
 Cluster Dynamics Model
 ----------------------
@@ -418,8 +408,6 @@ to enforce conservation, and the local Péclet number is logged for diagnostics.
    verification study.
 
 Implemented in :class:`z3st.models.cluster_dynamic_model.ClusterDynamicModel`.
-
-----
 
 Coupled Thermo-Mechanical Analysis
 ----------------------------------
@@ -455,8 +443,6 @@ conjugate gradients; the mechanical block uses GMRES. Non-linear mechanical
 problems (hyperelasticity, custom non-linear route) use PETSc SNES with a
 Newton line search.
 
-----
-
 Application: thermal-shock cracking of a UO\ :sub:`2` pellet
 ------------------------------------------------------------
 
@@ -491,8 +477,6 @@ Amor + hybrid, fully coupled :math:`T \to \boldsymbol{\varepsilon}_{el} \to D`).
 
    Quantitative verification: radial temperature profile, temperature history at
    the contact rim, and damage penetration, against McClenny Fig. 7b.
-
-----
 
 **See also**
 

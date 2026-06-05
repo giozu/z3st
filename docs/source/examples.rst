@@ -12,8 +12,6 @@ All cases include:
 - Non-regression testing
 - Visualization and post-processing scripts
 
----
-
 Linear thermo-mechanics
 -----------------------
 
@@ -71,8 +69,6 @@ The case serves as a **verification benchmark** for:
    :align: center
 
    Combined view: Temperature field and resulting stress distribution.
-
----
 
 Cylindrical Shell: Lamé Solution Verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -138,8 +134,6 @@ Agreement with Lamé solution
 Correct stress state in cylindrical coordinates
 Proper enforcement of plane-strain conditions
 
----
-
 Plasticity and Material Nonlinearity
 -------------------------------------
 
@@ -176,8 +170,6 @@ This example demonstrates **J2 (von Mises) plasticity** with isotropic hardening
 2. **Yielding** at :math:`\sigma = \sigma_y`: Deviation from linearity
 3. **Plastic flow** with hardening: Continued load bearing beyond yield
 4. **Strain accumulation**: Permanent plastic deformation
-
----
 
 Crystal Plasticity with Automatic Differentiation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -232,8 +224,6 @@ The model uses UFL's ``ufl.variable()`` and ``ufl.diff()`` to automatically comp
 
 This eliminates **hundreds of lines** of error-prone manual derivative code!
 
----
-
 Stress-Strain Curves: Displacement-Controlled Loading
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -258,8 +248,6 @@ This example generates stress-strain curves under **displacement-controlled** lo
 - Tensile testing simulation
 - Compression testing
 - Cyclic loading (with appropriate modifications)
-
----
 
 Phase-Field Fracture
 --------------------
@@ -311,8 +299,6 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 **Thermodynamically consistent**: Variational formulation
 **Irreversibility**: Damage can only increase
 
----
-
 Single-Edge-Notched Shear Test (Miehe 2010 benchmark)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -344,8 +330,6 @@ result of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010)
    :align: center
 
    Von Mises stress concentration at the propagating crack tip.
-
----
 
 UO\ :sub:`2` Pellet Thermal-Shock Cracking (McClenny 2022)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -392,8 +376,6 @@ radial cracks. It reproduces McClenny et al., *J. Nucl. Mater.* 565 (2022).
    Quantitative verification: radial temperature profile, temperature history at
    the contact rim, and damage penetration, against McClenny Fig. 7b.
 
----
-
 Numerical analysis
 ------------------
 
@@ -439,5 +421,3 @@ This example demonstrates **mesh convergence** for a 2D thermal problem, showing
 - Convergence rate: :math:`\mathcal{O}(h^2)` for P1 elements
 - Fine mesh (nx=80) achieves < 0.5% error
 - Demonstrates importance of mesh refinement for accurate results
-
----
