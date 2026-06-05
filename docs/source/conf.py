@@ -40,7 +40,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.todo",
     "sphinx.ext.ifconfig",
-    "sphinx.ext.imgmath",
     # Type hints and doc improvements
     "sphinx_autodoc_typehints",
     "myst_parser",  # enables Markdown support
@@ -122,6 +121,10 @@ todo_include_todos = False
 math_number_all = True
 math_eqref_format = "Eq.{number}"
 numfig = True
+
+# Render math client-side with MathJax (no LaTeX/dvipng toolchain needed in CI).
+# Without this, sphinx.ext.imgmath could hijack rendering and emit raw LaTeX.
+html_math_renderer = "mathjax"
 
 # ============================================================================
 # MARKDOWN (MyST) CONFIGURATION

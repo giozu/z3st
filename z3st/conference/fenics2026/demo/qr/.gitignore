@@ -1,0 +1,3 @@
+# Static QR codes for the attract loop — track them despite the repo's *.png ignore.
+# Regenerate with ./make_qr.sh if the URLs ever change.
+!qr_*.png

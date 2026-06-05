@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<!-- =====================================================================
+  Z3ST attract loop  --  FEniCS 2026 software-demonstration table.
+  Runs full-screen on the laptop when no one is at the table: loops the
+  case-14 crack animation with the pitch and QR codes, to pull the
+  cycling poster-session crowd (and every passing judge) toward Z3ST.
+
+  Fully offline. No dependencies, no internet. Just open in a browser and
+  press F11 for full screen (or click once to go full screen).
+
+  Needs the baked frames:  ./open_paraview.sh --render   (-> baked/*.png)
+===================================================================== -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Z3ST — FEniCS 2026</title>
+<style>
+  :root{
+    --blue:#1F6FB2; --teal:#2A9D8F; --amber:#E9A23B; --ink:#23303a; --bg:#eef2f5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);overflow:hidden;cursor:none}
+  .wrap{height:100vh;display:flex;flex-direction:column}
+  header{background:var(--blue);color:#fff;padding:2.2vh 4vw 1.6vh}
+  header h1{font-size:4.2vh;letter-spacing:.5px}
+  header .sub{font-size:2.2vh;opacity:.92;margin-top:.4vh;font-weight:300}
+  main{flex:1;display:flex;align-items:center;justify-content:center;gap:4vw;padding:1.5vh 4vw}
+  .stage{flex:0 0 56%;height:64vh;background:#fff;border-radius:14px;
+    box-shadow:0 10px 40px rgba(0,0,0,.12);display:flex;align-items:center;
+    justify-content:center;position:relative;overflow:hidden}
+  .stage img{max-width:96%;max-height:96%;object-fit:contain}
+  .badge{position:absolute;left:18px;bottom:14px;font-size:1.7vh;color:var(--ink);
+    background:rgba(255,255,255,.78);padding:.4vh 1vw;border-radius:8px}
+  .miss{display:none;padding:3vh;text-align:center;color:#b23;font-size:2.2vh;line-height:1.5}
+  .right{flex:1;display:flex;flex-direction:column;gap:2.4vh}
+  .pitch{font-size:2.5vh;line-height:1.45}
+  .pitch b{color:var(--blue)}
+  .pitch .ad{font-family:ui-monospace,Menlo,Consolas,monospace;background:#fff;
+    border-left:4px solid var(--teal);padding:1.2vh 1.4vw;border-radius:6px;
+    font-size:2.1vh;display:inline-block;margin-top:1vh}
+  .qrs{display:flex;gap:2vw;margin-top:auto}
+  .qr{text-align:center}
+  .qr img{width:13vh;height:13vh;background:#fff;padding:6px;border-radius:8px;
+    box-shadow:0 4px 14px rgba(0,0,0,.10)}
+  .qr div{font-size:1.7vh;margin-top:.6vh;color:var(--ink)}
+  .qr small{display:block;font-size:1.3vh;color:#667;font-weight:300}
+  footer{background:#fff;border-top:3px solid var(--amber);padding:1.4vh 4vw;
+    display:flex;justify-content:space-between;align-items:center;font-size:1.9vh}
+  footer .who{font-weight:600}
+  footer .who span{font-weight:300;color:#667}
+  .tag{color:var(--teal);font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap" id="full">
+  <header>
+    <h1>Z3ST &mdash; a FEniCSx framework for thermo-mechanical analysis &amp; fracture</h1>
+    <div class="sub">multiscale coupling &middot; phase-field fracture &middot; automatic differentiation</div>
+  </header>
+
+  <main>
+    <div class="stage">
+      <img id="frame" alt="Z3ST crack propagation">
+      <div class="badge" id="badge">UO&#8322; thermal-shock cracking &middot; phase-field damage</div>
+      <div class="miss" id="miss">
+        No baked frames found.<br>
+        Run <code>./open_paraview.sh --render</code> to generate the animation,<br>
+        then reload this page.
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="pitch">
+        Write the constitutive physics as an <b>energy</b>.<br>
+        Automatic differentiation gives you the stress and the tangent for free:
+        <span class="ad">P = ufl.diff(&psi;, F)</span>
+      </div>
+      <div class="pitch" style="font-size:2.1vh">
+        Coupled thermo-mechanics, plasticity and phase-field fracture &mdash;
+        all <b>YAML-driven</b>, verified, reproducible. Your case is one input file.
+      </div>
+
+      <div class="qrs">
+        <div class="qr"><img src="qr/qr_repo.png" alt="repo"><div>code <small>github.com/giozu/z3st</small></div></div>
+        <div class="qr"><img src="qr/qr_docs.png" alt="docs"><div>docs <small>giozu.github.io/z3st</small></div></div>
+        <div class="qr"><img src="qr/qr_doi.png" alt="doi"><div>cite <small>zenodo 10.5281/&hellip;17748028</small></div></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="who">Giovanni Zullo <span>&middot; Politecnico di Milano &middot; giovanni.zullo@polimi.it</span></div>
+    <div class="tag">FEniCS 2026 &middot; live software demonstration &mdash; come and run it with me</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  // ---- configuration -------------------------------------------------------
+  var PREFIX = 'baked/case14_crack.';   // SaveAnimation output pattern
+  var EXT = '.png';
+  var MAX = 100;                         // baked frame count (case-14 n_steps)
+  var PAD = 4;
+  var FRAME_MS = 110;                    // ~9 fps
+  var HOLD_MS = 1600;                    // pause on the fully-developed crack
+
+  function pad(n){ var s=''+n; while(s.length<PAD) s='0'+s; return s; }
+
+  // ---- preload, tolerate gaps ----------------------------------------------
+  var srcs = [], settled = 0, anyOk = false, total = MAX;
+  for (var i=0;i<MAX;i++){ (function(i){
+    var src = PREFIX+pad(i)+EXT, im = new Image();
+    im.onload  = function(){ srcs[i]=src; anyOk=true; done(); };
+    im.onerror = function(){ srcs[i]=null;            done(); };
+    im.src = src;
+  })(i); }
+
+  function done(){
+    if (++settled < total) return;
+    var frames = srcs.filter(function(s){return s;});   // contiguous-ish, gaps dropped
+    if (!anyOk || frames.length===0){
+      document.getElementById('miss').style.display='block';
+      document.getElementById('frame').style.display='none';
+      document.getElementById('badge').style.display='none';
+      return;
+    }
+    play(frames);
+  }
+
+  // ---- playback: forward sweep, hold last, restart -------------------------
+  function play(frames){
+    var img = document.getElementById('frame'), k = 0;
+    img.src = frames[0];
+    function tick(){
+      k++;
+      if (k >= frames.length){
+        img.src = frames[frames.length-1];
+        setTimeout(function(){ k=0; img.src=frames[0]; setTimeout(loop,FRAME_MS); }, HOLD_MS);
+        return;
+      }
+      img.src = frames[k];
+      setTimeout(loop, FRAME_MS);
+    }
+    function loop(){ tick(); }
+    setTimeout(loop, FRAME_MS);
+  }
+
+  // ---- click anywhere -> full screen ---------------------------------------
+  document.getElementById('full').addEventListener('click', function(){
+    var el = document.documentElement;
+    (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
+  });
+})();
+</script>
+</body>
+</html>
