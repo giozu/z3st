@@ -272,6 +272,21 @@ paper's empirical and pedagogical content.
 <a id="paper-exp-9"></a>
 - [ ] **PAPER-EXP-9 — concrete numbers throughout.** The paper currently uses qualitative language in places where the implementation supplies concrete numbers. Examples: §2.5.1 says "adaptive relaxation" with no growth/shrink factors stated (defaults are 1.1 / 0.9 / 0.95 max / 0.1 min); §2.5.2 doesn't quote default rtol / stag_tol; §3.4.3 case-14 paragraph could state mesh size (currently 17 965 nodes per CONTEXT.md §9c), wall-time (311 s per CONTEXT.md §9c). A surgical sweep that promotes these from CONTEXT.md into the paper would help reproducibility.
 
+## Batch J — June 2026 session (docs rendering + per-material γ-heating)
+
+Work done in the 2026-06-05 session: a live-docs math-rendering fix, a docs
+accuracy + figures overhaul, and a new per-material γ-attenuation reference
+radius. Recorded here for traceability.
+
+<a id="docs-1"></a>
+- [x] **DOCS-1** — *Resolved 2026-06-05.* Math on the live Sphinx site (`giozu.github.io/z3st`) rendered as **raw LaTeX**. Root cause: `sphinx.ext.imgmath` was listed *after* `sphinx.ext.mathjax` in `docs/source/conf.py` and became the active math renderer; imgmath rasterises equations via `latex` + `dvipng`, which are absent in the Pages CI, so every formula fell back to source (and produced the `dvipng cannot be run` warning). Fix: removed `imgmath` from `extensions` and pinned `html_math_renderer = "mathjax"` (client-side, no toolchain). Verified locally — MathJax script injected, equations wrapped in `\(...\)`, dvipng warning gone. Deployed via PR #26. *Note:* the docs deploy is `main`-only (`static.yml`); `develop` work must reach `main` to publish.
+
+<a id="docs-2"></a>
+- [x] **DOCS-2** — *Resolved 2026-06-05.* `physics_models.rst` rewritten for accuracy against `main.tex`: hyperelasticity corrected from "(planned)" to **implemented**; a **crystal-plasticity** section added; the consistent **g(D) degradation of the thermal stress** documented (with the `1/K` argument); gap-conductance (gas correlation) and cluster-dynamics (advection–diffusion / DG1 / SIPG) equations aligned to the implementation. `examples.rst` gained the **SEN-shear (Miehe 2010)** and **UO₂ thermal-shock (McClenny 2022)** cases with result figures, and all inline math converted to proper `:math:` directives (also fixed a malformed `\dot{\gamma}` accent). New figures tracked under `docs/source/images/` via a `.gitignore` negation; `conf.py` excludes stray `images/**/*.md` from the build. Relates to [README-P2-1](#readme-p2-1) (public Sphinx URL now demonstrably useful).
+
+<a id="code-feature-2"></a>
+- [ ] **CODE-FEATURE-2** — *Added 2026-06-05 (staged, not yet committed).* Per-material γ-attenuation reference radius. `spine.py::set_power` (the `f(x)` heating closure) now reads `gamma_inner_radius` from each material card (`mat.get("gamma_inner_radius", self.inner_radius)`) and normalises the cylindrical `K₀(μr)/K₀(μ·R_ref)` and spherical `(R_ref/r)·exp(−μ(r−R_ref))` profiles at that per-material surface instead of the single geometry `inner_radius`. Backward-compatible (defaults to `inner_radius` → existing cases unchanged). Motivation: layered γ-heating where an inboard layer (e.g. a thermal shield ahead of the pressure vessel) must be normalised at its own inner surface. Documented in `CONTEXT.md` §2.2/§5. **Owed:** no material card or case sets `gamma_inner_radius` yet — wire it into a layered shield+vessel attenuation case (likely a variant of `II_attenuation_map`) and add a non-regression check. Commit with a `feat(thermal):` message.
+
 ## Follow-ups (work spawned by other fixes)
 
 <a id="code-feature-1"></a>

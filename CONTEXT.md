@@ -132,7 +132,7 @@ Key responsibilities:
    Also recognises `k` or `Gc` given as **symbolic Python callables** (`module.function`) and resolves them via `importlib`.
 4. `initialize_fields()` — instantiate `T`, `u`, `D`, `H`, `c`, … with initial conditions from material cards.
 5. `set_boundary_conditions()` — read `boundary_conditions.yaml` and dispatch to thermal/mechanical/damage BC setters.
-6. `set_power()` — build `q_third` (W/m³) per material: fissile (LHR/area), γ-heating with exponential decay in rect geometry or `K₀(μr)/K₀(μRᵢ)` in cylindrical geometry, spherical decay, etc.
+6. `set_power()` — build `q_third` (W/m³) per material: fissile (LHR/area), γ-heating with exponential decay in rect geometry or `K₀(μr)/K₀(μRᵢ)` in cylindrical geometry, spherical decay, etc. The cylindrical/spherical γ-attenuation profile is normalised at a **per-material reference surface** `gamma_inner_radius` (defaults to the geometry `inner_radius`, so existing cases are unchanged); a layer that sits inboard of the geometry reference — e.g. a thermal shield ahead of the vessel — sets it so its `K₀` profile is normalised at its own inner surface rather than the vessel's.
 7. `solve(dt, max_iters)` — dispatch to `solve_staggered`.
 8. `get_results()` — build symbolic UFL strain/stress/stress_mech/stress_th/energy_density dictionaries per material.
 9. `compute_energy_balance()` (damage only) — assembles elastic + fracture energy (`E_el`, `E_frac`) for diagnostics written to `energies.txt`.
@@ -389,6 +389,7 @@ Materials are plain YAML cards. Common fields:
 | `T_initial`         | K          | Initial temperature in the field                        |
 | `mu_gamma`          | 1/m        | γ-ray attenuation coefficient                          |
 | `gamma_heating`     | W/m³       | Volumetric γ heating magnitude                          |
+| `gamma_inner_radius`| m          | Per-material reference radius for the cylindrical/spherical γ-attenuation profile (optional; defaults to geometry `inner_radius`; set it for an inboard layer such as a shield) |
 | `fissile`           | bool       | If true, `q''' = LHR / area` in the pellet              |
 | `sigma_c` / `Gc`    | Pa, J/m²   | Phase-field critical stress OR fracture energy (one is derived from the other given `lc`) |
 | `yield_strength`    | Pa         | Initial yield stress (J2 plasticity)                    |
@@ -747,4 +748,4 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 
 ---
 
-*Generated on 2026-04-16 for Z3ST v0.1.0.*
+*Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-05 (per-material `gamma_inner_radius`; docs rendering + accuracy overhaul).*

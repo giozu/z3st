@@ -331,8 +331,15 @@ class Spine(
 
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
+                # Per-material reference surface for the cylindrical/spherical
+                # decay correlation. Defaults to the geometry inner_radius
+                # (backward-compatible). A material that sits inboard of the
+                # geometry reference (e.g. a thermal shield in front of the
+                # vessel) sets `gamma_inner_radius` so its K_0 profile is
+                # normalised at its own inner surface rather than the vessel's.
+                gamma_Ri = float(mat.get("gamma_inner_radius", self.inner_radius))
 
-                def f(x, q_third_0=q_third_0, mu=mu):
+                def f(x, q_third_0=q_third_0, mu=mu, gamma_Ri=gamma_Ri):
                     if self.geometry_type == "rect":
                         return q_third_0 * np.exp(-x[0] * mu)
                     elif self.geometry_type in ["cyl", "cylinder"]:
@@ -349,13 +356,13 @@ class Spine(
                             # 3D cartesian case, x[0] = x, x[1] = y
                             radius = np.sqrt(x[0] ** 2 + x[1] ** 2)
 
-                        return q_third_0 * sp.k0(mu * radius) / sp.k0(mu * self.inner_radius)
+                        return q_third_0 * sp.k0(mu * radius) / sp.k0(mu * gamma_Ri)
                     elif self.geometry_type == "sphere":
                         r = np.sqrt(x[0] ** 2 + x[1] ** 2 + x[2] ** 2)
                         return (
                             q_third_0
-                            * (self.inner_radius / r)
-                            * np.exp(-mu * (r - self.inner_radius))
+                            * (gamma_Ri / r)
+                            * np.exp(-mu * (r - gamma_Ri))
                         )
 
                 f_func = dolfinx.fem.Function(self.V_t)
