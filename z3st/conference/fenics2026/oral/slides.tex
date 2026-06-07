@@ -209,6 +209,39 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
   \end{block}
 \end{frame}
 
+% ---------------------------------------------------------------- 6b (PCMI)
+\begin{frame}{Pellet--cladding mechanical interaction (PCMI), verified}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Contact across the closing gap}
+      \begin{itemize}
+        \item pellet heats, expands, \alert{closes the gap}, contacts the clad
+        \item penalty $p = k_{pen}\langle -g\rangle_+$; traction $-p\,\mathbf{n}$ on both faces
+        \item \alert{emergent} pressure; clad driven outward -- load transfer
+        \item contact \alert{raises} gap conductance (Todreas Eq.~8.141) -- fuel cools
+      \end{itemize}
+      \vspace{0.2em}
+      \centering
+      \includegraphics[height=3.1cm]{figures/pcmi_curves.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{Verified against analytical Lam\'e}
+      \begin{itemize}
+        \item uniform-$\Delta T$ interference fit: exact $\delta=\alpha_f(T-T_{ref})b - g_0$
+        \item plane-stress regime \alert{confirmed} ($\sigma_{zz}\!\approx\!3\%$)
+        \item penalty matches Lam\'e to \alert{3.5\%}
+      \end{itemize}
+      \vspace{0.2em}
+      \centering
+      \includegraphics[height=3.1cm]{figures/pcmi_verification.png}
+    \end{column}
+  \end{columns}
+  \vspace{0.2em}
+  {\scriptsize The penalty tangent? Again \alert{AD} -- the same
+  \texttt{ufl.derivative} path, no hand-coded contact Jacobian.}
+\end{frame}
+
 % ---------------------------------------------------------------- 7
 \begin{frame}{Verified, reproducible, and easy to drive}
   \begin{columns}[T]

@@ -3,13 +3,6 @@
 # Author: Giovanni Zullo
 # Version: 0.1.0 (2025)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-#
-# 2D axisymmetric fuel-rod PCMI demo.
-# A UO2 pellet (cyl_1) and Zircaloy cladding (cyl_2) are separated by an
-# initial 30 um radial gap. As the linear heat rate ramps, the pellet heats,
-# expands, closes the gap, and mechanically contacts the cladding. Contact is
-# enforced by an explicit penalty (models.contact); heat crosses the gap via
-# the Robin gap-conductance pair (thermal).
 
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
@@ -36,17 +29,17 @@ models:
   thermal: true
   mechanical: true
   gap_conductance:
-    type: Fixed
-    value: 5000.0    # W/m2-K (open-gap baseline)
+    type: Gas
+    value: 15.8                 # He prefactor A (Todreas Eq. 8.140), W/(cm.K) -> SI
     contact_coupling:           # Todreas-Kazimi Eq. 8.141/8.142
       enabled: true
       meyer_hardness: 9.65e8    # (Pa) Zircaloy Meyer hardness (~14e4 psi)
       gas_thickness: 4.0e-6     # (m) roughness-based gas space on contact
   contact:
-    surface_a: lateral_1     # pellet outer
-    surface_b: inner_2       # clad inner
-    penalty_stiffness: 5.0e13  # (Pa/m)
-    initial_gap: 30.0e-6       # (m)
+    surface_a: lateral_1        # pellet outer
+    surface_b: inner_2          # clad inner
+    penalty_stiffness: 5.0e13   # (Pa/m)
+    initial_gap: 30.0e-6        # (m)
 
 mechanical:
   solver: linear

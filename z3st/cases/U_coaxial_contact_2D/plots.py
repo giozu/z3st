@@ -163,13 +163,6 @@ def plot_pcmi_curves():
     ax3.set_title("Load transfer (clad pushed out on contact)")
     ax3.legend(loc="upper left")
     ax3.grid(alpha=0.3)
-    # explain the non-zero displacement at zero power: the stress-free
-    # reference is T_ref (293/300 K), but the rod sits in 580 K coolant, so it
-    # is already thermally expanded at LHR = 0.
-    ax3.annotate("u_r > 0 at LHR = 0:\nthermal expansion from\nT_ref (293 K) to 580 K coolant",
-                 xy=(0, ur_p[0]), xytext=(8, ur_p[0] + 0.30 * (max(ur_p) - ur_p[0])),
-                 fontsize=8, color="#333",
-                 arrowprops=dict(arrowstyle="->", color="#888", lw=0.8))
 
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "pcmi_curves.png"), dpi=150)

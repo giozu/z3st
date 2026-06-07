@@ -165,7 +165,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   [INFO] Neumann thermal BC on 'cyl_2' → 0.0 W/m² at region 'bottom_2'
   [INFO] Neumann thermal BC on 'cyl_2' → 0.0 W/m² at region 'top_2'
   [INFO] Robin (gap) thermal BC on 'cyl_2' at region 'inner_2' coupled with 'lateral_1'
-  [INFO] Dirichlet thermal BC on 'cyl_2' → 580.0 K at region 'outer_2'
+  [INFO] Dirichlet thermal BC on 'cyl_2' → 580.0 K (first step) at region 'outer_2'
   [INFO] Clamp_x mechanical BC on 'cyl_1' → 0.0 (first step) at region 'axis_1'
   [INFO] Clamp_y mechanical BC on 'cyl_1' → 0.0 (first step) at region 'bottom_1'
   [INFO] Clamp_y mechanical BC on 'cyl_2' → 0.0 (first step) at region 'bottom_2'
@@ -5955,7 +5955,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+35.35 um, u_r(clad)=+5.23 um, gap=-0.12 um, p=6.013 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 9.581e-04
+  ||Δu||/||u|| = 9.582e-04
   [adaptive] relax_u=0.16
 
 Convergence check
@@ -6015,7 +6015,7 @@ Convergence check
   Applying flux on subdomain id = 6
 
 [INFO] Applying fixed gap conductance (h_gap = 5000.00 W/m²K)
-  → h_open      = 5000.00 W/m²K, h_contact = 121.42 W/m²K (gap closed)
+  → h_open      = 5000.00 W/m²K, h_contact = 121.41 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
@@ -6248,7 +6248,7 @@ Convergence check
   Applying flux on subdomain id = 6
 
 [INFO] Applying fixed gap conductance (h_gap = 5000.00 W/m²K)
-  → h_open      = 5000.00 W/m²K, h_contact = 377.68 W/m²K (gap closed)
+  → h_open      = 5000.00 W/m²K, h_contact = 377.69 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
@@ -6287,7 +6287,7 @@ Convergence check
   Applying flux on subdomain id = 6
 
 [INFO] Applying fixed gap conductance (h_gap = 5000.00 W/m²K)
-  → h_open      = 5000.00 W/m²K, h_contact = 177.78 W/m²K (gap closed)
+  → h_open      = 5000.00 W/m²K, h_contact = 177.77 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
@@ -6331,7 +6331,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1308.48 K, mean=1026.17 K
-  ||ΔT||/||T|| = 8.410e-04
+  ||ΔT||/||T|| = 8.411e-04
   [adaptive] relax_T=0.06
 
 [INFO] Assembling mechanical problem...
@@ -7046,7 +7046,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+35.35 um, u_r(clad)=+5.28 um, gap=-0.07 um, p=3.733 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.242e-04
+  ||Δu||/||u|| = 1.243e-04
   [adaptive] relax_u=0.06
 
 Convergence check
@@ -7111,7 +7111,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1316.84 K, mean=1032.54 K
-  ||ΔT||/||T|| = 2.257e-05
+  ||ΔT||/||T|| = 2.258e-05
   [adaptive] relax_T=0.04
 
 [INFO] Assembling mechanical problem...
@@ -39290,5 +39290,5 @@ Convergence check
 [SUCCESS] Staggered solver converged in 206 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 197.24 s
+Simulation completed in 179.68 s
 Total time steps solved: 13
