@@ -1,31 +1,30 @@
 [INFO] Loading mesh from mesh.msh
 Info    : Reading 'mesh.msh'...
-Info    : 73 entities
-Info    : 30240 nodes
-Info    : 32928 elements
+Info    : 16 entities
+Info    : 42759 nodes
+Info    : 83640 elements
 Info    : Done reading 'mesh.msh'
 [INFO] Mesh successfully loaded from Gmsh file.
-[INFO] Mesh topology dimension d=3
+[INFO] Mesh topology dimension d=2
 [INFO] 
 Available volume tags (dx):
-[INFO]   Tag ID: 5
+[INFO]   Tag ID: 1
 [INFO] 
-Unique tags found in facet data: [1 2 3 4]
+Unique tags found in facet data: [10 11 12]
 [INFO] Label map loaded from geometry:
-[INFO]   bottom       → 1
-[INFO]   top          → 2
-[INFO]   inner_radius → 3
-[INFO]   outer_radius → 4
-[INFO]   steel        → 5
-[INFO]   Lz = 0.500 m
-[INFO]   Ri = 2.000e-02 m, Ro = 3.000e-02 m
-[INFO]   area = 1.571e-03 m², perimeter = 1.885e-01 m
+[INFO]   steel        → 1
+[INFO]   inner        → 10
+[INFO]   symmetry_axis → 11
+[INFO]   bottom_boundary → 12
+[INFO]   Lz = 2.000 m
+[INFO]   Ri = 1.520e+00 m, Ro = 1.572e+00 m
+[INFO]   area = 5.051e-01 m², perimeter = 9.877e+00 m
 [INFO] === Mesh summary ===
-[INFO]   Topology dim: 3
-[INFO]   Facet dim: 2
-[INFO]   Num cells: 27440
-[INFO]   Cell tags: {np.int32(5)}
-[INFO]   Facet tags: {np.int32(1), np.int32(2), np.int32(3), np.int32(4)}
+[INFO]   Topology dim: 2
+[INFO]   Facet dim: 1
+[INFO]   Num cells: 81857
+[INFO]   Cell tags: {np.int32(1)}
+[INFO]   Facet tags: {np.int32(10), np.int32(11), np.int32(12)}
 [INFO]   Geometry type: cyl
 
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
@@ -44,7 +43,7 @@ __Config initializer__
   → Mesh                : mesh.msh
   → Boundary conditions : boundary_conditions.yaml
   → Time steps          : 1
-  → Regime              : 3d
+  → Regime              : axisymmetric
   → Models active       :
       thermal    → ON
       mechanical → ON
@@ -57,9 +56,9 @@ __Config initializer__
 
 __FiniteElementSetup initializer__
 Mechanical element order: 1
-Thermal function space (V_t): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []))
-Mechanical function space (V_m): FunctionSpace(<Mesh #0>, blocked element (Basix element (P, hexahedron, 1, gll_warped, unset, False, float64, []), (3,)))
-Scalar function space (Q): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron, 0, gll_warped, unset, True, float64, []))
+Thermal function space (V_t): FunctionSpace(<Mesh #0>, Basix element (P, triangle, 1, gll_warped, unset, False, float64, []))
+Mechanical function space (V_m): FunctionSpace(<Mesh #0>, blocked element (Basix element (P, triangle, 1, gll_warped, unset, False, float64, []), (2,)))
+Scalar function space (Q): FunctionSpace(<Mesh #0>, Basix element (P, triangle, 0, gll_warped, unset, True, float64, []))
 [Solver] initializer
   Applied relaxation factor:
   → Temperature  : 0.9
@@ -114,7 +113,7 @@ Material loaded: steel
 
 Initializing the temperature field...
   → Setting initial temperature for material: 'steel'
-    Set 30240 DOFs to 300.00 K
+    Set 42759 DOFs to 300.00 K
   Initial T: min=300.00 K, max=300.00 K, mean=300.00 K
 
 Initializing the displacement field...
@@ -127,12 +126,11 @@ Initializing the displacement field...
 
 
 Loading boundary conditions from 'boundary_conditions.yaml'
-  [INFO] Dirichlet thermal BC on 'steel' → 300.0 K (first step) at region 'inner_radius'
-  [INFO] Constant Dirichlet vector (3D) → [0.0, 0.0, 0.0]
-  [INFO] Dirichlet mechanical BC on 'steel' → [0.0, 0.0, 0.0] at region 'bottom'
-  [INFO] Clamp_z mechanical BC on 'steel' → -1.359155e-06 (first step) at region 'top'
-  [INFO] Neumann mechanical BC on 'steel' → inner_radius: -1000000.0 Pa (list loaded)
-  [INFO] Neumann mechanical BC on 'steel' → outer_radius: 0.0 Pa (list loaded)
+  [INFO] Dirichlet thermal BC on 'steel' → 300.0 K (first step) at region 'inner'
+  [INFO] Clamp_x mechanical BC on 'steel' → 0.0 (first step) at region 'symmetry_axis'
+  [INFO] Constant Dirichlet vector (2D) → [0.0, 0.0]
+  [INFO] Dirichlet mechanical BC on 'steel' → [0.0, 0.0] at region 'bottom_boundary'
+  [INFO] Neumann mechanical BC on 'steel' → inner: 10000000.0 Pa (list loaded)
 Computing symbolic result fields (strain, stress, ...)
 
 [INFO] Hot-reload of allow-listed input.yaml parameters is active. Edit input.yaml during the run; changes apply at the next step boundary. Allowed keys: damage.{stag_tol,rtol,hybrid_constraint,gamma_star}, mechanical.{stag_tol,rtol}, thermal.{stag_tol,rtol}, solver_settings.{max_iters,relax_*}.
@@ -162,21 +160,19 @@ Coupling = staggered
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
-  ||ΔT||/||T|| = 1.098e-06
+  ||ΔT||/||T|| = 7.759e-08
   [adaptive] relax_T=0.90
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
   ||Δu||/||u|| = 1.000e+00
   [adaptive] relax_u=0.40
@@ -187,23 +183,21 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
-  ||ΔT||/||T|| = 1.098e-07
+  ||ΔT||/||T|| = 7.759e-09
   [adaptive] relax_T=0.99
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 4.878e-01
+  ||Δu||/||u|| = 6.000e-01
   [adaptive] relax_u=0.44
 
 Convergence check
@@ -212,23 +206,21 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
-  ||ΔT||/||T|| = 1.207e-08
+  ||ΔT||/||T|| = 8.535e-10
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 3.219e-01
+  ||Δu||/||u|| = 3.960e-01
   [adaptive] relax_u=0.48
 
 Convergence check
@@ -237,23 +229,21 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
-  ||ΔT||/||T|| = 1.219e-10
+  ||ΔT||/||T|| = 8.621e-12
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 1.983e-01
+  ||Δu||/||u|| = 2.439e-01
   [adaptive] relax_u=0.53
 
 Convergence check
@@ -262,7 +252,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -270,15 +260,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 1.126e-01
+  ||Δu||/||u|| = 1.385e-01
   [adaptive] relax_u=0.59
 
 Convergence check
@@ -287,7 +275,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -295,15 +283,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 5.789e-02
+  ||Δu||/||u|| = 7.122e-02
   [adaptive] relax_u=0.64
 
 Convergence check
@@ -312,7 +298,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -320,15 +306,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 2.639e-02
+  ||Δu||/||u|| = 3.246e-02
   [adaptive] relax_u=0.71
 
 Convergence check
@@ -337,7 +321,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -345,15 +329,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 1.033e-02
+  ||Δu||/||u|| = 1.270e-02
   [adaptive] relax_u=0.78
 
 Convergence check
@@ -362,7 +344,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -370,15 +352,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 3.310e-03
+  ||Δu||/||u|| = 4.072e-03
   [adaptive] relax_u=0.86
 
 Convergence check
@@ -387,7 +367,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -395,15 +375,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 8.029e-04
+  ||Δu||/||u|| = 9.877e-04
   [adaptive] relax_u=0.94
 
 Convergence check
@@ -412,7 +390,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -420,15 +398,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 1.259e-04
+  ||Δu||/||u|| = 1.549e-04
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -437,7 +413,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -445,15 +421,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 7.586e-06
+  ||Δu||/||u|| = 9.331e-06
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -462,7 +436,7 @@ Convergence check
 
 [INFO] Assembling thermal problem...
 
-  Building weak form, volume integrals (dx) for steel, tag = 5
+  Building weak form, volume integrals (dx) for steel, tag = 1
   → q_third[steel](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
   Linear solver
   T_new: min=300.00 K, max=300.00 K, mean=300.00 K
@@ -470,15 +444,13 @@ Convergence check
   [adaptive] relax_T=1.00
 
 [INFO] Assembling mechanical problem...
-  [INFO] Updating Displacement Dirichlet on region 1 → [0.0, 0.0, 0.0]
-  [INFO] Updating Displacement Dirichlet on region 2 → -1.359155e-06
-  [INFO] Updating traction on region 3 → -1000000.0 Pa
-  [INFO] Updating traction on region 4 → 0.0 Pa
-  Building weak form, volume integrals (dx) for steel, tag = 5
-  Applying mechanical traction on subdomain id = 3
-  Applying mechanical traction on subdomain id = 4
+  [INFO] Updating Displacement Dirichlet on region 11 → 0.0
+  [INFO] Updating Displacement Dirichlet on region 12 → [0.0, 0.0]
+  [INFO] Updating traction on region 10 → 10000000.0 Pa
+  Building weak form, volume integrals (dx) for steel, tag = 1
+  Applying mechanical traction on subdomain id = 10
   Linear solver
-  ||Δu||/||u|| = 0.000e+00
+  ||Δu||/||u|| = 2.685e-12
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -486,5 +458,5 @@ Convergence check
 [SUCCESS] Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 214.45 s
+Simulation completed in 29.56 s
 Total time steps solved: 1

@@ -13,6 +13,7 @@
 
 import glob
 import os
+import warnings
 
 import numpy as np
 import yaml
@@ -24,10 +25,14 @@ import pyvista as pv
 from z3st.utils.utils_load import generate_power_history
 
 pv.OFF_SCREEN = True
-try:
-    pv.start_xvfb()
-except Exception:
-    pass
+# start_xvfb is deprecated in recent PyVista but is the working headless path
+# here; silence the deprecation notice rather than change the render backend.
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    try:
+        pv.start_xvfb()
+    except Exception:
+        pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "output")

@@ -6,6 +6,7 @@
 #
 #   ./run_demo.sh            full core loop A->E
 #   ./run_demo.sh A          jump to a single segment (A|B|C|D|E)
+#   ./run_demo.sh P          optional PCMI segment (pellet-clad contact, verified)
 #   ./run_demo.sh --check    quick non-interactive smoke test of A and C
 # =====================================================================
 set -uo pipefail
@@ -15,6 +16,7 @@ DEMO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$DEMO_DIR/../../../.." && pwd)"     # -> /.../z3st
 CASES="$REPO_ROOT/z3st/cases"
 MECH="$REPO_ROOT/z3st/models/mechanical_model.py"
+BAKED="$DEMO_DIR/baked"
 
 # --- colours -----------------------------------------------------------------
 B=$'\e[1m'; C=$'\e[36m'; G=$'\e[32m'; Y=$'\e[33m'; R=$'\e[31m'; Z=$'\e[0m'
@@ -33,6 +35,17 @@ say()    { echo; echo "${C}${B}▶ $*${Z}"; }
 cue()    { echo "${Y}  say: \"$*\"${Z}"; }
 
 hr() { printf '%s\n' "────────────────────────────────────────────────────────────"; }
+
+# open one or more images in the system viewer; fall back to listing paths
+open_imgs() {
+  if command -v xdg-open >/dev/null 2>&1; then
+    for f in "$@"; do xdg-open "$f" >/dev/null 2>&1 & done
+  elif command -v eog >/dev/null 2>&1; then
+    eog "$@" >/dev/null 2>&1 &
+  else
+    echo "  images:"; for f in "$@"; do echo "    $f"; done
+  fi
+}
 
 # =====================================================================
 seg_A() {
@@ -90,6 +103,22 @@ seg_E() {
   echo "  ${B}github.com/giozu/z3st${Z}  ·  ${B}giozu.github.io/z3st${Z}  ·  DOI ${B}10.5281/zenodo.17748028${Z}"
 }
 
+seg_P() {
+  hr; say "P · Multi-body: pellet–cladding contact (PCMI), verified  (optional)"
+  cue "A fuel pellet heats, expands, closes the gap, and contacts the cladding — fully coupled."
+  echo "  baked story: ${B}$BAKED/pcmi_curves.png${Z}  +  ${B}$BAKED/pcmi_verification.png${Z}"
+  open_imgs "$BAKED/pcmi_curves.png" "$BAKED/pcmi_verification.png"
+  echo
+  cue "Contact is a penalty — pressure proportional to penetration, equal/opposite tractions."
+  cue "Nothing is prescribed: the pressure EMERGES, the cladding is pushed outward — that is load transfer."
+  cue "And it feeds back thermally: contact raises the gap conductance, so the fuel cools the moment it touches."
+  echo "${G}  → verified to 3.5% against the analytical Lamé interference-fit (stress state confirmed plane-stress).${Z}"
+  cue "The penalty tangent? The same AD path — ufl.derivative — no hand-coded contact Jacobian."
+  echo
+  echo "${Y}  (optional, live — watch the gap close and contact switch on):${Z}"
+  echo "    ${B}cd $CASES/U_coaxial_contact_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
+}
+
 # --- quick non-interactive smoke test ---------------------------------------
 smoke() {
   echo "${B}smoke test: 1D case + coupled slab${Z}  ($ENVNOTE)"
@@ -112,7 +141,8 @@ case "${1:-all}" in
   C) seg_C ;;
   D) seg_D ;;
   E) seg_E ;;
+  P) seg_P ;;
   all|"") seg_A; pause; seg_B; pause; seg_C; pause; seg_D; pause; seg_E ;;
-  *) echo "usage: $0 [A|B|C|D|E | --check]"; exit 2 ;;
+  *) echo "usage: $0 [A|B|C|D|E|P | --check]   (P = optional PCMI segment)"; exit 2 ;;
 esac
 echo; echo "${G}${B}done.${Z}"

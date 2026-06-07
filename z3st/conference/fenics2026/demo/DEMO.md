@@ -90,6 +90,22 @@ control the pace while you talk. Talking points below.
 - Hand them a card / point at the QR on the poster.
   - `github.com/giozu/z3st` · `giozu.github.io/z3st` · DOI `10.5281/zenodo.17748028`
 
+### P. (optional) Multi-body: pellet–cladding contact, verified — 60 s
+*Not in the default tight loop — pull it up for a fuel-interested visitor or a
+judge who lingers (`./run_demo.sh P`; it opens the baked figures). It pairs with
+the oral's PCMI slide.*
+- *"A fuel pellet heats, expands, closes the gap, and contacts the cladding — all
+  coupled. Contact is a penalty: pressure proportional to penetration. Nothing is
+  prescribed — the pressure **emerges**, and the cladding is driven outward, load
+  transfer. And it feeds back: contact raises the gap conductance, so the fuel
+  cools the moment it touches."*
+- Impact: *"and it's **verified** — 3.5% against the analytical Lamé interference
+  fit, the stress state confirmed plane-stress."*
+- Tie back to the one sentence: *"the penalty tangent is the same AD path —
+  `ufl.derivative` — no hand-coded contact Jacobian."*
+- Optional live (during a longer chat): run the case and watch the gap close and
+  contact switch on in the streamed `[contact] … CLOSED` lines.
+
 ---
 
 ## 3 · Deep-dive cards (only if a knowledgeable person stays)
@@ -135,7 +151,7 @@ artifacts. Then, by hand:
 - [ ] Laptop on mains power; screen-sleep and notifications **off**.
 - [ ] ParaView opens the baked case-14 series and the animation plays smoothly.
 - [ ] `teaching/01_1D`, `teaching/01_3D`, `1_thin_slab_neumann_2D` each run clean once (warms the dolfinx import cache too).
-- [ ] `demo/baked/` contains the fallback PNGs.
+- [ ] `demo/baked/` contains the fallback PNGs (incl. `pcmi_curves.png`, `pcmi_verification.png` for the optional PCMI segment — `./run_demo.sh P`).
 - [ ] Open `attract.html` once (`./attract.sh`) and confirm the loop plays and the QR codes scan.
 - [ ] `../handout/handout.pdf` printed (a small stack to hand out); QR codes scan.
 - [ ] Editor open on `mechanical_model.py` (AD lines) and `1_thin_slab_neumann_2D/input.yaml` (for the hot-reload edit) in separate tabs.

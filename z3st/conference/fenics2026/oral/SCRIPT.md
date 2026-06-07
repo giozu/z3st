@@ -1,12 +1,14 @@
 # Speaker script — Z3ST oral (FEniCS 2026, 10-minute slot)
 
-Format: 10-minute oral, Paris, 17–19 June 2026. Budget ~9 content slides at
-~60–65 s each, leaving a few seconds of slack. Backup slides are not presented
-unless a question pulls them up. Aim to *finish by 9:30* so you are never cut off.
+Format: 10-minute oral, Paris, 17–19 June 2026. Budget 10 content slides; the
+deck is tighter since the PCMI slide (6b) was added, so move briskly. Backup
+slides are not presented unless a question pulls them up. Aim to *finish by 9:45*
+so you are never cut off.
 
-Timings are cumulative targets (mm:ss). If you are behind at slide 6, drop the
-gap-conductance sentence and the mesh-sensitivity aside — they are the most
-compressible.
+Timings are cumulative targets (mm:ss). The most compressible cuts, in order:
+the cluster-dynamics line on slide 6, the teaching-cases aside on slide 7, and
+the gap-conductance detail on slide 6 (PCMI / slide 6b already carries the
+across-bodies story). Drop these first if you are behind at slide 6b.
 
 ---
 
@@ -56,30 +58,40 @@ residual shrinks and back off when it oscillates. And crucially, damage degrades
 both the elastic and the thermal-stress contributions through a consistent g(D) —
 without that, thermal-shock fracture is intractable."
 
-## 6 · Coupled multi-physics, across bodies — 5:25 → 6:40
+## 6 · Coupled multi-physics, across bodies — 5:25 → 6:10
 "At heart this is a multi-physics framework: thermal, mechanical and phase-field
 damage, genuinely two-way coupled — temperature drives the thermal strain and
-stress, and damage degrades both the elastic and the thermal-stress terms. The
-second point is that it works across separate bodies: gap conductance carries heat
-across a gap between two regions — think a fuel pellet and its cladding — as a
-thermal interface condition. That multi-body heat transfer is essential for real
-fuel-performance modelling. And one newer, exploratory capability: cluster
-dynamics, which evolves a defect population in cluster-size space — it is
-implemented but not yet investigated, and it is our path towards a genuine
-micro-to-continuum link."
+stress, and damage degrades both the elastic and the thermal-stress terms. And it
+works across separate bodies — gap conductance carries heat across a gap between two
+regions, a fuel pellet and its cladding. *(Compressible: cluster dynamics — a
+newer, exploratory capability evolving a defect population in cluster-size space,
+our path to a micro-to-continuum link.)*"
 
-## 7 · Verified and reproducible — 6:40 → 7:50
+## 6b · PCMI: pellet–clad contact, verified — 6:10 → 7:05  ← new
+"And here is the *mechanical* side of 'across bodies' — pellet–cladding
+interaction. As the pellet heats it expands, closes the gap, and contacts the
+cladding. Contact is a penalty: a pressure proportional to the penetration,
+applied as equal and opposite tractions on the two faces. Nothing is prescribed —
+the pressure *emerges*, and you can watch it on the left: the gap closes, contact
+switches on, and the cladding is pushed outward — that is load transfer. And it
+feeds back thermally: contact raises the gap conductance, so the fuel cools the
+moment it touches. The point for this room is on the right — it's *verified*:
+against the analytical Lamé interference-fit pressure, to three and a half percent,
+with the stress state confirmed plane-stress. And the penalty tangent? The same AD
+path — `ufl.derivative` — no hand-coded contact Jacobian."
+
+## 7 · Verified and reproducible — 7:05 → 8:00
 "None of this is useful unless it's trustworthy, and verification is something I
 care about a lot. Every solver and every physics — thermal, mechanical, plasticity,
 fracture — is checked against an analytical solution. That's about fifty cases, each
 a numerical-versus-analytical comparison, and they re-run on every single commit, so
-a regression can't sneak in. The teaching cases make the point nicely: a 1D bar on a
-line mesh and the same bar in full 3D give the identical displacement — regime
-selection, not re-meshing. And it's built for experimentation: you can hot-reload
-tolerances and relaxation factors mid-run, stream force-displacement curves per step,
-and inspect the matrix directly."
+a regression can't sneak in. *(Compressible: the teaching cases make the point — a
+1D bar on a line mesh and the same bar in full 3D give identical displacement,
+regime selection not re-meshing.)* And it's built for experimentation: hot-reload
+tolerances and relaxation mid-run, stream force-displacement per step, inspect the
+matrix directly."
 
-## 8 · Hero case — 7:50 → 9:00
+## 8 · Hero case — 8:00 → 9:05
 "Here's everything together: thermal-shock cracking of a UO2 pellet. Top row: a
 cold-contact wedge cools the rim, and the tensile hoop-stress ring it sets up drives
 the cracking. Bottom row is the payoff — on the left, the simulated damage: a set of
@@ -90,7 +102,7 @@ plane-strain half-disc, AT1, Amor split, hybrid, fully coupled temperature to
 elastic strain to damage — all from one `input.yaml`. (Backup has the quantitative
 match to McClenny 7b.)"
 
-## 9 · Open + demo invite — 9:00 → 9:45
+## 9 · Open + demo invite — 9:05 → 9:45
 "Z3ST is open under Apache-2.0 on GitHub, documented, archived on Zenodo with a DOI.
 If you'd like to see it run, come to the software demonstration at the poster
 session — I'll take a coupled case end to end on my laptop and tune it while it
@@ -109,6 +121,13 @@ solves. Thank you — I'm happy to take questions."
   dynamics; quadrature elements for plasticity history.
 - *Validation vs verification?* The suite is verification (vs analytical /
   reference); validation against experiment is application-specific.
+- *Which contact method / is the pressure trustworthy?* Explicit penalty —
+  pressure proportional to penetration, equal-and-opposite tractions, the tangent
+  from AD (no hand-coded contact Jacobian). Verified against the analytical Lamé
+  interference-fit to 3.5%, with the stress state confirmed plane-stress.
+  Uniform-pressure today; per-facet (to resolve axial ridging) is the next step.
+  No mesh-cutting / XFEM needed: the two bodies are separate meshes, so the
+  contact interface is a mesh boundary, not an intra-element discontinuity.
 - *Show me plasticity / what about crystal plasticity?* Backup "plasticity verified" —
   J2 vs analytical 2D plane strain, and the single-crystal case saturating to the
   analytical sigma_sat. Same AD path; the slip-system Jacobian is automatic.
@@ -124,9 +143,13 @@ solves. Thank you — I'm happy to take questions."
 6. hero case verified vs McClenny (2022), Fig. 7b.
 
 ## Delivery notes
-- The AD slide (4) and the hero case (8) are the two the audience remembers. Slow
-  down on those; speed through 3 and 7 if you must.
+- The AD slide (4), PCMI (6b) and the hero case (8) are what the audience
+  remembers. Slow down on those; speed through 3 and 7 if you must.
+- On 6b: land "*emergent* pressure" and "verified to 3.5% against Lamé" — the two
+  phrases that make it stick. Point once at the gap-closure curve, once at the
+  verification curve; don't narrate both panels.
 - Do not read the code aloud line by line — point at `ufl.diff(psi, F)` and say it
-  once.
-- Practised cold, this runs ~9:30. That is the target; the committee is strict on
-  the 10-minute format.
+  once; same for the contact-tangent callback to AD on 6b.
+- Practised cold, with 6b added this runs ~9:45. The compressible asides (cluster
+  line on 6, teaching aside on 7) buy ~20 s of slack if the committee clock is
+  tight on the 10-minute format.

@@ -1,31 +1,31 @@
 {
     "results": {
         "T_max": {
-            "numerical": 500.9567957542861,
-            "reference": 461.98001657548446,
-            "abs_error": 38.97677917880162,
-            "rel_error": 0.08436897220733588,
+            "numerical": 566.6324115126781,
+            "reference": 474.30000637518634,
+            "abs_error": 92.33240513749178,
+            "rel_error": 0.19467089162224027,
             "status": "PASS"
         },
         "sigma1_mean": {
-            "numerical": -185741890.80315825,
+            "numerical": -260644084.0198727,
             "reference": 0.0,
-            "abs_error": 185741890.80315825,
-            "rel_error": 0.0010318993933508792,
+            "abs_error": 260644084.0198727,
+            "rel_error": 0.0014725654464399587,
             "status": "PASS"
         },
         "sigma2_mean": {
-            "numerical": -863636939.0115176,
+            "numerical": -1248473963.044902,
             "reference": 0.0,
-            "abs_error": 863636939.0115176,
-            "rel_error": 0.0047979829945084315,
+            "abs_error": 1248473963.044902,
+            "rel_error": 0.0070535252149429494,
             "status": "PASS"
         },
         "sigma3_mean": {
-            "numerical": -875141287.0207973,
+            "numerical": -1266292637.6593814,
             "reference": 0.0,
-            "abs_error": 875141287.0207973,
-            "rel_error": 0.004861896039004429,
+            "abs_error": 1266292637.6593814,
+            "rel_error": 0.007154195692990855,
             "status": "PASS"
         }
     },
