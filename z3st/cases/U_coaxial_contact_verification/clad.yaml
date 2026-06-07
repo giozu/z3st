@@ -1,0 +1,13 @@
+name: zircaloy-4
+
+E: 99.3e9     # Young's modulus (Pa)
+nu: 0.37      # Poisson's ratio (-)
+
+k: 17.0       # Thermal conductivity (W/m·K)
+alpha: 7.5e-6 # Thermal expansion coefficient (1/K)
+cp: 350       # Specific heat capacity (J/kg·K)
+T_ref: 300        # (K)
+T_initial: 580.0  # (K)
+
+rho: 6500         # Density (kg/m³)
+melting_temperature: 2123  # (K)

@@ -130,6 +130,13 @@ class Solver:
 
         analysis = self.th_cfg.get("analysis", "stationary")
 
+        # update step-dependent Dirichlet temperatures
+        for bc_list in self.dirichlet_thermal.values():
+            for bc in bc_list:
+                if isinstance(bc, dict) and isinstance(bc.get("raw"), list):
+                    idx = min(self.current_step, len(bc["raw"]) - 1)
+                    bc["const"].value = PETSc.ScalarType(bc["raw"][idx])
+
         # Transient mode with dt=0: preserve IC, only apply BCs
         if analysis == "transient" and self.dt <= 0:
             print("\n[INFO] Transient thermal: dt=0 → preserving initial condition (applying BCs only)")
@@ -810,8 +817,11 @@ class Solver:
             T_new.x.array[:] = self.T.x.array
             T_old = dolfinx.fem.Function(self.V_t)
 
-            bcs_t = []
-            [bcs_t.extend(bc_list) for bc_list in self.dirichlet_thermal.values()]
+            bcs_t = [
+                bc["value"] if isinstance(bc, dict) else bc
+                for bc_list in self.dirichlet_thermal.values()
+                for bc in bc_list
+            ]
         else:
             T_new = T_old = None
             bcs_t = []

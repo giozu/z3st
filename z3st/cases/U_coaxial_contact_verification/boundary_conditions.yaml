@@ -1,0 +1,57 @@
+thermal:
+  cyl_1:
+  # cyl_1 at uniform temperature, ramped from 300 K to 1500 K over 13 steps
+  - type: Dirichlet
+    region: lateral_1
+    temperature:
+    - 300.0
+    - 400.0
+    - 500.0
+    - 600.0
+    - 700.0
+    - 800.0
+    - 900.0
+    - 1000.0
+    - 1100.0
+    - 1200.0
+    - 1300.0
+    - 1400.0
+    - 1500.0
+  - type: Neumann
+    region: bottom_1
+    flux: 0.0
+  - type: Neumann
+    region: top_1
+    flux: 0.0
+  - type: Neumann
+    region: axis_1
+    flux: 0.0
+
+  cyl_2:
+  # cyl_2 at reference temperature
+  - type: Dirichlet
+    region: outer_2
+    temperature: 300.0
+  - type: Neumann
+    region: inner_2
+    flux: 0.0
+  - type: Neumann
+    region: bottom_2
+    flux: 0.0
+  - type: Neumann
+    region: top_2
+    flux: 0.0
+
+mechanical:
+  cyl_1:
+  - type: Clamp_x
+    region: axis_1        # u_r = 0 on symmetry axis
+  - type: Clamp_y
+    region: bottom_1      # u_z = 0
+    # lateral_1: free until penalty contact engages
+
+  cyl_2:
+  - type: Clamp_y
+    region: bottom_2      # u_z = 0
+    # inner_2: free until penalty contact engages
+    # outer_2: free

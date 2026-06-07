@@ -84,31 +84,37 @@ class ThermalModel:
                         )
                         sys.exit(1)
 
-                    # Step-dependent temperature lists are not yet supported by
-                    # the thermal block (the mechanical block does support them
-                    # via the ``raw`` mechanism). Reject the input up-front with
-                    # a clear message instead of silently fixing T to the first
-                    # element or crashing inside dolfinx.
+                    # Step-dependent temperature: a list of length n_steps gives
+                    # a time-varying Dirichlet temperature. The Constant is updated per step by the
+                    # solver; a scalar is broadcast to every step.
                     if isinstance(temperature, list):
-                        print(
-                            f"  [ERROR] Thermal Dirichlet BC on '{label}' for region '{region_name}' "
-                            f"was given a list of length {len(temperature)}, but step-dependent "
-                            f"temperatures are not yet supported. Use a constant scalar; see "
-                            f"mechanical_model.py for the planned extension pattern."
-                        )
-                        sys.exit(1)
+                        # Step index is capped at the last entry by the solver,
+                        # so a length mismatch with n_steps is tolerated (the
+                        # final value simply holds). Warn if they differ.
+                        if len(temperature) != self.n_steps:
+                            print(
+                                f"  [WARNING] Thermal Dirichlet list on '{label}' region "
+                                f"'{region_name}' has length {len(temperature)} != n_steps "
+                                f"{self.n_steps}; the last value will hold for extra steps."
+                            )
+                        raw_value = [float(t) for t in temperature]
+                    else:
+                        raw_value = [float(temperature)] * self.n_steps
 
-                    T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
+                    T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(raw_value[0]))
 
                     # locate dofs
                     dofs = dolfinx.fem.locate_dofs_topological(
                         V_t, self.fdim, self.facet_tags.find(region_id)
                     )
                     bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t)
-                    self.dirichlet_thermal[label].append(bc)
+                    self.dirichlet_thermal[label].append(
+                        {"id": region_id, "value": bc, "const": T_d, "raw": raw_value}
+                    )
 
                     print(
-                        f"  [INFO] Dirichlet thermal BC on '{label}' → {temperature} K at region '{region_name}'"
+                        f"  [INFO] Dirichlet thermal BC on '{label}' → {raw_value[0]} K "
+                        f"(first step) at region '{region_name}'"
                     )
 
                 elif bc_type == "Neumann":
