@@ -11,6 +11,7 @@ extracts σ_xx and ε_xx for each step, and reconstructs the stress-strain curve
 """
 
 import os
+import yaml
 import numpy as np
 from glob import glob
 import matplotlib.pyplot as plt
@@ -23,10 +24,18 @@ OUTPUT_DIR = os.path.join(CASE_DIR, "output")
 VTU_FILES = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
 OUT_JSON = os.path.join(OUTPUT_DIR, "non-regression.json")
 
-# geometry and material
-Lx, Ly = 1.0, 0.001         # m (geometry dimensions)
-E = 200e9                   # (Pa) Young modulus
-nu = 0.3                    # (/) Poisson modulus
+# geometry and material (loaded from YAML)
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Lx, Ly = float(geom["Lx"]), float(geom["Ly"])   # m (geometry dimensions)
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
+E = float(mat["E"])          # (Pa) Young modulus
+nu = float(mat["nu"])        # (/) Poisson modulus
 
 n_fe = 40                   # number of vertical finite elements (from mesh.geo)
 

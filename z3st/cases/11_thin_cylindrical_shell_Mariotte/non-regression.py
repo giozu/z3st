@@ -14,6 +14,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
@@ -24,9 +25,16 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 2.40, 2.50, 15.0  # m          inner and outer radius, height
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Ri, Ro, Lz = float(geom["Ri"]), float(geom["Ro"]), float(geom["Lz"])  # m  inner/outer radius, height
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
 Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3  # Pa, -
+E, nu = float(mat["E"]), float(mat["nu"])  # Pa, -
 t = Ro - Ri  # m          wall thickness
 slenderness = Ri / t  # -          slenderness ratio
 z_target, z_tol = Lz, 1.0  # m          z-plane for data extraction

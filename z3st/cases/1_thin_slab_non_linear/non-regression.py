@@ -12,6 +12,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
@@ -22,8 +23,16 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly, Lz = 0.100, 0.100, 0.004  # m
-E = 200e9  # Pa
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Lx, Ly, Lz = float(geom["Lx"]), float(geom["Ly"]), float(geom["Lz"])  # m
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
+E = float(mat["E"])  # Pa
 y_target, z_target, mask_tol = Ly / 2, Lz / 2, Ly * 0.1  # Extraction line
 
 # Analytical references

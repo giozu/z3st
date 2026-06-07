@@ -14,6 +14,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
@@ -25,12 +26,21 @@ OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 OUT_DIR = os.path.join(CASE_DIR, "output")
 
 # Parameters
-L = 1.0             # cube edge (m)
-R = 0.04            # cavity radius (m)
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+L = float(geom["Lx"])     # cube edge (m)
+R = float(geom["ax"])     # cavity radius (m)
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
+
 Pi = 1.0e6          # internal pressure (Pa)
 
-E = 2.0e11          # Young modulus (/)
-nu = 0.30           # Poisson ratio
+E = float(mat["E"])       # Young modulus (/)
+nu = float(mat["nu"])     # Poisson ratio
 
 TOLERANCE = 2e-1
 

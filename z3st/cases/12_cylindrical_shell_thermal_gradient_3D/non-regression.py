@@ -11,6 +11,7 @@ non-regression script
 import os
 
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder
@@ -22,9 +23,18 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.5  # m          inner and outer radius
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Ri, Ro, Lz = float(geom["Ri"]), float(geom["Ro"]), float(geom["Lz"])  # m   inner and outer radius
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
+k, E, nu, alpha = float(mat["k"]), float(mat["E"]), float(mat["nu"]), float(mat["alpha"])  # W/m·K, Pa, -, 1/K
+
 Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
-k, E, nu, alpha = 50, 2e11, 0.3, 1.0e-5  # W/m·K, Pa, -, 1/K
 Ti, To = 500.0, 400.0  # K          inner and outer surface temperature
 q0, mu = 0.0, 24.0  # W/m³, 1/m  heat source, attenuation
 Lx = Ro - Ri  # m          wall thickness

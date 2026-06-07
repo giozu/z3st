@@ -13,6 +13,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
@@ -22,17 +23,25 @@ CASE_DIR = os.path.dirname(__file__)
 VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
-# Geometry and material
-Ri, Ro, Lz = 2.0, 2.1, 20  # m          inner and outer radius
+# Geometry and material (loaded from YAML)
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Ri, Ro, Lz = float(geom["Ri"]), float(geom["Ro"]), float(geom["Lz"])  # m  inner/outer radius, height
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
+k = float(mat["k"])  # W/m·K   thermal conductivity
+E = float(mat["E"])  # Pa      Young's modulus
+nu = float(mat["nu"])  # -      Poisson's ratio
+alpha = float(mat["alpha"])  # 1/K  thermal expansion
+q0 = float(mat["gamma_heating"])  # W/m³  heat source
+mu = float(mat["mu_gamma"])  # 1/m   attenuation
+
 Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
-k, E, nu, alpha = (
-    48.1,
-    1.77e11,
-    0.3,
-    1.7e-5,
-)  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
 Ti, To = 490.0, 500.0  # K          inner and outer surface temperature
-q0, mu = 2.0e6, 24.0  # W/m³, 1/m  heat source, attenuation
 Lx = Ro - Ri  # m          wall thickness
 slenderness = Ri / Lx  # -          slenderness ratio
 

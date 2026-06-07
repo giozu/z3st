@@ -14,6 +14,7 @@ Reference is the Lamé solution under plane stress.
 import os
 
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_plot import plotter_sigma_cylinder, plotter_strain_cylinder
@@ -25,9 +26,18 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.02, 0.03, 0.01  # m          inner and outer radius, height
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Ri, Ro, Lz = float(geom["Ri"]), float(geom["Ro"]), float(geom["Lz"])  # m  inner and outer radius, height
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
+E, nu = float(mat["E"]), float(mat["nu"])  # Pa, -      Young modulus, Poisson ratio
+
 Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
 t = Ro - Ri  # m          wall thickness
 slenderness = Ri / t  # -          slenderness ratio
 z_target, z_tol = Lz / 2, 0.01  # m          z-plane for data extraction

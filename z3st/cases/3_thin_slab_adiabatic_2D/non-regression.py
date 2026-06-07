@@ -13,6 +13,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
@@ -23,15 +24,23 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Lx, Ly = 0.1, 1.0  # m (geometry dimensions)
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Lx, Ly = float(geom["Lx"]), float(geom["Ly"])  # m (geometry dimensions)
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
 k, E, nu, alpha = (
-    48.1,
-    1.77e11,
-    0.3,
-    1.7e-5,
+    float(mat["k"]),
+    float(mat["E"]),
+    float(mat["nu"]),
+    float(mat["alpha"]),
 )  # W/m-K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
 Ti = 490.0  # K (boundary temperature)
-q0, mu = 2.00e6, 24.0  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
+q0, mu = float(mat["gamma_heating"]), float(mat["mu_gamma"])  # W/m³, 1/m (volumetric heat source, attenuation coefficient)
 
 y_target, mask_tol = Ly / 2, 0.05  # m, m, m (extraction line and tolerance)
 

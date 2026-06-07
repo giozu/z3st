@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
 import pandas as pd
+import yaml
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -29,11 +30,13 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_DIR = os.path.join(CASE_DIR, "output")
 os.makedirs(OUT_DIR, exist_ok=True)
 
-# Geometry
-Ri = 1.52  # m
-t_cyl = 0.052  # m
-t_head = 0.026  # m
-L_cyl = 2.0  # m
+# Geometry (loaded from geometry.yaml)
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Ri = float(geom["Ri"])  # m
+L_cyl = float(geom["Lz"])  # m
+t_cyl = 0.052  # m  (thickness defined in mesh.geo, not in geometry.yaml)
+t_head = 0.026  # m  (thickness defined in mesh.geo, not in geometry.yaml)
 Ro_cyl = Ri + t_cyl
 Ro_head = Ri + t_head
 

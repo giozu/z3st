@@ -14,6 +14,7 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 
 from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
@@ -24,14 +25,23 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
-Ri, Ro, Lz = 0.004, 0.04, 0.10  # m          inner and outer radius
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Ri, Ro, Lz = float(geom["Ri"]), float(geom["Ro"]), float(geom["Lz"])  # m  inner/outer radius, height
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
+
 Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
-k, E, nu, alpha = (
-    2.5,
-    1.7e11,
-    0.29,
-    1.45e-5,
-)  # W/m·K, Pa, -, 1/K (thermal conductivity, Young's modulus, Poisson's ratio, thermal expansion)
+k = 2.5  # W/m·K       thermal conductivity (analytical reference)
+E, nu, alpha = (
+    float(mat["E"]),
+    float(mat["nu"]),
+    float(mat["alpha"]),
+)  # Pa, -, 1/K (Young's modulus, Poisson's ratio, thermal expansion)
 To = 500.0  # K          outer surface temperature
 Lx = Ro - Ri  # m          wall thickness
 slenderness = Ri / Lx  # -          slenderness ratio

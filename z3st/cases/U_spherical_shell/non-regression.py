@@ -13,6 +13,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
+import yaml
 
 # Add the z3st/utils directory to sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "utils"))
@@ -26,18 +27,26 @@ VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Parameters
-Ri = 2.000  # inner radius (m)
-Ro = 2.500  # outer radius (m)
+with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+    geom = yaml.safe_load(f)
+Ri = float(geom["Ri"])  # inner radius (m)
+Ro = float(geom["Ro"])  # outer radius (m)
 t = Ro - Ri  # thickness (m)
+
+with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+    inp = yaml.safe_load(f)
+mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
+with open(mat_path) as f:
+    mat = yaml.safe_load(f)
 
 Pi = 0.000  # internal pressure (Pa)
 Po = 0.000  # external pressure (Pa)
 
-nu = 0.280  # Poisson's ratio
-E = 1.8e11  # Young modulus (Pa)
+nu = float(mat["nu"])  # Poisson's ratio
+E = float(mat["E"])  # Young modulus (Pa)
 
-alpha = 1.4e-5  # (1/K)
-k = 18.5  # (W/mK
+alpha = float(mat["alpha"])  # (1/K)
+k = float(mat["k"])  # (W/mK
 q0 = 9.0e4  # (W/m³)
 mu = 27.0  # (1/m)
 
