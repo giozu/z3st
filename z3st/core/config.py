@@ -41,10 +41,19 @@ class Config:
             "damage": models.get("damage", False),
             "cluster": models.get("cluster", False),
             "plasticity": models.get("plasticity", False),
+            "contact": bool(models.get("contact", False)),
         }
         gap_config = self.input_file.get("models", {}).get("gap_conductance", {})
         self.gap_model = gap_config.get("type", None)
         self.h_gap_value = gap_config.get("value", 0.0)
+
+        # Contact-coupled gap conductance (Todreas & Kazimi, Nuclear Systems I,
+        # 3rd ed., Eq. 8.141/8.142): on gap closure a contact term proportional
+        # to the pellet-clad contact pressure is added to the open-gap value.
+        cc = gap_config.get("contact_coupling", {})
+        self.gap_contact_coupling = bool(cc.get("enabled", False))
+        self.gap_meyer_hardness = float(cc.get("meyer_hardness", 9.65e8))   # Pa (Zircaloy ~ 14e4 psi)
+        self.gap_contact_thickness = float(cc.get("gas_thickness", 4.0e-6))  # m (roughness-based gas space on contact)
         
         # --. Paths --..
         self.geometry_path = self.input_file.get("geometry_path", None)

@@ -17,6 +17,7 @@ from z3st.core.finite_element_setup import FiniteElementSetup
 from z3st.core.mesh import load_mesh
 from z3st.core.mesh.manager import MeshManager
 from z3st.core.solver import Solver
+from z3st.models.contact_model import ContactModel
 from z3st.models.damage_model import DamageModel
 from z3st.models.gap_model import GapModel
 from z3st.models.mechanical_model import MechanicalModel
@@ -26,7 +27,7 @@ from z3st.models.plasticity_model import PlasticityModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, DamageModel, ClusterDynamicsModel, PlasticityModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -65,6 +66,8 @@ class Spine(
             MechanicalModel.__init__(self)
         if self.on.get("gap", False):
             GapModel.__init__(self)
+        if self.on.get("contact", False):
+            ContactModel.__init__(self)
         if self.on.get("damage", False):
             DamageModel.__init__(self)
         if self.on.get("cluster", False):

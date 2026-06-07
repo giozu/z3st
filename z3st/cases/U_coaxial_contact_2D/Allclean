@@ -1,13 +1,3 @@
 #!/bin/bash
 cd "${0%/*}" || exit 1
-
-echo "Cleaning current directory..."
-
-rm -f output/non-regression.json
-rm -f output/fields.vtu
-rm -f output/*.png
-rm -f output/*.csv
-rm -f *.msh
-rm -f log_*.md
-
-echo "Done. Output and temporary files deleted."
+rm -rf output log_mesh.md log_z3st.md mesh.msh energies.txt __pycache__

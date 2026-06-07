@@ -386,6 +386,19 @@ class Solver:
                 else:
                     F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
 
+        # Penalty contact: update the contact pressure from the current
+        # displacement iterate (explicit / fixed-point) and add the contact
+        # traction t = -p*n on both facing surfaces. Treated as an external
+        # load (RHS for the linear solve), driven to consistency by the
+        # staggered relaxation loop.
+        if self.on.get("contact", False):
+            self.update_contact_pressure(u_new)
+            contact_form = self.contact_traction(v_m)
+            if self.mech_cfg["solver"] == "linear":
+                L_m += contact_form
+            else:
+                F_m -= contact_form
+
         # --- Extract actual DirichletBC objects (handles both dict and direct BCs) ---
         bcs_mech = [
             bc["value"] if isinstance(bc, dict) else bc

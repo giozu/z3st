@@ -13,6 +13,8 @@ analysis:
 - **Phase-field fracture** (AT1 / AT2) for crack initiation and propagation
 - **Gap conductance** for heat transfer across the interface between
   separate bodies
+- **Penalty contact** for mechanical pellet-clad interaction (gap closure
+  and load transfer across the interface)
 - **Cluster dynamics** for defect-cluster evolution in size space
 
 All models are written as FEniCSx (UFL) variational forms. A central feature
@@ -366,22 +368,190 @@ Gap Conductance Model
 ---------------------
 
 Heat transfer between two paired bodies separated by a small gap is a Robin
-coupling with an effective film coefficient :math:`h_{gap}`, taken either from a
-fixed user value or from a gas-conduction correlation,
-
-.. math::
-
-   k_{gas} = c \cdot 10^{-4}\, T_{gap}^{0.79}, \qquad
-   h_{gap} = \frac{k_{gas}}{d_{gap}},
-
-where :math:`T_{gap} = \tfrac{1}{2}(T_{inner} + T_{outer})` is the mean surface
-temperature, :math:`c` a user prefactor, and :math:`d_{gap}` the mean
-centroid-to-centroid distance between the two paired facet groups, computed once
-per simulation with a SciPy cKDTree query. The gap pair is declared through the
+coupling with an effective film coefficient :math:`h_{gap}`, applied through the
 ``pair`` field of a Robin boundary condition in ``boundary_conditions.yaml``; no
 specialised contact element is required. This is the capability that makes Z3ST
 **multi-body** -- for example, heat transfer from a fuel pellet to its cladding.
-Implemented in :class:`z3st.models.gap_model.GapModel`.
+The model follows Todreas and Kazimi, *Nuclear Systems Volume I*, 3rd ed.,
+§8.7.1, with an open-gap term and, on gap closure, an added solid-contact term:
+
+.. math::
+
+   q''_{g} = h_{g}\,(T_{fo} - T_{ci}), \qquad
+   h_{g} = h_{g,\text{open}} + h_{contact}.
+
+**Open gap.** The open-gap conductance is gas conduction across the effective
+gap width (a fixed user value or a gas-conduction correlation),
+
+.. math::
+
+   h_{g,\text{open}} = \frac{k_{gas}}{\delta_{eff}}, \qquad
+   k_{gas} = c \cdot 10^{-4}\, T_{gap}^{0.79},
+
+where :math:`T_{gap} = \tfrac{1}{2}(T_{inner} + T_{outer})` is the mean surface
+temperature and :math:`\delta_{eff}` the mean centroid-to-centroid distance
+between the two paired facet groups, computed with a SciPy cKDTree query. The
+correlation is the Todreas--Kazimi Eq. 8.140, :math:`k = A\cdot 10^{-6} T^{0.79}`
+W/(cm·K) converted to SI, with the user prefactor :math:`c` playing the role of
+the gas constant :math:`A` (:math:`A = 15.8` helium, :math:`1.97` argon,
+:math:`1.15` krypton, :math:`0.72` xenon). The effective gap width exceeds the
+geometric one by the temperature-jump distances
+:math:`\delta_{eff} = \delta_g + \delta_{jump,1} + \delta_{jump,2}`
+(Eq. 8.138; :math:`\delta_{jump}\sim 10\,\mu\text{m}` in helium,
+:math:`1\,\mu\text{m}` in xenon). A radiative contribution
+(Eq. 8.137a) may be added in series but is small at LWR temperatures.
+
+.. _contact-coupled-conductance:
+
+**Gap closure (contact-coupled conductance).** When the pellet expands enough to
+close the gap and contact the cladding (see the :ref:`penalty contact model
+<penalty-contact>`), a solid-contact term is added, Todreas--Kazimi Eq. 8.141
+(Ross--Stoute form),
+
+.. math::
+
+   h_{contact} = C\,\frac{2\,k_f k_c}{k_f + k_c}\,\frac{P_i}{H\,\sqrt{\delta_g}},
+
+where :math:`P_i` is the **pellet-clad contact pressure supplied by the penalty
+contact model**, :math:`k_f, k_c` are the fuel and cladding conductivities,
+:math:`H` is the Meyer hardness of the softer solid (Zircaloy
+:math:`\approx 14\times 10^4` psi), and :math:`\delta_g` the roughness-based mean
+gas-space thickness in contact. The empirical constant :math:`C = 10\,\text{ft}^{-1/2}`
+is expressed in SI as :math:`C_{SI} = 18.11\,\text{m}^{-1/2}` so that, with
+:math:`k` in W/(m·K), :math:`\delta_g` in m and the dimensionless ratio
+:math:`P_i/H`, the result is W/(m²·K).
+
+This couples the :ref:`thermal gap model <gap-conductance>` to the
+:ref:`mechanical contact model <penalty-contact>`: the contact pressure that the
+penalty model computes on closure raises the gap conductance, which in turn cools
+the pellet -- the physically observed effect that pellet--clad contact improves
+heat transfer and lowers fuel temperature. In the demonstration case
+``U_coaxial_contact_2D`` the fuel centreline temperature drops once contact
+engages. The coupling is explicit within the staggered loop (the thermal step
+uses the contact pressure from the previous mechanical step) and is enabled by
+``gap_conductance.contact_coupling`` in ``input.yaml``. Implemented in
+:class:`z3st.models.gap_model.GapModel`.
+
+.. _penalty-contact:
+
+Penalty Contact Model (Pellet--Clad Mechanical Interaction)
+-----------------------------------------------------------
+
+Where the :ref:`gap-conductance model <gap-conductance>` couples two bodies
+*thermally* across a gap, the penalty contact model couples them
+*mechanically*: when a heated pellet expands enough to close its clearance to
+the cladding, the two bodies come into contact and transmit a normal pressure.
+This is the essence of pellet--clad mechanical interaction (PCMI).
+
+**Geometry and the gap function.** Two bodies :math:`\Omega_1` (inner, e.g. the
+fuel pellet) and :math:`\Omega_2` (outer, e.g. the cladding) face each other
+across an initial radial clearance :math:`g_0 = R_{2,\mathrm{in}} - R_{1,\mathrm{out}}`
+on the surface pair :math:`\Gamma_a` (pellet outer) and :math:`\Gamma_b` (clad
+inner). The current normal gap, measured from the radial displacement
+:math:`u_r = u_{(0)}`, is
+
+.. math::
+
+   g(\boldsymbol{u}) = g_0 + \langle u_r \rangle_{\Gamma_b} - \langle u_r \rangle_{\Gamma_a},
+
+so :math:`g > 0` is an open gap and :math:`g < 0` an interpenetration.
+
+**Unilateral contact (Signorini) conditions.** Physical contact obeys the
+Karush--Kuhn--Tucker complementarity conditions on the interface,
+
+.. math::
+
+   g \ge 0, \qquad p \ge 0, \qquad p\, g = 0,
+
+i.e. the surfaces cannot interpenetrate (:math:`g \ge 0`), the contact pressure
+is compressive only -- no adhesion (:math:`p \ge 0`), and pressure is non-zero
+only when the gap is closed (:math:`p\,g = 0`).
+
+**Penalty regularisation.** The hard constraint is regularised by penalising
+penetration with a stiffness :math:`k_{pen}` (Pa/m),
+
+.. math::
+
+   p = k_{pen}\,\langle -g \rangle_+ = k_{pen}\,\max(0,\,-g),
+
+where :math:`\langle \cdot \rangle_+` is the Macaulay bracket. As
+:math:`k_{pen} \to \infty` the admissible penetration :math:`-g = p/k_{pen} \to 0`
+and the exact Signorini solution is recovered; at finite :math:`k_{pen}` a small
+penetration of order :math:`p/k_{pen}` persists.
+
+**Contact traction.** The pressure acts as a compressive normal traction on
+*both* facing surfaces, each with its own outward facet normal
+:math:`\boldsymbol{n}` (:math:`\boldsymbol{n}_a \approx +\boldsymbol{e}_r`,
+:math:`\boldsymbol{n}_b \approx -\boldsymbol{e}_r`), so that penetration pushes
+the bodies apart,
+
+.. math::
+
+   \boldsymbol{t}_{\Gamma} = -p\,\boldsymbol{n}_{\Gamma}, \qquad \Gamma \in \{\Gamma_a, \Gamma_b\}.
+
+**Weak form contribution.** The contact traction is added to the mechanical
+weak form as an interface load,
+
+.. math::
+
+   \sum_{\Gamma \in \{\Gamma_a, \Gamma_b\}} \int_{\Gamma} w\,(-p\,\boldsymbol{n}_\Gamma)\cdot\boldsymbol{v}\,\mathrm{d}s,
+
+with the regime weight :math:`w = 2\pi r` (axisymmetric). Because the pellet and
+cladding meshes share no nodes across the (unmeshed) gap, the surfaces are free
+to separate and to close -- the prerequisite for genuine contact, as opposed to
+a bonded interface.
+
+**Explicit (fixed-point) solution.** The pressure :math:`p` is evaluated from the
+previous displacement iterate inside the staggered loop, so it enters the linear
+momentum balance as a known interface load that is refreshed every iteration; the
+staggered under-relaxation (see :ref:`coupled scheme <coupled-scheme>`) drives the
+contact fixed point to consistency. No contact Jacobian is assembled. This is the
+explicit counterpart of constraint-based (Lagrange-multiplier) contact: cheaper
+and robust, at the cost of a fixed-point rather than a monolithic Newton
+convergence.
+
+**Gap measure.** The representative gap uses the boundary-integral mean radial
+displacement on each surface,
+
+.. math::
+
+   \langle u_r \rangle_{\Gamma} = \frac{\int_{\Gamma} u_r\,\mathrm{d}s}{\int_{\Gamma}\mathrm{d}s},
+
+which is unambiguous under blocked vector spaces and MPI-parallel. A single scalar
+pressure is then applied uniformly over the interface.
+
+.. note::
+
+   **Modelling scope and limitations (current implementation).**
+
+   - *Uniform (average-gap) pressure.* One scalar :math:`p` is applied over the
+     whole interface. This is exact when the gap is axially uniform; under an
+     axially varying expansion (the pellet "wheatsheaf" / hourglass shape,
+     hotter and freer at one end) the contact is genuinely non-uniform. The
+     consistent extension is a *per-facet* local gap :math:`g(z)` and pressure
+     :math:`p(z)`, which also resolves axial ridging.
+   - *Penalty vs constraint.* A finite :math:`k_{pen}` admits a small penetration
+     :math:`p/k_{pen}`; the contact pressure approaches the physical value only as
+     :math:`k_{pen}\to\infty`, and in the explicit fixed point it may oscillate
+     within the displacement convergence tolerance. The reported pressure is
+     therefore accurate in magnitude but not to high precision.
+   - *Frictionless and normal-only.* Only the normal interaction is modelled; no
+     tangential (friction) traction is included yet. The *thermal* consequence of
+     closure -- the rise in gap conductance with contact pressure -- **is**
+     modelled, through the :ref:`contact-coupled conductance
+     <contact-coupled-conductance>` (Todreas--Kazimi Eq. 8.141).
+
+   Made implicit, the penalty tangent is available exactly as the UFL derivative
+   of the residual, consistent with the automatic-differentiation philosophy used
+   elsewhere in Z3ST.
+
+The model is exercised by the demonstration case ``U_coaxial_contact_2D``: a 2D
+axisymmetric UO\ :sub:`2` pellet and Zircaloy cladding separated by a 30 µm gap.
+As the linear heat rate is ramped, the pellet heats and expands, the gap closes
+progressively, contact engages, an emergent (not prescribed) contact pressure
+builds, and the cladding is driven outward -- the load transfer that is the
+signature of PCMI. Implemented in
+:class:`z3st.models.contact_model.ContactModel`.
 
 Cluster Dynamics Model
 ----------------------
@@ -408,6 +578,8 @@ to enforce conservation, and the local Péclet number is logged for diagnostics.
    verification study.
 
 Implemented in :class:`z3st.models.cluster_dynamic_model.ClusterDynamicModel`.
+
+.. _coupled-scheme:
 
 Coupled Thermo-Mechanical Analysis
 ----------------------------------

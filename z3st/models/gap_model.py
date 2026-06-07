@@ -45,9 +45,55 @@ class GapModel:
         else:
             h_gap_value = 0.0
 
+        # Contact-coupled conductance (Todreas & Kazimi, Nuclear Systems I,
+        # 3rd ed., Eq. 8.141/8.142): on gap closure the pellet-clad contact
+        # pressure adds a contact term to the open-gap value.
+        if self.on.get("contact", False) and getattr(self, "gap_contact_coupling", False):
+            h_contact = self.contact_conductance()
+            if h_contact > 0.0:
+                print(
+                    f"  → h_open      = {h_gap_value:.2f} W/m²K, "
+                    f"h_contact = {h_contact:.2f} W/m²K (gap closed)"
+                )
+                h_gap_value += h_contact
+
         h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_value))
 
         return h_gap
+
+    def contact_conductance(self):
+        """
+        Solid-contact gap conductance on gap closure, Todreas & Kazimi,
+        *Nuclear Systems I*, 3rd ed., Eq. 8.141 (Ross-Stoute form):
+
+            h_contact = C * (2 k_f k_c)/(k_f + k_c) * P_i / (H * sqrt(delta_g)),
+
+        with the pellet-clad contact pressure P_i taken from the penalty
+        :class:`ContactModel`. The empirical constant C = 10 ft^-1/2 is here
+        expressed in SI as C_SI = 18.11 m^-1/2 so that, with k in W/(m.K),
+        delta_g in m and the dimensionless ratio P_i/H, the result is W/(m^2.K).
+        Returns 0 when the surfaces are not in contact (P_i = 0).
+        """
+        P_i = float(getattr(self, "_last_pressure", 0.0))  # Pa, from ContactModel
+        if P_i <= 0.0:
+            return 0.0
+
+        # harmonic mean of the two solid conductivities
+        ks = [
+            float(m["k"])
+            for m in self.materials.values()
+            if isinstance(m.get("k"), (int, float))
+        ]
+        if len(ks) < 2:
+            return 0.0
+        k_f, k_c = ks[0], ks[1]
+        k_harm = 2.0 * k_f * k_c / (k_f + k_c)
+
+        H = self.gap_meyer_hardness            # Pa (Meyer hardness, softer solid)
+        delta_g = self.gap_contact_thickness   # m (roughness-based gas space)
+        C_SI = 18.11                           # m^-1/2  (= 10 ft^-1/2, Eq. 8.141)
+
+        return C_SI * k_harm * (P_i / H) / (delta_g ** 0.5)
 
     def set_gap_temperature(self, T_i):
 
