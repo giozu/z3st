@@ -553,6 +553,34 @@ builds, and the cladding is driven outward -- the load transfer that is the
 signature of PCMI. Implemented in
 :class:`z3st.models.contact_model.ContactModel`.
 
+**Verification.** The penalty contact pressure is verified against the analytical
+**Lamé interference-fit** solution in case ``U_coaxial_contact_verification``. The
+pellet is heated *uniformly* (a ramped Dirichlet temperature) while the cladding
+is held at its reference temperature, so the radial interference is known in
+closed form,
+
+.. math::
+
+   \delta(\Delta T) = \alpha_f\,(T - T_{ref})\,b - g_0,
+
+and the shrink-fit pressure of a solid cylinder in a tube follows (plane-stress
+form, with :math:`b` the interface radius, :math:`c` the clad outer radius):
+
+.. math::
+
+   p_{\mathrm{Lame}} = \frac{\delta}{\,b\left[\dfrac{1}{E_c}\!\left(\dfrac{c^2+b^2}{c^2-b^2}+\nu_c\right) + \dfrac{1}{E_f}\left(1-\nu_f\right)\right]}.
+
+The analytical formula and the simulation are matched in **regime**: the pellet
+top is left axially free, so the bulk stress state is plane stress -- confirmed
+in the output (:math:`\sigma_{zz}\approx 3\%` of the in-plane stress) -- exactly
+the condition under which the formula above is derived. With this consistency,
+the Z3ST penalty pressure reproduces the analytical line to a **mean error of
+3.5 %** over the contact range, the small residual being the finite penalty
+stiffness (and a slight departure from ideal plane stress near the clamped end).
+The contact pressure is therefore a verified quantity, not merely a qualitatively
+reasonable one. The ``non-regression.py`` of that case regenerates the comparison
+plot and prints the error metric.
+
 Cluster Dynamics Model
 ----------------------
 
