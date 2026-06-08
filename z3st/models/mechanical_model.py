@@ -706,52 +706,70 @@ class MechanicalModel:
         J = ufl.det(F_def)
         return (1.0 / J) * P * F_def.T
 
-    def sigma_th(self, T, material):
+    def eigenstrain(self, T, material):
         """
-        Thermal stress tensor σ_th(T) = -(3λ + 2G) α (T - T_ref) I.
+        Total inelastic eigenstrain tensor ε* of a material — the strain that
+        develops stress-free and is subtracted from the total strain in the
+        constitutive law, σ = ℂ : (ε − ε*).
 
-        Sign convention: compressive thermal stress for T > T_ref. The
-        (3λ + 2G) factor is the standard isotropic 3D form; for regime
-        "2d" (plane strain in z3st) the 3x3 identity contracts with
-        eps(v) which has eps_zz(v) = 0 on a 2D mesh, so the in-plane
-        coupling is naturally the plane-strain (3λ + 2G) result (the
-        eigenstrain is implicitly α(T-T_ref) on the z direction too,
-        blocked by the plane-strain constraint eps_zz = 0).
-
-        Damage coupling: when damage is active, σ_th is degraded by
-        g(D) = (1-D)^2 + K, mirroring σ_mech. Without this degradation, a
-        fully damaged cell (g(D) ~ K ~ 1e-6) loses its mechanical stiffness
-        on the LHS of the equilibrium but still feels the full thermal
-        body force on the RHS, which drives the displacement to ~1/K →
-        numerical explosion. Degrading both gives the physical limit of a
-        traction-free crack face.
-
-        Note on the damage driver: damage_model._thermal_eigenstrain uses
-        the "pancake" convention (eth_zz = 0) when evaluating ψ⁺. That is
-        a deliberate, independent choice that suppresses the 2D-projected
-        bulk σ_zz artifact in the damage decision only; it does not affect
-        the displacement field, which keeps the standard plane-strain
-        (3λ + 2G) thermal stress here.
+        Every material with a thermal-expansion coefficient contributes the
+        thermal eigenstrain α(T − T_ref) I. A material may add further inelastic
+        contributions — fuel swelling and densification, cladding creep, ... —
+        by exposing an ``eigenstrain`` callable in its card, which
+        ``spine.load_materials`` resolves to ``_eigenstrain_func``. This is the
+        single channel through which the mechanical equilibrium receives
+        inelastic strains: "fuel is a material", so its swelling/creep enter
+        *here*, carried by the fuel material, not as a separate global model.
+        The result is a UFL tensor, so the Newton tangent stays automatic.
         """
         regime = self.regime
+        dim = 1 if regime == "1d" else (3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim)
 
-        if regime == "1d":
-            # Engineering 1D bar: a fully restrained line element develops the
-            # uniaxial thermal stress -E alpha (T - T_ref), consistent with the
-            # sigma = E eps constitutive law used in sigma_mech for regime 1d
-            # (NOT the 3D (3 lambda + 2G) bulk factor).
-            coeff = material["E"]
-            dim = 1
+        # Thermal eigenstrain (isotropic), present for any expanding material.
+        eps_star = material["alpha"] * (T - material["T_ref"]) * ufl.Identity(dim)
+
+        # Material-contributed inelastic eigenstrains (e.g. fuel swelling,
+        # densification, cladding creep). Dormant unless the material provides
+        # them — non-fuel materials (steel, ...) are unaffected.
+        fn = material.get("_eigenstrain_func")
+        if fn is not None:
+            eps_star = eps_star + fn(T, material, model=self, dim=dim)
+
+        return eps_star
+
+    def sigma_th(self, T, material):
+        """
+        Eigenstress −ℂ : ε* moved to the right-hand side of the momentum
+        balance, where ε* is the total inelastic eigenstrain returned by
+        :meth:`eigenstrain`. For a purely thermal eigenstrain this reduces to
+        the classical σ_th = −(3λ + 2G) α (T − T_ref) I (and −E α (T − T_ref)
+        in regime "1d"); fuel swelling/creep enter through the same channel
+        once the material supplies them, so equilibrium needs no further change.
+
+        Damage coupling: when damage is active the eigenstress is degraded by
+        g(D) = (1−D)² + K, mirroring σ_mech. Without this a fully damaged cell
+        (g(D) ~ K ~ 1e-6) loses its stiffness on the LHS but still feels the
+        full eigenstress on the RHS, driving the displacement to ~1/K and a
+        numerical explosion; degrading both recovers the traction-free
+        crack-face limit. (The damage *driver* uses its own "pancake"
+        eth_zz = 0 convention in damage_model._thermal_eigenstrain, which
+        affects only the ψ⁺ decision, not the displacement field here.)
+        """
+        eps_star = self.eigenstrain(T, material)
+        dim = eps_star.ufl_shape[0]
+
+        # Eigenstress ℂ : ε*. For the engineering 1D bar the stiffness is E
+        # (uniaxial); otherwise the isotropic Lamé contraction λ tr(ε*) I + 2G ε*
+        # — which for ε* = αΔT I recovers exactly the (3λ + 2G) αΔT thermal form.
+        if self.regime == "1d":
+            sigma_eig = material["E"] * eps_star
         else:
-            coeff = 3.0 * material["lmbda"] + 2.0 * material["G"]
-            dim = 3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim
+            sigma_eig = (
+                material["lmbda"] * ufl.tr(eps_star) * ufl.Identity(dim)
+                + 2.0 * material["G"] * eps_star
+            )
 
-        sigma_th = (
-            -coeff
-            * material["alpha"]
-            * (T - material["T_ref"])
-            * ufl.Identity(dim)
-        )
+        sigma_th = -sigma_eig
 
         if self.on.get("damage", False):
             sigma_th = self.degradation_function(self.D) * sigma_th
