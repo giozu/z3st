@@ -19,10 +19,8 @@ ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 #     (linear elasticity, axisymmetric thermal, 3D thermal, volumetric
 #     heating, multi-material with Robin pair gap, 2D damage, J2 plasticity,
 #     custom-plasticity hook).
-# Active WIP cases (14_full_cylinder_cracking, 14_full_cylinder_cracking_2D_xy,
-# 14_full_cylinder_thermal_2D_rz, 19_single-edge_notched_*) are intentionally
-# excluded — they are too long for CI and their golds are still being
-# blessed. Run them locally via cases/non-regression.sh.
+# Active WIP cases are intentionally excluded, they are too long for CI 
+# and their golds are still being blessed. Run them locally via cases/non-regression.sh.
 CASES=(
     "1_thin_slab_2D"
     "2_thin_cylindrical_shell_2D"
@@ -33,6 +31,8 @@ CASES=(
     "18_box_crack_2D"
     "20_plasticity_2D"
     "demo_CP_single_grain"
+    "U_coaxial_contact_verification"
+    "U_swelling_verification"
 )
 SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 

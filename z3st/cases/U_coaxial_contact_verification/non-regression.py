@@ -25,8 +25,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
+from z3st.utils.utils_extract_vtu import *
+from z3st.utils.utils_verification import *
+
 CASE = os.path.dirname(__file__)
 OUT = os.path.join(CASE, "output")
+OUT_JSON = os.path.join(CASE, "output", "non-regression.json")
+
+TOLERANCE = 5e-2
+
 files = sorted(glob.glob(os.path.join(OUT, "fields_*.vtu")))
 
 geo = yaml.safe_load(open(os.path.join(CASE, "geometry.yaml")))
@@ -84,3 +91,18 @@ if mask.any():
     rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_lame[mask]
     print(f"[INFO] closed-gap steps: {mask.sum()}, mean rel. error vs Lame = {rel.mean() * 100:.1f}%")
 print("[INFO] non-regression completed.\n")
+
+# --. numerical results --..
+errors = {
+    "contact_pressure": {
+        "numerical": p_z3st[mask].max(),
+        "reference": p_lame[mask].max(),
+        "abs_error": float(rel.max()),
+        "rel_error": float(rel.max()),
+    },
+}
+
+pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE)
+regression_check(errors, CASE)
+
+print("\n[INFO] non-regression completed.\n")

@@ -1,7 +1,7 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
 //  Gmsh GEO: 2D axisymmetric (r-z) segment for PCMI.
-//  cyl_1 = UO2 fuel pellet, cyl_2 = Zircaloy cladding, separated by a
+//  cyl_1 = pellet, cyl_2 = cladding, separated by a
 //  small radial gap (r_1_o .. r_2_i) left unmeshed so the gap can close
 //  and the pellet contacts the cladding (pellet-clad mechanical
 //  interaction). Penalty contact is applied between lateral_1 (pellet
