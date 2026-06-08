@@ -1,0 +1,20 @@
+{
+    "results": {
+        "u_x_free": {
+            "numerical": 0.006000000088405657,
+            "reference": 0.006,
+            "abs_error": 8.840565692697089e-11,
+            "rel_error": 1.4734276154495147e-08,
+            "status": "PASS"
+        },
+        "stress_free_residual": {
+            "numerical": 406.61041971028146,
+            "reference": 0.0,
+            "abs_error": 406.61041971028146,
+            "rel_error": 1.3553680657009383e-08,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

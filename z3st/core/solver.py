@@ -370,14 +370,18 @@ class Solver:
                 sigma = self.sigma_mech(u_m, material)
                 a_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
                 L_m += w * ufl.dot(body_force, v_m) * dx
-                if self.on.get("thermal", False):
+                # Eigenstress -C:ε* (e.g., thermal + material eigenstrains). Applied
+                # when the thermal block is active or the material carries a
+                # non-thermal eigenstrain (e.g., swelling), since those are
+                # not thermal-only.
+                if self.on.get("thermal", False) or self.has_eigenstrain(material):
                     L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
             else:
                 mode = material.get("constitutive_mode", "lame")
                 if mode == "hyperelastic":
                     F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
                     F_m -= w * ufl.dot(body_force, v_m) * dx
-                    if self.on.get("thermal", False):
+                    if self.on.get("thermal", False) or self.has_eigenstrain(material):
                         F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
                 else:
                     sigma = self.sigma_mech(u_new, material)

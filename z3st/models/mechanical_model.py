@@ -706,31 +706,49 @@ class MechanicalModel:
         J = ufl.det(F_def)
         return (1.0 / J) * P * F_def.T
 
+    def has_eigenstrain(self, material):
+        """
+        True if the material carries a non-thermal inelastic eigenstrain 
+        (swelling, a material eigenstrain callable, ...). Used by the solver to
+        apply the eigenstress even when the thermal block is inactive — these
+        strains are not thermal-only.
+        """
+        return ("swelling" in material) or ("_eigenstrain_func" in material)
+
     def eigenstrain(self, T, material):
         """
-        Total inelastic eigenstrain tensor ε* of a material — the strain that
-        develops stress-free and is subtracted from the total strain in the
-        constitutive law, σ = ℂ : (ε − ε*).
+        Total inelastic eigenstrain tensor ε* of a material: 
+        the strain that develops stress-free and is subtracted from 
+        the total strain in the constitutive law, σ = C : (ε - ε*).
 
         Every material with a thermal-expansion coefficient contributes the
-        thermal eigenstrain α(T − T_ref) I. A material may add further inelastic
-        contributions — fuel swelling and densification, cladding creep, ... —
+        thermal eigenstrain α(T - T_ref) I. A material may add further inelastic
+        contributions (fuel swelling and densification, cladding creep, ... )
         by exposing an ``eigenstrain`` callable in its card, which
         ``spine.load_materials`` resolves to ``_eigenstrain_func``. This is the
         single channel through which the mechanical equilibrium receives
-        inelastic strains: "fuel is a material", so its swelling/creep enter
-        *here*, carried by the fuel material, not as a separate global model.
+        inelastic strains: so its swelling/creep enter *here*, not as a separate global model.
         The result is a UFL tensor, so the Newton tangent stays automatic.
         """
         regime = self.regime
         dim = 1 if regime == "1d" else (3 if regime in ["axisymmetric", "3d", "2d"] else self.tdim)
+        I = ufl.Identity(dim)
+        eps_star = 0.0 * I  # zero eigenstrain tensor; contributions add below
 
-        # Thermal eigenstrain (isotropic), present for any expanding material.
-        eps_star = material["alpha"] * (T - material["T_ref"]) * ufl.Identity(dim)
+        # Thermal eigenstrain α(T − T_ref) I — only when a temperature field is
+        # active (T is None for mechanical-only runs, where it is simply absent).
+        if T is not None and "alpha" in material and "T_ref" in material:
+            eps_star = eps_star + material["alpha"] * (T - material["T_ref"]) * I
 
-        # Material-contributed inelastic eigenstrains (e.g. fuel swelling,
-        # densification, cladding creep). Dormant unless the material provides
-        # them — non-fuel materials (steel, ...) are unaffected.
+        # Constant volumetric swelling ΔV/V from a scalar material field
+        # (`swelling: 0.01` = 1% volume increase). Isotropic, so the linear
+        # eigenstrain per direction is (ΔV/V)/3 since tr(ε*) = ΔV/V.
+        s = material.get("swelling")
+        if s:
+            eps_star = eps_star + (float(s) / 3.0) * I
+
+        # State-dependent material eigenstrains (real swelling(bu,T),
+        # densification, creep) via a callable. Dormant unless provided.
         fn = material.get("_eigenstrain_func")
         if fn is not None:
             eps_star = eps_star + fn(T, material, model=self, dim=dim)

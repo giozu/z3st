@@ -1,0 +1,41 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.1.0 (2025)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+# VERIFICATION of the eigenstrain bus: a block of a
+# material carrying a constant volumetric swelling ΔV/V, free to expand from a
+# corner. Free swelling is stress-free, so the analytical result is σ = 0 and a
+# uniform expansion u = (ΔV/V)/3 * x. Mechanical only.
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  steel: swell.yaml
+
+regime: 3D
+
+solver_settings:
+  coupling: staggered
+  max_iters: 10
+  relax_u: 1.0
+  relax_adaptive: false
+
+models:
+  mechanical: true
+
+mechanical:
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-9
+  stag_tol: 1.0e-8
+  convergence: rel_norm
+
+lhr:
+- 0.0
+time:
+- 0.0
+n_steps: 1
