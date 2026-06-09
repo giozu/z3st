@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -115,7 +116,7 @@ Initializing the displacement field...
 
 
 Loading boundary conditions from 'boundary_conditions.yaml'
-  **[INFO]** Dirichlet thermal BC on 'steel' → 490.0 K at region 'inner_radius'
+  **[INFO]** Dirichlet thermal BC on 'steel' → 490.0 K (first step) at region 'inner_radius'
   **[INFO]** Neumann thermal BC on 'steel' → 0.0 W/m² at region 'outer_radius'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'bottom'
 Computing symbolic result fields (strain, stress, ...)
@@ -453,5 +454,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.39 s
+Simulation completed in 5.25 s
 Total time steps solved: 1

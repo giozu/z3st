@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -118,7 +119,7 @@ Initializing the displacement field...
 
 
 Loading boundary conditions from 'boundary_conditions.yaml'
-  **[INFO]** Dirichlet thermal BC on 'steel' → 300.0 K at region 'inner_radius'
+  **[INFO]** Dirichlet thermal BC on 'steel' → 300.0 K (first step) at region 'inner_radius'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'bottom'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'top'
   **[INFO]** Neumann mechanical BC on 'steel' → inner_radius: -1000000.0 Pa (list loaded)
@@ -502,7 +503,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 1
   Applying mechanical traction on subdomain id = 2
   Linear solver
-  ||Δu||/||u|| = 2.109e-15
+  ||Δu||/||u|| = 3.533e-15
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -510,5 +511,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.95 s
+Simulation completed in 2.93 s
 Total time steps solved: 1

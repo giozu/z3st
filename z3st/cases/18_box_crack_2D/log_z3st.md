@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → ON
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -358,5 +359,5 @@ Computing symbolic result fields (strain, stress, ...)
   → Fracture energy : 4.0841e+03 J
   → Total energy    : 3.9035e+04 J
 
-Simulation completed in 30.74 s
+Simulation completed in 35.01 s
 Total time steps solved: 1

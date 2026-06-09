@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -691,5 +692,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 6 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 3.68 s
+Simulation completed in 3.81 s
 Total time steps solved: 5

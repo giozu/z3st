@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -115,7 +116,7 @@ Initializing the displacement field...
 
 
 Loading boundary conditions from 'boundary_conditions.yaml'
-  **[INFO]** Dirichlet thermal BC on 'steel' → 490.0 K at region 'inner_radius'
+  **[INFO]** Dirichlet thermal BC on 'steel' → 490.0 K (first step) at region 'inner_radius'
   **[INFO]** Neumann thermal BC on 'steel' → 0.0 W/m² at region 'outer_radius'
   **[INFO]** Clamp_y mechanical BC on 'steel' → 0.0 (first step) at region 'bottom'
 Computing symbolic result fields (strain, stress, ...)
@@ -399,7 +400,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.854e-04
+  ||Δu||/||u|| = 1.853e-04
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -422,7 +423,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.062e-05
+  ||Δu||/||u|| = 1.060e-05
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -445,59 +446,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.121e-06
+  ||Δu||/||u|| = 9.269e-07
   [adaptive] relax_u=0.95
 
 Convergence check
 
-
-#### Iteration 14/100
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  → q_third[steel](W/m3) min = 1.77e+05, max = 2.00e+06, mean = 7.60e+05
-  Applying flux on subdomain id = 2
-  Linear solver
-  T_new: min=490.00 K, max=539.94 K, mean=526.76 K
-  ||ΔT||/||T|| = 1.251e-17
-  [adaptive] relax_T=0.95
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  Linear solver
-  ||Δu||/||u|| = 1.094e-06
-  [adaptive] relax_u=0.95
-
-Convergence check
-
-
-#### Iteration 15/100
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  → q_third[steel](W/m3) min = 1.77e+05, max = 2.00e+06, mean = 7.60e+05
-  Applying flux on subdomain id = 2
-  Linear solver
-  T_new: min=490.00 K, max=539.94 K, mean=526.76 K
-  ||ΔT||/||T|| = 0.000e+00
-  [adaptive] relax_T=0.95
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  Linear solver
-  ||Δu||/||u|| = 5.469e-08
-  [adaptive] relax_u=0.95
-
-Convergence check
-
-**[SUCCESS]** Staggered solver converged in 15 iterations.
+**[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 19.63 s
+Simulation completed in 29.85 s
 Total time steps solved: 1

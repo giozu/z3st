@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -357,7 +358,7 @@ Convergence check
   Building weak form, volume integrals (dx) for steel, tag = 7
   Applying mechanical traction on subdomain id = 3
   Linear solver
-  ||Δu||/||u|| = 1.510e-13
+  ||Δu||/||u|| = 1.225e-13
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -365,5 +366,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 1.64 s
+Simulation completed in 4.24 s
 Total time steps solved: 1

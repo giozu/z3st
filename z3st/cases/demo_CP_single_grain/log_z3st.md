@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → ON
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -2462,5 +2463,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 9.43 s
+Simulation completed in 10.32 s
 Total time steps solved: 41

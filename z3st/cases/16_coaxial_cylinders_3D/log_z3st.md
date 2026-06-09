@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : Fixed (value = 2000.0)
 
 
@@ -80,7 +81,7 @@ Material loaded: cyl_1
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7fa4d97339c0> (function)
+  _k_func         → <function k at 0x7f187f73d580> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -149,7 +150,7 @@ Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Neumann thermal BC on 'cyl_1' → 0.0 W/m² at region 'top_1'
   **[INFO]** Robin (gap) thermal BC on 'cyl_1' at region 'lateral_1' coupled with 'inner_2'
   **[INFO]** Neumann thermal BC on 'cyl_2' → 0.0 W/m² at region 'bottom_2'
-  **[INFO]** Dirichlet thermal BC on 'cyl_2' → 350.0 K at region 'outer_2'
+  **[INFO]** Dirichlet thermal BC on 'cyl_2' → 350.0 K (first step) at region 'outer_2'
   **[INFO]** Neumann thermal BC on 'cyl_2' → 0.0 W/m² at region 'top_2'
   **[INFO]** Robin (gap) thermal BC on 'cyl_2' at region 'inner_2' coupled with 'lateral_1'
   **[INFO]** Constant Dirichlet vector (3D) → [0.0, 0.0, 0.0]
@@ -802,5 +803,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 91.25 s
+Simulation completed in 86.41 s
 Total time steps solved: 1

@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -75,7 +76,7 @@ Material loaded: oxide
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7f4d52063ce0> (function)
+  _k_func         → <function k at 0x7f59c1657ec0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -117,7 +118,7 @@ k expression for oxide → 2.5
 
 
 Loading boundary conditions from 'boundary_conditions.yaml'
-  **[INFO]** Dirichlet thermal BC on 'oxide' → 500.0 K at region 'outer'
+  **[INFO]** Dirichlet thermal BC on 'oxide' → 500.0 K (first step) at region 'outer'
   **[INFO]** Clamp_y mechanical BC on 'oxide' → 0.0 (first step) at region 'bottom'
 Computing symbolic result fields (strain, stress, ...)
 
@@ -498,5 +499,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 17 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 9.64 s
+Simulation completed in 8.46 s
 Total time steps solved: 1

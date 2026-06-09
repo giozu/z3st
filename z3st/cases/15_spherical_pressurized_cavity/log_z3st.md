@@ -35,6 +35,7 @@ complex geometries, and user-defined boundary conditions.
       damage     → OFF
       cluster    → OFF
       plasticity → OFF
+      contact    → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -118,7 +119,7 @@ Initializing the displacement field...
 
 
 Loading boundary conditions from 'boundary_conditions.yaml'
-  **[INFO]** Dirichlet thermal BC on 'solid' → 300.0 K at region 'xmin'
+  **[INFO]** Dirichlet thermal BC on 'solid' → 300.0 K (first step) at region 'xmin'
   **[INFO]** Constant Dirichlet vector (3D) → [0.0, 0.0, 0.0]
   **[INFO]** Dirichlet mechanical BC on 'solid' → [0.0, 0.0, 0.0] at region 'zmin'
   **[INFO]** Neumann mechanical BC on 'solid' → cavity: -1000000.0 Pa (list loaded)
@@ -462,7 +463,7 @@ Convergence check
   Building weak form, volume integrals (dx) for solid, tag = 1
   Applying mechanical traction on subdomain id = 2
   Linear solver
-  ||Δu||/||u|| = 2.183e-16
+  ||Δu||/||u|| = 1.671e-15
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -470,5 +471,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 51.78 s
+Simulation completed in 53.66 s
 Total time steps solved: 1

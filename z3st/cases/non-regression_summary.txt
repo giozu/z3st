@@ -1,75 +1,75 @@
-Z3ST non-regression summary - Fri Jun  5 12:02:02 CEST 2026
+Z3ST non-regression summary - Tue Jun  9 05:33:23 CEST 2026
 --.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
 
 Case: 00_example
   Run             : OK
   Non-regression  : PASS
-  Time            : 6s
+  Time            : 23s
 
 Case: 1_thin_slab_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 6s
+  Time            : 11s
 
 Case: 1_thin_slab_neumann_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 12s
+  Time            : 17s
 
 Case: 1_thin_slab_neumann_3D
   Run             : OK
   Non-regression  : PASS
-  Time            : 30s
+  Time            : 37s
 
 Case: 1_thin_slab_non_linear
   Run             : OK
   Non-regression  : PASS
-  Time            : 18s
+  Time            : 17s
 
 Case: 2_thin_cylindrical_shell_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 29s
+  Time            : 26s
 
 Case: 3_thick_slab_adiabatic_3D
   Run             : OK
   Non-regression  : PASS
-  Time            : 11s
+  Time            : 20s
 
 Case: 3_thin_slab_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 8s
+  Time            : 12s
 
 Case: 4_thin_cylindrical_shell_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 25s
+  Time            : 39s
 
 Case: 4_thick_cylindrical_shell_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 12s
+  Time            : 15s
 
 Case: 5_thin_slab_non_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 21s
+  Time            : 12s
 
 Case: 6_thin_cylindrical_shell_non_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 29s
+  Time            : 28s
 
 Case: 6_thick_cylindrical_shell_non_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 20s
+  Time            : 16s
 
 Case: 7_box_heated
   Run             : OK
   Non-regression  : PASS
-  Time            : 44s
+  Time            : 32s
 
 Case: 8_thick_cylindrical_shell_plane_strain_2D
   Run             : OK
@@ -79,7 +79,7 @@ Case: 8_thick_cylindrical_shell_plane_strain_2D
 Case: 9_thick_cylindrical_shell_GPS_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 64s
+  Time            : 26s
 
 Case: 11_thin_cylindrical_shell_Mariotte
   Run             : OK
@@ -89,7 +89,7 @@ Case: 11_thin_cylindrical_shell_Mariotte
 Case: 12_cylindrical_shell_thermal_gradient_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 16s
+  Time            : 15s
 
 Case: 13_annular_cylinder
   Run             : OK
@@ -99,7 +99,7 @@ Case: 13_annular_cylinder
 Case: 14_full_cylinder
   Run             : OK
   Non-regression  : PASS
-  Time            : 23s
+  Time            : 19s
 
 Case: 15_spherical_pressurized_cavity
   Run             : OK
@@ -109,7 +109,7 @@ Case: 15_spherical_pressurized_cavity
 Case: 16_coaxial_cylinders_3D
   Run             : OK
   Non-regression  : PASS
-  Time            : 104s
+  Time            : 98s
 
 Case: 17_stress_strain_curve_displacement
   Run             : OK
@@ -124,20 +124,20 @@ Case: 17_stress_strain_curve_stress
 Case: 18_box_crack_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 52s
+  Time            : 56s
 
 Case: 20_plasticity_2D
   Run             : OK
   Non-regression  : PASS
-  Time            : 61s
+  Time            : 55s
 
 Case: demo_CP_single_grain
   Run             : OK
   Non-regression  : PASS
-  Time            : 18s
+  Time            : 19s
 
 Case: I_mesh_sensitivity_2D
   Run             : OK
   Non-regression  : (no non-regression.json found)
-  Time            : 33s
+  Time            : 28s
 
