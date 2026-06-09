@@ -1,0 +1,20 @@
+{
+    "results": {
+        "burnup_mean_closed_form": {
+            "numerical": 27.19699824399601,
+            "reference": 27.196998243996006,
+            "abs_error": 3.552713678800501e-15,
+            "rel_error": 1.306288895166876e-16,
+            "status": "PASS"
+        },
+        "rim_core_ratio": {
+            "numerical": 4.0,
+            "reference": 4.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

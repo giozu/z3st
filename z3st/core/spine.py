@@ -192,6 +192,13 @@ class Spine(
                 print(f"  → eigenstrain defined as callable: {mat['eigenstrain']}")
                 mat["_eigenstrain_func"] = self.resolve_function(mat["eigenstrain"])
 
+            # Radial power form factor f(r, bu) for a fissile material — the
+            # source-bus analogue of the eigenstrain callable. Resolved here and
+            # consumed by set_power.
+            if isinstance(mat.get("radial_profile"), str):
+                print(f"  → radial_profile defined as callable: {mat['radial_profile']}")
+                mat["_radial_profile_func"] = self.resolve_function(mat["radial_profile"])
+
             self.materials[name] = mat
             for k in sorted(mat.keys()):
                 v = mat[k]
@@ -218,6 +225,7 @@ class Spine(
         print(f"[spine.initialize_fields]")
 
         self.q_third = None
+        self.burnup = None
         self.T = None
         self.u = None
         self.D = None
@@ -228,6 +236,16 @@ class Spine(
             self.q_third = dolfinx.fem.Function(self.V_t, name="q_third")
             self.q_third.x.array[:] = 0.0
             self.set_power()
+
+            # Burnup state field (MWd/kgU). A fissile material accumulates its own
+            # local burnup from the deposited fission power (see update_state).
+            # Created once, here, and *never* zeroed — it is history, not a per-step
+            # source. Absent when no material is fissile, so non-fuel runs pay
+            # nothing.
+            if any(m.get("fissile", False) for m in self.materials.values()):
+                self.burnup = dolfinx.fem.Function(self.V_t, name="Burnup")
+                self.burnup.x.array[:] = 0.0
+                print("Initialized burnup field (fissile material present).")
 
             print("\nInitializing the temperature field...")
             self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
@@ -317,11 +335,38 @@ class Spine(
             if mat.get("fissile", False):
                 print("Fissile material")
                 q_val = self.lhr / self.area
+
+                # Radial power form factor f(r, bu) — the source bus. A fissile
+                # material may shape its own volumetric source through a callable
+                # ``radial_profile`` (resolved to ``_radial_profile_func``), the
+                # natural home of a TUBRNP-style rim profile later. The callable
+                # receives the dof coordinates and the *current* local burnup, so
+                # f can depend on both r and bu. Default (no callable): f ≡ 1, i.e.
+                # the flat source — so every existing fissile case is bit-identical.
+                shape = np.ones(len(dofs))
+                rprof = mat.get("_radial_profile_func")
+                if rprof is not None:
+                    coords = self.V_t.tabulate_dof_coordinates()[dofs]
+                    bu_vals = (
+                        self.burnup.x.array[dofs]
+                        if self.burnup is not None
+                        else np.zeros(len(dofs))
+                    )
+                    shape = np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
+                    # Preserve total deposited power: normalise so the mean
+                    # multiplier over the fuel is 1 (the form factor *redistributes*
+                    # the linear heat rate radially, it does not change its
+                    # integral). Nodal-mean normalisation here; the area-weighted
+                    # integral refinement lands with the TUBRNP profile.
+                    mean = shape.mean()
+                    if mean > 0:
+                        shape = shape / mean
+
                 # Accumulate: if multiple sources are configured on the same
                 # material (e.g. fissile + gamma_heating below), they should
                 # add — not overwrite.
-                self.q_third.x.array[dofs] += q_val
-                print(f"  q_third += {q_val:.3e} W/m³ (fissile: {mat.get('fissile', False)})")
+                self.q_third.x.array[dofs] += q_val * shape
+                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu) (fissile, mean f = 1)")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
@@ -384,6 +429,49 @@ class Spine(
                 self.q_third.x.array[dofs] += f_func.x.array[dofs]
 
         self.q_third.x.scatter_forward()
+
+    def update_state(self, dt):
+        """Advance each material's own history over a step of ``dt`` seconds — the
+        state channel of the "fuel is a material" contract (alongside the property
+        and eigenstrain buses). Called once per step, *after* the solve.
+
+        Burnup: a fissile material accumulates its local burnup from the deposited
+        fission power. The volumetric source ``q_third`` [W/m³] is the energy
+        deposited per unit fuel volume per second; dividing by the heavy-metal mass
+        density ``ρ·HM_frac`` gives the specific power per unit heavy metal [W/kgU],
+        whose time integral is the burnup. The unit conversion W·s/kgU → MWd/kgU
+        divides by 86400 s/day × 1e6 W/MW = 8.64e10::
+
+            Δbu = q_third · dt / (ρ · HM_frac · 8.64e10)   [MWd/kgU]
+
+        No feedback is applied here — burnup is *recorded*. The downstream
+        behaviours that consume it (fuel-k(bu), swelling(bu,T), FGR) read this
+        field through their own buses, so a fissile case with no such behaviour is
+        unaffected in its solve (only the new burnup field changes).
+        """
+        if self.burnup is None or dt <= 0.0:
+            return
+
+        SECONDS_PER_MWD = 8.64e10  # 86400 s/day × 1e6 W/MW
+
+        for name, mat in self.materials.items():
+            if not mat.get("fissile", False):
+                continue
+            rho = mat.get("rho")
+            if rho is None:
+                print(f"  [update_state] '{name}' is fissile but has no 'rho'; "
+                      f"skipping burnup accumulation.")
+                continue
+            # Heavy-metal (uranium) mass fraction. Default = M_U / M_UO2 =
+            # 238.0289 / 270.027 = 0.8815 for stoichiometric UO2; a material card
+            # may override (MOX, different stoichiometry, nitride, ...).
+            hm = float(mat.get("heavy_metal_fraction", 0.8815))
+            dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+            q = self.q_third.x.array[dofs]
+            self.burnup.x.array[dofs] += q * dt / (float(rho) * hm * SECONDS_PER_MWD)
+
+        self.burnup.x.scatter_forward()
+        print(f"[update_state] burnup max = {self.burnup.x.array.max():.4e} MWd/kgU")
 
     def solve(self, max_iters=100, dt=0.0):
         print("\n")

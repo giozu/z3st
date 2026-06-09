@@ -326,6 +326,9 @@ if __name__ == "__main__":
         problem.solve(max_iters=max_iters, dt=dt)
         problem.get_results()
 
+        # Advance material history
+        problem.update_state(dt)
+
         # Writing energies.txt
         if problem.on.get("damage"):
             E_el, E_frac = problem.compute_energy_balance(problem.u)

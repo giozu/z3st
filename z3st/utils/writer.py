@@ -406,6 +406,10 @@ class OutputWriter:
         if self._c_cg_fn is not None:
             grid.point_data["ClusterDensity"] = self._c_cg_fn.x.array
 
+        # Burnup (nodal fuel state, MWd/kgU)
+        if getattr(p, "burnup", None) is not None:
+            grid.point_data["Burnup"] = p.burnup.x.array
+
         # Damage + crack-driving-force
         if on.get("damage", False) and p.D is not None:
             grid.point_data["Damage"] = p.D.x.array.copy()
