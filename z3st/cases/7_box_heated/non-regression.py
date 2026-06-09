@@ -67,7 +67,7 @@ x_T = x_T[mask][sort_idx]
 T = T_all[mask][sort_idx]
 
 # Stress
-x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
 mask = (np.abs(y_S - y_target) < mask_tol) & (np.abs(z_S - z_target) < mask_tol)
 sort_idx = np.argsort(x_S[mask])
 

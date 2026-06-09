@@ -348,5 +348,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 8 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 10.57 s
+Simulation completed in 9.61 s
 Total time steps solved: 1

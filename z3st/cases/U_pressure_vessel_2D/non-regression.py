@@ -54,14 +54,14 @@ def extract_mid_cylinder(grid):
     
     # Get Cell Centers and Data
     # Prefer cell data for stress usually, but let's check what we have
-    if "Stress_steel (cells)" in grid.cell_data:
+    if "Stress (cells)" in grid.cell_data:
         data_source = "cell"
         coords = grid.cell_centers().points
-        stress_flat = grid.cell_data["Stress_steel (cells)"]
-    elif "Stress_steel (points)" in grid.point_data:
+        stress_flat = grid.cell_data["Stress (cells)"]
+    elif "Stress (points)" in grid.point_data:
         data_source = "point"
         coords = grid.points
-        stress_flat = grid.point_data["Stress_steel (points)"]
+        stress_flat = grid.point_data["Stress (points)"]
     else:
         print("[ERROR] 'Stress_steel' not found in fields.")
         return
@@ -142,12 +142,12 @@ def extract_head_middle(grid):
     print(f"\n[INFO] Extracting stress at Head Middle (45 deg)")
     
     # Get Data
-    if "Stress_steel (cells)" in grid.cell_data:
+    if "Stress (cells)" in grid.cell_data:
         coords = grid.cell_centers().points
-        stress_flat = grid.cell_data["Stress_steel (cells)"]
-    elif "Stress_steel (points)" in grid.point_data:
+        stress_flat = grid.cell_data["Stress (cells)"]
+    elif "Stress (points)" in grid.point_data:
         coords = grid.points
-        stress_flat = grid.point_data["Stress_steel (points)"]
+        stress_flat = grid.point_data["Stress (points)"]
     else:
         return
 

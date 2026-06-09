@@ -49,14 +49,14 @@ list_fields(VTU_FILE)
 print(f"[INFO] Target plane: y={y_target:.4e}, z={z_target:.4e}")
 
 # Stress
-x_s_all, y_s_all, z_s_all, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+x_s_all, y_s_all, z_s_all, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
 mask_s = (np.abs(y_s_all - y_target) < mask_tol) & (np.abs(z_s_all - z_target) < mask_tol)
 sort_idx_s = np.argsort(x_s_all[mask_s])
 
 x_s_line = x_s_all[mask_s][sort_idx_s]
 sigma_xx = S_all[mask_s, 0][sort_idx_s]
 
-_, _, _, vm_all = extract_field(VTU_FILE, field_name="VonMises_steel (cells)")
+_, _, _, vm_all = extract_field(VTU_FILE, field_name="VonMises (cells)")
 sigma_vm_line = vm_all[mask_s][sort_idx_s]  # Use same mask/sort as Stress cells
 
 # Displacement

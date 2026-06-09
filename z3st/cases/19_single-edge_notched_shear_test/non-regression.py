@@ -132,7 +132,7 @@ if D_field is not None:
     print("[INFO] damage_field.png saved")
     print(f"          max D = {float(np.max(D_field)):.4f}")
 
-S = _get(m, ["Stress_steel (points)", "Stress (points)"])
+S = _get(m, ["Stress (points)", "Stress (points)"])
 if S is not None and S.ndim == 2 and S.shape[1] >= 9:
     vm = von_mises(S) / 1e6
     vm_hi = max(float(np.nanpercentile(vm, 99.0)), 1.0)

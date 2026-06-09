@@ -81,7 +81,7 @@ Material loaded: cyl_1
   E               → 170000000000.0 (float)
   G               → 65891472868.21705 (float)
   T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7f187f73d580> (function)
+  _k_func         → <function k at 0x7f1a8f3453a0> (function)
   alpha           → 1.45e-05 (float)
   bulk_modulus    → 134920634920.6349 (float)
   constitutive_mode → lame (str)
@@ -118,8 +118,9 @@ Material loaded: cyl_2
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
-  q_third += 2.546e+03 W/m³ (fissile: True)
+  q_third += 2.546e+03 W/m³ × f(r,bu) (fissile, mean f = 1)
   Heat flux = 6.366e+01 W/m2
+Initialized burnup field (fissile material present).
 
 Initializing the temperature field...
   → Setting initial temperature for material: 'cyl_1'
@@ -171,7 +172,7 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 2.546e+03 W/m³ (fissile: True)
+  q_third += 2.546e+03 W/m³ × f(r,bu) (fissile, mean f = 1)
   Heat flux = 6.366e+01 W/m2
   → dt=0: solving static step / initial condition
 Computing symbolic result fields (strain, stress, ...)
@@ -803,5 +804,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 86.41 s
+Simulation completed in 80.51 s
 Total time steps solved: 1

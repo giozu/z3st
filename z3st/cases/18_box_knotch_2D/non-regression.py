@@ -65,7 +65,7 @@ x_d, y_d, _, D_all = extract_field(VTU_FILE, field_name="Damage")
 d_max = np.max(D_all)
 
 # Stress
-x_s, y_s, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+x_s, y_s, _, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
 sigma_xx_max = np.max(S_all[:, 0]) 
 sigma_yy_max = np.max(S_all[:, 4]) 
 

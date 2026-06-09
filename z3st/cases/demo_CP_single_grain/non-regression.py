@@ -118,7 +118,7 @@ for vtu in vtu_files:
     strains_np.append(epsilon_zz)
 
     # Extract stress field (cell data)
-    _, _, _, stress = extract_field(vtu, "Stress_grain (cells)")
+    _, _, _, stress = extract_field(vtu, "Stress (cells)")
     sigma_zz = np.mean(stress[:, 8])
     stresses_np.append(sigma_zz)
 

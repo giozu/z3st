@@ -150,6 +150,61 @@ def plot_mesh():
 # 2. PCMI CURVES (gap, contact pressure, load transfer) vs LHR
 # ----------------------------------------------------------------------
 def plot_pcmi_curves():
+    """PCMI gap/pressure trajectory. Prefers output/history.csv (written by
+    diagnostics.py every step) — format-independent and scales to 1000 steps, so
+    it works for VTU *or* XDMF runs. Falls back to per-step VTU reads when no CSV
+    is present."""
+    if os.path.exists(os.path.join(OUT, "history.csv")):
+        _pcmi_from_csv()
+    else:
+        _pcmi_from_vtu()
+
+
+def _pcmi_from_csv():
+    d = np.genfromtxt(os.path.join(OUT, "history.csv"), delimiter=",", names=True)
+    bu = np.atleast_1d(d["burnup_avg_MWdkgU"])
+    days = np.atleast_1d(d["time_days"])
+    gaps = np.atleast_1d(d["gap_um"])
+    pres = np.atleast_1d(d["contact_pressure_MPa"])
+    tmax = np.atleast_1d(d["T_max_K"])
+
+    fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
+    # left: gap closure + contact pressure vs burnup
+    ax1.plot(bu, gaps, "o-", color="#4C72B0", label="gap")
+    ax1.axhline(0, color="grey", lw=0.8, ls=":")
+    ax1.set_xlabel("fuel-average burnup (MWd/kgU)")
+    ax1.set_ylabel("gap (um)", color="#4C72B0")
+    ax1.tick_params(axis="y", labelcolor="#4C72B0")
+    ax2 = ax1.twinx()
+    ax2.plot(bu, pres, "s--", color="#C44E52", label="contact pressure")
+    ax2.set_ylabel("contact pressure (MPa)", color="#C44E52")
+    ax2.tick_params(axis="y", labelcolor="#C44E52")
+    ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
+
+    # right: operating history (burnup and peak temperature vs time)
+    ax3.plot(days, bu, "o-", color="#55A868", label="fuel-avg burnup")
+    ax3.set_xlabel("time (days)")
+    ax3.set_ylabel("burnup (MWd/kgU)", color="#55A868")
+    ax3.tick_params(axis="y", labelcolor="#55A868")
+    ax4 = ax3.twinx()
+    ax4.plot(days, tmax, "^--", color="#C44E52", label="peak temperature")
+    ax4.set_ylabel("peak temperature (K)", color="#C44E52")
+    ax4.tick_params(axis="y", labelcolor="#C44E52")
+    ax3.set_title("Operating history")
+    ax3.grid(alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "pcmi_curves.png"), dpi=150)
+    plt.close(fig)
+    print("  wrote output/pcmi_curves.png  (from history.csv)")
+    onset = next((bu[i] for i in range(len(bu)) if pres[i] > 0.0), None)
+    onset_s = f"{onset:.1f} MWd/kgU" if onset is not None else "not reached"
+    print(f"    PCMI onset at burnup = {onset_s}")
+    print(f"    final: bu={bu[-1]:.1f} MWd/kgU, gap={gaps[-1]:+.2f} um, "
+          f"p={pres[-1]:.1f} MPa, T_max={tmax[-1]:.0f} K")
+
+
+def _pcmi_from_vtu():
     files = sorted(glob.glob(os.path.join(OUT, "*.vtu")))
     bu = burnup_per_step(files)        # rod-average burnup (MWd/kgU), x-axis
     gaps, pres, ur_p, ur_c, tmax = [], [], [], [], []
@@ -301,7 +356,9 @@ def plot_fields():
     print("  wrote output/field_radial_disp.png")
 
     # ---- (c) cladding von Mises ----
-    vm_key = next((k for k in grid.point_data.keys() if k.startswith("VonMises_cyl_2")), None)
+    # Single merged von Mises field; the clad is selected by region (the `clad`
+    # extract above), so reading it on those cells gives the cladding stress.
+    vm_key = "VonMises (points)" if "VonMises (points)" in grid.point_data else None
     if vm_key is not None:
         vm = np.asarray(clad.point_data[vm_key]) / 1e6  # MPa
         clad.point_data["vM_MPa"] = vm
@@ -319,12 +376,19 @@ def plot_fields():
 
 
 if __name__ == "__main__":
-    if not glob.glob(os.path.join(OUT, "*.vtu")):
-        raise SystemExit("No output/*.vtu found - run the case first (Allrun).")
+    have_vtu = bool(glob.glob(os.path.join(OUT, "*.vtu")))
+    have_csv = os.path.exists(os.path.join(OUT, "history.csv"))
+    if not have_vtu and not have_csv:
+        raise SystemExit("No output found - run the case first (Allrun).")
     print("[plots] generating figures...")
     plot_history()
-    plot_mesh()
-    plot_pcmi_curves()
-    plot_radial_profile()
-    plot_fields()
+    plot_pcmi_curves()           # CSV-preferred; works for XDMF-only runs too
+    if have_vtu:
+        plot_mesh()
+        plot_radial_profile()
+        plot_fields()
+    else:
+        print("  [plots] XDMF-only run: skipping mesh / radial-profile / field "
+              "renders (pyvista cannot read dolfinx XDMF). Open output/fields.xdmf "
+              "in ParaView, or re-run with 'output: {format: vtu}' for those figures.")
     print("[plots] done.")

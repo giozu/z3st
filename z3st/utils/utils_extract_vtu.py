@@ -78,13 +78,13 @@ def _detect_VonMises(grid, prefer="cells"):
 
     if prefer == "cells":
         for name in grid.cell_data.keys():
-            if "VonMises_" in name:
+            if "VonMises" in name:
                 print(f"[INFO] Found VonMises in cell_data: '{name}'")
                 return "cell", name
 
     elif prefer == "points":
         for name in grid.point_data.keys():
-            if "VonMises_" in name:
+            if "VonMises" in name:
                 print(f"[INFO] Found VonMises in point_data: '{name}'")
                 return "point", name
 
@@ -94,7 +94,7 @@ def _detect_VonMises(grid, prefer="cells"):
 def _detect_sigma(grid, prefer="points"):
     """
     Detect the stress field in the VTU file.
-    Prefer 'Stress_steel (points)' if available, otherwise fallback to cell data.
+    Prefer 'Stress (points)' if available, otherwise fallback to cell data.
     """
     if prefer == "points":
         for name in grid.point_data.keys():
@@ -114,7 +114,7 @@ def _detect_sigma(grid, prefer="points"):
     print("\n[ERROR] No stress field found in VTU file.")
     print("Available point_data:", list(grid.point_data.keys()))
     print("Available cell_data:", list(grid.cell_data.keys()))
-    raise KeyError("No stress field found containing 'Stress_steel'.")
+    raise KeyError("No stress field found containing 'Stress'.")
 
 
 def _data_coords(grid, location, field_name):

@@ -274,7 +274,9 @@ def plot_fields():
     print("  wrote output/field_radial_disp.png")
 
     # ---- (c) cladding von Mises ----
-    vm_key = next((k for k in grid.point_data.keys() if k.startswith("VonMises_cyl_2")), None)
+    # Single merged von Mises field; the clad is selected by region (the `clad`
+    # extract above), so reading it on those cells gives the cladding stress.
+    vm_key = "VonMises (points)" if "VonMises (points)" in grid.point_data else None
     if vm_key is not None:
         vm = np.asarray(clad.point_data[vm_key]) / 1e6  # MPa
         clad.point_data["vM_MPa"] = vm

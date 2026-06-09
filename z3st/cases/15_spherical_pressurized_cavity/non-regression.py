@@ -59,7 +59,7 @@ def sigma_vm_an(r):
 list_fields(VTU_FILE)
 
 # --.. ..- .-.. .-.. --- extract field --.. ..- .-.. .-.. ---
-x, y, z, S_all = extract_field(VTU_FILE, field_name="Stress_solid (cells)")
+x, y, z, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
 
 r_raw = np.sqrt(x**2 + y**2 + z**2)
 theta = np.arccos(np.divide(z, r_raw, out=np.zeros_like(z), where=r_raw > 0))

@@ -67,7 +67,7 @@ TOLERANCE = 1e-2
 x_u, y_u, z_u, u = extract_field(VTU_FILE, field_name="Displacement")
 ux_num = float(np.max(u[:, 0]))
 
-_, _, _, vm = extract_field(VTU_FILE, field_name="VonMises_fuel (cells)")
+_, _, _, vm = extract_field(VTU_FILE, field_name="VonMises (cells)")
 vm_num = float(np.mean(np.abs(vm)))                       # ≈ 0 for free swelling
 
 print(f"[INFO] burnup (uniform) = {bu_ref:.4f} MWd/kgU  ->  ΔV/V = {dVV:.4e}")

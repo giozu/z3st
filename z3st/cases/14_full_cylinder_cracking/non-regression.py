@@ -313,7 +313,7 @@ for ax, title, si in [(axes2[0], "Radial stress σ_rr", 0), (axes2[1], "Hoop str
     for i, snap in enumerate(plot_snapshots):
         m = pv.read(vtu_files[snap["idx"]])
         sk = None
-        for name in ["Stress_uo2 (points)", "Stress (points)"]:
+        for name in ["Stress (points)", "Stress (points)"]:
             if name in m.point_data:
                 sk = name
                 break

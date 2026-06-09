@@ -268,7 +268,7 @@ for ax, title, comp in labels_components:
     for i, snap in enumerate(plot_snapshots):
         m = pv.read(vtu_files[snap["idx"]])
         sk = None
-        for name in ["Stress_uo2 (points)", "Stress (points)"]:
+        for name in ["Stress (points)", "Stress (points)"]:
             if name in m.point_data:
                 sk = name
                 break

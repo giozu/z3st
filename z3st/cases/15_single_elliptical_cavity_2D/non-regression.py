@@ -56,7 +56,7 @@ E = float(mat_data.get('E'))
 X_tip = ax
 y_target = 0.0
 
-x, y, _, sigma = extract_field(VTU_FILE, field_name="Stress_solid (points)")
+x, y, _, sigma = extract_field(VTU_FILE, field_name="Stress (points)")
 sigma_yy_max = np.max(sigma[:, 4]) 
 
 # mask = (np.abs(y - y_target) < (Ly/500)) & (x >= X_tip)

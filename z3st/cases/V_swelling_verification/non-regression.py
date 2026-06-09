@@ -46,7 +46,7 @@ TOLERANCE = 1e-2
 x_u, y_u, z_u, u = extract_field(VTU_FILE, field_name="Displacement")
 ux_num = float(np.max(u[:, 0]))
 
-_, _, _, vm = extract_field(VTU_FILE, field_name="VonMises_steel (cells)")
+_, _, _, vm = extract_field(VTU_FILE, field_name="VonMises (cells)")
 vm_num = float(np.mean(np.abs(vm)))     # should be close to zero for free swelling
 
 print(f"[INFO] swelling ΔV/V = {s} → linear eigenstrain s/3 = {eps_lin:.4e}")
