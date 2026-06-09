@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: U_coaxial_contact_verification
+Z3ST case: V_coaxial_contact_verification
 
 VERIFICATION of the penalty contact pressure against the analytical Lame
 interference-fit pressure. The pellet is heated UNIFORMLY, so its free thermal

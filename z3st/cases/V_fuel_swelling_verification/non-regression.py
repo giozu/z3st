@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: U_fuel_swelling_verification
+Z3ST case: V_fuel_swelling_verification
 
 Verifies that the eigenstrain bus consumes the burnup state bus — i.e. a fuel
 material whose swelling is a function of the accumulated burnup field. A fissile
@@ -15,7 +15,7 @@ expansion. With alpha absent (no thermal strain) the closed form is
 
 q''' = lhr / area, area = Lx*Ly, 8.64e10 = 86400 s/day * 1e6 W/MW. This is the
 chain state -> eigenstrain -> stress: it confirms swelling reads the burnup
-field and produces the right strain, the analogue of U_swelling_verification but
+field and produces the right strain, the analogue of V_swelling_verification but
 for a *state-dependent* eigenstrain.
 """
 

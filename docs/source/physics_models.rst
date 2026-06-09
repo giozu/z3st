@@ -554,7 +554,7 @@ signature of PCMI. Implemented in
 :class:`z3st.models.contact_model.ContactModel`.
 
 **Verification.** The penalty contact pressure is verified against the analytical
-**Lamé interference-fit** solution in case ``U_coaxial_contact_verification``. The
+**Lamé interference-fit** solution in case ``V_coaxial_contact_verification``. The
 pellet is heated *uniformly* (a ramped Dirichlet temperature) while the cladding
 is held at its reference temperature, so the radial interference is known in
 closed form,

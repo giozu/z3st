@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: U_swelling_verification
+Z3ST case: V_swelling_verification
 
 Verifies the eigenstrain bus. A block of a material
 carrying a constant volumetric swelling ΔV/V is left free to expand from a

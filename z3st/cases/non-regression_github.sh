@@ -31,8 +31,10 @@ CASES=(
     "18_box_crack_2D"
     "20_plasticity_2D"
     "demo_CP_single_grain"
-    "U_coaxial_contact_verification"
-    "U_swelling_verification"
+    "V_coaxial_contact_verification"
+    "V_swelling_verification"
+    "V_burnup_verification"
+    "V_fuel_swelling_verification"
 )
 SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 

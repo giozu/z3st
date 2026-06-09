@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: U_burnup_verification
+Z3ST case: V_burnup_verification
 
 Verifies the burnup state bus (spine.update_state) AND the radial-power source
 bus (radial_profile -> set_power f(r,bu)) in a single axisymmetric pellet run.
