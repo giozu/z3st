@@ -1,0 +1,26 @@
+name: UO2-fuel
+fissile: true
+
+# Radial power form factor (rim peaking)
+radial_profile: materials.fuel_profiles.rim_peaking
+radial_peak_amplitude: 2.0
+radial_peak_exponent: 8.0
+
+E: 200.0e9          # (Pa) Young's modulus (irradiated/effective)
+nu: 0.345           # (-)  Poisson's ratio
+
+k: 5.0              # (W/(m·K)) thermal conductivity (representative)
+cp: 280.0           # (J/(kg·K))
+rho: 10970.0        # (kg/m³)
+heavy_metal_fraction: 0.8815   # (-) M_U/M_UO2 — burnup accumulated per kg HM
+
+alpha: 1.1e-5       # (1/K) thermal expansion
+
+# Burnup-driven solid swelling (eigenstrain bus reads the burnup state field):
+# ΔV/V = swelling_rate * bu. This is the fuel mechanism that, on top of thermal
+# expansion, closes the gap and drives PCMI as the rod burns.
+eigenstrain: materials.fuel_swelling.solid_swelling
+swelling_rate: 7.0e-4          # (ΔV/V) per MWd/kgU (solid FP swelling, ~1%/10 GWd/tU solid fraction)
+
+T_ref: 293.15       # (K)
+T_initial: 580.0    # (K) start at coolant temperature

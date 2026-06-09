@@ -1,0 +1,70 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.1.0 (2025)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  cyl_1: fuel.yaml
+  cyl_2: clad.yaml
+
+regime: axisymmetric
+
+solver_settings:
+  coupling: staggered
+  max_iters: 250
+  relax_T: 0.9
+  relax_u: 0.3
+  relax_adaptive: true
+  relax_growth: 1.1
+  relax_shrink: 0.6
+  relax_min: 0.03
+  relax_max: 0.9
+
+models:
+  thermal: true
+  mechanical: true
+  gap_conductance:
+    type: Gas
+    value: 15.8                 # He prefactor A (Todreas Eq. 8.140), W/(cm.K) -> SI
+    contact_coupling:           # Todreas-Kazimi Eq. 8.141/8.142
+      enabled: true
+      meyer_hardness: 9.65e8    # (Pa) Zircaloy Meyer hardness (~14e4 psi)
+      gas_thickness: 4.0e-6     # (m) roughness-based gas space on contact
+  contact:
+    surface_a: lateral_1        # pellet outer
+    surface_b: inner_2          # clad inner
+    penalty_stiffness: 5.0e13   # (Pa/m)
+    initial_gap: 65.0e-6        # (m)  generic-PWR cold gap
+
+mechanical:
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-5
+  stag_tol: 1.0e-4
+  convergence: rel_norm
+
+thermal:
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-7
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+  analysis: stationary
+
+lhr:
+- 0.0
+- 25000.0
+- 25000.0
+time:
+- 0.0
+- 1.728e+6     # 20 days ramp
+- 9.504e+7     # ~1100 days hold
+n_steps: 30
+
+output:
+  format: xdmf
