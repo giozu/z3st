@@ -1,0 +1,22 @@
+name: contact_2d
+geometry_type: cyl
+
+Lx: 0.004 # (m) total width between R_int and R_o
+Ly: 0.30  # (m) height of the rectangles
+
+R_int: 0.001  # (m) x-coordinate of the left boundary of the first rectangle
+R_mid: 0.004  # (m) x-coordinate of the interface between the two rectangles
+R_o: 0.005    # (m) x-coordinate of the right boundary of the second rectangle
+Ly_rect: 0.010 # (m) rectangle height
+Lz: 0.01 # (m) rectangle hight
+Ri: 0.004 # (m) inner radius of the circular part
+Ro: 0.005 # (m) outer radius of the circular part
+
+labels:
+  bottom: 1
+  top: 2
+  inner_radius: 3
+  outer_radius: 4
+  interface: 5
+  steel_in: 6
+  steel_o: 7
