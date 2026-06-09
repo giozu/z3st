@@ -1,0 +1,26 @@
+
+mechanical:
+  steel_o:
+  - type: Clamp_y
+    region: bottom
+    value: 0.0   # (m)   Clamp on bottom edge
+
+  - type: Clamp_y
+    region: top
+    value: 0.0   # (m)   Clamp on top edge
+
+
+  - type: Neumann
+    region: interface
+    traction: 1.0e+6   # (Pa)   Pressure at the interface
+
+  - type: Neumann
+    region: outer_radius
+    traction: -1.0e+6   # (Pa)   Pressure on the external boundary
+
+  - type : Clamp_x
+    region: inner_radius
+    value: 0.0
+
+
+ 

@@ -1,28 +1,23 @@
 name: contact_2d
 geometry_type: cyl
 
-Lx_ext: 0.03 # (m)
-Ly_ext: 0.50 # (m)
-Lx_int: 0.028 # (m)
-Ly_int: 0.499 # (m)
-Lx_mid: 0.025 # (m)
-Ly_mid: 0.45 # (m)
-Lz: 0.5 # (m)
-Ri: 0.0125 # inner radius (m)
-Ro: 0.225 # outer radius (m)
+R_o: 0.05 # (m) - Correspond à R_o
+Ly_rect: 0.1 # (m) - Correspond à Ly_rect
+R_int: 0.01 # (m) - Correspond à R_int
+Ly_int: 0.1 # (m)
+R_mid: 0.03 # (m) - Correspond à R_mid
+Lz: 0.1 # (m)
+Ri: 0.01 # inner radius (m)
+Ro: 0.05 # outer radius (m)
 
 labels:
-  left_radius_o: 1
-  right_radius_o: 2
-  bottom_o: 3
-  top_o: 4
-  left_radius_in: 5
+  bottom_in: 1
+  bottom_o: 5
+  top_in: 2
+  top_o: 6
+  left_radius_in: 3
+  left_radius_o: 4
   right_radius_in: 6
-  bottom_in: 7
-  top_in: 8
-  left_mid: 9
-  bottom_mid: 10
-  right_mid: 11
-  top_mid: 12
-  steel_o: 13
-  steel_mid: 14
+  right_radius_o: 7
+  steel_in: 9
+  steel_o: 10
