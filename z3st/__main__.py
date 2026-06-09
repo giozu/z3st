@@ -317,6 +317,13 @@ if __name__ == "__main__":
         else:
             dt = t - times[step-1]
 
+        # Advance material history before the solve,
+        # using this step's deposited power (q_third set just above) over dt. This
+        # makes the fields at t_k consistent with the state at t_k: a behaviour
+        # that consumes burnup (swelling(bu), fuel-k(bu)) sees the end-of-step
+        # value, not a one-step-lagged one.
+        problem.update_state(dt)
+
         if dt == 0.0:
             print(f"  → dt=0: solving static step / initial condition")
             problem.get_results()
@@ -325,9 +332,6 @@ if __name__ == "__main__":
         max_iters = int(input_file.get("solver_settings", {}).get("max_iters", 100))
         problem.solve(max_iters=max_iters, dt=dt)
         problem.get_results()
-
-        # Advance material history
-        problem.update_state(dt)
 
         # Writing energies.txt
         if problem.on.get("damage"):

@@ -1,0 +1,13 @@
+thermal:
+  fuel:
+  - type: Dirichlet
+    region: zmax
+    temperature: 300.0   # (K)
+mechanical:
+  fuel:
+  - type: Clamp_x
+    region: xmin
+  - type: Clamp_y
+    region: ymin
+  - type: Clamp_z
+    region: zmin

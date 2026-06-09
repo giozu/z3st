@@ -1,0 +1,26 @@
+name: fuel-swelling-test
+# Fissile fuel whose swelling is a function of the accumulated burnup — verifies
+# the eigenstrain bus CONSUMING the burnup state bus (the first behaviour that
+# reads the burnup field). alpha is deliberately omitted so thermal expansion
+# contributes nothing and the strain is purely the burnup-driven swelling; the
+# block is then left free to expand, so free swelling is stress-free.
+fissile: true
+
+# Swelling as a state-dependent eigenstrain: ΔV/V = swelling_rate * bu.
+eigenstrain: materials.fuel_swelling.solid_swelling
+swelling_rate: 1.0e-3           # (ΔV/V) per MWd/kgU (verification value)
+
+E: 200.0e9                      # (Pa) Young's modulus
+nu: 0.3                         # (-)  Poisson's ratio
+
+k: 5.0                          # (W/(m·K)) thermal conductivity
+cp: 280.0                       # (J/(kg·K)) specific heat
+rho: 10970.0                    # (kg/m³) density
+heavy_metal_fraction: 0.8815    # (-) M_U / M_UO2
+
+# alpha intentionally absent -> no thermal eigenstrain (isolate swelling)
+T_ref: 300.0                    # (K)
+T_initial: 300.0                # (K)
+
+mu_gamma: 0.0
+gamma_heating: 0.0

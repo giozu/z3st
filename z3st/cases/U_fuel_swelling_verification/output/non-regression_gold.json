@@ -1,0 +1,20 @@
+{
+    "results": {
+        "u_x_free_swelling": {
+            "numerical": 9.9741539560688e-06,
+            "reference": 9.974153950928989e-06,
+            "abs_error": 5.139811170532145e-15,
+            "rel_error": 5.153129975553892e-10,
+            "status": "PASS"
+        },
+        "stress_free_residual": {
+            "numerical": 0.7606023303919272,
+            "reference": 0.0,
+            "abs_error": 0.7606023303919272,
+            "rel_error": 1.2201172496577878e-09,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}
