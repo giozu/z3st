@@ -706,14 +706,27 @@ class MechanicalModel:
         J = ufl.det(F_def)
         return (1.0 / J) * P * F_def.T
 
-    def has_eigenstrain(self, material):
+    def has_material_eigenstrain(self, material):
         """
-        True if the material carries a non-thermal inelastic eigenstrain 
-        (swelling, a material eigenstrain callable, ...). Used by the solver to
-        apply the eigenstress even when the thermal block is inactive — these
-        strains are not thermal-only.
+        True if the material carries an eigenstrain of its own — swelling, a
+        material eigenstrain callable, ... — i.e. one that is *not* the thermal
+        eigenstrain.
+
+        (The thermal expansion α(T-T_ref)I is itself an eigenstrain too, but it
+        is supplied by the thermal block: it exists only when thermal is active
+        and needs the temperature field. This predicate covers the material's
+        *own* eigenstrains, which apply regardless of the thermal block.)
         """
         return ("swelling" in material) or ("_eigenstrain_func" in material)
+
+    def applies_eigenstress(self, material):
+        """
+        Whether the eigenstress -C:ε* must be assembled for this material: when
+        the thermal block contributes a thermal eigenstrain, or the material
+        carries one of its own. Single predicate so the solver states the intent
+        once.
+        """
+        return self.on.get("thermal", False) or self.has_material_eigenstrain(material)
 
     def eigenstrain(self, T, material):
         """

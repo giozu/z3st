@@ -45,6 +45,22 @@ class Solver:
 
         print("\n")
 
+    @staticmethod
+    def _bc_objects(dirichlet_dict):
+        """Flatten a {label: [bc | {"value": bc, ...}]} store into the list of
+        actual dolfinx DirichletBC objects (BCs may be stored directly or as a
+        dict carrying step-dependent metadata)."""
+        return [
+            bc["value"] if isinstance(bc, dict) else bc
+            for bc_list in dirichlet_dict.values()
+            for bc in bc_list
+        ]
+
+    def _value_at_step(self, raw):
+        """The entry of a per-step list ``raw`` for the current step, clamped to
+        the last entry when the step index runs past the end."""
+        return raw[min(self.current_step, len(raw) - 1)]
+
     def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
         """
         Returns PETSc options for the linear solver based on the physics.
@@ -134,17 +150,12 @@ class Solver:
         for bc_list in self.dirichlet_thermal.values():
             for bc in bc_list:
                 if isinstance(bc, dict) and isinstance(bc.get("raw"), list):
-                    idx = min(self.current_step, len(bc["raw"]) - 1)
-                    bc["const"].value = PETSc.ScalarType(bc["raw"][idx])
+                    bc["const"].value = PETSc.ScalarType(self._value_at_step(bc["raw"]))
 
         # Transient mode with dt=0: preserve IC, only apply BCs
         if analysis == "transient" and self.dt <= 0:
             print("\n[INFO] Transient thermal: dt=0 → preserving initial condition (applying BCs only)")
-            bcs_thermal_actual = [
-                bc["value"] if isinstance(bc, dict) else bc
-                for _, bc_list in self.dirichlet_thermal.items()
-                for bc in bc_list
-            ]
+            bcs_thermal_actual = self._bc_objects(self.dirichlet_thermal)
             dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
             T_new.x.scatter_forward()
             return True, 0.0, 0.0, prev_res_T
@@ -225,12 +236,7 @@ class Solver:
                     L_t += w * h_conv * T_ext * v_t * ds_robin
                     print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
 
-        # Extract actual DirichletBC objects (handles both dict and direct BCs)
-        bcs_thermal_actual = [
-            bc["value"] if isinstance(bc, dict) else bc
-            for _, bc_list in self.dirichlet_thermal.items()
-            for bc in bc_list
-        ]
+        bcs_thermal_actual = self._bc_objects(self.dirichlet_thermal)
 
         # Solve
         if self.th_cfg["solver"] == "linear":
@@ -312,8 +318,7 @@ class Solver:
 
                 raw = bc.get("raw", None)
                 if isinstance(raw, list):
-                    idx = min(self.current_step, len(raw) - 1)
-                    val = raw[idx]
+                    val = self._value_at_step(raw)
                     bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
                     print(f"  [INFO] Updating Displacement Dirichlet on region {bc['id']} → {val}")
 
@@ -323,8 +328,7 @@ class Solver:
                 raw = bc.get("raw", None)
                 
                 if isinstance(raw, list):
-                    idx = min(self.current_step, len(raw) - 1)
-                    val = raw[idx]
+                    val = self._value_at_step(raw)
                 elif isinstance(raw, (int, float)):
                     val = raw
                 else:
@@ -370,18 +374,15 @@ class Solver:
                 sigma = self.sigma_mech(u_m, material)
                 a_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
                 L_m += w * ufl.dot(body_force, v_m) * dx
-                # Eigenstress -C:ε* (e.g., thermal + material eigenstrains). Applied
-                # when the thermal block is active or the material carries a
-                # non-thermal eigenstrain (e.g., swelling), since those are
-                # not thermal-only.
-                if self.on.get("thermal", False) or self.has_eigenstrain(material):
+                # Eigenstress -C:ε* (thermal + material eigenstrains, assembled when the material requires it.
+                if self.applies_eigenstress(material):
                     L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
             else:
                 mode = material.get("constitutive_mode", "lame")
                 if mode == "hyperelastic":
                     F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
                     F_m -= w * ufl.dot(body_force, v_m) * dx
-                    if self.on.get("thermal", False) or self.has_eigenstrain(material):
+                    if self.applies_eigenstress(material):
                         F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
                 else:
                     sigma = self.sigma_mech(u_new, material)
@@ -410,12 +411,7 @@ class Solver:
             else:
                 F_m -= contact_form
 
-        # --- Extract actual DirichletBC objects (handles both dict and direct BCs) ---
-        bcs_mech = [
-            bc["value"] if isinstance(bc, dict) else bc
-            for _, bc_list in self.dirichlet_mechanical.items()
-            for bc in bc_list
-        ]
+        bcs_mech = self._bc_objects(self.dirichlet_mechanical)
 
         # Solve
         if self.mech_cfg["solver"] == "linear":
@@ -821,11 +817,7 @@ class Solver:
             T_new.x.array[:] = self.T.x.array
             T_old = dolfinx.fem.Function(self.V_t)
 
-            bcs_t = [
-                bc["value"] if isinstance(bc, dict) else bc
-                for bc_list in self.dirichlet_thermal.values()
-                for bc in bc_list
-            ]
+            bcs_t = self._bc_objects(self.dirichlet_thermal)
         else:
             T_new = T_old = None
             bcs_t = []
