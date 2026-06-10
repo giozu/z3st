@@ -22,6 +22,7 @@ Z3ST provides a **modular and extensible** environment to simulate:
 - **gap conductance** between domains (fixed or gas-type);
 - **1D cluster-dynamics** advection–diffusion problems;
 - arbitrary, spatially-dependent **internal heat sources** (γ-heating, user-defined);
+- **fuel-performance behaviours carried at the material level**: burnup accumulation, radial power shaping `f(r, bu)`, burnup-driven swelling, and penalty **pellet-clad contact (PCMI)** with contact-coupled gap conductance;
 - fully **YAML-driven** configuration for reproducibility, with the ability to plug in user **Python material modules** at runtime.
 
 All physical models can be enabled/disabled independently via the `models:` block of `input.yaml`, and coupled physics are solved with a **staggered scheme** with adaptive relaxation.
@@ -70,7 +71,8 @@ z3st/
     │   ├── mechanical_model.py       linear, Voigt, hyperelastic, plane_stress, custom
     │   ├── damage_model.py           phase-field AT1/AT2, Miehe/Amor splits
     │   ├── plasticity_model.py       J2 (return mapping) + custom crystal plasticity hook
-    │   ├── gap_model.py              Fixed / Gas gap conductance
+    │   ├── gap_model.py              Fixed / Gas gap conductance (+ contact-coupled)
+    │   ├── contact_model.py          penalty pellet-clad mechanical contact (gap closure)
     │   └── cluster_dynamic_model.py  1D advection-diffusion (DG+SIPG+upwind)
     ├── materials/                    YAML material cards + Python modules
     │   ├── steel.yaml, austenitic_steel.yaml, martensitic_steel.yaml,
@@ -78,10 +80,11 @@ z3st/
     │   │ vessel_steel.yaml, vessel_steel_0.yaml
     │   ├── uo2.yaml, zircaloy.yaml
     │   ├── ceramic.yaml, oxide.yaml, plastic.yaml, lead.yaml, h2o.yaml
-    │   └── ceramic.py, oxide.py                    Python-side callables
-    │                                               (e.g. k(T), Gc(mesh))
+    │   ├── ceramic.py, oxide.py                    Python-side property callables (k(T), Gc(mesh))
+    │   └── fuel_profiles.py, fuel_swelling.py      fuel-behaviour callables:
+    │                                               radial power f(r,bu) + burnup-driven swelling(bu)
     ├── utils/                        post-processing + helpers
-    │   ├── export_vtu.py             VTU writer for T, u, D, σ, ε
+    │   ├── writer.py                 unified VTU / XDMF OutputWriter (pre-compiled, single-pass)
     │   ├── mesh_builder.py           build simple meshes from YAML geometry
     │   ├── plot_convergence.py       staggered-residual plots
     │   ├── utils_extract_vtu.py      scalar/vector/tensor extraction from VTU
@@ -132,10 +135,11 @@ Key responsibilities:
    Also recognises `k` or `Gc` given as **symbolic Python callables** (`module.function`) and resolves them via `importlib`.
 4. `initialize_fields()` — instantiate `T`, `u`, `D`, `H`, `c`, … with initial conditions from material cards.
 5. `set_boundary_conditions()` — read `boundary_conditions.yaml` and dispatch to thermal/mechanical/damage BC setters.
-6. `set_power()` — build `q_third` (W/m³) per material: fissile (LHR/area), γ-heating with exponential decay in rect geometry or `K₀(μr)/K₀(μRᵢ)` in cylindrical geometry, spherical decay, etc. The cylindrical/spherical γ-attenuation profile is normalised at a **per-material reference surface** `gamma_inner_radius` (defaults to the geometry `inner_radius`, so existing cases are unchanged); a layer that sits inboard of the geometry reference — e.g. a thermal shield ahead of the vessel — sets it so its `K₀` profile is normalised at its own inner surface rather than the vessel's.
-7. `solve(dt, max_iters)` — dispatch to `solve_staggered`.
-8. `get_results()` — build symbolic UFL strain/stress/stress_mech/stress_th/energy_density dictionaries per material.
-9. `compute_energy_balance()` (damage only) — assembles elastic + fracture energy (`E_el`, `E_frac`) for diagnostics written to `energies.txt`.
+6. `set_power()` — build `q_third` (W/m³) per material: fissile (LHR/area), γ-heating with exponential decay in rect geometry or `K₀(μr)/K₀(μRᵢ)` in cylindrical geometry, spherical decay, etc. The cylindrical/spherical γ-attenuation profile is normalised at a **per-material reference surface** `gamma_inner_radius` (defaults to the geometry `inner_radius`, so existing cases are unchanged); a layer that sits inboard of the geometry reference — e.g. a thermal shield ahead of the vessel — sets it so its `K₀` profile is normalised at its own inner surface rather than the vessel's. **Radial power form factor (source bus):** a fissile material may carry a `radial_profile` callable (resolved like `k`/`Gc`), evaluated on the fuel dofs and area-normalised to mean 1, so the volumetric source is shaped `q''' = (LHR/area)·f(r, bu)` while preserving the integral. A built-in rim-peaking profile lives in `materials/fuel_profiles.py`; a mechanistic TUBRNP-style profile drops in behind the same hook.
+7. `update_state(dt)` — advance each material's own history once per step (**state bus**, the `material.update_state(dt, fields)` channel). Currently: a fissile material accumulates its local **burnup** into the `self.burnup` field (MWd/kgU) from the deposited power, `Δbu = q_third·dt/(ρ·HM_frac·8.64e10)` (`heavy_metal_fraction` from the card). Called *before* the solve so fields at `t_k` are consistent with the state at `t_k` (behaviours that consume burnup — swelling, fuel-k — see the end-of-step value).
+8. `solve(dt, max_iters)` — dispatch to `solve_staggered`.
+9. `get_results()` — build symbolic UFL strain / stress / stress_mech / stress_th / energy_density dictionaries per material. The eigenstress `stress_th = −ℂ:ε*` carries the **total inelastic eigenstrain** ε* (thermal + material-carried swelling/creep — see §4.2), so fuel swelling enters equilibrium through the same channel as thermal expansion.
+10. `compute_energy_balance()` (damage only) — assembles elastic + fracture energy (`E_el`, `E_frac`) for diagnostics written to `energies.txt`.
 
 ### 2.3 Execution flow (`z3st/__main__.py`)
 
@@ -151,12 +155,16 @@ read input.yaml
     ├── generate_power_history(times, lhrs, n_steps)
     ├── parameters(lhr), initialize_fields(), set_boundary_conditions()
     └── for each (t, lhr):
-        ├── parameters(lhr); set_power()
+        ├── parameters(lhr); set_power()   # source bus: q''' = (LHR/area)·f(r, bu)
+        ├── update_state(dt)               # state bus: accumulate burnup (before solve)
         ├── solve(max_iters, dt)           # staggered
-        ├── get_results()                  # symbolic σ, ε, ψ
+        ├── get_results()                  # symbolic σ, ε, ψ, eigenstress
         ├── compute_energy_balance         # if damage
-        └── export_vtu  or  XDMF           # output/fields_*.vtu / .xdmf
+        ├── writer.write(t, step)          # VTU per-step files OR single XDMF time series
+        └── diagnostics.per_step(...)      # optional case-local CSV hook (if diagnostics.py present)
 ```
+
+**Output (`utils/writer.py::OutputWriter`).** The unified writer pre-allocates Function targets and compiles all field Expressions once at construction, so each `write()` is just interpolate + I/O (no UFL JIT in the loop). It emits a single set of **merged, domain-wide** fields — `Stress`, `VonMises`, `Hydrostatic`, `StrainEnergyDensity`, `HeatFlux` (plus `Temperature`, `Displacement`, `Strain`, `Damage`, `Burnup`, …) — each cell filled from its own material's expression, rather than one field per material. Format is selected by `output.format`: **`vtu`** writes per-step `fields_NNNN.vtu`; **`xdmf`** writes a single `fields.xdmf` + `.h5` time series for the whole run (the right choice for long transients — one file, opened directly in ParaView). Note: dolfinx XDMF is for ParaView / dolfinx read-back, not generic pyvista/meshio parsing. For scripted post-processing of long runs, a case-local `diagnostics.py` exposing `per_step(problem, step, t)` can stream scalar trajectories (e.g. burnup, gap, contact pressure, T_max) to a CSV — format-independent and step-count-independent.
 
 CLI flags:
 - `--debug`       enable verbose debugging
@@ -320,9 +328,14 @@ Regime handling in `epsilon(u)`:
 
 BC types (`set_mechanical_boundary_conditions`): `Dirichlet`, `Dirichlet_x/y/z`, `Neumann` (scalar traction along facet normal), `Clamp_x/y/z`, `Slip_x/y/z`. Step-dependent BCs supported via a list of values of length `n_steps`.
 
-Thermal stress coupling: `σ_th = −(3λ + 2G) α (T − T_ref) I` subtracted from the mechanical right-hand side.
+**Eigenstrain bus (thermal + material inelastic strains).** Equilibrium puts an eigenstress on the RHS, `σ_th = −ℂ:ε*`, where `ε*` is the *total* inelastic eigenstrain returned by `MechanicalModel.eigenstrain(T, material)`:
+- thermal expansion `α (T − T_ref) I` (when a thermal field is active);
+- a constant volumetric swelling `(swelling/3) I` from a scalar `swelling` card field;
+- a state-dependent material eigenstrain via an `eigenstrain` callable (`"pkg.mod.func"`, resolved like `k`/`Gc`) — e.g. burnup-driven fuel swelling `(swelling_rate·bu/3) I` in `materials/fuel_swelling.py`, which reads the `burnup` field.
 
-Damage coupling: when damage is active, `σ ← g(D) σ` with `g(D) = (1−D)² + K` (K = 1e-6 regularization).
+For a purely thermal eigenstrain this reduces exactly to `σ_th = −(3λ + 2G) α (T − T_ref) I`. Because ε* is a UFL tensor the Newton tangent stays automatic, and fuel swelling/creep need no change to the momentum balance — *"fuel is a material"*: each region's inelastic behaviour travels with its own material, applied wherever the material's thermal block or own eigenstrain is active.
+
+Damage coupling: when damage is active, `σ ← g(D) σ` with `g(D) = (1−D)² + K` (K = 1e-6 regularization). The eigenstress is degraded by the same `g(D)` so a fully-damaged cell recovers the traction-free crack-face limit.
 
 ### 4.3 Damage (`damage_model.py`)
 
@@ -364,6 +377,8 @@ Two modes (selected via `models.gap_conductance.type`):
 
 Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to another subdomain.
 
+**Contact-coupled conductance.** When `gap_conductance.contact_coupling.enabled` is set, a solid-contact term is added on gap closure (Todreas & Kazimi, *Nuclear Systems I*, 3rd ed., Eqs. 8.141/8.142): the emergent contact pressure (from `contact_model`) raises `h_gap` above the open-gap gas value, so closing the gap cools the fuel. Parameters: `meyer_hardness` (Pa), `gas_thickness` (m, roughness-based residual gas space).
+
 ### 4.6 Cluster dynamics (`cluster_dynamic_model.py`)
 
 1D advection–diffusion solver for defect-cluster size distributions `c(n,t)`:
@@ -371,6 +386,14 @@ Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to anothe
 - initial conditions: `constant` (on labelled region) or `gaussian`.
 - DG1 space with upwind advection and SIPG diffusion.
 - Mass conservation: `∫ c·n dn` is rescaled to the initial target every step.
+
+### 4.7 Mechanical contact (`contact_model.py`)
+
+Penalty pellet-clad mechanical contact (gap closure / PCMI), enabled via the `models.contact` block. An explicit fixed-point scheme integrated into the staggered loop:
+
+- **Gap measurement** — each mechanical iteration measures the current normal gap from the displacement iterate as `gap = g0 + ⟨u_r⟩_b − ⟨u_r⟩_a`, the boundary-integral mean radial displacement of the two paired facing surfaces (`surface_a` = pellet outer, `surface_b` = clad inner).
+- **Penalty traction** — on penetration (`gap < 0`) a pressure `p = k_pen · ⟨−gap⟩₊` is applied as `t = −p·n` on both facing surfaces (UFL/AD supplies the tangent). Config: `penalty_stiffness` (Pa/m), `initial_gap` (m).
+- Verified against the analytical plane-stress Lamé interference-fit solution (`cases/V_coaxial_contact_verification`, ~3.5 %). The emergent contact pressure also feeds the contact-coupled gap conductance (§4.5), so thermal + mechanical PCMI are two-way coupled.
 
 ---
 
@@ -391,6 +414,12 @@ Materials are plain YAML cards. Common fields:
 | `gamma_heating`     | W/m³       | Volumetric γ heating magnitude                          |
 | `gamma_inner_radius`| m          | Per-material reference radius for the cylindrical/spherical γ-attenuation profile (optional; defaults to geometry `inner_radius`; set it for an inboard layer such as a shield) |
 | `fissile`           | bool       | If true, `q''' = LHR / area` in the pellet              |
+| `heavy_metal_fraction` | —       | M_U / M_compound (e.g. 0.8815 for UO2); burnup accumulated per kg heavy metal |
+| `radial_profile`    | string     | `"pkg.mod.func"` radial power form factor `f(r, bu)` (source bus); see `fuel_profiles.py` |
+| `radial_peak_amplitude` / `radial_peak_exponent` | — | parameters of the built-in `rim_peaking` profile `f = 1 + A(r/Ro)^p` |
+| `swelling`          | —          | constant volumetric swelling ΔV/V (isotropic eigenstrain `(ΔV/V)/3 · I`) |
+| `eigenstrain`       | string     | `"pkg.mod.func"` state-dependent eigenstrain callable (e.g. swelling(bu)); see `fuel_swelling.py` |
+| `swelling_rate`     | (MWd/kgU)⁻¹ | ΔV/V per unit burnup for `fuel_swelling.solid_swelling`  |
 | `sigma_c` / `Gc`    | Pa, J/m²   | Phase-field critical stress OR fracture energy (one is derived from the other given `lc`) |
 | `yield_strength`    | Pa         | Initial yield stress (J2 plasticity)                    |
 | `hardening_modulus` | Pa         | Linear isotropic hardening modulus                      |
@@ -406,6 +435,7 @@ Available cards (non-exhaustive):
 - **Materials:** `uo2.yaml` (E = 358 GPa, k = 5 W/mK, α = 1e-5/K, Gc = 15 kJ/m², T_initial = 1023 K), `zircaloy.yaml` (Zircaloy-4)
 - **Ceramics / oxides:** `ceramic.yaml` (+ Python `ceramic.py::k(T)`), `oxide.yaml` (+ Python `oxide.py::k(T), Gc(mesh)` with grain-boundary heterogeneity via `tanh(|y|/half_width)`)
 - **Other:** `plastic.yaml`, `lead.yaml`, `h2o.yaml`
+- **Fuel-behaviour callables:** `fuel_profiles.py::rim_peaking` (radial power form factor `f(r, bu)` — source bus), `fuel_swelling.py::solid_swelling` (burnup-driven swelling eigenstrain — eigenstrain bus). These realise the *"fuel is a material"* design: state-dependent fuel physics (radial power, swelling; later densification, fuel-k(bu), creep) live in the material and travel with its region, rather than as global solver toggles.
 
 ---
 
@@ -480,8 +510,16 @@ The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regressio
 - `I_mesh_sensitivity_2D` — mesh convergence study
 - `II_attenuation_map` — γ attenuation in materials
 
-**U_* — Extended/user cases**
-- `U_box_knotch_3D`, `U_cluster_dynamics_test`, `U_coaxial_contact_2D`, `U_pressure_vessel_2D`, `U_quarter_block`, `U_slab_contact`, `U_spherical_shell`, `U_thick_cylindrical_shell_plane_stress`
+**V_* — Analytical-verification cases** (closed-form checks; `V_` = verification, renamed from `U_*` on 2026-06-09)
+- `V_swelling_verification` — constant volumetric swelling eigenstrain (free expansion → σ ≈ 0, exact `u`).
+- `V_fuel_swelling_verification` — burnup-driven swelling reading the `burnup` field (the eigenstrain bus consuming the state bus).
+- `V_burnup_verification` — burnup accumulation + radial-power source bus on an axisymmetric pellet (closed-form mean burnup; rim/core ratio = 1 + A).
+- `V_coaxial_contact_verification` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit.
+
+**U_* — Extended / demo cases**
+- `U_coaxial_contact_2D` — 2D-rz PCMI penalty-contact demo (oxide pellet + steel clad, power ramp → gap closure, contact pressure).
+- `U_pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm gap, Zircaloy clad): coupled thermal + mechanical + gap conductance + penalty contact + burnup + swelling → **burnup-driven gap closure and PCMI** over a multi-year power history.
+- `U_pressure_vessel_2D`, `U_box_knotch_3D`, `U_cluster_dynamics_test`, `U_quarter_block`, `U_slab_contact`, `U_spherical_shell`, `U_thick_cylindrical_shell_plane_stress`.
 
 **demo_CP_single_grain** — crystal-plasticity single-grain demo using the `custom` constitutive + `plasticity.mode: custom` hook.
 
@@ -518,6 +556,16 @@ models:
   # gap_conductance:
   #   type: Fixed              # or Gas
   #   value: 5000.0
+  #   contact_coupling: { enabled: true, meyer_hardness: 9.65e8, gas_thickness: 4.0e-6 }
+  # contact:                   # penalty pellet-clad mechanical contact (PCMI)
+  #   surface_a: pellet_outer  # facet group on body A
+  #   surface_b: clad_inner    # facet group on body B
+  #   penalty_stiffness: 5.0e13
+  #   initial_gap: 65.0e-6
+
+# Fissile / fuel behaviour is configured on the MATERIAL cards, not here:
+#   fissile, heavy_metal_fraction, radial_profile (source bus),
+#   swelling / eigenstrain + swelling_rate (eigenstrain bus). See §5.
 
 thermal:
   analysis: transient          # stationary | transient
@@ -594,8 +642,12 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Cluster dynamics (1D)             | ✓ DG upwind + SIPG, mass-conservation renormalisation                |
 | Axisymmetric / 2D / 3D / plane-stress regimes | ✓ all consistent with the integration weight `w`      |
 | Volumetric heating                | ✓ fissile (LHR/area), γ-heating (rect / cyl / sphere analytic decay), user `q'''` |
-| Python material callables         | ✓ `k(T)`, `Gc(mesh)` loaded via `importlib`                         |
-| Post-processing                   | VTU / XDMF writers, radial/1D plots, PyVista viewer, notebook GUI   |
+| Burnup accumulation               | ✓ per-fissile-material `burnup` field via `update_state(dt)` (state bus)            |
+| Radial power shaping              | ✓ `radial_profile` form factor `f(r, bu)` (source bus); built-in rim-peaking        |
+| Fuel swelling                     | ✓ constant ΔV/V or burnup-driven eigenstrain (eigenstrain bus)                       |
+| Pellet-clad contact (PCMI)        | ✓ penalty contact + contact-coupled gap conductance (verified vs analytical Lamé)   |
+| Python material callables         | ✓ `k(T)`, `Gc(mesh)`, `radial_profile(r,bu)`, `eigenstrain(bu)` loaded via `importlib` |
+| Post-processing                   | unified `OutputWriter` (merged domain-wide fields; per-step VTU **or** single-file XDMF time series), case-local diagnostics CSV, radial/1D plots, PyVista viewer, notebook GUI |
 | Mesh IO                           | Gmsh (`.msh`), YAML-based mesh builder                              |
 | Parallelism                       | MPI via `MPI.COMM_WORLD`; PETSc (MUMPS / GAMG / HYPRE BoomerAMG)     |
 | CI / non-regression               | per-case `non-regression.py` vs. JSON gold, summarised in `non-regression_summary.txt` |
@@ -732,11 +784,13 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/models/mechanical_model.py`             | Strain/stress tensors, constitutive routes, mech BCs  |
 | `z3st/models/damage_model.py`                 | AT1/AT2 phase-field, energy splits, history update    |
 | `z3st/models/plasticity_model.py`             | J2 return mapping + custom crystal-plasticity hook    |
-| `z3st/models/gap_model.py`                    | Fixed / Gas gap-conductance model                     |
+| `z3st/models/gap_model.py`                    | Fixed / Gas gap-conductance model (+ contact-coupled) |
+| `z3st/models/contact_model.py`                | Penalty pellet-clad mechanical contact (PCMI)         |
 | `z3st/models/cluster_dynamic_model.py`        | 1D advection–diffusion cluster dynamics (DG/SIPG)     |
 | `z3st/materials/*.yaml`                       | Material cards                                        |
 | `z3st/materials/{ceramic,oxide}.py`           | Python callables for `k(T)`, `Gc(mesh)`                |
-| `z3st/utils/export_vtu.py`                    | VTU writer                                            |
+| `z3st/materials/{fuel_profiles,fuel_swelling}.py` | Fuel-behaviour callables: radial power `f(r,bu)`, swelling(bu) |
+| `z3st/utils/writer.py`                        | Unified `OutputWriter` (VTU / single-file XDMF; merged fields) |
 | `z3st/utils/utils_load.py`                    | YAML loader + power-history generator                 |
 | `z3st/utils/utils_plot.py`, `plot_convergence.py` | Plotting helpers                                  |
 | `z3st/utils/utils_extract_{vtu,xdmf}.py`      | Field extraction from output files                    |
@@ -748,4 +802,4 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 
 ---
 
-*Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-05 (per-material `gamma_inner_radius`; docs rendering + accuracy overhaul).*
+*Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-09 (fuel-as-material buses: burnup accumulation `update_state`, radial-power source bus, swelling/eigenstrain bus; penalty pellet-clad contact + contact-coupled gap conductance; unified `OutputWriter` with merged domain-wide fields and single-file XDMF; `U_pwr_rod_2D` burnup-driven PCMI rod; `V_*` verification cases).*

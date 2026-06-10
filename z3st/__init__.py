@@ -29,7 +29,6 @@ def __getattr__(name):
         "gap_model": (".models", "gap_model"),
         "cluster_dynamic_model": (".models", "cluster_dynamic_model"),
         "Cluster": (".models.cluster_dynamic_model", "ClusterDynamicsModel"),
-        "export_vtu": (".utils", "export_vtu"),
         "plot_convergence": (".utils", "plot_convergence"),
     }
 
@@ -50,6 +49,5 @@ __all__ = [
     "mechanical_model",
     "gap_model",
     "cluster_dynamic_model",
-    "export_vtu",
     "plot_convergence",
 ]
