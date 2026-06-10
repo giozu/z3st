@@ -1,5 +1,5 @@
 thermal:
-  cyl_1:
+  fuel:
   - type: Neumann
     region: bottom_1
     flux: 0.0
@@ -16,7 +16,7 @@ thermal:
     region: lateral_1
     pair: inner_2
 
-  cyl_2:
+  clad:
   - type: Neumann
     region: bottom_2
     flux: 0.0
@@ -33,11 +33,8 @@ thermal:
     region: outer_2
     temperature: 580.0   # (K) coolant
 
-# He fill-gas pressure. Scalar Neumann traction acts along the outward facet
-# normal, so a pressure is always negative (compresses the surface). After
-# gap closure the penalty contact traction is added on top of this.
 mechanical:
-  cyl_1:
+  fuel:
   - type: Clamp_x
     region: axis_1        # u_r = 0 on symmetry axis
 
@@ -52,7 +49,7 @@ mechanical:
     region: top_1
     traction: -2.0e+6     # (Pa) fill-gas pressure on pellet end face
 
-  cyl_2:
+  clad:
   - type: Clamp_y
     region: bottom_2      # u_z = 0
 

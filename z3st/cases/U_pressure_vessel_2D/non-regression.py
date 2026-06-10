@@ -125,7 +125,7 @@ def extract_mid_cylinder(grid):
     plt.plot(r, sigma_yy * 1e-6, '-s', label=r'$\sigma_{yy}$ (Axial)')
     plt.plot(r, sigma_zz * 1e-6, '-^', label=r'$\sigma_{\theta\theta}$ (Hoop)')
     
-    plt.xlabel("Radius [m]")
+    plt.xlabel("Radius (m)")
     plt.ylabel("Stress [MPa]")
     plt.title(f"Stress at Cylinder Mid-Height (y={y_target} m)")
     plt.grid(True, linestyle="--", alpha=0.7)
@@ -228,7 +228,7 @@ def extract_head_middle(grid):
     plt.plot(r_sph, sig_meridional * 1e-6, '-s', label=r'$\sigma_{meridional}$ (Tangential)')
     plt.plot(r_sph, sig_zz * 1e-6, '-^', label=r'$\sigma_{hoop}$')
     
-    plt.xlabel("Spherical Radius [m]")
+    plt.xlabel("Spherical Radius (m)")
     plt.ylabel("Stress [MPa]")
     plt.title("Stress at Hemi-Sphere Middle (45 deg)")
     plt.grid(True, linestyle="--", alpha=0.7)

@@ -9,8 +9,8 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  cyl_1: fuel.yaml
-  cyl_2: clad.yaml
+  fuel: fuel.yaml
+  clad: clad.yaml
 
 regime: axisymmetric
 
@@ -63,7 +63,7 @@ lhr:
 time:
 - 0.0
 - 1.728e+6     # 20 days ramp
-- 9.504e+7     # ~1100 days hold
+- 9.504e+7     # 1100 days hold
 n_steps: 50
 
 output:

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST case-local diagnostics --.. ..- .-.. .-.. ---
 """
-Per-step PCMI diagnostics for U_pwr_rod_2D.
+PCMI diagnostics for U_pwr_rod_2D.
 
-Streams a one-row-per-step summary to ``output/history.csv``. This is the
-format-independent, scales-to-1000-steps trajectory source: it records scalars
+Streams a one-row-per-step summary to ``output/history.csv``. It records scalars
 the solver has already computed — the contact model's last gap/pressure
-(``problem._last_gap`` [m], ``problem._last_pressure`` [Pa]), the burnup field,
+(``problem._last_gap`` (m), ``problem._last_pressure`` (Pa)), the burnup field,
 and the temperature field — so it works whether the run writes VTU or XDMF and
 needs no per-step VTU files at all. ``plots.py`` reads this CSV for the PCMI
 curves; field snapshots come from VTU (short runs) or ParaView (the single XDMF).

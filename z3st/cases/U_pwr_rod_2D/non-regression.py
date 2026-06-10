@@ -3,9 +3,9 @@
 """
 Z3ST case: U_pwr_rod_2D
 
-Protects the full PCMI coupling chain (thermal + mechanical + Gas gap
-conductance + penalty contact + burnup state bus + swelling eigenstrain bus)
-against regression. All metrics are read from ``output/history.csv`` — the
+PCMI coupling chain (thermal + mechanical + Gas gap
+conductance + penalty contact + burnup state bus + swelling eigenstrain bus).
+All metrics are read from ``output/history.csv`` — the
 per-step trajectory streamed by the case-local ``diagnostics.py`` — so the
 check is independent of the output format (the run writes a single XDMF).
 
@@ -57,7 +57,7 @@ with open(os.path.join(CASE_DIR, "input.yaml")) as f:
     inp = yaml.safe_load(f)
 with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
     geom = yaml.safe_load(f)
-fuel_card = inp["materials"]["cyl_1"]
+fuel_card = inp["materials"]["fuel"]
 with open(os.path.join(CASE_DIR, fuel_card)) as f:
     fuel = yaml.safe_load(f)
 

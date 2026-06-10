@@ -16,5 +16,5 @@ labels:
   top_2: 6
   top_1: 7
   axis_1: 8
-  cyl_1: 1
-  cyl_2: 2
+  fuel: 1
+  clad: 2
