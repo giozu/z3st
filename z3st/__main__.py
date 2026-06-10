@@ -333,6 +333,11 @@ if __name__ == "__main__":
         problem.solve(max_iters=max_iters, dt=dt)
         problem.get_results()
 
+        # Per-material average heat-flux diagnostic (debug-only: the writer
+        # already exports the HeatFlux field; this is the printed summary).
+        if DEBUG_MODE and problem.on.get("thermal"):
+            problem.heat_flux(problem.T)
+
         # Writing energies.txt
         if problem.on.get("damage"):
             E_el, E_frac = problem.compute_energy_balance(problem.u)

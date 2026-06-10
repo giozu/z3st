@@ -33,7 +33,6 @@ CASES=(
     # "12_cylindrical_shell_thermal_gradient_3D"
     "13_annular_cylinder"
     "14_full_cylinder"
-    # "15_box_elliptical_cavity_2D"
     "15_spherical_pressurized_cavity"
     "16_coaxial_cylinders_3D"
     # The following are present on disk but currently lack a
@@ -51,6 +50,11 @@ CASES=(
     # "19_single-edge_notched_shear_test"
     "20_plasticity_2D"
     "demo_CP_single_grain"
+    "V_swelling_verification"
+    "V_fuel_swelling_verification"
+    "V_burnup_verification"
+    "V_coaxial_contact_verification"
+    "U_pwr_rod_2D"
     "I_mesh_sensitivity_2D"
 )
 
@@ -115,9 +119,13 @@ for case_name in "${CASES[@]}"; do
 
         if [[ -f "output/non-regression.json" ]]; then
             summary_status=$(grep -o '"summary": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
+            regression_status=$(grep -o '"regression": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
             printf "  %-15s : %s\n" "Non-regression" "$summary_status"
+            printf "  %-15s : %s\n" "Gold regression" "${regression_status:-(no gold)}"
         else
-            printf "  %-15s : %s\n" "Non-regression" "(no non-regression.json found)"
+            summary_status="(no non-regression.json — NOT VALIDATED)"
+            regression_status=""
+            printf "  %-15s : %s\n" "Non-regression" "$summary_status"
         fi
 
         printf "  %-15s : %ss\n" "Time" "$elapsed"
@@ -127,6 +135,7 @@ for case_name in "${CASES[@]}"; do
     echo "Case: $case_name"
     printf "  %-15s : %s\n" "Run" "$status"
     printf "  %-15s : %s\n" "Non-regression" "$summary_status"
+    printf "  %-15s : %s\n" "Gold regression" "${regression_status:-(no gold)}"
     printf "  %-15s : %ss\n" "Time" "$elapsed"
     echo ""
 

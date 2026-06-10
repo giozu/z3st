@@ -54,8 +54,6 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
         print(f"  {key:18s} → rel err = {rel_err_display:.2e}  → {color}{status}{END}")
         val["status"] = status
 
-        val["status"] = status
-
     summary = (
         f"{GREEN}PASS{END} All checks within tolerance"
         if all_pass
@@ -173,5 +171,18 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         else f"{RED}FAIL{END} Regression mismatch"
     )
     print(f"\n[SUMMARY] {BOLD}{summary_reg}{END}")
+
+    # Persist the gold-regression verdict next to the analytic "summary" key so
+    # the suite drivers (non-regression.sh / non-regression_github.sh) can
+    # surface it — otherwise a regression vs GOLD is invisible outside stdout.
+    out_json = os.path.join(case_dir, "output", "non-regression.json")
+    try:
+        with open(out_json, "r") as f:
+            data = json.load(f)
+        data["regression"] = "PASS" if reg_pass else "FAIL"
+        with open(out_json, "w") as f:
+            json.dump(data, f, indent=4)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
 
     return reg_pass

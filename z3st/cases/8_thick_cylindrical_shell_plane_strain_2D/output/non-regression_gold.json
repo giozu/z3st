@@ -1,48 +1,48 @@
 {
     "results": {
         "L2_error_sigma_rr": {
-            "numerical": 0.0015495343467032022,
+            "numerical": 0.00025159192904668026,
             "reference": 0.0,
-            "abs_error": 0.0015495343467032022,
-            "rel_error": 0.0015495343467032022,
+            "abs_error": 0.00025159192904668026,
+            "rel_error": 0.00025159192904668026,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.002302555258104305,
+            "numerical": 0.0002570308001286641,
             "reference": 0.0,
-            "abs_error": 0.002302555258104305,
-            "rel_error": 0.002302555258104305,
+            "abs_error": 0.0002570308001286641,
+            "rel_error": 0.0002570308001286641,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 0.004570741086624695,
+            "numerical": 0.0005610719375893003,
             "reference": 0.0,
-            "abs_error": 0.004570741086624695,
-            "rel_error": 0.004570741086624695,
+            "abs_error": 0.0005610719375893003,
+            "rel_error": 0.0005610719375893003,
             "status": "PASS"
         },
         "L2_error_strain_rr": {
-            "numerical": 0.006898689553298413,
+            "numerical": 0.0008348256399732189,
             "reference": 0.0,
-            "abs_error": 0.006898689553298413,
-            "rel_error": 0.006898689553298413,
+            "abs_error": 0.0008348256399732189,
+            "rel_error": 0.0008348256399732189,
             "status": "PASS"
         },
         "L2_error_strain_tt": {
-            "numerical": 0.0010596988323559116,
+            "numerical": 0.00021958362040385858,
             "reference": 0.0,
-            "abs_error": 0.0010596988323559116,
-            "rel_error": 0.0010596988323559116,
+            "abs_error": 0.00021958362040385858,
+            "rel_error": 0.00021958362040385858,
             "status": "PASS"
         },
         "L2_error_strain_zz": {
-            "numerical": 3.381566551057205e-08,
+            "numerical": 4.500126245738519e-09,
             "reference": 0.0,
-            "abs_error": 3.381566551057205e-08,
-            "rel_error": 3.381566551057205e-08,
+            "abs_error": 4.500126245738519e-09,
+            "rel_error": 4.500126245738519e-09,
             "status": "PASS"
         }
     },
-    "tolerance": 0.05,
+    "tolerance": 0.007,
     "summary": "PASS"
 }

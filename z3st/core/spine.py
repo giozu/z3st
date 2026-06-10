@@ -5,6 +5,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import importlib
+import sys
 
 import dolfinx
 import ufl
@@ -200,9 +201,11 @@ class Spine(
                 mat["_radial_profile_func"] = self.resolve_function(mat["radial_profile"])
 
             self.materials[name] = mat
-            for k in sorted(mat.keys()):
-                v = mat[k]
-                print(f"  {k:<15} → {v} ({type(v).__name__})")
+            # Full per-key material dump only under --debug (CODE-P2-4)
+            if "--debug" in sys.argv:
+                for k in sorted(mat.keys()):
+                    v = mat[k]
+                    print(f"  {k:<15} → {v} ({type(v).__name__})")
 
     def set_boundary_conditions(self):
         print("\n")
@@ -291,11 +294,6 @@ class Spine(
 
             print("\nSetting cluster initial conditions...")
             self.set_cluster_initial_conditions()
-
-        # if self.u:
-        #      print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
-        # if self.T:
-        #      print(f"  Temperature space (self.T):           {self.T.function_space.ufl_element()}")
 
         # Material properties
         for name, mat in self.materials.items():

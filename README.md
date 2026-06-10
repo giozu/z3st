@@ -150,7 +150,6 @@ z3st/                                # repository root
     │   └── ceramic.py, oxide.py     # k(T), Gc(mesh) callables
     ├── utils/                       # post-processing + helpers
     │   ├── writer.py                # unified VTU / XDMF OutputWriter
-    │   ├── export_vtu.py            # legacy VTU writer (backward compat)
     │   ├── mesh_builder.py
     │   ├── plot_convergence.py
     │   ├── utils_extract_vtu.py     # field extraction from VTU
@@ -169,6 +168,8 @@ z3st/                                # repository root
         ├── 14_full_cylinder_cracking_2D_xy/   # UO2 thermal-shock + AT1 (paper flagship)
         ├── 19_single-edge_notched_*/          # SENT / SENS phase-field benchmarks
         ├── 20_plasticity_2D/
+        ├── U_pwr_rod_2D/                     # PWR fuel-rod segment: burnup-driven PCMI
+        ├── V_*/                              # analytical verification (swelling, burnup, contact)
         ├── demo_CP_single_grain/             # custom crystal-plasticity demo
         ├── non-regression.sh / .py / _github.sh   # regression infrastructure
         └── non-regression_summary.txt
@@ -259,7 +260,7 @@ Full compatibility with **ParaView** and **PyVista** enables both automated and 
 
 | Tool                   | Description                                                                             |
 | ---------------------- | --------------------------------------------------------------------------------------- |
-| `export_vtu.py`        | Exports temperature, displacement, strain, and stress fields to `.vtu` format           |
+| `writer.py`            | Unified `OutputWriter`: per-step VTU files or single-file XDMF time series              |
 | `utils_extract_vtu.py` | Extracts scalar/vector fields and stress components from VTU outputs                    |
 | `utils_plot.py`        | Generates 1D and radial plots (e.g. T(r), σ<sub>rr</sub>(r)) and can be easily extended |
 | `z-gui.py`             | Interactive 3D viewer built on PyVista for exploratory visualization                    |

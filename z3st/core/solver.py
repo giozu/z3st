@@ -332,7 +332,10 @@ class Solver:
                 elif isinstance(raw, (int, float)):
                     val = raw
                 else:
-                    raise RuntimeError("Invalid traction 'raw' format")
+                    raise RuntimeError(
+                        f"Invalid traction 'raw' format (got {type(raw).__name__}: {raw!r}); "
+                        f"expected a scalar or a list of length n_steps"
+                    )
 
                 bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
                 print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
@@ -340,7 +343,7 @@ class Solver:
                 regime = self.regime
                 if self.mgr.tdim == 1:
                     n_vec = ufl.as_vector([self.normal[0]])
-                elif regime in ["axisymmetric", "2d"]:
+                elif regime in ["axisymmetric", "2d", "plane_stress"]:
                     n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                 else:
                     n_vec = self.normal
@@ -363,7 +366,7 @@ class Solver:
             regime = self.regime
             if self.mgr.tdim == 1:
                 body_force = dolfinx.fem.Constant(self.mesh, (-rho * g,))
-            elif regime == "axisymmetric" or regime == "2d":
+            elif regime in ["axisymmetric", "2d", "plane_stress"]:
                 # 2D: (F_r, F_z) or (F_x, F_y)
                 body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
             else:
@@ -714,7 +717,7 @@ class Solver:
         if pe > 1:
             print(f"    [INFO] Advection-dominated system. DG Upwind will provide stability.")
 
-        # Variational form (Implicit uler + DG)
+        # Variational form (Implicit Euler + DG)
         # Mass matrix (time derivative)
         a = (u_c / dt_c) * v_c * ufl.dx
         L = (c_old / dt_c) * v_c * ufl.dx
@@ -790,9 +793,11 @@ class Solver:
         self,
         max_iter=20,
         dt=0.0,
-        stag_tol_th=1e-3,
-        stag_tol_mech=1e-3,
-        stag_tol_dmg=1e-3,
+        # stag_tol defaults mirror Spine.solve (the only caller, which always
+        # passes them explicitly) — keep the two in sync.
+        stag_tol_th=1e-4,
+        stag_tol_mech=1e-4,
+        stag_tol_dmg=1e-4,
         rtol_th=1e-6,
         rtol_mech=1e-6,
         rtol_dmg=1e-5,
@@ -828,7 +833,8 @@ class Solver:
             u_old = dolfinx.fem.Function(self.V_m)
 
             bcs_m = []
-            [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
+            for bc_list in self.dirichlet_mechanical.values():
+                bcs_m.extend(bc_list)
         else:
             u_new = u_old = None
             bcs_m = []

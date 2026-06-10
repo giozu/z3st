@@ -85,6 +85,14 @@ class GapModel:
             if isinstance(m.get("k"), (int, float))
         ]
         if len(ks) < 2:
+            # Symbolic k (Python-callable card) cannot feed the Ross-Stoute
+            # harmonic mean — warn loudly: contact coupling is requested but
+            # the conductance silently stays at the open-gap value otherwise.
+            print(
+                "  [WARNING] contact_coupling enabled but fewer than two materials "
+                "carry a numeric 'k' (symbolic k is not supported here); "
+                "h_contact = 0 — gap conductance stays at the open-gap value."
+            )
             return 0.0
         k_f, k_c = ks[0], ks[1]
         k_harm = 2.0 * k_f * k_c / (k_f + k_c)
@@ -139,9 +147,6 @@ class GapModel:
 
         centroids_a = facet_centroids(facets_a)
         centroids_b = facet_centroids(facets_b)
-
-        # min_len = min(len(centroids_a), len(centroids_b))
-        # distances = np.linalg.norm(centroids_a[:min_len] - centroids_b[:min_len], axis=1)
 
         from scipy.spatial import cKDTree
 

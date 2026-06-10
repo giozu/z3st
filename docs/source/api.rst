@@ -55,6 +55,24 @@ Physics Models
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: z3st.models.contact_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.plasticity_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Output
+------
+
+.. automodule:: z3st.utils.writer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Diagnostics
 -----------
 

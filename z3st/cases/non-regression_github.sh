@@ -72,9 +72,26 @@ for case_name in "${CASES[@]}"; do
     ./Allrun > "${case_name}_log.txt" 2>&1
     exit_code=$?
 
+    # Allrun's exit code only catches crashes: the per-case non-regression.py
+    # always exits 0. Gate on the verdicts it writes into non-regression.json
+    # ("summary" = analytic tolerance check, "regression" = vs GOLD reference)
+    # so a numerical regression actually fails CI.
+    fail_reason=""
+    if [[ $exit_code -eq 0 && -f "output/non-regression.json" ]]; then
+        summary_status=$(grep -o '"summary": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
+        regression_status=$(grep -o '"regression": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
+        if [[ "$summary_status" == "FAIL" ]]; then
+            exit_code=1
+            fail_reason=" (analytic tolerance)"
+        elif [[ "$regression_status" == "FAIL" ]]; then
+            exit_code=1
+            fail_reason=" (regression vs gold)"
+        fi
+    fi
+
     if [[ $exit_code -ne 0 ]]; then
-        echo "Case ${case_name} FAILED (exit code ${exit_code})"
-        echo "Case: $case_name -> FAIL" >> "$SUMMARY_FILE"
+        echo "Case ${case_name} FAILED (exit code ${exit_code})${fail_reason}"
+        echo "Case: $case_name -> FAIL${fail_reason}" >> "$SUMMARY_FILE"
         global_status=1
     else
         echo "Case ${case_name} PASSED"

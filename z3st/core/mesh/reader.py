@@ -80,9 +80,9 @@ class XdmfMeshReader:
                 cell_tags = xdmf.read_meshtags(mesh, name="CellTags")
             except RuntimeError:
                 log.warning("Could not find 'CellTags' in XDMF. Trying default...")
-                try: 
+                try:
                     cell_tags = xdmf.read_meshtags(mesh, name="Grid")
-                except:
+                except RuntimeError:
                     log.warning("Could not find cell tags.")
                     cell_tags = None
             

@@ -1,10 +1,10 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 2.890089678934496e-06,
+            "numerical": 2.765716359777107e-06,
             "reference": 0.0,
-            "abs_error": 2.890089678934496e-06,
-            "rel_error": 5.959022256125562e-09,
+            "abs_error": 2.765716359777107e-06,
+            "rel_error": 5.702579218274803e-09,
             "status": "PASS"
         },
         "Linf_error_T": {
@@ -15,17 +15,17 @@
             "status": "PASS"
         },
         "T_max": {
-            "numerical": 490.000003847554,
+            "numerical": 490.0,
             "reference": 490.0,
-            "abs_error": 3.847554012281762e-06,
-            "rel_error": 7.852151045472984e-09,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
             "status": "PASS"
         },
         "L2_error_sigma_yy": {
-            "numerical": 0.000334252388345246,
+            "numerical": 0.0003342712247618348,
             "reference": 0.0,
-            "abs_error": 0.000334252388345246,
-            "rel_error": 0.000334252388345246,
+            "abs_error": 0.0003342712247618348,
+            "rel_error": 0.0003342712247618348,
             "status": "PASS"
         }
     },

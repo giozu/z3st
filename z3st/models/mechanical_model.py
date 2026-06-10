@@ -340,7 +340,7 @@ class MechanicalModel:
             u_d.interpolate(lambda x: np.tile(displacement, (1, x.shape[1])))
             return dolfinx.fem.dirichletbc(u_d, dofs)
         else:
-            raise ValueError(f"Formato displacement non valido: shape {displacement.shape}")
+            raise ValueError(f"Invalid displacement format: shape {displacement.shape}")
 
     def epsilon(self, u):
         """

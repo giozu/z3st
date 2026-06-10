@@ -304,7 +304,7 @@ Custom structured logger (`log.info`, `log.warning`, …) reused across modules.
 ### 4.1 Thermal (`thermal_model.py`)
 
 - Supported BCs: `Dirichlet`, `Neumann` (flux), `Robin` (two modes — gap by `pair:` or convective by `h_conv + T_ext`).
-- `heat_flux(T)` diagnostic: per-material average `|q|`, `q_x`, `q_y`, `q_z`.
+- `heat_flux(T)` diagnostic: per-material average `|q|` + per-component flux (dimension-aware, `r`/`z` labels in axisymmetric; supports symbolic `k(T)` cards). Printed after each step's `get_results()` **only under `--debug`** — the writer's `HeatFlux` field is the default output channel.
 - Config keys read from `input.yaml::thermal`:
   `solver`, `linear_solver`, `rtol`, `stag_tol`, `convergence`, `analysis` (`stationary | transient`).
 
@@ -456,7 +456,7 @@ Each case folder is self-contained:
 └── output/                   auto-generated VTU/XDMF + plots
 ```
 
-The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`.
+The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. Each case's `non-regression.json` carries two verdicts (since 2026-06-10): `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL (previously only Allrun crashes failed CI — numerical regressions were invisible).
 
 ### 6.1 Catalogue of cases
 
@@ -518,8 +518,8 @@ The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regressio
 
 **U_* — Extended / demo cases**
 - `U_coaxial_contact_2D` — 2D-rz PCMI penalty-contact demo (oxide pellet + steel clad, power ramp → gap closure, contact pressure).
-- `U_pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm gap, Zircaloy clad): coupled thermal + mechanical + gap conductance + penalty contact + burnup + swelling → **burnup-driven gap closure and PCMI** over a multi-year power history.
-- `U_pressure_vessel_2D`, `U_box_knotch_3D`, `U_cluster_dynamics_test`, `U_quarter_block`, `U_slab_contact`, `U_spherical_shell`, `U_thick_cylindrical_shell_plane_stress`.
+- `U_pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm gap, Zircaloy clad): coupled thermal + mechanical + gap conductance + penalty contact + burnup + swelling → **burnup-driven gap closure and PCMI** over a multi-year power history. Gold-protected since 2026-06-10: `non-regression.py` reads end-state PCMI scalars from `output/history.csv` (gap −0.81 µm, p = 40.3 MPa, bu = 44.5 MWd/kgU) with the mean burnup checked against the closed form; in the local suite, not in CI (~3 min run).
+- `U_pressure_vessel_2D`, `U_cluster_dynamics_test`, `U_quarter_block`, `U_spherical_shell`. (`U_box_knotch_3D`, `U_slab_contact`, `U_thick_cylindrical_shell_plane_stress` were removed in commit f1bb70b; note this leaves the `plane_stress` regime with no exercising case.)
 
 **demo_CP_single_grain** — crystal-plasticity single-grain demo using the `custom` constitutive + `plasticity.mode: custom` hook.
 
@@ -802,4 +802,4 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 
 ---
 
-*Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-09 (fuel-as-material buses: burnup accumulation `update_state`, radial-power source bus, swelling/eigenstrain bus; penalty pellet-clad contact + contact-coupled gap conductance; unified `OutputWriter` with merged domain-wide fields and single-file XDMF; `U_pwr_rod_2D` burnup-driven PCMI rod; `V_*` verification cases).*
+*Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-10 (full four-agent re-audit folded into punch_list.md; CODE-P0-5 plane_stress solver fix + regime validation; gold-regression verdict now persisted to `non-regression.json` and gated in local summary + CI; 8 stale golds re-blessed; `heat_flux` fixed and re-wired under `--debug`; `U_pwr_rod_2D` gold-protected and wired into the local suite together with the `V_*` cases).*

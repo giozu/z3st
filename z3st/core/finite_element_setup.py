@@ -64,10 +64,3 @@ class FiniteElementSetup:
         else:
             self.q_degree = None
 
-        # --. Mixed function spaces --..
-        # P1_3 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, shape=(self.tdim,), dtype=dolfinx.default_real_type)
-        # P1_1 = basix.ufl.element("Lagrange", self.mesh.basix_cell(), 1, dtype=dolfinx.default_real_type)
-        # Same P1_3 and P1_1 of above, but for coherence I prefere to define the following from V_m and V_t
-        # P1_3 = self.V_m.ufl_element()
-        # P1_1 = self.V_t.ufl_element()
-        # self.W = dolfinx.fem.functionspace(self.mesh, basix.ufl.mixed_element([P1_3, P1_1]))

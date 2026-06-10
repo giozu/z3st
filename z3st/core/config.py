@@ -60,7 +60,14 @@ class Config:
         self.mesh_path = self.input_file.get("mesh_path", None)
         self.boundary_conditions_path = self.input_file.get("boundary_conditions_path", None)
         self.n_steps = self.input_file.get("n_steps", 10)
+        # Normalised to lowercase ("2D" → "2d"); downstream regime branches
+        # assume one of these four values, so reject anything else up front.
         self.regime = self.input_file.get("regime", "2d").lower()
+        valid_regimes = {"2d", "3d", "axisymmetric", "plane_stress"}
+        if self.regime not in valid_regimes:
+            raise ValueError(
+                f"Invalid regime '{self.regime}'. Must be one of {sorted(valid_regimes)}."
+            )
 
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")
