@@ -1,0 +1,27 @@
+name: fuel-axial-test
+# Fissile fuel used to verify the AXIAL power source bus. A chopped-cosine
+# axial form factor f(z) = cos(pi (z - z_mid)/L') shapes the deposited power,
+# so the burnup accumulates faster at mid-height than at the stack ends. The
+# verification checks the accumulation magnitude (nodal-mean burnup = closed
+# form, normalisation preserves the rating), the peak/average ratio (the
+# axial peaking factor) and the end/peak ratio (cos(pi L / 2 L')).
+fissile: true
+
+# Axial power form factor: resolved by spine.load_materials, applied in set_power.
+axial_profile: materials.fuel_profiles.chopped_cosine
+axial_extrapolated_length: 0.5  # L' (m); active height L = 0.4 m -> L/L' = 0.8
+
+E: 358.0e9                      # (Pa) (only the thermal-stress output field needs these;
+nu: 0.23                        # (-)  mechanical is off)
+
+k: 5.0                          # (W/(m·K)) thermal conductivity
+cp: 280.0                       # (J/(kg·K)) specific heat
+rho: 10970.0                    # (kg/m³) density
+heavy_metal_fraction: 0.8815    # (-) M_U / M_UO2; burnup is per kg heavy metal
+
+alpha: 1.0e-5                   # (1/K) thermal expansion
+T_ref: 300.0                    # (K)
+T_initial: 300.0                # (K)
+
+mu_gamma: 0.0
+gamma_heating: 0.0

@@ -57,6 +57,7 @@ VTU_FILE = _steps[-1] if _steps else _single
 with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
     geom = yaml.safe_load(f)
 Ro = float(geom["Ro"])
+Lz = float(geom["Lz"])
 area = np.pi * Ro**2                          # solid pellet cross-section
 
 with open(os.path.join(CASE_DIR, "input.yaml")) as f:
@@ -69,6 +70,7 @@ with open(os.path.join(CASE_DIR, next(iter(inp["materials"].values())))) as f:
 rho = float(mat["rho"])
 hm = float(mat.get("heavy_metal_fraction", 0.8815))
 A = float(mat.get("radial_peak_amplitude", 3.0))
+p_exp = float(mat.get("radial_peak_exponent", 8.0))
 
 # --. analytical references --..
 SECONDS_PER_MWD = 8.64e10                      # 86400 s/day * 1e6 W/MW
@@ -107,6 +109,45 @@ errors = {
         "rel_error": float(abs(ratio - RATIO_REF) / RATIO_REF),
     },
 }
+
+# --. integrated power (parsed from the solver log) --..
+# set_power prints the exact FE integral of the fissile source. For a RADIALLY
+# peaked profile the integral does NOT equal LHR·Lz: the mean-1 normalisation
+# is nodal (uniform in r), while the integral carries the 2πr area weight, so
+#
+#   P / (LHR·Lz) = <f>_area / <f>_nodal = [1 + 2A/(p+2)] / [1 + A/(p+1)]
+#
+# = 1.6/(4/3) = 1.2 for A = 3, p = 8. This check pins the documented
+# nodal-normalisation approximation quantitatively (the area-weighted
+# refinement lands with the TUBRNP profile — see spine.set_power).
+import re
+LOG = os.path.join(CASE_DIR, "log_z3st.md")
+F_AREA = 1.0 + 2.0 * A / (p_exp + 2.0)              # continuum area-weighted mean
+F_NODAL_CONT = 1.0 + A / (p_exp + 1.0)              # continuum nodal (line) mean
+# The code normalises by the DISCRETE nodal mean over the actual fuel dofs
+# (O(1/N) above the continuum value) — replicate it exactly so the check
+# verifies the FE area integral sharply, mesh-independently.
+_coords = np.column_stack([np.asarray(x), np.asarray(y), np.asarray(z)])
+F_NODAL = float(np.mean(rim_peaking(_coords, np.zeros(len(_coords)), mat, model=None)))
+P_REF = lhr * Lz * F_AREA / F_NODAL
+if os.path.exists(LOG):
+    with open(LOG) as f:
+        hits = re.findall(r"Integrated fissile power in \S+:\s*([0-9.eE+\-]+)", f.read())
+    if hits:
+        P_int = float(hits[-1])
+        print(f"[INFO] integrated power: numerical = {P_int:.6e} W, "
+              f"analytical LHR·Lz·<f>_area/<f>_nodal = {P_REF:.6e} W "
+              f"(continuum ratio to LHR·Lz = {F_AREA / F_NODAL_CONT:.4f})")
+        errors["total_power"] = {
+            "numerical": P_int,
+            "reference": P_REF,
+            "abs_error": float(abs(P_int - P_REF)),
+            "rel_error": float(abs(P_int - P_REF) / P_REF),
+        }
+    else:
+        print("[WARNING] no 'Integrated fissile power' line in log — power check skipped.")
+else:
+    print("[WARNING] log_z3st.md not found — power check skipped.")
 
 # --. figure 1: accumulation vs time (per-step mean burnup vs closed form) --..
 try:

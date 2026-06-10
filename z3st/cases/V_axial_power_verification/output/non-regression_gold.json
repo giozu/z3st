@@ -1,0 +1,35 @@
+{
+    "results": {
+        "burnup_mean_closed_form": {
+            "numerical": 27.196998243996,
+            "reference": 27.196998243996006,
+            "abs_error": 7.105427357601002e-15,
+            "rel_error": 2.612577790333752e-16,
+            "status": "PASS"
+        },
+        "axial_peaking_factor": {
+            "numerical": 1.3262074673259314,
+            "reference": 1.3213063996776495,
+            "abs_error": 0.004901067648281909,
+            "rel_error": 0.003709258995095756,
+            "status": "PASS"
+        },
+        "end_peak_ratio": {
+            "numerical": 0.30901699437494745,
+            "reference": 0.30901699437494745,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "total_power": {
+            "numerical": 8029.509,
+            "reference": 8000.0,
+            "abs_error": 29.509000000000015,
+            "rel_error": 0.003688625000000002,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS",
+    "regression": "PASS"
+}

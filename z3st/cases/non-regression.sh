@@ -53,6 +53,8 @@ CASES=(
     "V_swelling_verification"
     "V_fuel_swelling_verification"
     "V_burnup_verification"
+    "V_axial_power_verification"
+    "V_axial_table_verification"
     "V_coaxial_contact_verification"
     "U_pwr_rod_2D"
     "I_mesh_sensitivity_2D"

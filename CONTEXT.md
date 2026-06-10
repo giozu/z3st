@@ -417,6 +417,9 @@ Materials are plain YAML cards. Common fields:
 | `heavy_metal_fraction` | —       | M_U / M_compound (e.g. 0.8815 for UO2); burnup accumulated per kg heavy metal |
 | `radial_profile`    | string     | `"pkg.mod.func"` radial power form factor `f(r, bu)` (source bus); see `fuel_profiles.py` |
 | `radial_peak_amplitude` / `radial_peak_exponent` | — | parameters of the built-in `rim_peaking` profile `f = 1 + A(r/Ro)^p` |
+| `axial_profile`     | string     | `"pkg.mod.func"` axial power form factor `f(z)` (source bus, composed with the radial one); built-ins in `fuel_profiles.py`: `chopped_cosine`, `tabulated_axial` |
+| `axial_extrapolated_length` | m  | extrapolated length L′ of the chopped cosine `f(z) = cos(π(z−z_mid)/L′)` (default 1.1·L; peaking factor = 1/[(2L′/πL)·sin(πL/2L′)]) |
+| `axial_table_z` / `axial_table_f` | m, — | elevation/factor lists for `tabulated_axial` (piecewise-linear, end values held outside the range); only the *shape* matters — the mean-1 normalisation makes the absolute scale irrelevant |
 | `swelling`          | —          | constant volumetric swelling ΔV/V (isotropic eigenstrain `(ΔV/V)/3 · I`) |
 | `eigenstrain`       | string     | `"pkg.mod.func"` state-dependent eigenstrain callable (e.g. swelling(bu)); see `fuel_swelling.py` |
 | `swelling_rate`     | (MWd/kgU)⁻¹ | ΔV/V per unit burnup for `fuel_swelling.solid_swelling`  |
@@ -514,6 +517,8 @@ The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regressio
 - `V_swelling_verification` — constant volumetric swelling eigenstrain (free expansion → σ ≈ 0, exact `u`).
 - `V_fuel_swelling_verification` — burnup-driven swelling reading the `burnup` field (the eigenstrain bus consuming the state bus).
 - `V_burnup_verification` — burnup accumulation + radial-power source bus on an axisymmetric pellet (closed-form mean burnup; rim/core ratio = 1 + A).
+- `V_axial_power_verification` — axial-power source bus (chopped-cosine `f(z)`, Todreas & Kazimi 1-D axial problem) on a tall axisymmetric fuel column: closed-form mean burnup (machine precision); axial peaking factor = 1/[(2L′/πL)·sin(πL/2L′)]; end/peak = cos(πL/2L′).
+- `V_axial_table_verification` — tabulated axial profile (`tabulated_axial`, piecewise-linear node-wise peaking factors — the standard core-physics input): closed-form mean burnup (exact); table-node ratio f₃/f₁ (machine precision); peak/mean = max f / trapezoid mean.
 - `V_coaxial_contact_verification` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit.
 
 **U_* — Extended / demo cases**
@@ -644,6 +649,8 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Volumetric heating                | ✓ fissile (LHR/area), γ-heating (rect / cyl / sphere analytic decay), user `q'''` |
 | Burnup accumulation               | ✓ per-fissile-material `burnup` field via `update_state(dt)` (state bus)            |
 | Radial power shaping              | ✓ `radial_profile` form factor `f(r, bu)` (source bus); built-in rim-peaking        |
+| Axial power shaping               | ✓ `axial_profile` form factor `f(z)` (source bus, composed `f_r·f_z`, single mean-1 normalisation); built-ins: chopped cosine (T&K), tabulated (node-wise peaking factors) |
+| Integrated-power diagnostic       | ✓ `set_power` prints the exact FE integral of the fissile source per material per step (regime-weighted, MPI-reduced); note the mean-1 normalisation is *nodal*, so a radially peaked profile integrates to LHR·Lz·⟨f⟩_area/⟨f⟩_nodal (= 1.2·LHR·Lz for rim-peaking A=3, p=8) — pinned by the `total_power` checks in the burnup-family `V_` cases |
 | Fuel swelling                     | ✓ constant ΔV/V or burnup-driven eigenstrain (eigenstrain bus)                       |
 | Pellet-clad contact (PCMI)        | ✓ penalty contact + contact-coupled gap conductance (verified vs analytical Lamé)   |
 | Python material callables         | ✓ `k(T)`, `Gc(mesh)`, `radial_profile(r,bu)`, `eigenstrain(bu)` loaded via `importlib` |

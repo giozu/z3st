@@ -1,7 +1,7 @@
 Info    : Reading 'mesh.msh'...
 Info    : 9 entities
-Info    : 486 nodes
-Info    : 570 elements
+Info    : 966 nodes
+Info    : 1130 elements
 Info    : Done reading 'mesh.msh'
 
 
@@ -66,18 +66,18 @@ Material loaded: fuel
   → k defined as constant: 5.0
   → Gc not defined for fuel
   → constitutive model: lame
-  → radial_profile defined as callable: materials.fuel_profiles.rim_peaking
+  → axial_profile defined as callable: materials.fuel_profiles.tabulated_axial
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
 Initialized burnup field (fissile material present).
 
 Initializing the temperature field...
   → Setting initial temperature for material: 'fuel'
-    Set 486 DOFs to 300.00 K
+    Set 966 DOFs to 300.00 K
   Initial T: min=300.00 K, max=300.00 K, mean=300.00 K
 
 
@@ -105,7 +105,7 @@ Computing symbolic result fields (strain, stress, ...)
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
   → dt=0: solving static step / initial condition
 Computing symbolic result fields (strain, stress, ...)
 
@@ -138,10 +138,10 @@ Coupling = staggered
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
-  ||ΔT||/||T|| = 6.213e-01
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
+  ||ΔT||/||T|| = 6.397e-01
 
 Convergence check
 
@@ -152,9 +152,9 @@ Convergence check
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
   ||ΔT||/||T|| = 0.000e+00
 
 Convergence check
@@ -169,8 +169,8 @@ Computing symbolic result fields (strain, stress, ...)
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
-[update_state] burnup max = 1.3450e+01 MWd/kgU
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
+[update_state] burnup max = 6.3930e+00 MWd/kgU
 
 
 
@@ -201,9 +201,9 @@ Coupling = staggered
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
   ||ΔT||/||T|| = 0.000e+00
 
 Convergence check
@@ -218,8 +218,8 @@ Computing symbolic result fields (strain, stress, ...)
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
-[update_state] burnup max = 2.6900e+01 MWd/kgU
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
+[update_state] burnup max = 1.2786e+01 MWd/kgU
 
 
 
@@ -250,9 +250,9 @@ Coupling = staggered
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
   ||ΔT||/||T|| = 0.000e+00
 
 Convergence check
@@ -267,8 +267,8 @@ Computing symbolic result fields (strain, stress, ...)
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
-[update_state] burnup max = 4.0350e+01 MWd/kgU
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
+[update_state] burnup max = 1.9179e+01 MWd/kgU
 
 
 
@@ -299,9 +299,9 @@ Coupling = staggered
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
   ||ΔT||/||T|| = 0.000e+00
 
 Convergence check
@@ -316,8 +316,8 @@ Computing symbolic result fields (strain, stress, ...)
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
-[update_state] burnup max = 5.3800e+01 MWd/kgU
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
+[update_state] burnup max = 2.5572e+01 MWd/kgU
 
 
 
@@ -348,9 +348,9 @@ Coupling = staggered
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
   ||ΔT||/||T|| = 0.000e+00
 
 Convergence check
@@ -365,8 +365,8 @@ Computing symbolic result fields (strain, stress, ...)
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
-[update_state] burnup max = 6.7250e+01 MWd/kgU
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
+[update_state] burnup max = 3.1965e+01 MWd/kgU
 
 
 
@@ -397,9 +397,9 @@ Coupling = staggered
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
   ||ΔT||/||T|| = 0.000e+00
 
 Convergence check
@@ -414,8 +414,8 @@ Computing symbolic result fields (strain, stress, ...)
 Fissile material
   q_third += 3.787e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 7.764e+05 W/m2
-  **[INFO]** Integrated fissile power in fuel: 2.374619e+02 W
-[update_state] burnup max = 8.0701e+01 MWd/kgU
+  **[INFO]** Integrated fissile power in fuel: 8.028302e+03 W
+[update_state] burnup max = 3.8358e+01 MWd/kgU
 
 
 
@@ -446,9 +446,9 @@ Coupling = staggered
 **[INFO]** Assembling thermal problem...
 
   Building weak form, volume integrals (dx) for fuel, tag = 10
-  → q_third[fuel](W/m3) min = 2.81e+08, max = 1.12e+09, mean = 3.79e+08
+  → q_third[fuel](W/m3) min = 1.64e+08, max = 5.34e+08, mean = 3.79e+08
   Linear solver
-  T_new: min=600.00 K, max=864.54 K, mean=782.58 K
+  T_new: min=600.00 K, max=1057.86 K, mean=804.01 K
   ||ΔT||/||T|| = 0.000e+00
 
 Convergence check
@@ -456,5 +456,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 1 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 0.27 s
+Simulation completed in 0.34 s
 Total time steps solved: 7

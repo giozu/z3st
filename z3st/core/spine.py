@@ -200,6 +200,12 @@ class Spine(
                 print(f"  → radial_profile defined as callable: {mat['radial_profile']}")
                 mat["_radial_profile_func"] = self.resolve_function(mat["radial_profile"])
 
+            # Axial power form factor f(z) — same source-bus contract as the
+            # radial profile; composed multiplicatively in set_power.
+            if isinstance(mat.get("axial_profile"), str):
+                print(f"  → axial_profile defined as callable: {mat['axial_profile']}")
+                mat["_axial_profile_func"] = self.resolve_function(mat["axial_profile"])
+
             self.materials[name] = mat
             # Full per-key material dump only under --debug (CODE-P2-4)
             if "--debug" in sys.argv:
@@ -334,27 +340,31 @@ class Spine(
                 print("Fissile material")
                 q_val = self.lhr / self.area
 
-                # Radial power form factor f(r, bu) — the source bus. A fissile
-                # material may shape its own volumetric source through a callable
-                # ``radial_profile`` (resolved to ``_radial_profile_func``), the
-                # natural home of a TUBRNP-style rim profile later. The callable
-                # receives the dof coordinates and the *current* local burnup, so
-                # f can depend on both r and bu. Default (no callable): f ≡ 1, i.e.
-                # the flat source — so every existing fissile case is bit-identical.
+                # Power form factors — the source bus. A fissile material may
+                # shape its own volumetric source through the callables
+                # ``radial_profile`` f(r, bu) (the natural home of a TUBRNP-style
+                # rim profile later) and/or ``axial_profile`` f(z) (e.g. the
+                # chopped cosine). Each callable receives the dof coordinates and
+                # the *current* local burnup. The composite f_r·f_z is normalised
+                # ONCE to nodal mean 1, so the shaping *redistributes* the linear
+                # heat rate without changing its integral — with a single profile
+                # this reduces exactly to the previous behaviour. Default (no
+                # callables): f ≡ 1, the flat source.
                 shape = np.ones(len(dofs))
                 rprof = mat.get("_radial_profile_func")
-                if rprof is not None:
+                zprof = mat.get("_axial_profile_func")
+                if rprof is not None or zprof is not None:
                     coords = self.V_t.tabulate_dof_coordinates()[dofs]
                     bu_vals = (
                         self.burnup.x.array[dofs]
                         if self.burnup is not None
                         else np.zeros(len(dofs))
                     )
-                    shape = np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
-                    # Preserve total deposited power: normalise so the mean
-                    # multiplier over the fuel is 1 (the form factor *redistributes*
-                    # the linear heat rate radially, it does not change its
-                    # integral). Nodal-mean normalisation here; the area-weighted
+                    if rprof is not None:
+                        shape = shape * np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
+                    if zprof is not None:
+                        shape = shape * np.asarray(zprof(coords, bu_vals, mat, model=self), dtype=float)
+                    # Nodal-mean normalisation of the composite; the area-weighted
                     # integral refinement lands with the TUBRNP profile.
                     mean = shape.mean()
                     if mean > 0:
@@ -364,8 +374,32 @@ class Spine(
                 # material (e.g. fissile + gamma_heating below), they should
                 # add — not overwrite.
                 self.q_third.x.array[dofs] += q_val * shape
-                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu) (fissile, mean f = 1)")
+                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
+
+                # Integrated-power diagnostic: the exact FE integral of the
+                # fissile source over this material, with the regime weight
+                # (2πr in axisymmetric). For a rod this should track LHR·Lz;
+                # a radially peaked profile deviates slightly because the
+                # mean-1 normalisation is nodal, not area-weighted — printing
+                # the integral makes that approximation visible. The form is
+                # compiled once and cached (q_third updates in place).
+                if not hasattr(self, "_power_forms"):
+                    self._power_forms = {}
+                if name not in self._power_forms:
+                    x_sc = ufl.SpatialCoordinate(self.mesh)
+                    w_int = 2.0 * ufl.pi * x_sc[0] if self.regime == "axisymmetric" else 1.0
+                    dx_mat = ufl.Measure(
+                        "dx", domain=self.mesh,
+                        subdomain_data=self.cell_tags,
+                        subdomain_id=self.label_map[name],
+                    )
+                    self._power_forms[name] = dolfinx.fem.form(w_int * self.q_third * dx_mat)
+                P_int = dolfinx.fem.assemble_scalar(self._power_forms[name])
+                P_int = self.mesh.comm.allreduce(P_int, op=MPI.SUM)
+                unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
+                        "plane_stress": "W/m", "1d": "W/m²"}.get(self.regime, "W")
+                print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
                 # Cylindrical and spherical gamma-decay correlations use

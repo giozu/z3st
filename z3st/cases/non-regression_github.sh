@@ -35,6 +35,8 @@ CASES=(
     "V_swelling_verification"
     "V_burnup_verification"
     "V_fuel_swelling_verification"
+    "V_axial_power_verification"
+    "V_axial_table_verification"
 )
 SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 
