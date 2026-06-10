@@ -33,6 +33,9 @@ thermal:
     region: outer_2
     temperature: 580.0   # (K) coolant
 
+# He fill-gas pressure. Scalar Neumann traction acts along the outward facet
+# normal, so a pressure is always negative (compresses the surface). After
+# gap closure the penalty contact traction is added on top of this.
 mechanical:
   cyl_1:
   - type: Clamp_x
@@ -40,7 +43,14 @@ mechanical:
 
   - type: Clamp_y
     region: bottom_1      # u_z = 0 (symmetry plane)
-  # lateral_1 (pellet outer): free until penalty contact engages
+
+  - type: Neumann
+    region: lateral_1
+    traction: -2.0e+6     # (Pa) fill-gas pressure on pellet outer
+
+  - type: Neumann
+    region: top_1
+    traction: -2.0e+6     # (Pa) fill-gas pressure on pellet end face
 
   cyl_2:
   - type: Clamp_y
@@ -49,4 +59,7 @@ mechanical:
   - type: Neumann
     region: outer_2
     traction: -15.5e+6    # (Pa) coolant system pressure (inward)
-  # inner_2 (clad inner): free until penalty contact engages
+
+  - type: Neumann
+    region: inner_2
+    traction: -2.0e+6     # (Pa) fill-gas pressure on clad inner (pushes clad outward)

@@ -15,21 +15,21 @@
             "status": "PASS"
         },
         "gap_final_um": {
-            "numerical": -0.8061,
+            "numerical": -0.775,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "contact_pressure_final_MPa": {
-            "numerical": 40.3046,
+            "numerical": 38.7521,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "T_max_final_K": {
-            "numerical": 1101.39,
+            "numerical": 1103.48,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
