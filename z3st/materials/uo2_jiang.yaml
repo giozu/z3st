@@ -1,0 +1,10 @@
+name: "UO2_Jiang_2020_GB"
+E: 385.0e+9          # 385 GPa
+nu: 0.23             # Poisson ratio
+rho: 10970.0
+cp: 280.0
+alpha: 1.0e-5
+k: 5.0
+T_ref: 293.15
+T_initial: 293.15
+Gc: 2.0              # 2 J/m^2 (0.002 MPa.mm)
