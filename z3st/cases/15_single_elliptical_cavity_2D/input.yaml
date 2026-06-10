@@ -9,13 +9,15 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  solid: ../../materials/oxide.yaml
+  uo2: ../../materials/uo2_jiang.yaml
+
 
 regime: 2D
 
 solver_settings:
   coupling: staggered
-  max_iters: 100
+  # max_iters: 100
+  max_iters: 200
   relax_T: 0.9
   relax_u: 0.7
   relax_adaptive: true
@@ -27,13 +29,16 @@ solver_settings:
 models:
   thermal: false
   mechanical: true
+  damage: true
 
 mechanical:
   solver: linear
   order: 1
-  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
+  # linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
+  linear_solver: direct_mumps 
   rtol: 1.0e-6
-  stag_tol: 1.0e-6
+  # stag_tol: 1.0e-6
+  stag_tol: 1.0e-4
   convergence: rel_norm # rel_norm | norm
   debug: false
 
@@ -44,8 +49,30 @@ thermal:
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
 
-lhr:
-- 0
-time:
-- 0
-n_steps: 1
+#----------New---------------
+
+damage:
+  type: AT2
+  split: miehe
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-6
+  stag_tol: 1.0e-4
+  convergence: rel_norm
+  lc: 5.0e-7          # 0.5 µm like the article
+  hybrid_constraint: true
+
+# lhr:
+# - 0
+# time:
+# - 0
+# n_steps: 1
+
+# Fictive time for a static ramp
+n_steps: 100
+time: [0.0, 1.0]
+lhr: [0.0, 0.0]
+
+output:
+  format: vtu
+  filename: simulation.vtu

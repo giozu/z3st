@@ -1,13 +1,26 @@
 name: box_with_cavity
 geometry_type: rect
-Lx: 2.0
-Ly: 2.0
-ax: 0.06
-ay: 0.03464101615137754
+# Lx: 2.0
+# Ly: 2.0
+# ax: 0.06
+# ay: 0.03464101615137754
+
+Lx: 60.0e-6
+Ly: 60.0e-6
+
+# Approximation 2D of a lenticular bubble (Case i  of Jiang)
+cavity:
+  type: ellipse
+  x_c: 0.0
+  y_c: 0.0
+  ax: 7.9e-06
+  ay: 7.9e-06
+
+
 labels:
-  solid: 1
-  cavity: 2
-  ymin: 3
-  xmin: 4
-  xmax: 5
-  ymax: 6
+  uo2: 1
+  ymin: 2
+  xmin: 3
+  xmax: 4
+  ymax: 5
+  cavity: 6
