@@ -81,22 +81,6 @@ Material loaded: steel
   → Gc defined as constant: 2700.0
   - Material 'steel': sigma_c (AT2) from Gc = 2700.00 J/m2
   → constitutive model: lame
-  E               → 210000000000.0 (float)
-  G               → 80769230769.23077 (float)
-  Gc              → 2700.0 (float)
-  T_ref           → 293.15 (float)
-  alpha           → 1.1e-05 (float)
-  bulk_modulus    → 174999999999.99997 (float)
-  constitutive_mode → lame (str)
-  cp              → 470.0 (float)
-  gamma_heating   → 0.0 (float)
-  k               → 45.0 (float)
-  lmbda           → 121153846153.84615 (float)
-  mu_gamma        → 25.0 (float)
-  name            → high_carbon_steel (str)
-  nu              → 0.3 (float)
-  rho             → 7850.0 (float)
-  sigma_c         → 172917294.17556822 (float)
 [spine.initialize_fields]
 
 Initializing the displacement field...
@@ -359,5 +343,5 @@ Computing symbolic result fields (strain, stress, ...)
   → Fracture energy : 4.0841e+03 J
   → Total energy    : 3.9035e+04 J
 
-Simulation completed in 30.32 s
+Simulation completed in 19.48 s
 Total time steps solved: 1

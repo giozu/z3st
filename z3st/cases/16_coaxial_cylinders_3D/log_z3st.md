@@ -78,43 +78,10 @@ Material loaded: cyl_1
   → k defined as symbolic function: materials.ceramic.k
   → Gc not defined for cyl_1
   → constitutive model: lame
-  E               → 170000000000.0 (float)
-  G               → 65891472868.21705 (float)
-  T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7f1a8f3453a0> (function)
-  alpha           → 1.45e-05 (float)
-  bulk_modulus    → 134920634920.6349 (float)
-  constitutive_mode → lame (str)
-  cp              → 330.0 (float)
-  fissile         → True (bool)
-  gamma_heating   → 0.0 (float)
-  k               → materials.ceramic.k (str)
-  lmbda           → 90992986341.82355 (float)
-  mu_gamma        → 0.0 (float)
-  name            → ceramic (str)
-  nu              → 0.29 (float)
-  rho             → 11000.0 (float)
 Material loaded: cyl_2
   → k defined as constant: 50.0
   → Gc not defined for cyl_2
   → constitutive model: lame
-  E               → 200000000000.0 (float)
-  G               → 76923076923.07692 (float)
-  T_ref           → 300.0 (float)
-  alpha           → 1e-05 (float)
-  bulk_modulus    → 166666666666.66666 (float)
-  constitutive_mode → lame (str)
-  cp              → 200.0 (float)
-  gamma_heating   → 0.0 (float)
-  hardening_modulus → 10000000000.0 (float)
-  k               → 50.0 (float)
-  lmbda           → 115384615384.61539 (float)
-  mu_gamma        → 25.0 (float)
-  name            → steel (str)
-  nu              → 0.3 (float)
-  rho             → 8000.0 (float)
-  sigma_c         → 600000000.0 (float)
-  yield_strength  → 200000000.0 (float)
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
@@ -804,5 +771,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 80.51 s
+Simulation completed in 49.40 s
 Total time steps solved: 1

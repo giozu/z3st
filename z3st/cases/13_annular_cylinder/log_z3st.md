@@ -77,22 +77,6 @@ Material loaded: volume
   → k defined as symbolic function: materials.ceramic.k
   → Gc not defined for volume
   → constitutive model: lame
-  E               → 170000000000.0 (float)
-  G               → 65891472868.21705 (float)
-  T_ref           → 300.0 (float)
-  _k_func         → <function k at 0x7f3f5ee0d3a0> (function)
-  alpha           → 1.45e-05 (float)
-  bulk_modulus    → 134920634920.6349 (float)
-  constitutive_mode → lame (str)
-  cp              → 330.0 (float)
-  fissile         → True (bool)
-  gamma_heating   → 0.0 (float)
-  k               → materials.ceramic.k (str)
-  lmbda           → 90992986341.82355 (float)
-  mu_gamma        → 0.0 (float)
-  name            → ceramic (str)
-  nu              → 0.29 (float)
-  rho             → 11000.0 (float)
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
@@ -450,5 +434,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 5.39 s
+Simulation completed in 3.30 s
 Total time steps solved: 1

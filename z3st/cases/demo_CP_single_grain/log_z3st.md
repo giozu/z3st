@@ -69,23 +69,6 @@ Material loaded: grain
   → k defined as constant: 50.0
   → Gc not defined for grain
   → constitutive model: custom
-  E               → 200000000000.0 (float)
-  G               → 76923076923.07692 (float)
-  T_ref           → 300.0 (float)
-  alpha           → 1.2e-05 (float)
-  bulk_modulus    → 166666666666.66666 (float)
-  constitutive    → custom (str)
-  constitutive_mode → custom (str)
-  cp              → 400.0 (float)
-  g0              → 200000000.0 (float)
-  gamma0          → 0.001 (float)
-  k               → 50.0 (float)
-  lmbda           → 115384615384.61539 (float)
-  n_pow           → 5.0 (float)
-  name            → single_crystal (str)
-  nu              → 0.3 (float)
-  rho             → 7800.0 (float)
-  stress_function → single_crystal_law.single_crystal_stress (str)
 [spine.initialize_fields]
 
 Initializing the displacement field...
@@ -2463,5 +2446,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 8.92 s
+Simulation completed in 4.90 s
 Total time steps solved: 41

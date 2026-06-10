@@ -1,5 +1,5 @@
 Info    : Running '/home/giovanni/miniconda3/envs/z3st/bin/gmsh mesh.geo -2' [Gmsh 4.14.1, 1 node, max. 1 thread]
-Info    : Started on Tue Jun  9 23:22:51 2026
+Info    : Started on Wed Jun 10 10:26:05 2026
 Info    : Reading 'mesh.geo'...
 Info    : Done reading 'mesh.geo'
 Info    : Meshing 1D...
@@ -7,11 +7,11 @@ Info    : [  0%] Meshing curve 1 (Line)
 Info    : [ 30%] Meshing curve 2 (Line)
 Info    : [ 60%] Meshing curve 3 (Line)
 Info    : [ 80%] Meshing curve 4 (Line)
-Info    : Done meshing 1D (Wall 0.000511119s, CPU 0.000168s)
+Info    : Done meshing 1D (Wall 0.000613721s, CPU 0.000196s)
 Info    : Meshing 2D...
 Info    : Meshing surface 1 (Transfinite)
-Info    : Done meshing 2D (Wall 0.00175695s, CPU 0.000574s)
+Info    : Done meshing 2D (Wall 0.00163815s, CPU 0.00052s)
 Info    : 6561 nodes 6724 elements
 Info    : Writing 'mesh.msh'...
 Info    : Done writing 'mesh.msh'
-Info    : Stopped on Tue Jun  9 23:22:51 2026 (From start: Wall 0.0404768s, CPU 0.482293s)
+Info    : Stopped on Wed Jun 10 10:26:05 2026 (From start: Wall 0.019401s, CPU 0.466937s)

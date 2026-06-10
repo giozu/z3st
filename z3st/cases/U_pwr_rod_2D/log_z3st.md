@@ -1,39 +1,8 @@
-[INFO] Loading mesh from mesh.msh
 Info    : Reading 'mesh.msh'...
 Info    : 18 entities
 Info    : 992 nodes
 Info    : 1080 elements
 Info    : Done reading 'mesh.msh'
-[INFO] Mesh successfully loaded from Gmsh file.
-[INFO] Mesh topology dimension d=2
-[INFO] 
-Available volume tags (dx):
-[INFO]   Tag ID: 1
-[INFO]   Tag ID: 2
-[INFO] 
-Unique tags found in facet data: [1 2 3 4 5 6 7 8]
-[INFO] Label map loaded from geometry:
-[INFO]   bottom_1     → 1
-[INFO]   cyl_1        → 1
-[INFO]   bottom_2     → 2
-[INFO]   cyl_2        → 2
-[INFO]   lateral_1    → 3
-[INFO]   outer_2      → 4
-[INFO]   inner_2      → 5
-[INFO]   top_2        → 6
-[INFO]   top_1        → 7
-[INFO]   axis_1       → 8
-[INFO]   Lz = 0.010 m
-[INFO]   inner_radius_1 = 0.00e+00 m, outer_radius_1 = 4.50e-03 m
-[INFO]   inner_radius_2 = 4.56e-03 m, outer_radius_2 = 5.32e-03 m
-[INFO]   area = 6.362e-05 m², perimeter = 2.827e-02 m
-[INFO] === Mesh summary ===
-[INFO]   Topology dim: 2
-[INFO]   Facet dim: 1
-[INFO]   Num cells: 900
-[INFO]   Cell tags: {np.int32(1), np.int32(2)}
-[INFO]   Facet tags: {np.int32(1), np.int32(2), np.int32(3), np.int32(4), np.int32(5), np.int32(6), np.int32(7), np.int32(8)}
-[INFO]   Geometry type: cyl-cyl
 
 
 ***
@@ -115,46 +84,10 @@ Material loaded: cyl_1
   → constitutive model: lame
   → eigenstrain defined as callable: materials.fuel_swelling.solid_swelling
   → radial_profile defined as callable: materials.fuel_profiles.rim_peaking
-  E               → 200000000000.0 (float)
-  G               → 74349442379.18216 (float)
-  T_initial       → 580.0 (float)
-  T_ref           → 293.15 (float)
-  _eigenstrain_func → <function solid_swelling at 0x7fd960079080> (function)
-  _radial_profile_func → <function rim_peaking at 0x7fd960079300> (function)
-  alpha           → 1.1e-05 (float)
-  bulk_modulus    → 215053763440.86017 (float)
-  constitutive_mode → lame (str)
-  cp              → 280.0 (float)
-  eigenstrain     → materials.fuel_swelling.solid_swelling (str)
-  fissile         → True (bool)
-  heavy_metal_fraction → 0.8815 (float)
-  k               → 5.0 (float)
-  lmbda           → 165487468521.40543 (float)
-  name            → UO2-fuel (str)
-  nu              → 0.345 (float)
-  radial_peak_amplitude → 2.0 (float)
-  radial_peak_exponent → 8.0 (float)
-  radial_profile  → materials.fuel_profiles.rim_peaking (str)
-  rho             → 10970.0 (float)
-  swelling_rate   → 0.0007 (float)
 Material loaded: cyl_2
   → k defined as constant: 17.0
   → Gc not defined for cyl_2
   → constitutive model: lame
-  E               → 99300000000.0 (float)
-  G               → 36240875912.40876 (float)
-  T_initial       → 580.0 (float)
-  T_ref           → 300 (int)
-  alpha           → 7.5e-06 (float)
-  bulk_modulus    → 127307692307.6923 (float)
-  constitutive_mode → lame (str)
-  cp              → 350 (int)
-  k               → 17.0 (float)
-  lmbda           → 103147108366.08646 (float)
-  melting_temperature → 2123 (int)
-  name            → zircaloy-4 (str)
-  nu              → 0.37 (float)
-  rho             → 6500 (int)
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
@@ -12884,7 +12817,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 6.967e-12
+  ||ΔT||/||T|| = 6.966e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -12927,7 +12860,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 3.316e-12
+  ||ΔT||/||T|| = 3.322e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -12970,7 +12903,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 6.032e-13
+  ||ΔT||/||T|| = 5.971e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13013,7 +12946,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 2.943e-13
+  ||ΔT||/||T|| = 2.916e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13056,7 +12989,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.225e-13
+  ||ΔT||/||T|| = 1.157e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13099,7 +13032,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 5.295e-14
+  ||ΔT||/||T|| = 4.219e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13142,7 +13075,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 2.999e-14
+  ||ΔT||/||T|| = 3.455e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13185,7 +13118,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 2.753e-15
+  ||ΔT||/||T|| = 1.750e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13228,7 +13161,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 9.653e-16
+  ||ΔT||/||T|| = 1.536e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13271,7 +13204,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 2.143e-15
+  ||ΔT||/||T|| = 1.793e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13314,7 +13247,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.787e-15
+  ||ΔT||/||T|| = 3.484e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13357,7 +13290,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 4.176e-15
+  ||ΔT||/||T|| = 7.322e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13400,7 +13333,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 3.756e-15
+  ||ΔT||/||T|| = 8.110e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13443,7 +13376,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.900e-15
+  ||ΔT||/||T|| = 3.148e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13486,7 +13419,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.369e-15
+  ||ΔT||/||T|| = 6.376e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13529,7 +13462,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.453e-15
+  ||ΔT||/||T|| = 4.251e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13572,7 +13505,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.061e-14
+  ||ΔT||/||T|| = 6.103e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13615,7 +13548,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.404e-14
+  ||ΔT||/||T|| = 5.189e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13658,7 +13591,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 4.136e-15
+  ||ΔT||/||T|| = 7.718e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13701,7 +13634,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 4.841e-15
+  ||ΔT||/||T|| = 6.208e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13744,7 +13677,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 4.090e-15
+  ||ΔT||/||T|| = 3.601e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13787,7 +13720,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 1.013e-15
+  ||ΔT||/||T|| = 2.472e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13830,7 +13763,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 2.416e-15
+  ||ΔT||/||T|| = 5.621e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13873,7 +13806,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 5.676e-15
+  ||ΔT||/||T|| = 8.758e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13950,7 +13883,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 7.307e-16
+  ||ΔT||/||T|| = 2.150e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -13993,7 +13926,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1163.35 K, mean=953.34 K
-  ||ΔT||/||T|| = 6.056e-16
+  ||ΔT||/||T|| = 8.138e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -14939,7 +14872,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 4.246e-12
+  ||ΔT||/||T|| = 4.249e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -14982,7 +14915,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 2.730e-12
+  ||ΔT||/||T|| = 2.732e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15025,7 +14958,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 9.361e-13
+  ||ΔT||/||T|| = 9.310e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15068,7 +15001,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.485e-13
+  ||ΔT||/||T|| = 1.476e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15111,7 +15044,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 7.510e-14
+  ||ΔT||/||T|| = 6.734e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15154,7 +15087,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.674e-14
+  ||ΔT||/||T|| = 2.011e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15197,7 +15130,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.168e-14
+  ||ΔT||/||T|| = 1.090e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15240,7 +15173,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.371e-14
+  ||ΔT||/||T|| = 1.078e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15283,7 +15216,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 5.199e-15
+  ||ΔT||/||T|| = 4.432e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15326,7 +15259,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 7.532e-15
+  ||ΔT||/||T|| = 3.746e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15369,7 +15302,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 8.729e-15
+  ||ΔT||/||T|| = 3.033e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15412,7 +15345,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 5.568e-15
+  ||ΔT||/||T|| = 4.393e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15455,7 +15388,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 3.002e-15
+  ||ΔT||/||T|| = 3.248e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15498,7 +15431,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.111e-14
+  ||ΔT||/||T|| = 6.510e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15541,7 +15474,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 3.465e-15
+  ||ΔT||/||T|| = 4.345e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15584,7 +15517,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 2.847e-15
+  ||ΔT||/||T|| = 3.839e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15627,7 +15560,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 2.953e-15
+  ||ΔT||/||T|| = 4.427e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15670,7 +15603,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.836e-15
+  ||ΔT||/||T|| = 2.361e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15713,7 +15646,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 4.090e-15
+  ||ΔT||/||T|| = 2.877e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15756,7 +15689,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 3.980e-15
+  ||ΔT||/||T|| = 9.735e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15799,7 +15732,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.124e-14
+  ||ΔT||/||T|| = 8.645e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15842,7 +15775,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 7.993e-15
+  ||ΔT||/||T|| = 1.072e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15885,7 +15818,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 6.647e-16
+  ||ΔT||/||T|| = 1.703e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15928,7 +15861,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 6.166e-15
+  ||ΔT||/||T|| = 7.997e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -15971,7 +15904,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 3.820e-15
+  ||ΔT||/||T|| = 5.423e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -16014,7 +15947,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.901e-15
+  ||ΔT||/||T|| = 1.843e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -16057,7 +15990,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 2.336e-15
+  ||ΔT||/||T|| = 2.857e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -16100,7 +16033,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 5.101e-16
+  ||ΔT||/||T|| = 1.603e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -16143,7 +16076,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.298e-15
+  ||ΔT||/||T|| = 3.732e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -16186,7 +16119,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 6.795e-15
+  ||ΔT||/||T|| = 1.776e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -16263,7 +16196,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 5.306e-16
+  ||ΔT||/||T|| = 3.939e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -16306,7 +16239,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1153.62 K, mean=945.74 K
-  ||ΔT||/||T|| = 1.575e-15
+  ||ΔT||/||T|| = 1.297e-14
   [adaptive] relax_T=0.54
 
 **[INFO]** Assembling mechanical problem...
@@ -17596,7 +17529,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 6.498e-12
+  ||ΔT||/||T|| = 6.500e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17639,7 +17572,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 3.087e-12
+  ||ΔT||/||T|| = 3.085e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17682,7 +17615,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 2.320e-12
+  ||ΔT||/||T|| = 2.322e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17725,7 +17658,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 4.552e-13
+  ||ΔT||/||T|| = 4.575e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17768,7 +17701,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 5.552e-14
+  ||ΔT||/||T|| = 5.549e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17811,7 +17744,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 4.028e-14
+  ||ΔT||/||T|| = 3.715e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17854,7 +17787,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 7.847e-15
+  ||ΔT||/||T|| = 9.880e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17897,7 +17830,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 1.091e-14
+  ||ΔT||/||T|| = 6.950e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17940,7 +17873,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 1.662e-15
+  ||ΔT||/||T|| = 2.910e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -17983,7 +17916,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 9.690e-16
+  ||ΔT||/||T|| = 4.341e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18026,7 +17959,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 6.508e-15
+  ||ΔT||/||T|| = 1.579e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18069,7 +18002,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 5.705e-15
+  ||ΔT||/||T|| = 2.505e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18112,7 +18045,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 1.791e-15
+  ||ΔT||/||T|| = 3.343e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18155,7 +18088,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 3.972e-15
+  ||ΔT||/||T|| = 5.578e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18198,7 +18131,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 3.829e-15
+  ||ΔT||/||T|| = 5.297e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18241,7 +18174,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 8.445e-16
+  ||ΔT||/||T|| = 8.683e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18284,7 +18217,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 7.810e-16
+  ||ΔT||/||T|| = 4.479e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18327,7 +18260,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 3.565e-15
+  ||ΔT||/||T|| = 2.832e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18370,7 +18303,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 3.086e-15
+  ||ΔT||/||T|| = 1.430e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18413,7 +18346,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 1.205e-15
+  ||ΔT||/||T|| = 8.723e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18456,7 +18389,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 1.965e-15
+  ||ΔT||/||T|| = 4.895e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18533,7 +18466,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 7.936e-16
+  ||ΔT||/||T|| = 4.090e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -18576,8 +18509,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1144.53 K, mean=938.63 K
-  ||ΔT||/||T|| = 6.810e-15
-  [adaptive] relax_T=0.54
+  ||ΔT||/||T|| = 3.827e-15
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18619,8 +18552,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1137.51 K, mean=933.29 K
-  ||ΔT||/||T|| = 3.495e-03
-  [adaptive] relax_T=0.32
+  ||ΔT||/||T|| = 5.825e-03
+  [adaptive] relax_T=0.54
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18632,7 +18565,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+74.96 um, u_r(clad)=+9.56 um, gap=-0.39 um, p=19.589 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.222e-04
+  ||Δu||/||u|| = 6.754e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -18653,17 +18586,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 709.37 K
+  → Average gap temperature between cyl_1 and inner_2: 708.35 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4344.45 W/m²K
-  → h_open      = 4344.45 W/m²K, h_contact = 1420.33 W/m²K (gap closed)
+  → h_gap       = 4339.49 W/m²K
+  → h_open      = 4339.49 W/m²K, h_contact = 1420.33 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1135.71 K, mean=931.86 K
-  ||ΔT||/||T|| = 1.501e-03
-  [adaptive] relax_T=0.19
+  T_new: min=580.00 K, max=1136.33 K, mean=932.29 K
+  ||ΔT||/||T|| = 9.395e-04
+  [adaptive] relax_T=0.59
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18673,9 +18606,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.01 um, u_r(clad)=+9.61 um, gap=-0.40 um, p=19.759 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.00 um, u_r(clad)=+9.61 um, gap=-0.39 um, p=19.560 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.414e-04
+  ||Δu||/||u|| = 6.991e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -18696,17 +18629,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 708.62 K
+  → Average gap temperature between cyl_1 and inner_2: 707.68 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4340.81 W/m²K
-  → h_open      = 4340.81 W/m²K, h_contact = 1432.68 W/m²K (gap closed)
+  → h_gap       = 4336.24 W/m²K
+  → h_open      = 4336.24 W/m²K, h_contact = 1418.23 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1135.57 K, mean=931.73 K
-  ||ΔT||/||T|| = 6.328e-04
-  [adaptive] relax_T=0.21
+  T_new: min=580.00 K, max=1136.16 K, mean=932.14 K
+  ||ΔT||/||T|| = 5.709e-04
+  [adaptive] relax_T=0.65
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18716,9 +18649,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.06 um, u_r(clad)=+9.66 um, gap=-0.39 um, p=19.710 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.05 um, u_r(clad)=+9.66 um, gap=-0.39 um, p=19.471 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.719e-04
+  ||Δu||/||u|| = 7.273e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -18739,17 +18672,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 708.28 K
+  → Average gap temperature between cyl_1 and inner_2: 707.22 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4339.14 W/m²K
-  → h_open      = 4339.14 W/m²K, h_contact = 1429.11 W/m²K (gap closed)
+  → h_gap       = 4334.04 W/m²K
+  → h_open      = 4334.04 W/m²K, h_contact = 1411.78 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1135.73 K, mean=931.83 K
-  ||ΔT||/||T|| = 5.303e-04
-  [adaptive] relax_T=0.24
+  T_new: min=580.00 K, max=1136.12 K, mean=932.09 K
+  ||ΔT||/||T|| = 2.845e-04
+  [adaptive] relax_T=0.72
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18759,10 +18692,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.11 um, u_r(clad)=+9.72 um, gap=-0.39 um, p=19.626 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.10 um, u_r(clad)=+9.71 um, gap=-0.39 um, p=19.384 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.016e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 7.608e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -18782,17 +18715,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 707.97 K
+  → Average gap temperature between cyl_1 and inner_2: 706.95 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4337.67 W/m²K
-  → h_open      = 4337.67 W/m²K, h_contact = 1423.01 W/m²K (gap closed)
+  → h_gap       = 4332.73 W/m²K
+  → h_open      = 4332.73 W/m²K, h_contact = 1405.51 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1135.92 K, mean=931.96 K
-  ||ΔT||/||T|| = 4.178e-04
-  [adaptive] relax_T=0.26
+  T_new: min=580.00 K, max=1136.11 K, mean=932.07 K
+  ||ΔT||/||T|| = 1.240e-04
+  [adaptive] relax_T=0.79
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18802,9 +18735,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.16 um, u_r(clad)=+9.77 um, gap=-0.39 um, p=19.537 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.15 um, u_r(clad)=+9.77 um, gap=-0.39 um, p=19.329 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.678e-04
+  ||Δu||/||u|| = 7.982e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -18825,17 +18758,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 707.71 K
+  → Average gap temperature between cyl_1 and inner_2: 706.81 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4336.41 W/m²K
-  → h_open      = 4336.41 W/m²K, h_contact = 1416.60 W/m²K (gap closed)
+  → h_gap       = 4332.03 W/m²K
+  → h_open      = 4332.03 W/m²K, h_contact = 1401.49 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.08 K, mean=932.08 K
-  ||ΔT||/||T|| = 3.134e-04
-  [adaptive] relax_T=0.28
+  T_new: min=580.00 K, max=1136.09 K, mean=932.05 K
+  ||ΔT||/||T|| = 5.815e-05
+  [adaptive] relax_T=0.87
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18845,10 +18778,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.20 um, u_r(clad)=+9.81 um, gap=-0.39 um, p=19.486 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.21 um, u_r(clad)=+9.82 um, gap=-0.39 um, p=19.303 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.976e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 5.195e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -18868,17 +18801,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 707.50 K
+  → Average gap temperature between cyl_1 and inner_2: 706.73 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4335.37 W/m²K
-  → h_open      = 4335.37 W/m²K, h_contact = 1412.89 W/m²K (gap closed)
+  → h_gap       = 4331.67 W/m²K
+  → h_open      = 4331.67 W/m²K, h_contact = 1399.66 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.13 K, mean=932.11 K
-  ||ΔT||/||T|| = 2.426e-04
-  [adaptive] relax_T=0.31
+  T_new: min=580.00 K, max=1136.06 K, mean=932.02 K
+  ||ΔT||/||T|| = 3.413e-05
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18888,9 +18821,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.24 um, u_r(clad)=+9.86 um, gap=-0.39 um, p=19.434 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.24 um, u_r(clad)=+9.86 um, gap=-0.39 um, p=19.298 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.283e-04
+  ||Δu||/||u|| = 5.535e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -18911,17 +18844,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 707.32 K
+  → Average gap temperature between cyl_1 and inner_2: 706.70 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4334.50 W/m²K
-  → h_open      = 4334.50 W/m²K, h_contact = 1409.15 W/m²K (gap closed)
+  → h_gap       = 4331.49 W/m²K
+  → h_open      = 4331.49 W/m²K, h_contact = 1399.25 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.17 K, mean=932.13 K
-  ||ΔT||/||T|| = 1.808e-04
-  [adaptive] relax_T=0.34
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 2.382e-05
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18931,9 +18864,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.29 um, u_r(clad)=+9.90 um, gap=-0.39 um, p=19.390 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.28 um, u_r(clad)=+9.90 um, gap=-0.39 um, p=19.293 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.599e-04
+  ||Δu||/||u|| = 5.880e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -18954,17 +18887,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 707.17 K
+  → Average gap temperature between cyl_1 and inner_2: 706.68 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4333.78 W/m²K
-  → h_open      = 4333.78 W/m²K, h_contact = 1405.97 W/m²K (gap closed)
+  → h_gap       = 4331.39 W/m²K
+  → h_open      = 4331.39 W/m²K, h_contact = 1398.91 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.19 K, mean=932.14 K
-  ||ΔT||/||T|| = 1.329e-04
-  [adaptive] relax_T=0.38
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 4.245e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -18974,10 +18907,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.33 um, u_r(clad)=+9.95 um, gap=-0.39 um, p=19.358 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.32 um, u_r(clad)=+9.94 um, gap=-0.39 um, p=19.289 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.919e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 6.231e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -18997,17 +18930,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 707.05 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4333.20 W/m²K
-  → h_open      = 4333.20 W/m²K, h_contact = 1403.58 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.62 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.18 K, mean=932.12 K
-  ||ΔT||/||T|| = 9.981e-05
-  [adaptive] relax_T=0.42
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 1.256e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19017,9 +18950,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.38 um, u_r(clad)=+9.99 um, gap=-0.39 um, p=19.335 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.36 um, u_r(clad)=+9.98 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.493e-04
+  ||Δu||/||u|| = 6.580e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -19040,17 +18973,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.95 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4332.74 W/m²K
-  → h_open      = 4332.74 W/m²K, h_contact = 1401.96 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.50 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.15 K, mean=932.10 K
-  ||ΔT||/||T|| = 7.816e-05
-  [adaptive] relax_T=0.46
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 7.027e-07
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19060,10 +18993,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.41 um, u_r(clad)=+10.03 um, gap=-0.39 um, p=19.326 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.41 um, u_r(clad)=+10.02 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.775e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.297e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -19083,17 +19016,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.88 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4332.37 W/m²K
-  → h_open      = 4332.37 W/m²K, h_contact = 1401.31 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.11 K, mean=932.07 K
-  ||ΔT||/||T|| = 6.790e-05
-  [adaptive] relax_T=0.50
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 2.840e-08
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19103,9 +19036,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.44 um, u_r(clad)=+10.06 um, gap=-0.39 um, p=19.317 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.44 um, u_r(clad)=+10.05 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.060e-04
+  ||Δu||/||u|| = 4.585e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19126,17 +19059,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.81 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4332.06 W/m²K
-  → h_open      = 4332.06 W/m²K, h_contact = 1400.64 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.09 K, mean=932.04 K
-  ||ΔT||/||T|| = 5.315e-05
-  [adaptive] relax_T=0.55
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 1.049e-07
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19146,9 +19079,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.48 um, u_r(clad)=+10.09 um, gap=-0.39 um, p=19.308 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.47 um, u_r(clad)=+10.09 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.347e-04
+  ||Δu||/||u|| = 4.877e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19169,17 +19102,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.76 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4331.82 W/m²K
-  → h_open      = 4331.82 W/m²K, h_contact = 1399.98 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.07 K, mean=932.03 K
-  ||ΔT||/||T|| = 3.772e-05
-  [adaptive] relax_T=0.61
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 3.069e-08
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19189,10 +19122,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.52 um, u_r(clad)=+10.13 um, gap=-0.39 um, p=19.300 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.51 um, u_r(clad)=+10.12 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.634e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 5.170e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -19212,17 +19145,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.73 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4331.64 W/m²K
-  → h_open      = 4331.64 W/m²K, h_contact = 1399.43 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.06 K, mean=932.02 K
-  ||ΔT||/||T|| = 2.467e-05
-  [adaptive] relax_T=0.67
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 6.803e-09
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19232,9 +19165,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.56 um, u_r(clad)=+10.17 um, gap=-0.39 um, p=19.295 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.54 um, u_r(clad)=+10.16 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.673e-04
+  ||Δu||/||u|| = 5.460e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -19255,17 +19188,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.70 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4331.52 W/m²K
-  → h_open      = 4331.52 W/m²K, h_contact = 1399.03 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.05 K, mean=932.01 K
-  ||ΔT||/||T|| = 1.529e-05
-  [adaptive] relax_T=0.74
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 1.169e-09
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19275,10 +19208,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.58 um, u_r(clad)=+10.20 um, gap=-0.39 um, p=19.293 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.58 um, u_r(clad)=+10.19 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.915e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.565e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -19298,17 +19231,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.69 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4331.45 W/m²K
-  → h_open      = 4331.45 W/m²K, h_contact = 1398.87 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1136.04 K, mean=932.01 K
-  ||ΔT||/||T|| = 1.110e-05
-  [adaptive] relax_T=0.81
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 3.642e-10
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19318,9 +19251,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.61 um, u_r(clad)=+10.22 um, gap=-0.39 um, p=19.291 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.60 um, u_r(clad)=+10.22 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.161e-04
+  ||Δu||/||u|| = 3.804e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19341,17 +19274,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 706.68 K
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4331.40 W/m²K
-  → h_open      = 4331.40 W/m²K, h_contact = 1398.72 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 5.428e-06
-  [adaptive] relax_T=0.89
+  ||ΔT||/||T|| = 5.278e-10
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -19361,9 +19294,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.64 um, u_r(clad)=+10.25 um, gap=-0.39 um, p=19.289 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.63 um, u_r(clad)=+10.24 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.409e-04
+  ||Δu||/||u|| = 4.047e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19387,13 +19320,13 @@ Convergence check
   → Average gap temperature between cyl_1 and inner_2: 706.67 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4331.37 W/m²K
-  → h_open      = 4331.37 W/m²K, h_contact = 1398.60 W/m²K (gap closed)
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.835e-06
+  ||ΔT||/||T|| = 7.839e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19404,10 +19337,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.67 um, u_r(clad)=+10.28 um, gap=-0.39 um, p=19.288 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.66 um, u_r(clad)=+10.27 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.655e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 4.290e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -19431,12 +19364,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4331.36 W/m²K
-  → h_open      = 4331.36 W/m²K, h_contact = 1398.52 W/m²K (gap closed)
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 4.394e-07
+  ||ΔT||/||T|| = 1.554e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19447,9 +19380,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.70 um, u_r(clad)=+10.31 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.69 um, u_r(clad)=+10.30 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.040e-04
+  ||Δu||/||u|| = 4.530e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -19474,12 +19407,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4331.36 W/m²K
-  → h_open      = 4331.36 W/m²K, h_contact = 1398.49 W/m²K (gap closed)
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.093e-07
+  ||ΔT||/||T|| = 9.885e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19492,8 +19425,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+75.72 um, u_r(clad)=+10.33 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.244e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.958e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -19517,12 +19450,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4331.36 W/m²K
-  → h_open      = 4331.36 W/m²K, h_contact = 1398.49 W/m²K (gap closed)
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.508e-07
+  ||ΔT||/||T|| = 5.748e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19533,9 +19466,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.74 um, u_r(clad)=+10.36 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.74 um, u_r(clad)=+10.35 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.450e-04
+  ||Δu||/||u|| = 3.157e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19565,7 +19498,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.729e-08
+  ||ΔT||/||T|| = 1.902e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19576,9 +19509,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.77 um, u_r(clad)=+10.38 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.76 um, u_r(clad)=+10.38 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.657e-04
+  ||Δu||/||u|| = 3.358e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19608,7 +19541,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 9.212e-09
+  ||ΔT||/||T|| = 4.764e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19619,10 +19552,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.79 um, u_r(clad)=+10.41 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.78 um, u_r(clad)=+10.40 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.862e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.559e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -19651,7 +19584,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 4.251e-09
+  ||ΔT||/||T|| = 9.495e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19662,9 +19595,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.82 um, u_r(clad)=+10.43 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.81 um, u_r(clad)=+10.42 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.522e-04
+  ||Δu||/||u|| = 3.759e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -19694,7 +19627,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 2.097e-10
+  ||ΔT||/||T|| = 2.558e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19707,8 +19640,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+75.84 um, u_r(clad)=+10.45 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.691e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.455e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -19737,7 +19670,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 4.949e-10
+  ||ΔT||/||T|| = 7.701e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19748,9 +19681,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.86 um, u_r(clad)=+10.47 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.85 um, u_r(clad)=+10.47 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.863e-04
+  ||Δu||/||u|| = 2.619e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19780,7 +19713,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.713e-10
+  ||ΔT||/||T|| = 1.044e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19791,9 +19724,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.87 um, u_r(clad)=+10.49 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.87 um, u_r(clad)=+10.48 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.035e-04
+  ||Δu||/||u|| = 2.786e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19823,7 +19756,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 4.333e-11
+  ||ΔT||/||T|| = 1.588e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19834,10 +19767,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.90 um, u_r(clad)=+10.51 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.89 um, u_r(clad)=+10.50 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.205e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.953e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -19866,7 +19799,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 5.812e-12
+  ||ΔT||/||T|| = 9.621e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19877,9 +19810,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.92 um, u_r(clad)=+10.53 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.91 um, u_r(clad)=+10.52 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.093e-04
+  ||Δu||/||u|| = 3.119e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -19909,7 +19842,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 2.183e-12
+  ||ΔT||/||T|| = 3.334e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19922,8 +19855,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+75.93 um, u_r(clad)=+10.55 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.233e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.037e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -19952,7 +19885,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 2.743e-12
+  ||ΔT||/||T|| = 3.416e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -19965,7 +19898,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+75.95 um, u_r(clad)=+10.56 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.375e-04
+  ||Δu||/||u|| = 2.173e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -19995,7 +19928,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 3.531e-13
+  ||ΔT||/||T|| = 3.416e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20006,9 +19939,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.96 um, u_r(clad)=+10.58 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.96 um, u_r(clad)=+10.57 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.518e-04
+  ||Δu||/||u|| = 2.312e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20038,7 +19971,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 9.619e-14
+  ||ΔT||/||T|| = 1.159e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20049,10 +19982,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+75.98 um, u_r(clad)=+10.60 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.98 um, u_r(clad)=+10.59 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.659e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.450e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -20081,7 +20014,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 5.901e-14
+  ||ΔT||/||T|| = 1.728e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20092,9 +20025,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.00 um, u_r(clad)=+10.61 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+75.99 um, u_r(clad)=+10.61 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.736e-04
+  ||Δu||/||u|| = 2.588e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -20124,7 +20057,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 6.872e-15
+  ||ΔT||/||T|| = 2.829e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20137,8 +20070,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+76.01 um, u_r(clad)=+10.63 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.853e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.690e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -20167,7 +20100,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 8.185e-15
+  ||ΔT||/||T|| = 7.352e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20178,9 +20111,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.03 um, u_r(clad)=+10.64 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.02 um, u_r(clad)=+10.64 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.971e-04
+  ||Δu||/||u|| = 1.803e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20210,7 +20143,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.369e-15
+  ||ΔT||/||T|| = 2.403e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20223,7 +20156,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+76.04 um, u_r(clad)=+10.65 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.089e-04
+  ||Δu||/||u|| = 1.918e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20253,7 +20186,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 4.625e-15
+  ||ΔT||/||T|| = 2.883e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20264,10 +20197,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.05 um, u_r(clad)=+10.67 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.05 um, u_r(clad)=+10.66 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.206e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.033e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -20296,7 +20229,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 3.898e-15
+  ||ΔT||/||T|| = 2.418e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20307,9 +20240,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.07 um, u_r(clad)=+10.68 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.06 um, u_r(clad)=+10.68 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.441e-04
+  ||Δu||/||u|| = 2.147e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -20339,7 +20272,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 5.928e-15
+  ||ΔT||/||T|| = 4.385e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20352,8 +20285,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+76.08 um, u_r(clad)=+10.69 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.537e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.402e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -20382,7 +20315,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.573e-15
+  ||ΔT||/||T|| = 9.536e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20395,7 +20328,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+76.09 um, u_r(clad)=+10.70 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.635e-04
+  ||Δu||/||u|| = 1.496e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20425,7 +20358,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.896e-15
+  ||ΔT||/||T|| = 1.029e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20438,7 +20371,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+76.10 um, u_r(clad)=+10.71 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.733e-04
+  ||Δu||/||u|| = 1.591e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20468,7 +20401,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 2.312e-15
+  ||ΔT||/||T|| = 7.885e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20479,10 +20412,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.11 um, u_r(clad)=+10.73 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.11 um, u_r(clad)=+10.72 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.831e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.687e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -20511,7 +20444,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 1.753e-15
+  ||ΔT||/||T|| = 5.797e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20522,9 +20455,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.13 um, u_r(clad)=+10.74 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.12 um, u_r(clad)=+10.73 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.195e-04
+  ||Δu||/||u|| = 1.782e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -20554,7 +20487,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 4.789e-16
+  ||ΔT||/||T|| = 2.643e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20567,8 +20500,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+76.13 um, u_r(clad)=+10.75 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.276e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.163e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -20597,7 +20530,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 3.219e-15
+  ||ΔT||/||T|| = 3.053e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20608,9 +20541,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.14 um, u_r(clad)=+10.76 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.14 um, u_r(clad)=+10.75 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.357e-04
+  ||Δu||/||u|| = 1.241e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20640,7 +20573,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 2.779e-15
+  ||ΔT||/||T|| = 6.350e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20651,9 +20584,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.15 um, u_r(clad)=+10.77 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.15 um, u_r(clad)=+10.76 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.438e-04
+  ||Δu||/||u|| = 1.320e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20683,7 +20616,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 3.935e-15
+  ||ΔT||/||T|| = 2.358e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20694,10 +20627,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.16 um, u_r(clad)=+10.78 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.16 um, u_r(clad)=+10.77 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.519e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.400e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -20726,7 +20659,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 3.708e-15
+  ||ΔT||/||T|| = 8.542e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20737,14 +20670,57 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.17 um, u_r(clad)=+10.79 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.17 um, u_r(clad)=+10.78 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 9.919e-05
+  ||Δu||/||u|| = 1.478e-04
   [adaptive] relax_u=0.03
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 52 iterations.
+
+#### Iteration 53/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 706.67 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4331.36 W/m²K
+  → h_open      = 4331.36 W/m²K, h_contact = 1398.48 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
+  ||ΔT||/||T|| = 2.522e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+76.18 um, u_r(clad)=+10.79 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 9.653e-05
+  [adaptive] relax_u=0.03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 53 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
 
@@ -20803,7 +20779,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 3.351e-15
+  ||ΔT||/||T|| = 1.036e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -20814,9 +20790,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.18 um, u_r(clad)=+10.79 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.18 um, u_r(clad)=+10.80 um, gap=-0.39 um, p=19.287 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.540e-04
+  ||Δu||/||u|| = 8.514e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -20846,8 +20822,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1136.04 K, mean=932.00 K
-  ||ΔT||/||T|| = 2.596e-15
-  [adaptive] relax_T=0.90
+  ||ΔT||/||T|| = 3.872e-15
+  [adaptive] relax_T=0.54
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -20857,9 +20833,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.25 um, u_r(clad)=+10.80 um, gap=-0.45 um, p=22.324 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.25 um, u_r(clad)=+10.81 um, gap=-0.45 um, p=22.324 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.639e-04
+  ||Δu||/||u|| = 8.612e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -20889,8 +20865,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1129.65 K, mean=927.15 K
-  ||ΔT||/||T|| = 5.341e-03
-  [adaptive] relax_T=0.54
+  ||ΔT||/||T|| = 3.205e-03
+  [adaptive] relax_T=0.32
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -20900,9 +20876,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.31 um, u_r(clad)=+10.84 um, gap=-0.47 um, p=23.576 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.32 um, u_r(clad)=+10.85 um, gap=-0.47 um, p=23.576 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.762e-04
+  ||Δu||/||u|| = 7.157e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -20923,17 +20899,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 704.36 K
+  → Average gap temperature between cyl_1 and inner_2: 705.28 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4320.16 W/m²K
-  → h_open      = 4320.16 W/m²K, h_contact = 1709.44 W/m²K (gap closed)
+  → h_gap       = 4324.64 W/m²K
+  → h_open      = 4324.64 W/m²K, h_contact = 1709.44 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.58 K, mean=926.24 K
-  ||ΔT||/||T|| = 8.600e-04
-  [adaptive] relax_T=0.59
+  T_new: min=580.00 K, max=1128.01 K, mean=925.84 K
+  ||ΔT||/||T|| = 1.376e-03
+  [adaptive] relax_T=0.19
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -20943,9 +20919,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.36 um, u_r(clad)=+10.89 um, gap=-0.47 um, p=23.591 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.37 um, u_r(clad)=+10.89 um, gap=-0.48 um, p=23.772 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.032e-04
+  ||Δu||/||u|| = 7.385e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -20966,17 +20942,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 703.74 K
+  → Average gap temperature between cyl_1 and inner_2: 704.60 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4317.19 W/m²K
-  → h_open      = 4317.19 W/m²K, h_contact = 1710.52 W/m²K (gap closed)
+  → h_gap       = 4321.33 W/m²K
+  → h_open      = 4321.33 W/m²K, h_contact = 1723.69 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.33 K, mean=926.02 K
-  ||ΔT||/||T|| = 5.776e-04
-  [adaptive] relax_T=0.65
+  T_new: min=580.00 K, max=1127.84 K, mean=925.68 K
+  ||ΔT||/||T|| = 5.903e-04
+  [adaptive] relax_T=0.21
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -20986,9 +20962,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.41 um, u_r(clad)=+10.94 um, gap=-0.47 um, p=23.531 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.42 um, u_r(clad)=+10.94 um, gap=-0.47 um, p=23.749 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.327e-04
+  ||Δu||/||u|| = 7.709e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -21009,17 +20985,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 703.30 K
+  → Average gap temperature between cyl_1 and inner_2: 704.28 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4315.04 W/m²K
-  → h_open      = 4315.04 W/m²K, h_contact = 1706.20 W/m²K (gap closed)
+  → h_gap       = 4319.80 W/m²K
+  → h_open      = 4319.80 W/m²K, h_contact = 1721.98 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.24 K, mean=925.93 K
-  ||ΔT||/||T|| = 3.183e-04
-  [adaptive] relax_T=0.72
+  T_new: min=580.00 K, max=1127.93 K, mean=925.73 K
+  ||ΔT||/||T|| = 5.052e-04
+  [adaptive] relax_T=0.24
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21029,9 +21005,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.46 um, u_r(clad)=+10.99 um, gap=-0.47 um, p=23.457 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.47 um, u_r(clad)=+11.00 um, gap=-0.47 um, p=23.681 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.662e-04
+  ||Δu||/||u|| = 8.020e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -21052,17 +21028,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 703.02 K
+  → Average gap temperature between cyl_1 and inner_2: 703.99 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4313.69 W/m²K
-  → h_open      = 4313.69 W/m²K, h_contact = 1700.80 W/m²K (gap closed)
+  → h_gap       = 4318.41 W/m²K
+  → h_open      = 4318.41 W/m²K, h_contact = 1717.05 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.20 K, mean=925.89 K
-  ||ΔT||/||T|| = 1.514e-04
-  [adaptive] relax_T=0.79
+  T_new: min=580.00 K, max=1128.07 K, mean=925.83 K
+  ||ΔT||/||T|| = 4.060e-04
+  [adaptive] relax_T=0.26
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21072,9 +21048,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.51 um, u_r(clad)=+11.04 um, gap=-0.47 um, p=23.402 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.53 um, u_r(clad)=+11.06 um, gap=-0.47 um, p=23.601 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.485e-04
+  ||Δu||/||u|| = 5.687e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -21095,17 +21071,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.86 K
+  → Average gap temperature between cyl_1 and inner_2: 703.75 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.93 W/m²K
-  → h_open      = 4312.93 W/m²K, h_contact = 1696.82 W/m²K (gap closed)
+  → h_gap       = 4317.21 W/m²K
+  → h_open      = 4317.21 W/m²K, h_contact = 1711.30 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.17 K, mean=925.86 K
-  ||ΔT||/||T|| = 7.125e-05
-  [adaptive] relax_T=0.87
+  T_new: min=580.00 K, max=1128.20 K, mean=925.92 K
+  ||ΔT||/||T|| = 3.108e-04
+  [adaptive] relax_T=0.28
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21115,9 +21091,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.55 um, u_r(clad)=+11.08 um, gap=-0.47 um, p=23.382 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.57 um, u_r(clad)=+11.10 um, gap=-0.47 um, p=23.553 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.833e-04
+  ||Δu||/||u|| = 5.989e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -21138,17 +21114,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.78 K
+  → Average gap temperature between cyl_1 and inner_2: 703.54 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.53 W/m²K
-  → h_open      = 4312.53 W/m²K, h_contact = 1695.41 W/m²K (gap closed)
+  → h_gap       = 4316.20 W/m²K
+  → h_open      = 4316.20 W/m²K, h_contact = 1707.80 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.13 K, mean=925.83 K
-  ||ΔT||/||T|| = 5.198e-05
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.24 K, mean=925.94 K
+  ||ΔT||/||T|| = 2.431e-04
+  [adaptive] relax_T=0.31
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21158,9 +21134,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.59 um, u_r(clad)=+11.12 um, gap=-0.47 um, p=23.369 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.61 um, u_r(clad)=+11.14 um, gap=-0.47 um, p=23.503 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.189e-04
+  ||Δu||/||u|| = 6.299e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -21181,17 +21157,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.73 K
+  → Average gap temperature between cyl_1 and inner_2: 703.36 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.29 W/m²K
-  → h_open      = 4312.29 W/m²K, h_contact = 1694.44 W/m²K (gap closed)
+  → h_gap       = 4315.35 W/m²K
+  → h_open      = 4315.35 W/m²K, h_contact = 1704.19 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.592e-05
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.27 K, mean=925.96 K
+  ||ΔT||/||T|| = 1.836e-04
+  [adaptive] relax_T=0.34
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21201,10 +21177,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.64 um, u_r(clad)=+11.17 um, gap=-0.47 um, p=23.359 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.65 um, u_r(clad)=+11.19 um, gap=-0.47 um, p=23.460 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.554e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 6.617e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -21224,17 +21200,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 703.22 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.20 W/m²K
-  → h_open      = 4312.20 W/m²K, h_contact = 1693.74 W/m²K (gap closed)
+  → h_gap       = 4314.64 W/m²K
+  → h_open      = 4314.64 W/m²K, h_contact = 1701.05 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.759e-06
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.28 K, mean=925.96 K
+  ||ΔT||/||T|| = 1.369e-04
+  [adaptive] relax_T=0.38
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21244,9 +21220,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.68 um, u_r(clad)=+11.21 um, gap=-0.47 um, p=23.355 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.70 um, u_r(clad)=+11.23 um, gap=-0.47 um, p=23.427 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.726e-04
+  ||Δu||/||u|| = 6.938e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -21267,17 +21243,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 703.10 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.18 W/m²K
-  → h_open      = 4312.18 W/m²K, h_contact = 1693.40 W/m²K (gap closed)
+  → h_gap       = 4314.07 W/m²K
+  → h_open      = 4314.07 W/m²K, h_contact = 1698.65 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.155e-06
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.27 K, mean=925.95 K
+  ||ΔT||/||T|| = 1.038e-04
+  [adaptive] relax_T=0.42
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21287,10 +21263,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.71 um, u_r(clad)=+11.25 um, gap=-0.47 um, p=23.354 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.75 um, u_r(clad)=+11.28 um, gap=-0.47 um, p=23.404 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.043e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.505e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -21310,17 +21286,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 703.00 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.34 W/m²K (gap closed)
+  → h_gap       = 4313.60 W/m²K
+  → h_open      = 4313.60 W/m²K, h_contact = 1697.00 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 7.319e-07
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.24 K, mean=925.92 K
+  ||ΔT||/||T|| = 8.157e-05
+  [adaptive] relax_T=0.46
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21330,9 +21306,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.75 um, u_r(clad)=+11.28 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.78 um, u_r(clad)=+11.31 um, gap=-0.47 um, p=23.395 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.364e-04
+  ||Δu||/||u|| = 4.788e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -21353,17 +21329,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 702.92 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.32 W/m²K (gap closed)
+  → h_gap       = 4313.22 W/m²K
+  → h_open      = 4313.22 W/m²K, h_contact = 1696.31 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.425e-07
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.20 K, mean=925.89 K
+  ||ΔT||/||T|| = 7.039e-05
+  [adaptive] relax_T=0.50
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21373,10 +21349,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.79 um, u_r(clad)=+11.32 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.82 um, u_r(clad)=+11.35 um, gap=-0.47 um, p=23.385 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.686e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 5.073e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -21396,17 +21372,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 702.86 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.91 W/m²K
+  → h_open      = 4312.91 W/m²K, h_contact = 1695.60 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 8.981e-08
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.17 K, mean=925.86 K
+  ||ΔT||/||T|| = 5.524e-05
+  [adaptive] relax_T=0.55
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21416,10 +21392,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.83 um, u_r(clad)=+11.36 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.85 um, u_r(clad)=+11.38 um, gap=-0.47 um, p=23.375 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.101e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 5.361e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -21439,17 +21415,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 702.81 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.66 W/m²K
+  → h_open      = 4312.66 W/m²K, h_contact = 1694.91 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.996e-08
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.15 K, mean=925.85 K
+  ||ΔT||/||T|| = 3.973e-05
+  [adaptive] relax_T=0.61
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21459,10 +21435,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.86 um, u_r(clad)=+11.39 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.89 um, u_r(clad)=+11.42 um, gap=-0.47 um, p=23.367 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.376e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 5.648e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -21482,17 +21458,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 702.77 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.48 W/m²K
+  → h_open      = 4312.48 W/m²K, h_contact = 1694.33 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.417e-09
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.14 K, mean=925.84 K
+  ||ΔT||/||T|| = 2.659e-05
+  [adaptive] relax_T=0.67
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21502,10 +21478,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.89 um, u_r(clad)=+11.42 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.93 um, u_r(clad)=+11.46 um, gap=-0.47 um, p=23.362 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.655e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.682e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -21525,17 +21501,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 702.75 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.35 W/m²K
+  → h_open      = 4312.35 W/m²K, h_contact = 1693.91 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 5.285e-10
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.13 K, mean=925.83 K
+  ||ΔT||/||T|| = 1.694e-05
+  [adaptive] relax_T=0.74
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21545,10 +21521,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.92 um, u_r(clad)=+11.45 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.95 um, u_r(clad)=+11.49 um, gap=-0.47 um, p=23.359 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.935e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.924e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -21568,17 +21544,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 702.73 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.27 W/m²K
+  → h_open      = 4312.27 W/m²K, h_contact = 1693.74 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.871e-10
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1128.13 K, mean=925.82 K
+  ||ΔT||/||T|| = 1.228e-05
+  [adaptive] relax_T=0.81
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21588,10 +21564,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.96 um, u_r(clad)=+11.49 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+76.98 um, u_r(clad)=+11.51 um, gap=-0.47 um, p=23.357 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.559e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 4.171e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -21611,17 +21587,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
+  → Average gap temperature between cyl_1 and inner_2: 702.72 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.22 W/m²K
+  → h_open      = 4312.22 W/m²K, h_contact = 1693.58 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 7.818e-11
-  [adaptive] relax_T=0.90
+  ||ΔT||/||T|| = 6.223e-06
+  [adaptive] relax_T=0.89
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -21631,9 +21607,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+76.98 um, u_r(clad)=+11.51 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.01 um, u_r(clad)=+11.54 um, gap=-0.47 um, p=23.355 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.798e-04
+  ||Δu||/||u|| = 4.419e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -21657,13 +21633,13 @@ Convergence check
   → Average gap temperature between cyl_1 and inner_2: 702.71 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.19 W/m²K
+  → h_open      = 4312.19 W/m²K, h_contact = 1693.44 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.546e-11
+  ||ΔT||/||T|| = 2.342e-06
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21674,10 +21650,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.01 um, u_r(clad)=+11.54 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.04 um, u_r(clad)=+11.57 um, gap=-0.47 um, p=23.354 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.040e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.666e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -21700,13 +21676,13 @@ Convergence check
   → Average gap temperature between cyl_1 and inner_2: 702.71 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_gap       = 4312.18 W/m²K
+  → h_open      = 4312.18 W/m²K, h_contact = 1693.35 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.013e-12
+  ||ΔT||/||T|| = 6.620e-07
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21717,9 +21693,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.04 um, u_r(clad)=+11.57 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.07 um, u_r(clad)=+11.61 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.283e-04
+  ||Δu||/||u|| = 3.046e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -21744,12 +21720,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_open      = 4312.17 W/m²K, h_contact = 1693.31 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.016e-12
+  ||ΔT||/||T|| = 1.743e-07
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21760,10 +21736,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.07 um, u_r(clad)=+11.60 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.10 um, u_r(clad)=+11.63 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.089e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.251e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -21787,12 +21763,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
+  → h_open      = 4312.17 W/m²K, h_contact = 1693.31 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.032e-13
+  ||ΔT||/||T|| = 1.936e-07
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21803,9 +21779,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.09 um, u_r(clad)=+11.62 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.12 um, u_r(clad)=+11.65 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.296e-04
+  ||Δu||/||u|| = 3.458e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -21835,7 +21811,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.820e-14
+  ||ΔT||/||T|| = 2.380e-08
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21846,9 +21822,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.11 um, u_r(clad)=+11.64 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.14 um, u_r(clad)=+11.68 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.506e-04
+  ||Δu||/||u|| = 3.665e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -21878,7 +21854,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 5.829e-15
+  ||ΔT||/||T|| = 9.931e-09
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21889,9 +21865,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.13 um, u_r(clad)=+11.67 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.17 um, u_r(clad)=+11.70 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.717e-04
+  ||Δu||/||u|| = 3.871e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -21921,7 +21897,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.983e-15
+  ||ΔT||/||T|| = 4.799e-09
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21932,9 +21908,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.16 um, u_r(clad)=+11.69 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.20 um, u_r(clad)=+11.73 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.681e-04
+  ||Δu||/||u|| = 2.528e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -21964,7 +21940,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 4.488e-15
+  ||ΔT||/||T|| = 2.029e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -21975,9 +21951,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.18 um, u_r(clad)=+11.71 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.21 um, u_r(clad)=+11.75 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.860e-04
+  ||Δu||/||u|| = 2.697e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22007,7 +21983,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 5.994e-16
+  ||ΔT||/||T|| = 6.964e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22018,9 +21994,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.20 um, u_r(clad)=+11.73 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.23 um, u_r(clad)=+11.77 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.043e-04
+  ||Δu||/||u|| = 2.869e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22050,7 +22026,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.129e-15
+  ||ΔT||/||T|| = 1.857e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22061,10 +22037,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.22 um, u_r(clad)=+11.75 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.25 um, u_r(clad)=+11.79 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.225e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.041e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -22093,7 +22069,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 5.121e-15
+  ||ΔT||/||T|| = 4.988e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22104,9 +22080,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.24 um, u_r(clad)=+11.78 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.27 um, u_r(clad)=+11.81 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.327e-04
+  ||Δu||/||u|| = 3.212e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -22136,7 +22112,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 5.168e-15
+  ||ΔT||/||T|| = 8.399e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22147,10 +22123,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.26 um, u_r(clad)=+11.79 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.30 um, u_r(clad)=+11.83 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.482e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.097e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -22179,7 +22155,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 4.018e-15
+  ||ΔT||/||T|| = 2.360e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22190,9 +22166,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.28 um, u_r(clad)=+11.81 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.31 um, u_r(clad)=+11.85 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.641e-04
+  ||Δu||/||u|| = 2.238e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22222,7 +22198,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.463e-15
+  ||ΔT||/||T|| = 3.856e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22233,10 +22209,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.30 um, u_r(clad)=+11.83 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.33 um, u_r(clad)=+11.86 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.799e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.380e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -22265,7 +22241,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.295e-15
+  ||ΔT||/||T|| = 5.026e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22276,10 +22252,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.32 um, u_r(clad)=+11.85 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.34 um, u_r(clad)=+11.88 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.019e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.523e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -22308,7 +22284,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 4.751e-15
+  ||ΔT||/||T|| = 1.285e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22319,10 +22295,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.33 um, u_r(clad)=+11.86 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.36 um, u_r(clad)=+11.90 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.154e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.665e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -22351,7 +22327,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.354e-15
+  ||ΔT||/||T|| = 7.270e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22362,10 +22338,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.35 um, u_r(clad)=+11.88 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.38 um, u_r(clad)=+11.91 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.292e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.740e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -22394,7 +22370,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.671e-15
+  ||ΔT||/||T|| = 8.908e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22405,10 +22381,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.36 um, u_r(clad)=+11.89 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.39 um, u_r(clad)=+11.93 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.429e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.857e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -22437,7 +22413,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.953e-15
+  ||ΔT||/||T|| = 6.007e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22448,10 +22424,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.38 um, u_r(clad)=+11.91 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.41 um, u_r(clad)=+11.94 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.752e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.975e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -22480,7 +22456,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 7.610e-15
+  ||ΔT||/||T|| = 7.294e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22491,9 +22467,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.39 um, u_r(clad)=+11.92 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.42 um, u_r(clad)=+11.95 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.870e-04
+  ||Δu||/||u|| = 2.094e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22523,7 +22499,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.600e-15
+  ||ΔT||/||T|| = 2.662e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22534,10 +22510,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.40 um, u_r(clad)=+11.94 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.44 um, u_r(clad)=+11.97 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.989e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.211e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -22566,7 +22542,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.794e-15
+  ||ΔT||/||T|| = 1.266e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22577,9 +22553,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.42 um, u_r(clad)=+11.95 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.45 um, u_r(clad)=+11.98 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.108e-04
+  ||Δu||/||u|| = 1.444e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -22609,7 +22585,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.900e-15
+  ||ΔT||/||T|| = 1.116e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22620,10 +22596,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.43 um, u_r(clad)=+11.97 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.46 um, u_r(clad)=+11.99 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.521e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.541e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -22652,7 +22628,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 8.448e-15
+  ||ΔT||/||T|| = 6.268e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22663,9 +22639,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.44 um, u_r(clad)=+11.98 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.47 um, u_r(clad)=+12.00 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.623e-04
+  ||Δu||/||u|| = 1.639e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22695,7 +22671,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 1.795e-15
+  ||ΔT||/||T|| = 2.918e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22706,9 +22682,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.45 um, u_r(clad)=+11.99 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.48 um, u_r(clad)=+12.02 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.726e-04
+  ||Δu||/||u|| = 1.737e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22738,7 +22714,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 5.243e-15
+  ||ΔT||/||T|| = 9.725e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22749,9 +22725,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.47 um, u_r(clad)=+12.00 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.50 um, u_r(clad)=+12.03 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.830e-04
+  ||Δu||/||u|| = 1.835e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -22781,7 +22757,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.114e-15
+  ||ΔT||/||T|| = 9.736e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22792,9 +22768,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.48 um, u_r(clad)=+12.01 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.51 um, u_r(clad)=+12.04 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.320e-04
+  ||Δu||/||u|| = 1.198e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -22824,7 +22800,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 5.870e-15
+  ||ΔT||/||T|| = 3.156e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22835,9 +22811,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.49 um, u_r(clad)=+12.02 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.52 um, u_r(clad)=+12.05 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.408e-04
+  ||Δu||/||u|| = 1.278e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22867,7 +22843,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.957e-15
+  ||ΔT||/||T|| = 1.440e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22878,9 +22854,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.50 um, u_r(clad)=+12.03 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.53 um, u_r(clad)=+12.06 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.498e-04
+  ||Δu||/||u|| = 1.360e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -22910,7 +22886,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.727e-15
+  ||ΔT||/||T|| = 1.487e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22921,10 +22897,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.51 um, u_r(clad)=+12.04 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.54 um, u_r(clad)=+12.07 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.588e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.441e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -22953,7 +22929,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 6.530e-15
+  ||ΔT||/||T|| = 8.991e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -22964,9 +22940,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.52 um, u_r(clad)=+12.05 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.55 um, u_r(clad)=+12.08 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.145e-04
+  ||Δu||/||u|| = 1.522e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -22996,136 +22972,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 4.269e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.53 um, u_r(clad)=+12.06 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.222e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 53/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.097e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.54 um, u_r(clad)=+12.07 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.300e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 54/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 6.437e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.55 um, u_r(clad)=+12.08 um, gap=-0.47 um, p=23.353 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.378e-04
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-
-#### Iteration 55/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 702.71 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4312.17 W/m²K
-  → h_open      = 4312.17 W/m²K, h_contact = 1693.30 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 3.224e-15
+  ||ΔT||/||T|| = 8.751e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -23143,7 +22990,7 @@ Convergence check
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 55 iterations.
+**[SUCCESS]** Staggered solver converged in 52 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
 
@@ -23202,7 +23049,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 2.794e-15
+  ||ΔT||/||T|| = 3.217e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -23245,8 +23092,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1128.12 K, mean=925.82 K
-  ||ΔT||/||T|| = 4.482e-15
-  [adaptive] relax_T=0.54
+  ||ΔT||/||T|| = 3.011e-15
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23288,8 +23135,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1122.30 K, mean=921.39 K
-  ||ΔT||/||T|| = 2.943e-03
-  [adaptive] relax_T=0.32
+  ||ΔT||/||T|| = 4.906e-03
+  [adaptive] relax_T=0.54
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23301,7 +23148,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+77.70 um, u_r(clad)=+12.14 um, gap=-0.55 um, p=27.642 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.124e-04
+  ||Δu||/||u|| = 6.749e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -23322,17 +23169,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 701.45 K
+  → Average gap temperature between cyl_1 and inner_2: 700.62 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4306.09 W/m²K
-  → h_open      = 4306.09 W/m²K, h_contact = 2004.26 W/m²K (gap closed)
+  → h_gap       = 4302.04 W/m²K
+  → h_open      = 4302.04 W/m²K, h_contact = 2004.26 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.80 K, mean=920.21 K
-  ||ΔT||/||T|| = 1.263e-03
-  [adaptive] relax_T=0.19
+  T_new: min=580.00 K, max=1121.33 K, mean=920.57 K
+  ||ΔT||/||T|| = 7.866e-04
+  [adaptive] relax_T=0.59
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23342,9 +23189,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.75 um, u_r(clad)=+12.19 um, gap=-0.56 um, p=27.862 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.74 um, u_r(clad)=+12.19 um, gap=-0.55 um, p=27.696 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.385e-04
+  ||Δu||/||u|| = 7.047e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -23365,17 +23212,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 700.83 K
+  → Average gap temperature between cyl_1 and inner_2: 700.06 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4303.09 W/m²K
-  → h_open      = 4303.09 W/m²K, h_contact = 2020.22 W/m²K (gap closed)
+  → h_gap       = 4299.32 W/m²K
+  → h_open      = 4299.32 W/m²K, h_contact = 2008.17 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.59 K, mean=920.02 K
-  ||ΔT||/||T|| = 5.500e-04
-  [adaptive] relax_T=0.21
+  T_new: min=580.00 K, max=1121.01 K, mean=920.30 K
+  ||ΔT||/||T|| = 5.746e-04
+  [adaptive] relax_T=0.65
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23385,9 +23232,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.80 um, u_r(clad)=+12.24 um, gap=-0.56 um, p=27.861 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.79 um, u_r(clad)=+12.24 um, gap=-0.55 um, p=27.663 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.728e-04
+  ||Δu||/||u|| = 7.354e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -23408,17 +23255,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 700.54 K
+  → Average gap temperature between cyl_1 and inner_2: 699.63 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4301.67 W/m²K
-  → h_open      = 4301.67 W/m²K, h_contact = 2020.16 W/m²K (gap closed)
+  → h_gap       = 4297.25 W/m²K
+  → h_open      = 4297.25 W/m²K, h_contact = 2005.78 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.64 K, mean=920.04 K
-  ||ΔT||/||T|| = 4.792e-04
-  [adaptive] relax_T=0.24
+  T_new: min=580.00 K, max=1120.88 K, mean=920.19 K
+  ||ΔT||/||T|| = 3.401e-04
+  [adaptive] relax_T=0.72
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23428,9 +23275,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.85 um, u_r(clad)=+12.30 um, gap=-0.56 um, p=27.808 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.85 um, u_r(clad)=+12.29 um, gap=-0.55 um, p=27.600 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.055e-04
+  ||Δu||/||u|| = 7.691e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -23451,17 +23298,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 700.28 K
+  → Average gap temperature between cyl_1 and inner_2: 699.35 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4300.37 W/m²K
-  → h_open      = 4300.37 W/m²K, h_contact = 2016.29 W/m²K (gap closed)
+  → h_gap       = 4295.88 W/m²K
+  → h_open      = 4295.88 W/m²K, h_contact = 2001.23 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.74 K, mean=920.11 K
-  ||ΔT||/||T|| = 3.916e-04
-  [adaptive] relax_T=0.26
+  T_new: min=580.00 K, max=1120.83 K, mean=920.13 K
+  ||ΔT||/||T|| = 1.722e-04
+  [adaptive] relax_T=0.79
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23471,9 +23318,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.91 um, u_r(clad)=+12.36 um, gap=-0.55 um, p=27.737 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.90 um, u_r(clad)=+12.35 um, gap=-0.55 um, p=27.547 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.720e-04
+  ||Δu||/||u|| = 5.503e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -23494,17 +23341,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 700.04 K
+  → Average gap temperature between cyl_1 and inner_2: 699.18 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4299.23 W/m²K
-  → h_open      = 4299.23 W/m²K, h_contact = 2011.16 W/m²K (gap closed)
+  → h_gap       = 4295.08 W/m²K
+  → h_open      = 4295.08 W/m²K, h_contact = 1997.38 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.85 K, mean=920.18 K
-  ||ΔT||/||T|| = 3.047e-04
-  [adaptive] relax_T=0.28
+  T_new: min=580.00 K, max=1120.79 K, mean=920.09 K
+  ||ΔT||/||T|| = 8.318e-05
+  [adaptive] relax_T=0.87
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23514,9 +23361,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+77.95 um, u_r(clad)=+12.40 um, gap=-0.55 um, p=27.692 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.94 um, u_r(clad)=+12.39 um, gap=-0.55 um, p=27.526 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.028e-04
+  ||Δu||/||u|| = 5.850e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -23537,17 +23384,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.84 K
+  → Average gap temperature between cyl_1 and inner_2: 699.10 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4298.26 W/m²K
-  → h_open      = 4298.26 W/m²K, h_contact = 2007.89 W/m²K (gap closed)
+  → h_gap       = 4294.65 W/m²K
+  → h_open      = 4294.65 W/m²K, h_contact = 1995.86 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.88 K, mean=920.19 K
-  ||ΔT||/||T|| = 2.406e-04
-  [adaptive] relax_T=0.31
+  T_new: min=580.00 K, max=1120.74 K, mean=920.06 K
+  ||ΔT||/||T|| = 5.695e-05
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23557,9 +23404,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.00 um, u_r(clad)=+12.44 um, gap=-0.55 um, p=27.644 MPa (CLOSED)
+  [contact] u_r(fuel)=+77.98 um, u_r(clad)=+12.43 um, gap=-0.55 um, p=27.511 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.343e-04
+  ||Δu||/||u|| = 6.206e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -23580,17 +23427,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.67 K
+  → Average gap temperature between cyl_1 and inner_2: 699.04 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4297.44 W/m²K
-  → h_open      = 4297.44 W/m²K, h_contact = 2004.42 W/m²K (gap closed)
+  → h_gap       = 4294.39 W/m²K
+  → h_open      = 4294.39 W/m²K, h_contact = 1994.77 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.90 K, mean=920.20 K
-  ||ΔT||/||T|| = 1.839e-04
-  [adaptive] relax_T=0.34
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 1.869e-05
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23600,10 +23447,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.04 um, u_r(clad)=+12.49 um, gap=-0.55 um, p=27.602 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.03 um, u_r(clad)=+12.48 um, gap=-0.55 um, p=27.500 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.665e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 6.571e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -23623,17 +23470,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.53 K
+  → Average gap temperature between cyl_1 and inner_2: 699.02 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4296.74 W/m²K
-  → h_open      = 4296.74 W/m²K, h_contact = 2001.37 W/m²K (gap closed)
+  → h_gap       = 4294.29 W/m²K
+  → h_open      = 4294.29 W/m²K, h_contact = 1993.98 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.90 K, mean=920.20 K
-  ||ΔT||/||T|| = 1.389e-04
-  [adaptive] relax_T=0.38
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 3.920e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23643,9 +23490,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.09 um, u_r(clad)=+12.54 um, gap=-0.55 um, p=27.569 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.07 um, u_r(clad)=+12.52 um, gap=-0.55 um, p=27.495 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.989e-04
+  ||Δu||/||u|| = 4.738e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -23666,17 +23513,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.41 K
+  → Average gap temperature between cyl_1 and inner_2: 699.02 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4296.18 W/m²K
-  → h_open      = 4296.18 W/m²K, h_contact = 1999.00 W/m²K (gap closed)
+  → h_gap       = 4294.26 W/m²K
+  → h_open      = 4294.26 W/m²K, h_contact = 1993.60 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.89 K, mean=920.18 K
-  ||ΔT||/||T|| = 1.065e-04
-  [adaptive] relax_T=0.42
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 1.014e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23686,10 +23533,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.14 um, u_r(clad)=+12.59 um, gap=-0.55 um, p=27.546 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.11 um, u_r(clad)=+12.56 um, gap=-0.55 um, p=27.494 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.539e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 5.055e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -23709,17 +23556,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.31 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4295.71 W/m²K
-  → h_open      = 4295.71 W/m²K, h_contact = 1997.32 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.52 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.86 K, mean=920.15 K
-  ||ΔT||/||T|| = 8.412e-05
-  [adaptive] relax_T=0.46
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 1.003e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23729,9 +23576,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.17 um, u_r(clad)=+12.62 um, gap=-0.55 um, p=27.536 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.14 um, u_r(clad)=+12.59 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.823e-04
+  ||Δu||/||u|| = 5.377e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -23752,17 +23599,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.24 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4295.33 W/m²K
-  → h_open      = 4295.33 W/m²K, h_contact = 1996.62 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.49 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.82 K, mean=920.12 K
-  ||ΔT||/||T|| = 7.229e-05
-  [adaptive] relax_T=0.50
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 1.629e-07
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23772,10 +23619,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.21 um, u_r(clad)=+12.65 um, gap=-0.55 um, p=27.526 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.18 um, u_r(clad)=+12.63 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.111e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 5.699e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -23795,17 +23642,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.17 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4295.01 W/m²K
-  → h_open      = 4295.01 W/m²K, h_contact = 1995.88 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.47 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.79 K, mean=920.09 K
-  ||ΔT||/||T|| = 5.695e-05
-  [adaptive] relax_T=0.55
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 9.739e-08
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23815,10 +23662,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.24 um, u_r(clad)=+12.69 um, gap=-0.55 um, p=27.516 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.22 um, u_r(clad)=+12.67 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.401e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.111e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -23838,17 +23685,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.12 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4294.76 W/m²K
-  → h_open      = 4294.76 W/m²K, h_contact = 1995.17 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.77 K, mean=920.08 K
-  ||ΔT||/||T|| = 4.149e-05
-  [adaptive] relax_T=0.61
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 3.820e-08
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23858,10 +23705,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.28 um, u_r(clad)=+12.73 um, gap=-0.55 um, p=27.508 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.25 um, u_r(clad)=+12.70 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.689e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 4.387e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -23881,17 +23728,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.08 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4294.58 W/m²K
-  → h_open      = 4294.58 W/m²K, h_contact = 1994.57 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.76 K, mean=920.07 K
-  ||ΔT||/||T|| = 2.836e-05
-  [adaptive] relax_T=0.67
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 3.988e-09
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23901,10 +23748,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.32 um, u_r(clad)=+12.77 um, gap=-0.55 um, p=27.502 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.28 um, u_r(clad)=+12.73 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.709e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 4.666e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -23924,17 +23771,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.05 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4294.45 W/m²K
-  → h_open      = 4294.45 W/m²K, h_contact = 1994.12 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.75 K, mean=920.06 K
-  ||ΔT||/||T|| = 1.849e-05
-  [adaptive] relax_T=0.74
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 2.343e-09
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23944,10 +23791,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.35 um, u_r(clad)=+12.80 um, gap=-0.55 um, p=27.500 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.32 um, u_r(clad)=+12.77 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.953e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.946e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -23967,17 +23814,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.04 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4294.36 W/m²K
-  → h_open      = 4294.36 W/m²K, h_contact = 1993.94 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1120.74 K, mean=920.05 K
-  ||ΔT||/||T|| = 1.341e-05
-  [adaptive] relax_T=0.81
+  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
+  ||ΔT||/||T|| = 5.231e-10
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -23987,10 +23834,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.38 um, u_r(clad)=+12.83 um, gap=-0.55 um, p=27.497 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.35 um, u_r(clad)=+12.80 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.201e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.568e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -24010,17 +23857,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.02 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4294.30 W/m²K
-  → h_open      = 4294.30 W/m²K, h_contact = 1993.77 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 7.033e-06
-  [adaptive] relax_T=0.89
+  ||ΔT||/||T|| = 1.492e-10
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -24030,9 +23877,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.41 um, u_r(clad)=+12.86 um, gap=-0.55 um, p=27.495 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.38 um, u_r(clad)=+12.83 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.451e-04
+  ||Δu||/||u|| = 3.807e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -24053,16 +23900,16 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.02 K
+  → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4294.27 W/m²K
-  → h_open      = 4294.27 W/m²K, h_contact = 1993.62 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.891e-06
+  ||ΔT||/||T|| = 5.614e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24073,10 +23920,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.44 um, u_r(clad)=+12.89 um, gap=-0.55 um, p=27.494 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.41 um, u_r(clad)=+12.86 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.699e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 4.049e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -24099,13 +23946,13 @@ Convergence check
   → Average gap temperature between cyl_1 and inner_2: 699.01 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4294.26 W/m²K
-  → h_open      = 4294.26 W/m²K, h_contact = 1993.52 W/m²K (gap closed)
+  → h_gap       = 4294.25 W/m²K
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 9.298e-07
+  ||ΔT||/||T|| = 8.773e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24116,9 +23963,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.47 um, u_r(clad)=+12.92 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.43 um, u_r(clad)=+12.88 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.068e-04
+  ||Δu||/||u|| = 4.293e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -24143,12 +23990,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4294.25 W/m²K
-  → h_open      = 4294.25 W/m²K, h_contact = 1993.48 W/m²K (gap closed)
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.702e-07
+  ||ΔT||/||T|| = 4.863e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24159,10 +24006,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.49 um, u_r(clad)=+12.94 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.46 um, u_r(clad)=+12.92 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.274e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.096e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -24186,12 +24033,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4294.25 W/m²K
-  → h_open      = 4294.25 W/m²K, h_contact = 1993.47 W/m²K (gap closed)
+  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.495e-07
+  ||ΔT||/||T|| = 2.091e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24202,9 +24049,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.52 um, u_r(clad)=+12.97 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.49 um, u_r(clad)=+12.94 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.482e-04
+  ||Δu||/||u|| = 3.304e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -24234,7 +24081,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 3.543e-08
+  ||ΔT||/||T|| = 5.100e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24245,9 +24092,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.54 um, u_r(clad)=+12.99 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.51 um, u_r(clad)=+12.96 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.691e-04
+  ||Δu||/||u|| = 3.514e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -24277,7 +24124,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.005e-08
+  ||ΔT||/||T|| = 1.538e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24288,9 +24135,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.57 um, u_r(clad)=+13.02 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.54 um, u_r(clad)=+12.99 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.898e-04
+  ||Δu||/||u|| = 3.725e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -24320,7 +24167,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 4.921e-09
+  ||ΔT||/||T|| = 5.709e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24331,9 +24178,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.60 um, u_r(clad)=+13.05 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.56 um, u_r(clad)=+13.01 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.546e-04
+  ||Δu||/||u|| = 2.687e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -24363,7 +24210,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 5.037e-10
+  ||ΔT||/||T|| = 1.857e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24374,9 +24221,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.61 um, u_r(clad)=+13.06 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.58 um, u_r(clad)=+13.03 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.716e-04
+  ||Δu||/||u|| = 2.867e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -24406,7 +24253,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.122e-09
+  ||ΔT||/||T|| = 1.881e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24417,9 +24264,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.63 um, u_r(clad)=+13.08 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.60 um, u_r(clad)=+13.05 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.889e-04
+  ||Δu||/||u|| = 3.050e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -24449,7 +24296,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.229e-10
+  ||ΔT||/||T|| = 1.671e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24460,10 +24307,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.65 um, u_r(clad)=+13.10 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.62 um, u_r(clad)=+13.07 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.063e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.233e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -24492,7 +24339,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 6.115e-11
+  ||ΔT||/||T|| = 4.379e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24503,9 +24350,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.68 um, u_r(clad)=+13.13 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.65 um, u_r(clad)=+13.10 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.234e-04
+  ||Δu||/||u|| = 2.332e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -24535,7 +24382,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.277e-11
+  ||ΔT||/||T|| = 1.810e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24546,10 +24393,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.70 um, u_r(clad)=+13.15 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.66 um, u_r(clad)=+13.11 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.112e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.488e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -24578,7 +24425,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 4.477e-12
+  ||ΔT||/||T|| = 2.994e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24589,9 +24436,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.71 um, u_r(clad)=+13.16 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.68 um, u_r(clad)=+13.13 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.254e-04
+  ||Δu||/||u|| = 2.647e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -24621,7 +24468,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 6.342e-12
+  ||ΔT||/||T|| = 5.940e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24632,10 +24479,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.73 um, u_r(clad)=+13.18 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.70 um, u_r(clad)=+13.15 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.397e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.806e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -24664,7 +24511,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 9.632e-13
+  ||ΔT||/||T|| = 7.968e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24675,10 +24522,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.75 um, u_r(clad)=+13.20 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.72 um, u_r(clad)=+13.17 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.541e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.024e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -24707,7 +24554,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.166e-13
+  ||ΔT||/||T|| = 2.059e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24718,10 +24565,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.77 um, u_r(clad)=+13.22 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.73 um, u_r(clad)=+13.19 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.684e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.159e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -24750,7 +24597,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 8.777e-14
+  ||ΔT||/||T|| = 2.657e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24761,10 +24608,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.78 um, u_r(clad)=+13.24 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.75 um, u_r(clad)=+13.20 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.753e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.297e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -24793,7 +24640,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.843e-14
+  ||ΔT||/||T|| = 1.658e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24804,10 +24651,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.80 um, u_r(clad)=+13.25 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.77 um, u_r(clad)=+13.22 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.870e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.435e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -24836,7 +24683,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.851e-14
+  ||ΔT||/||T|| = 5.420e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24847,10 +24694,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.81 um, u_r(clad)=+13.26 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.78 um, u_r(clad)=+13.23 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.989e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.756e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -24879,7 +24726,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 4.025e-15
+  ||ΔT||/||T|| = 3.018e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24890,9 +24737,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.83 um, u_r(clad)=+13.28 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.80 um, u_r(clad)=+13.25 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.109e-04
+  ||Δu||/||u|| = 1.874e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -24922,7 +24769,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.484e-15
+  ||ΔT||/||T|| = 2.947e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24933,10 +24780,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.84 um, u_r(clad)=+13.29 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.81 um, u_r(clad)=+13.26 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.227e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.993e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -24965,7 +24812,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.429e-15
+  ||ΔT||/||T|| = 2.540e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -24976,9 +24823,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.86 um, u_r(clad)=+13.31 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.82 um, u_r(clad)=+13.27 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.454e-04
+  ||Δu||/||u|| = 2.113e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25008,7 +24855,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.576e-15
+  ||ΔT||/||T|| = 5.506e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25019,10 +24866,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.87 um, u_r(clad)=+13.32 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.84 um, u_r(clad)=+13.29 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.552e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.524e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -25051,7 +24898,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.105e-15
+  ||ΔT||/||T|| = 1.531e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25062,9 +24909,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.88 um, u_r(clad)=+13.33 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.85 um, u_r(clad)=+13.30 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.650e-04
+  ||Δu||/||u|| = 1.626e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -25094,7 +24941,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.447e-15
+  ||ΔT||/||T|| = 9.177e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25105,9 +24952,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.89 um, u_r(clad)=+13.34 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.86 um, u_r(clad)=+13.31 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.750e-04
+  ||Δu||/||u|| = 1.730e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -25137,7 +24984,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 3.904e-15
+  ||ΔT||/||T|| = 1.378e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25148,9 +24995,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.90 um, u_r(clad)=+13.35 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.87 um, u_r(clad)=+13.32 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.848e-04
+  ||Δu||/||u|| = 1.834e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25180,7 +25027,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.399e-15
+  ||ΔT||/||T|| = 1.266e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25191,9 +25038,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.92 um, u_r(clad)=+13.37 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.89 um, u_r(clad)=+13.34 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.207e-04
+  ||Δu||/||u|| = 1.323e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25223,7 +25070,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 8.528e-16
+  ||ΔT||/||T|| = 8.696e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25234,9 +25081,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.92 um, u_r(clad)=+13.37 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.90 um, u_r(clad)=+13.35 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.287e-04
+  ||Δu||/||u|| = 1.411e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -25266,7 +25113,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.971e-15
+  ||ΔT||/||T|| = 2.186e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25277,9 +25124,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.93 um, u_r(clad)=+13.38 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.91 um, u_r(clad)=+13.36 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.369e-04
+  ||Δu||/||u|| = 1.501e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -25309,7 +25156,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 5.734e-16
+  ||ΔT||/||T|| = 1.018e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25320,10 +25167,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.94 um, u_r(clad)=+13.39 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.92 um, u_r(clad)=+13.37 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.452e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.592e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -25352,7 +25199,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 7.632e-16
+  ||ΔT||/||T|| = 1.039e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25363,9 +25210,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.95 um, u_r(clad)=+13.40 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.93 um, u_r(clad)=+13.38 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.533e-04
+  ||Δu||/||u|| = 1.148e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25395,7 +25242,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.178e-15
+  ||ΔT||/||T|| = 1.018e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25406,10 +25253,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.96 um, u_r(clad)=+13.41 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.94 um, u_r(clad)=+13.39 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.001e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.225e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -25438,7 +25285,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.089e-15
+  ||ΔT||/||T|| = 4.927e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25449,9 +25296,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.97 um, u_r(clad)=+13.42 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.95 um, u_r(clad)=+13.40 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.068e-04
+  ||Δu||/||u|| = 1.303e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -25481,7 +25328,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 9.214e-16
+  ||ΔT||/||T|| = 1.503e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25492,10 +25339,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.98 um, u_r(clad)=+13.43 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.96 um, u_r(clad)=+13.41 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.136e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.381e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -25524,7 +25371,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.509e-15
+  ||ΔT||/||T|| = 7.538e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25535,100 +25382,14 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+78.99 um, u_r(clad)=+13.44 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.97 um, u_r(clad)=+13.42 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.204e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 56/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.01 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4294.25 W/m²K
-  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 1.513e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.00 um, u_r(clad)=+13.45 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.272e-04
+  ||Δu||/||u|| = 9.963e-05
   [adaptive] relax_u=0.03
 
 Convergence check
 
-
-#### Iteration 57/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 699.01 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4294.25 W/m²K
-  → h_open      = 4294.25 W/m²K, h_contact = 1993.46 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.271e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.00 um, u_r(clad)=+13.45 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 8.306e-05
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-**[SUCCESS]** Staggered solver converged in 57 iterations.
+**[SUCCESS]** Staggered solver converged in 55 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
 
@@ -25687,7 +25448,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 2.063e-15
+  ||ΔT||/||T|| = 6.408e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25698,9 +25459,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.01 um, u_r(clad)=+13.46 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+78.97 um, u_r(clad)=+13.42 um, gap=-0.55 um, p=27.493 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.107e-04
+  ||Δu||/||u|| = 8.275e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25730,7 +25491,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1120.73 K, mean=920.04 K
-  ||ΔT||/||T|| = 7.390e-16
+  ||ΔT||/||T|| = 1.816e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -25741,9 +25502,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.08 um, u_r(clad)=+13.47 um, gap=-0.61 um, p=30.530 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.04 um, u_r(clad)=+13.43 um, gap=-0.61 um, p=30.530 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.200e-04
+  ||Δu||/||u|| = 8.370e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25784,9 +25545,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.14 um, u_r(clad)=+13.51 um, gap=-0.64 um, p=31.782 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.11 um, u_r(clad)=+13.47 um, gap=-0.64 um, p=31.782 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.573e-04
+  ||Δu||/||u|| = 6.724e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25827,9 +25588,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.19 um, u_r(clad)=+13.55 um, gap=-0.64 um, p=31.870 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.15 um, u_r(clad)=+13.52 um, gap=-0.64 um, p=31.870 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.886e-04
+  ||Δu||/||u|| = 7.046e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -25870,9 +25631,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.24 um, u_r(clad)=+13.60 um, gap=-0.64 um, p=31.861 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.21 um, u_r(clad)=+13.57 um, gap=-0.64 um, p=31.861 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.194e-04
+  ||Δu||/||u|| = 7.365e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -25913,9 +25674,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.29 um, u_r(clad)=+13.66 um, gap=-0.64 um, p=31.810 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.26 um, u_r(clad)=+13.62 um, gap=-0.64 um, p=31.810 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.524e-04
+  ||Δu||/||u|| = 7.705e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25956,9 +25717,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.35 um, u_r(clad)=+13.71 um, gap=-0.64 um, p=31.759 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.31 um, u_r(clad)=+13.68 um, gap=-0.64 um, p=31.759 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.382e-04
+  ||Δu||/||u|| = 5.512e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -25999,9 +25760,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.39 um, u_r(clad)=+13.75 um, gap=-0.63 um, p=31.738 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.35 um, u_r(clad)=+13.72 um, gap=-0.63 um, p=31.738 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.718e-04
+  ||Δu||/||u|| = 5.858e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26042,9 +25803,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.43 um, u_r(clad)=+13.79 um, gap=-0.63 um, p=31.721 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.40 um, u_r(clad)=+13.76 um, gap=-0.63 um, p=31.721 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.064e-04
+  ||Δu||/||u|| = 6.213e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26085,9 +25846,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.47 um, u_r(clad)=+13.84 um, gap=-0.63 um, p=31.710 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.44 um, u_r(clad)=+13.81 um, gap=-0.63 um, p=31.710 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.420e-04
+  ||Δu||/||u|| = 6.577e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26128,9 +25889,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.52 um, u_r(clad)=+13.88 um, gap=-0.63 um, p=31.704 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.49 um, u_r(clad)=+13.86 um, gap=-0.63 um, p=31.704 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.629e-04
+  ||Δu||/||u|| = 4.742e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26171,9 +25932,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.55 um, u_r(clad)=+13.92 um, gap=-0.63 um, p=31.702 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.52 um, u_r(clad)=+13.89 um, gap=-0.63 um, p=31.702 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.938e-04
+  ||Δu||/||u|| = 5.059e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26214,9 +25975,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.59 um, u_r(clad)=+13.95 um, gap=-0.63 um, p=31.702 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.56 um, u_r(clad)=+13.93 um, gap=-0.63 um, p=31.702 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.253e-04
+  ||Δu||/||u|| = 5.381e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26257,9 +26018,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.63 um, u_r(clad)=+13.99 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.60 um, u_r(clad)=+13.97 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.568e-04
+  ||Δu||/||u|| = 5.704e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26300,9 +26061,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.67 um, u_r(clad)=+14.03 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.64 um, u_r(clad)=+14.01 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.016e-04
+  ||Δu||/||u|| = 4.115e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26343,9 +26104,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.69 um, u_r(clad)=+14.06 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.67 um, u_r(clad)=+14.04 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.285e-04
+  ||Δu||/||u|| = 4.390e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26386,9 +26147,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.73 um, u_r(clad)=+14.09 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.70 um, u_r(clad)=+14.07 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.558e-04
+  ||Δu||/||u|| = 4.670e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26429,9 +26190,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.76 um, u_r(clad)=+14.13 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.74 um, u_r(clad)=+14.10 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.832e-04
+  ||Δu||/||u|| = 4.950e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26472,9 +26233,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.79 um, u_r(clad)=+14.16 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.77 um, u_r(clad)=+14.14 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.485e-04
+  ||Δu||/||u|| = 3.571e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26515,9 +26276,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.82 um, u_r(clad)=+14.19 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.80 um, u_r(clad)=+14.17 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.719e-04
+  ||Δu||/||u|| = 3.810e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26558,9 +26319,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.85 um, u_r(clad)=+14.21 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.83 um, u_r(clad)=+14.19 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.956e-04
+  ||Δu||/||u|| = 4.053e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26601,9 +26362,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.88 um, u_r(clad)=+14.24 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.86 um, u_r(clad)=+14.22 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.194e-04
+  ||Δu||/||u|| = 4.296e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26633,7 +26394,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 7.717e-12
+  ||ΔT||/||T|| = 7.718e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26644,9 +26405,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.91 um, u_r(clad)=+14.27 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.89 um, u_r(clad)=+14.25 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.025e-04
+  ||Δu||/||u|| = 3.099e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26676,7 +26437,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.042e-12
+  ||ΔT||/||T|| = 2.043e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26687,9 +26448,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.93 um, u_r(clad)=+14.29 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.91 um, u_r(clad)=+14.28 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.228e-04
+  ||Δu||/||u|| = 3.307e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26719,7 +26480,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.190e-12
+  ||ΔT||/||T|| = 2.185e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26730,9 +26491,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.95 um, u_r(clad)=+14.32 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.94 um, u_r(clad)=+14.30 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.433e-04
+  ||Δu||/||u|| = 3.517e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26762,7 +26523,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.915e-13
+  ||ΔT||/||T|| = 2.912e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26773,9 +26534,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+79.98 um, u_r(clad)=+14.34 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.96 um, u_r(clad)=+14.33 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.639e-04
+  ||Δu||/||u|| = 3.728e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26805,7 +26566,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.448e-13
+  ||ΔT||/||T|| = 1.444e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26816,9 +26577,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.00 um, u_r(clad)=+14.37 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+79.99 um, u_r(clad)=+14.35 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.625e-04
+  ||Δu||/||u|| = 2.689e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26848,7 +26609,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 6.670e-14
+  ||ΔT||/||T|| = 6.574e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26859,9 +26620,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.02 um, u_r(clad)=+14.39 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.01 um, u_r(clad)=+14.37 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.801e-04
+  ||Δu||/||u|| = 2.870e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26891,7 +26652,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.548e-14
+  ||ΔT||/||T|| = 1.597e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26902,9 +26663,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.04 um, u_r(clad)=+14.41 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.03 um, u_r(clad)=+14.39 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.979e-04
+  ||Δu||/||u|| = 3.052e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -26934,7 +26695,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 4.297e-15
+  ||ΔT||/||T|| = 5.543e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26945,9 +26706,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.06 um, u_r(clad)=+14.43 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.05 um, u_r(clad)=+14.42 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.158e-04
+  ||Δu||/||u|| = 3.236e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -26977,7 +26738,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.472e-15
+  ||ΔT||/||T|| = 3.010e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -26988,9 +26749,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.09 um, u_r(clad)=+14.45 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.07 um, u_r(clad)=+14.44 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.278e-04
+  ||Δu||/||u|| = 2.334e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27020,7 +26781,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 9.057e-15
+  ||ΔT||/||T|| = 5.413e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27031,9 +26792,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.10 um, u_r(clad)=+14.47 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.09 um, u_r(clad)=+14.46 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.431e-04
+  ||Δu||/||u|| = 2.490e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27063,7 +26824,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 8.168e-15
+  ||ΔT||/||T|| = 6.451e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27074,9 +26835,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.12 um, u_r(clad)=+14.49 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.11 um, u_r(clad)=+14.48 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.586e-04
+  ||Δu||/||u|| = 2.649e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27106,7 +26867,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 4.490e-15
+  ||ΔT||/||T|| = 9.230e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27117,9 +26878,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.14 um, u_r(clad)=+14.51 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.13 um, u_r(clad)=+14.49 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.741e-04
+  ||Δu||/||u|| = 2.808e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27149,7 +26910,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.352e-15
+  ||ΔT||/||T|| = 2.505e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27160,9 +26921,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.16 um, u_r(clad)=+14.53 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.15 um, u_r(clad)=+14.51 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.977e-04
+  ||Δu||/||u|| = 2.026e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27192,7 +26953,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.194e-15
+  ||ΔT||/||T|| = 2.489e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27203,9 +26964,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.17 um, u_r(clad)=+14.54 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.16 um, u_r(clad)=+14.53 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.110e-04
+  ||Δu||/||u|| = 2.161e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27235,7 +26996,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 3.364e-15
+  ||ΔT||/||T|| = 1.588e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27246,9 +27007,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.19 um, u_r(clad)=+14.56 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.18 um, u_r(clad)=+14.55 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.244e-04
+  ||Δu||/||u|| = 2.299e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27278,7 +27039,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.583e-15
+  ||ΔT||/||T|| = 1.066e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27289,9 +27050,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.21 um, u_r(clad)=+14.57 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.20 um, u_r(clad)=+14.56 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.379e-04
+  ||Δu||/||u|| = 2.437e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27321,7 +27082,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.819e-15
+  ||ΔT||/||T|| = 2.891e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27332,9 +27093,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.22 um, u_r(clad)=+14.59 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.21 um, u_r(clad)=+14.58 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.716e-04
+  ||Δu||/||u|| = 1.758e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27364,7 +27125,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 6.141e-16
+  ||ΔT||/||T|| = 1.698e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27375,9 +27136,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.24 um, u_r(clad)=+14.60 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.23 um, u_r(clad)=+14.59 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.831e-04
+  ||Δu||/||u|| = 1.876e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27407,7 +27168,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 5.671e-16
+  ||ΔT||/||T|| = 2.314e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27418,9 +27179,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.25 um, u_r(clad)=+14.62 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.24 um, u_r(clad)=+14.61 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.947e-04
+  ||Δu||/||u|| = 1.995e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27450,7 +27211,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.665e-15
+  ||ΔT||/||T|| = 3.787e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27461,9 +27222,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.26 um, u_r(clad)=+14.63 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.25 um, u_r(clad)=+14.62 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.064e-04
+  ||Δu||/||u|| = 2.115e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27493,7 +27254,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.081e-15
+  ||ΔT||/||T|| = 2.005e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27504,9 +27265,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.28 um, u_r(clad)=+14.64 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.27 um, u_r(clad)=+14.64 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.489e-04
+  ||Δu||/||u|| = 1.526e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27536,7 +27297,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.570e-15
+  ||ΔT||/||T|| = 2.804e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27547,9 +27308,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.29 um, u_r(clad)=+14.66 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.28 um, u_r(clad)=+14.65 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.589e-04
+  ||Δu||/||u|| = 1.628e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27579,7 +27340,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.219e-15
+  ||ΔT||/||T|| = 2.781e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27590,9 +27351,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.30 um, u_r(clad)=+14.67 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.29 um, u_r(clad)=+14.66 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.690e-04
+  ||Δu||/||u|| = 1.731e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27622,7 +27383,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.600e-15
+  ||ΔT||/||T|| = 1.068e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27633,9 +27394,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.31 um, u_r(clad)=+14.68 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.31 um, u_r(clad)=+14.67 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.792e-04
+  ||Δu||/||u|| = 1.835e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27665,7 +27426,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 4.415e-15
+  ||ΔT||/||T|| = 1.219e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27676,9 +27437,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.33 um, u_r(clad)=+14.69 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.32 um, u_r(clad)=+14.69 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.292e-04
+  ||Δu||/||u|| = 1.324e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27708,7 +27469,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 7.271e-15
+  ||ΔT||/||T|| = 2.814e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27719,9 +27480,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.34 um, u_r(clad)=+14.70 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.33 um, u_r(clad)=+14.69 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.379e-04
+  ||Δu||/||u|| = 1.413e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27751,7 +27512,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 5.873e-16
+  ||ΔT||/||T|| = 1.057e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27762,9 +27523,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.35 um, u_r(clad)=+14.71 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.34 um, u_r(clad)=+14.70 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.467e-04
+  ||Δu||/||u|| = 1.503e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27794,7 +27555,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.890e-15
+  ||ΔT||/||T|| = 6.783e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27805,9 +27566,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.36 um, u_r(clad)=+14.72 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.35 um, u_r(clad)=+14.72 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.555e-04
+  ||Δu||/||u|| = 1.593e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27837,7 +27598,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 3.154e-15
+  ||ΔT||/||T|| = 2.157e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27848,9 +27609,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.37 um, u_r(clad)=+14.73 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.36 um, u_r(clad)=+14.73 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.122e-04
+  ||Δu||/||u|| = 1.149e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -27880,7 +27641,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 1.964e-15
+  ||ΔT||/||T|| = 4.529e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27891,9 +27652,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.38 um, u_r(clad)=+14.74 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.37 um, u_r(clad)=+14.74 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.197e-04
+  ||Δu||/||u|| = 1.226e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27923,7 +27684,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 2.274e-15
+  ||ΔT||/||T|| = 2.613e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27934,9 +27695,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.38 um, u_r(clad)=+14.75 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.38 um, u_r(clad)=+14.74 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.273e-04
+  ||Δu||/||u|| = 1.304e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -27966,7 +27727,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 3.647e-16
+  ||ΔT||/||T|| = 5.142e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -27977,9 +27738,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.39 um, u_r(clad)=+14.76 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.39 um, u_r(clad)=+14.75 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.349e-04
+  ||Δu||/||u|| = 1.382e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28009,7 +27770,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 4.500e-15
+  ||ΔT||/||T|| = 2.519e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -28020,9 +27781,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.40 um, u_r(clad)=+14.77 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.40 um, u_r(clad)=+14.76 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 9.733e-05
+  ||Δu||/||u|| = 9.971e-05
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28086,7 +27847,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 9.193e-15
+  ||ΔT||/||T|| = 1.080e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -28097,9 +27858,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.41 um, u_r(clad)=+14.78 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.41 um, u_r(clad)=+14.77 um, gap=-0.63 um, p=31.701 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.121e-04
+  ||Δu||/||u|| = 8.144e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28129,8 +27890,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1113.83 K, mean=914.65 K
-  ||ΔT||/||T|| = 7.303e-16
-  [adaptive] relax_T=0.90
+  ||ΔT||/||T|| = 1.788e-15
+  [adaptive] relax_T=0.54
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28140,9 +27901,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.48 um, u_r(clad)=+14.78 um, gap=-0.69 um, p=34.738 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.47 um, u_r(clad)=+14.78 um, gap=-0.69 um, p=34.738 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.214e-04
+  ||Δu||/||u|| = 8.238e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28172,8 +27933,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1108.96 K, mean=910.96 K
-  ||ΔT||/||T|| = 4.158e-03
-  [adaptive] relax_T=0.54
+  ||ΔT||/||T|| = 2.495e-03
+  [adaptive] relax_T=0.32
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28185,7 +27946,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+80.54 um, u_r(clad)=+14.82 um, gap=-0.72 um, p=35.990 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.668e-04
+  ||Δu||/||u|| = 6.993e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28206,17 +27967,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 693.85 K
+  → Average gap temperature between cyl_1 and inner_2: 694.54 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4269.17 W/m²K
-  → h_open      = 4269.17 W/m²K, h_contact = 2609.56 W/m²K (gap closed)
+  → h_gap       = 4272.50 W/m²K
+  → h_open      = 4272.50 W/m²K, h_contact = 2609.56 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1108.17 K, mean=910.28 K
-  ||ΔT||/||T|| = 6.571e-04
-  [adaptive] relax_T=0.59
+  T_new: min=580.00 K, max=1107.72 K, mean=909.97 K
+  ||ΔT||/||T|| = 1.068e-03
+  [adaptive] relax_T=0.19
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28226,9 +27987,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.59 um, u_r(clad)=+14.87 um, gap=-0.72 um, p=36.110 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.59 um, u_r(clad)=+14.87 um, gap=-0.72 um, p=36.250 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.009e-04
+  ||Δu||/||u|| = 7.303e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -28249,17 +28010,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 693.38 K
+  → Average gap temperature between cyl_1 and inner_2: 694.02 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4266.88 W/m²K
-  → h_open      = 4266.88 W/m²K, h_contact = 2618.28 W/m²K (gap closed)
+  → h_gap       = 4270.01 W/m²K
+  → h_open      = 4270.01 W/m²K, h_contact = 2628.39 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.79 K, mean=909.97 K
-  ||ΔT||/||T|| = 5.496e-04
-  [adaptive] relax_T=0.65
+  T_new: min=580.00 K, max=1107.48 K, mean=909.77 K
+  ||ΔT||/||T|| = 4.766e-04
+  [adaptive] relax_T=0.21
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28269,10 +28030,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.65 um, u_r(clad)=+14.92 um, gap=-0.72 um, p=36.122 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.65 um, u_r(clad)=+14.92 um, gap=-0.73 um, p=36.288 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.337e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 7.673e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -28292,17 +28053,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.99 K
+  → Average gap temperature between cyl_1 and inner_2: 693.77 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4264.99 W/m²K
-  → h_open      = 4264.99 W/m²K, h_contact = 2619.14 W/m²K (gap closed)
+  → h_gap       = 4268.81 W/m²K
+  → h_open      = 4268.81 W/m²K, h_contact = 2631.16 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.61 K, mean=909.82 K
-  ||ΔT||/||T|| = 3.576e-04
-  [adaptive] relax_T=0.72
+  T_new: min=580.00 K, max=1107.46 K, mean=909.74 K
+  ||ΔT||/||T|| = 4.273e-04
+  [adaptive] relax_T=0.24
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28312,9 +28073,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.70 um, u_r(clad)=+14.98 um, gap=-0.72 um, p=36.081 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.70 um, u_r(clad)=+14.98 um, gap=-0.73 um, p=36.260 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.679e-04
+  ||Δu||/||u|| = 6.027e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28335,17 +28096,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.72 K
+  → Average gap temperature between cyl_1 and inner_2: 693.54 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4263.66 W/m²K
-  → h_open      = 4263.66 W/m²K, h_contact = 2616.20 W/m²K (gap closed)
+  → h_gap       = 4267.67 W/m²K
+  → h_open      = 4267.67 W/m²K, h_contact = 2629.11 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.52 K, mean=909.74 K
-  ||ΔT||/||T|| = 1.974e-04
-  [adaptive] relax_T=0.79
+  T_new: min=580.00 K, max=1107.51 K, mean=909.77 K
+  ||ΔT||/||T|| = 3.582e-04
+  [adaptive] relax_T=0.26
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28355,10 +28116,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.76 um, u_r(clad)=+15.04 um, gap=-0.72 um, p=36.034 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.75 um, u_r(clad)=+15.02 um, gap=-0.72 um, p=36.218 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.493e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 6.350e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -28378,17 +28139,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.54 K
+  → Average gap temperature between cyl_1 and inner_2: 693.33 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4262.82 W/m²K
-  → h_open      = 4262.82 W/m²K, h_contact = 2612.79 W/m²K (gap closed)
+  → h_gap       = 4266.66 W/m²K
+  → h_open      = 4266.66 W/m²K, h_contact = 2626.11 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.47 K, mean=909.69 K
-  ||ΔT||/||T|| = 1.017e-04
-  [adaptive] relax_T=0.87
+  T_new: min=580.00 K, max=1107.55 K, mean=909.79 K
+  ||ΔT||/||T|| = 2.909e-04
+  [adaptive] relax_T=0.28
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28398,9 +28159,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.80 um, u_r(clad)=+15.08 um, gap=-0.72 um, p=36.012 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.79 um, u_r(clad)=+15.07 um, gap=-0.72 um, p=36.167 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.836e-04
+  ||Δu||/||u|| = 6.677e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -28421,17 +28182,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.45 K
+  → Average gap temperature between cyl_1 and inner_2: 693.15 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4262.34 W/m²K
-  → h_open      = 4262.34 W/m²K, h_contact = 2611.20 W/m²K (gap closed)
+  → h_gap       = 4265.77 W/m²K
+  → h_open      = 4265.77 W/m²K, h_contact = 2622.41 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.42 K, mean=909.65 K
-  ||ΔT||/||T|| = 6.594e-05
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.59 K, mean=909.81 K
+  ||ΔT||/||T|| = 2.281e-04
+  [adaptive] relax_T=0.31
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28441,10 +28202,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.84 um, u_r(clad)=+15.12 um, gap=-0.72 um, p=35.995 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.84 um, u_r(clad)=+15.12 um, gap=-0.72 um, p=36.118 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.189e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 7.009e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -28464,17 +28225,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.39 K
+  → Average gap temperature between cyl_1 and inner_2: 692.99 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4262.06 W/m²K
-  → h_open      = 4262.06 W/m²K, h_contact = 2609.96 W/m²K (gap closed)
+  → h_gap       = 4265.00 W/m²K
+  → h_open      = 4265.00 W/m²K, h_contact = 2618.86 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.495e-05
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.61 K, mean=909.82 K
+  ||ΔT||/||T|| = 1.755e-04
+  [adaptive] relax_T=0.34
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28484,9 +28245,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.89 um, u_r(clad)=+15.17 um, gap=-0.72 um, p=35.983 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.89 um, u_r(clad)=+15.17 um, gap=-0.72 um, p=36.078 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.552e-04
+  ||Δu||/||u|| = 5.015e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28507,17 +28268,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.36 K
+  → Average gap temperature between cyl_1 and inner_2: 692.86 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.93 W/m²K
-  → h_open      = 4261.93 W/m²K, h_contact = 2609.06 W/m²K (gap closed)
+  → h_gap       = 4264.36 W/m²K
+  → h_open      = 4264.36 W/m²K, h_contact = 2615.93 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 7.465e-06
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.60 K, mean=909.80 K
+  ||ΔT||/||T|| = 1.356e-04
+  [adaptive] relax_T=0.38
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28527,10 +28288,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.93 um, u_r(clad)=+15.21 um, gap=-0.72 um, p=35.976 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.93 um, u_r(clad)=+15.21 um, gap=-0.72 um, p=36.057 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.723e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 5.319e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -28550,17 +28311,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.75 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.89 W/m²K
-  → h_open      = 4261.89 W/m²K, h_contact = 2608.59 W/m²K (gap closed)
+  → h_gap       = 4263.82 W/m²K
+  → h_open      = 4263.82 W/m²K, h_contact = 2614.45 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.102e-06
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.56 K, mean=909.77 K
+  ||ΔT||/||T|| = 1.121e-04
+  [adaptive] relax_T=0.42
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28570,9 +28331,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+80.97 um, u_r(clad)=+15.25 um, gap=-0.72 um, p=35.975 MPa (CLOSED)
+  [contact] u_r(fuel)=+80.97 um, u_r(clad)=+15.25 um, gap=-0.72 um, p=36.038 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.039e-04
+  ||Δu||/||u|| = 5.628e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -28593,17 +28354,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.65 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.87 W/m²K
-  → h_open      = 4261.87 W/m²K, h_contact = 2608.47 W/m²K (gap closed)
+  → h_gap       = 4263.36 W/m²K
+  → h_open      = 4263.36 W/m²K, h_contact = 2613.02 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.805e-06
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.53 K, mean=909.74 K
+  ||ΔT||/||T|| = 9.047e-05
+  [adaptive] relax_T=0.46
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28613,10 +28374,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.01 um, u_r(clad)=+15.29 um, gap=-0.72 um, p=35.974 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.01 um, u_r(clad)=+15.29 um, gap=-0.72 um, p=36.020 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.359e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 5.939e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -28636,17 +28397,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.58 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.41 W/m²K (gap closed)
+  → h_gap       = 4262.98 W/m²K
+  → h_open      = 4262.98 W/m²K, h_contact = 2611.77 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.515e-07
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.50 K, mean=909.71 K
+  ||ΔT||/||T|| = 7.165e-05
+  [adaptive] relax_T=0.50
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28656,9 +28417,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.05 um, u_r(clad)=+15.33 um, gap=-0.72 um, p=35.974 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.06 um, u_r(clad)=+15.34 um, gap=-0.72 um, p=36.006 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.681e-04
+  ||Δu||/||u|| = 4.268e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28679,17 +28440,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.51 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.38 W/m²K (gap closed)
+  → h_gap       = 4262.67 W/m²K
+  → h_open      = 4262.67 W/m²K, h_contact = 2610.76 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 7.910e-08
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.47 K, mean=909.69 K
+  ||ΔT||/||T|| = 5.581e-05
+  [adaptive] relax_T=0.55
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28699,10 +28460,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.09 um, u_r(clad)=+15.37 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.09 um, u_r(clad)=+15.37 um, gap=-0.72 um, p=35.999 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.098e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 4.542e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -28722,17 +28483,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.46 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_gap       = 4262.42 W/m²K
+  → h_open      = 4262.42 W/m²K, h_contact = 2610.24 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 3.557e-08
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.44 K, mean=909.67 K
+  ||ΔT||/||T|| = 4.508e-05
+  [adaptive] relax_T=0.61
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28742,9 +28503,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.12 um, u_r(clad)=+15.40 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.12 um, u_r(clad)=+15.40 um, gap=-0.72 um, p=35.992 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.372e-04
+  ||Δu||/||u|| = 4.819e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -28765,17 +28526,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.42 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_gap       = 4262.23 W/m²K
+  → h_open      = 4262.23 W/m²K, h_contact = 2609.72 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.181e-08
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.43 K, mean=909.65 K
+  ||ΔT||/||T|| = 3.258e-05
+  [adaptive] relax_T=0.67
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28785,10 +28546,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.15 um, u_r(clad)=+15.43 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.16 um, u_r(clad)=+15.44 um, gap=-0.72 um, p=35.986 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.651e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 5.099e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -28808,17 +28569,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.39 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_gap       = 4262.09 W/m²K
+  → h_open      = 4262.09 W/m²K, h_contact = 2609.25 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 5.013e-09
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.42 K, mean=909.64 K
+  ||ΔT||/||T|| = 2.151e-05
+  [adaptive] relax_T=0.74
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28828,9 +28589,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.19 um, u_r(clad)=+15.47 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.19 um, u_r(clad)=+15.47 um, gap=-0.72 um, p=35.981 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.930e-04
+  ||Δu||/||u|| = 3.673e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -28851,17 +28612,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.37 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_gap       = 4261.99 W/m²K
+  → h_open      = 4261.99 W/m²K, h_contact = 2608.89 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.692e-09
-  [adaptive] relax_T=0.90
+  T_new: min=580.00 K, max=1107.41 K, mean=909.64 K
+  ||ΔT||/||T|| = 1.326e-05
+  [adaptive] relax_T=0.81
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28871,10 +28632,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.22 um, u_r(clad)=+15.50 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.22 um, u_r(clad)=+15.50 um, gap=-0.72 um, p=35.978 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.556e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.916e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -28894,17 +28655,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → Average gap temperature between cyl_1 and inner_2: 692.36 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_gap       = 4261.93 W/m²K
+  → h_open      = 4261.93 W/m²K, h_contact = 2608.72 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 8.443e-10
-  [adaptive] relax_T=0.90
+  ||ΔT||/||T|| = 8.958e-06
+  [adaptive] relax_T=0.89
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -28914,9 +28675,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.25 um, u_r(clad)=+15.53 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.25 um, u_r(clad)=+15.53 um, gap=-0.72 um, p=35.976 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.794e-04
+  ||Δu||/||u|| = 4.163e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -28940,13 +28701,13 @@ Convergence check
   → Average gap temperature between cyl_1 and inner_2: 692.35 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_gap       = 4261.89 W/m²K
+  → h_open      = 4261.89 W/m²K, h_contact = 2608.58 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 3.683e-11
+  ||ΔT||/||T|| = 4.263e-06
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -28957,10 +28718,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.28 um, u_r(clad)=+15.56 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.28 um, u_r(clad)=+15.56 um, gap=-0.72 um, p=35.975 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.036e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.411e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -28983,13 +28744,13 @@ Convergence check
   → Average gap temperature between cyl_1 and inner_2: 692.35 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_gap       = 4261.87 W/m²K
+  → h_open      = 4261.87 W/m²K, h_contact = 2608.46 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 9.711e-11
+  ||ΔT||/||T|| = 1.522e-06
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29000,9 +28761,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.31 um, u_r(clad)=+15.59 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.31 um, u_r(clad)=+15.59 um, gap=-0.72 um, p=35.974 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.279e-04
+  ||Δu||/||u|| = 3.182e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -29027,12 +28788,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_open      = 4261.86 W/m²K, h_contact = 2608.40 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.558e-11
+  ||ΔT||/||T|| = 4.489e-07
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29043,10 +28804,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.34 um, u_r(clad)=+15.62 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.34 um, u_r(clad)=+15.62 um, gap=-0.72 um, p=35.974 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.086e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.395e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -29070,12 +28831,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_open      = 4261.86 W/m²K, h_contact = 2608.38 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.019e-11
+  ||ΔT||/||T|| = 3.217e-07
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29088,7 +28849,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.36 um, u_r(clad)=+15.64 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.293e-04
+  ||Δu||/||u|| = 3.611e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -29113,12 +28874,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4261.86 W/m²K
-  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  → h_open      = 4261.86 W/m²K, h_contact = 2608.37 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 4.011e-12
+  ||ΔT||/||T|| = 5.036e-08
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29129,10 +28890,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.38 um, u_r(clad)=+15.67 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.39 um, u_r(clad)=+15.67 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.503e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.828e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -29161,7 +28922,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.080e-12
+  ||ΔT||/||T|| = 1.430e-08
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29172,9 +28933,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.41 um, u_r(clad)=+15.69 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.42 um, u_r(clad)=+15.70 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.713e-04
+  ||Δu||/||u|| = 2.761e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -29204,7 +28965,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.565e-13
+  ||ΔT||/||T|| = 5.762e-09
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29217,8 +28978,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.44 um, u_r(clad)=+15.72 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.678e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.946e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -29247,7 +29008,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 7.219e-14
+  ||ΔT||/||T|| = 4.406e-09
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29260,7 +29021,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.46 um, u_r(clad)=+15.74 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.858e-04
+  ||Δu||/||u|| = 3.134e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -29290,7 +29051,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 8.153e-14
+  ||ΔT||/||T|| = 8.517e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29303,8 +29064,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.48 um, u_r(clad)=+15.76 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.040e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.322e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -29333,7 +29094,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.066e-14
+  ||ΔT||/||T|| = 2.997e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29344,9 +29105,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.50 um, u_r(clad)=+15.78 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.51 um, u_r(clad)=+15.79 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.222e-04
+  ||Δu||/||u|| = 2.396e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -29376,7 +29137,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 4.497e-15
+  ||ΔT||/||T|| = 1.523e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29389,8 +29150,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.53 um, u_r(clad)=+15.81 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.324e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.557e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -29419,7 +29180,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.289e-15
+  ||ΔT||/||T|| = 1.560e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29432,7 +29193,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.54 um, u_r(clad)=+15.82 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.480e-04
+  ||Δu||/||u|| = 2.719e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -29462,7 +29223,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.825e-15
+  ||ΔT||/||T|| = 1.788e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29475,8 +29236,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.56 um, u_r(clad)=+15.84 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.638e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.883e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -29505,7 +29266,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 6.525e-16
+  ||ΔT||/||T|| = 4.875e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29516,9 +29277,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.58 um, u_r(clad)=+15.86 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.59 um, u_r(clad)=+15.87 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.797e-04
+  ||Δu||/||u|| = 2.079e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -29548,7 +29309,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 3.736e-15
+  ||ΔT||/||T|| = 2.032e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29561,8 +29322,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.60 um, u_r(clad)=+15.88 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.017e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.219e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -29591,7 +29352,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 5.181e-16
+  ||ΔT||/||T|| = 6.450e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29604,7 +29365,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.62 um, u_r(clad)=+15.90 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.152e-04
+  ||Δu||/||u|| = 2.360e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -29634,7 +29395,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.810e-15
+  ||ΔT||/||T|| = 2.149e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29645,10 +29406,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.63 um, u_r(clad)=+15.91 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.63 um, u_r(clad)=+15.92 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.290e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.502e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -29677,7 +29438,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.489e-15
+  ||ΔT||/||T|| = 5.241e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29690,7 +29451,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.65 um, u_r(clad)=+15.93 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.427e-04
+  ||Δu||/||u|| = 1.805e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -29720,7 +29481,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.798e-15
+  ||ΔT||/||T|| = 1.372e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29733,8 +29494,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.67 um, u_r(clad)=+15.95 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.751e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.926e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -29763,7 +29524,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.744e-15
+  ||ΔT||/||T|| = 1.851e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29776,7 +29537,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.68 um, u_r(clad)=+15.96 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.868e-04
+  ||Δu||/||u|| = 2.048e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -29806,7 +29567,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 5.618e-15
+  ||ΔT||/||T|| = 2.545e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29817,10 +29578,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.69 um, u_r(clad)=+15.97 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.70 um, u_r(clad)=+15.98 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.987e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.171e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -29849,7 +29610,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 3.237e-15
+  ||ΔT||/||T|| = 4.401e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29862,7 +29623,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.71 um, u_r(clad)=+15.99 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.106e-04
+  ||Δu||/||u|| = 1.566e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -29892,7 +29653,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.827e-15
+  ||ΔT||/||T|| = 3.032e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29905,8 +29666,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.72 um, u_r(clad)=+16.00 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.519e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.671e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -29935,7 +29696,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 5.677e-15
+  ||ΔT||/||T|| = 1.638e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29948,7 +29709,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.74 um, u_r(clad)=+16.02 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.621e-04
+  ||Δu||/||u|| = 1.778e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -29978,7 +29739,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 3.315e-15
+  ||ΔT||/||T|| = 2.773e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -29991,8 +29752,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.75 um, u_r(clad)=+16.03 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.724e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.884e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -30021,7 +29782,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.696e-15
+  ||ΔT||/||T|| = 1.960e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30034,7 +29795,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.76 um, u_r(clad)=+16.04 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.828e-04
+  ||Δu||/||u|| = 1.359e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30064,7 +29825,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 6.463e-15
+  ||ΔT||/||T|| = 1.543e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30077,8 +29838,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.77 um, u_r(clad)=+16.05 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.319e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.450e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -30107,7 +29868,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 3.308e-15
+  ||ΔT||/||T|| = 7.705e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30120,7 +29881,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.78 um, u_r(clad)=+16.06 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.407e-04
+  ||Δu||/||u|| = 1.543e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -30150,7 +29911,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.418e-15
+  ||ΔT||/||T|| = 2.203e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30161,10 +29922,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.79 um, u_r(clad)=+16.07 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.80 um, u_r(clad)=+16.08 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.496e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.635e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -30193,7 +29954,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 4.538e-15
+  ||ΔT||/||T|| = 3.792e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30204,9 +29965,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.80 um, u_r(clad)=+16.09 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.81 um, u_r(clad)=+16.09 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.586e-04
+  ||Δu||/||u|| = 1.180e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30236,7 +29997,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.136e-15
+  ||ΔT||/||T|| = 1.514e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30249,8 +30010,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.82 um, u_r(clad)=+16.10 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.144e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.259e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -30279,7 +30040,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.705e-15
+  ||ΔT||/||T|| = 4.729e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30292,7 +30053,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.83 um, u_r(clad)=+16.11 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.221e-04
+  ||Δu||/||u|| = 1.339e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -30322,7 +30083,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.185e-15
+  ||ΔT||/||T|| = 3.490e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30333,10 +30094,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.83 um, u_r(clad)=+16.11 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.84 um, u_r(clad)=+16.12 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.299e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.419e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -30365,7 +30126,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.127e-15
+  ||ΔT||/||T|| = 5.087e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30376,9 +30137,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.84 um, u_r(clad)=+16.12 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.85 um, u_r(clad)=+16.13 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.377e-04
+  ||Δu||/||u|| = 1.024e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30408,7 +30169,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 7.275e-16
+  ||ΔT||/||T|| = 1.757e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30421,12 +30182,141 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+81.85 um, u_r(clad)=+16.13 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 9.931e-05
+  ||Δu||/||u|| = 1.092e-04
+  [adaptive] relax_u=0.04
+
+Convergence check
+
+
+#### Iteration 56/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4261.86 W/m²K
+  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
+  ||ΔT||/||T|| = 5.843e-16
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+81.86 um, u_r(clad)=+16.14 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.162e-04
+  [adaptive] relax_u=0.04
+
+Convergence check
+
+
+#### Iteration 57/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4261.86 W/m²K
+  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
+  ||ΔT||/||T|| = 3.257e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+81.87 um, u_r(clad)=+16.15 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.232e-04
   [adaptive] relax_u=0.03
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 55 iterations.
+
+#### Iteration 58/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 692.35 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4261.86 W/m²K
+  → h_open      = 4261.86 W/m²K, h_contact = 2608.36 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
+  ||ΔT||/||T|| = 4.181e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+81.88 um, u_r(clad)=+16.16 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 8.884e-05
+  [adaptive] relax_u=0.03
+
+Convergence check
+
+**[SUCCESS]** Staggered solver converged in 58 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
 
@@ -30485,7 +30375,7 @@ Coupling = staggered
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 1.122e-15
+  ||ΔT||/||T|| = 4.061e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -30496,9 +30386,9 @@ Coupling = staggered
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.86 um, u_r(clad)=+16.14 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.89 um, u_r(clad)=+16.17 um, gap=-0.72 um, p=35.973 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.011e-04
+  ||Δu||/||u|| = 7.905e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30528,8 +30418,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1107.40 K, mean=909.63 K
-  ||ΔT||/||T|| = 2.189e-15
-  [adaptive] relax_T=0.54
+  ||ΔT||/||T|| = 2.371e-15
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30539,9 +30429,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.93 um, u_r(clad)=+16.15 um, gap=-0.78 um, p=39.010 MPa (CLOSED)
+  [contact] u_r(fuel)=+81.95 um, u_r(clad)=+16.17 um, gap=-0.78 um, p=39.010 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 8.103e-04
+  ||Δu||/||u|| = 7.995e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30571,8 +30461,8 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1102.93 K, mean=906.24 K
-  ||ΔT||/||T|| = 2.302e-03
-  [adaptive] relax_T=0.32
+  ||ΔT||/||T|| = 3.837e-03
+  [adaptive] relax_T=0.54
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30582,9 +30472,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+81.99 um, u_r(clad)=+16.19 um, gap=-0.81 um, p=40.262 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.02 um, u_r(clad)=+16.21 um, gap=-0.81 um, p=40.262 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.916e-04
+  ||Δu||/||u|| = 6.547e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30605,17 +30495,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 691.41 K
+  → Average gap temperature between cyl_1 and inner_2: 690.79 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4257.31 W/m²K
-  → h_open      = 4257.31 W/m²K, h_contact = 2919.32 W/m²K (gap closed)
+  → h_gap       = 4254.27 W/m²K
+  → h_open      = 4254.27 W/m²K, h_contact = 2919.32 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.79 K, mean=905.34 K
-  ||ΔT||/||T|| = 9.838e-04
-  [adaptive] relax_T=0.19
+  T_new: min=580.00 K, max=1102.21 K, mean=905.63 K
+  ||ΔT||/||T|| = 6.005e-04
+  [adaptive] relax_T=0.59
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30625,9 +30515,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.05 um, u_r(clad)=+16.24 um, gap=-0.81 um, p=40.539 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.07 um, u_r(clad)=+16.26 um, gap=-0.81 um, p=40.410 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.245e-04
+  ||Δu||/||u|| = 6.899e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -30648,17 +30538,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 690.94 K
+  → Average gap temperature between cyl_1 and inner_2: 690.36 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4255.03 W/m²K
-  → h_open      = 4255.03 W/m²K, h_contact = 2939.38 W/m²K (gap closed)
+  → h_gap       = 4252.18 W/m²K
+  → h_open      = 4252.18 W/m²K, h_contact = 2930.08 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.55 K, mean=905.13 K
-  ||ΔT||/||T|| = 4.436e-04
-  [adaptive] relax_T=0.21
+  T_new: min=580.00 K, max=1101.81 K, mean=905.30 K
+  ||ΔT||/||T|| = 5.314e-04
+  [adaptive] relax_T=0.65
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30668,10 +30558,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.10 um, u_r(clad)=+16.29 um, gap=-0.81 um, p=40.593 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.12 um, u_r(clad)=+16.31 um, gap=-0.81 um, p=40.441 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.624e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 7.232e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -30691,17 +30581,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 690.71 K
+  → Average gap temperature between cyl_1 and inner_2: 689.99 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4253.92 W/m²K
-  → h_open      = 4253.92 W/m²K, h_contact = 2943.34 W/m²K (gap closed)
+  → h_gap       = 4250.39 W/m²K
+  → h_open      = 4250.39 W/m²K, h_contact = 2932.33 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.51 K, mean=905.09 K
-  ||ΔT||/||T|| = 4.023e-04
-  [adaptive] relax_T=0.24
+  T_new: min=580.00 K, max=1101.62 K, mean=905.14 K
+  ||ΔT||/||T|| = 3.573e-04
+  [adaptive] relax_T=0.72
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30711,9 +30601,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.16 um, u_r(clad)=+16.35 um, gap=-0.81 um, p=40.576 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.17 um, u_r(clad)=+16.37 um, gap=-0.81 um, p=40.411 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.997e-04
+  ||Δu||/||u|| = 7.573e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30734,17 +30624,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 690.50 K
+  → Average gap temperature between cyl_1 and inner_2: 689.72 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4252.87 W/m²K
-  → h_open      = 4252.87 W/m²K, h_contact = 2942.08 W/m²K (gap closed)
+  → h_gap       = 4249.09 W/m²K
+  → h_open      = 4249.09 W/m²K, h_contact = 2930.12 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.54 K, mean=905.10 K
-  ||ΔT||/||T|| = 3.407e-04
-  [adaptive] relax_T=0.26
+  T_new: min=580.00 K, max=1101.53 K, mean=905.06 K
+  ||ΔT||/||T|| = 2.036e-04
+  [adaptive] relax_T=0.79
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30754,10 +30644,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.20 um, u_r(clad)=+16.39 um, gap=-0.81 um, p=40.540 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.23 um, u_r(clad)=+16.42 um, gap=-0.81 um, p=40.368 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.324e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 5.417e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -30777,17 +30667,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 690.30 K
+  → Average gap temperature between cyl_1 and inner_2: 689.55 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4251.91 W/m²K
-  → h_open      = 4251.91 W/m²K, h_contact = 2939.46 W/m²K (gap closed)
+  → h_gap       = 4248.25 W/m²K
+  → h_open      = 4248.25 W/m²K, h_contact = 2926.98 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.57 K, mean=905.12 K
-  ||ΔT||/||T|| = 2.787e-04
-  [adaptive] relax_T=0.28
+  T_new: min=580.00 K, max=1101.47 K, mean=905.00 K
+  ||ΔT||/||T|| = 1.082e-04
+  [adaptive] relax_T=0.87
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30797,9 +30687,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.25 um, u_r(clad)=+16.44 um, gap=-0.81 um, p=40.493 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.27 um, u_r(clad)=+16.46 um, gap=-0.81 um, p=40.346 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.655e-04
+  ||Δu||/||u|| = 5.754e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -30820,17 +30710,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 690.13 K
+  → Average gap temperature between cyl_1 and inner_2: 689.45 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4251.07 W/m²K
-  → h_open      = 4251.07 W/m²K, h_contact = 2936.06 W/m²K (gap closed)
+  → h_gap       = 4247.76 W/m²K
+  → h_open      = 4247.76 W/m²K, h_contact = 2925.41 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.60 K, mean=905.13 K
-  ||ΔT||/||T|| = 2.205e-04
-  [adaptive] relax_T=0.31
+  T_new: min=580.00 K, max=1101.42 K, mean=904.96 K
+  ||ΔT||/||T|| = 6.952e-05
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30840,10 +30730,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.30 um, u_r(clad)=+16.49 um, gap=-0.81 um, p=40.447 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.31 um, u_r(clad)=+16.51 um, gap=-0.81 um, p=40.328 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 6.990e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 6.102e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -30863,17 +30753,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.98 K
+  → Average gap temperature between cyl_1 and inner_2: 689.39 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4250.34 W/m²K
-  → h_open      = 4250.34 W/m²K, h_contact = 2932.74 W/m²K (gap closed)
+  → h_gap       = 4247.46 W/m²K
+  → h_open      = 4247.46 W/m²K, h_contact = 2924.13 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.61 K, mean=905.13 K
-  ||ΔT||/||T|| = 1.716e-04
-  [adaptive] relax_T=0.34
+  T_new: min=580.00 K, max=1101.40 K, mean=904.94 K
+  ||ΔT||/||T|| = 2.801e-05
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30883,9 +30773,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.35 um, u_r(clad)=+16.55 um, gap=-0.81 um, p=40.409 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.36 um, u_r(clad)=+16.55 um, gap=-0.81 um, p=40.315 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.003e-04
+  ||Δu||/||u|| = 6.458e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -30906,17 +30796,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.85 K
+  → Average gap temperature between cyl_1 and inner_2: 689.36 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4249.72 W/m²K
-  → h_open      = 4249.72 W/m²K, h_contact = 2929.95 W/m²K (gap closed)
+  → h_gap       = 4247.33 W/m²K
+  → h_open      = 4247.33 W/m²K, h_contact = 2923.20 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.60 K, mean=905.12 K
-  ||ΔT||/||T|| = 1.339e-04
-  [adaptive] relax_T=0.38
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 9.464e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30926,10 +30816,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.39 um, u_r(clad)=+16.58 um, gap=-0.81 um, p=40.389 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.41 um, u_r(clad)=+16.60 um, gap=-0.81 um, p=40.308 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.308e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.655e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -30949,17 +30839,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.74 K
+  → Average gap temperature between cyl_1 and inner_2: 689.35 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4249.20 W/m²K
-  → h_open      = 4249.20 W/m²K, h_contact = 2928.52 W/m²K (gap closed)
+  → h_gap       = 4247.27 W/m²K
+  → h_open      = 4247.27 W/m²K, h_contact = 2922.70 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.56 K, mean=905.08 K
-  ||ΔT||/||T|| = 1.112e-04
-  [adaptive] relax_T=0.42
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 3.069e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -30969,9 +30859,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.43 um, u_r(clad)=+16.62 um, gap=-0.81 um, p=40.369 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.44 um, u_r(clad)=+16.64 um, gap=-0.81 um, p=40.307 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.617e-04
+  ||Δu||/||u|| = 4.966e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -30992,17 +30882,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.65 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4248.75 W/m²K
-  → h_open      = 4248.75 W/m²K, h_contact = 2927.11 W/m²K (gap closed)
+  → h_gap       = 4247.25 W/m²K
+  → h_open      = 4247.25 W/m²K, h_contact = 2922.56 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.52 K, mean=905.05 K
-  ||ΔT||/||T|| = 9.028e-05
-  [adaptive] relax_T=0.46
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 2.308e-06
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31012,10 +30902,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.47 um, u_r(clad)=+16.67 um, gap=-0.81 um, p=40.352 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.48 um, u_r(clad)=+16.68 um, gap=-0.81 um, p=40.306 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.929e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 5.282e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -31035,17 +30925,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.57 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4248.37 W/m²K
-  → h_open      = 4248.37 W/m²K, h_contact = 2925.88 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.49 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.49 K, mean=905.02 K
-  ||ΔT||/||T|| = 7.207e-05
-  [adaptive] relax_T=0.50
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 4.058e-07
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31055,9 +30945,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.52 um, u_r(clad)=+16.71 um, gap=-0.81 um, p=40.339 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.52 um, u_r(clad)=+16.72 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.261e-04
+  ||Δu||/||u|| = 5.599e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -31078,17 +30968,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.51 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4248.06 W/m²K
-  → h_open      = 4248.06 W/m²K, h_contact = 2924.88 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.44 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.47 K, mean=905.00 K
-  ||ΔT||/||T|| = 5.665e-05
-  [adaptive] relax_T=0.55
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 1.236e-07
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31098,10 +30988,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.55 um, u_r(clad)=+16.74 um, gap=-0.81 um, p=40.331 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.56 um, u_r(clad)=+16.76 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.534e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 4.038e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -31121,17 +31011,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.46 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4247.82 W/m²K
-  → h_open      = 4247.82 W/m²K, h_contact = 2924.36 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.44 K, mean=904.98 K
-  ||ΔT||/||T|| = 4.594e-05
-  [adaptive] relax_T=0.61
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 3.643e-08
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31141,9 +31031,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.58 um, u_r(clad)=+16.78 um, gap=-0.81 um, p=40.324 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.59 um, u_r(clad)=+16.79 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.811e-04
+  ||Δu||/||u|| = 4.309e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -31164,17 +31054,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.42 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4247.62 W/m²K
-  → h_open      = 4247.62 W/m²K, h_contact = 2923.83 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.42 K, mean=904.96 K
-  ||ΔT||/||T|| = 3.360e-05
-  [adaptive] relax_T=0.67
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 4.177e-08
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31184,10 +31074,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.62 um, u_r(clad)=+16.81 um, gap=-0.81 um, p=40.318 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.63 um, u_r(clad)=+16.82 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.090e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 4.584e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -31207,17 +31097,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.39 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4247.48 W/m²K
-  → h_open      = 4247.48 W/m²K, h_contact = 2923.36 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.41 K, mean=904.95 K
-  ||ΔT||/||T|| = 2.262e-05
-  [adaptive] relax_T=0.74
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 5.680e-09
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31227,9 +31117,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.66 um, u_r(clad)=+16.85 um, gap=-0.81 um, p=40.312 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.66 um, u_r(clad)=+16.86 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.666e-04
+  ||Δu||/||u|| = 4.859e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -31250,17 +31140,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.37 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4247.38 W/m²K
-  → h_open      = 4247.38 W/m²K, h_contact = 2922.98 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
-  T_new: min=580.00 K, max=1101.40 K, mean=904.94 K
-  ||ΔT||/||T|| = 1.429e-05
-  [adaptive] relax_T=0.81
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 1.704e-09
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31270,10 +31160,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.69 um, u_r(clad)=+16.88 um, gap=-0.81 um, p=40.310 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.70 um, u_r(clad)=+16.89 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.909e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.505e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -31293,17 +31183,17 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.36 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4247.32 W/m²K
-  → h_open      = 4247.32 W/m²K, h_contact = 2922.81 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 9.719e-06
-  [adaptive] relax_T=0.89
+  ||ΔT||/||T|| = 9.209e-10
+  [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
@@ -31313,9 +31203,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.72 um, u_r(clad)=+16.91 um, gap=-0.81 um, p=40.308 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.72 um, u_r(clad)=+16.92 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.155e-04
+  ||Δu||/||u|| = 3.740e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -31336,16 +31226,16 @@ Convergence check
   Applying flux on subdomain id = 8
   Applying flux on subdomain id = 2
   Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.35 K
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4247.28 W/m²K
-  → h_open      = 4247.28 W/m²K, h_contact = 2922.66 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 4.823e-06
+  ||ΔT||/||T|| = 4.327e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31356,10 +31246,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.75 um, u_r(clad)=+16.94 um, gap=-0.81 um, p=40.306 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.75 um, u_r(clad)=+16.95 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.403e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.978e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -31382,13 +31272,13 @@ Convergence check
   → Average gap temperature between cyl_1 and inner_2: 689.34 K
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
-  → h_gap       = 4247.25 W/m²K
-  → h_open      = 4247.25 W/m²K, h_contact = 2922.54 W/m²K (gap closed)
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.864e-06
+  ||ΔT||/||T|| = 1.337e-10
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31399,9 +31289,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.78 um, u_r(clad)=+16.97 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.78 um, u_r(clad)=+16.98 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.176e-04
+  ||Δu||/||u|| = 4.217e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -31426,12 +31316,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.47 W/m²K (gap closed)
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 6.200e-07
+  ||ΔT||/||T|| = 3.602e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31442,10 +31332,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.80 um, u_r(clad)=+17.00 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.81 um, u_r(clad)=+17.01 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.388e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 3.042e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -31469,12 +31359,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.44 W/m²K (gap closed)
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 4.128e-07
+  ||ΔT||/||T|| = 2.051e-11
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31485,9 +31375,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.83 um, u_r(clad)=+17.02 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.84 um, u_r(clad)=+17.03 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.604e-04
+  ||Δu||/||u|| = 3.245e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -31512,12 +31402,12 @@ Convergence check
   → k_gas       = 0.28 W/m·K
   → gap_size    = 0.065 mm
   → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.43 W/m²K (gap closed)
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
   Robin (gap) BC on region 3, paired with 'inner_2'
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 8.132e-08
+  ||ΔT||/||T|| = 8.650e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31528,10 +31418,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.86 um, u_r(clad)=+17.05 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.86 um, u_r(clad)=+17.06 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.820e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 3.452e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -31560,7 +31450,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.447e-08
+  ||ΔT||/||T|| = 2.727e-12
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31573,7 +31463,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+82.89 um, u_r(clad)=+17.08 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.756e-04
+  ||Δu||/||u|| = 3.659e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -31603,7 +31493,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 6.968e-09
+  ||ΔT||/||T|| = 7.462e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31614,10 +31504,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.91 um, u_r(clad)=+17.10 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.92 um, u_r(clad)=+17.11 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.940e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.640e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -31646,7 +31536,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 8.081e-09
+  ||ΔT||/||T|| = 3.228e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31657,9 +31547,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.93 um, u_r(clad)=+17.12 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.94 um, u_r(clad)=+17.13 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.127e-04
+  ||Δu||/||u|| = 2.816e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -31689,7 +31579,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.061e-09
+  ||ΔT||/||T|| = 1.458e-13
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31700,10 +31590,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+82.95 um, u_r(clad)=+17.15 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+82.96 um, u_r(clad)=+17.15 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.315e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.996e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -31732,7 +31622,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 3.245e-10
+  ||ΔT||/||T|| = 4.058e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31745,7 +31635,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+82.98 um, u_r(clad)=+17.17 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.391e-04
+  ||Δu||/||u|| = 3.176e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -31775,7 +31665,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.619e-10
+  ||ΔT||/||T|| = 1.179e-14
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31786,10 +31676,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.00 um, u_r(clad)=+17.19 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.00 um, u_r(clad)=+17.20 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.552e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 2.291e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -31818,7 +31708,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 9.366e-11
+  ||ΔT||/||T|| = 7.330e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31829,9 +31719,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.01 um, u_r(clad)=+17.21 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.02 um, u_r(clad)=+17.21 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.714e-04
+  ||Δu||/||u|| = 2.444e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -31861,7 +31751,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.397e-11
+  ||ΔT||/||T|| = 1.519e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31874,8 +31764,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+83.04 um, u_r(clad)=+17.23 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.877e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.600e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -31904,7 +31794,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 6.497e-12
+  ||ΔT||/||T|| = 8.484e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31917,7 +31807,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+83.06 um, u_r(clad)=+17.25 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.075e-04
+  ||Δu||/||u|| = 2.756e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -31947,7 +31837,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 3.812e-12
+  ||ΔT||/||T|| = 9.764e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -31958,10 +31848,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.07 um, u_r(clad)=+17.27 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.08 um, u_r(clad)=+17.27 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.214e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.988e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -31990,7 +31880,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.498e-13
+  ||ΔT||/||T|| = 3.585e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32001,9 +31891,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.09 um, u_r(clad)=+17.28 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.09 um, u_r(clad)=+17.29 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.355e-04
+  ||Δu||/||u|| = 2.121e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -32033,7 +31923,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 5.129e-13
+  ||ΔT||/||T|| = 6.006e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32046,8 +31936,8 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+83.11 um, u_r(clad)=+17.30 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.497e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 2.256e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -32076,7 +31966,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.435e-13
+  ||ΔT||/||T|| = 5.134e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32089,7 +31979,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+83.13 um, u_r(clad)=+17.32 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.801e-04
+  ||Δu||/||u|| = 2.392e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -32119,7 +32009,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 5.993e-14
+  ||ΔT||/||T|| = 3.431e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32130,10 +32020,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.14 um, u_r(clad)=+17.33 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.14 um, u_r(clad)=+17.34 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.922e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.725e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -32162,7 +32052,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.205e-14
+  ||ΔT||/||T|| = 7.911e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32173,9 +32063,9 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.15 um, u_r(clad)=+17.35 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.16 um, u_r(clad)=+17.35 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.044e-04
+  ||Δu||/||u|| = 1.841e-04
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -32205,7 +32095,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.335e-14
+  ||ΔT||/||T|| = 1.405e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32216,10 +32106,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.17 um, u_r(clad)=+17.36 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.17 um, u_r(clad)=+17.37 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.167e-04
-  [adaptive] relax_u=0.03
+  ||Δu||/||u|| = 1.958e-04
+  [adaptive] relax_u=0.04
 
 Convergence check
 
@@ -32248,7 +32138,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.914e-15
+  ||ΔT||/||T|| = 5.222e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32261,7 +32151,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+83.19 um, u_r(clad)=+17.38 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.563e-04
+  ||Δu||/||u|| = 2.076e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -32291,7 +32181,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.211e-15
+  ||ΔT||/||T|| = 7.064e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32302,10 +32192,10 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.20 um, u_r(clad)=+17.39 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.20 um, u_r(clad)=+17.40 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.668e-04
-  [adaptive] relax_u=0.04
+  ||Δu||/||u|| = 1.497e-04
+  [adaptive] relax_u=0.03
 
 Convergence check
 
@@ -32334,7 +32224,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.890e-15
+  ||ΔT||/||T|| = 7.483e-16
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32345,402 +32235,15 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.21 um, u_r(clad)=+17.40 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.21 um, u_r(clad)=+17.41 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.774e-04
+  ||Δu||/||u|| = 1.598e-04
   [adaptive] relax_u=0.04
 
 Convergence check
 
 
 #### Iteration 45/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.591e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.22 um, u_r(clad)=+17.42 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.881e-04
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-
-#### Iteration 46/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.233e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.24 um, u_r(clad)=+17.43 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.357e-04
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-
-#### Iteration 47/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.353e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.25 um, u_r(clad)=+17.44 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.447e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 48/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 5.380e-16
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.26 um, u_r(clad)=+17.45 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.540e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 49/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 8.058e-16
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.27 um, u_r(clad)=+17.46 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.632e-04
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-
-#### Iteration 50/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 4.073e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.28 um, u_r(clad)=+17.48 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.177e-04
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-
-#### Iteration 51/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 6.331e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.29 um, u_r(clad)=+17.49 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.256e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 52/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 4.656e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.30 um, u_r(clad)=+17.49 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.336e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 53/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.633e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.31 um, u_r(clad)=+17.50 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.416e-04
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-
-#### Iteration 54/250
 
 
 **[INFO]** Assembling thermal problem...
@@ -32775,9 +32278,396 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.23 um, u_r(clad)=+17.42 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.699e-04
+  [adaptive] relax_u=0.04
+
+Convergence check
+
+
+#### Iteration 46/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 1.075e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.24 um, u_r(clad)=+17.43 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.801e-04
+  [adaptive] relax_u=0.03
+
+Convergence check
+
+
+#### Iteration 47/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 4.733e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.25 um, u_r(clad)=+17.45 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.299e-04
+  [adaptive] relax_u=0.03
+
+Convergence check
+
+
+#### Iteration 48/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 5.299e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.26 um, u_r(clad)=+17.46 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.387e-04
+  [adaptive] relax_u=0.04
+
+Convergence check
+
+
+#### Iteration 49/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 5.923e-16
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.27 um, u_r(clad)=+17.47 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.475e-04
+  [adaptive] relax_u=0.04
+
+Convergence check
+
+
+#### Iteration 50/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 3.068e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.28 um, u_r(clad)=+17.48 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.563e-04
+  [adaptive] relax_u=0.03
+
+Convergence check
+
+
+#### Iteration 51/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 2.978e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.29 um, u_r(clad)=+17.49 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.128e-04
+  [adaptive] relax_u=0.03
+
+Convergence check
+
+
+#### Iteration 52/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 2.997e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.30 um, u_r(clad)=+17.50 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.203e-04
+  [adaptive] relax_u=0.04
+
+Convergence check
+
+
+#### Iteration 53/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 7.174e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
+  [contact] u_r(fuel)=+83.31 um, u_r(clad)=+17.51 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  Linear solver
+  ||Δu||/||u|| = 1.280e-04
+  [adaptive] relax_u=0.04
+
+Convergence check
+
+
+#### Iteration 54/250
+
+
+**[INFO]** Assembling thermal problem...
+
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
+
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
+  Applying flux on subdomain id = 1
+  Applying flux on subdomain id = 7
+  Applying flux on subdomain id = 8
+  Applying flux on subdomain id = 2
+  Applying flux on subdomain id = 6
+  → Average gap temperature between cyl_1 and inner_2: 689.34 K
+  → k_gas       = 0.28 W/m·K
+  → gap_size    = 0.065 mm
+  → h_gap       = 4247.24 W/m²K
+  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
+  Robin (gap) BC on region 3, paired with 'inner_2'
+  Robin (gap) BC on region 5, paired with 'lateral_1'
+  Linear solver
+  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
+  ||ΔT||/||T|| = 8.162e-15
+  [adaptive] relax_T=0.90
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
+  Building weak form, volume integrals (dx) for cyl_1, tag = 1
+  Building weak form, volume integrals (dx) for cyl_2, tag = 2
+  Applying mechanical traction on subdomain id = 4
   [contact] u_r(fuel)=+83.32 um, u_r(clad)=+17.52 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.022e-04
+  ||Δu||/||u|| = 1.357e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -32807,7 +32697,7 @@ Convergence check
   Robin (gap) BC on region 5, paired with 'lateral_1'
   Linear solver
   T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 1.060e-15
+  ||ΔT||/||T|| = 3.174e-15
   [adaptive] relax_T=0.90
 
 **[INFO]** Assembling mechanical problem...
@@ -32818,144 +32708,15 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.33 um, u_r(clad)=+17.52 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
+  [contact] u_r(fuel)=+83.33 um, u_r(clad)=+17.53 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.090e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 56/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 5.361e-16
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.34 um, u_r(clad)=+17.53 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.160e-04
-  [adaptive] relax_u=0.04
-
-Convergence check
-
-
-#### Iteration 57/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 4.252e-16
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.35 um, u_r(clad)=+17.54 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 1.229e-04
+  ||Δu||/||u|| = 9.787e-05
   [adaptive] relax_u=0.03
 
 Convergence check
 
-
-#### Iteration 58/250
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  → q_third[cyl_1](W/m3) min = 3.13e+08, max = 9.39e+08, mean = 3.93e+08
-
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  → q_third[cyl_2](W/m3) min = 0.00e+00, max = 0.00e+00, mean = 0.00e+00
-  Applying flux on subdomain id = 1
-  Applying flux on subdomain id = 7
-  Applying flux on subdomain id = 8
-  Applying flux on subdomain id = 2
-  Applying flux on subdomain id = 6
-  → Average gap temperature between cyl_1 and inner_2: 689.34 K
-  → k_gas       = 0.28 W/m·K
-  → gap_size    = 0.065 mm
-  → h_gap       = 4247.24 W/m²K
-  → h_open      = 4247.24 W/m²K, h_contact = 2922.42 W/m²K (gap closed)
-  Robin (gap) BC on region 3, paired with 'inner_2'
-  Robin (gap) BC on region 5, paired with 'lateral_1'
-  Linear solver
-  T_new: min=580.00 K, max=1101.39 K, mean=904.93 K
-  ||ΔT||/||T|| = 2.221e-15
-  [adaptive] relax_T=0.90
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 8 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating traction on region 4 → -15500000.0 Pa
-  Building weak form, volume integrals (dx) for cyl_1, tag = 1
-  Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  Applying mechanical traction on subdomain id = 4
-  [contact] u_r(fuel)=+83.36 um, u_r(clad)=+17.55 um, gap=-0.81 um, p=40.305 MPa (CLOSED)
-  Linear solver
-  ||Δu||/||u|| = 8.867e-05
-  [adaptive] relax_u=0.03
-
-Convergence check
-
-**[SUCCESS]** Staggered solver converged in 58 iterations.
+**[SUCCESS]** Staggered solver converged in 55 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 129.06 s
+Simulation completed in 73.08 s
 Total time steps solved: 31

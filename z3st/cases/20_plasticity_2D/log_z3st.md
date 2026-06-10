@@ -72,23 +72,6 @@ Material loaded: steel
   → Gc not defined for steel
   → constitutive model: lame
   → constitutive model promoted to: plasticity (yield_strength present)
-  E               → 200000000000.0 (float)
-  G               → 76923076923.07692 (float)
-  T_ref           → 300.0 (float)
-  alpha           → 1e-05 (float)
-  bulk_modulus    → 166666666666.66666 (float)
-  constitutive_mode → plasticity (str)
-  cp              → 200.0 (float)
-  gamma_heating   → 0.0 (float)
-  hardening_modulus → 10000000000.0 (float)
-  k               → 50.0 (float)
-  lmbda           → 115384615384.61539 (float)
-  mu_gamma        → 25.0 (float)
-  name            → steel (str)
-  nu              → 0.3 (float)
-  rho             → 8000.0 (float)
-  sigma_c         → 600000000.0 (float)
-  yield_strength  → 200000000.0 (float)
 [spine.initialize_fields]
 
 Initializing the displacement field...
@@ -568,7 +551,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 1.429e-10
+  ||Δu||/||u|| = 3.128e-10
 
 Convergence check
 
@@ -627,7 +610,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 8.726e-11
+  ||Δu||/||u|| = 1.608e-10
 
 Convergence check
 
@@ -686,7 +669,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 8.250e-11
+  ||Δu||/||u|| = 8.394e-11
 
 Convergence check
 
@@ -745,7 +728,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 5.557e-11
+  ||Δu||/||u|| = 8.358e-11
 
 Convergence check
 
@@ -804,7 +787,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 3.432e-11
+  ||Δu||/||u|| = 8.311e-11
 
 Convergence check
 
@@ -863,7 +846,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 5.001e-11
+  ||Δu||/||u|| = 5.069e-11
 
 Convergence check
 
@@ -922,7 +905,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 3.043e-11
+  ||Δu||/||u|| = 2.515e-11
 
 Convergence check
 
@@ -981,7 +964,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 1.821e-11
+  ||Δu||/||u|| = 5.839e-11
 
 Convergence check
 
@@ -1040,7 +1023,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 4.266e-11
+  ||Δu||/||u|| = 2.420e-11
 
 Convergence check
 
@@ -1099,7 +1082,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.072e-11
+  ||Δu||/||u|| = 1.444e-11
 
 Convergence check
 
@@ -1158,7 +1141,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 3.544e-11
+  ||Δu||/||u|| = 1.557e-11
 
 Convergence check
 
@@ -1217,7 +1200,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.696e-11
+  ||Δu||/||u|| = 2.311e-11
 
 Convergence check
 
@@ -1276,7 +1259,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 8.992e-12
+  ||Δu||/||u|| = 1.695e-11
 
 Convergence check
 
@@ -1335,7 +1318,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 1.696e-11
+  ||Δu||/||u|| = 2.478e-11
 
 Convergence check
 
@@ -1343,5 +1326,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 32.04 s
+Simulation completed in 24.05 s
 Total time steps solved: 21

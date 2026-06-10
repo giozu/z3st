@@ -78,23 +78,6 @@ Material loaded: steel
   → k defined as constant: 50.0
   → Gc not defined for steel
   → constitutive model: lame
-  E               → 200000000000.0 (float)
-  G               → 76923076923.07692 (float)
-  T_ref           → 300.0 (float)
-  alpha           → 1e-05 (float)
-  bulk_modulus    → 166666666666.66666 (float)
-  constitutive_mode → lame (str)
-  cp              → 200.0 (float)
-  gamma_heating   → 0.0 (float)
-  hardening_modulus → 10000000000.0 (float)
-  k               → 50.0 (float)
-  lmbda           → 115384615384.61539 (float)
-  mu_gamma        → 25.0 (float)
-  name            → steel (str)
-  nu              → 0.3 (float)
-  rho             → 8000.0 (float)
-  sigma_c         → 600000000.0 (float)
-  yield_strength  → 200000000.0 (float)
 [spine.initialize_fields]
 [UPDATING q_third]
 
@@ -503,7 +486,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 1
   Applying mechanical traction on subdomain id = 2
   Linear solver
-  ||Δu||/||u|| = 3.581e-15
+  ||Δu||/||u|| = 3.237e-15
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -511,5 +494,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 3.07 s
+Simulation completed in 1.89 s
 Total time steps solved: 1

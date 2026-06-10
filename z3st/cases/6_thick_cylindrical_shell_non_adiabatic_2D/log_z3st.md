@@ -78,20 +78,6 @@ Material loaded: steel
   → k defined as constant: 48.1
   → Gc not defined for steel
   → constitutive model: lame
-  E               → 177000000000.0 (float)
-  G               → 68076923076.92307 (float)
-  T_ref           → 300.0 (float)
-  alpha           → 1.7e-05 (float)
-  bulk_modulus    → 147499999999.99997 (float)
-  constitutive_mode → lame (str)
-  cp              → 200.0 (float)
-  gamma_heating   → 2000000.0 (float)
-  k               → 48.1 (float)
-  lmbda           → 102115384615.38461 (float)
-  mu_gamma        → 24.0 (float)
-  name            → vessel_steel (str)
-  nu              → 0.3 (float)
-  rho             → 8000.0 (float)
 [spine.initialize_fields]
 [UPDATING q_third]
 
@@ -441,5 +427,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 5.52 s
+Simulation completed in 2.36 s
 Total time steps solved: 1
