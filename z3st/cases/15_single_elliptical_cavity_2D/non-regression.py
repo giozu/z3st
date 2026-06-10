@@ -7,7 +7,7 @@ non-regression script
 ---------------------
 """
 
-import os, re
+import os, re, sys
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,23 +27,25 @@ from z3st.utils.utils_verification import *
 CASE_DIR = os.path.dirname(__file__)
 
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
-vtu_files = [f for f in os.listdir(OUTPUT_DIR) if f.startswith("fields_") and f.endswith(".vtu")]
-if vtu_files:
-    latest_vtu = sorted(vtu_files)[-1]
-    VTU_FILE = os.path.join(OUTPUT_DIR, latest_vtu)
-    print(f"[INFO] Using VTU file: {VTU_FILE}")
-else:
-    VTU_FILE = os.path.join(OUTPUT_DIR, "fields.vtu")
+
+def extract_step(filename):
+    match = re.search(r'_(\d+)\.vtu', filename)
+    return int(match.group(1)) if match else -1
+
+vtu_files = sorted([f for f in os.listdir(OUTPUT_DIR) if f.startswith("simulation_") and f.endswith(".vtu")], key=extract_step)
+if not vtu_files:
+    print("[ERROR] No simulation_*.vtu files found in output directory!")
+    sys.exit(1)
 
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/oxide.yaml")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../materials/uo2_jiang.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 
 # Geometry
 with open(GEOMETRY_FILE, 'r') as f:
     geom_data = yaml.safe_load(f)
-ax = float(geom_data.get('ax'))
-ay = float(geom_data.get('ay'))
+ax = float(geom_data['cavity']['ax'])
+ay = float(geom_data['cavity']['ay'])
 Lx = float(geom_data.get('Lx'))
 Ly = float(geom_data.get('Ly'))
 
@@ -53,34 +55,61 @@ with open(MATERIAL_FILE, 'r') as f:
 E = float(mat_data.get('E'))
 
 # --.. ..- .-.. .-.. --- extract fields --.. ..- .-.. .-.. ---
-X_tip = ax
-y_target = 0.0
+strains = []
+stresses = []
 
-x, y, _, sigma = extract_field(VTU_FILE, field_name="Stress_solid (points)")
-sigma_yy_max = np.max(sigma[:, 4]) 
+print("[INFO] Extracting macroscopic stress and strain from VTU files over time...")
+for vtu in vtu_files:
+    vtu_path = os.path.join(OUTPUT_DIR, vtu)
+    
+    x, y, _, disp = extract_field(vtu_path, field_name="Displacement")
+    _, _, _, sigma = extract_field(vtu_path, field_name="Stress_uo2 (points)")
+    
+    # Macroscopic stress: average of sigma_yy on the top boundary (ymax)
+    # This avoids compressive numerical artifacts at the crack tip which distort a global point average
+    top_nodes_mask = np.abs(y - Ly) < 1e-6
 
-# mask = (np.abs(y - y_target) < (Ly/500)) & (x >= X_tip)
-mask = (np.abs(y - y_target) < (Ly/500))
-idx_line = np.argsort(x[mask])
-x_line = x[mask][idx_line]
-sigma_yy_line = sigma[mask, 4][idx_line]
+    # --- DIAGNOSTIC ---
+    # Check if any nodes are found on the top boundary. If not, something is wrong.
+    if not np.any(top_nodes_mask):
+        print(f"[WARNING] For file {vtu}: No nodes found on the top boundary (y={Ly}). Stress will be zero.")
+        stresses.append(0.0)
+        strains.append(0.0)
+        continue # Go to next vtu file
 
-# --.. ..- .-.. .-.. --- plot --.. ..- .-.. .-.. ---
+    # --- CALCULATION ---
+    # Macroscopic strain: average y-displacement on top / Ly
+    u_y_top = np.mean(disp[top_nodes_mask, 1])
+    strains.append(u_y_top / Ly)
+
+    # Extraction robuste de sigma_yy : on calcule la moyenne de chaque composante 
+    # sur le bord supérieur, et on prend celle qui a la plus grande valeur absolue 
+    # (puisque nous sommes en traction pure selon Y)
+    top_sigma_mean = np.mean(sigma[top_nodes_mask], axis=0)
+    idx_yy = np.argmax(np.abs(top_sigma_mean))
+    sigma_yy_macro = top_sigma_mean[idx_yy]
+        
+    print(f"  -> {vtu}: Déplacement ymax = {u_y_top:.3e} m | Strain = {u_y_top/Ly:.4e} | Stress_yy = {sigma_yy_macro*1e-6:.2f} MPa")
+
+    stresses.append(sigma_yy_macro * 1e-6) # Convert to MPa
+
+sigma_yy_max = np.max(stresses) if stresses else 0.0
+
+# --.. ..- .-.. .-.. --- plot Stress vs Strain --.. ..- .-.. .-.. ---
 plt.figure(figsize=(10, 6))
 
-plt.plot(x_line, sigma_yy_line, 'b-o', markersize=4, label=r"$\sigma_{yy}$")
-plt.axvline(X_tip, color='r', linestyle='--', label="Bubble tip")
-plt.axvline(-X_tip, color='r', linestyle='--', label="Bubble tip")
+plt.plot(strains, stresses, 'b-o', markersize=4, label=r"Z3ST - $\sigma_{yy}$ (Top Boundary Average)")
 
-plt.xlabel(r"Distance $x$ ($\mu$m)")
-plt.ylabel(r"Stress (MPa)")
+plt.xlabel(r"Macroscopic Strain $\varepsilon_{yy}$ (-)")
+plt.ylabel(r"Average Stress $\sigma_{yy}$ (MPa)")
+plt.title("Stress-Strain Curve (Jiang 2020 Reproduction)")
 plt.grid(True, ls=':', alpha=0.6)
 plt.legend()
 
-plot_path = os.path.join(CASE_DIR, "output", "stress_profile_tip.png")
+plot_path_ss = os.path.join(CASE_DIR, "output", "stress_strain_jiang.png")
 plt.tight_layout()
-plt.savefig(plot_path, dpi=300)
-print(f"[INFO] Plot saved in: {plot_path}")
+plt.savefig(plot_path_ss, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path_ss}")
 
 errors = {
     "max_stress_yy": {
