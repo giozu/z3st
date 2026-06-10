@@ -64,7 +64,7 @@ time:
 - 0.0
 - 1.728e+6     # 20 days ramp
 - 9.504e+7     # ~1100 days hold
-n_steps: 30
+n_steps: 50
 
 output:
   format: xdmf

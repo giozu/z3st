@@ -49,6 +49,9 @@ command -v paraview >/dev/null 2>&1 && ok "paraview on PATH" || warn "paraview n
 nb=$(ls "$HERE"/baked/case14_crack*.png 2>/dev/null | wc -l)
 if [ "$nb" -gt 0 ]; then ok "baked PNG fallback present ($nb frames)"; else
   warn "no baked fallback — bake it once: ./open_paraview.sh --render"; fi
+for f in pcmi_curves.png pcmi_verification.png pcmi_burnup_curves.png; do
+  [ -f "$HERE/baked/$f" ] && ok "baked $f present" || warn "baked $f missing (segment P)"
+done
 
 echo "${B}attract loop + handout:${Z}"
 [ -f "$HERE/attract.html" ] && ok "attract.html present" || no "attract.html missing"

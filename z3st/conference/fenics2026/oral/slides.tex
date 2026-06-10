@@ -395,6 +395,21 @@ fixed-point iteration stable across linear elasticity through thermal-shock frac
   {\scriptsize thin slab: temperature and thermal stress, numerical vs analytical, across the thickness}
 \end{frame}
 
+\begin{frame}{Backup: burnup-driven PCMI -- a three-year rod history}
+  \centering
+  \includegraphics[width=0.95\textwidth]{figures/pcmi_burnup_curves.png}\\[2pt]
+  \begin{itemize}\scriptsize
+    \item burnup accumulates as a per-material state field; swelling is an
+      eigenstrain callable that reads it -- \alert{``fuel is a material''},
+      no solver change
+    \item constant 25\,kW/m for $\sim$3 years: swelling closes the 65\,$\mu$m
+      gap at $\sim$30\,MWd/kgU; the contact pressure \alert{emerges} and rises
+      to $\sim$39\,MPa
+    \item two-way feedback: contact raises the gap conductance, so the peak fuel
+      temperature \alert{drops} as the gap closes (right panel)
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Backup: single-edge-notched shear -- a Miehe (2010) reproducer}
   \begin{columns}[T]
     \begin{column}{0.33\textwidth}\centering

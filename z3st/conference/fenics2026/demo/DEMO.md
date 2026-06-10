@@ -103,6 +103,14 @@ the oral's PCMI slide.*
   fit, the stress state confirmed plane-stress."*
 - Tie back to the one sentence: *"the penalty tangent is the same AD path —
   `ufl.derivative` — no hand-coded contact Jacobian."*
+- **The burnup beat (the fuel-performance closer):** open
+  `baked/pcmi_burnup_curves.png`. *"That was a power ramp. Here is the same
+  physics over a **three-year irradiation**: burnup accumulates as a material
+  state field, swelling is an eigenstrain that reads it — 'fuel is a material',
+  no solver change — and the gap closes at ~30 MWd/kgU. Watch the right panel:
+  the moment contact engages, the gap conductance jumps and the **peak fuel
+  temperature drops**. That is the two-way coupling, visible in one figure. And
+  the burnup itself is verified against the closed form to 1e-7."*
 - Optional live (during a longer chat): run the case and watch the gap close and
   contact switch on in the streamed `[contact] … CLOSED` lines.
 

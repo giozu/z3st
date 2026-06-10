@@ -115,6 +115,11 @@ seg_P() {
   echo "${G}  → verified to 3.5% against the analytical Lamé interference-fit (stress state confirmed plane-stress).${Z}"
   cue "The penalty tangent? The same AD path — ufl.derivative — no hand-coded contact Jacobian."
   echo
+  cue "The burnup beat: same physics over a THREE-YEAR irradiation — swelling closes the gap at ~30 MWd/kgU,"
+  cue "and the peak fuel temperature DROPS the moment contact engages (gap conductance jumps). Two-way, one figure."
+  echo "  baked story: ${B}$BAKED/pcmi_burnup_curves.png${Z}"
+  open_imgs "$BAKED/pcmi_burnup_curves.png"
+  echo
   echo "${Y}  (optional, live — watch the gap close and contact switch on):${Z}"
   echo "    ${B}cd $CASES/U_coaxial_contact_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
 }

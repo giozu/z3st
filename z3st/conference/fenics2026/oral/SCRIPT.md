@@ -136,11 +136,19 @@ solves. Thank you — I'm happy to take questions."
   u_x = 15 microns.
 - *Is the coupling actually verified, not just claimed?* Backup "coupled thermo-
   mechanics" — temperature and thermal stress vs analytical across the slab.
+- *Can it do fuel performance — burnup, swelling, gap closure over an irradiation?*
+  Backup "burnup-driven PCMI" — burnup accumulates as a per-material state field,
+  swelling is an eigenstrain callable that reads it ("fuel is a material" — no
+  solver change), and a 3-year rod history at 25 kW/m closes the 65 µm gap at
+  ~30 MWd/kgU with ~39 MPa emergent contact pressure; the mean burnup is verified
+  against the closed form to 1e-7. The peak fuel temperature *drops* on contact —
+  the thermal feedback, live in the figure.
 
 ## Backup slides (do not present; flip to on a question)
 1. staggered solver loop · 2. constitutive-model table · 3. plasticity verified
-(J2 + crystal) · 4. coupled thermo-mechanics verified · 5. SEN shear, Miehe (2010) ·
-6. hero case verified vs McClenny (2022), Fig. 7b.
+(J2 + crystal) · 4. coupled thermo-mechanics verified · 5. burnup-driven PCMI
+(3-year rod history) · 6. SEN shear, Miehe (2010) ·
+7. hero case verified vs McClenny (2022), Fig. 7b.
 
 ## Delivery notes
 - The AD slide (4), PCMI (6b) and the hero case (8) are what the audience

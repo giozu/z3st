@@ -203,7 +203,7 @@ Parses the user YAML and fills:
 - `self.gap_model`, `self.h_gap_value` from `models.gap_conductance`
 - paths to geometry, mesh, boundary conditions
 - `self.n_steps`
-- `self.regime ∈ {2d, 3d, axisymmetric, plane_stress}`
+- `self.regime ∈ {1d, 2d, 3d, axisymmetric, plane_stress}` (validated up front since 2026-06-10; `1d` is used by the teaching cases)
 
 ### 3.2 `core/finite_element_setup.py — FiniteElementSetup`
 

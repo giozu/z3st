@@ -61,3 +61,9 @@ latexmk -pdf slides.tex      # -> slides.pdf (15 pages)
       animation. All cases verified (`preflight.sh` passes).
 - [x] Attract loop (`demo/attract.html`) and one-page handout (`handout/handout.pdf`)
       with QR codes — legitimate demo-table craft (no poster was submitted).
+- [x] 2026-06-10 review pass: preflight green end-to-end (caught and fixed a
+      regime-validation regression that broke `teaching/01_1D`); **burnup-driven
+      PCMI** (the `U_pwr_rod_2D` 3-year rod history, PCMI onset ~30 MWd/kgU,
+      peak-T drop on contact) added as oral backup slide 5, a Q&A answer, and
+      the closing beat of demo segment P (`baked/pcmi_burnup_curves.png`).
+      Deck rebuilt (17 pages).
