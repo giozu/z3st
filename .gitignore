@@ -22,6 +22,8 @@ ba_*
 log.*
 *.log
 non-regression.json
+z3st/cases/**/log_*.md
+!z3st/cases/00_example/log_*.md
 
 # --. Data / results / figures --..
 *.csv
