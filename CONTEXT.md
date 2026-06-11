@@ -379,6 +379,10 @@ Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to anothe
 
 **Contact-coupled conductance.** When `gap_conductance.contact_coupling.enabled` is set, a solid-contact term is added on gap closure (Todreas & Kazimi, *Nuclear Systems I*, 3rd ed., Eqs. 8.141/8.142): the emergent contact pressure (from `contact_model`) raises `h_gap` above the open-gap gas value, so closing the gap cools the fuel. Parameters: `meyer_hardness` (Pa), `gas_thickness` (m, roughness-based residual gas space).
 
+### 4.5bis Creep (`creep_model.py`)
+
+Implicit Norton creep (`ε̇_eq = A0·exp(−Q/RT)·σ_eq^n`) for a material carrying `creep: norton` + `creep_A0/n/Q` on its card — the dissipative extension of the energy-first design (incremental variational principle, Ortiz–Stainier). The cell-local minimisation over Δε_cr condenses to the scalar radial-return equation per point; a DG0 **predictor** Δγ₀ holds its exact root (vectorised numpy Newton, refreshed before every mechanical solve, consistency gated in the staggered convergence test), and the UFL stress carries **one symbolic Newton step** from the predictor — so `ufl.derivative` yields exactly the implicit-function-theorem consistent tangent through a trivially small expression tree (a fully unrolled symbolic Newton explodes FFCx). The accumulated `ε_cr` is a per-material DG0 tensor state advanced once per converged step; it enters the trial through the eigenstrain channel and the output stress via `creep_output_stress`. Mechanical steps auto-promote to SNES when creep is active. v1 scope: isotropic Lamé, no damage/plasticity combination, regimes with 3×3 strain tensors. Verified by `V_creep_verification` (1e-14) and `V_creep_relaxation_verification` (4e-15 vs the BE recursion; O(dt) defect pinned).
+
 ### 4.6 Cluster dynamics (`cluster_dynamic_model.py`)
 
 1D advection–diffusion solver for defect-cluster size distributions `c(n,t)`:
@@ -519,6 +523,8 @@ The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regressio
 - `V_burnup_verification` — burnup accumulation + radial-power source bus on an axisymmetric pellet (closed-form mean burnup; rim/core ratio = 1 + A).
 - `V_axial_power_verification` — axial-power source bus (chopped-cosine `f(z)`, Todreas & Kazimi 1-D axial problem) on a tall axisymmetric fuel column: closed-form mean burnup (machine precision); axial peaking factor = 1/[(2L′/πL)·sin(πL/2L′)]; end/peak = cos(πL/2L′).
 - `V_axial_table_verification` — tabulated axial profile (`tabulated_axial`, piecewise-linear node-wise peaking factors — the standard core-physics input): closed-form mean burnup (exact); table-node ratio f₃/f₁ (machine precision); peak/mean = max f / trapezoid mean.
+- `V_creep_verification` — implicit Norton creep, constant-stress uniaxial bar (backward Euler exact): total/creep/radial strain vs closed form at 1e-14 (radial pins the deviatoric −½ flow).
+- `V_creep_relaxation_verification` — stress relaxation at held strain: Z3ST ≡ the scalar backward-Euler recursion at 4e-15; deviation from the exact `σ(t)` equals the predicted O(dt) defect (2.11% at 50 steps, pinned to 2e-13).
 - `V_coaxial_contact_verification` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit.
 
 **U_* — Extended / demo cases**
@@ -650,6 +656,7 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Burnup accumulation               | ✓ per-fissile-material `burnup` field via `update_state(dt)` (state bus)            |
 | Radial power shaping              | ✓ `radial_profile` form factor `f(r, bu)` (source bus); built-in rim-peaking        |
 | Axial power shaping               | ✓ `axial_profile` form factor `f(z)` (source bus, composed `f_r·f_z`, single mean-1 normalisation); built-ins: chopped cosine (T&K), tabulated (node-wise peaking factors) |
+| Cladding creep (implicit, AD)     | ✓ Norton + Arrhenius via the incremental variational principle (`models/creep_model.py`): condensed radial return on the displacement space, DG0 predictor + one symbolic Newton step → exact IFT consistent tangent by `ufl.derivative`; per-material `ε_cr` DG0 state; card keys `creep: norton`, `creep_A0/n/Q`; verified to 1e-14 (constant stress) and 4e-15 vs the BE recursion (relaxation) |
 | Integrated-power diagnostic       | ✓ `set_power` prints the exact FE integral of the fissile source per material per step (regime-weighted, MPI-reduced); note the mean-1 normalisation is *nodal*, so a radially peaked profile integrates to LHR·Lz·⟨f⟩_area/⟨f⟩_nodal (= 1.2·LHR·Lz for rim-peaking A=3, p=8) — pinned by the `total_power` checks in the burnup-family `V_` cases |
 | Fuel swelling                     | ✓ constant ΔV/V or burnup-driven eigenstrain (eigenstrain bus)                       |
 | Pellet-clad contact (PCMI)        | ✓ penalty contact + contact-coupled gap conductance (verified vs analytical Lamé)   |
@@ -793,6 +800,7 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/models/plasticity_model.py`             | J2 return mapping + custom crystal-plasticity hook    |
 | `z3st/models/gap_model.py`                    | Fixed / Gas gap-conductance model (+ contact-coupled) |
 | `z3st/models/contact_model.py`                | Penalty pellet-clad mechanical contact (PCMI)         |
+| `z3st/models/creep_model.py`                  | Implicit Norton creep (incremental variational, IFT tangent by AD) |
 | `z3st/models/cluster_dynamic_model.py`        | 1D advection–diffusion cluster dynamics (DG/SIPG)     |
 | `z3st/materials/*.yaml`                       | Material cards                                        |
 | `z3st/materials/{ceramic,oxide}.py`           | Python callables for `k(T)`, `Gc(mesh)`                |

@@ -55,6 +55,8 @@ CASES=(
     "V_burnup_verification"
     "V_axial_power_verification"
     "V_axial_table_verification"
+    "V_creep_verification"
+    "V_creep_relaxation_verification"
     "V_coaxial_contact_verification"
     "U_pwr_rod_2D"
     "I_mesh_sensitivity_2D"

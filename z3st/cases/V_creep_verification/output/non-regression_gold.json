@@ -1,0 +1,27 @@
+{
+    "results": {
+        "axial_strain_total": {
+            "numerical": 0.01108854771019852,
+            "reference": 0.011088547710198647,
+            "abs_error": 1.2663481374630692e-16,
+            "rel_error": 1.1420324559710832e-14,
+            "status": "PASS"
+        },
+        "creep_strain": {
+            "numerical": 0.010081498364780596,
+            "reference": 0.01008149836478072,
+            "abs_error": 1.249000902703301e-16,
+            "rel_error": 1.2389040373865772e-14,
+            "status": "PASS"
+        },
+        "radial_strain_deviatoric": {
+            "numerical": -0.005413357440194933,
+            "reference": -0.005413357440194993,
+            "abs_error": 5.984795992119984e-17,
+            "rel_error": 1.1055608387656013e-14,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.001,
+    "summary": "PASS"
+}

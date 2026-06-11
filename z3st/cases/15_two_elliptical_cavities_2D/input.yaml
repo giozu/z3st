@@ -62,5 +62,5 @@ time:
 n_steps: 10
 
 output:
-  format: "xdmf"
+  format: xdmf
   filename: "results.xdmf"

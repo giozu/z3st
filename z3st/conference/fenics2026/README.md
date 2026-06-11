@@ -34,13 +34,17 @@ fenics2026/
     └── handout.pdf     built handout
 ```
 
-## Prize strategy (FEniCS 2025 precedent)
+## Prize strategy (FEniCS 2026, confirmed by the final-info email + website)
 
-Awards: best presentation (PhD / postdoc categories), best poster, and the
-**Nate Sime award for visualization**. Judging is on a 7-point scale across
-*comprehension & content* and *engagement & communication*. The demo targets the
-visualization award (case-14 crack animation) and engagement (live hot-reload);
-the oral targets best presentation. See `demo/DEMO.md` §0 for the full plan.
+Four awards: **Best Presentation by a PhD Candidate** ($500), **Best
+Presentation by a Postdoctoral Researcher** ($500), **Best FEniCS 2026 Poster**
+($500), and **Nate Sime's Exceptional Visualization** (surprise prize; "most
+beautiful according to the committee's subjective sense of aesthetics",
+composed from data generated primarily with FEniCS). Presentations are judged
+on a 0–7 scale across *background & significance* and *engagement &
+communication*. The demo targets the visualization award (case-14 crack
+animation) and engagement (live hot-reload); the oral targets the relevant
+best-presentation category. See `demo/DEMO.md` §0 for the full plan.
 
 ## Building the oral deck
 
@@ -67,3 +71,14 @@ latexmk -pdf slides.tex      # -> slides.pdf (15 pages)
       peak-T drop on contact) added as oral backup slide 5, a Q&A answer, and
       the closing beat of demo segment P (`baked/pcmi_burnup_curves.png`).
       Deck rebuilt (17 pages).
+- [x] 2026-06-11 compliance pass vs the organisers' final-info email: 10-min
+      format confirmed (talk slot Wed 17 June 14:00–14:15; demo in the Wed
+      poster session); **no blitz needed** (talk-givers are exempt — confirmed
+      against the programme's blitz list); 2026 award names updated here and in
+      `DEMO.md` §0; co-authors (Nicodemo, Cappellari, Pizzocri, Luzzi) added to
+      the title slide, handout and attract loop; stale poster references in
+      `DEMO.md` reworded. Outstanding (not materials): submit the badge form,
+      and re-read the published abstracts (DOI 10.5281/zenodo.20632491) — the
+      demo abstract promises crystal-plasticity + ML constitutive training,
+      which the current run-sheet only covers as backups; PR the abstract or
+      prepare a bridge line.

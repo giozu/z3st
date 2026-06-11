@@ -1,0 +1,20 @@
+{
+    "results": {
+        "sigma_relaxed_vs_backward_euler": {
+            "numerical": 22262368.993231814,
+            "reference": 22262368.99323173,
+            "abs_error": 8.568167686462402e-08,
+            "rel_error": 3.848722339058939e-15,
+            "status": "PASS"
+        },
+        "time_discretisation_defect": {
+            "numerical": 0.021064085049301177,
+            "reference": 0.02106408504929725,
+            "abs_error": 3.927413949611491e-15,
+            "rel_error": 1.8645072598311215e-13,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

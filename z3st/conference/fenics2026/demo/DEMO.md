@@ -11,12 +11,15 @@ the pre-flight checklist.
 
 ## 0 · Prize strategy (read this once, internalise it)
 
-At FEniCS 2025 the awards were:
-- **Best presentation** — separate PhD and postdoc categories (Ridgway Scott Foundation).
-- **Best poster.**
-- **Nate Sime award for visualization.**
+The FEniCS 2026 awards (confirmed by the final-info email and the website):
+- **Best Presentation by a PhD Candidate** — $500.
+- **Best Presentation by a Postdoctoral Researcher** — $500.
+- **Best FEniCS 2026 Poster** — $500.
+- **Nate Sime's Exceptional Visualization** — surprise prize; "most beautiful
+  according to the committee's subjective sense of aesthetics", composed from
+  data generated primarily with FEniCS. The case-14 animation qualifies.
 
-Judging was on a 7-point scale across two axes:
+Judging is on a 0–7 scale across two axes:
 1. **Comprehension & content** — clear background, transparent strategy and results, articulated impact.
 2. **Engagement & communication** — clarity, organisation, *enthusiasm*, thoughtful answers to questions, holding attention.
 
@@ -87,7 +90,7 @@ control the pace while you talk. Talking points below.
 ### E. Close — 30 s
 - *"It is open, Apache-2.0, on GitHub, archived on Zenodo with a DOI, documented.
   Your case is a YAML file. Clone it tonight."*
-- Hand them a card / point at the QR on the poster.
+- Hand them the handout / point at the QR codes on the attract screen.
   - `github.com/giozu/z3st` · `giozu.github.io/z3st` · DOI `10.5281/zenodo.17748028`
 
 ### P. (optional) Multi-body: pellet–cladding contact, verified — 60 s
@@ -140,7 +143,7 @@ Have these ready; do not volunteer them in the core loop.
 | dolfinx import fails | The env was not activated — `conda activate z3st`. `preflight.sh` checks this; run it before the session. |
 | ParaView is slow / wrong screen | Fall back to the pre-rendered MP4/PNG sequence in `demo/baked/` — `open_paraview.sh --baked` just opens the images. |
 | Projector resolution is bad | Pre-set ParaView and terminal font large (see checklist). Use the PNG sequence, not interactive, if rotation stutters. |
-| No internet | Everything here runs **offline**. The only online things are the GitHub/DOI links — those live on the poster, not the laptop. |
+| No internet | Everything here runs **offline**. The only online things are the GitHub/DOI links — those live on the handout and the attract screen, not the laptop. |
 | Someone asks something you do not know | *"Good question — I am not certain; here is how I would find out."* Judges score *thoughtful* answers, not bluffing. |
 
 **Golden rule:** the baked artifacts in `demo/baked/` mean you can deliver the
@@ -163,7 +166,8 @@ artifacts. Then, by hand:
 - [ ] Open `attract.html` once (`./attract.sh`) and confirm the loop plays and the QR codes scan.
 - [ ] `../handout/handout.pdf` printed (a small stack to hand out); QR codes scan.
 - [ ] Editor open on `mechanical_model.py` (AD lines) and `1_thin_slab_neumann_2D/input.yaml` (for the hot-reload edit) in separate tabs.
-- [ ] Poster has the QR codes (repo, docs, DOI) and your email.
+- [ ] No poster was submitted — the attract screen and the handout are the
+      stand-ins; both carry the QR codes (repo, docs, DOI) and your email.
 - [ ] A few business cards / a printed one-pager to hand out.
 - [ ] Water. You will talk for two hours straight in loops.
 

@@ -355,6 +355,21 @@ class Solver:
         F_m = 0
         w = self.weight
 
+        # A creeping material makes the stress σ(u) nonlinear in u,
+        # so the step must go through the SNES path regardless of the
+        # configured solver.
+        creep_present = any(self.creep_active(m) for m in self.materials.values())
+        linear = self.mech_cfg["solver"] == "linear" and not creep_present
+        if self.mech_cfg["solver"] == "linear" and creep_present:
+            print("  [INFO] creep active → mechanical step promoted to the nonlinear (SNES) path")
+
+        # Creep predictor Δγ₀ at the current iterate, BEFORE assembling: a
+        # stale predictor can zero the symbolic correction (base clamp) and
+        # let |Δu| pass spuriously. Its change feeds the convergence test.
+        creep_pred_change = 0.0
+        if creep_present:
+            creep_pred_change = self.update_creep_predictor(u_new, T_current)
+
         for label, material in self.materials.items():
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
@@ -373,7 +388,7 @@ class Solver:
                 # 3D: (F_x, F_y, F_z)
                 body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
 
-            if self.mech_cfg["solver"] == "linear":
+            if linear:
                 sigma = self.sigma_mech(u_m, material)
                 a_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
                 L_m += w * ufl.dot(body_force, v_m) * dx
@@ -382,7 +397,13 @@ class Solver:
                     L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
             else:
                 mode = material.get("constitutive_mode", "lame")
-                if mode == "hyperelastic":
+                if self.creep_active(material):
+                    # Condensed implicit creep stress (creep_model.py). The
+                    # eigenstrain ε* is inside σ(u) — no separate eigenstress.
+                    sigma = self.creep_stress(u_new, material, T_current, self.dt)
+                    F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
+                    F_m -= w * ufl.dot(body_force, v_m) * dx
+                elif mode == "hyperelastic":
                     F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
                     F_m -= w * ufl.dot(body_force, v_m) * dx
                     if self.applies_eigenstress(material):
@@ -390,13 +411,18 @@ class Solver:
                 else:
                     sigma = self.sigma_mech(u_new, material)
                     F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
+                    # Eigenstress on the residual — mirrors the linear path
+                    # (previously missing here; only exercised once non-lame /
+                    # creep runs route lame materials through SNES).
+                    if self.applies_eigenstress(material):
+                        F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
 
         # Traction BCs
         for label in self.materials:
             for bc_info in self.traction[label]:
                 print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
                 ds = self.ds_tags[bc_info["id"]]
-                if self.mech_cfg["solver"] == "linear":
+                if linear:
                     L_m += w * ufl.dot(bc_info["value"], v_m) * ds
                 else:
                     F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
@@ -409,7 +435,7 @@ class Solver:
         if self.on.get("contact", False):
             self.update_contact_pressure(u_new)
             contact_form = self.contact_traction(v_m)
-            if self.mech_cfg["solver"] == "linear":
+            if linear:
                 L_m += contact_form
             else:
                 F_m -= contact_form
@@ -417,7 +443,7 @@ class Solver:
         bcs_mech = self._bc_objects(self.dirichlet_mechanical)
 
         # Solve
-        if self.mech_cfg["solver"] == "linear":
+        if linear:
             print("  Linear solver")
             petsc_opts_mech = self.get_solver_options(
                 solver_type=self.mech_cfg["linear_solver"],
@@ -503,6 +529,13 @@ class Solver:
             print(f"  ||Δu||/||u|| = {rel_norm_du:.3e}")
             conv_mech = rel_norm_du < stag_tol_mech
             res_curr = rel_norm_du
+
+        # The creep predictor must be consistent with u as well — |Δu| alone
+        # can pass on the first iteration of a step while Δγ₀ is still moving.
+        if creep_present:
+            print(f"  [creep] predictor rel change = {creep_pred_change:.3e}")
+            pred_tol = max(stag_tol_mech, 1e-8)
+            conv_mech = conv_mech and creep_pred_change < pred_tol
 
         if self.relax_adaptive:
             if prev_res_u is not None:
@@ -916,6 +949,11 @@ class Solver:
 
                 if self.on.get("mechanical", False) and self.on.get("plasticity", False):
                     self.update_plastic_history(u_new)
+
+                if self.on.get("mechanical", False) and any(
+                    self.creep_active(m) for m in self.materials.values()
+                ):
+                    self.update_creep_state(u_new, T_new)
 
                 return True
 

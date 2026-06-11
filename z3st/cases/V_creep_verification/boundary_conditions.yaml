@@ -1,0 +1,17 @@
+thermal:
+  clad:
+  - type: Dirichlet
+    region: outer
+    temperature: 600.0   # (K)
+
+mechanical:
+  clad:
+  - type: Clamp_x
+    region: inner        # u_r = 0 on the symmetry axis
+
+  - type: Clamp_y
+    region: bottom       # u_z = 0
+
+  - type: Neumann
+    region: top
+    traction: 1.0e+8     # (Pa)

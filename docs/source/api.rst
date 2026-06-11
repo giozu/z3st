@@ -65,6 +65,11 @@ Physics Models
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: z3st.models.creep_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Output
 ------
 

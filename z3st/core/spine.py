@@ -19,6 +19,7 @@ from z3st.core.mesh import load_mesh
 from z3st.core.mesh.manager import MeshManager
 from z3st.core.solver import Solver
 from z3st.models.contact_model import ContactModel
+from z3st.models.creep_model import CreepModel
 from z3st.models.damage_model import DamageModel
 from z3st.models.gap_model import GapModel
 from z3st.models.mechanical_model import MechanicalModel
@@ -28,7 +29,7 @@ from z3st.models.plasticity_model import PlasticityModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -206,6 +207,33 @@ class Spine(
                 print(f"  → axial_profile defined as callable: {mat['axial_profile']}")
                 mat["_axial_profile_func"] = self.resolve_function(mat["axial_profile"])
 
+            # Implicit creep (incremental variational principle — see
+            # models/creep_model.py). Card: creep: norton +
+            # creep_A0 (Pa^-n s^-1), creep_n (-), creep_Q (J/mol).
+            if mat.get("creep") is not None:
+                if str(mat["creep"]).lower() != "norton":
+                    raise ValueError(
+                        f"Material '{name}': creep model '{mat['creep']}' unknown "
+                        f"(only 'norton' is implemented)."
+                    )
+                for key in ("creep_A0", "creep_n", "creep_Q"):
+                    if key not in mat:
+                        raise ValueError(f"Material '{name}': creep requires '{key}'.")
+                    mat[key] = float(mat[key])
+                if constitutive_mode != "lame":
+                    raise ValueError(
+                        f"Material '{name}': creep is only supported with the "
+                        f"'lame' constitutive route (got '{constitutive_mode}')."
+                    )
+                if self.on.get("damage", False) or self.on.get("plasticity", False):
+                    raise ValueError(
+                        "Creep cannot yet be combined with damage or plasticity "
+                        "in the same run."
+                    )
+                print(f"  → creep: Norton, A0 = {mat['creep_A0']:.3e} Pa^-n/s, "
+                      f"n = {mat['creep_n']:.2f}, Q = {mat['creep_Q']:.3e} J/mol")
+
+            mat["__label__"] = name
             self.materials[name] = mat
             # Full per-key material dump only under --debug (CODE-P2-4)
             if "--debug" in sys.argv:
@@ -561,4 +589,14 @@ class Spine(
                 self.stress[name] = self.stress_mech[name]
             elif name in self.stress_th:
                 self.stress[name] = self.stress_th[name]
+
+            # Creeping material: the composition above ignores ε_cr and would
+            # report the unrelaxed elastic stress. Replace with the
+            # end-of-step condensed stress (creep state already advanced) and
+            # the consistent elastic energy density.
+            if self.on.get("mechanical", False) and self.creep_active(mat):
+                T_field = self.T if self.on.get("thermal", False) else None
+                sigma_cr, eps_el_cr = self.creep_output_stress(self.u, mat, T_field)
+                self.stress[name] = sigma_cr
+                self.energy_density[name] = 0.5 * ufl.inner(sigma_cr, eps_el_cr)
 
