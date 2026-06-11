@@ -1,224 +1,207 @@
-Z3ST non-regression summary - Wed Jun 10 16:49:09 CEST 2026
+Z3ST non-regression summary - Thu Jun 11 21:55:18 CEST 2026
 --.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
 
 Case: 00_example
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 17s
 
 Case: 1_thin_slab_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 10s
 
 Case: 1_thin_slab_neumann_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 11s
+  Time            : 15s
 
 Case: 1_thin_slab_neumann_3D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 28s
+  Time            : 39s
 
 Case: 1_thin_slab_non_linear
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 9s
+  Time            : 18s
 
 Case: 2_thin_cylindrical_shell_2D
   Run             : OK
   Non-regression  : PASS
-  Gold regression : FAIL
-  Time            : 20s
+  Gold regression : PASS
+  Time            : 31s
 
 Case: 3_thick_slab_adiabatic_3D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 13s
+  Time            : 18s
 
 Case: 3_thin_slab_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 12s
 
 Case: 4_thin_cylindrical_shell_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 29s
+  Time            : 50s
 
 Case: 4_thick_cylindrical_shell_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 15s
 
 Case: 5_thin_slab_non_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 14s
 
 Case: 6_thin_cylindrical_shell_non_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 15s
+  Time            : 27s
 
 Case: 6_thick_cylindrical_shell_non_adiabatic_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 15s
 
 Case: 7_box_heated
   Run             : OK
   Non-regression  : PASS
-  Gold regression : FAIL
-  Time            : 19s
+  Gold regression : PASS
+  Time            : 32s
 
 Case: 8_thick_cylindrical_shell_plane_strain_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 13s
 
 Case: 9_thick_cylindrical_shell_GPS_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 22s
+  Time            : 27s
 
 Case: 11_thin_cylindrical_shell_Mariotte
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 15s
 
 Case: 12_cylindrical_shell_thermal_gradient_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 14s
 
 Case: 13_annular_cylinder
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 9s
+  Time            : 15s
 
 Case: 14_full_cylinder
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 11s
+  Time            : 18s
 
 Case: 15_spherical_pressurized_cavity
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 47s
+  Time            : 76s
 
 Case: 16_coaxial_cylinders_3D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 60s
+  Time            : 95s
 
 Case: 17_stress_strain_curve_displacement
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 21s
+  Time            : 38s
 
 Case: 17_stress_strain_curve_stress
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 11s
 
 Case: 18_box_crack_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 33s
+  Time            : 55s
 
 Case: 20_plasticity_2D
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 30s
+  Time            : 55s
 
 Case: demo_CP_single_grain
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 9s
+  Time            : 19s
 
 Case: V_swelling_verification
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 4s
+  Time            : 6s
 
 Case: V_fuel_swelling_verification
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 4s
+  Time            : 8s
 
 Case: V_burnup_verification
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 6s
+  Time            : 8s
 
 Case: V_axial_power_verification
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 4s
+  Time            : 8s
 
 Case: V_axial_table_verification
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 4s
+  Time            : 7s
 
 Case: V_creep_verification
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 66s
+  Time            : 54s
 
 Case: V_creep_relaxation_verification
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 94s
-
-Case: V_coaxial_contact_verification
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 105s
-
-Case: U_pwr_rod_2D
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 104s
-
-Case: I_mesh_sensitivity_2D
-  Run             : OK
-  Non-regression  : (no non-regression.json — NOT VALIDATED)
-  Time            : 4s
+  Time            : 75s
 

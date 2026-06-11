@@ -9,7 +9,6 @@ cp: 350           # Specific heat capacity (J/kg·K)
 T_ref: 300        # (K)
 T_initial: 580.0  # (K) start at coolant temperature
 
-# Physical properties
 rho: 6500                   # Density (kg/m³)
 melting_temperature: 2123   # (K)
 

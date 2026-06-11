@@ -9,7 +9,7 @@ Info    : Done reading 'mesh.msh'
 
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
-Version: 0.1.0 (2025)
+Version: 0.2.0 (2026)
 
 ***
 
@@ -341,7 +341,7 @@ Convergence check
   Building weak form, volume integrals (dx) for steel, tag = 7
   Applying mechanical traction on subdomain id = 3
   Linear solver
-  ||Δu||/||u|| = 1.985e-13
+  ||Δu||/||u|| = 2.891e-13
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -349,5 +349,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 1.72 s
+Simulation completed in 4.20 s
 Total time steps solved: 1

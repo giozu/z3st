@@ -1,6 +1,6 @@
 # Z3ST — Repository Context
 
-**Z3ST** is an open-source **FEniCSx-based finite-element framework** for coupled thermo-mechanical material analysis, written in Python. It is developed by **Giovanni Zullo** (Politecnico di Milano), licensed under **Apache 2.0**, version **0.1.0 (2025)**.
+**Z3ST** is an open-source **FEniCSx-based finite-element framework** for coupled thermo-mechanical material analysis, written in Python. It is developed by **Giovanni Zullo** (Politecnico di Milano), licensed under **Apache 2.0**, version **0.2.0 (2026)**.
 
 - **Repository:** https://github.com/giozu/z3st
 - **DOI:** 10.5281/zenodo.17748028

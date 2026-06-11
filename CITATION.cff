@@ -5,8 +5,8 @@ authors:
   - family-names: Zullo
     given-names: Giovanni
     affiliation: Politecnico di Milano
-version: 0.1.0
-date-released: 2025-01-01
+version: 0.2.0
+date-released: 2026-06-11
 license: Apache-2.0
 repository-code: "https://github.com/giozu/z3st"
 url: "https://giozu.github.io/z3st/"

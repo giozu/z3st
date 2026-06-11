@@ -382,16 +382,16 @@ Z3ST is built on the **FEniCSx** ecosystem. Recommended citations include:
 If you use Z3ST in your research, please cite this little work.
 
 ```bibtex
-@misc{Z3ST2025,
+@misc{Z3ST2026,
   author       = {Giovanni Zullo},
   title        = {Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis},
-  year         = {2025},
+  year         = {2026},
   howpublished = {\url{https://github.com/giozu/z3st}},
-  note         = {Version 0.1.0}
+  note         = {Version 0.2.0}
 }
 ```
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
-* **Version:** 0.1.0 (2025)
+* **Version:** 0.2.0 (2026)
 * **License:** Apache 2.0
