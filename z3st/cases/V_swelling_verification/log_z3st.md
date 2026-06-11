@@ -1,34 +1,8 @@
-[INFO] Loading mesh from mesh.msh
 Info    : Reading 'mesh.msh'...
 Info    : 27 entities
 Info    : 729 nodes
 Info    : 896 elements
 Info    : Done reading 'mesh.msh'
-[INFO] Mesh successfully loaded from Gmsh file.
-[INFO] Mesh topology dimension d=3
-[INFO] 
-Available volume tags (dx):
-[INFO]   Tag ID: 7
-[INFO] 
-Unique tags found in facet data: [1 2 3 4 5 6]
-[INFO] Label map loaded from geometry:
-[INFO]   zmin         → 1
-[INFO]   ymin         → 2
-[INFO]   xmax         → 3
-[INFO]   ymax         → 4
-[INFO]   xmin         → 5
-[INFO]   zmax         → 6
-[INFO]   steel        → 7
-[INFO]   Lz = 0.004 m
-[INFO]   Lx = 0.100 m, Ly = 0.100 m
-[INFO]   area = 1.000e-02 m², perimeter = 4.000e-01 m
-[INFO] === Mesh summary ===
-[INFO]   Topology dim: 3
-[INFO]   Facet dim: 2
-[INFO]   Num cells: 512
-[INFO]   Cell tags: {np.int32(7)}
-[INFO]   Facet tags: {np.int32(1), np.int32(2), np.int32(3), np.int32(4), np.int32(5), np.int32(6)}
-[INFO]   Geometry type: rect
 
 
 ***
@@ -92,15 +66,6 @@ Material loaded: steel
   → k not defined for steel
   → Gc not defined for steel
   → constitutive model: lame
-  E               → 200000000000.0 (float)
-  G               → 76923076923.07692 (float)
-  bulk_modulus    → 166666666666.66666 (float)
-  constitutive_mode → lame (str)
-  lmbda           → 115384615384.61539 (float)
-  name            → swelling-test (str)
-  nu              → 0.3 (float)
-  rho             → 8000.0 (float)
-  swelling        → 0.18 (float)
 [spine.initialize_fields]
 
 Initializing the displacement field...
@@ -178,12 +143,12 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 7
   Linear solver
-  ||Δu||/||u|| = 7.465e-14
+  ||Δu||/||u|| = 1.664e-14
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 0.54 s
+Simulation completed in 0.29 s
 Total time steps solved: 1

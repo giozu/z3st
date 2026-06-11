@@ -2416,5 +2416,5 @@ Convergence check
   [creep] clad: max equivalent creep strain = 1.0081e-02
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 61.74 s
+Simulation completed in 263.74 s
 Total time steps solved: 11

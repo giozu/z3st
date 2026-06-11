@@ -1,39 +1,8 @@
-[INFO] Loading mesh from mesh.msh
 Info    : Reading 'mesh.msh'...
 Info    : 18 entities
 Info    : 992 nodes
 Info    : 1080 elements
 Info    : Done reading 'mesh.msh'
-[INFO] Mesh successfully loaded from Gmsh file.
-[INFO] Mesh topology dimension d=2
-[INFO] 
-Available volume tags (dx):
-[INFO]   Tag ID: 1
-[INFO]   Tag ID: 2
-[INFO] 
-Unique tags found in facet data: [1 2 3 4 5 6 7 8]
-[INFO] Label map loaded from geometry:
-[INFO]   bottom_1     → 1
-[INFO]   cyl_1        → 1
-[INFO]   bottom_2     → 2
-[INFO]   cyl_2        → 2
-[INFO]   lateral_1    → 3
-[INFO]   outer_2      → 4
-[INFO]   inner_2      → 5
-[INFO]   top_2        → 6
-[INFO]   top_1        → 7
-[INFO]   axis_1       → 8
-[INFO]   Lz = 0.010 m
-[INFO]   inner_radius_1 = 0.00e+00 m, outer_radius_1 = 4.10e-03 m
-[INFO]   inner_radius_2 = 4.13e-03 m, outer_radius_2 = 4.75e-03 m
-[INFO]   area = 5.281e-05 m², perimeter = 2.576e-02 m
-[INFO] === Mesh summary ===
-[INFO]   Topology dim: 2
-[INFO]   Facet dim: 1
-[INFO]   Num cells: 900
-[INFO]   Cell tags: {np.int32(1), np.int32(2)}
-[INFO]   Facet tags: {np.int32(1), np.int32(2), np.int32(3), np.int32(4), np.int32(5), np.int32(6), np.int32(7), np.int32(8)}
-[INFO]   Geometry type: cyl-cyl
 
 
 ***
@@ -113,43 +82,16 @@ Material loaded: cyl_1
   → k defined as constant: 5.0
   → Gc not defined for cyl_1
   → constitutive model: lame
-  E               → 200000000000.0 (float)
-  G               → 74349442379.18216 (float)
-  T_initial       → 580.0 (float)
-  T_ref           → 293.15 (float)
-  alpha           → 1.1e-05 (float)
-  bulk_modulus    → 215053763440.86017 (float)
-  constitutive_mode → lame (str)
-  cp              → 280.0 (float)
-  fissile         → True (bool)
-  k               → 5.0 (float)
-  lmbda           → 165487468521.40543 (float)
-  name            → UO2-fuel (str)
-  nu              → 0.345 (float)
-  rho             → 10970.0 (float)
 Material loaded: cyl_2
   → k defined as constant: 17.0
   → Gc not defined for cyl_2
   → constitutive model: lame
-  E               → 99300000000.0 (float)
-  G               → 36240875912.40876 (float)
-  T_initial       → 580.0 (float)
-  T_ref           → 300 (int)
-  alpha           → 7.5e-06 (float)
-  bulk_modulus    → 127307692307.6923 (float)
-  constitutive_mode → lame (str)
-  cp              → 350 (int)
-  k               → 17.0 (float)
-  lmbda           → 103147108366.08646 (float)
-  melting_temperature → 2123 (int)
-  name            → zircaloy-4 (str)
-  nu              → 0.37 (float)
-  rho             → 6500 (int)
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 Initialized burnup field (fissile material present).
 
 Initializing the temperature field...
@@ -195,8 +137,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
   → dt=0: solving static step / initial condition
 Computing symbolic result fields (strain, stress, ...)
 
@@ -755,8 +698,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -1034,8 +978,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -1313,8 +1258,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -1592,8 +1538,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -1871,8 +1818,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -2150,8 +2098,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -2394,8 +2343,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -5320,7 +5270,7 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.75 um, gap=-0.06 um, p=5.785 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.085e-04
+  ||Δu||/||u|| = 1.084e-04
   [adaptive] relax_u=0.14
 
 Convergence check
@@ -5355,7 +5305,7 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.76 um, gap=-0.05 um, p=4.831 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 3.828e-04
+  ||Δu||/||u|| = 3.827e-04
   [adaptive] relax_u=0.15
 
 Convergence check
@@ -5388,7 +5338,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.72 um, gap=-0.08 um, p=8.198 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.72 um, gap=-0.08 um, p=8.197 MPa (CLOSED)
   Linear solver
   ||Δu||/||u|| = 1.528e-03
   [adaptive] relax_u=0.17
@@ -5458,7 +5408,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.55 um, gap=-0.27 um, p=26.761 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.55 um, gap=-0.27 um, p=26.762 MPa (CLOSED)
   Linear solver
   ||Δu||/||u|| = 8.102e-03
   [adaptive] relax_u=0.06
@@ -5633,9 +5583,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.67 um, gap=-0.13 um, p=13.481 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.67 um, gap=-0.13 um, p=13.479 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.660e-03
+  ||Δu||/||u|| = 2.659e-03
   [adaptive] relax_u=0.05
 
 Convergence check
@@ -5703,9 +5653,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.80 um, gap=-0.00 um, p=0.452 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.80 um, gap=-0.00 um, p=0.456 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.131e-03
+  ||Δu||/||u|| = 1.130e-03
   [adaptive] relax_u=0.06
 
 Convergence check
@@ -5738,9 +5688,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.70 um, gap=-0.10 um, p=10.403 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.70 um, gap=-0.10 um, p=10.399 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.181e-03
+  ||Δu||/||u|| = 1.180e-03
   [adaptive] relax_u=0.07
 
 Convergence check
@@ -5773,9 +5723,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.80 um, gap=-0.00 um, p=0.017 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.80 um, gap=-0.00 um, p=0.021 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.485e-03
+  ||Δu||/||u|| = 1.484e-03
   [adaptive] relax_u=0.08
 
 Convergence check
@@ -5808,9 +5758,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.68 um, gap=-0.13 um, p=13.084 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.68 um, gap=-0.13 um, p=13.078 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.219e-03
+  ||Δu||/||u|| = 2.217e-03
   [adaptive] relax_u=0.05
 
 Convergence check
@@ -5878,9 +5828,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.78 um, gap=-0.03 um, p=2.509 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.78 um, gap=-0.03 um, p=2.518 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.934e-04
+  ||Δu||/||u|| = 5.917e-04
   [adaptive] relax_u=0.06
 
 Convergence check
@@ -5913,9 +5863,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.73 um, gap=-0.08 um, p=7.729 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.73 um, gap=-0.08 um, p=7.723 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.647e-04
+  ||Δu||/||u|| = 4.634e-04
   [adaptive] relax_u=0.06
 
 Convergence check
@@ -5948,9 +5898,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.77 um, gap=-0.04 um, p=3.641 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.77 um, gap=-0.04 um, p=3.646 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.515e-04
+  ||Δu||/||u|| = 4.502e-04
   [adaptive] relax_u=0.07
 
 Convergence check
@@ -5983,9 +5933,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.73 um, gap=-0.08 um, p=7.612 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.73 um, gap=-0.08 um, p=7.606 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 5.321e-04
+  ||Δu||/||u|| = 5.306e-04
   [adaptive] relax_u=0.07
 
 Convergence check
@@ -6018,9 +5968,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.77 um, gap=-0.03 um, p=2.931 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.77 um, gap=-0.03 um, p=2.939 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 7.485e-04
+  ||Δu||/||u|| = 7.463e-04
   [adaptive] relax_u=0.08
 
 Convergence check
@@ -6053,9 +6003,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.71 um, gap=-0.10 um, p=9.515 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.71 um, gap=-0.10 um, p=9.504 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 1.240e-03
+  ||Δu||/||u|| = 1.237e-03
   [adaptive] relax_u=0.05
 
 Convergence check
@@ -6123,9 +6073,9 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   Building weak form, volume integrals (dx) for cyl_1, tag = 1
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
-  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.73 um, gap=-0.08 um, p=7.867 MPa (CLOSED)
+  [contact] u_r(fuel)=+31.81 um, u_r(clad)=+1.73 um, gap=-0.08 um, p=7.886 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 2.663e-04
+  ||Δu||/||u|| = 2.684e-04
   [adaptive] relax_u=0.03
 
 Convergence check
@@ -6160,7 +6110,7 @@ Convergence check
   Building weak form, volume integrals (dx) for cyl_2, tag = 2
   [contact] u_r(fuel)=+31.80 um, u_r(clad)=+1.75 um, gap=-0.06 um, p=5.525 MPa (CLOSED)
   Linear solver
-  ||Δu||/||u|| = 4.158e-06
+  ||Δu||/||u|| = 4.192e-06
   [adaptive] relax_u=0.04
 
 Convergence check
@@ -6173,8 +6123,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -12402,8 +12353,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -18421,8 +18373,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -24440,8 +24393,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -30319,8 +30273,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 0.000e+00 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 0.000e+00 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 0.000e+00 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 0.000000e+00 W
 [update_state] burnup max = 0.0000e+00 MWd/kgU
 
 
@@ -36053,5 +36008,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 163 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 199.86 s
+Simulation completed in 101.33 s
 Total time steps solved: 13

@@ -1,34 +1,8 @@
-[INFO] Loading mesh from mesh.msh
 Info    : Reading 'mesh.msh'...
 Info    : 27 entities
 Info    : 243 nodes
 Info    : 320 elements
 Info    : Done reading 'mesh.msh'
-[INFO] Mesh successfully loaded from Gmsh file.
-[INFO] Mesh topology dimension d=3
-[INFO] 
-Available volume tags (dx):
-[INFO]   Tag ID: 7
-[INFO] 
-Unique tags found in facet data: [1 2 3 4 5 6]
-[INFO] Label map loaded from geometry:
-[INFO]   zmin         → 1
-[INFO]   ymin         → 2
-[INFO]   xmax         → 3
-[INFO]   ymax         → 4
-[INFO]   xmin         → 5
-[INFO]   zmax         → 6
-[INFO]   fuel         → 7
-[INFO]   Lz = 0.001 m
-[INFO]   Lx = 0.008 m, Ly = 0.008 m
-[INFO]   area = 6.400e-05 m², perimeter = 3.200e-02 m
-[INFO] === Mesh summary ===
-[INFO]   Topology dim: 3
-[INFO]   Facet dim: 2
-[INFO]   Num cells: 128
-[INFO]   Cell tags: {np.int32(7)}
-[INFO]   Facet tags: {np.int32(1), np.int32(2), np.int32(3), np.int32(4), np.int32(5), np.int32(6)}
-[INFO]   Geometry type: rect
 
 
 ***
@@ -100,30 +74,12 @@ Material loaded: fuel
   → Gc not defined for fuel
   → constitutive model: lame
   → eigenstrain defined as callable: materials.fuel_swelling.solid_swelling
-  E               → 200000000000.0 (float)
-  G               → 76923076923.07692 (float)
-  T_initial       → 300.0 (float)
-  T_ref           → 300.0 (float)
-  _eigenstrain_func → <function solid_swelling at 0x7fe660811440> (function)
-  bulk_modulus    → 166666666666.66666 (float)
-  constitutive_mode → lame (str)
-  cp              → 280.0 (float)
-  eigenstrain     → materials.fuel_swelling.solid_swelling (str)
-  fissile         → True (bool)
-  gamma_heating   → 0.0 (float)
-  heavy_metal_fraction → 0.8815 (float)
-  k               → 5.0 (float)
-  lmbda           → 115384615384.61539 (float)
-  mu_gamma        → 0.0 (float)
-  name            → fuel-swelling-test (str)
-  nu              → 0.3 (float)
-  rho             → 10970.0 (float)
-  swelling_rate   → 0.001 (float)
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
-  q_third += 3.125e+08 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 3.125e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.250e+05 W/m2
+  **[INFO]** Integrated fissile power in fuel: 2.000000e+01 W
 Initialized burnup field (fissile material present).
 
 Initializing the temperature field...
@@ -160,8 +116,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 3.125e+08 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 3.125e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.250e+05 W/m2
+  **[INFO]** Integrated fissile power in fuel: 2.000000e+01 W
   → dt=0: solving static step / initial condition
 Computing symbolic result fields (strain, stress, ...)
 
@@ -239,8 +196,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 3.125e+08 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 3.125e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.250e+05 W/m2
+  **[INFO]** Integrated fissile power in fuel: 2.000000e+01 W
 [update_state] burnup max = 9.3508e-01 MWd/kgU
 
 
@@ -305,7 +263,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for fuel, tag = 7
   Linear solver
-  ||Δu||/||u|| = 1.095e-16
+  ||Δu||/||u|| = 0.000e+00
 
 Convergence check
 
@@ -317,8 +275,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 3.125e+08 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 3.125e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.250e+05 W/m2
+  **[INFO]** Integrated fissile power in fuel: 2.000000e+01 W
 [update_state] burnup max = 1.8702e+00 MWd/kgU
 
 
@@ -383,7 +342,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for fuel, tag = 7
   Linear solver
-  ||Δu||/||u|| = 0.000e+00
+  ||Δu||/||u|| = 3.596e-17
 
 Convergence check
 
@@ -395,8 +354,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 3.125e+08 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 3.125e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.250e+05 W/m2
+  **[INFO]** Integrated fissile power in fuel: 2.000000e+01 W
 [update_state] burnup max = 2.8052e+00 MWd/kgU
 
 
@@ -461,7 +421,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for fuel, tag = 7
   Linear solver
-  ||Δu||/||u|| = 8.800e-17
+  ||Δu||/||u|| = 1.550e-16
 
 Convergence check
 
@@ -473,8 +433,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 3.125e+08 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 3.125e+08 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.250e+05 W/m2
+  **[INFO]** Integrated fissile power in fuel: 2.000000e+01 W
 [update_state] burnup max = 3.7403e+00 MWd/kgU
 
 
@@ -539,12 +500,12 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for fuel, tag = 7
   Linear solver
-  ||Δu||/||u|| = 3.596e-17
+  ||Δu||/||u|| = 1.095e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 2.06 s
+Simulation completed in 0.60 s
 Total time steps solved: 5

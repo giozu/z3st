@@ -2446,5 +2446,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 4.90 s
+Simulation completed in 4.98 s
 Total time steps solved: 41

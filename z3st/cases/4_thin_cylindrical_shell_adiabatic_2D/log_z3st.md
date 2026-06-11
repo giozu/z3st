@@ -409,7 +409,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.069e-05
+  ||Δu||/||u|| = 1.221e-05
   [adaptive] relax_u=0.95
 
 Convergence check
@@ -432,59 +432,13 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 10
   Linear solver
-  ||Δu||/||u|| = 1.567e-06
+  ||Δu||/||u|| = 9.685e-07
   [adaptive] relax_u=0.95
 
 Convergence check
 
-
-#### Iteration 14/100
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  → q_third[steel](W/m3) min = 1.77e+05, max = 2.00e+06, mean = 7.60e+05
-  Applying flux on subdomain id = 2
-  Linear solver
-  T_new: min=490.00 K, max=539.94 K, mean=526.76 K
-  ||ΔT||/||T|| = 1.251e-17
-  [adaptive] relax_T=0.95
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  Linear solver
-  ||Δu||/||u|| = 1.407e-06
-  [adaptive] relax_u=0.95
-
-Convergence check
-
-
-#### Iteration 15/100
-
-
-**[INFO]** Assembling thermal problem...
-
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  → q_third[steel](W/m3) min = 1.77e+05, max = 2.00e+06, mean = 7.60e+05
-  Applying flux on subdomain id = 2
-  Linear solver
-  T_new: min=490.00 K, max=539.94 K, mean=526.76 K
-  ||ΔT||/||T|| = 0.000e+00
-  [adaptive] relax_T=0.95
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  Building weak form, volume integrals (dx) for steel, tag = 10
-  Linear solver
-  ||Δu||/||u|| = 8.349e-07
-  [adaptive] relax_u=0.95
-
-Convergence check
-
-**[SUCCESS]** Staggered solver converged in 15 iterations.
+**[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 22.18 s
+Simulation completed in 21.61 s
 Total time steps solved: 1

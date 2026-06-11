@@ -486,7 +486,7 @@ Convergence check
   Applying mechanical traction on subdomain id = 1
   Applying mechanical traction on subdomain id = 2
   Linear solver
-  ||Δu||/||u|| = 1.222e-15
+  ||Δu||/||u|| = 3.934e-16
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -494,5 +494,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 17.86 s
+Simulation completed in 14.63 s
 Total time steps solved: 1

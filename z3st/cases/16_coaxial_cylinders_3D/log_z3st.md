@@ -85,8 +85,9 @@ Material loaded: cyl_2
 [spine.initialize_fields]
 [UPDATING q_third]
 Fissile material
-  q_third += 2.546e+03 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 2.546e+03 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.366e+01 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 1.995806e+00 W
 Initialized burnup field (fissile material present).
 
 Initializing the temperature field...
@@ -139,8 +140,9 @@ Computing symbolic result fields (strain, stress, ...)
 
 [UPDATING q_third]
 Fissile material
-  q_third += 2.546e+03 W/m³ × f(r,bu) (fissile, mean f = 1)
+  q_third += 2.546e+03 W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)
   Heat flux = 6.366e+01 W/m2
+  **[INFO]** Integrated fissile power in cyl_1: 1.995806e+00 W
   → dt=0: solving static step / initial condition
 Computing symbolic result fields (strain, stress, ...)
 
@@ -771,5 +773,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 14 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 49.40 s
+Simulation completed in 53.82 s
 Total time steps solved: 1

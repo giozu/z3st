@@ -551,7 +551,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 3.128e-10
+  ||Δu||/||u|| = 2.293e-10
 
 Convergence check
 
@@ -610,7 +610,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 1.608e-10
+  ||Δu||/||u|| = 9.231e-11
 
 Convergence check
 
@@ -669,7 +669,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 8.394e-11
+  ||Δu||/||u|| = 6.371e-11
 
 Convergence check
 
@@ -728,7 +728,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 8.358e-11
+  ||Δu||/||u|| = 7.842e-11
 
 Convergence check
 
@@ -787,7 +787,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 8.311e-11
+  ||Δu||/||u|| = 1.226e-10
 
 Convergence check
 
@@ -846,7 +846,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 5.069e-11
+  ||Δu||/||u|| = 6.866e-11
 
 Convergence check
 
@@ -905,7 +905,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.515e-11
+  ||Δu||/||u|| = 2.032e-11
 
 Convergence check
 
@@ -964,7 +964,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 5.839e-11
+  ||Δu||/||u|| = 4.420e-11
 
 Convergence check
 
@@ -1023,7 +1023,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.420e-11
+  ||Δu||/||u|| = 2.405e-11
 
 Convergence check
 
@@ -1082,7 +1082,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 1.444e-11
+  ||Δu||/||u|| = 2.335e-11
 
 Convergence check
 
@@ -1141,7 +1141,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 1.557e-11
+  ||Δu||/||u|| = 3.084e-11
 
 Convergence check
 
@@ -1200,7 +1200,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.311e-11
+  ||Δu||/||u|| = 1.195e-11
 
 Convergence check
 
@@ -1259,7 +1259,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 1.695e-11
+  ||Δu||/||u|| = 1.825e-11
 
 Convergence check
 
@@ -1318,7 +1318,7 @@ Convergence check
   **[INFO]** Updating Displacement Dirichlet on region 1 → 0.0
   Building weak form, volume integrals (dx) for steel, tag = 5
   Non-linear solver (SNES Newton)
-  ||Δu||/||u|| = 2.478e-11
+  ||Δu||/||u|| = 1.479e-11
 
 Convergence check
 
@@ -1326,5 +1326,5 @@ Convergence check
 [PlasticityModel] Updating plastic history...
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 24.05 s
+Simulation completed in 23.06 s
 Total time steps solved: 21
