@@ -119,7 +119,7 @@ To automatically execute all available verification and non-regression tests, ru
 .. code-block:: bash
 
    cd cases
-   ./non-regression.sh
+   ./non-regression_local.sh
 
 This script sequentially executes all predefined test cases and compares the obtained results
 against the reference data stored in the repository.
@@ -132,22 +132,36 @@ A summary of the execution status is saved in ``non-regression_summary.txt``.
    description of the discrepancy.
 
 
-The ``cases`` folder contains individual benchmark setups, each in a dedicated subdirectory. The folder structure is somewhat similar to the following:
+The ``cases`` folder groups benchmark setups by the kind of guarantee they provide:
 
 .. code-block:: text
 
    cases/
-   ├── 1_thin_thermal_slab/
-   ├── 2_thin_cylindrical_thermal_shield/
-   ├── ...
-   └── non-regression.sh
+   ├── verification/          # analytic closed-form checks
+   │   ├── thermal/
+   │   ├── mechanics/
+   │   ├── plasticity/
+   │   └── fuel/
+   ├── benchmarks/            # literature reproducers (e.g. single-edge-notched tests)
+   ├── regression/            # gold-only regression guards
+   ├── studies/               # convergence and parametric studies (not in the suite)
+   ├── sandbox/               # work in progress (never scanned by the suite)
+   ├── teaching/
+   ├── non-regression_local.sh
+   ├── non-regression_github.sh
+   ├── cases_ci.txt           # curated CI subset
+   └── suite_exclude.txt      # local-suite opt-outs, with reasons
 
-Each subfolder contains:
+Each case directory contains:
 - a mesh input file for gmsh;
-- a YAML configuration file defining input, geometry, and boundary conditions;
-- a reference output file;
-- a non-regression.py analyzer;
+- YAML configuration files defining input, geometry, and boundary conditions;
+- a ``non-regression.py`` analyzer;
+- a blessed reference result, ``output/non-regression_gold.json``;
 - (optionally) a plotting or post-processing script for result visualization.
 
-To add a new regression test, create a new folder under ``cases/``, include the required
-input files and reference results, and register it in the ``non-regression.sh`` script.
+Suite membership is discovered, not registered: any case directory (outside
+``sandbox/``) that contains both an ``Allrun`` script and a blessed
+``output/non-regression_gold.json`` is run automatically by
+``non-regression_local.sh``. To add a new regression test, create the case
+folder, run it, sanity-check ``output/non-regression.json``, and copy it to
+``output/non-regression_gold.json`` — no script editing is required.

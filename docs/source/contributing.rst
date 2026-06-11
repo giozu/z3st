@@ -48,7 +48,7 @@ can be run using:
 
 .. code-block:: bash
 
-   ./non-regression.sh
+   ./non-regression_local.sh
 
 This workflow ensures that new developments preserve numerical consistency.
 

@@ -162,16 +162,19 @@ z3st/                                # repository root
     │   └── geo_files/               # reusable Gmsh templates
     ├── examples/                    # minimal didactic setups
     └── cases/                       # ~50 verification / validation / demo cases
-        ├── verification/mechanics/uniaxial_tension/              # tutorial: uniaxial steel block 3D
-        ├── verification/thermal/thin_slab_dirichlet_2D/          # first thermal slab
-        ├── ...
-        ├── benchmarks/pellet_quench_2D_xy/   # UO2 thermal-shock + AT1 (paper flagship)
-        ├── 19_single-edge_notched_*/          # SENT / SENS phase-field benchmarks
-        ├── verification/plasticity/j2_hardening_2D/
-        ├── regression/pwr_rod_2D/                     # PWR fuel-rod segment: burnup-driven PCMI
-        ├── V_*/                              # analytical verification (swelling, burnup, contact)
-        ├── verification/plasticity/crystal_single_grain/             # custom crystal-plasticity demo
-        ├── non-regression.sh / .py / _github.sh   # regression infrastructure
+        ├── verification/            # analytic closed-form checks
+        │   ├── thermal/             #   slabs, shells, heated box
+        │   ├── mechanics/           #   Lamé, GPS, Mariotte, cylinders, cavities
+        │   ├── plasticity/          #   J2 hardening, crystal-plasticity demo
+        │   └── fuel/                #   swelling, burnup, creep, contact, law discovery
+        ├── benchmarks/              # literature reproducers (SENT/SENS, pellet quench)
+        ├── regression/              # gold-only guards (incl. PWR fuel-rod PCMI)
+        ├── studies/                 # mesh sensitivity, attenuation map
+        ├── sandbox/                 # work in progress (never in the suite)
+        ├── teaching/
+        ├── non-regression_local.sh  # discovery-based local suite
+        ├── non-regression_github.sh # CI suite (reads cases_ci.txt)
+        ├── cases_ci.txt / suite_exclude.txt
         └── non-regression_summary.txt
 ```
 

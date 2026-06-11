@@ -5,8 +5,8 @@
 # Author: Giovanni Zullo
 # Date  : 2026-06-11
 #
-# Membership is discovered, not hand-maintained: every directory under
-# cases/ that has BOTH an Allrun and a blessed output/non-regression_gold.json
+# Membership is discovered: every directory under
+# cases/ that has both an Allrun and a blessed output/non-regression_gold.json
 # is part of the local suite. sandbox/ is never scanned (explicitly
 # unprotected work lives there). Exceptions go in suite_exclude.txt,
 # one case per line, with a reason as a trailing comment.

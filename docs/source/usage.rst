@@ -548,7 +548,7 @@ Run all tests with:
 .. code-block:: bash
 
    cd cases
-   ./non-regression.sh
+   ./non-regression_local.sh
 
 This script executes verification tests, compares each new result with its reference,
 and logs the outcome to ``non-regression_summary.txt``.

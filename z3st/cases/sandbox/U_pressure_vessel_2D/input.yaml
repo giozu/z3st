@@ -9,7 +9,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../materials/steel.yaml
+  steel: ../../../materials/steel.yaml
 
 regime: axisymmetric
 

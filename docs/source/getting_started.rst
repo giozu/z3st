@@ -290,7 +290,7 @@ Running All Verification Cases
 .. code-block:: bash
 
    cd z3st/cases
-   ./non-regression.sh
+   ./non-regression_local.sh
 
 This executes all test cases and generates a summary report.
 

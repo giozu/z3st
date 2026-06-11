@@ -9,8 +9,7 @@
 set -e
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
-# The CI case list lives in cases/cases_ci.txt (one case per line; the
-# inclusion policy is documented at the top of that file).
+# The CI case list lives in cases/cases_ci.txt
 mapfile -t CASES < <(grep -vE '^[[:space:]]*(#|$)' "${ROOT_DIR}/cases/cases_ci.txt" | awk '{print $1}')
 SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 
