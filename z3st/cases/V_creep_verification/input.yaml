@@ -44,3 +44,6 @@ time:
 - 0.0
 - 1.0e+8
 n_steps: 11
+
+output:
+  format: xdmf

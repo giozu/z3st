@@ -20,15 +20,14 @@ One figure: axial strain vs time, Z3ST per-step vs the closed form.
 """
 
 import os
-import glob
 import yaml
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_extract_vtu import *
 from z3st.utils.utils_verification import *
+from z3st.utils.utils_extract_xdmf import *
 
 R_GAS = 8.314462618
 
@@ -36,9 +35,7 @@ CASE_DIR = os.path.dirname(__file__)
 OUT = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(OUT, "non-regression.json")
 
-_single = os.path.join(OUT, "fields.vtu")
-_steps = sorted(glob.glob(os.path.join(OUT, "fields_*.vtu")))
-VTU_FILE = _steps[-1] if _steps else _single
+XDMF_FILE = os.path.join(OUT, "fields.xdmf")
 
 # --. case parameters --..
 with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
@@ -48,6 +45,7 @@ Ro, Lz = float(geom["Ro"]), float(geom["Lz"])
 with open(os.path.join(CASE_DIR, "input.yaml")) as f:
     inp = yaml.safe_load(f)
 t_total = float(max(inp["time"]))
+n_steps = int(inp["n_steps"]) - 1            # active increments
 
 with open(os.path.join(CASE_DIR, next(iter(inp["materials"].values())))) as f:
     mat = yaml.safe_load(f)
@@ -69,7 +67,7 @@ EPS_RR_REF = -nu * EPS_EL - 0.5 * EPS_CR
 TOLERANCE = 1e-3
 
 # --. numerical results --..
-x, y, _, u = extract_field(VTU_FILE, field_name="Displacement")
+x, y, _, u = extract_field_xdmf(XDMF_FILE, field_name="Displacement", step_index=-1)
 r, z = np.asarray(x), np.asarray(y)
 u = np.asarray(u)
 
@@ -108,13 +106,12 @@ errors = {
 
 # --. figure: axial strain accumulation vs the closed form --..
 try:
-    times, eps_steps = [], []
-    for k, fpath in enumerate(_steps):
-        _, yk, _, uk = extract_field(fpath, field_name="Displacement")
-        zk = np.asarray(yk)
-        topk = np.abs(zk - Lz) < 1e-4 * Lz
-        eps_steps.append(float(np.mean(np.asarray(uk)[topk, 1])) / Lz)
-        times.append(k * t_total / max(len(_steps) - 1, 1))
+    times = np.linspace(0.0, t_total, n_steps + 1)
+    eps_steps = []
+    for k in range(n_steps + 1):
+        uk = extract_field_xdmf(XDMF_FILE, "Displacement", step_index=k,
+                                return_coords=False)
+        eps_steps.append(float(np.mean(np.asarray(uk)[top, 1])) / Lz)
     t_line = np.linspace(0.0, t_total, 100)
     plt.figure(figsize=(7, 5))
     plt.plot(t_line / 86400.0, (EPS_EL + A * sigma**n * t_line) * 100, "k-",
