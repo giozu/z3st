@@ -67,7 +67,7 @@ latexmk -pdf slides.tex      # -> slides.pdf (15 pages)
       with QR codes — legitimate demo-table craft (no poster was submitted).
 - [x] 2026-06-10 review pass: preflight green end-to-end (caught and fixed a
       regime-validation regression that broke `teaching/01_1D`); **burnup-driven
-      PCMI** (the `U_pwr_rod_2D` 3-year rod history, PCMI onset ~30 MWd/kgU,
+      PCMI** (the `regression/pwr_rod_2D` 3-year rod history, PCMI onset ~30 MWd/kgU,
       peak-T drop on contact) added as oral backup slide 5, a Q&A answer, and
       the closing beat of demo segment P (`baked/pcmi_burnup_curves.png`).
       Deck rebuilt (17 pages).
@@ -84,7 +84,7 @@ latexmk -pdf slides.tex      # -> slides.pdf (15 pages)
       prepare a bridge line.
 - [x] 2026-06-11 abstract-compliance segments added (decision: abstracts stay
       as submitted; the demo now delivers them). **Segment K** — crystal
-      plasticity live (`demo_CP_single_grain`, ~11 s, saturation verified to
+      plasticity live (`verification/plasticity/crystal_single_grain`, ~11 s, saturation verified to
       3.4%). **Segment M** — constitutive-law identification
       (`demo/identify_creep.py`): forward-mode AD (own dual numbers, no new
       deps) through the implicit backward-Euler creep solver, Gauss-Newton

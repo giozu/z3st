@@ -118,8 +118,8 @@ cd fenics2026/demo
 - **ParaView 6.0.1** at `/opt/ParaView-6.0.1-MPI-Linux-Python3.12-x86_64/bin` (headless pvpython rendering works).
 - Demo cases, all verified to run/pass via `preflight.sh`:
   - `teaching/01_1D`, `teaching/01_3D` — fast; show 1D≡3D regime equivalence.
-  - `1_thin_slab_neumann_2D` — coupled thermal+mechanical, ~7 s solve; emits `fields.vtu` + comparison PNG.
-  - `14_full_cylinder_cracking_2D_xy` — the showpiece; 100-step crack series (`fields_0000…0099.vtu`). Too slow to run live, so it is **pre-baked** into a ParaView animation. Full run converged (fracture energy 3.74 J).
+  - `verification/thermal/thin_slab_neumann_2D` — coupled thermal+mechanical, ~7 s solve; emits `fields.vtu` + comparison PNG.
+  - `benchmarks/pellet_quench_2D_xy` — the showpiece; 100-step crack series (`fields_0000…0099.vtu`). Too slow to run live, so it is **pre-baked** into a ParaView animation. Full run converged (fracture energy 3.74 J).
 - The writer emits per-step VTU for multi-step runs, enabling the ParaView time-series scrub.
 
 ## 8. Status
@@ -135,7 +135,7 @@ cd fenics2026/demo
 
 - `conda activate z3st`; large terminal font; notifications + screen-sleep off; mains power.
 - Run `./preflight.sh`; confirm the ParaView animation plays smoothly.
-- Editor tabs open on `mechanical_model.py` (AD lines 619–665) and `1_thin_slab_neumann_2D/input.yaml` (for the hot-reload edit).
+- Editor tabs open on `mechanical_model.py` (AD lines 619–665) and `verification/thermal/thin_slab_neumann_2D/input.yaml` (for the hot-reload edit).
 - Everything runs **offline**; only the GitHub/DOI links need a network, and those are on the handout/QR, not the laptop.
 
 ## 10. Decisions and open notes (build discussion log)

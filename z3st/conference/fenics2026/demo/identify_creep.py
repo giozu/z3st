@@ -9,7 +9,7 @@ discovery (Flaschel et al., CMAME 2022) in Z3ST: today this identifies the
 over candidate energies is the roadmap.
 
 The physics is the verified stress-relaxation case
-(z3st/cases/V_creep_relaxation_verification): a bar held at constant total
+(z3st/cases/verification/fuel/creep_relaxation): a bar held at constant total
 strain relaxes by Norton creep, sigma' = -E*A*sigma^n, integrated with the
 same implicit backward-Euler recursion the FEM solver uses,
 
@@ -89,7 +89,7 @@ class Dual:
 
 
 # ---------------------------------------------------------------------------
-# the physics: verified relaxation case, V_creep_relaxation_verification
+# the physics: verified relaxation case, verification/fuel/creep_relaxation
 # ---------------------------------------------------------------------------
 R_GAS = 8.314462618
 E = 99.3e9            # Pa        (zircaloy_creep.yaml)

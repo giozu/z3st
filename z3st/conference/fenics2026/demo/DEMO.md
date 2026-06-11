@@ -73,7 +73,7 @@ control the pace while you talk. Talking points below.
     material is just a new energy."*
 
 ### C. Coupled thermo-mechanics + the hot-reload "wow" — 90 s
-- Start the **coupled slab** (`1_thin_slab_neumann_2D`): thermal + mechanical,
+- Start the **coupled slab** (`verification/thermal/thin_slab_neumann_2D`): thermal + mechanical,
   staggered. It solves in a few seconds and prints the staggered iteration count.
   - *"Now it is coupled: heat conduction drives thermal strain, which drives stress.
     Staggered loop with adaptive relaxation."*
@@ -123,7 +123,7 @@ the oral's PCMI slide.*
 ### K. (optional) Crystal plasticity — the demo abstract's first headline — 90 s
 *Pull it up for anyone who read the abstract, a plasticity person, or a judge
 (`./run_demo.sh K`; runs live in ~11 s, baked fallback `baked/cp_stress_strain.png`).*
-- Run `demo_CP_single_grain` live: single crystal, one FCC slip system
+- Run `verification/plasticity/crystal_single_grain` live: single crystal, one FCC slip system
   (111)[0-11], power-law viscoplasticity, backward Euler with history variables
   in quadrature spaces.
 - *"The slip-rate derivative through the Schmid tensor is the Jacobian nobody
@@ -195,12 +195,12 @@ artifacts. Then, by hand:
 - [ ] Terminal font size large (≥ 18 pt); dark-on-light or high-contrast theme.
 - [ ] Laptop on mains power; screen-sleep and notifications **off**.
 - [ ] ParaView opens the baked case-14 series and the animation plays smoothly.
-- [ ] `teaching/01_1D`, `teaching/01_3D`, `1_thin_slab_neumann_2D` each run clean once (warms the dolfinx import cache too).
+- [ ] `teaching/01_1D`, `teaching/01_3D`, `verification/thermal/thin_slab_neumann_2D` each run clean once (warms the dolfinx import cache too).
 - [ ] `demo/baked/` contains the fallback PNGs (incl. `pcmi_curves.png`, `pcmi_verification.png` for segment P, `cp_stress_strain.png` for segment K, `creep_identification.png` for segment M).
-- [ ] `demo_CP_single_grain` runs clean once (segment K live run, ~11 s) and `python3 identify_creep.py` converges (segment M, ~2 s) — both checked by `preflight.sh`.
+- [ ] `verification/plasticity/crystal_single_grain` runs clean once (segment K live run, ~11 s) and `python3 identify_creep.py` converges (segment M, ~2 s) — both checked by `preflight.sh`.
 - [ ] Open `attract.html` once (`./attract.sh`) and confirm the loop plays and the QR codes scan.
 - [ ] `../handout/handout.pdf` printed (a small stack to hand out); QR codes scan.
-- [ ] Editor open on `mechanical_model.py` (AD lines) and `1_thin_slab_neumann_2D/input.yaml` (for the hot-reload edit) in separate tabs.
+- [ ] Editor open on `mechanical_model.py` (AD lines) and `verification/thermal/thin_slab_neumann_2D/input.yaml` (for the hot-reload edit) in separate tabs.
 - [ ] No poster was submitted — the attract screen and the handout are the
       stand-ins; both carry the QR codes (repo, docs, DOI) and your email.
 - [ ] A few business cards / a printed one-pager to hand out.

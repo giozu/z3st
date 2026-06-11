@@ -34,23 +34,23 @@ echo "${B}live cases:${Z}"
     && RUN python3 -m z3st >/dev/null 2>&1 \
     && RUN python3 non-regression.py 2>&1 | grep -q "PASS" ) \
   && ok "teaching/01_3D runs and passes" || no "teaching/01_3D"
-( cd "$CASES/1_thin_slab_neumann_2D" && RUN gmsh mesh.geo -2 >/dev/null 2>&1 \
+( cd "$CASES/verification/thermal/thin_slab_neumann_2D" && RUN gmsh mesh.geo -2 >/dev/null 2>&1 \
     && RUN python3 -m z3st 2>&1 | grep -q "Simulation completed" ) \
-  && ok "1_thin_slab_neumann_2D (coupled) runs" || no "1_thin_slab_neumann_2D"
-( cd "$CASES/demo_CP_single_grain" && RUN gmsh mesh.geo -3 >/dev/null 2>&1 \
+  && ok "verification/thermal/thin_slab_neumann_2D (coupled) runs" || no "verification/thermal/thin_slab_neumann_2D"
+( cd "$CASES/verification/plasticity/crystal_single_grain" && RUN gmsh mesh.geo -3 >/dev/null 2>&1 \
     && RUN python3 -m z3st >/dev/null 2>&1 \
     && RUN python3 non-regression.py 2>&1 | grep -q "PASS All" ) \
-  && ok "demo_CP_single_grain (crystal plasticity, segment K) runs and passes" \
-  || no "demo_CP_single_grain (segment K)"
+  && ok "verification/plasticity/crystal_single_grain (crystal plasticity, segment K) runs and passes" \
+  || no "verification/plasticity/crystal_single_grain (segment K)"
 ( cd "$HERE" && RUN python3 identify_creep.py 2>&1 | grep -q "figure saved" ) \
   && ok "identify_creep.py (segment M) runs and bakes its figure" \
   || no "identify_creep.py (segment M)"
 
 echo "${B}showpiece (case 14):${Z}"
-C14="$CASES/14_full_cylinder_cracking_2D_xy/output"
+C14="$CASES/benchmarks/pellet_quench_2D_xy/output"
 n=$(ls "$C14"/fields_*.vtu 2>/dev/null | wc -l)
 if [ "$n" -gt 1 ]; then ok "case-14 VTU series present ($n steps)"; else
-  warn "case-14 VTU series missing — run: (cd $CASES/14_full_cylinder_cracking_2D_xy && ./Allrun)"; fi
+  warn "case-14 VTU series missing — run: (cd $CASES/benchmarks/pellet_quench_2D_xy && ./Allrun)"; fi
 
 echo "${B}paraview + baked fallback:${Z}"
 command -v paraview >/dev/null 2>&1 && ok "paraview on PATH" || warn "paraview not on PATH (baked images still work)"

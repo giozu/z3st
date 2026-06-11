@@ -48,16 +48,16 @@ Install in editable/development mode
 
 Then, it is possible to execute in each case folder, for instance:
   ```bash
-  cd ~/z3st/z3st/cases/00_example/
+  cd ~/z3st/z3st/cases/verification/mechanics/uniaxial_tension/
   gmsh mesh.geo -3 > log_mesh.md
   python3 -m z3st > log_z3st.md
   python3 non-regression.py
-  python3 ../../utils/plot_convergence.py
+  python3 ../../../../utils/plot_convergence.py
   ```
 
 Or, with less instructions:
   ```bash
-  cd ~/z3st/z3st/cases/00_example/
+  cd ~/z3st/z3st/cases/verification/mechanics/uniaxial_tension/
   ./Allrun
   ```
 
@@ -162,15 +162,15 @@ z3st/                                # repository root
     │   └── geo_files/               # reusable Gmsh templates
     ├── examples/                    # minimal didactic setups
     └── cases/                       # ~50 verification / validation / demo cases
-        ├── 00_example/              # tutorial: uniaxial steel block 3D
-        ├── 1_thin_slab_2D/          # first thermal slab
+        ├── verification/mechanics/uniaxial_tension/              # tutorial: uniaxial steel block 3D
+        ├── verification/thermal/thin_slab_dirichlet_2D/          # first thermal slab
         ├── ...
-        ├── 14_full_cylinder_cracking_2D_xy/   # UO2 thermal-shock + AT1 (paper flagship)
+        ├── benchmarks/pellet_quench_2D_xy/   # UO2 thermal-shock + AT1 (paper flagship)
         ├── 19_single-edge_notched_*/          # SENT / SENS phase-field benchmarks
-        ├── 20_plasticity_2D/
-        ├── U_pwr_rod_2D/                     # PWR fuel-rod segment: burnup-driven PCMI
+        ├── verification/plasticity/j2_hardening_2D/
+        ├── regression/pwr_rod_2D/                     # PWR fuel-rod segment: burnup-driven PCMI
         ├── V_*/                              # analytical verification (swelling, burnup, contact)
-        ├── demo_CP_single_grain/             # custom crystal-plasticity demo
+        ├── verification/plasticity/crystal_single_grain/             # custom crystal-plasticity demo
         ├── non-regression.sh / .py / _github.sh   # regression infrastructure
         └── non-regression_summary.txt
 ```

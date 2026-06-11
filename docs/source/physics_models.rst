@@ -160,7 +160,7 @@ Neo-Hookean hyperelasticity
 .. note::
 
    This route is **implemented and verified** (case
-   ``1_thin_slab_non_linear``), not planned.
+   ``verification/mechanics/uniaxial_tension_nonlinear``), not planned.
 
 Compressible Neo-Hookean hyperelasticity uses the strain-energy density
 
@@ -246,7 +246,7 @@ Crystal plasticity (single grain)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``plasticity.mode: custom`` hook replaces the J2 update with a user-supplied
-routine. The demonstration case ``demo_CP_single_grain`` implements
+routine. The demonstration case ``verification/plasticity/crystal_single_grain`` implements
 rate-dependent single-crystal plasticity on one 3D grain. The stress follows the
 elastic law on the plastic-corrected strain,
 
@@ -554,7 +554,7 @@ signature of PCMI. Implemented in
 :class:`z3st.models.contact_model.ContactModel`.
 
 **Verification.** The penalty contact pressure is verified against the analytical
-**Lamé interference-fit** solution in case ``V_coaxial_contact_verification``. The
+**Lamé interference-fit** solution in case ``verification/fuel/coaxial_contact``. The
 pellet is heated *uniformly* (a ramped Dirichlet temperature) while the cladding
 is held at its reference temperature, so the radial interference is known in
 closed form,
@@ -647,7 +647,7 @@ Application: thermal-shock cracking of a UO\ :sub:`2` pellet
 ------------------------------------------------------------
 
 The full coupled set -- thermal, mechanical, and phase-field damage -- meets in
-the UO\ :sub:`2` thermal-shock case (``14_full_cylinder_cracking_2D_xy``), a 2D
+the UO\ :sub:`2` thermal-shock case (``benchmarks/pellet_quench_2D_xy``), a 2D
 plane-strain transverse cross-section reproducer of McClenny et al.,
 *J. Nucl. Mater.* 565 (2022). A cold-contact wedge cools the rim of a hot disc;
 the tensile hoop-stress ring it sets up drives discrete radial cracks (AT1 +

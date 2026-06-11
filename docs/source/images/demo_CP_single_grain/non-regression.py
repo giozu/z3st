@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: demo_CP_single_grain
+Z3ST case: verification/plasticity/crystal_single_grain
 
 non-regression script
 ---------------------

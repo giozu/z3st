@@ -81,12 +81,12 @@ seg_C() {
   hr; say "C · Coupled thermo-mechanics + the hot-reload wow"
   cue "Now it is coupled: heat drives thermal strain, which drives stress. Staggered, adaptive relaxation."
   pause
-  ( cd "$CASES/1_thin_slab_neumann_2D" \
+  ( cd "$CASES/verification/thermal/thin_slab_neumann_2D" \
       && RUN gmsh mesh.geo -2 > log_mesh.md 2>&1 \
       && RUN python3 -m z3st 2>&1 | grep -E "iteration|converged|Simulation completed|staggered|Δ" | tail -8 )
   echo
   echo "${Y}${B}  HOT-RELOAD MOMENT:${Z}"
-  echo "  Open  ${B}$CASES/1_thin_slab_neumann_2D/input.yaml${Z}  in your editor,"
+  echo "  Open  ${B}$CASES/verification/thermal/thin_slab_neumann_2D/input.yaml${Z}  in your editor,"
   echo "  change e.g. ${B}relax_u: 0.4 → 0.2${Z}  or  ${B}stag_tol${Z}, save, and re-run this segment."
   cue "I can retune the solver while it runs — it picks up the change at the next step."
 }
@@ -123,7 +123,7 @@ seg_P() {
   open_imgs "$BAKED/pcmi_burnup_curves.png"
   echo
   echo "${Y}  (optional, live — watch the gap close and contact switch on):${Z}"
-  echo "    ${B}cd $CASES/U_coaxial_contact_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
+  echo "    ${B}cd $CASES/sandbox/U_coaxial_contact_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
 }
 
 seg_K() {
@@ -132,14 +132,14 @@ seg_K() {
   cue "derivative through the Schmid tensor is the Jacobian nobody enjoys deriving —"
   cue "here it comes from ufl.diff, exactly. Watch the Newton counts."
   pause
-  ( cd "$CASES/demo_CP_single_grain" \
+  ( cd "$CASES/verification/plasticity/crystal_single_grain" \
       && RUN gmsh mesh.geo -3 > log_mesh.md 2>&1 \
       && RUN python3 -m z3st > log_z3st.md 2>&1 \
       && RUN python3 non-regression.py 2>&1 \
          | grep -E "Schmid|σ_sat|sigma_zz_final|saturation|SUMMARY|EXCELLENT" )
   echo
-  echo "  curve: ${B}$CASES/demo_CP_single_grain/output/stress_strain_curve.png${Z}"
-  open_imgs "$CASES/demo_CP_single_grain/output/stress_strain_curve.png"
+  echo "  curve: ${B}$CASES/verification/plasticity/crystal_single_grain/output/stress_strain_curve.png${Z}"
+  open_imgs "$CASES/verification/plasticity/crystal_single_grain/output/stress_strain_curve.png"
   echo "${G}  → elastic, yield at τ = g₀, saturation at the semi-analytical σ_sat — "
   echo "    quadratic Newton convergence because the AD tangent is exact.${Z}"
   cue "History variables live in quadrature spaces; the law is ~10 lines of Python."
@@ -169,7 +169,7 @@ smoke() {
       && RUN python3 -m z3st >/dev/null 2>&1 \
       && RUN python3 non-regression.py 2>&1 | grep -E "SUMMARY" ) \
     && echo "${G}  1D OK${Z}" || echo "${R}  1D FAILED${Z}"
-  ( cd "$CASES/1_thin_slab_neumann_2D" && RUN gmsh mesh.geo -2 >/dev/null 2>&1 \
+  ( cd "$CASES/verification/thermal/thin_slab_neumann_2D" && RUN gmsh mesh.geo -2 >/dev/null 2>&1 \
       && RUN python3 -m z3st 2>&1 | grep -qE "Simulation completed" ) \
     && echo "${G}  coupled slab OK${Z}" || echo "${R}  coupled slab FAILED${Z}"
 }

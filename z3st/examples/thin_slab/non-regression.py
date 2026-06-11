@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: 1_thin_slab_2D
+Z3ST case: verification/thermal/thin_slab_dirichlet_2D
 
 non-regression script
 ---------------------

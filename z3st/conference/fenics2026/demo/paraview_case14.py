@@ -20,7 +20,7 @@ from paraview.simple import *  # noqa: F401,F403
 HERE = os.path.dirname(os.path.abspath(__file__))
 PKG = os.path.abspath(os.path.join(HERE, "..", "..", ".."))           # -> z3st package dir
 CASE_OUT = os.path.join(
-    PKG, "cases", "14_full_cylinder_cracking_2D_xy", "output"
+    PKG, "cases", "benchmarks/pellet_quench_2D_xy", "output"
 )
 BAKED = os.path.join(HERE, "baked")
 
@@ -39,7 +39,7 @@ if not files:
 if not files:
     sys.stderr.write(
         "[paraview_case14] no VTU files found in:\n  %s\n"
-        "Run the case first:  (cd .../14_full_cylinder_cracking_2D_xy && ./Allrun)\n"
+        "Run the case first:  (cd .../benchmarks/pellet_quench_2D_xy && ./Allrun)\n"
         % CASE_OUT
     )
     sys.exit(1)

@@ -365,7 +365,7 @@ BCs: only `Dirichlet` on D (e.g. `D=0` on healthy boundary).
 
 - **J2 plasticity** with isotropic linear hardening; constitutive update computed symbolically through `ufl.conditional` (returns stress `σ = σ_tr − 3μ Δp n`, yield stress `σ_y = σ_y0 + H p`).
 - History fields `ep`, `p`, `ep_n`, `p_n` on quadrature spaces.
-- `mode: custom` in `plasticity:` block hooks a user crystal-plasticity function `get_cp_internal_variables` inside the material's module — used by the `demo_CP_single_grain` case.
+- `mode: custom` in `plasticity:` block hooks a user crystal-plasticity function `get_cp_internal_variables` inside the material's module — used by the `verification/plasticity/crystal_single_grain` case.
 - `update_plastic_history(u)` refreshes `ep_n`, `p_n` after the staggered iteration converges.
 
 ### 4.5 Gap conductance (`gap_model.py`)
@@ -381,7 +381,7 @@ Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to anothe
 
 ### 4.5bis Creep (`creep_model.py`)
 
-Implicit Norton creep (`ε̇_eq = A0·exp(−Q/RT)·σ_eq^n`) for a material carrying `creep: norton` + `creep_A0/n/Q` on its card — the dissipative extension of the energy-first design (incremental variational principle, Ortiz–Stainier). The cell-local minimisation over Δε_cr condenses to the scalar radial-return equation per point; a DG0 **predictor** Δγ₀ holds its exact root (vectorised numpy Newton, refreshed before every mechanical solve, consistency gated in the staggered convergence test), and the UFL stress carries **one symbolic Newton step** from the predictor — so `ufl.derivative` yields exactly the implicit-function-theorem consistent tangent through a trivially small expression tree (a fully unrolled symbolic Newton explodes FFCx). The accumulated `ε_cr` is a per-material DG0 tensor state advanced once per converged step; it enters the trial through the eigenstrain channel and the output stress via `creep_output_stress`. Mechanical steps auto-promote to SNES when creep is active. v1 scope: isotropic Lamé, no damage/plasticity combination, regimes with 3×3 strain tensors. Verified by `V_creep_verification` (1e-14) and `V_creep_relaxation_verification` (4e-15 vs the BE recursion; O(dt) defect pinned).
+Implicit Norton creep (`ε̇_eq = A0·exp(−Q/RT)·σ_eq^n`) for a material carrying `creep: norton` + `creep_A0/n/Q` on its card — the dissipative extension of the energy-first design (incremental variational principle, Ortiz–Stainier). The cell-local minimisation over Δε_cr condenses to the scalar radial-return equation per point; a DG0 **predictor** Δγ₀ holds its exact root (vectorised numpy Newton, refreshed before every mechanical solve, consistency gated in the staggered convergence test), and the UFL stress carries **one symbolic Newton step** from the predictor — so `ufl.derivative` yields exactly the implicit-function-theorem consistent tangent through a trivially small expression tree (a fully unrolled symbolic Newton explodes FFCx). The accumulated `ε_cr` is a per-material DG0 tensor state advanced once per converged step; it enters the trial through the eigenstrain channel and the output stress via `creep_output_stress`. Mechanical steps auto-promote to SNES when creep is active. v1 scope: isotropic Lamé, no damage/plasticity combination, regimes with 3×3 strain tensors. Verified by `verification/fuel/creep` (1e-14) and `verification/fuel/creep_relaxation` (4e-15 vs the BE recursion; O(dt) defect pinned).
 
 ### 4.6 Cluster dynamics (`cluster_dynamic_model.py`)
 
@@ -397,7 +397,7 @@ Penalty pellet-clad mechanical contact (gap closure / PCMI), enabled via the `mo
 
 - **Gap measurement** — each mechanical iteration measures the current normal gap from the displacement iterate as `gap = g0 + ⟨u_r⟩_b − ⟨u_r⟩_a`, the boundary-integral mean radial displacement of the two paired facing surfaces (`surface_a` = pellet outer, `surface_b` = clad inner).
 - **Penalty traction** — on penetration (`gap < 0`) a pressure `p = k_pen · ⟨−gap⟩₊` is applied as `t = −p·n` on both facing surfaces (UFL/AD supplies the tangent). Config: `penalty_stiffness` (Pa/m), `initial_gap` (m).
-- Verified against the analytical plane-stress Lamé interference-fit solution (`cases/V_coaxial_contact_verification`, ~3.5 %). The emergent contact pressure also feeds the contact-coupled gap conductance (§4.5), so thermal + mechanical PCMI are two-way coupled.
+- Verified against the analytical plane-stress Lamé interference-fit solution (`cases/verification/fuel/coaxial_contact`, ~3.5 %). The emergent contact pressure also feeds the contact-coupled gap conductance (§4.5), so thermal + mechanical PCMI are two-way coupled.
 
 ---
 
@@ -463,77 +463,79 @@ Each case folder is self-contained:
 └── output/                   auto-generated VTU/XDMF + plots
 ```
 
-The suite is driven by `z3st/cases/non-regression.sh` (local) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. Each case's `non-regression.json` carries two verdicts (since 2026-06-10): `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL (previously only Allrun crashes failed CI — numerical regressions were invisible).
+The suite is driven by `z3st/cases/non-regression_local.sh` (local, since 2026-06-11) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. The local suite is discovery-based: every directory under `cases/` with both an `Allrun` and a blessed `output/non-regression_gold.json` is a member (`sandbox/` is never scanned); exceptions live in `cases/suite_exclude.txt` with a reason per line, and `--list` prints the discovered set. So "is this case protected?" has exactly one answer: does it have a gold. The CI list is curated separately in `cases/cases_ci.txt` (performance budget, not coverage); `non-regression_github.sh` reads it. The old hand-maintained `non-regression.sh` is kept temporarily for comparison. Each case's `non-regression.json` carries two verdicts (since 2026-06-10): `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL (previously only Allrun crashes failed CI — numerical regressions were invisible).
 
 ### 6.1 Catalogue of cases
 
 **00 — Tutorial / example**
-- `00_example` — uniaxial traction of a rectangular steel block (3D, linear elasticity, `Neumann` traction + `Clamp` BCs on 3 faces).
+- `verification/mechanics/uniaxial_tension` — uniaxial traction of a rectangular steel block (3D, linear elasticity, `Neumann` traction + `Clamp` BCs on 3 faces).
 
 **1–6 — Slabs and thin cylindrical shells (thermal / thermo-mechanical benchmarks)**
-- `1_thin_slab_2D`, `1_thin_slab_neumann_2D`, `1_thin_slab_neumann_3D`, `1_thin_slab_non_linear`
-- `2_thin_cylindrical_shell_2D`
-- `3_thick_slab_adiabatic_3D`, `3_thin_slab_adiabatic_2D`
-- `4_thick_cylindrical_shell_adiabatic_2D`, `4_thin_cylindrical_shell_adiabatic_2D`
-- `5_thick_slab_non_adiabatic_3D`, `5_thin_slab_non_adiabatic_2D`
-- `6_thick_cylindrical_shell_non_adiabatic_2D`, `6_thin_cylindrical_shell_non_adiabatic_2D`
+- `verification/thermal/thin_slab_dirichlet_2D`, `verification/thermal/thin_slab_neumann_2D`, `verification/thermal/thin_slab_neumann_3D`, `verification/mechanics/uniaxial_tension_nonlinear`
+- `verification/thermal/thin_cylindrical_shell_dirichlet_2D`
+- `verification/thermal/thick_slab_adiabatic_3D`, `verification/thermal/thin_slab_adiabatic_2D`
+- `verification/thermal/thick_cylindrical_shell_adiabatic_2D`, `verification/thermal/thin_cylindrical_shell_adiabatic_2D`
+- `verification/thermal/thick_slab_non_adiabatic_3D`, `verification/thermal/thin_slab_non_adiabatic_2D`
+- `verification/thermal/thick_cylindrical_shell_non_adiabatic_2D`, `verification/thermal/thin_cylindrical_shell_non_adiabatic_2D`
 
 **7 — Box heated**
-- `7_box_heated`
+- `verification/thermal/box_heated`
 
 **8–9 — Thick cylinders with regime variations**
-- `8_thick_cylindrical_shell_plane_strain_2D`
-- `9_thick_cylindrical_shell_GPS_2D`, `9_thick_cylindrical_shell_GPS_3D` (generalized plane strain)
+- `verification/mechanics/lame_plane_strain_2D`
+- `verification/mechanics/lame_gps_2D`, `verification/mechanics/lame_gps_3D` (generalized plane strain)
 
 **11–14 — Cylinders (Mariotte, gradients, annular, full cylinder, fracture)**
-- `11_thin_cylindrical_shell_Mariotte`
-- `12_cylindrical_shell_thermal_gradient_2D`, `12_cylindrical_shell_thermal_gradient_3D`
-- `13_annular_cylinder`
-- `14_full_cylinder`
-- `14_full_cylinder_cracking` (3D gold-standard McClenny reproducer), `14_full_cylinder_cracking_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the workhorse for the paper's case-14 chapter), `14_full_cylinder_thermal_2D_rz` (axisymmetric thermal verification, damage off). See §9c for the full three-variant rationale.
+- `verification/mechanics/mariotte_thin_shell`
+- `verification/mechanics/thermal_gradient_2D`, `verification/mechanics/thermal_gradient_3D`
+- `verification/mechanics/annular_cylinder`
+- `verification/mechanics/full_cylinder`
+- `benchmarks/pellet_quench_3D` (3D gold-standard McClenny reproducer), `benchmarks/pellet_quench_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the workhorse for the paper's case-14 chapter). See §9c for the variant rationale. (`14_full_cylinder_thermal_2D_rz`, the axisymmetric thermal-verification variant with damage off, was removed on 2026-06-11 — axisymmetric transient-cooling verification is no longer exercised by any case.)
 
 **15 — Cavities and pressurised bodies**
-- `15_single_elliptical_cavity_2D`, `15_two_elliptical_cavities_2D`
-- `15_spherical_pressurized_cavity`
+- `regression/elliptical_cavity_2D`, `regression/two_elliptical_cavities_2D`
+- `verification/mechanics/spherical_cavity`
 
 **16 — Multi-body coupling**
-- `16_coaxial_cylinders_3D`
+- `regression/coaxial_gap_3D`
 
 **17 — Stress–strain curves**
-- `17_stress_strain_curve_displacement`, `17_stress_strain_curve_stress`
-- `17_stress_strain_curve_double_crack`, `17_stress_strain_curve_knotch`
+- `verification/plasticity/stress_strain_displacement`, `verification/plasticity/stress_strain_stress`
+- `benchmarks/double_crack_2D`, `benchmarks/notched_plate_2D`
 
 **18 — 2D fracture benchmarks**
-- `18_box_crack_2D`, `18_box_knotch_2D`
+- `regression/box_crack_2D`, `regression/box_notch_2D`
 
 **19 — Single-edge notched (classical phase-field benchmarks)**
-- `19_single-edge_notched_shear_test`
-- `19_single-edge_notched_tension_test`
+- `benchmarks/sen_shear`
+- `benchmarks/sen_tension`
 
 **20 — Plasticity**
-- `20_plasticity_2D`
+- `verification/plasticity/j2_hardening_2D`
 
 **I, II — Utilities**
-- `I_mesh_sensitivity_2D` — mesh convergence study
-- `II_attenuation_map` — γ attenuation in materials
+- `studies/mesh_sensitivity_2D` — mesh convergence study
+- `studies/attenuation_map` (ex `II_attenuation_map`) — γ attenuation in materials. A non-suite study (custom `run_map.py`/`plot_map.py`, no `Allrun`/`non-regression.py`); it briefly visited `z3st/examples/` on 2026-06-11 before settling under `cases/studies/`.
 
 **V_* — Analytical-verification cases** (closed-form checks; `V_` = verification, renamed from `U_*` on 2026-06-09)
-- `V_swelling_verification` — constant volumetric swelling eigenstrain (free expansion → σ ≈ 0, exact `u`).
-- `V_fuel_swelling_verification` — burnup-driven swelling reading the `burnup` field (the eigenstrain bus consuming the state bus).
-- `V_burnup_verification` — burnup accumulation + radial-power source bus on an axisymmetric pellet (closed-form mean burnup; rim/core ratio = 1 + A).
-- `V_axial_power_verification` — axial-power source bus (chopped-cosine `f(z)`, Todreas & Kazimi 1-D axial problem) on a tall axisymmetric fuel column: closed-form mean burnup (machine precision); axial peaking factor = 1/[(2L′/πL)·sin(πL/2L′)]; end/peak = cos(πL/2L′).
-- `V_axial_table_verification` — tabulated axial profile (`tabulated_axial`, piecewise-linear node-wise peaking factors — the standard core-physics input): closed-form mean burnup (exact); table-node ratio f₃/f₁ (machine precision); peak/mean = max f / trapezoid mean.
-- `V_creep_verification` — implicit Norton creep, constant-stress uniaxial bar (backward Euler exact): total/creep/radial strain vs closed form at 1e-14 (radial pins the deviatoric −½ flow).
-- `V_creep_relaxation_verification` — stress relaxation at held strain: Z3ST ≡ the scalar backward-Euler recursion at 4e-15; deviation from the exact `σ(t)` equals the predicted O(dt) defect (2.11% at 50 steps, pinned to 2e-13).
-- `V_creep_law_discovery` *(2026-06-11)* — the framework's first **inverse / constitutive-identification** case (EUCLID-style, independent implementation — the published EUCLID codes are GPL-3.0 and are not used). Forward problem: the relaxation case re-run with **500** implicit steps (own `input.yaml`; ~36 min — data defect ~0.2%, below the noise; observations cached to `output/fem_stress_history.csv`). Inverse: 51 noisy (2%) observations of mean σ_zz; 5-mechanism library `{S, S², S³, S⁵, sinh S}` (S = σ/σ_ref); self-contained dual-number forward AD through the implicit BE integrator (different grid from the data → no inverse crime); damped Gauss-Newton on log-coefficients; backward elimination by strain share + **one-standard-error rule** (plain BIC could NOT separate {S²,S³} from {S³}; with the original coarse 50-step data a spurious S² absorbed the time-discretisation defect in 6/10 seeds — hence the 500-step forward run). Result: cubic Norton selected alone **10/10 seeds**, coefficient to 1.6%. Gold-blessed (`discover.py` ~16 s given the CSV); feeds the z3st paper's identification section (figure `creep_law_discovery.png`). In the local suite sense only — NOT in CI (forward run too long; see punch list CASES-FOLLOWUP-7).
-- `V_coaxial_contact_verification` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit.
+- `verification/fuel/swelling` — constant volumetric swelling eigenstrain (free expansion → σ ≈ 0, exact `u`).
+- `verification/fuel/fuel_swelling` — burnup-driven swelling reading the `burnup` field (the eigenstrain bus consuming the state bus).
+- `verification/fuel/burnup` — burnup accumulation + radial-power source bus on an axisymmetric pellet (closed-form mean burnup; rim/core ratio = 1 + A).
+- `verification/fuel/axial_power` — axial-power source bus (chopped-cosine `f(z)`, Todreas & Kazimi 1-D axial problem) on a tall axisymmetric fuel column: closed-form mean burnup (machine precision); axial peaking factor = 1/[(2L′/πL)·sin(πL/2L′)]; end/peak = cos(πL/2L′).
+- `verification/fuel/axial_table` — tabulated axial profile (`tabulated_axial`, piecewise-linear node-wise peaking factors — the standard core-physics input): closed-form mean burnup (exact); table-node ratio f₃/f₁ (machine precision); peak/mean = max f / trapezoid mean.
+- `verification/fuel/creep` — implicit Norton creep, constant-stress uniaxial bar (backward Euler exact): total/creep/radial strain vs closed form at 1e-14 (radial pins the deviatoric −½ flow).
+- `verification/fuel/creep_relaxation` — stress relaxation at held strain: Z3ST ≡ the scalar backward-Euler recursion at 4e-15; deviation from the exact `σ(t)` equals the predicted O(dt) defect (2.11% at 50 steps, pinned to 2e-13).
+- `verification/fuel/creep_law_discovery` *(2026-06-11)* — the framework's first **inverse / constitutive-identification** case (EUCLID-style, independent implementation — the published EUCLID codes are GPL-3.0 and are not used). Forward problem: the relaxation case re-run with **500** implicit steps (own `input.yaml`; ~36 min — data defect ~0.2%, below the noise; observations cached to `output/fem_stress_history.csv`). Inverse: 51 noisy (2%) observations of mean σ_zz; 5-mechanism library `{S, S², S³, S⁵, sinh S}` (S = σ/σ_ref); self-contained dual-number forward AD through the implicit BE integrator (different grid from the data → no inverse crime); damped Gauss-Newton on log-coefficients; backward elimination by strain share + **one-standard-error rule** (plain BIC could NOT separate {S²,S³} from {S³}; with the original coarse 50-step data a spurious S² absorbed the time-discretisation defect in 6/10 seeds — hence the 500-step forward run). Result: cubic Norton selected alone **10/10 seeds**, coefficient to 1.6%. Gold-blessed (`discover.py` ~16 s given the CSV); feeds the z3st paper's identification section (figure `creep_law_discovery.png`). In the local suite sense only — NOT in CI (forward run too long; see punch list CASES-FOLLOWUP-7).
+- `verification/fuel/coaxial_contact` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit.
 
 **U_* — Extended / demo cases**
-- `U_coaxial_contact_2D` — 2D-rz PCMI penalty-contact demo (oxide pellet + steel clad, power ramp → gap closure, contact pressure).
-- `U_pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm gap, Zircaloy clad): coupled thermal + mechanical + gap conductance + penalty contact + burnup + swelling + (since 2026-06-11) **Norton clad creep** → **burnup-driven gap closure, PCMI and clad creep-down** over a multi-year power history. BCs include the 15.5 MPa coolant pressure on the clad outer and (since 2026-06-10) a 2 MPa He fill-gas pressure on all gap/plenum-facing surfaces (`lateral_1`, `top_1`, `inner_2`); coolant is still a Dirichlet 580 K (no film drop — see punch list CODE-FEATURE-3 for the coolant module). Gold-protected since 2026-06-10: `non-regression.py` reads end-state PCMI scalars from `output/history.csv` (with clad creep: PCMI onset 17.1 MWd/kgU; final gap −0.61 µm, p = 30.7 MPa plateaued by creep relaxation, bu = 44.5 MWd/kgU) with the mean burnup checked against the closed form; in the local suite, not in CI (~3 min run).
-- `U_pressure_vessel_2D`, `U_cluster_dynamics_test`, `U_quarter_block`, `U_spherical_shell`. (`U_box_knotch_3D`, `U_slab_contact`, `U_thick_cylindrical_shell_plane_stress` were removed in commit f1bb70b; note this leaves the `plane_stress` regime with no exercising case.)
+- `U_coaxial_contact_2D` — 2D-rz PCMI penalty-contact demo (oxide pellet + steel clad, power ramp → gap closure, contact pressure). In `cases/sandbox/` since 2026-06-11 (no `non-regression.py`).
+- `regression/pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm gap, Zircaloy clad): coupled thermal + mechanical + gap conductance + penalty contact + burnup + swelling + (since 2026-06-11) **Norton clad creep** → **burnup-driven gap closure, PCMI and clad creep-down** over a multi-year power history. BCs include the 15.5 MPa coolant pressure on the clad outer and (since 2026-06-10) a 2 MPa He fill-gas pressure on all gap/plenum-facing surfaces (`lateral_1`, `top_1`, `inner_2`); coolant is still a Dirichlet 580 K (no film drop — see punch list CODE-FEATURE-3 for the coolant module). Gold-protected since 2026-06-10: `non-regression.py` reads end-state PCMI scalars from `output/history.csv` (with clad creep: PCMI onset 17.1 MWd/kgU; final gap −0.61 µm, p = 30.7 MPa plateaued by creep relaxation, bu = 44.5 MWd/kgU) with the mean burnup checked against the closed form; in the local suite, not in CI (~3 min run).
+- `verification/thermal/spherical_shell` — gold-protected (semi-analytic checks); added to the local suite list on 2026-06-11.
+- `U_pressure_vessel_2D` — moved to `cases/sandbox/` on 2026-06-11: its `non-regression.py` only extracts CSV/plots (no asserts, never writes `non-regression.json`), and the `non-regression_gold.json` on disk is orphaned — it holds Lamé-style L2 errors the current script cannot produce (likely inherited from a deleted case). See punch list CASES-FOLLOWUP-8.
+- `U_cluster_dynamics_test`, `U_quarter_block` — unvalidated sandboxes, moved to `cases/sandbox/` on 2026-06-11. (`U_box_knotch_3D`, `U_slab_contact`, `U_thick_cylindrical_shell_plane_stress` were removed in commit f1bb70b; note this leaves the `plane_stress` regime with no exercising case.)
 
-**demo_CP_single_grain** — crystal-plasticity single-grain demo using the `custom` constitutive + `plasticity.mode: custom` hook.
+**verification/plasticity/crystal_single_grain** — crystal-plasticity single-grain demo using the `custom` constitutive + `plasticity.mode: custom` hook.
 
 ### 6.2 Typical `input.yaml` structure
 
@@ -649,7 +651,7 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Thermo-mechanical coupling        | ✓ staggered, adaptive relaxation                                    |
 | Phase-field fracture (AT1, AT2)   | ✓ Miehe/Amor split, hybrid constraint, irreversibility              |
 | J2 plasticity                     | ✓ return mapping + linear isotropic hardening (quadrature elements) |
-| Crystal plasticity                | experimental — via `custom` constitutive hook (`demo_CP_single_grain`) |
+| Crystal plasticity                | experimental — via `custom` constitutive hook (`verification/plasticity/crystal_single_grain`) |
 | Gap conductance                   | ✓ Fixed or Gas (k_gas = f(T_gap), gap_size from facet centroids)    |
 | Cluster dynamics (1D)             | ✓ DG upwind + SIPG, mass-conservation renormalisation                |
 | Axisymmetric / 2D / 3D / plane-stress regimes | ✓ all consistent with the integration weight `w`      |
@@ -658,7 +660,7 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Radial power shaping              | ✓ `radial_profile` form factor `f(r, bu)` (source bus); built-in rim-peaking        |
 | Axial power shaping               | ✓ `axial_profile` form factor `f(z)` (source bus, composed `f_r·f_z`, single mean-1 normalisation); built-ins: chopped cosine (T&K), tabulated (node-wise peaking factors) |
 | Cladding creep (implicit, AD)     | ✓ Norton + Arrhenius via the incremental variational principle (`models/creep_model.py`): condensed radial return on the displacement space, DG0 predictor + one symbolic Newton step → exact IFT consistent tangent by `ufl.derivative`; per-material `ε_cr` DG0 state; card keys `creep: norton`, `creep_A0/n/Q`; verified to 1e-14 (constant stress) and 4e-15 vs the BE recursion (relaxation) |
-| Constitutive-law identification   | ✓ EUCLID-style sparse mechanism selection from simulation data (`cases/V_creep_law_discovery/discover.py`): candidate-library fit via self-contained forward-mode AD (dual numbers) through the implicit BE integrator, Gauss-Newton + backward elimination + one-SE rule; cubic Norton recovered 10/10 noise seeds; independent of the GPL-3.0 EUCLID codes |
+| Constitutive-law identification   | ✓ EUCLID-style sparse mechanism selection from simulation data (`cases/verification/fuel/creep_law_discovery/discover.py`): candidate-library fit via self-contained forward-mode AD (dual numbers) through the implicit BE integrator, Gauss-Newton + backward elimination + one-SE rule; cubic Norton recovered 10/10 noise seeds; independent of the GPL-3.0 EUCLID codes |
 | Integrated-power diagnostic       | ✓ `set_power` prints the exact FE integral of the fissile source per material per step (regime-weighted, MPI-reduced); note the mean-1 normalisation is *nodal*, so a radially peaked profile integrates to LHR·Lz·⟨f⟩_area/⟨f⟩_nodal (= 1.2·LHR·Lz for rim-peaking A=3, p=8) — pinned by the `total_power` checks in the burnup-family `V_` cases |
 | Fuel swelling                     | ✓ constant ΔV/V or burnup-driven eigenstrain (eigenstrain bus)                       |
 | Pellet-clad contact (PCMI)        | ✓ penalty contact + contact-coupled gap conductance (verified vs analytical Lamé)   |
@@ -677,7 +679,7 @@ git clone https://github.com/giozu/z3st.git
 conda env create -f z3st_env.yml && conda activate z3st
 pip install -e .
 
-cd z3st/cases/00_example/
+cd z3st/cases/verification/mechanics/uniaxial_tension/
 gmsh -3 mesh.geo                    # or: ./Allrun
 python -m z3st > log_z3st.md
 python non-regression.py
@@ -717,13 +719,13 @@ The case-14 family is being calibrated against McClenny et al., JNM 565 (2022) 1
 
 | Case directory | Role | Why |
 |---|---|---|
-| `14_full_cylinder_cracking/` (3D) | **Gold-standard** McClenny reproducer. | Faithfully captures the 60° azimuthal wedge AND the radial-only heat transfer (top/bottom faces zero-flux, matching McClenny's alumina-spacer design). |
-| `14_full_cylinder_cracking_2D_xy/` (2D plane strain) | **McClenny Fig. 8 reproducer** at lower compute cost. | Plane strain (no axial gradients) is consistent with the alumina spacer's role; the 60° contact arc on a transverse cross-section is exactly McClenny's 2D representation (their Fig. 8 top, Fig. A.13, Fig. A.14). Modeled as upper-half disc with mirror symmetry on y=0 (= 30° contact in the upper half). |
-| `14_full_cylinder_thermal_2D_rz/` (2D axisymmetric) | **Verification only** (thermal + linear-elastic). Damage disabled. | Axisymmetric mode mathematically prohibits azimuthal variation, so it cannot represent the 60° contact wedge. Any axisymmetric idealization (full-circumference cooling, single-face quench, etc.) either contradicts McClenny's experimental design or produces an unphysical annular damage band. Useful only to verify z3st's axisymmetric thermal solver against the analytic Bessel-series solution. |
+| `benchmarks/pellet_quench_3D/` (3D) | **Gold-standard** McClenny reproducer. | Faithfully captures the 60° azimuthal wedge AND the radial-only heat transfer (top/bottom faces zero-flux, matching McClenny's alumina-spacer design). |
+| `benchmarks/pellet_quench_2D_xy/` (2D plane strain) | **McClenny Fig. 8 reproducer** at lower compute cost. | Plane strain (no axial gradients) is consistent with the alumina spacer's role; the 60° contact arc on a transverse cross-section is exactly McClenny's 2D representation (their Fig. 8 top, Fig. A.13, Fig. A.14). Modeled as upper-half disc with mirror symmetry on y=0 (= 30° contact in the upper half). |
+| `14_full_cylinder_thermal_2D_rz/` (2D axisymmetric) — **removed 2026-06-11** | Was: verification only (thermal + linear-elastic, damage disabled). | Axisymmetric mode mathematically prohibits azimuthal variation, so it cannot represent the 60° contact wedge — any axisymmetric idealization either contradicts McClenny's experimental design or produces an unphysical annular damage band. Its only value was verifying the axisymmetric thermal solver against the analytic Bessel-series solution; deemed not worth keeping. |
 
 The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 notes "Insulation is placed on one side of the fuel pellet to ... eliminate axial thermal contact between the bottom of the capsule and the UO2 so that conductive radial heat transfer was the primary method of heat transfer to occur. This was intentionally designed to form a stress concentration on the contact region to induce fracturing." This means the experiment is actively radial-only by design — plane strain (2D-xy) is the *correct* dimensional reduction, and any axisymmetric variant with axial gradients (e.g. cooling only the top face) would *contradict* the experiment.
 
-**Methodological framing (the paper's contribution).** Z3ST's damage block implements the **Ambati et al. (2015) hybrid (isotropic-anisotropic) phase-field formulation** (Comput Mech 55:383-405, Eq. 27). McClenny et al. instead use the **Miehe anisotropic formulation with viscous Allen-Cahn evolution** (their Eq. 10, with viscosity `eta = 1e-8 s/mm`). The case-14 chapter is therefore not "same problem, same model, different code"; it is a benchmark that the hybrid model — whose mechanical block is **linear** and which has no viscosity-tuned kinetics — captures the same crack topology at a per-iteration cost roughly an order of magnitude lower (Ambati §3.1). The Ambati paper is checked into `z3st/cases/14_full_cylinder_cracking/`.
+**Methodological framing (the paper's contribution).** Z3ST's damage block implements the **Ambati et al. (2015) hybrid (isotropic-anisotropic) phase-field formulation** (Comput Mech 55:383-405, Eq. 27). McClenny et al. instead use the **Miehe anisotropic formulation with viscous Allen-Cahn evolution** (their Eq. 10, with viscosity `eta = 1e-8 s/mm`). The case-14 chapter is therefore not "same problem, same model, different code"; it is a benchmark that the hybrid model — whose mechanical block is **linear** and which has no viscosity-tuned kinetics — captures the same crack topology at a per-iteration cost roughly an order of magnitude lower (Ambati §3.1). The Ambati paper is checked into `z3st/cases/benchmarks/pellet_quench_3D/`.
 
 **Implementation correspondence:** verified against the Ambati paper on 2026-05-05.
 - Eq. (27a) `sigma = (1-D)^2 dPsi0/de` ↔ `damage_model.py:30-37` `g(D) = (1-D)^2 + K`, applied to the full stress in the linear mechanical block of `solver.py::_mechanical_step`.
@@ -747,16 +749,13 @@ The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 not
 **What still needs running (the user runs these locally — do not invoke from this assistant):**
 ```bash
 # 3D (gold standard)
-cd ~/z3st/z3st/cases/14_full_cylinder_cracking/
+cd ~/z3st/z3st/cases/benchmarks/pellet_quench_3D/
 ./Allrun
 
 # 2D-xy (McClenny Fig. 8 reproducer)
-cd ~/z3st/z3st/cases/14_full_cylinder_cracking_2D_xy/
+cd ~/z3st/z3st/cases/benchmarks/pellet_quench_2D_xy/
 ./Allrun
 
-# 2D-rz (verification only, damage off)
-cd ~/z3st/z3st/cases/14_full_cylinder_thermal_2D_rz/
-./Allrun
 ```
 
 `Allrun` chains `Allclean → gmsh → python -m z3st > log_z3st.md → non-regression.py` in each case.
@@ -819,4 +818,4 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 
 ---
 
-*Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-10 (full four-agent re-audit folded into punch_list.md; CODE-P0-5 plane_stress solver fix + regime validation; gold-regression verdict now persisted to `non-regression.json` and gated in local summary + CI; 8 stale golds re-blessed; `heat_flux` fixed and re-wired under `--debug`; `U_pwr_rod_2D` gold-protected and wired into the local suite together with the `V_*` cases).*
+*Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-10 (full four-agent re-audit folded into punch_list.md; CODE-P0-5 plane_stress solver fix + regime validation; gold-regression verdict now persisted to `non-regression.json` and gated in local summary + CI; 8 stale golds re-blessed; `heat_flux` fixed and re-wired under `--debug`; `regression/pwr_rod_2D` gold-protected and wired into the local suite together with the `V_*` cases).*

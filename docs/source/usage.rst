@@ -6,7 +6,7 @@ This section describes how to configure and run a Z3ST simulation using the refe
 Input files
 -----------
 
-A minimal demonstration case is provided in ``cases/00_example``.
+A minimal demonstration case is provided in ``cases/verification/mechanics/uniaxial_tension``.
 It illustrates the complete workflow of a thermo-mechanical simulation:
 - YAML-based configuration input;
 - mesh generation and region tagging;
@@ -16,7 +16,7 @@ To run the example:
 
 .. code-block:: bash
 
-   cd cases/00_example
+   cd cases/verification/mechanics/uniaxial_tension
    python3 -m z3st
 
 Optional flags:
@@ -27,7 +27,7 @@ Example folder structure:
 
 .. code-block:: text
 
-   00_example/
+   verification/mechanics/uniaxial_tension/
    ├── input.yaml
    ├── geometry.yaml
    ├── boundary_conditions.yaml

@@ -9,37 +9,9 @@
 set -e
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
-# CI case-inclusion policy (see CONTEXT.md §6 / punch_list.md CASES-P1-5):
-# This list is a tight subset of the local non-regression.sh suite, chosen
-# for fast CI turnaround under the dolfinx/dolfinx:stable container budget.
-# Each case here:
-#   - has a stable output/non-regression_gold.json,
-#   - runs in well under one minute,
-#   - exercises one physics path that's not covered by another listed case
-#     (linear elasticity, axisymmetric thermal, 3D thermal, volumetric
-#     heating, multi-material with Robin pair gap, 2D damage, J2 plasticity,
-#     custom-plasticity hook).
-# Active WIP cases are intentionally excluded, they are too long for CI 
-# and their golds are still being blessed. Run them locally via cases/non-regression.sh.
-CASES=(
-    "1_thin_slab_2D"
-    "2_thin_cylindrical_shell_2D"
-    "3_thick_slab_adiabatic_3D"
-    "7_box_heated"
-    "14_full_cylinder"
-    "16_coaxial_cylinders_3D"
-    "18_box_crack_2D"
-    "20_plasticity_2D"
-    "demo_CP_single_grain"
-    "V_coaxial_contact_verification"
-    "V_swelling_verification"
-    "V_burnup_verification"
-    "V_fuel_swelling_verification"
-    "V_axial_power_verification"
-    "V_axial_table_verification"
-    "V_creep_verification"
-    "V_creep_relaxation_verification"
-)
+# The CI case list lives in cases/cases_ci.txt (one case per line; the
+# inclusion policy is documented at the top of that file).
+mapfile -t CASES < <(grep -vE '^[[:space:]]*(#|$)' "${ROOT_DIR}/cases/cases_ci.txt" | awk '{print $1}')
 SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 
 echo "Running minimal non-regression suite..."
@@ -73,7 +45,7 @@ for case_name in "${CASES[@]}"; do
     chmod +x Allclean || true
 
     ./Allclean || true
-    ./Allrun > "${case_name}_log.txt" 2>&1
+    ./Allrun > "${case_name//\//_}_log.txt" 2>&1
     exit_code=$?
 
     # Allrun's exit code only catches crashes: the per-case non-regression.py

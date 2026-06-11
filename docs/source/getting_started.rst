@@ -101,7 +101,7 @@ Step 1: Navigate to the Example Directory
 
 .. code-block:: bash
 
-   cd z3st/cases/00_example
+   cd z3st/cases/verification/mechanics/uniaxial_tension
 
 Step 2: Generate the Mesh
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -274,7 +274,7 @@ Running a Single Case
 
 .. code-block:: bash
 
-   cd z3st/cases/1_thin_slab_neumann_3D
+   cd z3st/cases/verification/thermal/thin_slab_neumann_3D
    ./Allrun
 
 This script:
