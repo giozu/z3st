@@ -74,7 +74,7 @@ for nx in nx_values:
     idx_n = np.argsort(x_n[mask_n])
     xn_p, Tn_p = x_n[mask_n][idx_n], T_all[mask_n][idx_n]
 
-    x_c, y_c, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+    x_c, y_c, _, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
     mask_c = np.abs(y_c - y_target) < mask_tol
     idx_c = np.argsort(x_c[mask_c])
     xc_p, Sn_p = x_c[mask_c][idx_c], S_all[mask_c, 4][idx_c]
