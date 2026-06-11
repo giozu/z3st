@@ -1,0 +1,5 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+rm -f mesh.msh log_mesh.md log_z3st.md
+rm -f output/fields.* output/fem_stress_history.csv output/discovery.json
+rm -f output/creep_law_discovery.png output/non-regression.json

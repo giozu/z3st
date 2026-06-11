@@ -7,6 +7,8 @@
 #   ./run_demo.sh            full core loop A->E
 #   ./run_demo.sh A          jump to a single segment (A|B|C|D|E)
 #   ./run_demo.sh P          optional PCMI segment (pellet-clad contact, verified)
+#   ./run_demo.sh K          optional crystal-plasticity segment (abstract headline)
+#   ./run_demo.sh M          optional model-identification segment (EUCLID-style)
 #   ./run_demo.sh --check    quick non-interactive smoke test of A and C
 # =====================================================================
 set -uo pipefail
@@ -124,6 +126,42 @@ seg_P() {
   echo "    ${B}cd $CASES/U_coaxial_contact_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
 }
 
+seg_K() {
+  hr; say "K · Crystal plasticity — the case nobody wants to differentiate by hand  (optional)"
+  cue "Single crystal, one FCC slip system, power-law viscoplasticity. The slip-rate"
+  cue "derivative through the Schmid tensor is the Jacobian nobody enjoys deriving —"
+  cue "here it comes from ufl.diff, exactly. Watch the Newton counts."
+  pause
+  ( cd "$CASES/demo_CP_single_grain" \
+      && RUN gmsh mesh.geo -3 > log_mesh.md 2>&1 \
+      && RUN python3 -m z3st > log_z3st.md 2>&1 \
+      && RUN python3 non-regression.py 2>&1 \
+         | grep -E "Schmid|σ_sat|sigma_zz_final|saturation|SUMMARY|EXCELLENT" )
+  echo
+  echo "  curve: ${B}$CASES/demo_CP_single_grain/output/stress_strain_curve.png${Z}"
+  open_imgs "$CASES/demo_CP_single_grain/output/stress_strain_curve.png"
+  echo "${G}  → elastic, yield at τ = g₀, saturation at the semi-analytical σ_sat — "
+  echo "    quadratic Newton convergence because the AD tangent is exact.${Z}"
+  cue "History variables live in quadrature spaces; the law is ~10 lines of Python."
+  echo "  (baked fallback: ${B}$BAKED/cp_stress_strain.png${Z})"
+}
+
+seg_M() {
+  hr; say "M · Toward constitutive-law discovery — identification from data  (optional)"
+  cue "Same AD idea, pointed the other way: differentiate the SOLVER with respect to"
+  cue "the MATERIAL PARAMETERS, and you can learn the law from data."
+  pause
+  ( cd "$DEMO_DIR" && RUN python3 identify_creep.py )
+  echo
+  open_imgs "$BAKED/creep_identification.png"
+  cue "Norton creep relaxation — the verified case. 51 noisy synthetic points,"
+  cue "forward-mode AD through every implicit backward-Euler step, Gauss-Newton:"
+  cue "the exponent n comes back to ~2% in ten iterations, in about a second."
+  echo "${G}  → this is parametric identification today; EUCLID-style sparse-regression"
+  echo "    discovery over a library of candidate energies is the roadmap"
+  echo "    (Flaschel et al. 2022 — independent implementation, no GPL code).${Z}"
+}
+
 # --- quick non-interactive smoke test ---------------------------------------
 smoke() {
   echo "${B}smoke test: 1D case + coupled slab${Z}  ($ENVNOTE)"
@@ -147,7 +185,9 @@ case "${1:-all}" in
   D) seg_D ;;
   E) seg_E ;;
   P) seg_P ;;
+  K) seg_K ;;
+  M) seg_M ;;
   all|"") seg_A; pause; seg_B; pause; seg_C; pause; seg_D; pause; seg_E ;;
-  *) echo "usage: $0 [A|B|C|D|E|P | --check]   (P = optional PCMI segment)"; exit 2 ;;
+  *) echo "usage: $0 [A|B|C|D|E|P|K|M | --check]   (P = PCMI · K = crystal plasticity · M = identification)"; exit 2 ;;
 esac
 echo; echo "${G}${B}done.${Z}"

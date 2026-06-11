@@ -82,3 +82,14 @@ latexmk -pdf slides.tex      # -> slides.pdf (15 pages)
       demo abstract promises crystal-plasticity + ML constitutive training,
       which the current run-sheet only covers as backups; PR the abstract or
       prepare a bridge line.
+- [x] 2026-06-11 abstract-compliance segments added (decision: abstracts stay
+      as submitted; the demo now delivers them). **Segment K** — crystal
+      plasticity live (`demo_CP_single_grain`, ~11 s, saturation verified to
+      3.4%). **Segment M** — constitutive-law identification
+      (`demo/identify_creep.py`): forward-mode AD (own dual numbers, no new
+      deps) through the implicit backward-Euler creep solver, Gauss-Newton
+      recovers the Norton exponent to ~2% from 2%-noise synthetic data in
+      ~2 s; framed as the first preliminary step toward EUCLID-style
+      discovery (Flaschel 2022 — independent implementation, EUCLID code is
+      GPL-3.0 and was not used). Both wired into `run_demo.sh` (K/M) and
+      `preflight.sh`; a matching Q&A answer added to `oral/SCRIPT.md`.

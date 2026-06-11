@@ -37,6 +37,14 @@ echo "${B}live cases:${Z}"
 ( cd "$CASES/1_thin_slab_neumann_2D" && RUN gmsh mesh.geo -2 >/dev/null 2>&1 \
     && RUN python3 -m z3st 2>&1 | grep -q "Simulation completed" ) \
   && ok "1_thin_slab_neumann_2D (coupled) runs" || no "1_thin_slab_neumann_2D"
+( cd "$CASES/demo_CP_single_grain" && RUN gmsh mesh.geo -3 >/dev/null 2>&1 \
+    && RUN python3 -m z3st >/dev/null 2>&1 \
+    && RUN python3 non-regression.py 2>&1 | grep -q "PASS All" ) \
+  && ok "demo_CP_single_grain (crystal plasticity, segment K) runs and passes" \
+  || no "demo_CP_single_grain (segment K)"
+( cd "$HERE" && RUN python3 identify_creep.py 2>&1 | grep -q "figure saved" ) \
+  && ok "identify_creep.py (segment M) runs and bakes its figure" \
+  || no "identify_creep.py (segment M)"
 
 echo "${B}showpiece (case 14):${Z}"
 C14="$CASES/14_full_cylinder_cracking_2D_xy/output"
@@ -51,6 +59,9 @@ if [ "$nb" -gt 0 ]; then ok "baked PNG fallback present ($nb frames)"; else
   warn "no baked fallback — bake it once: ./open_paraview.sh --render"; fi
 for f in pcmi_curves.png pcmi_verification.png pcmi_burnup_curves.png; do
   [ -f "$HERE/baked/$f" ] && ok "baked $f present" || warn "baked $f missing (segment P)"
+done
+for f in cp_stress_strain.png creep_identification.png; do
+  [ -f "$HERE/baked/$f" ] && ok "baked $f present" || warn "baked $f missing (segments K/M)"
 done
 
 echo "${B}attract loop + handout:${Z}"

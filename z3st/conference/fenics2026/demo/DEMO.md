@@ -35,6 +35,9 @@ What this means for you, concretely:
 Two non-obvious wins:
 - **Demos cycle.** A small group leaves, a new one arrives. Your core loop must be tight (~4 min) and repeatable from a clean state. Practise the *restart*, not just the run.
 - **Judges wander the poster session.** They may catch any 4 minutes of you. Every loop must contain the animation and the one-sentence pitch — never bury the best thing waiting for a "later" that a judge will not stay for.
+- **The abstract is a promise.** Visitors who read it expect *crystal plasticity*
+  and *automated constitutive-law discovery* — segments K and M deliver both on
+  demand. Offer them unprompted to anyone who mentions the abstract.
 
 ---
 
@@ -117,6 +120,37 @@ the oral's PCMI slide.*
 - Optional live (during a longer chat): run the case and watch the gap close and
   contact switch on in the streamed `[contact] … CLOSED` lines.
 
+### K. (optional) Crystal plasticity — the demo abstract's first headline — 90 s
+*Pull it up for anyone who read the abstract, a plasticity person, or a judge
+(`./run_demo.sh K`; runs live in ~11 s, baked fallback `baked/cp_stress_strain.png`).*
+- Run `demo_CP_single_grain` live: single crystal, one FCC slip system
+  (111)[0-11], power-law viscoplasticity, backward Euler with history variables
+  in quadrature spaces.
+- *"The slip-rate derivative through the Schmid tensor is the Jacobian nobody
+  wants to derive by hand. Here it comes from `ufl.diff` — exactly. That's why
+  Newton converges quadratically: 2 iterations per step."*
+- Point at the stress-strain curve: elastic, yield at τ = g₀, saturation at the
+  **semi-analytical σ_sat to 3.4%**.
+- Tie back: *"the constitutive law is ~10 lines of Python — same AD path as
+  everything else."*
+
+### M. (optional) Toward constitutive-law discovery — identification from data — 90 s
+*The demo abstract's second headline (Flaschel et al. 2022 — EUCLID), shown as
+the first preliminary step (`./run_demo.sh M`; runs live in ~2 s, bakes
+`baked/creep_identification.png`).*
+- *"Same AD idea, pointed the other way: differentiate the **solver** with
+  respect to the **material parameters**, and you can learn the law from data."*
+- Run `identify_creep.py` live: Norton creep relaxation (the verified case),
+  51 synthetic data points with 2% noise, forward-mode AD propagated through
+  every implicit backward-Euler step, Gauss-Newton least squares.
+- Land the numbers: *"the creep exponent comes back to ~2%, the rate to ~1%,
+  in ten iterations — about a second."*
+- Be honest and forward-pointing: *"this is **parametric identification**
+  today; EUCLID-style sparse-regression discovery over a library of candidate
+  energies is the roadmap — the differentiable foundation you just saw is the
+  hard part."* (If asked: independent implementation; the EUCLID codes are
+  GPL-3.0 and nothing here derives from them.)
+
 ---
 
 ## 3 · Deep-dive cards (only if a knowledgeable person stays)
@@ -162,7 +196,8 @@ artifacts. Then, by hand:
 - [ ] Laptop on mains power; screen-sleep and notifications **off**.
 - [ ] ParaView opens the baked case-14 series and the animation plays smoothly.
 - [ ] `teaching/01_1D`, `teaching/01_3D`, `1_thin_slab_neumann_2D` each run clean once (warms the dolfinx import cache too).
-- [ ] `demo/baked/` contains the fallback PNGs (incl. `pcmi_curves.png`, `pcmi_verification.png` for the optional PCMI segment — `./run_demo.sh P`).
+- [ ] `demo/baked/` contains the fallback PNGs (incl. `pcmi_curves.png`, `pcmi_verification.png` for segment P, `cp_stress_strain.png` for segment K, `creep_identification.png` for segment M).
+- [ ] `demo_CP_single_grain` runs clean once (segment K live run, ~11 s) and `python3 identify_creep.py` converges (segment M, ~2 s) — both checked by `preflight.sh`.
 - [ ] Open `attract.html` once (`./attract.sh`) and confirm the loop plays and the QR codes scan.
 - [ ] `../handout/handout.pdf` printed (a small stack to hand out); QR codes scan.
 - [ ] Editor open on `mechanical_model.py` (AD lines) and `1_thin_slab_neumann_2D/input.yaml` (for the hot-reload edit) in separate tabs.
@@ -178,10 +213,11 @@ artifacts. Then, by hand:
 ```
 demo/
 ├── DEMO.md            this run-sheet
-├── run_demo.sh        interactive, segmented core-loop launcher
+├── run_demo.sh        interactive, segmented launcher (A–E core + P/K/M optional)
 ├── preflight.sh       environment + cases + artifacts check
 ├── open_paraview.sh   opens the case-14 crack animation (live or --baked)
 ├── paraview_case14.py pvpython script: builds the damage animation / PNG sequence
+├── identify_creep.py  segment M: gradient-based creep-law identification (own AD)
 ├── attract.html       idle-table attract loop (crack animation + pitch + QR codes)
 ├── attract.sh         opens the attract loop full-screen in a browser
 ├── qr/                QR codes for the attract loop (repo, docs, DOI) + make_qr.sh

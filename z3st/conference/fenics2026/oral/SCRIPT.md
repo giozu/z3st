@@ -136,6 +136,16 @@ solves. Thank you — I'm happy to take questions."
   u_x = 15 microns.
 - *Is the coupling actually verified, not just claimed?* Backup "coupled thermo-
   mechanics" — temperature and thermal stress vs analytical across the slab.
+- *The abstract mentions symbolic regression / automated discovery of
+  constitutive laws — where is that?* Preliminary, and I show the first step at
+  the demo table: the time integrator is differentiable, so forward-mode AD
+  through the implicit solver gives exact parameter sensitivities, and
+  gradient-based least squares recovers Norton creep parameters from noisy
+  relaxation data (exponent to ~2% in ten Gauss-Newton iterations, ~1 s).
+  That's parametric identification; EUCLID-style sparse regression over a
+  library of candidate energies (Flaschel et al. 2022) is the roadmap — the
+  differentiable foundation is the part you saw in this talk. Come to the demo
+  for the live run.
 - *Can it do fuel performance — burnup, swelling, gap closure over an irradiation?*
   Backup "burnup-driven PCMI" — burnup accumulates as a per-material state field,
   swelling is an eigenstrain callable that reads it ("fuel is a material" — no
