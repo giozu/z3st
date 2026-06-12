@@ -67,10 +67,10 @@ rho = float(fuel["rho"])
 hm = float(fuel.get("heavy_metal_fraction", 0.8815))
 SECONDS_PER_MWD = 8.64e10  # 86400 s/day * 1e6 W/MW
 
-# Replicate the solver's stepping: __main__ generates the discretised power
-# history and update_state accumulates Δbu_k = q(lhr_k)·Δt_k (right endpoint).
+raw_n_steps = inp["n_steps"]
+n_increments = raw_n_steps if isinstance(raw_n_steps, (list, tuple)) else int(raw_n_steps) - 1
 times, lhrs, _ = generate_power_history(
-    inp["time"], inp["lhr"], n_steps=int(inp["n_steps"]) - 1, filename=None
+    inp["time"], inp["lhr"], n_steps=n_increments, filename=None
 )
 energy_per_m = float(np.sum(np.asarray(lhrs)[1:] * np.diff(np.asarray(times))))
 BU_REF = energy_per_m / (area * rho * hm * SECONDS_PER_MWD)

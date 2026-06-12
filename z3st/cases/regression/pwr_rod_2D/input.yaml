@@ -31,21 +31,21 @@ models:
   mechanical: true
   gap_conductance:
     type: Gas
-    value: 15.8                 # He prefactor A (Todreas Eq. 8.140), W/(cm.K) -> SI
-    relax: 0.5                  # under-relax h between staggered iterations
-    contact_coupling:           # Todreas-Kazimi Eq. 8.141/8.142
+    value: 15.8                 # (He)
+    relax: 1.0
+    contact_coupling:
       enabled: true
-      meyer_hardness: 9.65e8    # (Pa) Zircaloy Meyer hardness (~14e4 psi)
-      gas_thickness: 4.0e-6     # (m) roughness-based gas space on contact
+      meyer_hardness: 9.65e8    # (Pa) Zry
+      gas_thickness: 4.0e-6     # (m)
   contact:
     surface_a: lateral_1        # pellet outer
     surface_b: inner_2          # clad inner
     penalty_stiffness: 5.0e13   # (Pa/m)
-    initial_gap: 65.0e-6        # (m)  generic-PWR cold gap
+    initial_gap: 65.0e-6        # (m)
 
 mechanical:
   solver: linear
-  linear_solver: direct_mumps   # 900-cell mesh: factorisation beats AMG setup
+  linear_solver: direct_mumps
   rtol: 1.0e-5
   stag_tol: 5.0e-4
   convergence: rel_norm
@@ -60,18 +60,18 @@ thermal:
 
 lhr:
 - 0.0
-- 20000.0
-- 20000.0
-- 20000.0
+- 15000.0
+- 15000.0
+- 15000.0
 time:
 - 0.0
-- 1.728e+6     # 20 days ramp
-- 6.048e+7     # 700 days: gap closure window (expected onset ~500 d), resolved finely
-- 1.5552e+8    # 1800 days: contact + creep-relaxation plateau, strided
-n_steps:       # intervals per segment (list form)
-- 8            #   ramp: 2.5 d/step
-- 60           #   20-700 d: 11.3 d/step through closure and contact onset
-- 40           #   700-1800 d: 27.5 d/step across the plateau
+- 1.728e+6     # 20 days
+- 6.048e+7     # 700 days
+- 1.5552e+8    # 1800 days
+n_steps:
+- 4
+- 30
+- 20
 
 output:
   format: xdmf

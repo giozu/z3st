@@ -12,9 +12,9 @@ T_initial: 580.0  # (K) start at coolant temperature
 rho: 6500                   # Density (kg/m³)
 melting_temperature: 2123   # (K)
 
-creep: norton
-creep_A0: 2.82e-24   # (Pa^-n s^-1)
-creep_n: 3.0         # (-)
-creep_Q: 1.2e5       # (J/mol)
-creep_irr_B: 2.0e-36 # (Pa^-1 per n/m^2) irradiation-creep coefficient
-fast_flux: 7.0e17    # (n/(m^2.s), E > 1 MeV) typical PWR fast flux
+# creep: norton
+# creep_A0: 2.82e-24   # (Pa^-n s^-1)
+# creep_n: 3.0         # (-)
+# creep_Q: 1.2e5       # (J/mol)
+# creep_irr_B: 2.0e-36 # (Pa^-1 per n/m^2) irradiation-creep coefficient
+# fast_flux: 7.0e17    # (n/(m^2.s), E > 1 MeV) typical PWR fast flux

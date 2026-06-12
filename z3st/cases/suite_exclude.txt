@@ -1,7 +1,5 @@
-# Cases excluded from the discovery-based local suite (non-regression_local.sh).
-# One case per line (path relative to cases/), reason as trailing comment.
-# A case listed here keeps its gold and can still be run by hand
-# (cd <case> && ./Allrun); remove its line to re-enable it in the suite.
+# Cases excluded from non-regression_local.s.
 
-regression/pwr_rod_2D                  # ~3 min integral PWR-rod transient; run on demand
-verification/fuel/creep_law_discovery  # Allrun re-runs the ~36 min FEM forward solve; run on demand (punch list CASES-FOLLOWUP-7)
+regression/pwr_rod_2D
+regression/pwr_rod_2D_backup
+verification/fuel/creep_law_discovery

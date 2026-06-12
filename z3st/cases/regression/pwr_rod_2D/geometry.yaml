@@ -1,10 +1,10 @@
 name: fuel_rod_segment
 geometry_type: cyl-cyl
 
-inner_radius_1: 0.0       # (m) pellet inner (solid)
-outer_radius_1: 0.0045    # (m) pellet outer
-inner_radius_2: 0.004565  # (m) clad inner  -> gap = 65 um
-outer_radius_2: 0.005315  # (m) clad outer
+inner_radius_1: 0.0       # (m)
+outer_radius_1: 0.0045    # (m)
+inner_radius_2: 0.004565  # (m)
+outer_radius_2: 0.005315  # (m)
 Lz: 0.010                 # (m)
 
 labels:

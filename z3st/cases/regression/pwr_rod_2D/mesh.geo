@@ -8,7 +8,7 @@
 
 SetFactory("OpenCASCADE");
 
-r_1_o = 0.0045;     // pellet outer radius (m)        4.50 mm  (generic PWR)
+r_1_o = 0.0045;     // pellet outer radius (m)        4.50 mm
 r_2_i = 0.004565;   // clad inner radius (m)          4.565 mm -> gap = 65 um
 r_2_o = 0.005315;   // clad outer radius (m)          5.315 mm
 h     = 0.010;      // axial segment height (m)       10 mm

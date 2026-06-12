@@ -49,8 +49,10 @@ def _imposed_lhr_kwm():
     """LHR (kW/m) per solve step, derived from input.yaml (any ramp/length)."""
     with open(os.path.join(HERE, "input.yaml")) as f:
         inp = yaml.safe_load(f)
+    raw = inp["n_steps"]  # int: legacy total points; list: intervals per segment
+    n_increments = raw if isinstance(raw, (list, tuple)) else int(raw) - 1
     _, lhrs, _ = generate_power_history(inp["time"], inp["lhr"],
-                                        n_steps=inp["n_steps"] - 1, filename=None)
+                                        n_steps=n_increments, filename=None)
     return np.array(lhrs) / 1e3
 
 
@@ -74,10 +76,11 @@ def plot_history():
         inp = yaml.safe_load(f)
     t_points = inp["time"]
     lhr_points = inp["lhr"]
-    n_steps = inp["n_steps"]
-    # match __main__: n_increments = n_steps - 1
+    raw = inp["n_steps"]
+    # match __main__: int → total points − 1; list → intervals per segment
+    n_increments = raw if isinstance(raw, (list, tuple)) else int(raw) - 1
     times, lhrs, _ = generate_power_history(t_points, lhr_points,
-                                            n_steps=n_steps - 1, filename=None)
+                                            n_steps=n_increments, filename=None)
 
     # display time in hours if the ramp is long, else seconds
     span = max(t_points) - min(t_points)

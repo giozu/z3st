@@ -31,33 +31,33 @@ thermal:
 
   - type: Robin
     region: outer_2
-    h_conv: 3.5e4        # (W/(m².K)) coolant film coefficient
-    T_ext: 580.0         # (K) bulk coolant temperature
+    h_conv: 3.5e4        # (W/(m²K))
+    T_ext: 580.0         # (K)
 
 mechanical:
   fuel:
   - type: Clamp_x
-    region: axis_1        # u_r = 0 on symmetry axis
+    region: axis_1        # u_r = 0
 
   - type: Clamp_y
-    region: bottom_1      # u_z = 0 (symmetry plane)
+    region: bottom_1      # u_z = 0
 
   - type: Neumann
     region: lateral_1
-    traction: -2.0e+6     # (Pa) fill-gas pressure on pellet outer
+    traction: -2.0e+6     # (Pa)
 
   - type: Neumann
     region: top_1
-    traction: -2.0e+6     # (Pa) fill-gas pressure on pellet end face
-
+    traction: -2.0e+6     # (Pa)
+    
   clad:
   - type: Clamp_y
     region: bottom_2      # u_z = 0
 
   - type: Neumann
     region: outer_2
-    traction: -15.5e+6    # (Pa) coolant system pressure (inward)
+    traction: -15.5e+6    # (Pa)
 
   - type: Neumann
     region: inner_2
-    traction: -2.0e+6     # (Pa) fill-gas pressure on clad inner (pushes clad outward)
+    traction: -2.0e+6     # (Pa)
