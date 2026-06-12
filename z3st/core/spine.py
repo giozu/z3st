@@ -19,6 +19,7 @@ from z3st.core.mesh import load_mesh
 from z3st.core.mesh.manager import MeshManager
 from z3st.core.solver import Solver
 from z3st.models.contact_model import ContactModel
+from z3st.models.cracking_model import CrackingModel
 from z3st.models.creep_model import CreepModel
 from z3st.models.damage_model import DamageModel
 from z3st.models.gap_model import GapModel
@@ -29,7 +30,7 @@ from z3st.models.plasticity_model import PlasticityModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -80,6 +81,9 @@ class Spine(
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
         self.lhr = lhr
+        # Rescale the elastic constants
+        if getattr(self, "materials", None):
+            self.update_cracking()
 
     def resolve_function(self, path: str):
         module_path, func_name = path.rsplit(".", 1)
@@ -201,15 +205,24 @@ class Spine(
                 print(f"  → radial_profile defined as callable: {mat['radial_profile']}")
                 mat["_radial_profile_func"] = self.resolve_function(mat["radial_profile"])
 
-            # Axial power form factor f(z) — same source-bus contract as the
-            # radial profile; composed multiplicatively in set_power.
+            # Axial power form factor f(z)
             if isinstance(mat.get("axial_profile"), str):
                 print(f"  → axial_profile defined as callable: {mat['axial_profile']}")
                 mat["_axial_profile_func"] = self.resolve_function(mat["axial_profile"])
 
-            # Implicit creep (incremental variational principle — see
-            # models/creep_model.py). Card: creep: norton +
-            # creep_A0 (Pa^-n s^-1), creep_n (-), creep_Q (J/mol).
+            if mat.get("cracking") is not None:
+                if str(mat["cracking"]).lower() != "barani":
+                    raise ValueError(
+                        f"Material '{name}': cracking model '{mat['cracking']}' unknown "
+                        f"(only 'barani' is implemented)."
+                    )
+                for key in ("cracking_lhr0", "cracking_n0", "cracking_n_inf", "cracking_tau"):
+                    if key in mat:
+                        mat[key] = float(mat[key])
+                print(f"  → cracking: Barani isotropic softening "
+                      f"(LHR0 = {float(mat.get('cracking_lhr0', 5.0e3))/1e3:.1f} kW/m, "
+                      f"n_inf = {float(mat.get('cracking_n_inf', 12.0)):.0f})")
+
             if mat.get("creep") is not None:
                 if str(mat["creep"]).lower() != "norton":
                     raise ValueError(
@@ -220,6 +233,18 @@ class Spine(
                     if key not in mat:
                         raise ValueError(f"Material '{name}': creep requires '{key}'.")
                     mat[key] = float(mat[key])
+                # Optional irradiation creep ε̇_irr = B·φ·σ_eq: both keys or neither.
+                has_B, has_phi = "creep_irr_B" in mat, "fast_flux" in mat
+                if has_B != has_phi:
+                    raise ValueError(
+                        f"Material '{name}': irradiation creep requires BOTH "
+                        f"'creep_irr_B' and 'fast_flux' (got only one)."
+                    )
+                if has_B:
+                    mat["creep_irr_B"] = float(mat["creep_irr_B"])
+                    mat["fast_flux"] = float(mat["fast_flux"])
+                    print(f"  → irradiation creep: B = {mat['creep_irr_B']:.3e} Pa^-1/(n/m^2), "
+                          f"phi = {mat['fast_flux']:.3e} n/(m^2.s)")
                 if constitutive_mode != "lame":
                     raise ValueError(
                         f"Material '{name}': creep is only supported with the "

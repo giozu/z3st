@@ -54,6 +54,12 @@ class Config:
         self.gap_contact_coupling = bool(cc.get("enabled", False))
         self.gap_meyer_hardness = float(cc.get("meyer_hardness", 9.65e8))   # Pa (Zircaloy ~ 14e4 psi)
         self.gap_contact_thickness = float(cc.get("gas_thickness", 4.0e-6))  # m (roughness-based gas space on contact)
+
+        # Under-relaxation of the gap conductance between staggered iterations
+        # (h ← ω·h_new + (1−ω)·h_prev). The contact-pressure → conductance →
+        # temperature → expansion → pressure feedback is the loop that chatters
+        # on gap closure; damping h attacks it at the source. 1.0 = off.
+        self.gap_relax = float(gap_config.get("relax", 1.0))
         
         # --. Paths --..
         self.geometry_path = self.input_file.get("geometry_path", None)

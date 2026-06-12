@@ -20,6 +20,7 @@ solver_settings:
   relax_T: 0.9
   relax_u: 0.3
   relax_adaptive: true
+  relax_aitken: true
   relax_growth: 1.1
   relax_shrink: 0.6
   relax_min: 0.03
@@ -31,6 +32,7 @@ models:
   gap_conductance:
     type: Gas
     value: 15.8                 # He prefactor A (Todreas Eq. 8.140), W/(cm.K) -> SI
+    relax: 0.5                  # under-relax h between staggered iterations
     contact_coupling:           # Todreas-Kazimi Eq. 8.141/8.142
       enabled: true
       meyer_hardness: 9.65e8    # (Pa) Zircaloy Meyer hardness (~14e4 psi)
@@ -43,14 +45,14 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps   # 900-cell mesh: factorisation beats AMG setup
   rtol: 1.0e-5
-  stag_tol: 1.0e-4
+  stag_tol: 5.0e-4
   convergence: rel_norm
 
 thermal:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-7
   stag_tol: 1.0e-6
   convergence: rel_norm
@@ -58,13 +60,18 @@ thermal:
 
 lhr:
 - 0.0
-- 25000.0
-- 25000.0
+- 20000.0
+- 20000.0
+- 20000.0
 time:
 - 0.0
 - 1.728e+6     # 20 days ramp
-- 9.504e+7     # 1100 days hold
-n_steps: 50
+- 6.048e+7     # 700 days: gap closure window (expected onset ~500 d), resolved finely
+- 1.5552e+8    # 1800 days: contact + creep-relaxation plateau, strided
+n_steps:       # intervals per segment (list form)
+- 8            #   ramp: 2.5 d/step
+- 60           #   20-700 d: 11.3 d/step through closure and contact onset
+- 40           #   700-1800 d: 27.5 d/step across the plateau
 
 output:
   format: xdmf

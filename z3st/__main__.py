@@ -117,7 +117,7 @@ from z3st.utils.writer import OutputWriter
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
-# ─── Hot-reload of input.yaml parameters ──────────────────────────────
+# --. Hot-reload of input.yaml parameters --..
 # Some run-time parameters can be safely changed mid-simulation: the user
 # edits input.yaml, and the next time-step picks up the new value. The
 # allow-list below covers tolerances, iteration limits, relaxation factors,
@@ -134,7 +134,7 @@ _HOT_RELOAD_ALLOWLIST = {
     "solver_settings": (
         "max_iters",
         "relax_T", "relax_u", "relax_D",
-        "relax_adaptive", "relax_growth", "relax_shrink",
+        "relax_adaptive", "relax_aitken", "relax_growth", "relax_shrink",
         "relax_min", "relax_max",
     ),
 }
@@ -153,6 +153,7 @@ _SOLVER_SETTINGS_CASTS = {
     "relax_u":        float,
     "relax_D":        float,
     "relax_adaptive": bool,
+    "relax_aitken":   bool,
     "relax_growth":   float,
     "relax_shrink":   float,
     "relax_min":      float,
@@ -241,7 +242,8 @@ if __name__ == "__main__":
     # --. History --..
     t_points = input_file.get("time")
     lhr_points = input_file.get("lhr")
-    n_increments = input_file.get("n_steps") - 1
+    raw_n_steps = input_file.get("n_steps")
+    n_increments = raw_n_steps if isinstance(raw_n_steps, (list, tuple)) else raw_n_steps - 1
 
     times, lhrs, n_steps = generate_power_history(
         t_points, lhr_points, n_steps=n_increments, filename=None

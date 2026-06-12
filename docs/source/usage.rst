@@ -59,6 +59,7 @@ The staggered scheme alternates between thermal and mechanical solves until both
      relax_T: 0.9
      relax_u: 0.7
      relax_adaptive: true
+     relax_aitken: false
      relax_growth: 1.2
      relax_shrink: 0.8
      relax_min: 0.05
@@ -98,6 +99,28 @@ The staggered scheme alternates between thermal and mechanical solves until both
    time:
    - 0
    n_steps: 1
+
+Two relaxation strategies are available for the displacement update. The
+default adaptive controller grows or shrinks ``relax_u`` heuristically from
+the residual trend; setting ``relax_aitken: true`` replaces it with Aitken
+delta-squared dynamic relaxation, which computes a quasi-optimal factor each
+staggered iteration from the last two residuals (clamped to
+``[relax_min, relax_max]``, restarted from ``relax_u`` at every time step).
+Aitken is recommended for strongly coupled physics. 
+Both ``relax_*`` settings and the tolerances are hot-reloadable:
+edits to ``input.yaml`` during a run are picked up at the next step boundary.
+
+The time grid is built from the piecewise-linear ``time``/``lhr`` history.
+``n_steps`` accepts either an integer (total number of points, distributed
+across segments proportionally to their duration) or a list with one entry
+per segment giving the number of time intervals in that segment — useful to
+resolve a fast transition finely while striding across a slow plateau:
+
+.. code-block:: yaml
+
+   time: [0.0, 1.728e6, 6.048e7, 1.5552e8]
+   lhr: [0.0, 20000.0, 20000.0, 20000.0]
+   n_steps: [8, 60, 40]   # intervals per segment
 
 
 geometry.yaml

@@ -1,6 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 Implicit creep via the incremental variational principle, tangent by AD.
@@ -15,12 +16,15 @@ with the Norton dual dissipation potential φ*. Because Δε_cr is cell-local
 (no gradients), its stationarity condition condenses to ONE scalar equation
 per point — the classical viscoplastic radial return for von Mises flow:
 
-    g(Δγ) = Δγ − Δt·A(T)·(σ_eq_trial − 3G·Δγ)^n = 0,
+    g(Δγ) = Δγ − Δt·[A(T)·(σ_eq_trial − 3G·Δγ)^n + B·φ·(σ_eq_trial − 3G·Δγ)] = 0,
     Δε_cr = Δγ · (3/2) s_trial / σ_eq_trial,
 
-with A(T) = A0·exp(−Q/RT) (Norton + Arrhenius). g is increasing and concave
-with g(0) ≤ 0, so Newton converges monotonically and the base
-(σ_eq_trial − 3GΔγ) never goes negative at the root.
+with A(T) = A0·exp(−Q/RT) (Norton + Arrhenius) and an optional in-pile
+irradiation-creep term linear in stress, ε̇_irr = B·φ·σ_eq (card keys
+``creep_irr_B`` + ``fast_flux``; absent → B·φ = 0 and the law reduces to
+thermal Norton). g is increasing and concave with g(0) ≤ 0, so Newton
+converges monotonically and the base (σ_eq_trial − 3GΔγ) never goes
+negative at the root — the linear term preserves both properties.
 
 The scalar equation is solved by a **predictor–corrector split** that keeps
 the exact consistent tangent without symbolic nesting (a fully unrolled
@@ -75,6 +79,14 @@ class CreepModel:
             T = float(material.get("T_initial", material.get("T_ref", 293.15)))
         return A0 * ufl.exp(-Q / (R_GAS * T))
 
+    def _creep_irr_C(self, material):
+        """Irradiation-creep compliance C = B·φ (Pa⁻¹ s⁻¹): the linear-in-stress
+        in-pile creep term ε̇_irr = B·φ·σ_eq, with B the irradiation-creep
+        coefficient (card ``creep_irr_B``, Pa⁻¹ per n/m²) and φ the fast flux
+        (card ``fast_flux``, n/(m²·s)). Zero (term absent) unless both keys are
+        on the card — out-of-pile cases are unaffected."""
+        return float(material.get("creep_irr_B", 0.0)) * float(material.get("fast_flux", 0.0))
+
     # --. the condensed incremental update --..
 
     def _creep_trial(self, u, material, T):
@@ -100,11 +112,12 @@ class CreepModel:
         G = material["G"]
         n = float(material["creep_n"])
         Adt = dt * self._creep_A(material, T)
+        Cdt = dt * self._creep_irr_C(material)
 
         dg0 = self._creep_predictor(material["__label__"])
         base = ufl.max_value(sig_eq_tr - 3.0 * G * dg0, 0.0)
-        f = dg0 - Adt * base**n
-        fp = 1.0 + 3.0 * G * n * Adt * base**(n - 1.0)
+        f = dg0 - Adt * base**n - Cdt * base
+        fp = 1.0 + 3.0 * G * (n * Adt * base**(n - 1.0) + Cdt)
         dg = dg0 - f / fp
 
         flow_dir = 1.5 * s_tr / sig_eq_tr
@@ -194,15 +207,17 @@ class CreepModel:
 
             G = float(material["G"])
             n = float(material["creep_n"])
+            Cdt = dt * self._creep_irr_C(material)
 
-            # Warm-started Newton on g(x) = x − Adt·(σ − 3Gx)^n, clamped to
-            # the admissible interval [0, σ/3G).
+            # Warm-started Newton on g(x) = x − Adt·(σ − 3Gx)^n − Cdt·(σ − 3Gx),
+            # clamped to the admissible interval [0, σ/3G). The irradiation term
+            # is linear in the base, so g stays increasing and concave.
             x_old = pred.x.array[cells].copy()
             x = np.clip(x_old, 0.0, sig / (3.0 * G) * (1 - 1e-12))
             for _ in range(_PRED_NEWTON_ITS):
                 base = np.maximum(sig - 3.0 * G * x, 0.0)
-                g = x - Adt * base**n
-                gp = 1.0 + 3.0 * G * n * Adt * base ** (n - 1.0)
+                g = x - Adt * base**n - Cdt * base
+                gp = 1.0 + 3.0 * G * (n * Adt * base ** (n - 1.0) + Cdt)
                 x = np.clip(x - g / gp, 0.0, sig / (3.0 * G) * (1 - 1e-12))
             pred.x.array[cells] = x
             pred.x.scatter_forward()

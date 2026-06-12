@@ -87,10 +87,13 @@ These cases serve both as:
 
 ## Key features
 
-* **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling and adaptive relaxation
+* **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling; adaptive or Aitken Δ² dynamic relaxation, per-step form caching, optional gap-conductance damping
 * **Multi-regime kinematics** — `2d` plane strain, `3d`, `axisymmetric`, and `plane_stress` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
 * **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
 * **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral or Amor volumetric/deviatoric energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
+* **Creep** — implicit Norton + Arrhenius via the incremental variational principle (radial return condensed onto the displacement space, exact consistent tangent by automatic differentiation), with an optional flux-driven irradiation-creep term for in-pile cladding
+* **Fuel cracking** — Barani et al. (2019) isotropic softening: the number of macro-cracks follows the rod-average linear heat rate and rescales the fuel elastic constants, irreversibly
+* **Engineering fuel behaviour** — burnup-driven solid and gaseous swelling with early-life densification (eigenstrain bus), Fink UO₂ k(T), rim-peaking radial and chopped-cosine/tabulated axial power profiles
 * **Multi-material domains** — independent thermal, mechanical, and damage properties per material; per-cell-tag integration measures handle interfaces naturally
 * **Volumetric heating** — fissile (LHR/area), analytic γ-heating decay in rectangular / cylindrical / spherical geometry, or arbitrary user-defined `q'''(x)`
 * **Flexible boundary conditions** — thermal (Dirichlet / Neumann / Robin with convective or gap-coupled mode), mechanical (Dirichlet vector / per-component / Neumann / Clamp / Slip), damage (Dirichlet); step-dependent value histories on mechanical BCs
@@ -141,7 +144,10 @@ z3st/                                # repository root
     │   ├── mechanical_model.py      # lame / voigt / hyperelastic / plasticity / custom
     │   ├── damage_model.py          # AT1 / AT2, Miehe / Amor splits, hybrid constraint
     │   ├── plasticity_model.py      # J2 + custom CP hook
-    │   ├── gap_model.py             # Fixed / Gas gap conductance
+    │   ├── creep_model.py           # implicit Norton + irradiation creep, AD tangent
+    │   ├── cracking_model.py        # Barani isotropic-softening fuel cracking
+    │   ├── contact_model.py         # penalty pellet-clad contact (PCMI)
+    │   ├── gap_model.py             # Fixed / Gas gap conductance + contact coupling
     │   └── cluster_dynamic_model.py # 1D advection–diffusion (DG + SIPG + upwind)
     ├── materials/                   # YAML cards + Python callables
     │   ├── steel.yaml, austenitic_steel.yaml, ..., vessel_steel.yaml

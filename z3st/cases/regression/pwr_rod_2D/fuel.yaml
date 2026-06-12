@@ -9,15 +9,22 @@ radial_peak_exponent: 8.0
 E: 200.0e9          # (Pa) Young's modulus
 nu: 0.345           # (-)  Poisson's ratio
 
-k: 5.0              # (W/(m·K)) thermal conductivity
+cracking: barani
+
+k: materials.fuel_thermal.k    # Fink (2000) UO2 k(T), 95% TD — W/(m·K)
 cp: 280.0           # (J/(kg·K))
 rho: 10970.0        # (kg/m³)
 heavy_metal_fraction: 0.8815   # (-) M_U/M_UO2 — burnup accumulated per kg HM
 
 alpha: 1.1e-5       # (1/K) thermal expansion
 
-eigenstrain: materials.fuel_swelling.solid_swelling
+eigenstrain: materials.fuel_swelling.solid_gas_densification
 swelling_rate: 7.0e-4          # (ΔV/V) per MWd/kgU (solid FP swelling)
+gas_swelling_rate: 4.0e-4      # (ΔV/V) per MWd/kgU at full thermal activation
+gas_T_onset: 1200.0            # (K) gaseous-swelling sigmoid centre
+gas_T_width: 150.0             # (K) sigmoid width
+densification_dv: 0.010        # (ΔV/V) as-fabricated porosity recovered in-pile
+densification_bu: 2.0          # (MWd/kgU) densification burnup constant
 
 T_ref: 293.15       # (K)
 T_initial: 580.0    # (K) start at coolant temperature

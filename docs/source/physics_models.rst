@@ -286,6 +286,70 @@ theory.
    Crystal plasticity (single grain): the Z3ST response saturates towards the
    analytical saturation stress :math:`\sigma_{sat}`.
 
+Creep Model
+-----------
+
+Implicit creep for a material carrying ``creep: norton`` on its card, built on
+the incremental variational principle (Ortiz and Stainier): the backward-Euler
+step minimises the incremental potential, and the cell-local minimisation over
+the creep-strain increment condenses to the classical viscoplastic radial
+return, one scalar equation per point,
+
+.. math::
+
+   g(\Delta\gamma) = \Delta\gamma - \Delta t \left[ A(T)\,
+   (\sigma_{eq}^{tr} - 3G\Delta\gamma)^{n_{cr}}
+   + B\,\phi\,(\sigma_{eq}^{tr} - 3G\Delta\gamma) \right] = 0,
+
+with the Norton-Arrhenius prefactor :math:`A(T) = A_0 \exp(-Q/RT)` (card keys
+``creep_A0``, ``creep_n``, ``creep_Q``) and an optional irradiation-creep term
+linear in stress, :math:`\dot\varepsilon_{irr} = B\phi\sigma_{eq}` (card keys
+``creep_irr_B`` and ``fast_flux``, both required together; without them the
+law reduces exactly to thermal Norton). Both terms preserve the monotone and
+concave structure of :math:`g`, so the scalar Newton iteration converges
+unconditionally.
+
+The exact root is maintained in a DG0 predictor field by a vectorised NumPy
+Newton refreshed before every mechanical solve; the UFL stress expression
+carries a single symbolic Newton step from the predictor, so
+``ufl.derivative`` recovers exactly the implicit-function-theorem consistent
+tangent without symbolic nesting. The accumulated creep strain is a
+per-material DG0 tensor state, deviatoric by construction. Verified against
+closed-form solutions by ``verification/fuel/creep`` (constant stress,
+backward Euler exact) and ``verification/fuel/creep_relaxation`` (stress
+relaxation vs the scalar recursion).
+
+Fuel Cracking (Isotropic Softening)
+-----------------------------------
+
+The temperature gradient across an oxide fuel pellet cracks it as soon as the
+thermal tensile stress exceeds the fracture stress. Following Barani et al.,
+*Nucl. Eng. Des.* 342 (2019), the cracked pellet is represented as an
+isotropically softened solid: the elastic constants are rescaled as a function
+of the number of macroscopic cracks :math:`n`, conserving principal strains,
+
+.. math::
+
+   E_{iso}(n) = f(\nu)^n E, \qquad
+   \nu_{iso}(n) = \frac{\nu}{2^n + (2^n - 1)\nu}, \qquad
+   f(\nu) = \frac{2}{3}\,\frac{2-\nu}{2+\nu}\,\frac{1}{1-\nu},
+
+applied from the virgin constants. The number of cracks follows the paper's
+empirical correlation on the rod-average linear heat rate,
+
+.. math::
+
+   n = n_0 + (n_\infty - n_0)\left[1 - e^{-(LHR - LHR_0)/\tau}\right]
+   \quad (LHR \geq LHR_0),
+
+with the fitted constants :math:`LHR_0 = 5` kW/m, :math:`n_0 = 1`,
+:math:`n_\infty = 12`, :math:`\tau = 21` kW/m. Cracking is irreversible: the
+correlation is driven by the maximum LHR seen in the power history (no
+healing). Activation is per material card with ``cracking: barani``; the
+constants can be overridden via ``cracking_lhr0``, ``cracking_n0``,
+``cracking_n_inf``, ``cracking_tau``. The rescaled constants are applied once
+per time step, before the solve.
+
 Phase-Field Damage (Fracture Mechanics)
 ---------------------------------------
 
@@ -430,7 +494,12 @@ heat transfer and lowers fuel temperature. In the demonstration case
 engages. The coupling is explicit within the staggered loop (the thermal step
 uses the contact pressure from the previous mechanical step) and is enabled by
 ``gap_conductance.contact_coupling`` in ``input.yaml``. Implemented in
-:class:`z3st.models.gap_model.GapModel`.
+:class:`z3st.models.gap_model.GapModel`. The Ross-Stoute harmonic mean of the
+solid conductivities accepts both numeric and symbolic :math:`k(T)` material
+cards (the latter evaluated at the current mean gap temperature). For strongly
+coupled contact problems the conductance can be under-relaxed between
+staggered iterations via ``gap_conductance.relax`` (default 1.0, i.e. off),
+damping the contact-pressure / conductance / temperature feedback loop.
 
 .. _penalty-contact:
 

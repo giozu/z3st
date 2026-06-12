@@ -29,9 +29,10 @@ thermal:
     region: inner_2
     pair: lateral_1
 
-  - type: Dirichlet
+  - type: Robin
     region: outer_2
-    temperature: 580.0   # (K) coolant
+    h_conv: 3.5e4        # (W/(m².K)) coolant film coefficient
+    T_ext: 580.0         # (K) bulk coolant temperature
 
 mechanical:
   fuel:

@@ -57,9 +57,25 @@ class GapModel:
                 )
                 h_gap_value += h_contact
 
-        h_gap = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_value))
+        # Under-relax h between staggered iterations (models.gap_conductance.
+        # relax, default 1.0 = off): damps the contact-pressure ↔ conductance
+        # ↔ temperature feedback at its source. _h_gap_prev is reset at every
+        # time step (solve_staggered), so the damping never lags across steps.
+        omega_h = float(getattr(self, "gap_relax", 1.0))
+        h_prev = getattr(self, "_h_gap_prev", None)
+        if omega_h < 1.0 and h_prev is not None:
+            h_gap_value = omega_h * h_gap_value + (1.0 - omega_h) * h_prev
+            print(f"  → h_gap (relaxed, ω={omega_h:.2f}) = {h_gap_value:.2f} W/m²K")
+        self._h_gap_prev = h_gap_value
 
-        return h_gap
+        # Persistent Constant so the cached thermal form sees the update in
+        # place (no form rebuild needed between staggered iterations).
+        if not hasattr(self, "_h_gap_const"):
+            self._h_gap_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_value))
+        else:
+            self._h_gap_const.value = PETSc.ScalarType(h_gap_value)
+
+        return self._h_gap_const
 
     def contact_conductance(self):
         """
@@ -78,19 +94,15 @@ class GapModel:
         if P_i <= 0.0:
             return 0.0
 
-        # harmonic mean of the two solid conductivities
-        ks = [
-            float(m["k"])
-            for m in self.materials.values()
-            if isinstance(m.get("k"), (int, float))
-        ]
+        # harmonic mean of the two solid conductivities; a symbolic k(T) card
+        # is evaluated at the current gap temperature (UFL folds constants, so
+        # k_func(float) returns a plain number)
+        ks = [k for k in (self._k_at_gap(m) for m in self.materials.values())
+              if k is not None]
         if len(ks) < 2:
-            # Symbolic k (Python-callable card) cannot feed the Ross-Stoute
-            # harmonic mean — warn loudly: contact coupling is requested but
-            # the conductance silently stays at the open-gap value otherwise.
             print(
                 "  [WARNING] contact_coupling enabled but fewer than two materials "
-                "carry a numeric 'k' (symbolic k is not supported here); "
+                "carry a usable 'k' (numeric card or symbolic k(T)); "
                 "h_contact = 0 — gap conductance stays at the open-gap value."
             )
             return 0.0
@@ -102,6 +114,26 @@ class GapModel:
         C_SI = 18.11                           # m^-1/2  (= 10 ft^-1/2, Eq. 8.141)
 
         return C_SI * k_harm * (P_i / H) / (delta_g ** 0.5)
+
+    def _k_at_gap(self, material):
+        """Numeric conductivity of one material for the Ross-Stoute harmonic
+        mean: a plain card value, or a symbolic k(T) card evaluated at the
+        current mean gap temperature (falls back to the card's T_initial when
+        the gap temperature is not yet available, e.g. Fixed gap model)."""
+        k_card = material.get("k")
+        if isinstance(k_card, (int, float)):
+            return float(k_card)
+        k_func = material.get("_k_func")
+        if k_func is not None:
+            T_gap = float(
+                getattr(self, "gap_temperature",
+                        material.get("T_initial", material.get("T_ref", 293.15)))
+            )
+            try:
+                return float(k_func(T_gap))
+            except (TypeError, ValueError):
+                return None
+        return None
 
     def set_gap_temperature(self, T_i):
 

@@ -1,21 +1,45 @@
-Z3ST non-regression summary - Thu Jun 11 23:12:47 CEST 2026
+Z3ST non-regression summary - Fri Jun 12 07:59:47 CEST 2026
 --.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
-
-Case: verification/fuel/swelling [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 7s
 
 Case: verification/thermal/thin_slab_dirichlet_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 11s
+  Time            : 7s
 
-Case: regression/box_crack_2D [OK]
+Case: verification/mechanics/full_cylinder [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 58s
+  Time            : 8s
+
+Case: regression/coaxial_gap_3D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 62s
+
+Case: verification/fuel/creep [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 49s
+
+Case: verification/fuel/creep_relaxation [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 82s
+
+Case: verification/fuel/coaxial_contact [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 47s
+
+Case: verification/fuel/swelling [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 3s
 
