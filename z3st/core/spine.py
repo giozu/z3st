@@ -189,18 +189,15 @@ class Spine(
                 constitutive_mode = "plasticity"
                 print(f"  → constitutive model promoted to: plasticity (yield_strength present)")
 
-            # Material-contributed inelastic eigenstrain (fuel swelling /
-            # densification / cladding creep, ...). A material card may expose an
-            # ``eigenstrain`` callable "module.func"; it is resolved here and
-            # consumed by MechanicalModel.eigenstrain. "Fuel is a material": this
-            # is how a fuel material carries its own inelastic behaviour.
+            # Material inelastic eigenstrain
+            # A material card may expose an ``eigenstrain`` callable "module.func"
+            # It is resolved here and consumed by MechanicalModel.eigenstrain
             if isinstance(mat.get("eigenstrain"), str):
                 print(f"  → eigenstrain defined as callable: {mat['eigenstrain']}")
                 mat["_eigenstrain_func"] = self.resolve_function(mat["eigenstrain"])
 
-            # Radial power form factor f(r, bu) for a fissile material — the
-            # source-bus analogue of the eigenstrain callable. Resolved here and
-            # consumed by set_power.
+            # Radial power form factor f(r, bu), source-bus analogue of the eigenstrain callable
+            # Resolved here and consumed by set_power
             if isinstance(mat.get("radial_profile"), str):
                 print(f"  → radial_profile defined as callable: {mat['radial_profile']}")
                 mat["_radial_profile_func"] = self.resolve_function(mat["radial_profile"])

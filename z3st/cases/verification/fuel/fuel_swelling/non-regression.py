@@ -1,22 +1,13 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: verification/fuel/fuel_swelling
+Verifies that the eigenstrain bus consumes the burnup state bus
 
-Verifies that the eigenstrain bus consumes the burnup state bus — i.e. a fuel
-material whose swelling is a function of the accumulated burnup field. A fissile
-block accumulates a uniform burnup (flat power profile) over a fixed time; its
-swelling eigenstrain ΔV/V = swelling_rate * bu then drives a free, stress-free
-expansion. With alpha absent (no thermal strain) the closed form is
-
-    bu      = q''' * t / (rho * HM * 8.64e10)        [MWd/kgU]
+    bu      = q''' * t / (rho * HM * 8.64e10)        (MWd/kgU)
     ΔV/V    = swelling_rate * bu
-    u_x(Lx) = (ΔV/V)/3 * Lx     and     sigma ≈ 0
+    u_x     = (ΔV/V)/3 * Lx     and     sigma = 0
 
-q''' = lhr / area, area = Lx*Ly, 8.64e10 = 86400 s/day * 1e6 W/MW. This is the
-chain state -> eigenstrain -> stress: it confirms swelling reads the burnup
-field and produces the right strain, the analogue of verification/fuel/swelling but
-for a *state-dependent* eigenstrain.
+q''' = lhr / area, area = Lx*Ly, 8.64e10 = 86400 s/day * 1e6 W/MW.
 """
 
 import os
@@ -86,7 +77,7 @@ errors = {
         "numerical": vm_num,
         "reference": 0.0,
         "abs_error": vm_num,
-        "rel_error": float(vm_num / (K * dVV)),
+        "rel_error": float(vm_num / (K * dVV)), # sigma = K * epsilon, stress due to isotropic eigenstrains
     },
 }
 

@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST case regression/pwr_rod_2D : PCMI penalty-contact plots
 #
 # Produces, into output/:
@@ -37,18 +41,16 @@ with warnings.catch_warnings():
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "output")
 
-# --- geometry / contact parameters (keep in sync with input.yaml) ---
-R_PELLET = 0.0045      # pellet outer radius (m)
-R_CLAD_I = 0.004565    # clad inner radius (m)
-R_CLAD_O = 0.005315    # clad outer radius (m)
-G0 = R_CLAD_I - R_PELLET       # initial gap (m)  -> 65 um
-K_PEN = 5.0e13                 # penalty stiffness (Pa/m)
+# parameters
+R_PELLET = 0.0045
+R_CLAD_I = 0.004565
+R_CLAD_O = 0.005315
+G0 = R_CLAD_I - R_PELLET
+K_PEN = 5.0e13
 
 
 def burnup_per_step(files):
-    """Fuel-average burnup (MWd/kgU) per solve step, from the Burnup VTU field.
-    Averaged over the *pellet* nodes only (r <= R_PELLET) — the cladding is
-    non-fissile (burnup = 0) and would otherwise drag a whole-mesh mean down."""
+    """Average burnup (MWd/kgU), from the Burnup VTU field"""
     bu = []
     for f in files:
         g = pv.read(f)
@@ -63,7 +65,7 @@ def burnup_per_step(files):
 
 
 def _imposed_lhr_kwm():
-    """LHR (kW/m) per solve step, derived from input.yaml (any ramp/length)."""
+    """LHR (kW/m) """
     with open(os.path.join(HERE, "input.yaml")) as f:
         inp = yaml.safe_load(f)
     raw = inp["n_steps"]
@@ -73,9 +75,9 @@ def _imposed_lhr_kwm():
     return np.array(lhrs) / 1e3
 
 
-LHR = _imposed_lhr_kwm()       # kW/m per step (matches the actual run)
+LHR = _imposed_lhr_kwm()
 
-TOL = 2.0e-5  # radial tolerance to pick a surface band
+TOL = 2.0e-5
 
 
 def surface_mean_ur(grid, r_target):
@@ -86,7 +88,7 @@ def surface_mean_ur(grid, r_target):
 
 
 # ----------------------------------------------------------------------
-# 0. IMPOSED POWER HISTORY (LHR vs time)
+# 0. LHR vs time
 # ----------------------------------------------------------------------
 def plot_history():
     with open(os.path.join(HERE, "input.yaml")) as f:
@@ -106,10 +108,8 @@ def plot_history():
         tscale, tunit = 1.0, "s"
 
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
-    # underlying ramp (the input control points, linearly interpolated)
     ax.plot(np.array(t_points) * tscale, np.array(lhr_points) / 1e3, "-",
             color="#C44E52", lw=1.5, alpha=0.6, label="imposed ramp")
-    # the discrete solve steps actually evaluated
     ax.plot(np.array(times) * tscale, np.array(lhrs) / 1e3, "o",
             color="#C44E52", ms=6, label="solve steps")
     ax.set_xlabel(f"time ({tunit})")
@@ -152,9 +152,8 @@ def plot_mesh():
 # 2. PCMI CURVES (gap, contact pressure, load transfer) vs LHR
 # ----------------------------------------------------------------------
 def plot_pcmi_curves():
-    """PCMI gap/pressure trajectory. Prefers output/history.csv (written by
-    diagnostics.py every step) — format-independent and scales to 1000 steps, so
-    it works for VTU *or* XDMF runs. Falls back to per-step VTU reads when no CSV
+    """Prefers output/history.csv (written by diagnostics.py)
+    It works for VTU *or* XDMF runs. Falls back to per-step VTU reads when no CSV
     is present."""
     if os.path.exists(os.path.join(OUT, "history.csv")):
         _pcmi_from_csv()
@@ -169,9 +168,11 @@ def _pcmi_from_csv():
     gaps = np.atleast_1d(d["gap_um"])
     pres = np.atleast_1d(d["contact_pressure_MPa"])
     tmax = np.atleast_1d(d["T_max_K"])
+    tmin = np.atleast_1d(d["T_min_K"])
 
     fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
-    # left: gap closure + contact pressure vs burnup
+
+    ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
     ax1.plot(bu, gaps, "o-", color="#4C72B0", label="gap")
     ax1.axhline(0, color="grey", lw=0.8, ls=":")
     ax1.set_xlabel("fuel-average burnup (MWd/kgU)")
@@ -181,18 +182,17 @@ def _pcmi_from_csv():
     ax2.plot(bu, pres, "s--", color="#C44E52", label="contact pressure")
     ax2.set_ylabel("contact pressure (MPa)", color="#C44E52")
     ax2.tick_params(axis="y", labelcolor="#C44E52")
-    ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
 
-    # right: operating history (burnup and peak temperature vs time)
+    ax3.set_title("Operating history")
     ax3.plot(days, bu, "o-", color="#55A868", label="fuel-avg burnup")
     ax3.set_xlabel("time (days)")
     ax3.set_ylabel("burnup (MWd/kgU)", color="#55A868")
     ax3.tick_params(axis="y", labelcolor="#55A868")
     ax4 = ax3.twinx()
-    ax4.plot(days, tmax, "^--", color="#C44E52", label="peak temperature")
-    ax4.set_ylabel("peak temperature (K)", color="#C44E52")
+    ax4.plot(days, tmax, "^--", color="#911B1F", label="max temperature")
+    ax4.plot(days, tmin, "^--", color="#BE7375", label="min temperature")
+    ax4.set_ylabel("temperature (K)", color="#C44E52")
     ax4.tick_params(axis="y", labelcolor="#C44E52")
-    ax3.set_title("Operating history")
     ax3.grid(alpha=0.3)
 
     fig.tight_layout()
@@ -257,7 +257,7 @@ def _pcmi_from_vtu():
 
 
 # ----------------------------------------------------------------------
-# 2b. RADIAL DISPLACEMENT PROFILE u_r(r) at mid-height, all power levels
+# 2b. RADIAL PROFILE at mid-height
 # ----------------------------------------------------------------------
 def plot_radial_profile():
     files = sorted(glob.glob(os.path.join(OUT, "*.vtu")))
@@ -266,7 +266,7 @@ def plot_radial_profile():
 
     bu = burnup_per_step(files)        # MWd/kgU per step, for the legend
     n = len(files)
-    label_every = max(1, n // 6)       # ~6 labelled curves, rest unlabelled
+    label_every = max(1, n // 6)       # 6 labelled curves, rest unlabelled
     fig, ax = plt.subplots(figsize=(7.2, 4.8))
     cmap = plt.cm.viridis
     for i, f in enumerate(files):
@@ -277,7 +277,6 @@ def plot_radial_profile():
         band = np.abs(z - z_mid) < dz
         rb, ub = r[band], ur[band]
         color = cmap(i / (len(files) - 1))
-        # pellet segment and clad segment, drawn separately (gap between)
         for lo, hi in [(0.0, R_PELLET + 1e-9), (R_CLAD_I - 1e-9, R_CLAD_O + 1e-9)]:
             sel = (rb >= lo) & (rb <= hi)
             o = np.argsort(rb[sel])
@@ -295,8 +294,6 @@ def plot_radial_profile():
                  "pellet swells with burnup, gap closes, clad pushed out")
     ax.legend(title="burnup", fontsize=8, ncol=2)
     ax.grid(alpha=0.3)
-    # the fresh (0 MWd/kgU) curve is already non-zero: stress-free reference is
-    # T_ref (293 K) while the rod sits in 580 K coolant -> baseline expansion.
     ax.text(0.97, 0.06, "fresh (0 MWd/kgU) curve is non-zero: thermal\n"
             "expansion from T_ref (293 K) to 580 K coolant",
             transform=ax.transAxes, fontsize=7.5, va="bottom", ha="right", color="#444",
@@ -358,8 +355,6 @@ def plot_fields():
     print("  wrote output/field_radial_disp.png")
 
     # ---- (c) cladding von Mises ----
-    # Single merged von Mises field; the clad is selected by region (the `clad`
-    # extract above), so reading it on those cells gives the cladding stress.
     vm_key = "VonMises (points)" if "VonMises (points)" in grid.point_data else None
     if vm_key is not None:
         vm = np.asarray(clad.point_data[vm_key]) / 1e6  # MPa

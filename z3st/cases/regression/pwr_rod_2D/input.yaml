@@ -46,32 +46,32 @@ models:
 mechanical:
   solver: linear
   linear_solver: direct_mumps
-  rtol: 1.0e-5
-  stag_tol: 5.0e-4
+  rtol: 1.0e-4
+  stag_tol: 1.0e-3
   convergence: rel_norm
 
 thermal:
   solver: linear
   linear_solver: direct_mumps
-  rtol: 1.0e-7
-  stag_tol: 1.0e-6
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
   convergence: rel_norm
   analysis: stationary
 
 lhr:
 - 0.0
-- 15000.0
-- 15000.0
-- 15000.0
+- 20000.0
+- 20000.0
+- 20000.0
 time:
 - 0.0
 - 1.728e+6     # 20 days
 - 6.048e+7     # 700 days
 - 1.5552e+8    # 1800 days
 n_steps:
-- 4
-- 30
-- 20
+- 8
+- 8
+- 8
 
 output:
   format: xdmf

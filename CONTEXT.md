@@ -445,7 +445,7 @@ Materials are plain YAML cards. Common fields:
 | `axial_table_z` / `axial_table_f` | m, — | elevation/factor lists for `tabulated_axial` (piecewise-linear, end values held outside the range); only the *shape* matters — the mean-1 normalisation makes the absolute scale irrelevant |
 | `swelling`          | —          | constant volumetric swelling ΔV/V (isotropic eigenstrain `(ΔV/V)/3 · I`) |
 | `eigenstrain`       | string     | `"pkg.mod.func"` state-dependent eigenstrain callable (e.g. swelling(bu)); see `fuel_swelling.py` |
-| `swelling_rate`     | (MWd/kgU)⁻¹ | ΔV/V per unit burnup for `fuel_swelling.solid_swelling` / `solid_gas_densification` |
+| `swelling_rate`     | (MWd/kgU)⁻¹ | ΔV/V per unit burnup for `fuel_swelling.solid_gas_densification` |
 | `gas_swelling_rate` / `gas_T_onset` / `gas_T_width` | (MWd/kgU)⁻¹, K, K | gaseous-swelling amplitude and thermal-activation sigmoid of `fuel_swelling.solid_gas_densification` (defaults 4.0e-4, 1200, 150) |
 | `densification_dv` / `densification_bu` | —, MWd/kgU | in-pile densification amplitude and burnup constant of `solid_gas_densification` (defaults 0.010, 2.0); set `densification_dv: 0` to switch the term off |
 | `cracking`          | —          | `barani` enables the isotropic-softening fuel-cracking model (§4.8); `cracking_lhr0/n0/n_inf/tau` override the correlation constants |

@@ -1,18 +1,8 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-#
-# VERIFICATION that the eigenstrain bus consumes the burnup state bus. A fissile
-# block accumulates a uniform burnup (flat power profile) over a fixed time; its
-# swelling eigenstrain ΔV/V = swelling_rate * bu then drives a free, stress-free
-# expansion. With alpha absent (no thermal strain) the closed form is
-#
-#     bu      = q''' * t / (rho * HM * 8.64e10)        [MWd/kgU]
-#     ΔV/V    = swelling_rate * bu
-#     u_x(Lx) = (ΔV/V)/3 * Lx     and     sigma ≈ 0
-#
-# q''' = lhr / area, area = Lx*Ly. Thermal + mechanical.
 
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
@@ -48,8 +38,6 @@ mechanical:
   stag_tol: 1.0e-8
   convergence: rel_norm
 
-# Constant 20 kW/m over 1e7 s (~116 days); the total burnup is independent of
-# the step subdivision.
 lhr:
 - 20000.0
 - 20000.0

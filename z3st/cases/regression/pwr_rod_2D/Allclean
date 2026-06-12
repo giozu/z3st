@@ -4,7 +4,7 @@ cd "${0%/*}" || exit 1
 echo "Cleaning current directory..."
 
 rm -f output/non-regression.json
-rm -f output/fields.*
+rm -f output/fields.* output/fields_*.vtu
 rm -f output/*.pvd
 rm -f output/*.png
 rm -f output/*.csv

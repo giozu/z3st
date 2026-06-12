@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a box Lx Ly Lz (fuel swelling verification)
+//  Gmsh GEO for a box Lx Ly Lz
 //
 //  Author: Giovanni Zullo
 //
