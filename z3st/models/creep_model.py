@@ -175,7 +175,7 @@ class CreepModel:
         started numpy Newton per cell. Called before every mechanical solve;
         the staggered loop drives (u, Δγ₀) to joint consistency, and the
         returned max relative predictor change feeds the staggered convergence
-        test (|Δu| alone can pass spuriously when a stale predictor zeroes the
+        test (``|Δu|`` alone can pass spuriously when a stale predictor zeroes the
         increment through the base ≥ 0 clamp)."""
         dt = getattr(self, "dt", 0.0)
         max_change = 0.0

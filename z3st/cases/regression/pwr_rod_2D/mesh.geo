@@ -12,7 +12,7 @@ r_1_o = 0.0045;     // pellet outer radius (m)
 r_2_i = 0.004565;   // clad inner radius (m)
 r_2_o = 0.005315;   // clad outer radius (m)
 h1    = 0.010;      // axial segment height (m)
-h2    = 0.012;      // axial segment height (m)
+h2    = 0.010;      // axial segment height (m)
 
 n_r1 = 25;          // radial divisions, pellet
 n_r2 = 7;           // radial divisions, clad

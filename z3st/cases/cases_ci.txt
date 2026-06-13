@@ -19,6 +19,7 @@ verification/thermal/thin_cylindrical_shell_dirichlet_2D
 verification/thermal/thick_slab_adiabatic_3D
 verification/thermal/box_heated
 verification/mechanics/full_cylinder
+verification/mechanics/tall_rod_axial_2D
 regression/coaxial_gap_3D
 regression/box_crack_2D
 verification/plasticity/j2_hardening_2D

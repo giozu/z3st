@@ -1,0 +1,51 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  fuel: fuel.yaml
+
+regime: axisymmetric
+
+solver_settings:
+  coupling: staggered
+  max_iters: 50
+  relax_T: 1.0
+  relax_u: 1.0
+  relax_adaptive: false
+
+models:
+  thermal: true
+  mechanical: true
+
+thermal:
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-8
+  stag_tol: 1.0e-7
+  convergence: rel_norm
+  analysis: stationary
+
+mechanical:
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-8
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+
+lhr:
+- 20000.0
+- 20000.0
+time:
+- 0.0
+- 1.0
+n_steps: 1
+
+output:
+  format: vtu

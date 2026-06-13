@@ -1,6 +1,6 @@
 name: zircaloy-4
 
-E: materials.zircaloy_E.E   # (Pa)
+E: 99.3e9     # (Pa)
 nu: 0.37      # (-)
 
 k: 17.0       # (W/(m·K))

@@ -804,8 +804,10 @@ class MechanicalModel:
         """
         Elastic strain energy density.
 
-        For linear-elastic (Lame) constitutive:
+        For linear-elastic (Lame) constitutive::
+
             psi_el = 0.5 * [lambda * tr(eps_el)^2 + 2G * eps_el : eps_el]
+
         where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
         (total strain minus thermal eigenstrain). When T is None or the
         material has no thermal-expansion properties, eps_el = eps(u) and

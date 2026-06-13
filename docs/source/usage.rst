@@ -395,7 +395,7 @@ Material Properties
 Materials in Z3ST are defined using YAML files stored in the ``materials/`` directory. Each material file specifies thermal and mechanical properties used in the simulation.
 
 Material File Format
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 A typical material file contains the following properties:
 
@@ -432,7 +432,7 @@ All properties must use **SI units**:
 - **Power**: Watts (W)
 
 Property Descriptions
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 **Mechanical Properties:**
 
@@ -453,7 +453,7 @@ Property Descriptions
 - ``gamma_heating`` — Volumetric heating (W/m³): Internal heat generation rate
 
 Available Materials
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 Z3ST includes a database of pre-defined materials in ``z3st/materials/``:
 
@@ -477,7 +477,7 @@ Z3ST includes a database of pre-defined materials in ``z3st/materials/``:
      - Water properties
 
 Using Materials in Simulations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use a material in your simulation, reference it in ``input.yaml``:
 
@@ -490,7 +490,7 @@ To use a material in your simulation, reference it in ``input.yaml``:
 Multiple materials can be defined for multi-material simulations.
 
 Temperature-Dependent Properties
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For temperature-dependent material properties, you can define a Python module instead of a YAML file (future enhancement), or use piecewise definitions.
 
@@ -512,7 +512,7 @@ For temperature-dependent material properties, you can define a Python module in
        return 50.0 - 0.01 * (T - 300.0)
 
 Creating Custom Materials
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To create a custom material:
 

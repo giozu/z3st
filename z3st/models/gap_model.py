@@ -29,17 +29,25 @@ class GapModel:
                 self.h_gap_value * 1e-4 * self.gap_temperature**0.79
             )  # (W/m-K)
 
-            gap_size = self.average_gap_distance(
-                self.mesh,
-                self.facet_tags,
-                label_a=self.label_map["lateral_1"],
-                label_b=self.label_map["inner_2"],
-            )
+            # Deformed gap
+            live_gap = getattr(self, "_last_gap", None)
+            if live_gap is not None:
+                floor = float(getattr(self, "gap_contact_thickness", 1.0e-6))
+                gap_size = max(float(live_gap), floor)
+                gap_label = "live, deformed"
+            else:
+                gap_size = self.average_gap_distance(
+                    self.mesh,
+                    self.facet_tags,
+                    label_a=self.label_map["lateral_1"],
+                    label_b=self.label_map["inner_2"],
+                )
+                gap_label = "cold, undeformed"
 
             h_gap_value = gas_thermal_conductivity / gap_size  # (W/m2-K)
 
             print(f"  → k_gas       = {gas_thermal_conductivity:.2f} W/m·K")
-            print(f"  → gap_size    = {gap_size*1e3:.3f} mm")
+            print(f"  → gap_size    = {gap_size*1e3:.3f} mm ({gap_label})")
             print(f"  → h_gap       = {h_gap_value:.2f} W/m²K")
 
         else:

@@ -84,6 +84,75 @@ Implemented in :class:`z3st.models.thermal_model.ThermalModel`.
    Coupled thermo-mechanical thin slab: temperature and thermal stress through
    the thickness, numerical (markers) against the analytical solution (lines).
 
+Power Shaping (Radial and Axial Form Factors)
+---------------------------------------------
+
+The volumetric source ``q'''`` of a fissile region can be *redistributed* by
+multiplicative form factors that leave its integral -- the prescribed linear
+heat rate -- unchanged. A material card names them via ``radial_profile`` and/or
+``axial_profile`` (resolved like the symbolic ``k(T)`` hook); ``set_power``
+evaluates them on the fuel degrees of freedom, multiplies them together,
+normalises the composite to mean 1, and scales the source:
+
+.. math::
+
+   q'''(\boldsymbol{x}) = \frac{\mathrm{LHR}}{A}\;
+   \frac{f_r(r, bu)\, f_z(z)}{\langle f_r f_z \rangle},
+
+so only the *distribution* changes, never the total power. Implemented in
+``materials/fuel_profiles.py``.
+
+Radial profile
+^^^^^^^^^^^^^^
+
+The built-in ``rim_peaking`` factor
+
+.. math::
+
+   f_r(r) = 1 + A \left(\frac{r}{R}\right)^p
+
+is flat through the pellet interior and rises steeply at the surface -- a
+parametric stand-in for the Pu-239 rim build-up (resonance capture in U-238
+breeds plutonium at the surface, so the local rating peaks: the "rim effect").
+``R`` is the pellet outer radius; the card sets ``radial_peak_amplitude`` (:math:`A`,
+default 3) and ``radial_peak_exponent`` (:math:`p`, default 8). A mechanistic
+TUBRNP profile drops in behind the same interface.
+
+.. code-block:: yaml
+
+   radial_profile: materials.fuel_profiles.rim_peaking
+   radial_peak_amplitude: 2.0
+   radial_peak_exponent: 8.0
+
+Axial profile
+^^^^^^^^^^^^^
+
+The axial factor shapes the source along the rod axis, representing the axial
+neutron-flux / power shape. Two built-ins:
+
+- ``chopped_cosine`` -- :math:`f_z(z) = \cos\!\big(\pi (z - z_\mathrm{mid})/L'\big)`,
+  with the extrapolated length :math:`L' \ge L` from ``axial_extrapolated_length``
+  (default :math:`1.1\,L`); the classic 1-D axial reactor profile (Todreas & Kazimi).
+- ``tabulated_axial`` -- piecewise-linear interpolation of user points
+  ``axial_table_z`` / ``axial_table_f`` (e.g. node-wise peaking factors from a
+  core-physics calculation).
+
+.. code-block:: yaml
+
+   axial_profile: materials.fuel_profiles.chopped_cosine
+   axial_extrapolated_length: 0.5   # (m)
+
+.. note::
+
+   The axial *power* profile shapes the heat *source*; it is **not** the coolant
+   temperature. The coolant enthalpy rise up the channel (a higher bulk coolant
+   temperature toward the outlet) is a distinct effect, applied through an
+   axially varying Robin condition :math:`T_\mathrm{ext}(z)` on the clad outer
+   surface -- part of the coolant heat-transfer model, not the power form factor.
+   An axial profile is only meaningful on a tall / full-height rod; on a short
+   r--z segment (e.g. ``regression/pwr_rod_2D``, ~1 cm) the source is essentially
+   flat over the segment height.
+
 Mechanical Model
 ----------------
 

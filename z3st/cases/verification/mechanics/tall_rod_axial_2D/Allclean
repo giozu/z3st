@@ -1,0 +1,5 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+rm -rf output/*.png output/*.vtu output/*.xdmf output/*.h5
+rm -rf output/non-regression.json
+rm -rf __pycache__ mesh.msh log_mesh.md log_z3st.md
