@@ -4,16 +4,6 @@
 # Author: Giovanni Zullo
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-# Z3ST case regression/pwr_rod_2D : PCMI penalty-contact plots
-#
-# Produces, into output/:
-#   mesh.png          2D axisymmetric (r-z) mesh: pellet + gap + cladding
-#   pcmi_curves.png   gap closure, contact pressure, and load transfer vs LHR
-#   fields.png        final-step temperature, deformed shape, clad von Mises
-#
-# Run (with the z3st conda env active), after a solve has written output/:
-#   python3 plots.py
-# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import glob
 import os
@@ -305,6 +295,83 @@ def plot_radial_profile():
 
 
 # ----------------------------------------------------------------------
+# 2c. STRESS PROFILE (radial + hoop) at mid-height, last step
+# ----------------------------------------------------------------------
+def _stress_profile_data():
+    """(r, sigma_rr, sigma_theta) in MPa on a mid-height band, last step.
+
+    Prefers nodal VTU stress; falls back to the cell-wise XDMF field
+    (piecewise constant, sampled at cell centres). The stress tensor is
+    stored in cylindrical order (r, theta, z), so in the flattened
+    9-component array column 0 is sigma_rr and column 4 is sigma_theta.
+    """
+    z_mid, dz = 0.005, 3.0e-4
+    files = sorted(glob.glob(os.path.join(OUT, "*.vtu")))
+    if files:
+        g = pv.read(files[-1])
+        if "Stress (points)" not in g.point_data:
+            return None
+        r, z = g.points[:, 0], g.points[:, 1]
+        s = np.asarray(g.point_data["Stress (points)"]).reshape(-1, 9)
+    else:
+        # the solver keeps fields.h5 locked while running; read-only access to
+        # flushed steps is safe, so disable HDF5 locking before h5py loads
+        os.environ.setdefault("HDF5_USE_FILE_LOCKING", "FALSE")
+        from z3st.utils.utils_extract_xdmf import extract_field_xdmf
+        xdmf = os.path.join(OUT, "fields.xdmf")
+        if not os.path.exists(xdmf):
+            return None
+        r, z, _, s = extract_field_xdmf(xdmf, "Stress", step_index=-1)
+        s = np.asarray(s).reshape(len(r), 9)
+    band = np.abs(z - z_mid) < dz
+    return r[band], s[band, 0] / 1e6, s[band, 4] / 1e6
+
+
+def plot_stress_profile():
+    data = _stress_profile_data()
+    if data is None:
+        print("  [plots] no stress field in output: skipping stress profile")
+        return
+    r, s_rr, s_tt = data
+
+    fig, ax = plt.subplots(figsize=(7.2, 4.8))
+    first = True
+    for lo, hi in [(0.0, R_PELLET + 1e-9), (R_CLAD_I - 1e-9, R_CLAD_O + 1e-9)]:
+        sel = (r >= lo) & (r <= hi)
+        o = np.argsort(r[sel])
+        ax.plot(r[sel][o] * 1e3, s_rr[sel][o], "o-", color="#4C72B0", ms=3,
+                lw=1.8, label=r"$\sigma_{rr}$ (radial)" if first else None)
+        ax.plot(r[sel][o] * 1e3, s_tt[sel][o], "s-", color="#C44E52", ms=3,
+                lw=1.8, label=r"$\sigma_{\theta\theta}$ (hoop)" if first else None)
+        first = False
+
+    ax.axvspan(R_PELLET * 1e3, R_CLAD_I * 1e3, color="0.85", alpha=0.7)
+    ax.axhline(0, color="grey", lw=0.8, ls=":")
+    ax.text((R_PELLET + R_CLAD_I) / 2 * 1e3, ax.get_ylim()[1] * 0.05,
+            "gap", ha="center", fontsize=8, color="0.4")
+    ax.set_xlabel("radius r (mm)")
+    ax.set_ylabel("stress (MPa)")
+    ax.set_title("Radial and hoop stress at mid-height (last step)")
+    ax.legend()
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "stress_profile.png"), dpi=150)
+    plt.close(fig)
+    print("  wrote output/stress_profile.png")
+
+    # console summary at the four radii of interest
+    def at(rt):
+        i = np.argmin(np.abs(r - rt))
+        return s_rr[i], s_tt[i]
+    print("    mid-height stresses (MPa):")
+    for name, rt in [("fuel centre", 0.0), ("fuel surface", R_PELLET),
+                     ("clad inner", R_CLAD_I), ("clad outer", R_CLAD_O)]:
+        srr, stt = at(rt)
+        print(f"      {name:12s} r={rt * 1e3:6.3f} mm   "
+              f"sigma_rr={srr:9.1f}   sigma_theta={stt:9.1f}")
+
+
+# ----------------------------------------------------------------------
 # 3. FINAL-STEP FIELDS: temperature, radial displacement, clad von Mises
 # ----------------------------------------------------------------------
 def _bar_args(title):
@@ -380,6 +447,7 @@ if __name__ == "__main__":
     print("[plots] generating figures...")
     plot_history()
     plot_pcmi_curves()           # CSV-preferred; works for XDMF-only runs too
+    plot_stress_profile()        # VTU-preferred; falls back to the XDMF h5
     if have_vtu:
         plot_mesh()
         plot_radial_profile()

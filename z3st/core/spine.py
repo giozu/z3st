@@ -101,11 +101,37 @@ class Spine(
             print(f"Material loaded: {name}")
 
             if "E" in mat and "nu" in mat:
-                mat["E"] = float(mat["E"])
-                mat["nu"] = float(mat["nu"])
-                mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
-                mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
-                mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
+                # E and/or nu may be given as a symbolic "module.func" card,
+                # Then, the derived elastic constants are built as UFL expressions in the T field by
+                # initialize_fields (T does not exist yet here). 
+                # NOTE: a symbolic E/nu is not yet compatible with the per-step cracking rescale or
+                # the numpy creep predictor.
+                def _is_symbolic(v):
+                    if not isinstance(v, str):
+                        return False
+                    try:
+                        float(v)
+                        return False
+                    except ValueError:
+                        return True
+                E_sym = _is_symbolic(mat["E"])
+                nu_sym = _is_symbolic(mat["nu"])
+                if E_sym:
+                    print(f"  → E defined as symbolic function: {mat['E']}")
+                    mat["_E_func"] = self.resolve_function(mat["E"])
+                else:
+                    mat["E"] = float(mat["E"])
+                if nu_sym:
+                    print(f"  → nu defined as symbolic function: {mat['nu']}")
+                    mat["_nu_func"] = self.resolve_function(mat["nu"])
+                else:
+                    mat["nu"] = float(mat["nu"])
+                if E_sym or nu_sym:
+                    print(f"  → '{name}': elastic constants deferred to UFL(T)")
+                else:
+                    mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
+                    mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
+                    mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
             else:
                 print(
                     f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties."
@@ -126,7 +152,7 @@ class Spine(
 
             # YAML quirk: scientific notation without explicit +/- in the exponent
             # (e.g. `1.0e9`) is parsed as a *string*, not a float. Coerce defensively
-            # so users don't hit a confusing TypeError downstream. A genuine symbolic
+            # so users don't hit a confusing TypeError downstream. A symbolic
             # Gc string (e.g. "module.func") will fail the float() and keep its string
             # form for the resolver below.
             if isinstance(sigma_c, str):
@@ -140,7 +166,7 @@ class Spine(
                     Gc = float(Gc)
                     mat["Gc"] = Gc
                 except ValueError:
-                    pass  # genuine "module.func" symbolic path — handled below
+                    pass  # "module.func" symbolic path, handled below
 
             if "Gc" in mat:
                 if isinstance(mat["Gc"], str):
@@ -208,15 +234,20 @@ class Spine(
                 mat["_axial_profile_func"] = self.resolve_function(mat["axial_profile"])
 
             if mat.get("cracking") is not None:
-                if str(mat["cracking"]).lower() != "barani":
+                if str(mat["cracking"]).lower() != "isotropic":
                     raise ValueError(
                         f"Material '{name}': cracking model '{mat['cracking']}' unknown "
-                        f"(only 'barani' is implemented)."
+                        f"(only 'isotropic' is implemented)."
                     )
                 for key in ("cracking_lhr0", "cracking_n0", "cracking_n_inf", "cracking_tau"):
                     if key in mat:
                         mat[key] = float(mat[key])
-                print(f"  → cracking: Barani isotropic softening "
+                if "lmbda" in mat:
+                    mat["lmbda"] = dolfinx.fem.Constant(
+                        self.mesh, dolfinx.default_scalar_type(mat["lmbda"]))
+                    mat["G"] = dolfinx.fem.Constant(
+                        self.mesh, dolfinx.default_scalar_type(mat["G"]))
+                print(f"  → cracking: Isotropic softening "
                       f"(LHR0 = {float(mat.get('cracking_lhr0', 5.0e3))/1e3:.1f} kW/m, "
                       f"n_inf = {float(mat.get('cracking_n_inf', 12.0)):.0f})")
 
@@ -357,6 +388,23 @@ class Spine(
                 k_func = mat["_k_func"]
                 mat["k"] = k_func(self.T)
                 print("\nk expression for", name, "→", mat["k"])
+
+            # Temperature-dependent elastic constants: build lmbda/G/bulk_modulus
+            # as UFL expressions in the live T field, so the per-iteration T
+            # propagates by reference into both the mechanical form and the
+            # (pre-compiled) output-writer stress expression.
+            if "_E_func" in mat or "_nu_func" in mat:
+                if getattr(self, "T", None) is None:
+                    raise ValueError(
+                        f"Material '{name}': temperature-dependent E/nu requires an "
+                        f"active thermal field (set models.thermal: true)."
+                    )
+                E_T = mat["_E_func"](self.T) if "_E_func" in mat else mat["E"]
+                nu_T = mat["_nu_func"](self.T) if "_nu_func" in mat else mat["nu"]
+                mat["lmbda"] = E_T * nu_T / ((1 + nu_T) * (1 - 2 * nu_T))
+                mat["G"] = E_T / (2 * (1 + nu_T))
+                mat["bulk_modulus"] = E_T / (3 * (1 - 2 * nu_T))
+                print(f"\nE/nu expression for {name} → lmbda, G built as UFL(T)")
 
             if "_Gc_func" in mat:
                 Gc_func = mat["_Gc_func"]

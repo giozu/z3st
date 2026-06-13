@@ -92,7 +92,7 @@ These cases serve both as:
 * **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
 * **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral or Amor volumetric/deviatoric energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
 * **Creep** — implicit Norton + Arrhenius via the incremental variational principle (radial return condensed onto the displacement space, exact consistent tangent by automatic differentiation), with an optional flux-driven irradiation-creep term for in-pile cladding
-* **Fuel cracking** — Barani et al. (2019) isotropic softening: the number of macro-cracks follows the rod-average linear heat rate and rescales the fuel elastic constants, irreversibly
+* **Fuel cracking** — Isotropic softening: the number of macro-cracks follows the rod-average linear heat rate and rescales the fuel elastic constants, irreversibly
 * **Engineering fuel behaviour** — burnup-driven solid and gaseous swelling with early-life densification (eigenstrain bus), Fink UO₂ k(T), rim-peaking radial and chopped-cosine/tabulated axial power profiles
 * **Multi-material domains** — independent thermal, mechanical, and damage properties per material; per-cell-tag integration measures handle interfaces naturally
 * **Volumetric heating** — fissile (LHR/area), analytic γ-heating decay in rectangular / cylindrical / spherical geometry, or arbitrary user-defined `q'''(x)`
@@ -145,7 +145,7 @@ z3st/                                # repository root
     │   ├── damage_model.py          # AT1 / AT2, Miehe / Amor splits, hybrid constraint
     │   ├── plasticity_model.py      # J2 + custom CP hook
     │   ├── creep_model.py           # implicit Norton + irradiation creep, AD tangent
-    │   ├── cracking_model.py        # Barani isotropic-softening fuel cracking
+    │   ├── cracking_model.py        # Isotropic-softening fuel cracking
     │   ├── contact_model.py         # penalty pellet-clad contact (PCMI)
     │   ├── gap_model.py             # Fixed / Gas gap conductance + contact coupling
     │   └── cluster_dynamic_model.py # 1D advection–diffusion (DG + SIPG + upwind)

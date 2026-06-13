@@ -345,7 +345,7 @@ empirical correlation on the rod-average linear heat rate,
 with the fitted constants :math:`LHR_0 = 5` kW/m, :math:`n_0 = 1`,
 :math:`n_\infty = 12`, :math:`\tau = 21` kW/m. Cracking is irreversible: the
 correlation is driven by the maximum LHR seen in the power history (no
-healing). Activation is per material card with ``cracking: barani``; the
+healing). Activation is per material card with ``cracking: isotropic``; the
 constants can be overridden via ``cracking_lhr0``, ``cracking_n0``,
 ``cracking_n_inf``, ``cracking_tau``. The rescaled constants are applied once
 per time step, before the solve.

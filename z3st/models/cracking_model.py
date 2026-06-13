@@ -32,7 +32,7 @@ far in the power history (irreversible).
 
 Card (material):
 
-    cracking: barani          # opt-in
+    cracking: isotropic       # opt-in
     cracking_lhr0:  5.0e3     # (W/m)  optional, default 5 kW/m
     cracking_n0:    1.0       # (-)    optional
     cracking_n_inf: 12.0      # (-)    optional
@@ -52,7 +52,7 @@ import math
 class CrackingModel:
 
     def cracking_active(self, material):
-        return str(material.get("cracking", "")).lower() == "barani"
+        return str(material.get("cracking", "")).lower() == "isotropic"
 
     @staticmethod
     def _n_cracks(lhr, lhr0, n0, n_inf, tau):
@@ -96,9 +96,16 @@ class CrackingModel:
 
             mat["E"] = E_iso
             mat["nu"] = nu_iso
-            mat["lmbda"] = E_iso * nu_iso / ((1 + nu_iso) * (1 - 2 * nu_iso))
-            mat["G"] = E_iso / (2 * (1 + nu_iso))
             mat["bulk_modulus"] = E_iso / (3 * (1 - 2 * nu_iso))
+
+            lmbda_new = E_iso * nu_iso / ((1 + nu_iso) * (1 - 2 * nu_iso))
+            G_new = E_iso / (2 * (1 + nu_iso))
+            if hasattr(mat["lmbda"], "value"):
+                mat["lmbda"].value = lmbda_new
+                mat["G"].value = G_new
+            else:
+                mat["lmbda"] = lmbda_new
+                mat["G"] = G_new
 
             print(
                 f"  [cracking] {name}: LHR_max = {mat['_lhr_max']/1e3:.1f} kW/m → "

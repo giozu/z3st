@@ -1,9 +1,9 @@
 #!/bin/bash
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-# Z3ST Non-regression test suite for github
+# Z3ST Non-regression test suite for GitHub
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Author: Giovanni Zullo
-# Date: 2025-12-12
+# Date: 2026-06-13
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 set -e
@@ -47,10 +47,7 @@ for case_name in "${CASES[@]}"; do
     ./Allrun > "${case_name//\//_}_log.txt" 2>&1
     exit_code=$?
 
-    # Allrun's exit code only catches crashes: the per-case non-regression.py
-    # always exits 0. Gate on the verdicts it writes into non-regression.json
-    # ("summary" = analytic tolerance check, "regression" = vs GOLD reference)
-    # so a numerical regression actually fails CI.
+    # A numerical regression fails CI.
     fail_reason=""
     if [[ $exit_code -eq 0 && -f "output/non-regression.json" ]]; then
         summary_status=$(grep -o '"summary": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)

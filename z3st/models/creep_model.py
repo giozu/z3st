@@ -205,7 +205,7 @@ class CreepModel:
             tmp.interpolate(Texpr, cells0=cells)
             Adt = dt * tmp.x.array[cells]
 
-            G = float(material["G"])
+            G = float(getattr(material["G"], "value", material["G"]))
             n = float(material["creep_n"])
             Cdt = dt * self._creep_irr_C(material)
 

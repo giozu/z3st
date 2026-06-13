@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: verification/fuel/coaxial_contact
-
-VERIFICATION of the penalty contact pressure against the analytical Lame
-interference-fit pressure. The pellet is heated UNIFORMLY, so its free thermal
-expansion is exactly u(b) = alpha_f (T - T_ref) b (no gradient, no Poisson
-ambiguity) and the cladding (held at T_ref) does not expand. The interference
+Verification of the penalty contact pressure against the analytical Lame
+interference-fit pressure. The inner cylinder is heated uniformly, so its free thermal
+expansion is exactly u(b) = alpha_f (T - T_ref) b and the outer cylinder does not expand. 
+The interference
 
     delta = alpha_f (T_pellet - T_ref) * b - g0
 
@@ -14,8 +12,7 @@ then gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
 
     p = delta / { b [ (1/E_c)((c^2+b^2)/(c^2-b^2) + nu_c) + (1/E_f)(1 - nu_f) ] }
 
-(plane-stress form, consistent with the axially-free pellet). One plot:
-Z3ST penalty contact pressure vs the Lame line, against pellet temperature.
+(plane-stress form, consistent with the axially-free pellet)
 """
 
 import os
@@ -91,6 +88,98 @@ if mask.any():
     rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_lame[mask]
     print(f"[INFO] closed-gap steps: {mask.sum()}, mean rel. error vs Lame = {rel.mean() * 100:.1f}%")
 print("[INFO] non-regression completed.\n")
+
+
+def plot_stress_profiles():
+    """Radial profile of sigma_rr and sigma_theta at the last step,
+    Z3ST vs the analytical Lame interference-fit solution.
+
+      * pellet (0 <= r <= b), solid cylinder under external pressure p, axially
+        free  ->  sigma_rr = sigma_theta = -p   (uniform)
+      * clad (bci <= r <= c), tube with internal pressure p, free outer ->
+            sigma_rr(r)    = p bci^2/(c^2-bci^2) (1 - c^2/r^2)
+            sigma_theta(r) = p bci^2/(c^2-bci^2) (1 + c^2/r^2)
+
+    sigma_rr is continuous, -p across the gap interface, and sigma_theta is
+    compressive in the pellet but tensile in the clad.
+    """
+    if not files or not mask.any():
+        print("[INFO] no closed-gap step: skipping stress profile")
+        return
+
+    i = int(np.argmax(p_lame))
+    p = p_lame[i]                                   # MPa, exact interference pressure
+    m = pv.read(files[i])
+
+    if "Stress (cells)" in m.cell_data:
+        coords = m.cell_centers().points
+        s = np.asarray(m.cell_data["Stress (cells)"]).reshape(-1, 9)
+    elif "Stress (points)" in m.point_data:
+        coords = m.points
+        s = np.asarray(m.point_data["Stress (points)"]).reshape(-1, 9)
+    else:
+        print("[INFO] no Stress field in VTU: skipping stress profile")
+        return
+
+    Lz = float(geo["Lz"])
+    rr_c, zz_c = coords[:, 0], coords[:, 1]
+    band = np.abs(zz_c - 0.5 * Lz) < 0.25 * Lz      # mid-height slice
+    rb = rr_c[band]
+    srr = s[band, 0] / 1e6                           # tensor order (r, theta, z)
+    stt = s[band, 4] / 1e6
+    o = np.argsort(rb)
+    rb, srr, stt = rb[o], srr[o], stt[o]
+    pellet = rb <= b + 1e-9
+    cladm = rb >= bci - 1e-9
+
+    # analytical curves at the same pressure p
+    rp = np.linspace(0.0, b, 50)
+    rcl = np.linspace(bci, c, 80)
+    kk = p * bci**2 / (c**2 - bci**2)
+    srr_clad = kk * (1.0 - c**2 / rcl**2)
+    stt_clad = kk * (1.0 + c**2 / rcl**2)
+
+    fig, ax = plt.subplots(figsize=(7.5, 5))
+    # analytic (lines)
+    ax.plot(rp * 1e3, np.full_like(rp, -p), color="C0", ls="--", lw=1.5,
+            label=r"$\sigma_{rr}$ analytic")
+    ax.plot(rcl * 1e3, srr_clad, color="C0", ls="--", lw=1.5)
+    ax.plot(rp * 1e3, np.full_like(rp, -p), color="C3", ls=":", lw=1.8,
+            label=r"$\sigma_{\theta\theta}$ analytic")
+    ax.plot(rcl * 1e3, stt_clad, color="C3", ls=":", lw=1.8)
+    # Z3ST (markers)
+    ax.plot(rb[pellet] * 1e3, srr[pellet], "o", color="C0", ms=4,
+            label=r"$\sigma_{rr}$ Z3ST")
+    ax.plot(rb[cladm] * 1e3, srr[cladm], "o", color="C0", ms=4)
+    ax.plot(rb[pellet] * 1e3, stt[pellet], "s", color="C3", ms=4,
+            label=r"$\sigma_{\theta\theta}$ Z3ST")
+    ax.plot(rb[cladm] * 1e3, stt[cladm], "s", color="C3", ms=4)
+
+    ax.axvspan(b * 1e3, bci * 1e3, color="0.85", alpha=0.7)
+    ax.axhline(0, color="grey", lw=0.8, ls="-")
+    ax.text((b + bci) / 2 * 1e3, ax.get_ylim()[1] * 0.9, "gap",
+            ha="center", fontsize=8, color="0.4")
+    ax.set_xlabel("radius r (mm)")
+    ax.set_ylabel("stress (MPa)")
+    ax.set_title(f"Radial / hoop stress vs Lame (p = {p:.1f} MPa, mid-height)")
+    ax.legend(fontsize=8, ncol=2)
+    ax.grid(True, ls=":", alpha=0.5)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "stress_profile_verification.png"), dpi=150)
+    plt.close(fig)
+    print("[INFO] stress_profile_verification.png saved")
+
+    # interface continuity diagnostic
+    if pellet.any() and cladm.any():
+        srr_fuel_surf = srr[pellet][-1]
+        srr_clad_inner = srr[cladm][0]
+        print(f"[INFO] interface sigma_rr: pellet={srr_fuel_surf:8.2f} MPa, "
+              f"clad={srr_clad_inner:8.2f} MPa, analytic -p={-p:8.2f} MPa")
+        print(f"[INFO] pellet sigma_rr range: [{srr[pellet].min():.2f}, "
+              f"{srr[pellet].max():.2f}] MPa (should be ~ -p, uniform, never tensile)")
+
+
+plot_stress_profiles()
 
 # --. numerical results --..
 errors = {
