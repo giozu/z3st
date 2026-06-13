@@ -1,25 +1,8 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-#
-# VERIFICATION of the AXIAL power source bus (Todreas & Kazimi "1-D axial
-# problem"). A tall axisymmetric fuel column runs at a constant linear heat
-# rate with a chopped-cosine axial form factor
-#
-#     f(z) = cos(pi (z - z_mid) / L'),    L = 0.4 m,  L' = 0.5 m,
-#
-# normalised to nodal mean 1 by set_power. Three closed-form checks (see
-# non-regression.py):
-#
-#   * accumulation magnitude — the nodal-mean burnup equals
-#         bu_mean = q_avg * t_total / (rho * HM * 8.64e10)   [MWd/kgU],
-#     q_avg = lhr / area (the normalisation preserves the average rating);
-#   * axial peaking factor — peak/mean burnup = 1 / [(2L'/piL) sin(piL/2L')];
-#   * end/peak shape — bu(z=0)/bu(z_mid) = cos(pi L / 2 L').
-#
-# Thermal only — the temperature field is irrelevant to the burnup; the outer
-# Dirichlet BC merely makes the conduction solve well-posed.
 
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
@@ -32,12 +15,14 @@ regime: axisymmetric
 
 solver_settings:
   coupling: staggered
-  max_iters: 20
+  max_iters: 50
   relax_T: 1.0
+  relax_u: 1.0
   relax_adaptive: false
 
 models:
   thermal: true
+  mechanical: true
 
 thermal:
   solver: linear
@@ -45,10 +30,15 @@ thermal:
   rtol: 1.0e-8
   stag_tol: 1.0e-7
   convergence: rel_norm
+  analysis: stationary
 
-# Constant 20 kW/m over 6e7 s (~700 days) in 6 increments — long enough to
-# build a clearly shaped burnup field. The total (mean) burnup is independent
-# of the step subdivision.
+mechanical:
+  solver: linear
+  linear_solver: iterative_hypre
+  rtol: 1.0e-8
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+
 lhr:
 - 20000.0
 - 20000.0
@@ -56,3 +46,6 @@ time:
 - 0.0
 - 6.0e+7
 n_steps: 7
+
+output:
+  format: vtu

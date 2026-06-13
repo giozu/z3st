@@ -1,10 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a 2D axisymmetric fuel stack (axial-power verification)
-//
-//  Tall (r-z) column: the radial source is flat, the axial chopped-cosine
-//  profile is what the case verifies, so the axial direction carries the
-//  resolution.
+//  Gmsh GEO for a 2D axisymmetric rod
 //
 //  Author: Giovanni Zullo
 //
@@ -17,8 +13,8 @@ Ro = 0.0041;  // Outer radius (m)
 Lz = 0.400;   // Active fuel height L (m)
 
 // Divisions
-nx = 6;    // radial (source is radially flat)
-ny = 161;  // axial (resolves the cosine; odd -> a node sits exactly at z_mid)
+nx = 12;   // radial
+ny = 161;  // axial
 
 Point(1) = {Ri, 0, 0};
 Point(2) = {Ro, 0, 0};

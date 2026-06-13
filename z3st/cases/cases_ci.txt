@@ -1,18 +1,10 @@
-# CI case list, consumed by non-regression_github.sh (one case per line,
-# paths relative to cases/, trailing comments allowed).
-#
-# CI case-inclusion policy (see CONTEXT.md §6 / punch_list.md CASES-P1-5):
+# CI case list, consumed by non-regression_github.sh
 # This is a tight subset of the local suite (non-regression_local.sh),
 # chosen for fast CI turnaround under the dolfinx/dolfinx:stable container
 # budget. Each case here:
 #   - has a stable output/non-regression_gold.json,
 #   - runs in well under one minute,
 #   - exercises one physics path that's not covered by another listed case
-#     (linear elasticity, axisymmetric thermal, 3D thermal, volumetric
-#     heating, multi-material with Robin pair gap, 2D damage, J2 plasticity,
-#     custom-plasticity hook).
-# Active WIP cases are intentionally excluded; run them locally via
-# cases/non-regression_local.sh.
 
 verification/thermal/thin_slab_dirichlet_2D
 verification/thermal/thin_cylindrical_shell_dirichlet_2D
