@@ -1,0 +1,41 @@
+{
+    "results": {
+        "n_at_peak": {
+            "numerical": 9.9224,
+            "reference": 9.92236836878682,
+            "abs_error": 3.163121317939499e-05,
+            "rel_error": 3.1878692670691937e-06,
+            "status": "PASS"
+        },
+        "E_iso_ratio_at_peak": {
+            "numerical": 0.03753,
+            "reference": 0.03753010951251226,
+            "abs_error": 1.0951251225993497e-07,
+            "rel_error": 2.917990746161407e-06,
+            "status": "PASS"
+        },
+        "nu_iso_at_peak": {
+            "numerical": 0.000264,
+            "reference": 0.00026441197566250336,
+            "abs_error": 4.119756625033371e-07,
+            "rel_error": 0.0015580824638184493,
+            "status": "PASS"
+        },
+        "n_at_20kW_paper": {
+            "numerical": 6.615,
+            "reference": 6.615041744873516,
+            "abs_error": 4.174487351615852e-05,
+            "rel_error": 6.310598651703098e-06,
+            "status": "PASS"
+        },
+        "irreversibility_n_held": {
+            "numerical": 9.9224,
+            "reference": 9.9224,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.005,
+    "summary": "PASS"
+}

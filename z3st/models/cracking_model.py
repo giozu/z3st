@@ -109,5 +109,5 @@ class CrackingModel:
 
             print(
                 f"  [cracking] {name}: LHR_max = {mat['_lhr_max']/1e3:.1f} kW/m → "
-                f"n = {n:.2f} cracks, E_iso/E = {E_iso/E0:.4f}, nu_iso = {nu_iso:.4f}"
+                f"n = {n:.4f} cracks, E_iso/E = {E_iso/E0:.6f}, nu_iso = {nu_iso:.6f}"
             )

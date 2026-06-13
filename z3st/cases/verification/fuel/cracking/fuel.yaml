@@ -1,0 +1,13 @@
+name: UO2-cracking-unit
+cracking: isotropic
+
+E: 200.0e9          # (Pa)
+nu: 0.345           # (-)
+alpha: 1.1e-5       # (1/K)
+
+k: 4.0              # (W/(m·K))
+cp: 280.0           # (J/(kg·K))
+rho: 10970.0        # (kg/m³)
+
+T_ref: 600.0        # (K)
+T_initial: 600.0    # (K)

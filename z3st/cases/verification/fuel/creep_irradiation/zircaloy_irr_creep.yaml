@@ -1,0 +1,19 @@
+name: zircaloy-irradiation-creep-test
+
+E: 99.3e9     # (Pa)
+nu: 0.37      # (-)
+
+k: 17.0       # (W/(m·K))
+cp: 350.0     # (J/(kg·K))
+rho: 6500.0   # (kg/m³)
+
+alpha: 7.5e-6 # (1/K)
+T_ref: 600.0      # (K)
+T_initial: 600.0  # (K)
+
+creep: norton
+creep_A0: 0.0        # (Pa^-n s^-1) Norton OFF
+creep_n: 1.0         # (-)
+creep_Q: 1.2e5       # (J/mol)
+creep_irr_B: 2.0e-36 # (Pa^-1 per n/m^2) irradiation-creep coefficient
+fast_flux: 7.0e17    # (n/(m^2.s), E > 1 MeV) fast flux phi

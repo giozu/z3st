@@ -5,8 +5,8 @@ radial_profile: materials.fuel_profiles.rim_peaking
 radial_peak_amplitude: 2.0
 radial_peak_exponent: 8.0
 
-E: 200.0e9          # (Pa) Young's modulus
-nu: 0.345           # (-)  Poisson's ratio
+E: 200.0e9          # (Pa)
+nu: 0.345           # (-)
 
 cracking: isotropic
 

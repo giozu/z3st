@@ -1,20 +1,20 @@
 name: zircaloy-4
 
-E: 99.3e9     # Young's modulus (Pa)
-nu: 0.37      # Poisson's ratio (-)
+E: 99.3e9     # (Pa)
+nu: 0.37      # (-)
 
-k: 17.0           # Thermal conductivity (W/m·K)
-alpha: 7.5e-6     # Thermal expansion coefficient (1/K)
-cp: 350           # Specific heat capacity (J/kg·K)
+k: 17.0           # (W/m·K)
+alpha: 7.5e-6     # (1/K)
+cp: 350           # (J/kg·K)
 T_ref: 300        # (K)
 T_initial: 580.0  # (K)
 
-rho: 6500                   # Density (kg/m³)
+rho: 6500                   # (kg/m³)
 melting_temperature: 2123   # (K)
 
-# creep: norton
-# creep_A0: 2.82e-24   # (Pa^-n s^-1)
-# creep_n: 3.0         # (-)
-# creep_Q: 1.2e5       # (J/mol)
-# creep_irr_B: 2.0e-36 # (Pa^-1 per n/m^2) irradiation-creep coefficient
-# fast_flux: 7.0e17    # (n/(m^2.s), E > 1 MeV)
+creep: norton
+creep_A0: 2.82e-24   # (Pa^-n s^-1)
+creep_n: 3.0         # (-)
+creep_Q: 1.2e5       # (J/mol)
+creep_irr_B: 2.0e-36 # (Pa^-1 per n/m^2) irradiation-creep coefficient
+fast_flux: 7.0e17    # (n/(m^2.s), E > 1 MeV)
