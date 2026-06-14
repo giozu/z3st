@@ -70,6 +70,17 @@ class Solver:
         the last entry when the step index runs past the end."""
         return raw[min(self.current_step, len(raw) - 1)]
 
+    # Cached assembled forms keyed on (current_step, u_new, T)
+    _DT_DEPENDENT_CACHES = ("_th_cache", "_mech_cache")
+
+    def invalidate_dt_caches(self):
+        """Drop every cached form that bakes dt in, forcing a rebuild at the
+        current dt on the next solve. Single owner of the dt-dependent cache
+        list: add any new dt-baking cache to ``_DT_DEPENDENT_CACHES`` rather
+        than nulling it ad hoc from the time loop."""
+        for name in self._DT_DEPENDENT_CACHES:
+            setattr(self, name, None)
+
     def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
         """
         Returns PETSc options for the linear solver based on the physics.

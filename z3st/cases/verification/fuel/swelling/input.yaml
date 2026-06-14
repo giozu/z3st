@@ -3,11 +3,6 @@
 # Author: Giovanni Zullo
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-#
-# VERIFICATION of the eigenstrain bus: a block of a
-# material carrying a constant volumetric swelling ΔV/V, free to expand from a
-# corner. Free swelling is stress-free, so the analytical result is σ = 0 and a
-# uniform expansion u = (ΔV/V)/3 * x. Mechanical only.
 
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
@@ -29,7 +24,7 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-9
   stag_tol: 1.0e-8
   convergence: rel_norm

@@ -73,6 +73,21 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
     return all_pass
 
 
+def _write_regression_verdict(case_dir, verdict):
+    """Persist the gold-regression verdict ('PASS'/'FAIL') into the run's
+    non-regression.json so the suite drivers (non-regression*.sh) can surface
+    it — a regression is otherwise invisible outside stdout."""
+    out_json = os.path.join(case_dir, "output", "non-regression.json")
+    try:
+        with open(out_json, "r") as f:
+            data = json.load(f)
+        data["regression"] = verdict
+        with open(out_json, "w") as f:
+            json.dump(data, f, indent=4)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
+
+
 def regression_check(errors, case_dir, regression_tol=1e-3):
     """
     This function evaluates the qualitative performance of the current run compared to the 
@@ -97,8 +112,16 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
 
     print(f"\nRegression check vs GOLD reference:")
 
-    with open(gold_file, "r") as f:
-        gold_data = json.load(f)
+    try:
+        with open(gold_file, "r") as f:
+            gold_data = json.load(f)
+    except (json.JSONDecodeError, OSError) as exc:
+        # A corrupt / unparseable gold must FAIL loudly, never be silently
+        # skipped: otherwise a broken gold disables the regression check and the
+        # suite reports a false pass.
+        print(f"  {RED}[ERROR] GOLD file unreadable ({exc}); marking regression FAIL.{END}")
+        _write_regression_verdict(case_dir, "FAIL")
+        return False
 
     gold_results = gold_data.get("results", gold_data)
     reg_pass = True
@@ -172,17 +195,5 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
     )
     print(f"\n[SUMMARY] {BOLD}{summary_reg}{END}")
 
-    # Persist the gold-regression verdict next to the analytic "summary" key so
-    # the suite drivers (non-regression.sh / non-regression_github.sh) can
-    # surface it — otherwise a regression vs GOLD is invisible outside stdout.
-    out_json = os.path.join(case_dir, "output", "non-regression.json")
-    try:
-        with open(out_json, "r") as f:
-            data = json.load(f)
-        data["regression"] = "PASS" if reg_pass else "FAIL"
-        with open(out_json, "w") as f:
-            json.dump(data, f, indent=4)
-    except (FileNotFoundError, json.JSONDecodeError):
-        pass
-
+    _write_regression_verdict(case_dir, "PASS" if reg_pass else "FAIL")
     return reg_pass

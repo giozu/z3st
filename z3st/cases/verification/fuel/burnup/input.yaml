@@ -1,21 +1,8 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-#
-# VERIFICATION of the burnup state bus + the radial-power source bus. A solid
-# axisymmetric pellet runs at a constant linear heat rate with a rim-peaking
-# radial form factor f(r). Two closed-form checks (see non-regression.py):
-#
-#   * accumulation magnitude — the nodal-mean burnup equals
-#         bu_mean = q_avg * t_total / (rho * HM * 8.64e10)   [MWd/kgU],
-#     q_avg = lhr / area, area = pi*Ro^2  (f is normalised to mean 1, so the
-#     radial shaping preserves the average rating);
-#   * radial shape — the rim/core burnup ratio equals 1 + A (the un-normalised
-#     f(Ro)/f(0)), independent of the normalisation.
-#
-# Thermal only — the temperature field is irrelevant to the burnup; the outer
-# Dirichlet BC merely makes the conduction solve well-posed.
 
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
@@ -37,14 +24,11 @@ models:
 
 thermal:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-8
   stag_tol: 1.0e-7
   convergence: rel_norm
 
-# Constant 20 kW/m over 6e7 s (~700 days) in 6 increments — long enough to build
-# a clearly radial burnup field. The total (mean) burnup is independent of the
-# step subdivision.
 lhr:
 - 20000.0
 - 20000.0

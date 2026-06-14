@@ -1,27 +1,26 @@
 {
     "results": {
         "sigma_xx": {
-            "numerical": 124999999.99991491,
+            "numerical": 124999999.99990216,
             "reference": 125000000.0,
-            "abs_error": 8.508563041687012e-05,
-            "rel_error": 6.80685043334961e-13,
+            "abs_error": 9.784102439880371e-05,
+            "rel_error": 7.827281951904297e-13,
             "status": "PASS"
         },
         "sigma_von_mises": {
-            "numerical": 124999999.999929,
+            "numerical": 124999999.99989536,
             "reference": 125000000.0,
-            "abs_error": 7.100403308868408e-05,
-            "rel_error": 5.680322647094727e-13,
+            "abs_error": 0.00010463595390319824,
+            "rel_error": 8.370876312255859e-13,
             "status": "PASS"
         },
         "ux_displacement": {
-            "numerical": 6.25000000000335e-05,
+            "numerical": 6.24999999999493e-05,
             "reference": 6.25e-05,
-            "abs_error": 3.350184712980209e-17,
-            "rel_error": 5.360295540768334e-13,
+            "abs_error": 5.07000040908534e-17,
+            "rel_error": 8.112000654536544e-13,
             "status": "PASS"
         }
     },
-    "tolerance": 0.01,
-    "summary": "PASS"
+    "tolerance": 0.01
 }

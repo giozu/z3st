@@ -44,18 +44,28 @@ from dolfinx.io import XDMFFile
 # ---------------------------------------------------------------------------
 
 def _von_mises(sig):
-    """Von Mises equivalent stress for an (..., 3, 3) batch."""
+    """Von Mises equivalent stress for an (..., 3, 3) batch.
+
+    In the axisymmetric regime the hoop strain eps_tt = u_r / r is singular at
+    the axis r=0, so the stress carries NaN at axis nodes. Suppress the
+    resulting 'invalid value' warning and return a finite field (0 at the
+    singular nodes) rather than poisoning the exported VonMises field with NaN.
+    """
     s_xx, s_yy, s_zz = sig[..., 0, 0], sig[..., 1, 1], sig[..., 2, 2]
     s_xy, s_yz, s_zx = sig[..., 0, 1], sig[..., 1, 2], sig[..., 2, 0]
-    return np.sqrt(
-        0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
-        + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
-    )
+    with np.errstate(invalid="ignore"):
+        vm = np.sqrt(
+            0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
+            + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
+        )
+    return np.nan_to_num(vm, nan=0.0, posinf=0.0, neginf=0.0)
 
 
 def _hydrostatic(sig):
-    """Hydrostatic pressure p = tr(sigma) / 3 on an (..., 3, 3) batch."""
-    return (sig[..., 0, 0] + sig[..., 1, 1] + sig[..., 2, 2]) / 3.0
+    """Hydrostatic pressure p = tr(sigma) / 3 on an (..., 3, 3) batch. Guarded
+    for the same axisymmetric r=0 NaN as :func:`_von_mises`."""
+    p = (sig[..., 0, 0] + sig[..., 1, 1] + sig[..., 2, 2]) / 3.0
+    return np.nan_to_num(p, nan=0.0, posinf=0.0, neginf=0.0)
 
 
 # ---------------------------------------------------------------------------

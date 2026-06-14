@@ -16,7 +16,7 @@ regime: axisymmetric
 
 solver_settings:
   coupling: staggered
-  max_iters: 250
+  max_iters: 100
   relax_T: 0.9
   relax_u: 0.3
   relax_adaptive: true
@@ -47,7 +47,7 @@ mechanical:
   solver: linear
   linear_solver: direct_mumps
   rtol: 1.0e-4
-  stag_tol: 1.0e-3
+  stag_tol: 1.0e-4
   convergence: rel_norm
 
 thermal:
@@ -69,9 +69,14 @@ time:
 - 6.048e+7     # 700 days
 - 1.5552e+8    # 1800 days
 n_steps:
-- 8
-- 8
-- 8
+- 10
+- 14
+- 14
+
+time_adaptivity:
+  enabled: true
+  dt_min: 1.0e+4
+  max_cuts: 8
 
 output:
   format: xdmf

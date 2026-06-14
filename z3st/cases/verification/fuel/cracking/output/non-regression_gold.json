@@ -36,6 +36,5 @@
             "status": "PASS"
         }
     },
-    "tolerance": 0.005,
-    "summary": "PASS"
+    "tolerance": 0.005
 }

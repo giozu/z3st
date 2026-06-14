@@ -1,48 +1,47 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 0.00036438707715660183,
+            "numerical": 0.00040956856374871575,
             "reference": 0.0,
-            "abs_error": 0.00036438707715660183,
-            "rel_error": 7.130926239604794e-07,
+            "abs_error": 0.00040956856374871575,
+            "rel_error": 8.015111954417045e-07,
             "status": "PASS"
         },
         "Linf_error_T": {
-            "numerical": 0.0007774048381179455,
+            "numerical": 0.0017423973644099533,
             "reference": 0.0,
-            "abs_error": 0.0007774048381179455,
-            "rel_error": 1.5213537763713026e-06,
+            "abs_error": 0.0017423973644099533,
+            "rel_error": 3.4098100247252583e-06,
             "status": "PASS"
         },
         "T_max": {
-            "numerical": 515.9162717140276,
+            "numerical": 515.9172367065539,
             "reference": 515.9154943091895,
-            "abs_error": 0.0007774048381179455,
-            "rel_error": 1.50684530062213e-06,
+            "abs_error": 0.0017423973644099533,
+            "rel_error": 3.3772921798811687e-06,
             "status": "PASS"
         },
         "L2_error_sigma_rr": {
-            "numerical": 0.012711943944959872,
+            "numerical": 0.012835964590103738,
             "reference": 0.0,
-            "abs_error": 0.012711943944959872,
-            "rel_error": 0.012711943944959872,
+            "abs_error": 0.012835964590103738,
+            "rel_error": 0.012835964590103738,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.011883744372878481,
+            "numerical": 0.01194792118818077,
             "reference": 0.0,
-            "abs_error": 0.011883744372878481,
-            "rel_error": 0.011883744372878481,
+            "abs_error": 0.01194792118818077,
+            "rel_error": 0.01194792118818077,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 0.013271103964858345,
+            "numerical": 0.013295264814598536,
             "reference": 0.0,
-            "abs_error": 0.013271103964858345,
-            "rel_error": 0.013271103964858345,
+            "abs_error": 0.013295264814598536,
+            "rel_error": 0.013295264814598536,
             "status": "PASS"
         }
     },
-    "tolerance": 0.02,
-    "summary": "PASS"
+    "tolerance": 0.02
 }

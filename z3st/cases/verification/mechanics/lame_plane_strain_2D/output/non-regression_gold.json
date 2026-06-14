@@ -1,48 +1,47 @@
 {
     "results": {
         "L2_error_sigma_rr": {
-            "numerical": 0.00025159192904668026,
+            "numerical": 2.717714304827954e-05,
             "reference": 0.0,
-            "abs_error": 0.00025159192904668026,
-            "rel_error": 0.00025159192904668026,
+            "abs_error": 2.717714304827954e-05,
+            "rel_error": 2.717714304827954e-05,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.0002570308001286641,
+            "numerical": 1.0228449347426104e-05,
             "reference": 0.0,
-            "abs_error": 0.0002570308001286641,
-            "rel_error": 0.0002570308001286641,
+            "abs_error": 1.0228449347426104e-05,
+            "rel_error": 1.0228449347426104e-05,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 0.0005610719375893003,
+            "numerical": 1.4468694410729015e-05,
             "reference": 0.0,
-            "abs_error": 0.0005610719375893003,
-            "rel_error": 0.0005610719375893003,
+            "abs_error": 1.4468694410729015e-05,
+            "rel_error": 1.4468694410729015e-05,
             "status": "PASS"
         },
         "L2_error_strain_rr": {
-            "numerical": 0.0008348256399732189,
+            "numerical": 1.2779490212840826e-05,
             "reference": 0.0,
-            "abs_error": 0.0008348256399732189,
-            "rel_error": 0.0008348256399732189,
+            "abs_error": 1.2779490212840826e-05,
+            "rel_error": 1.2779490212840826e-05,
             "status": "PASS"
         },
         "L2_error_strain_tt": {
-            "numerical": 0.00021958362040385858,
+            "numerical": 1.0007554836203554e-05,
             "reference": 0.0,
-            "abs_error": 0.00021958362040385858,
-            "rel_error": 0.00021958362040385858,
+            "abs_error": 1.0007554836203554e-05,
+            "rel_error": 1.0007554836203554e-05,
             "status": "PASS"
         },
         "L2_error_strain_zz": {
-            "numerical": 4.500126245738519e-09,
+            "numerical": 2.55716964300673e-17,
             "reference": 0.0,
-            "abs_error": 4.500126245738519e-09,
-            "rel_error": 4.500126245738519e-09,
+            "abs_error": 2.55716964300673e-17,
+            "rel_error": 2.55716964300673e-17,
             "status": "PASS"
         }
     },
-    "tolerance": 0.007,
-    "summary": "PASS"
+    "tolerance": 0.007
 }

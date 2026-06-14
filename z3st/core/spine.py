@@ -592,9 +592,6 @@ class Spine(
                 print(f"  [update_state] '{name}' is fissile but has no 'rho'; "
                       f"skipping burnup accumulation.")
                 continue
-            # Heavy-metal (uranium) mass fraction. Default = M_U / M_UO2 =
-            # 238.0289 / 270.027 = 0.8815 for stoichiometric UO2; a material card
-            # may override (MOX, different stoichiometry, nitride, ...).
             hm = float(mat.get("heavy_metal_fraction", 0.8815))
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
             q = self.q_third.x.array[dofs]
@@ -602,6 +599,86 @@ class Spine(
 
         self.burnup.x.scatter_forward()
         print(f"[update_state] burnup max = {self.burnup.x.array.max():.4e} MWd/kgU")
+
+    _SNAPSHOT_FIELDS = (
+        "T", "u", "D", "H", "burnup", "c", "c_n",
+        "p", "ep", "p_n", "ep_n",
+    )  # dolfinx Functions
+    _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
+    _SNAPSHOT_MATERIAL_KEYS = ("E", "nu", "bulk_modulus", "_lhr_max")
+    _SNAPSHOT_MATERIAL_CONSTANTS = ("lmbda", "G")
+
+    def snapshot_state(self):
+        """Deep-copy every step-level state field so a time step can be rolled
+        back and retried at a smaller dt (adaptive time-stepping, piece B).
+
+        The roster of what is captured lives in the class constants
+        ``_SNAPSHOT_FIELDS`` / ``_SNAPSHOT_DICTS`` / ``_SNAPSHOT_MATERIAL_*`` —
+        extend those when adding new persistent state. Captured (only those
+        present, per active physics):
+          - primary fields T, u, D and the crack-driving history H;
+          - the burnup accumulator and the cluster pair c / c_n;
+          - the plasticity history p, ep, p_n, ep_n;
+          - the per-material creep dicts eps_cr and _dgamma0 (predictor —
+            updated every iteration, so polluted even by a *failed* attempt);
+          - per-material cracking scalars (``_lhr_max`` is a running max that
+            does NOT decrease, so without rollback a bisected sub-step inherits
+            the failed attempt's stiffness degradation) and the live lmbda/G
+            Constants.
+
+        NOT captured: iteration scratch (``_aitken_R_prev``, ``_h_gap_prev``) —
+        solve_staggered resets those at entry.
+
+        IMPORTANT: take the snapshot at the very start of a (sub)step, BEFORE
+        parameters()/set_power()/update_state() run, so ``_lhr_max`` and burnup
+        are captured at their last-converged values.
+        """
+        snap = {"fields": {}, "dicts": {}, "materials": {}}
+        for name in self._SNAPSHOT_FIELDS:
+            fn = getattr(self, name, None)
+            if isinstance(fn, dolfinx.fem.Function):
+                snap["fields"][name] = fn.x.array.copy()
+        for name in self._SNAPSHOT_DICTS:
+            d = getattr(self, name, None)
+            if isinstance(d, dict):
+                snap["dicts"][name] = {
+                    k: v.x.array.copy()
+                    for k, v in d.items()
+                    if isinstance(v, dolfinx.fem.Function)
+                }
+        for mname, mat in getattr(self, "materials", {}).items():
+            msnap = {k: mat[k] for k in self._SNAPSHOT_MATERIAL_KEYS if k in mat}
+            for k in self._SNAPSHOT_MATERIAL_CONSTANTS:
+                v = mat.get(k)
+                if hasattr(v, "value"):  # live dolfinx Constant
+                    msnap[k + ".value"] = float(v.value)
+            if msnap:
+                snap["materials"][mname] = msnap
+        return snap
+
+    def restore_state(self, snap):
+        """Inverse of :meth:`snapshot_state`: write every captured field, dict
+        and material scalar back in place, undoing a failed or oversized step so
+        it can be retried at a smaller dt. scatter_forward keeps ghost dofs
+        consistent after the in-place array overwrite."""
+        for name, arr in snap.get("fields", {}).items():
+            fn = getattr(self, name)
+            fn.x.array[:] = arr
+            fn.x.scatter_forward()
+        for name, saved in snap.get("dicts", {}).items():
+            d = getattr(self, name)
+            for k, arr in saved.items():
+                d[k].x.array[:] = arr
+                d[k].x.scatter_forward()
+        for mname, msnap in snap.get("materials", {}).items():
+            mat = self.materials[mname]
+            for key, val in msnap.items():
+                if key.endswith(".value"):
+                    target = mat.get(key[: -len(".value")])
+                    if hasattr(target, "value"):
+                        target.value = val
+                else:
+                    mat[key] = val
 
     def solve(self, max_iters=100, dt=0.0):
         print("\n")
@@ -614,7 +691,9 @@ class Spine(
         print(f"Coupling = {self.coupling}")
 
         if self.coupling == "staggered":
-            self.solve_staggered(
+            # Return the convergence verdict so the time loop can react to a
+            # stalled step. solve_staggered returns True on convergence, False if it exhausts max_iter.
+            return self.solve_staggered(
                 max_iter=max_iters,
                 dt=dt,
                 rtol_th=self.th_cfg.get("rtol", 1e-6) if self.on.get("thermal") else 1e-6,
@@ -659,11 +738,7 @@ class Spine(
                 self.stress[name] = self.stress_mech[name]
             elif name in self.stress_th:
                 self.stress[name] = self.stress_th[name]
-
-            # Creeping material: the composition above ignores ε_cr and would
-            # report the unrelaxed elastic stress. Replace with the
-            # end-of-step condensed stress (creep state already advanced) and
-            # the consistent elastic energy density.
+            
             if self.on.get("mechanical", False) and self.creep_active(mat):
                 T_field = self.T if self.on.get("thermal", False) else None
                 sigma_cr, eps_el_cr = self.creep_output_stress(self.u, mat, T_field)

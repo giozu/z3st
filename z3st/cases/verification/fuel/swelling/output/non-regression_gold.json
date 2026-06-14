@@ -1,20 +1,19 @@
 {
     "results": {
         "u_x_free": {
-            "numerical": 0.006000000088405811,
+            "numerical": 0.006000000000004641,
             "reference": 0.006,
-            "abs_error": 8.840581044999851e-11,
-            "rel_error": 1.4734301741666418e-08,
+            "abs_error": 4.641252659975947e-15,
+            "rel_error": 7.735421099959913e-13,
             "status": "PASS"
         },
         "stress_free_residual": {
-            "numerical": 406.61034682104355,
+            "numerical": 0.016292602060127566,
             "reference": 0.0,
-            "abs_error": 406.61034682104355,
-            "rel_error": 1.355367822736812e-08,
+            "abs_error": 0.016292602060127566,
+            "rel_error": 5.430867353375856e-13,
             "status": "PASS"
         }
     },
-    "tolerance": 0.01,
-    "summary": "PASS"
+    "tolerance": 0.01
 }

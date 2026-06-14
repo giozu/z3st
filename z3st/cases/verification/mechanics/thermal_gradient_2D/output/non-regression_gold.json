@@ -1,17 +1,17 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 0.0006231790542288868,
+            "numerical": 6.417355949401013e-05,
             "reference": 0.0,
-            "abs_error": 0.0006231790542288868,
-            "rel_error": 1.3950272145734659e-06,
+            "abs_error": 6.417355949401013e-05,
+            "rel_error": 1.4365672488939662e-07,
             "status": "PASS"
         },
         "Linf_error_T": {
-            "numerical": 0.001629286772811156,
+            "numerical": 8.957433340128773e-05,
             "reference": 0.0,
-            "abs_error": 0.001629286772811156,
-            "rel_error": 3.647265377410017e-06,
+            "abs_error": 8.957433340128773e-05,
+            "rel_error": 2.0051802443311498e-07,
             "status": "PASS"
         },
         "T_max": {
@@ -22,27 +22,26 @@
             "status": "PASS"
         },
         "L2_error_sigma_rr": {
-            "numerical": 0.005436422430476036,
+            "numerical": 0.0028966419980309796,
             "reference": 0.0,
-            "abs_error": 0.005436422430476036,
-            "rel_error": 0.005436422430476036,
+            "abs_error": 0.0028966419980309796,
+            "rel_error": 0.0028966419980309796,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.0003660957781431171,
+            "numerical": 0.00012329152212385862,
             "reference": 0.0,
-            "abs_error": 0.0003660957781431171,
-            "rel_error": 0.0003660957781431171,
+            "abs_error": 0.00012329152212385862,
+            "rel_error": 0.00012329152212385862,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 0.00032224851855310754,
+            "numerical": 0.00010587658498777064,
             "reference": 0.0,
-            "abs_error": 0.00032224851855310754,
-            "rel_error": 0.00032224851855310754,
+            "abs_error": 0.00010587658498777064,
+            "rel_error": 0.00010587658498777064,
             "status": "PASS"
         }
     },
-    "tolerance": 0.03,
-    "summary": "PASS"
+    "tolerance": 0.03
 }

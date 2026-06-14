@@ -1,27 +1,8 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-#
-# VERIFICATION of the TABULATED axial power source bus. A tall axisymmetric
-# fuel column runs at a constant linear heat rate with a piecewise-linear
-# axial form factor given as a table on the material card
-#
-#     z (m): 0.0   0.1   0.2   0.3   0.4
-#     f (-): 0.4   1.0   1.3   1.0   0.4
-#
-# normalised to nodal mean 1 by set_power. Three closed-form checks (see
-# non-regression.py):
-#
-#   * accumulation magnitude — the nodal-mean burnup equals
-#         bu_mean = q_avg * t_total / (rho * HM * 8.64e10)   [MWd/kgU],
-#     q_avg = lhr / area (the normalisation preserves the average rating);
-#   * table-node ratio — bu(z=0.2)/bu(z=0.0) = f3/f1 = 3.25,
-#     normalisation-independent and interpolation-exact at table nodes;
-#   * peak/mean — max(f) / (trapezoid mean of the table) = 1.3/0.925.
-#
-# Thermal only — the temperature field is irrelevant to the burnup; the outer
-# Dirichlet BC merely makes the conduction solve well-posed.
 
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
@@ -43,12 +24,11 @@ models:
 
 thermal:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-8
   stag_tol: 1.0e-7
   convergence: rel_norm
 
-# Constant 20 kW/m over 6e7 s (~700 days) in 6 increments.
 lhr:
 - 20000.0
 - 20000.0

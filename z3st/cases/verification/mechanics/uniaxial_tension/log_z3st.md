@@ -61,7 +61,7 @@ Scalar function space (Q): FunctionSpace(<Mesh #0>, Basix element (P, hexahedron
 [MechanicalModel] initializer
 [MechanicalModel] options loaded from input.yaml:
   solver              : linear
-  linear_solver       : iterative_hypre
+  linear_solver       : direct_mumps
   rtol                : 1e-08
   stag_tol            : 1e-08
   convergence         : rel_norm
@@ -241,5 +241,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 1.17 s
+Simulation completed in 1.56 s
 Total time steps solved: 1

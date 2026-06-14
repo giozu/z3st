@@ -1,41 +1,40 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 0.10761953547685647,
+            "numerical": 0.10761955483029746,
             "reference": 0.0,
-            "abs_error": 0.10761953547685647,
-            "rel_error": 0.0002123856808446252,
+            "abs_error": 0.10761955483029746,
+            "rel_error": 0.0002123857190383762,
             "status": "PASS"
         },
         "Linf_error_T": {
-            "numerical": 0.16671459344297546,
+            "numerical": 0.1667033046492179,
             "reference": 0.0,
-            "abs_error": 0.16671459344297546,
-            "rel_error": 0.0003290089692194932,
+            "abs_error": 0.1667033046492179,
+            "rel_error": 0.0003289866909394626,
             "status": "PASS"
         },
         "T_max": {
-            "numerical": 512.531220787826,
+            "numerical": 512.531209095405,
             "reference": 512.6721533550017,
-            "abs_error": 0.14093256717569602,
-            "rel_error": 0.0002748980342572005,
+            "abs_error": 0.14094425959672208,
+            "rel_error": 0.00027492084107623595,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.010192920764334775,
+            "numerical": 0.01018362056945156,
             "reference": 0.0,
-            "abs_error": 0.010192920764334775,
-            "rel_error": 0.010192920764334775,
+            "abs_error": 0.01018362056945156,
+            "rel_error": 0.01018362056945156,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 0.010262273456543793,
+            "numerical": 0.010216030516102237,
             "reference": 0.0,
-            "abs_error": 0.010262273456543793,
-            "rel_error": 0.010262273456543793,
+            "abs_error": 0.010216030516102237,
+            "rel_error": 0.010216030516102237,
             "status": "PASS"
         }
     },
-    "tolerance": 0.7,
-    "summary": "PASS"
+    "tolerance": 0.02
 }

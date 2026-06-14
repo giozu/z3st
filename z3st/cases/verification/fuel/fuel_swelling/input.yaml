@@ -26,14 +26,14 @@ models:
 
 thermal:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-8
   stag_tol: 1.0e-7
   convergence: rel_norm
 
 mechanical:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-9
   stag_tol: 1.0e-8
   convergence: rel_norm

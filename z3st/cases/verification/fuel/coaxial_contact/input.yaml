@@ -3,6 +3,7 @@
 # Author: Giovanni Zullo
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
 mesh_path: mesh.msh
 geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
@@ -35,14 +36,14 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-6
   stag_tol: 1.0e-5
   convergence: rel_norm
 
 thermal:
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-7
   stag_tol: 1.0e-6
   convergence: rel_norm
