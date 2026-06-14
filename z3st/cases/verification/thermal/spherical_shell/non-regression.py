@@ -15,11 +15,9 @@ import numpy as np
 import pyvista as pv
 import yaml
 
-# Add the z3st/utils directory to sys.path
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "utils"))
-from utils_extract_vtu import extract_principal_stresses, extract_temperature, list_fields
-from utils_plot import plot_field_along_r_xyz
-from utils_verification import pass_fail_check, regression_check
+from z3st.utils.utils_extract_vtu import extract_principal_stresses, extract_temperature, list_fields
+from z3st.utils.utils_plot import plot_field_along_r_xyz
+from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)

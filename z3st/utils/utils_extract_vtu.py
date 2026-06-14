@@ -365,7 +365,7 @@ def extract_principal_stresses(
     sigma1, sigma2, sigma3 = eigvals[:, 2], eigvals[:, 1], eigvals[:, 0]
 
     if average:
-        from utils_plot import (
+        from z3st.utils.utils_plot import (
             radial_average_kernel,
             radial_average_round,
             radial_average_uniform_bins,

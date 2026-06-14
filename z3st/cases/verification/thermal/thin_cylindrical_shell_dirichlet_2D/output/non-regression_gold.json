@@ -22,24 +22,24 @@
             "status": "PASS"
         },
         "L2_error_sigma_rr": {
-            "numerical": 0.017678566498773106,
+            "numerical": 0.017626708085807814,
             "reference": 0.0,
-            "abs_error": 0.017678566498773106,
-            "rel_error": 0.017678566498773106,
+            "abs_error": 0.017626708085807814,
+            "rel_error": 0.017626708085807814,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.0004303494950675607,
+            "numerical": 0.00043086030105079067,
             "reference": 0.0,
-            "abs_error": 0.0004303494950675607,
-            "rel_error": 0.0004303494950675607,
+            "abs_error": 0.00043086030105079067,
+            "rel_error": 0.00043086030105079067,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 8.449885066144721e-05,
+            "numerical": 8.367686977247955e-05,
             "reference": 0.0,
-            "abs_error": 8.449885066144721e-05,
-            "rel_error": 8.449885066144721e-05,
+            "abs_error": 8.367686977247955e-05,
+            "rel_error": 8.367686977247955e-05,
             "status": "PASS"
         }
     },
