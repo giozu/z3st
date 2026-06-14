@@ -43,3 +43,6 @@ time:
 - 0.0
 n_steps: 1
 
+
+output:
+  format: xdmf

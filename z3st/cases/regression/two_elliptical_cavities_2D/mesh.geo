@@ -13,7 +13,11 @@ scale = 1; // (micrometers)
 
 // Parameters
 ax = 0.100;          // Semi-axis X (100 nm)
-Fc_target = 0.40;    // Target coverage (40%)
+// Target areal coverage. Overridable for a parametric sweep, e.g.
+//   gmsh -setnumber Fc_target 0.30 mesh.geo -2
+If (!Exists(Fc_target))
+  Fc_target = 0.40;  // Target coverage (40%)
+EndIf
 
 Lx = 2 * ax * Sqrt(Pi / Fc_target);
 Ly = Lx;
@@ -31,8 +35,11 @@ Printf("The value of ay (minor semi-axis) is: %g", ay);
 rho = ay*ay/ax;
 Printf("Computed curvature radius rho: %g", rho);
 
-h_plate = scale * 0.00400; // coarse mesh size
-h_cavity = rho / 3.0;      // fine mesh size, adaptive to curvature
+h_plate = scale * 0.00400; // coarse mesh size (bulk grains — no damage there)
+// Resolve the AT2 damage band: phase-field needs h < lc/2. With lc = 0.004 µm
+// (input.yaml) that means 0.002 µm along the grain boundary / bubble tips,
+// otherwise the damage band cannot localise and the GB never fractures.
+h_cavity = 0.002;
 
 // Rectangular plate
 Rectangle(1) = {-Lx/2, -Ly/2, 0, Lx, Ly};
@@ -66,7 +73,7 @@ Field[2] = Threshold;
 Field[2].InField = 1;
 Field[2].SizeMin = h_cavity;
 Field[2].SizeMax = h_plate;
-Field[2].DistMin = 0.02;
+Field[2].DistMin = 0.05;   // keep the full GB ligament between bubbles fine
 Field[2].DistMax = Lx/2;
 
 Background Field = 2;

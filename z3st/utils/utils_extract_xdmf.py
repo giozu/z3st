@@ -63,7 +63,6 @@ def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True)
         field_group = f[f"Function/{field_name}"]
         
         # Steps are names of datasets, usually strings representing time or step index
-        # Z3ST seems to name them by time values or step indices (e.g., '0', '400', '800')
         # We sort them numerically if possible
         def try_float(s):
             try:
@@ -74,7 +73,12 @@ def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True)
         steps = sorted(field_group.keys(), key=try_float)
         target_step = steps[step_index]
         data = np.array(field_group[target_step])
-        
+        # Match the VTU extractor's contract: scalar fields as (N,), not (N, 1).
+        # Otherwise `field - analytic` broadcasts (N,1)-(N,) -> (N,N) and
+        # pointwise metrics (e.g. Linf) blow up even though the values are right.
+        if data.ndim == 2 and data.shape[1] == 1:
+            data = data[:, 0]
+
         if not return_coords:
             return data
             

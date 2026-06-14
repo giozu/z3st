@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
-from z3st.utils.utils_extract_vtu import *
+from z3st.utils.utils_extract_xdmf import *
 from z3st.utils.utils_verification import *
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
+XDMF_FILE = os.path.join(CASE_DIR, "output", "fields.xdmf")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
 # Geometry and material
@@ -75,14 +75,14 @@ def analytical_thermal_stress(x, T):
 
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
-list_fields(VTU_FILE)
+list_fields_xdmf(XDMF_FILE)
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
 # Temperature
-x_T, z_T, _, T_all = extract_field(VTU_FILE, field_name="Temperature")
+x_T, z_T, _, T_all = extract_field_xdmf(XDMF_FILE, field_name="Temperature", step_index=-1)
 mask = np.abs(z_T - z_target) < z_tol
 sort_idx = np.argsort(x_T[mask])
 
@@ -90,7 +90,7 @@ r_T = x_T[mask][sort_idx]
 T = T_all[mask][sort_idx]
 
 # Stress
-x_S, z_S, _, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
+x_S, z_S, _, S_all = extract_field_xdmf(XDMF_FILE, field_name="Stress", step_index=-1)
 mask = np.abs(z_S - z_target) < z_tol
 sort_idx = np.argsort(x_S[mask])
 
