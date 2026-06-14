@@ -616,15 +616,16 @@ class Spine(
         ``_SNAPSHOT_FIELDS`` / ``_SNAPSHOT_DICTS`` / ``_SNAPSHOT_MATERIAL_*`` —
         extend those when adding new persistent state. Captured (only those
         present, per active physics):
-          - primary fields T, u, D and the crack-driving history H;
-          - the burnup accumulator and the cluster pair c / c_n;
-          - the plasticity history p, ep, p_n, ep_n;
-          - the per-material creep dicts eps_cr and _dgamma0 (predictor —
-            updated every iteration, so polluted even by a *failed* attempt);
-          - per-material cracking scalars (``_lhr_max`` is a running max that
-            does NOT decrease, so without rollback a bisected sub-step inherits
-            the failed attempt's stiffness degradation) and the live lmbda/G
-            Constants.
+
+        - primary fields T, u, D and the crack-driving history H;
+        - the burnup accumulator and the cluster pair c / c_n;
+        - the plasticity history p, ep, p_n, ep_n;
+        - the per-material creep dicts eps_cr and _dgamma0 (predictor,
+          updated every iteration, so polluted even by a failed attempt);
+        - per-material cracking scalars (``_lhr_max`` is a running max that
+          does NOT decrease, so without rollback a bisected sub-step inherits
+          the failed attempt's stiffness degradation) and the live lmbda/G
+          Constants.
 
         NOT captured: iteration scratch (``_aitken_R_prev``, ``_h_gap_prev``) —
         solve_staggered resets those at entry.

@@ -88,6 +88,8 @@ These cases serve both as:
 ## Key features
 
 * **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling; adaptive or Aitken Δ² dynamic relaxation, per-step form caching, optional gap-conductance damping
+* **Adaptive time-stepping** — optional, off by default; when a step stalls under strongly coupled non-linear physics the solver snapshots the converged state, bisects `dt`, and re-solves the step as internal sub-steps (output stays on the original grid), aborting cleanly only if it cannot converge at `dt_min`
+* **Hot-reloadable parameters** — an allow-listed subset of `input.yaml` (tolerances, relaxation factors, `max_iters`) can be edited mid-run and is picked up at the next step boundary, for steering long simulations without restarting
 * **Multi-regime kinematics** — `2d` plane strain, `3d`, `axisymmetric`, and `plane_stress` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
 * **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
 * **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral or Amor volumetric/deviatoric energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
@@ -254,6 +256,11 @@ lhr:
 time:
   - 0
 n_steps: 1
+
+# time_adaptivity:                 # optional, off by default; bisect dt on a stalled step
+#   enabled: true
+#   dt_min: 1.0e3                  # (s) smallest dt to attempt before aborting
+#   max_cuts: 6                    # max bisection depth per original-grid step
 
 output:
   format: vtu                     # vtu | xdmf

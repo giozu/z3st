@@ -159,6 +159,11 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
       \vspace{0.5em}
       \alert{Adaptive relaxation}: per-field factors grow when the residual
       shrinks, shrink when it oscillates -- robust without a monolithic Newton.
+      \vspace{0.3em}
+
+      {\scriptsize \alert{Adaptive time-stepping} (opt-in): a stalled step rolls
+      back to the last converged state and bisects $\Delta t$ -- it pushes through
+      a stiff interval instead of failing.}
     \end{column}
     \begin{column}{0.44\textwidth}
       \centering

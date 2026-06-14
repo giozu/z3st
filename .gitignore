@@ -36,6 +36,7 @@ z3st/cases/**/log_*.md
 *.h5
 *.xdmf
 *.vtu
+energies.txt
 
 # --. LaTeX build artifacts (slides.pdf is force-tracked) --..
 *.aux

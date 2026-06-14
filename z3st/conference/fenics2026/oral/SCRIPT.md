@@ -54,7 +54,9 @@ temperature-dependent conductivity and a heat source; a mechanical solve that
 subtracts the thermal eigenstrain so stress is driven by the elastic strain; and a
 damage solve driven by the positive elastic energy, kept irreversible. The trick
 that makes it robust is adaptive relaxation — per-field factors that grow when the
-residual shrinks and back off when it oscillates. And crucially, damage degrades
+residual shrinks and back off when it oscillates. And if a step still stalls — too
+many physics fighting at once — the solver can roll back and halve the time step on
+its own, pushing through the stiff interval instead of giving up. Crucially, damage degrades
 both the elastic and the thermal-stress contributions through a consistent g(D) —
 without that, thermal-shock fracture is intractable."
 

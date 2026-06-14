@@ -1,6 +1,6 @@
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  2 2D elliptical cavities in a rectangular plate (cross-section)
+//  Two 2D elliptical cavities in a rectangular plate (cross-section)
 //  Coherent with a semi-dihedral angle of 50 degrees
 //
 //  Author: Giovanni Zullo

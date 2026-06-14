@@ -107,8 +107,9 @@ delta-squared dynamic relaxation, which computes a quasi-optimal factor each
 staggered iteration from the last two residuals (clamped to
 ``[relax_min, relax_max]``, restarted from ``relax_u`` at every time step).
 Aitken is recommended for strongly coupled physics. 
-Both ``relax_*`` settings and the tolerances are hot-reloadable:
-edits to ``input.yaml`` during a run are picked up at the next step boundary.
+Both ``relax_*`` settings and the tolerances are hot-reloadable: edits to
+``input.yaml`` during a run are picked up at the next step boundary (see
+`Hot-reloaded parameters`_ below for the full allow-list).
 
 The time grid is built from the piecewise-linear ``time``/``lhr`` history.
 ``n_steps`` accepts either an integer (total number of points, distributed
@@ -121,6 +122,78 @@ resolve a fast transition finely while striding across a slow plateau:
    time: [0.0, 1.728e6, 6.048e7, 1.5552e8]
    lhr: [0.0, 20000.0, 20000.0, 20000.0]
    n_steps: [8, 60, 40]   # intervals per segment
+
+
+Time adaptivity (optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default the time grid above is fixed: every step is solved once at its
+prescribed ``dt``. When several non-linear physics are active at once (for
+example contact onset in a fuel-rod run), a step can occasionally fail to
+converge within ``max_iters`` at that ``dt``. The optional ``time_adaptivity``
+block lets the solver recover by sub-stepping the offending step instead of
+aborting the run:
+
+.. code-block:: yaml
+
+   time_adaptivity:
+     enabled: true     # default false — fixed grid unless turned on
+     dt_min: 1.0e3     # (s) smallest dt to attempt before giving up
+     max_cuts: 6       # maximum bisection depth per original-grid step
+
+When a step does not converge, the solver rolls the state back to the last
+converged step, halves ``dt``, and re-solves the step as two sub-steps; each
+sub-step may bisect again, recursively, up to ``max_cuts`` levels or until
+``dt`` reaches ``dt_min``. The roll-back and retry are exact: the full step
+state (primary fields, history variables, plasticity and creep accumulators,
+per-material cracking scalars) is snapshotted before the attempt and restored
+on failure, so a failed attempt never pollutes the retry. Output is still
+written on the **original grid** — sub-steps are internal and do not appear in
+the time series. If a step cannot converge even at ``dt_min``, the run rolls
+back to the last converged step, prints the reason, writes the output up to
+that step, and exits with a non-zero status.
+
+The feature is off by default and adds no cost to a run that converges. Two
+caveats:
+
+- Only the linear heat rate ``lhr`` is interpolated to sub-step times.
+  Per-step ramped boundary-condition lists are applied at their grid-step value
+  within a bisected step (not re-interpolated to the sub-step times); a warning
+  is printed at start-up when a ramped BC coexists with adaptivity.
+- ``dt_min`` is a floor in seconds; set it well below the smallest physically
+  meaningful step so the bisection has room to work before the run aborts.
+
+
+Hot-reloaded parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A subset of ``input.yaml`` can be changed **while a simulation is running**:
+edit and save the file mid-run and the new value is picked up at the next step
+boundary, with a ``[hot-reload]`` line logged. This is meant for steering a long
+run — tightening or loosening tolerances, nudging relaxation — without
+restarting it. Only an explicit allow-list is reloaded; structural settings
+(mesh, geometry, materials, model on/off switches, the time grid) are read once
+at start-up and ignored if edited mid-run:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Block
+     - Hot-reloadable keys
+   * - ``solver_settings``
+     - ``max_iters``, ``relax_T``, ``relax_u``, ``relax_D``, ``relax_adaptive``,
+       ``relax_aitken``, ``relax_growth``, ``relax_shrink``, ``relax_min``,
+       ``relax_max``
+   * - ``mechanical``
+     - ``stag_tol``, ``rtol``
+   * - ``thermal``
+     - ``stag_tol``, ``rtol``
+   * - ``damage``
+     - ``stag_tol``, ``rtol``, ``hybrid_constraint``, ``gamma_star``
+
+A malformed or half-written file (caught mid-save) is ignored for that cycle,
+so saving over ``input.yaml`` during a run is always safe.
 
 
 geometry.yaml
