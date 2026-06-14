@@ -1,3 +1,4 @@
 #!/bin/bash
 cd "${0%/*}" || exit 1
-rm -rf output __pycache__ mesh.msh log_mesh.md log_z3st.md
+rm -rf output/*.vtu output/*.ong output/non-regression.json
+rm -rf __pycache__ mesh.msh log_mesh.md log_z3st.md

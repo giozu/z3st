@@ -26,29 +26,29 @@ class MechanicalModel:
         for key, value in self.mech_cfg.items():
             print(f"  {key:<20}: {value}")
 
+    # BC types handled per displacement component (single sub-space).
+    _COMPONENT_BC_TYPES = (
+        "Dirichlet_x", "Dirichlet_y", "Dirichlet_z",
+        "Clamp_x", "Clamp_y", "Clamp_z",
+    )
+    # BC types that free one axis and block the other two (frictionless slip).
+    _SLIP_BC_TYPES = ("Slip_x", "Slip_y", "Slip_z")
+
     def set_mechanical_boundary_conditions(self, V_u):
         """
-        Apply mechanical boundary conditions
+        Apply mechanical boundary conditions.
+
+        Each definition in ``boundary_conditions["mechanical"]`` is validated
+        (region present and known, type present) and then dispatched to the
+        handler for its type, which appends to ``self.dirichlet_mechanical`` or
+        ``self.traction``. See the ``_add_*`` helpers for the per-type logic.
 
         Parameters:
             V_u: FunctionSpace (displacement space)
         """
         mechanical_bcs_defs = self.boundary_conditions.get("mechanical", {})
 
-        seen_regions = {}
-
-        for mat_type, bc_list in mechanical_bcs_defs.items():
-            for bc_info in bc_list:
-                region_name = bc_info.get("region")
-                bc_type = bc_info.get("type")
-
-                key = (region_name, bc_type)
-                if key in seen_regions:
-                    print(
-                        f"[WARNING] Duplicate mechanical BC of type '{bc_type}' defined for region '{region_name}' (previously in '{seen_regions[key]}', now in '{mat_type}')."
-                    )
-                else:
-                    seen_regions[key] = mat_type
+        self._warn_duplicate_mechanical_bcs(mechanical_bcs_defs)
 
         for name in self.materials:
             self.traction[name] = []
@@ -71,249 +71,240 @@ class MechanicalModel:
                     sys.exit(1)
 
                 facets = self.facet_tags.find(region_id)
-                facet_dim = self.fdim
 
-                # --. Dirichlet --..
                 if bc_type == "Dirichlet":
-                    displacement = bc_info.get("displacement")
-                    if displacement is None:
-                        print(
-                            f"[ERROR] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement."
-                        )
-                        sys.exit(1)
-
-                    # --- interpret displacement input ---
-                    dim = self.tdim
-
-                    # Case 1: single vector [ux, uy, uz] or [u1, u2]
-                    if isinstance(displacement, (list, tuple)) and all(isinstance(x, (int, float)) for x in displacement):
-                        if len(displacement) != dim:
-                            print(f"[ERROR] Displacement vector length {len(displacement)} != mesh dimension {dim}.")
-                            sys.exit(1)
-                        raw_value = [displacement]
-                        print(f"  [INFO] Constant Dirichlet vector ({dim}D) → {displacement}")
-
-                    # Case 2: list of vectors over steps
-                    elif isinstance(displacement, list):
-                        if all(isinstance(v, (list, tuple)) and len(v) == dim for v in displacement):
-                            raw_value = displacement
-                            print(f"  [INFO] Step-dependent Dirichlet list ({dim}D), length {len(displacement)}")
-
-                            if len(displacement) != self.n_steps:
-                                print(f"[ERROR] BC list length {len(displacement)} != n_steps {self.n_steps}.")
-                                sys.exit(1)
-                        else:
-                            print(f"[ERROR] All vectors in the list must have length {dim} for a {dim}D mesh.")
-                            sys.exit(1)
-
-                    else:
-                        print(
-                            f"[ERROR] Invalid Dirichlet 'displacement' format for region '{region_name}'. "
-                            f"Must be [ux,uy,uz] or list of such vectors."
-                        )
-                        sys.exit(1)
-
-                    # --- create constant ---
-                    initial_disp = raw_value[0]
-                    # On a 1D mesh V_u is built with a blocked element of shape
-                    # (1,), which dolfinx treats as a scalar function space.
-                    # The Constant must then be rank-0, not a length-1 vector,
-                    # otherwise dirichletbc raises "Rank mismatch between
-                    # Constant and function space".
-                    if self.tdim == 1:
-                        disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp[0]))
-                    else:
-                        disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
-
-                    dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
-                    bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
-
-                    self.dirichlet_mechanical[mat_type].append(
-                        {
-                            "id": region_id,
-                            "value": bc,
-                            "const": disp_const,
-                            "raw": raw_value,
-                        }
-                    )
-
-                    print(
-                        f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {initial_disp} at region '{region_name}'"
-                    )
-
-                # --. Neumann --..
+                    self._add_dirichlet_bc(V_u, mat_type, bc_info, region_name, region_id, facets)
                 elif bc_type == "Neumann":
-                    traction_value = bc_info.get("traction")
-
-                    # Handling list
-                    if isinstance(traction_value, list):
-                        raw_value = traction_value
-                        if len(raw_value) != self.n_steps:
-                            print(
-                                f"[ERROR] Neumann traction list length {len(raw_value)} "
-                                f"!= n_steps {self.n_steps} for region '{region_name}'."
-                            )
-                            sys.exit(1)
-                        initial_val = float(traction_value[0])  # starting from step 0
-                    # Scalar
-                    else:
-                        raw_value = [traction_value] * self.n_steps
-                        initial_val = float(traction_value)
-
-                    # scalar constant (Pa)
-                    traction_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_val))
-
-                    # normal vector according to the mechanical regime
-                    regime = self.regime
-                    if self.mgr.tdim == 1:
-                        # 1D mesh: V_m has one component; the test function v_m
-                        # is rank-1 of size 1, so the traction n_vec must be a
-                        # 1-vector. self.normal still has gdim = 3 entries
-                        # because gmsh stores 3D node coords; we only keep the
-                        # axial component (which is the only physically
-                        # meaningful one on a line).
-                        n_vec = ufl.as_vector([self.normal[0]])
-                    elif regime in ["axisymmetric", "2d", "plane_stress"]:
-                        n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
-                    else:
-                        n_vec = self.normal
-
-                    # T = p * n
-                    traction_expr = traction_const * n_vec
-
-                    self.traction[mat_type].append({
-                        "id": region_id,
-                        "region_name": region_name,
-                        "value": traction_expr,  # --> in weak form
-                        "const": traction_const, # --> in the loop
-                        "raw": raw_value,        # --> list
-                    })
-
-                    print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → {region_name}: {initial_val} Pa (list loaded)")
-                    
-                # --. Dirichlet component-wise (x, y, z) or Clamp --..
-                elif bc_type in ["Dirichlet_x", "Dirichlet_y", "Dirichlet_z", "Clamp_x", "Clamp_y", "Clamp_z"]:
-                    
-                    # 2D/3D check for Clamp_z
-                    if bc_type == "Clamp_z" and self.regime in ["2d", "axisymmetric"]:
-                        raise ValueError(
-                            f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
-                            f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"
-                            f"        Please use 'Clamp_y' in your boundary_conditions.yaml for region '{region_name}'."
-                        )
-
-                    # Extract value: check 'displacement', then 'value', default to 0.0
-                    displacement = bc_info.get("displacement")
-                    if displacement is None:
-                        displacement = bc_info.get("value", 0.0)
-
-                    comp_map = {
-                        "Dirichlet_x": 0, "Dirichlet_y": 1, "Dirichlet_z": 2,
-                        "Clamp_x": 0, "Clamp_y": 1, "Clamp_z": 2
-                    }
-                    c_idx = comp_map[bc_type]
-                    
-                    if c_idx >= self.tdim:
-                        print(f"[ERROR] {bc_type} not valid for {self.tdim}D mesh (region '{region_name}').")
-                        sys.exit(1)
-
-                    # Interpret displacement (scalar or list of scalars)
-                    if isinstance(displacement, (int, float)):
-                        raw_value = [float(displacement)] * self.n_steps
-                    elif isinstance(displacement, list):
-                        if len(displacement) != self.n_steps:
-                            print(f"[ERROR] {bc_type} list length {len(displacement)} != n_steps {self.n_steps} (region '{region_name}').")
-                            sys.exit(1)
-                        raw_value = [float(v) for v in displacement]
-                    else:
-                        print(f"[ERROR] Invalid displacement format for {bc_type}. Must be scalar or list of scalars.")
-                        sys.exit(1)
-
-                    disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(raw_value[0]))
-                    # On a 1D mesh V_u has a single component (shape (1,)) and
-                    # dolfinx refuses V_u.sub(0) -- "Cannot extract subsystem...
-                    # no subsystems". Since the check at line ~200 already
-                    # rejects Clamp_y / Clamp_z for tdim==1, the only valid
-                    # component is c_idx == 0, which IS V_u itself.
-                    if self.tdim == 1:
-                        dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
-                        bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
-                    else:
-                        dofs = dolfinx.fem.locate_dofs_topological(V_u.sub(c_idx), self.fdim, facets)
-                        bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u.sub(c_idx))
-
-                    self.dirichlet_mechanical[mat_type].append(
-                        {
-                            "id": region_id,
-                            "value": bc,
-                            "const": disp_const,
-                            "raw": raw_value,
-                        }
-                    )
-                    print(f"  [INFO] {bc_type} mechanical BC on '{mat_type}' → {raw_value[0]} (first step) at region '{region_name}'")
-
-                # --. Slip (double component-wise blocking) --..
-                elif bc_type == "Slip_x":
-                    for i in [1, 2]:  # constrain u_y, u_z
-                        if i >= self.tdim: continue
-                        V_m_sub = V_u.sub(i)
-                        boundary_dofs = dolfinx.fem.locate_dofs_topological(
-                            (V_u, V_m_sub), facet_dim, facets
-                        )
-                        boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
-                        bc_i = dolfinx.fem.dirichletbc(
-                            dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
-                            boundary_dofs,
-                            V_m_sub,
-                        )
-                        self.dirichlet_mechanical[mat_type].append(bc_i)
-
-                    print(
-                        f"  [INFO] Slip_x mechanical BC on '{mat_type}' → u_y, u_z = 0.0 at region '{region_name}'"
-                    )
-
-                elif bc_type == "Slip_y":
-                    for i in [0, 2]:  # constrain u_x, u_z
-                        if i >= self.tdim: continue
-                        V_m_sub = V_u.sub(i)
-                        boundary_dofs = dolfinx.fem.locate_dofs_topological(
-                            (V_u, V_m_sub), facet_dim, facets
-                        )
-                        boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
-                        bc_i = dolfinx.fem.dirichletbc(
-                            dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
-                            boundary_dofs,
-                            V_m_sub,
-                        )
-                        self.dirichlet_mechanical[mat_type].append(bc_i)
-
-                    print(
-                        f"  [INFO] Slip_y mechanical BC on '{mat_type}' → u_x, u_z = 0.0 at region '{region_name}'"
-                    )
-
-                elif bc_type == "Slip_z":
-                    for i in [0, 1]:  # constrain u_x, u_y
-                        if i >= self.tdim: continue
-                        V_m_sub = V_u.sub(i)
-                        boundary_dofs = dolfinx.fem.locate_dofs_topological(
-                            (V_u, V_m_sub), facet_dim, facets
-                        )
-                        boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
-                        bc_i = dolfinx.fem.dirichletbc(
-                            dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
-                            boundary_dofs,
-                            V_m_sub,
-                        )
-                        self.dirichlet_mechanical[mat_type].append(bc_i)
-
-                    print(
-                        f"  [INFO] Slip_z mechanical BC on '{mat_type}' →  u_x, u_y = 0.0 at region '{region_name}'"
-                    )
-
+                    self._add_neumann_bc(V_u, mat_type, bc_info, region_name, region_id, facets)
+                elif bc_type in self._COMPONENT_BC_TYPES:
+                    self._add_component_bc(V_u, mat_type, bc_info, region_name, region_id, facets, bc_type)
+                elif bc_type in self._SLIP_BC_TYPES:
+                    self._add_slip_bc(V_u, mat_type, region_name, facets, bc_type)
                 else:
                     print(f"  [ERROR] Unknown mechanical BC type '{bc_type}' for '{mat_type}'.")
                     print(f"  Available are: Dirichlet, Dirichlet_x/y/z, Neumann, Clamp_x/y/z, Slip_x/y/z.")
                     sys.exit(1)
+
+    @staticmethod
+    def _warn_duplicate_mechanical_bcs(mechanical_bcs_defs):
+        """Warn (but do not abort) on duplicate (region, type) BC definitions."""
+        seen_regions = {}
+        for mat_type, bc_list in mechanical_bcs_defs.items():
+            for bc_info in bc_list:
+                key = (bc_info.get("region"), bc_info.get("type"))
+                if key in seen_regions:
+                    print(
+                        f"[WARNING] Duplicate mechanical BC of type '{key[1]}' defined for region '{key[0]}' (previously in '{seen_regions[key]}', now in '{mat_type}')."
+                    )
+                else:
+                    seen_regions[key] = mat_type
+
+    def _add_dirichlet_bc(self, V_u, mat_type, bc_info, region_name, region_id, facets):
+        """Full-vector Dirichlet displacement BC (constant or step-dependent)."""
+        displacement = bc_info.get("displacement")
+        if displacement is None:
+            print(
+                f"[ERROR] Dirichlet BC on '{mat_type}' for region '{region_name}' has no displacement."
+            )
+            sys.exit(1)
+
+        # --- interpret displacement input ---
+        dim = self.tdim
+
+        # Case 1: single vector [ux, uy, uz] or [u1, u2]
+        if isinstance(displacement, (list, tuple)) and all(isinstance(x, (int, float)) for x in displacement):
+            if len(displacement) != dim:
+                print(f"[ERROR] Displacement vector length {len(displacement)} != mesh dimension {dim}.")
+                sys.exit(1)
+            raw_value = [displacement]
+            print(f"  [INFO] Constant Dirichlet vector ({dim}D) → {displacement}")
+
+        # Case 2: list of vectors over steps
+        elif isinstance(displacement, list):
+            if all(isinstance(v, (list, tuple)) and len(v) == dim for v in displacement):
+                raw_value = displacement
+                print(f"  [INFO] Step-dependent Dirichlet list ({dim}D), length {len(displacement)}")
+
+                if len(displacement) != self.n_steps:
+                    print(f"[ERROR] BC list length {len(displacement)} != n_steps {self.n_steps}.")
+                    sys.exit(1)
+            else:
+                print(f"[ERROR] All vectors in the list must have length {dim} for a {dim}D mesh.")
+                sys.exit(1)
+
+        else:
+            print(
+                f"[ERROR] Invalid Dirichlet 'displacement' format for region '{region_name}'. "
+                f"Must be [ux,uy,uz] or list of such vectors."
+            )
+            sys.exit(1)
+
+        # --- create constant ---
+        initial_disp = raw_value[0]
+        # On a 1D mesh V_u is built with a blocked element of shape
+        # (1,), which dolfinx treats as a scalar function space.
+        # The Constant must then be rank-0, not a length-1 vector,
+        # otherwise dirichletbc raises "Rank mismatch between
+        # Constant and function space".
+        if self.tdim == 1:
+            disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp[0]))
+        else:
+            disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_disp))
+
+        dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
+        bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
+
+        self.dirichlet_mechanical[mat_type].append(
+            {
+                "id": region_id,
+                "value": bc,
+                "const": disp_const,
+                "raw": raw_value,
+            }
+        )
+
+        print(
+            f"  [INFO] Dirichlet mechanical BC on '{mat_type}' → {initial_disp} at region '{region_name}'"
+        )
+
+    def _add_neumann_bc(self, V_u, mat_type, bc_info, region_name, region_id, facets):
+        """Neumann pressure/traction BC: stored weak-form term T = p * n."""
+        traction_value = bc_info.get("traction")
+
+        # Handling list
+        if isinstance(traction_value, list):
+            raw_value = traction_value
+            if len(raw_value) != self.n_steps:
+                print(
+                    f"[ERROR] Neumann traction list length {len(raw_value)} "
+                    f"!= n_steps {self.n_steps} for region '{region_name}'."
+                )
+                sys.exit(1)
+            initial_val = float(traction_value[0])  # starting from step 0
+        # Scalar
+        else:
+            raw_value = [traction_value] * self.n_steps
+            initial_val = float(traction_value)
+
+        # scalar constant (Pa)
+        traction_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_val))
+
+        # normal vector according to the mechanical regime
+        regime = self.regime
+        if self.mgr.tdim == 1:
+            # 1D mesh: V_m has one component; the test function v_m
+            # is rank-1 of size 1, so the traction n_vec must be a
+            # 1-vector. self.normal still has gdim = 3 entries
+            # because gmsh stores 3D node coords; we only keep the
+            # axial component (which is the only physically
+            # meaningful one on a line).
+            n_vec = ufl.as_vector([self.normal[0]])
+        elif regime in ["axisymmetric", "2d", "plane_stress"]:
+            n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
+        else:
+            n_vec = self.normal
+
+        # T = p * n
+        traction_expr = traction_const * n_vec
+
+        self.traction[mat_type].append({
+            "id": region_id,
+            "region_name": region_name,
+            "value": traction_expr,  # --> in weak form
+            "const": traction_const, # --> in the loop
+            "raw": raw_value,        # --> list
+        })
+
+        print(f"  [INFO] Neumann mechanical BC on '{mat_type}' → {region_name}: {initial_val} Pa (list loaded)")
+
+    def _add_component_bc(self, V_u, mat_type, bc_info, region_name, region_id, facets, bc_type):
+        """Component-wise Dirichlet / Clamp on a single axis (x, y, z)."""
+        # 2D/3D check for Clamp_z
+        if bc_type == "Clamp_z" and self.regime in ["2d", "axisymmetric"]:
+            raise ValueError(
+                f"\n[ERROR] Boundary condition 'Clamp_z' is not allowed in 2D mode.\n"
+                f"        In 2D axisymmetric regime, the axial/vertical component is Y.\n"
+                f"        Please use 'Clamp_y' in your boundary_conditions.yaml for region '{region_name}'."
+            )
+
+        # Extract value: check 'displacement', then 'value', default to 0.0
+        displacement = bc_info.get("displacement")
+        if displacement is None:
+            displacement = bc_info.get("value", 0.0)
+
+        comp_map = {
+            "Dirichlet_x": 0, "Dirichlet_y": 1, "Dirichlet_z": 2,
+            "Clamp_x": 0, "Clamp_y": 1, "Clamp_z": 2
+        }
+        c_idx = comp_map[bc_type]
+
+        if c_idx >= self.tdim:
+            print(f"[ERROR] {bc_type} not valid for {self.tdim}D mesh (region '{region_name}').")
+            sys.exit(1)
+
+        # Interpret displacement (scalar or list of scalars)
+        if isinstance(displacement, (int, float)):
+            raw_value = [float(displacement)] * self.n_steps
+        elif isinstance(displacement, list):
+            if len(displacement) != self.n_steps:
+                print(f"[ERROR] {bc_type} list length {len(displacement)} != n_steps {self.n_steps} (region '{region_name}').")
+                sys.exit(1)
+            raw_value = [float(v) for v in displacement]
+        else:
+            print(f"[ERROR] Invalid displacement format for {bc_type}. Must be scalar or list of scalars.")
+            sys.exit(1)
+
+        disp_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(raw_value[0]))
+        # On a 1D mesh V_u has a single component (shape (1,)) and
+        # dolfinx refuses V_u.sub(0) -- "Cannot extract subsystem...
+        # no subsystems". Since the Clamp_z check above already
+        # rejects Clamp_y / Clamp_z for tdim==1, the only valid
+        # component is c_idx == 0, which IS V_u itself.
+        if self.tdim == 1:
+            dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
+            bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
+        else:
+            dofs = dolfinx.fem.locate_dofs_topological(V_u.sub(c_idx), self.fdim, facets)
+            bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u.sub(c_idx))
+
+        self.dirichlet_mechanical[mat_type].append(
+            {
+                "id": region_id,
+                "value": bc,
+                "const": disp_const,
+                "raw": raw_value,
+            }
+        )
+        print(f"  [INFO] {bc_type} mechanical BC on '{mat_type}' → {raw_value[0]} (first step) at region '{region_name}'")
+
+    def _add_slip_bc(self, V_u, mat_type, region_name, facets, bc_type):
+        """
+        Frictionless slip: free the named axis and block the other two
+        components (e.g. Slip_x leaves u_x free and sets u_y = u_z = 0).
+        Each blocked component is appended as a bare DirichletBC, since these
+        are not (yet) step-dependent.
+        """
+        axis_names = ("u_x", "u_y", "u_z")
+        free_axis = {"Slip_x": 0, "Slip_y": 1, "Slip_z": 2}[bc_type]
+        constrained = [i for i in (0, 1, 2) if i != free_axis and i < self.tdim]
+
+        for i in constrained:
+            V_m_sub = V_u.sub(i)
+            boundary_dofs = dolfinx.fem.locate_dofs_topological(
+                (V_u, V_m_sub), self.fdim, facets
+            )
+            boundary_dofs = np.concatenate(boundary_dofs).astype(np.int32)
+            bc_i = dolfinx.fem.dirichletbc(
+                dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(0.0)),
+                boundary_dofs,
+                V_m_sub,
+            )
+            self.dirichlet_mechanical[mat_type].append(bc_i)
+
+        blocked = ", ".join(axis_names[i] for i in constrained)
+        print(
+            f"  [INFO] {bc_type} mechanical BC on '{mat_type}' → {blocked} = 0.0 at region '{region_name}'"
+        )
 
     def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):
         """

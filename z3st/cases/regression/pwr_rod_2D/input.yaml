@@ -32,7 +32,7 @@ models:
   gap_conductance:
     type: Gas
     value: 15.8                 # (He)
-    relax: 1.0
+    relax: 0.5                  # under-relax h_gap: damps the gap-h-T feedback
     contact_coupling:
       enabled: true
       meyer_hardness: 9.65e8    # (Pa) Zry
