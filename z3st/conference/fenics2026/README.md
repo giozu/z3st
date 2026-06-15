@@ -67,8 +67,8 @@ latexmk -pdf slides.tex      # -> slides.pdf (15 pages)
       with QR codes — legitimate demo-table craft (no poster was submitted).
 - [x] 2026-06-10 review pass: preflight green end-to-end (caught and fixed a
       regime-validation regression that broke `teaching/01_1D`); **burnup-driven
-      PCMI** (the `regression/pwr_rod_2D` 3-year rod history, PCMI onset ~30 MWd/kgU,
-      peak-T drop on contact) added as oral backup slide 5, a Q&A answer, and
+      PCMI** (the `regression/pwr_rod_2D` 1800-day rod history, PCMI onset ~21 MWd/kgU,
+      creep-relaxed contact pressure ~25 MPa, peak-T drop on contact) added as oral backup slide 5, a Q&A answer, and
       the closing beat of demo segment P (`baked/pcmi_burnup_curves.png`).
       Deck rebuilt (17 pages).
 - [x] 2026-06-11 compliance pass vs the organisers' final-info email: 10-min

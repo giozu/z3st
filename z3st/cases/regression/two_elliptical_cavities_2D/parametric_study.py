@@ -12,18 +12,32 @@ fail the GB, as a function of the bubble areal coverage ``Fc`` and the GB
 toughness ``Gc`` — the actual deliverable of this case (a GB-failure map),
 rather than a single ``max_damage`` number.
 
-First-approximation reference model
------------------------------------
-- AT2 critical stress (GB):          sigma_c = sqrt(27 * E * Gc / (256 * lc))
-- elliptical-tip stress concentration: K_t   = 2*(ax/ay) - 1   (same factor the
-  non-regression already prints)
-- load-bearing ligament: the intact fraction (1 - Fc) carries the load, so the
-  ligament stress is K_t * p / (1 - Fc); the GB fails when it reaches sigma_c:
+Two analytical references (both plotted on the map)
+---------------------------------------------------
+1. Strength estimate (superseded — kept for contrast), ``p_crit_ref``:
+       sigma_c = sqrt(27 * E * Gc / (256 * lc))          (AT2 peak stress)
+       K_t     = 2*(ax/ay) - 1                           (elliptical-tip conc.)
+       p_crit  = sigma_c * (1 - Fc) / K_t
+   This mixes a pointwise stress concentration with an lc-scale strength and
+   predicts *tip nucleation*, not GB *percolation* — it sits ~17x below the FEM.
 
-      p_crit(Fc, Gc) = sigma_c(Gc) * (1 - Fc) / K_t
+2. Fracture-mechanics estimate (recommended), ``p_crit_sif`` — Chakraborty,
+   Tonks & Pastore, J. Nucl. Mater. 452 (2014) 95-101, doi:10.1016/j.jnucmat.2014.04.023.
+   A Mode-I stress-intensity factor for a pressurised lenticular GB bubble:
+       K_I = F(Fc) * p * sqrt(pi*(R+a))                  (their Eq. 3)
+   crack initiation when K_I >= K_Ic, with K_Ic = sqrt(E*Gc/(1-nu^2)). Inverting
+   at initiation (a -> 0, R = ax = GB-projected bubble half-width) gives
+       p_crit = K_Ic / (F(Fc) * sqrt(pi*R))  +  sigma_h  (their Eqs. 7/9)
+   F(Fc) is the non-dimensional SIF they tabulated (see ``F_sif``); sigma_h is a
+   compressive hydrostatic restraint (raises p_crit, their Eqs. 6/8) — the
+   "external restraint" lever from the GB-overpressurisation literature.
 
-  -> p_crit = sigma_c/K_t at Fc=0 (isolated bubble, tip nucleation) and -> 0 as
-     Fc -> 1 (the ligament vanishes). Higher Gc shifts the whole curve up.
+   This carries the right fracture-mechanics basis, trend and magnitude
+   (hundreds of MPa). A residual ~4-6x below the FEM is expected and physical:
+   the phase-field bubble tip is a *smooth* ellipse (rho = ay^2/ax ~ 22 nm) with
+   finite lc (4 nm), so the case sits in the strength<->toughness transition
+   (characteristic length l_ch = K_Ic^2/sigma_c^2 ~ 42 nm ~ rho), and the FEM
+   measures *percolation*, not first initiation. See README "OPEN DECISION".
 
 Coverage <-> spacing (areal, GB-surface convention)
 ---------------------------------------------------
@@ -36,7 +50,11 @@ height ay, not the footprint ax).
 Usage
 -----
     python3 parametric_study.py            # analytical reference map only (fast)
-    python3 parametric_study.py --fem      # + FEM sweep overlay (slow; see below)
+    python3 parametric_study.py --fem      # + FEM sweep over the CASES below (slow)
+    python3 parametric_study.py --fem 0.3 0.5   # override: sweep these Fc instead
+
+Edit the CONFIGURATION block below to set the cases (coverage, ramp ceiling,
+number of steps) and the analytical toughnesses, then run with --fem.
 """
 import os
 import sys
@@ -53,21 +71,71 @@ CASE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(CASE, "output")
 
 # --. material + numerics (read, never hardcode) --..
-E = float(yaml.safe_load(open(os.path.join(CASE, "../../../materials/oxide.yaml")))["E"])  # MPa
-lc = float(yaml.safe_load(open(os.path.join(CASE, "input.yaml")))["damage"]["lc"])         # µm
+_mat = yaml.safe_load(open(os.path.join(CASE, "../../../materials/oxide.yaml")))
+E = float(_mat["E"])                                                          # MPa
+NU = float(_mat["nu"])                                                        # -
+lc = float(yaml.safe_load(open(os.path.join(CASE, "input.yaml")))["damage"]["lc"])  # µm
 _g = yaml.safe_load(open(os.path.join(CASE, "geometry.yaml")))
-ax, ay = float(_g["ax"]), float(_g["ay"])             # µm
-K_t = 2.0 * (ax / ay) - 1.0                           # elliptical-tip concentration
+ax, ay = float(_g["ax"]), float(_g["ay"])            # µm
+K_t = 2.0 * (ax / ay) - 1.0                          # elliptical-tip concentration
+
+# --.. ..- .-.. .-.. --- CONFIGURATION (edit me) --.. ..- .-.. .-.. ---
+# Cases for the FEM sweep (`--fem`). One dict per case; run all at once.
+#   Fc      target GB areal coverage (regenerates the mesh at this Fc)
+#   p_max   bubble-pressure ramp ceiling (MPa) — must reach p_crit to fracture
+#   n_steps ramp resolution (pressure steps 0 -> p_max)
+CASES = [
+    {"Fc": 0.2, "p_max": 3000.0, "n_steps": 20},
+    {"Fc": 0.4, "p_max": 3000.0, "n_steps": 20},
+    {"Fc": 0.6, "p_max": 3000.0, "n_steps": 20},
+]
+# Defaults used when Fc values are passed on the command line (`--fem 0.3 0.5`).
+DEFAULT_P_MAX = 3000.0
+DEFAULT_N_STEPS = 20
+
+# Analytical reference map: GB toughnesses to draw (pJ/µm² = J/m²).
+GC_VALUES = (GC_GB, 1.0, 5.0)
+# SIF crack-face assumption: "pressurised" (gas enters crack, Eq. 5, coverage-
+# dependent) or "pressure_free" (gas stays in bubble, Eq. 9, ~constant 0.67).
+CRACK_FACES = "pressurised"
+# Compressive hydrostatic restraint sigma_h (MPa); 0 for this case (no far-field
+# load). Raises p_crit via Chakraborty Eqs. 6/8 — the external-restraint lever.
+SIGMA_H = 0.0
 
 
+# --.. ..- .-.. .-.. --- analytical models --.. ..- .-.. .-.. ---
 def sigma_c(Gc):
     """AT2 critical stress (MPa) for a toughness Gc (pJ/µm² = J/m²)."""
     return np.sqrt(27.0 * E * Gc / (256.0 * lc))
 
 
 def p_crit_ref(Fc, Gc):
-    """First-approximation critical bubble pressure (MPa) — see module docstring."""
+    """Strength estimate (superseded) — sigma_c * (1 - Fc) / K_t, see docstring."""
     return sigma_c(Gc) * (1.0 - Fc) / K_t
+
+
+def F_sif(Fc, faces=None):
+    """Non-dimensional Mode-I SIF at crack initiation, Chakraborty (2014).
+    "pressurised" cracked faces -> Eq. 5 (coverage-dependent); "pressure_free"
+    -> Eq. 9 limit value (~0.67 near Fc=0.5). Higher F -> lower p_crit."""
+    faces = faces or CRACK_FACES
+    if faces == "pressure_free":
+        return 0.67
+    return 0.568 * Fc**2 + 0.059 * Fc + 0.5587
+
+
+def K_Ic(Gc):
+    """Plane-strain fracture toughness sqrt(E*Gc/(1-nu^2)) (MPa·µm^0.5). In the
+    case's consistent units (MPa, µm, pJ/µm²) this needs no conversion factor."""
+    return np.sqrt(E * Gc / (1.0 - NU**2))
+
+
+def p_crit_sif(Fc, Gc, sigma_h=None, faces=None):
+    """Fracture-mechanics critical bubble pressure (MPa), Chakraborty Eqs. 7/9:
+    p_crit = K_Ic / (F(Fc) * sqrt(pi*R)) + sigma_h, with R = ax (GB-projected
+    bubble half-width). The recommended reference — see module docstring."""
+    sigma_h = SIGMA_H if sigma_h is None else sigma_h
+    return K_Ic(Gc) / (F_sif(Fc, faces) * np.sqrt(np.pi * ax)) + sigma_h
 
 
 def spacing_from_Fc(Fc):
@@ -75,28 +143,34 @@ def spacing_from_Fc(Fc):
     return ax * np.sqrt(np.pi / Fc)
 
 
-def reference_map(gc_values=(GC_GB, 1.0, 5.0), fc=np.linspace(0.02, 0.9, 200), ax_plot=None):
-    """Plot p_crit vs Fc for several GB toughnesses (the ligament reference)."""
+def reference_map(gc_values=GC_VALUES, fc=np.linspace(0.02, 0.9, 200), ax_plot=None):
+    """Plot p_crit vs Fc: the SIF reference (solid, per Gc) plus the superseded
+    strength estimate (dashed, GB toughness only) for contrast."""
     own = ax_plot is None
     if own:
         plt.figure(figsize=(9, 6)); ax_plot = plt.gca()
     for Gc in gc_values:
-        ax_plot.plot(fc, p_crit_ref(fc, Gc),
-                     label=f"Gc = {Gc:g} J/m²  (σc = {sigma_c(Gc):.0f} MPa)")
+        ax_plot.plot(fc, p_crit_sif(fc, Gc),
+                     label=f"SIF  Gc = {Gc:g} J/m²  (K_Ic = {K_Ic(Gc):.2f} MPa·µm½)")
+    # superseded strength estimate, GB toughness only, for visual contrast
+    ax_plot.plot(fc, p_crit_ref(fc, GC_GB), "0.5", ls="--",
+                 label=f"strength est. (superseded), Gc = {GC_GB:g} J/m²")
     ax_plot.set_xlabel("GB bubble coverage  Fc  (areal)")
     ax_plot.set_ylabel("critical bubble pressure  p_crit  (MPa)")
-    ax_plot.set_title(f"GB fracture map — Kt={K_t:.2f}, lc={lc} µm, E={E/1e3:.0f} GPa")
-    ax_plot.grid(True, ls=":"); ax_plot.legend()
+    ax_plot.set_title(f"GB fracture map — SIF (Chakraborty 2014) vs strength\n"
+                      f"Kt={K_t:.2f}, lc={lc} µm, E={E/1e3:.0f} GPa, nu={NU}, R=ax={ax} µm")
+    ax_plot.grid(True, ls=":"); ax_plot.legend(fontsize=8)
     if own:
         os.makedirs(OUT, exist_ok=True)
         path = os.path.join(OUT, "pcrit_vs_Fc_reference.png")
         plt.tight_layout(); plt.savefig(path, dpi=200)
         print(f"[INFO] reference map -> {path}")
-    # report the case's operating point
+    # report the case's operating point under both models
     Fc0 = 4.0 * np.pi * ax**2 / float(_g["Lx"])**2 if "Lx" in _g else 0.40
-    print(f"[INFO] operating point Fc≈{Fc0:.2f}, GB Gc={GC_GB} J/m²: "
-          f"p_crit ≈ {p_crit_ref(Fc0, GC_GB):.0f} MPa "
-          f"(bubble-spacing λ ≈ {spacing_from_Fc(Fc0):.3f} µm)")
+    print(f"[INFO] operating point Fc≈{Fc0:.2f}, GB Gc={GC_GB} J/m² "
+          f"(λ ≈ {spacing_from_Fc(Fc0):.3f} µm):")
+    print(f"       p_crit (SIF, recommended) ≈ {p_crit_sif(Fc0, GC_GB):.0f} MPa")
+    print(f"       p_crit (strength, superseded) ≈ {p_crit_ref(Fc0, GC_GB):.0f} MPa")
     return ax_plot
 
 
@@ -201,11 +275,13 @@ def plot_case(Fc, p_crit, out_png):
     plt.close(fig)
 
 
-def fem_sweep(fc_values, p_max=3000.0, n_steps=20):
-    """Sweep coverage. Each point fractures at the energy-regime load (~p_max),
-    saves a per-Fc figure, and returns its percolation pressure."""
+def fem_sweep(cases):
+    """Run every configured case (each a dict with Fc/p_max/n_steps). Each point
+    fractures at its energy-regime load, saves a per-Fc figure, and returns its
+    percolation pressure as (Fc, p_crit)."""
     pts = []
-    for Fc in fc_values:
+    for c in cases:
+        Fc, p_max, n_steps = c["Fc"], c.get("p_max", DEFAULT_P_MAX), c.get("n_steps", DEFAULT_N_STEPS)
         try:
             p_crit, _ = run_fem_point(Fc, p_max=p_max, n_steps=n_steps)
         except subprocess.CalledProcessError as e:
@@ -224,16 +300,18 @@ def fem_sweep(fc_values, p_max=3000.0, n_steps=20):
 if __name__ == "__main__":
     ax_plot = reference_map()
     if "--fem" in sys.argv:
-        # values after --fem are the Fc points to sweep (default: 0.2/0.4/0.6)
+        # bare `--fem` runs the configured CASES; `--fem 0.3 0.5` overrides the
+        # coverage list (at DEFAULT_P_MAX / DEFAULT_N_STEPS).
         rest = [a for a in sys.argv[sys.argv.index("--fem") + 1:] if not a.startswith("-")]
-        fc_values = [float(a) for a in rest] if rest else [0.2, 0.4, 0.6]
-        pts = fem_sweep(fc_values)
+        cases = ([{"Fc": float(a), "p_max": DEFAULT_P_MAX, "n_steps": DEFAULT_N_STEPS} for a in rest]
+                 if rest else CASES)
+        pts = fem_sweep(cases)
         ok = [(f, p) for f, p in pts if p == p]  # drop NaN
         if ok:
             fc, pc = zip(*ok)
-            ax_plot.plot(fc, pc, "ks-", ms=9, label="phase-field $p_{crit}$")
+            ax_plot.plot(fc, pc, "ks-", ms=9, label="phase-field $p_{crit}$ (percolation)")
             ax_plot.set_ylim(0, 1.1 * max(pc))
-            ax_plot.legend()
+            ax_plot.legend(fontsize=8)
             plt.tight_layout()
             plt.savefig(os.path.join(OUT, "pcrit_vs_Fc_sweep.png"), dpi=200)
             print(f"[INFO] overlaid {len(ok)} FEM point(s) -> pcrit_vs_Fc_sweep.png")

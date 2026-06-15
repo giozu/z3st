@@ -147,13 +147,15 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
 
 % ---------------------------------------------------------------- 5
 \begin{frame}{Coupled thermo-mechanics, solved in a staggered loop}
+  \small
   \begin{columns}[T]
     \begin{column}{0.56\textwidth}
       Per load step, the driver alternates until each field converges:
       \begin{enumerate}
         \item \textbf{thermal} $\;\rho c_p \dot T = \nabla\!\cdot(k(T)\nabla T) + q'''$
-        \item \textbf{mechanical} $\;\nabla\!\cdot\sigma = 0$, with thermal eigenstrain\\
-              $\varepsilon_{el} = \varepsilon(u) - \alpha\,(T-T_{ref})\,I$
+        \item \textbf{mechanical} $\;\nabla\!\cdot\sigma = 0$; elastic strain minus
+              \alert{eigenstrains} (thermal, swelling, \alert{creep})\\
+              $\varepsilon_{el} = \varepsilon(u) - \varepsilon_{th} - \varepsilon_{sw} - \varepsilon^{cr}$
         \item \textbf{damage} driven by $\psi^+(\varepsilon_{el})$, irreversible
       \end{enumerate}
       \vspace{0.5em}
@@ -167,15 +169,16 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
     \end{column}
     \begin{column}{0.44\textwidth}
       \centering
-      \begin{tikzpicture}[font=\scriptsize, node distance=5mm,
-        s/.style={draw, rounded corners, minimum width=22mm, align=center, inner sep=3pt}]
-        \node[s, fill=z3amber!20] (t) {thermal $T$};
-        \node[s, fill=z3blue!12, below=of t] (m) {mechanical $u$};
-        \node[s, fill=z3teal!15, below=of m] (d) {damage $D$};
-        \draw[-{Stealth}] (t) -- (m);
-        \draw[-{Stealth}] (m) -- (d);
-        \draw[-{Stealth}, z3grey] (d.east) to[bend left=60] node[right=1pt]{until conv.} (t.east);
-      \end{tikzpicture}
+      \begin{tikzpicture}[font=\scriptsize, node distance=6mm,
+        s/.style={draw, rounded corners, minimum width=26mm, align=center, inner sep=3pt}]
+        \node[s, fill=z3amber!20] (t) {thermal $T$\\{\tiny $k(T),\;q'''$}};
+        \node[s, fill=z3blue!12, below=of t] (m) {mechanical $u$\\{\tiny eigenstrains, $g(D)\,\sigma$}};
+        \node[s, fill=z3teal!15, below=of m] (d) {damage $D$\\{\tiny $\psi^+$, irreversible}};
+        \draw[-{Stealth}] (t) -- node[left=1pt]{\tiny $\alpha_u$} (m);
+        \draw[-{Stealth}] (m) -- node[left=1pt]{\tiny $\alpha_D$} (d);
+        \draw[-{Stealth}, z3grey] (d.east) to[bend left=60] (t.east);
+      \end{tikzpicture}\\[3pt]
+      {\tiny staggered loop -- under-relax each field, repeat until all converge}
       \vspace{0.6em}
 
       {\scriptsize Damage degrades \alert{both} elastic and thermal-stress terms
@@ -214,37 +217,28 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
   \end{block}
 \end{frame}
 
-% ---------------------------------------------------------------- 6b (PCMI)
-\begin{frame}{Pellet--cladding mechanical interaction (PCMI), verified}
+% ---------------------------------------------------------------- 6b (PCMI -- fuel rod)
+\begin{frame}{Pellet--cladding interaction (PCMI) over a full irradiation}
+  \centering
+  \includegraphics[width=0.86\textwidth]{figures/pcmi_burnup_curves.png}\\[3pt]
   \footnotesize
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
-      \textbf{Contact across the closing gap}
       \begin{itemize}
-        \item pellet heats, expands, \alert{closes the gap}, contacts the clad
-        \item penalty $p = k_{pen}\langle -g\rangle_+$; traction $-p\,\mathbf{n}$ on both faces
-        \item \alert{emergent} pressure; clad driven outward -- load transfer
-        \item contact \alert{raises} gap conductance (Todreas Eq.~8.141) -- fuel cools
+        \item fuel swells with burnup and \alert{closes the gap} ($\sim$21\,MWd/kgU)
+        \item contact pressure \alert{emerges} (penalty, \alert{AD} tangent) and
+              \alert{creep-saturates} near 25\,MPa
       \end{itemize}
-      \vspace{0.2em}
-      \centering
-      \includegraphics[height=3.1cm]{figures/pcmi_curves.png}
     \end{column}
     \begin{column}{0.5\textwidth}
-      \textbf{Verified against analytical Lam\'e}
       \begin{itemize}
-        \item uniform-$\Delta T$ interference fit: exact $\delta=\alpha_f(T-T_{ref})b - g_0$
-        \item plane-stress regime \alert{confirmed} ($\sigma_{zz}\!\approx\!3\%$)
-        \item penalty matches Lam\'e to \alert{3.5\%}
+        \item contact raises gap conductance -- peak fuel $T$ \alert{drops}
+              1126 $\to$ 976\,K (two-way feedback)
+        \item one \texttt{input.yaml}: $k(T)$, swelling, creep, gap, contact;
+              verified vs Lam\'e (backup)
       \end{itemize}
-      \vspace{0.2em}
-      \centering
-      \includegraphics[height=3.1cm]{figures/pcmi_verification.png}
     \end{column}
   \end{columns}
-  \vspace{0.2em}
-  {\scriptsize The penalty tangent? Again \alert{AD} -- the same
-  \texttt{ufl.derivative} path, no hand-coded contact Jacobian.}
 \end{frame}
 
 % ---------------------------------------------------------------- 7
@@ -310,6 +304,7 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
 
 % ---------------------------------------------------------------- 9
 \begin{frame}{Open, and runnable on your laptop}
+  \small
   \begin{columns}[T]
     \begin{column}{0.58\textwidth}
       \textbf{Z3ST is}
@@ -319,25 +314,31 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
         \item plasticity (J2 + crystal) and phase-field fracture
         \item YAML-driven, material-agnostic, verified
       \end{itemize}
-      \vspace{0.6em}
-      \textbf{Get it}
+      \vspace{0.4em}
+      \textbf{Get it / See it live}
       \begin{itemize}
         \item \texttt{github.com/giozu/z3st} \quad(Apache-2.0)
         \item docs: \texttt{giozu.github.io/z3st}
         \item DOI: \texttt{10.5281/zenodo.17748028}
+        \item \alert{live demo} -- a coupled case end to end at the poster session
       \end{itemize}
     \end{column}
     \begin{column}{0.42\textwidth}
-      \begin{block}{See it live}
-        Come to the \alert{software demonstration} at the poster session --
-        I will run a coupled case end to end on my laptop, and tune it while it solves.
-      \end{block}
-      \vspace{0.4em}
+      \textbf{Future developments}
+      \begin{itemize}
+        \item \texttt{dolfinx\_mpc} for contact -- multi-point constraints give
+              per-facet contact pressure (axial ridging) and periodic BCs
+        \item coupling to fuel codes: \alert{SCIANTIX} (fission-gas behaviour) and
+              \alert{M\'erope} (microstructure)
+        \item monolithic phase-field Newton for spontaneous nucleation
+        \item full constitutive-law \alert{discovery} through the coupled adjoint
+      \end{itemize}
+      \vspace{0.3em}
       \centering
       {\scriptsize Giovanni Zullo \\ Politecnico di Milano \\ \texttt{giovanni.zullo@polimi.it}}
     \end{column}
   \end{columns}
-  \vspace{0.5em}
+  \vspace{0.3em}
   \centering
   \alert{\large Thank you -- questions welcome.}
 \end{frame}
@@ -370,6 +371,8 @@ fixed-point iteration stable across linear elasticity through thermal-shock frac
     Hyperelasticity (neo-Hookean) & $P = \partial_F \psi$ (AD) \\
     J2 plasticity (macroscopic) & return mapping, linear hardening \\
     Crystal plasticity (single grain) & slip-system viscoplasticity, AD Jacobian \\
+    Creep (Norton $+$ irradiation) & implicit backward-Euler return, AD tangent \\
+    Eigenstrains & thermal, swelling, densification (callables) \\
     Phase-field damage & AT1 / AT2, Miehe / Amor, hybrid \\
     Custom & user Python stress callable (e.g. the CP law) \\
     \bottomrule
@@ -400,19 +403,79 @@ fixed-point iteration stable across linear elasticity through thermal-shock frac
   {\scriptsize thin slab: temperature and thermal stress, numerical vs analytical, across the thickness}
 \end{frame}
 
-\begin{frame}{Backup: burnup-driven PCMI -- a three-year rod history}
+\begin{frame}{Backup: automated creep-law discovery (EUCLID-style)}
+  \scriptsize
+  The differentiable machinery runs \alert{backwards} -- discover the constitutive
+  law from noisy data, not just calibrate an assumed form.
+  \begin{columns}[T]
+    \begin{column}{0.45\textwidth}
+      \textbf{Forward model -- implicit creep}
+      \begin{itemize}
+        \item Norton $\dot\varepsilon^{cr}_{eq} = A(T)\,\sigma_{eq}^{\,n}$,\;
+              $A(T)=A_0\,e^{-Q/R_g T}$
+        \item relaxation $\dot\sigma = -E\,\dot\varepsilon^{cr}_{eq}(\sigma)$,
+              backward Euler
+        \item each Newton step in \alert{forward-mode AD} $\Rightarrow$ exact
+              $\partial\sigma_i/\partial\ln\beta_k$ through the implicit update
+      \end{itemize}
+      \textbf{Discovery}
+      \begin{itemize}
+        \item library $\dot\varepsilon^{cr}_{eq}=\sum_k \beta_k\,\phi_k(S)$,\;
+              $\phi_k\!\in\!\{S, S^2, S^3, S^5, \sinh S\}$
+        \item Gauss-Newton on $\ln\beta_k$, then \alert{backward elimination}
+              (one-standard-error rule)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.55\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/creep_law_discovery.png}\\
+      {\scriptsize left: noisy FEM data, identified $S^3$ law, closed-form Norton
+      \;\textbar\; right: only the cubic mechanism survives selection (red)}
+    \end{column}
+  \end{columns}
+  {\scriptsize From 2\% noisy data the \alert{cubic} Norton term is recovered alone
+  -- 10/10 seeds, coefficient to \alert{1.7\%}; selection follows EUCLID (Flaschel et al.\ 2022).}
+\end{frame}
+
+\begin{frame}{Backup: penalty contact verified against analytical Lam\'e}
+  \footnotesize
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Contact across the closing gap}
+      \begin{itemize}
+        \item pellet heats, expands, \alert{closes the gap}, contacts the clad
+        \item penalty $p = k_{pen}\langle -g\rangle_+$; traction $-p\,\mathbf{n}$ on both faces
+        \item \alert{emergent} pressure; clad driven outward -- load transfer
+        \item contact \alert{raises} gap conductance (Todreas Eq.~8.141) -- fuel cools
+      \end{itemize}
+      \vspace{0.2em}
+      \centering
+      \includegraphics[height=3.1cm]{figures/pcmi_curves.png}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{Verified against analytical Lam\'e}
+      \begin{itemize}
+        \item uniform-$\Delta T$ interference fit: exact $\delta=\alpha_f(T-T_{ref})b - g_0$
+        \item plane-stress regime \alert{confirmed} ($\sigma_{zz}\!\approx\!3\%$)
+        \item penalty matches Lam\'e to \alert{3.5\%}
+      \end{itemize}
+      \vspace{0.2em}
+      \centering
+      \includegraphics[height=3.1cm]{figures/pcmi_verification.png}
+    \end{column}
+  \end{columns}
+  \vspace{0.2em}
+  {\scriptsize The penalty tangent? Again \alert{AD} -- the same
+  \texttt{ufl.derivative} path, no hand-coded contact Jacobian.}
+\end{frame}
+
+\begin{frame}{Backup: integral rod -- end-of-life stress state}
   \centering
-  \includegraphics[width=0.95\textwidth]{figures/pcmi_burnup_curves.png}\\[2pt]
-  \begin{itemize}\scriptsize
-    \item burnup accumulates as a per-material state field; swelling is an
-      eigenstrain callable that reads it -- \alert{``fuel is a material''},
-      no solver change
-    \item constant 25\,kW/m for $\sim$3 years: swelling closes the 65\,$\mu$m
-      gap at $\sim$30\,MWd/kgU; the contact pressure \alert{emerges} and rises
-      to $\sim$39\,MPa
-    \item two-way feedback: contact raises the gap conductance, so the peak fuel
-      temperature \alert{drops} as the gap closes (right panel)
-  \end{itemize}
+  \includegraphics[height=0.66\textheight]{figures/pwr_rod_stress.png}\\[3pt]
+  {\scriptsize Radial and hoop stress at mid-height at the end of the 1800-day
+  history: the fuel surface carries a strong \alert{compressive hoop} stress
+  ($\sim$-306\,MPa) and the cladding is left in mild tension -- the load-transfer
+  state of an irradiated rod (shaded band = closed gap).}
 \end{frame}
 
 \begin{frame}{Backup: single-edge-notched shear -- a Miehe (2010) reproducer}
@@ -438,9 +501,9 @@ fixed-point iteration stable across linear elasticity through thermal-shock frac
 
 \begin{frame}{Backup: hero case verified against McClenny (2022)}
   \centering
-  \includegraphics[width=0.92\textwidth]{figures/case14_results.png}\\[2pt]
-  {\scriptsize radial $T$ profile, $T$ history at the contact rim, damage penetration -- cf.\ McClenny, \textit{J.\ Nucl.\ Mater.} 565 (2022), Fig.\ 7b}\\[5pt]
-  \includegraphics[width=0.6\textwidth]{figures/case14_damage_angular.png}\\[-1pt]
+  \includegraphics[width=0.70\textwidth]{figures/case14_results.png}\\[2pt]
+  {\scriptsize radial $T$ profile, $T$ history, damage penetration -- cf.\ McClenny (2022), \textit{J.\ Nucl.\ Mater.} 565, Fig.\ 7b}\\[3pt]
+  \includegraphics[width=0.40\textwidth]{figures/case14_damage_angular.png}\\[-1pt]
   {\scriptsize angular damage scan: \alert{discrete peaks = individual radial cracks}, confined to the cold-contact wedge}
 \end{frame}
 

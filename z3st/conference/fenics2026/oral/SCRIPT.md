@@ -69,18 +69,22 @@ regions, a fuel pellet and its cladding. *(Compressible: cluster dynamics — a
 newer, exploratory capability evolving a defect population in cluster-size space,
 our path to a micro-to-continuum link.)*"
 
-## 6b · PCMI: pellet–clad contact, verified — 6:10 → 7:05  ← new
-"And here is the *mechanical* side of 'across bodies' — pellet–cladding
-interaction. As the pellet heats it expands, closes the gap, and contacts the
-cladding. Contact is a penalty: a pressure proportional to the penetration,
-applied as equal and opposite tractions on the two faces. Nothing is prescribed —
-the pressure *emerges*, and you can watch it on the left: the gap closes, contact
-switches on, and the cladding is pushed outward — that is load transfer. And it
-feeds back thermally: contact raises the gap conductance, so the fuel cools the
-moment it touches. The point for this room is on the right — it's *verified*:
-against the analytical Lamé interference-fit pressure, to three and a half percent,
-with the stress state confirmed plane-stress. And the penalty tangent? The same AD
-path — `ufl.derivative` — no hand-coded contact Jacobian."
+## 6b · PCMI: a fuel rod over a full irradiation — 6:10 → 7:05
+"And here is the *mechanical* side of 'across bodies', taken all the way — a fuel
+rod followed over an entire irradiation, eighteen hundred days at twenty kilowatts
+per metre. Watch the left panel: as burnup builds, the pellet swells and the gap
+closes; the moment it touches, a contact pressure *emerges* — nothing is
+prescribed, it is a penalty proportional to the penetration. But look what it does
+— it does not climb without bound, it *saturates*, because the cladding creeps
+under irradiation and relaxes the contact stress about as fast as swelling builds
+it. That self-limiting plateau is a real fuel-performance signature, and it falls
+straight out of the coupled solve. The right panel is the thermal feedback: the
+instant contact engages, the gap conductance jumps and the peak fuel temperature
+*drops* — from eleven-twenty-six down to nine-seventy-six kelvin. And every
+ingredient here — Fink conductivity, swelling, creep, gap, contact — is one
+`input.yaml`, with the penalty tangent again from AD. It is *verified* against the
+analytical Lamé interference-fit pressure, to three and a half percent — I have
+that in the backup if you want it."
 
 ## 7 · Verified and reproducible — 7:05 → 8:00
 "None of this is useful unless it's trustworthy, and verification is something I
@@ -126,7 +130,7 @@ solves. Thank you — I'm happy to take questions."
 - *Which contact method / is the pressure trustworthy?* Explicit penalty —
   pressure proportional to penetration, equal-and-opposite tractions, the tangent
   from AD (no hand-coded contact Jacobian). Verified against the analytical Lamé
-  interference-fit to 3.5%, with the stress state confirmed plane-stress.
+  interference-fit to 3.5% (backup slide), with the stress state confirmed plane-stress.
   Uniform-pressure today; per-facet (to resolve axial ridging) is the next step.
   No mesh-cutting / XFEM needed: the two bodies are separate meshes, so the
   contact interface is a mesh boundary, not an intra-element discontinuity.
@@ -149,25 +153,29 @@ solves. Thank you — I'm happy to take questions."
   differentiable foundation is the part you saw in this talk. Come to the demo
   for the live run.
 - *Can it do fuel performance — burnup, swelling, gap closure over an irradiation?*
-  Backup "burnup-driven PCMI" — burnup accumulates as a per-material state field,
-  swelling is an eigenstrain callable that reads it ("fuel is a material" — no
-  solver change), and a 3-year rod history at 25 kW/m closes the 65 µm gap at
-  ~30 MWd/kgU with ~39 MPa emergent contact pressure; the mean burnup is verified
-  against the closed form to 1e-7. The peak fuel temperature *drops* on contact —
-  the thermal feedback, live in the figure.
+  That is slide 6b — burnup accumulates as a per-material state field,
+  swelling is an eigenstrain callable that reads it (handled like any other
+  material property — no solver change), and an 1800-day rod history at 20 kW/m closes the 65 µm gap at
+  ~21 MWd/kgU; the contact pressure emerges and then saturates near 25 MPa as
+  cladding irradiation creep relaxes it; the mean burnup is verified against the
+  closed form to 2e-8. The peak fuel temperature *drops* from 1126 K to ~976 K on
+  contact — the thermal feedback, live in the figure. The end-of-life stress state
+  (compressive hoop at the fuel surface) is in the backup.
 
 ## Backup slides (do not present; flip to on a question)
 1. staggered solver loop · 2. constitutive-model table · 3. plasticity verified
-(J2 + crystal) · 4. coupled thermo-mechanics verified · 5. burnup-driven PCMI
-(3-year rod history) · 6. SEN shear, Miehe (2010) ·
-7. hero case verified vs McClenny (2022), Fig. 7b.
+(J2 + crystal) · 4. coupled thermo-mechanics verified · 5. automated creep-law
+discovery (EUCLID-style) · 6. penalty contact verified vs Lamé (the old PCMI
+slide) · 7. integral-rod end-of-life stress state · 8. SEN shear, Miehe (2010) ·
+9. hero case verified vs McClenny (2022), Fig. 7b.
 
 ## Delivery notes
 - The AD slide (4), PCMI (6b) and the hero case (8) are what the audience
   remembers. Slow down on those; speed through 3 and 7 if you must.
-- On 6b: land "*emergent* pressure" and "verified to 3.5% against Lamé" — the two
-  phrases that make it stick. Point once at the gap-closure curve, once at the
-  verification curve; don't narrate both panels.
+- On 6b: lead with the gap closing and the *emergent* pressure, then land the two
+  payoffs — the pressure *creep-saturates* (cladding creep), and the peak fuel
+  temperature *drops* on contact. Point at the gap-closure/pressure panel, then the
+  temperature curve. Lamé verification ("3.5%") is in the backup if asked.
 - Do not read the code aloud line by line — point at `ufl.diff(psi, F)` and say it
   once; same for the contact-tangent callback to AD on 6b.
 - Practised cold, with 6b added this runs ~9:45. The compressible asides (cluster

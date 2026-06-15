@@ -1,0 +1,18 @@
+{
+    "results": {
+        "max_damage": {
+            "numerical": 3.2726363998685114e-05,
+            "reference": 0.0,
+            "rel_error": 3.2726363998685114e-05,
+            "status": "PASS"
+        },
+        "max_stress_yy": {
+            "numerical": 99.08248968771312,
+            "reference": 82.22536981827218,
+            "rel_error": 0.2050111772886783,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.25,
+    "summary": "PASS"
+}
