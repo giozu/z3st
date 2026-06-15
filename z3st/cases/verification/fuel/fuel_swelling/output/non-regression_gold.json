@@ -1,19 +1,20 @@
 {
     "results": {
         "u_x_free_swelling": {
-            "numerical": 9.974153950929048e-06,
+            "numerical": 9.974153950929002e-06,
             "reference": 9.974153950928989e-06,
-            "abs_error": 5.929230630780102e-20,
-            "rel_error": 5.944595060343796e-15,
+            "abs_error": 1.3552527156068805e-20,
+            "rel_error": 1.3587645852214392e-15,
             "status": "PASS"
         },
         "stress_free_residual": {
-            "numerical": 2.071455803757151e-06,
+            "numerical": 2.217310132453646e-06,
             "reference": 0.0,
-            "abs_error": 2.071455803757151e-06,
-            "rel_error": 3.3229177154446738e-15,
+            "abs_error": 2.217310132453646e-06,
+            "rel_error": 3.556889365634268e-15,
             "status": "PASS"
         }
     },
-    "tolerance": 0.01
+    "tolerance": 0.01,
+    "summary": "PASS"
 }

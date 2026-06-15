@@ -6,18 +6,24 @@ mechanical how-to-build so I don't re-derive it each session.
 
 ## Environment — which Python
 
-Always use the project conda env interpreter directly:
+Always use the project conda env interpreter directly. As of 2026-06-15 the project
+targets **dolfinx 0.11.0**, in the `z3st11` env:
 
 ```
-/home/giovanni/miniconda3/envs/z3st/bin/python3
+/home/giovanni/miniconda3/envs/z3st11/bin/python3
 ```
 
-In a Bash tool call, prefix once: `export PATH="/home/giovanni/miniconda3/envs/z3st/bin:$PATH"`.
+In a Bash tool call, prefix once: `export PATH="/home/giovanni/miniconda3/envs/z3st11/bin:$PATH"`.
 - **Do NOT** use bare `python3` — it resolves to base conda, which has an **older
   libhdf5** that cannot read dolfinx-written `.h5` files (`OSError: bad object
-  header version number`). dolfinx/h5py only work in the `z3st` env.
+  header version number`). dolfinx/h5py only work in the dedicated env.
 - When reading dolfinx XDMF/`.h5` outside a live run, set
   `HDF5_USE_FILE_LOCKING=FALSE` (the solver may hold the file).
+- The older **`z3st`** env (dolfinx **0.10.0**) is kept as the FEniCS 2026 demo /
+  stage fallback — do not delete it. Note its golds are now 0.11-blessed, so the six
+  re-blessed cases (box_heated, thin_slab_neumann_2D/3D, fuel_swelling, swelling,
+  lame_gps_2D) will report a regression FAIL under 0.10; that is expected and does not
+  affect the live demo (which does not check golds).
 
 ## Running a case
 

@@ -87,7 +87,7 @@ You should see output similar to:
 
 .. code-block:: text
 
-   dolfinx 0.10.0 | gmsh 4.14.1
+   dolfinx 0.11.0 | gmsh 4.15.2
 
 ---
 

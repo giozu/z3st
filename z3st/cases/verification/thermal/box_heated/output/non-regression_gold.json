@@ -1,17 +1,17 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 1.5189421817835353e-09,
+            "numerical": 1.520433346535668e-09,
             "reference": 0.0,
-            "abs_error": 1.5189421817835353e-09,
-            "rel_error": 3.0378843635670707e-12,
+            "abs_error": 1.520433346535668e-09,
+            "rel_error": 3.040866693071336e-12,
             "status": "PASS"
         },
         "Linf_error_T": {
-            "numerical": 1.5620003068761434e-09,
+            "numerical": 1.5621708371327259e-09,
             "reference": 0.0,
-            "abs_error": 1.5620003068761434e-09,
-            "rel_error": 3.1240006137522868e-12,
+            "abs_error": 1.5621708371327259e-09,
+            "rel_error": 3.1243416742654517e-12,
             "status": "PASS"
         },
         "T_max": {
@@ -22,26 +22,27 @@
             "status": "PASS"
         },
         "L2_error_sigma_yy": {
-            "numerical": 2.3552636654926795e-11,
+            "numerical": 2.3554539826582744e-11,
             "reference": 0.0,
-            "abs_error": 2.3552636654926795e-11,
-            "rel_error": 2.3552636654926795e-11,
+            "abs_error": 2.3554539826582744e-11,
+            "rel_error": 2.3554539826582744e-11,
             "status": "PASS"
         },
         "L2_error_sigma_xy": {
-            "numerical": 3.061891896374439e-16,
+            "numerical": 5.321683356188304e-16,
             "reference": 0.0,
-            "abs_error": 3.061891896374439e-16,
-            "rel_error": 3.061891896374439e-16,
+            "abs_error": 5.321683356188304e-16,
+            "rel_error": 5.321683356188304e-16,
             "status": "PASS"
         },
         "L2_error_sigma_xz": {
-            "numerical": 3.896875724678881e-15,
+            "numerical": 5.1202059402556205e-15,
             "reference": 0.0,
-            "abs_error": 3.896875724678881e-15,
-            "rel_error": 3.896875724678881e-15,
+            "abs_error": 5.1202059402556205e-15,
+            "rel_error": 5.1202059402556205e-15,
             "status": "PASS"
         }
     },
-    "tolerance": 0.001
+    "tolerance": 0.001,
+    "summary": "PASS"
 }

@@ -69,7 +69,7 @@ SECONDS_PER_MWD = 8.64e10
 q_avg = lhr / area
 BU_MEAN_REF = q_avg * t_total / (rho * hm * SECONDS_PER_MWD)
 
-F_MEAN = float(np.trapz(f_tab, z_tab) / (z_tab[-1] - z_tab[0]))
+F_MEAN = float(np.trapezoid(f_tab, z_tab) / (z_tab[-1] - z_tab[0]))
 PEAK_RATIO_REF = float(f_tab.max() / F_MEAN)
 # Table-node ratio: peak node over first node — normalisation cancels.
 NODE_RATIO_REF = float(f_tab[2] / f_tab[0])

@@ -62,6 +62,67 @@ are NOT listed here). Fix when there is time and a way to re-validate.
   `solve_staggered` were ever refactored to reuse persistent `T_new`/`u_new`, the
   fixed-grid path (which does not call it) would silently solve a stale-`dt` form.
   Harden by keying the caches on `dt` explicitly.
+- [ ] **REVIEW-0615-8** — *`regression_check` uses a purely relative tolerance, which
+  spuriously FAILs near-zero quantities.* `utils_verification.py:~147-149` compares
+  `|now − gold| / max(|gold|, 1e-12) < regression_tol` with no absolute floor, so a
+  quantity that is ≈0 by symmetry (e.g. `L2_error_sigma_xz` in `box_heated`) fails on
+  noise-level absolute differences. Surfaced 2026-06-15 running `box_heated` under
+  dolfinx 0.11 in `z3st11`: analytic `summary` PASS at machine precision (rel err
+  ~1e-12), but `regression` FAIL solely on `L2_error_sigma_xz` (rel diff 1.22e-3 vs a
+  1e-3 threshold) — a meaningless relative drift between two ~0 values. Fix: accept a
+  metric when `rel_diff < rtol` **OR** `abs_diff < atol` (small absolute floor).
+  **Note:** this changes verdicts for the 0.10 suite too, so apply it together with
+  the 0.11 re-validation / re-bless ([[PORT-0.11]] below), not in isolation.
+
+## Deferred — DOLFINx 0.11.0 port (post-conference)
+
+- [x] **PORT-0.11 — EXECUTED 2026-06-15** (at Giovanni's explicit request, pre-conference;
+  `z3st` 0.10 env kept as the stage fallback). Done: **7 golds re-blessed on 0.11**
+  (box_heated, thin_slab_neumann_2D/3D, fuel_swelling, swelling, lame_gps_2D, axial_table
+  — all `summary` analytic PASS, now regression PASS); `np.trapz`→`np.trapezoid` fix;
+  **CI pinned to `dolfinx/dolfinx:v0.11.0`** (ci.yml, was `:stable`); docs version strings
+  → `dolfinx 0.11.0 | gmsh 4.15.2` (installation.rst, getting_started.rst). The full
+  44-case suite was green on 0.11 except those 7 (1 numpy crash + 6 version-drift), now
+  all PASS/PASS. Still open: (a) re-run the **full** suite once in `z3st11` to confirm
+  end-to-end green with the new golds; (b) decide whether CLAUDE.md's dev interpreter
+  should point to `z3st11`; (c) REVIEW-0615-8 (atol floor) remains optional. Original
+  plan kept below for reference.
+- [ ] **PORT-0.11 (original plan)** — *Port z3st from DOLFINx 0.10.0 to 0.11.0.* DOLFINx v0.11.0
+  (v0.11.0.post0) is out; the FEniCS 2026 advanced-tutorial session targets it. A
+  clean conda env **`z3st11`** was created 2026-06-15 (conda-forge
+  `fenics-dolfinx=0.11.0` py312 build `_100`, + pyvista/matplotlib/h5py/pyyaml/scipy,
+  gmsh via pip) — the working `z3st` env (0.10.0) is left untouched for the conference
+  demo. z3st is **not** yet installed into `z3st11`; that is the port.
+  Notable version jumps to watch: **ufl 2025.2.0 → 2026.1.0** and **petsc4py
+  3.24.0 → 3.25.2**, so the likely break sites are the UFL form layer and the PETSc
+  `LinearProblem` / `NonlinearProblem` construction/solve API (z3st uses
+  `dolfinx.fem.petsc.LinearProblem` and a `NonlinearProblem`/SNES path). Plan:
+  (i) read the 0.10→0.11 changelog and cross-ref with z3st's API surface (already
+  extracted: heavy use of `dolfinx.fem.{Function,Constant,functionspace,Expression,
+  form,assemble_scalar,dirichletbc,locate_dofs_topological}`, `dolfinx.io.XDMFFile`,
+  `dolfinx.plot.vtk_mesh`, `ufl.*`); (ii) `pip install -e .` into `z3st11`, fix
+  imports/API breaks; (iii) **validate with the full non-regression suite** (~46
+  golds) — re-bless only if any change is an accepted accuracy improvement, never to
+  paper over a regression; (iv) decide whether CI moves to a 0.11 container or stays
+  on 0.10 until validated. Do NOT start before the conference (17-19 June).
+  *Smoke test 2026-06-15 (env `z3st11`, z3st `pip install -e .`):* the local suite was
+  run on dolfinx 0.11 and found **no core/solver API break**. Green (run + analytic +
+  gold) across regression (box_crack, box_notch, coaxial_gap, two_elliptical), fuel
+  (axial_power, burnup, coaxial_contact PCMI, cracking, creep ×3), mechanics
+  (annular/full cylinder, lame_gps_3D, lame_plane_strain_2D, mariotte, spherical_cavity,
+  thermal_gradient_2D); plus — from an earlier subset run — plasticity (j2,
+  crystal_single_grain) and the thermal slabs/shells. Only two kinds of finding:
+  (a) `axial_table` crashed on the numpy-2.4 removal of `np.trapz` — already FIXED to
+  `np.trapezoid` (backward-compatible, also valid in the 0.10 env); (b) **six** cases
+  give `regression` FAIL but `summary` (analytic) PASS — pure cross-version drift, to be
+  re-blessed on 0.11: `box_heated`, `thin_slab_neumann_2D`, `thin_slab_neumann_3D`
+  (thermal flux/Neumann), `fuel_swelling`, `swelling`, `lame_gps_2D` (some
+  near-zero-relative, see REVIEW-0615-8). The **full 44-case discovery suite completed**:
+  all plasticity (j2, crystal, stress_strain ×2), the non-linear case
+  (uniaxial_tension_nonlinear), and every other thermal/mechanics/fuel case are fully
+  green (run + analytic + gold) on 0.11. Net: the port is **~drop-in** — remaining work
+  is re-bless those 6 golds + REVIEW-0615-8 + the `np.trapezoid` fix (done), NOT solver
+  code.
 
 ## Resolved
 

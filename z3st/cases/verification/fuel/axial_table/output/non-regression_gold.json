@@ -29,5 +29,7 @@
             "status": "PASS"
         }
     },
-    "tolerance": 0.01
+    "tolerance": 0.01,
+    "summary": "PASS",
+    "regression": "PASS"
 }
