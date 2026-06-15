@@ -68,14 +68,28 @@ print(f"[INFO] Phase-fld : {dmg_type}, lc = {lc*1e6:.2f} um -> sigma_c = {sigma_
 def _build_triangulation(pv_mesh):
     pts = pv_mesh.points
     x, y = pts[:, 0], pts[:, 1]
-    cells = pv_mesh.cells_dict
-    if 5 in cells:
-        tri = np.asarray(cells[5])
-    elif 9 in cells:
-        q = np.asarray(cells[9])
-        tri = np.vstack([q[:, [0, 1, 2]], q[:, [0, 2, 3]]])
-    else:
+    tri = None
+    try:
+        cells = pv_mesh.cells_dict
+        if 5 in cells:                        # VTK_TRIANGLE
+            tri = np.asarray(cells[5])
+        elif 9 in cells:                      # VTK_QUAD -> split into two tris
+            q = np.asarray(cells[9])
+            tri = np.vstack([q[:, [0, 1, 2]], q[:, [0, 2, 3]]])
+    except Exception:
         tri = None
+    if tri is None:
+        # dolfinx 0.11 writes VTK_LAGRANGE_TRIANGLE; cells_dict raises. Rebuild
+        # from the raw connectivity (P1 -> 3 corner nodes per cell). Required here:
+        # the notched domain is non-convex, so a Delaunay fallback would bridge
+        # the slit.
+        try:
+            conn = np.asarray(pv_mesh.cell_connectivity)
+            sizes = np.diff(np.asarray(pv_mesh.offset))
+            if sizes.size and np.all(sizes == 3):
+                tri = conn.reshape(-1, 3)
+        except Exception:
+            tri = None
     return (mtri.Triangulation(x, y, tri) if tri is not None and len(tri) > 0
             else mtri.Triangulation(x, y)), x, y
 
