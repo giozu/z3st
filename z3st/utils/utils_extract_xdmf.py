@@ -65,10 +65,12 @@ def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True)
         # Steps are names of datasets, usually strings representing time or step index
         # We sort them numerically if possible
         def try_float(s):
+            # total-order-safe key: numeric steps sort before any non-numeric
+            # names, and the two groups never compare across types
             try:
-                return float(s.replace("_", "."))
+                return (0, float(s.replace("_", ".")))
             except ValueError:
-                return s
+                return (1, s)
 
         steps = sorted(field_group.keys(), key=try_float)
         target_step = steps[step_index]

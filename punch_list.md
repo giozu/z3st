@@ -6,6 +6,63 @@ Audit performed 2026-05-18 against develop @ dbcee1d, generated from four parall
 
 All P0 items resolved (CODE-P0-5 fixed 2026-06-10). A full four-agent re-audit was run on 2026-06-10 against develop @ 131bc73; verdicts and new items are folded in below. The structural items now worth attention: **[CODE-P1-14]** (orphaned `heat_flux` diagnostic — keep/rewire/delete decision), **[CASES-FOLLOWUP-2]** (the `plane_stress` regime has **zero** exercising cases since `U_thick_cylindrical_shell_plane_stress` was deleted in f1bb70b), and **[CASES-P1-7]** (`regression/pwr_rod_2D` not wired into any regression suite).
 
+## Deferred — FEniCS 2026 pre-conference review (2026-06-15)
+
+Items surfaced by the 2026-06-15 multi-agent review and **deliberately left unfixed**
+for the conference (numerically sensitive, or latent and not worth the risk two days
+out). All are verified-real (the adversarial pass refuted the two scariest claims —
+the Robin-gap *present-bug* reading and a `sigma_mech` UnboundLocalError — so those
+are NOT listed here). Fix when there is time and a way to re-validate.
+
+- [ ] **REVIEW-0615-1** — *Staggered convergence test measures the under-relaxed
+  increment.* In `solver.py` the relaxation is applied before the convergence norm
+  (`thermal` ~318/328-329, `mechanical` ~605/615-616, `damage` ~752/763-764), so
+  `‖dΦ‖ = relax·(Φ_solved − Φ_old)` and the effective coupling tolerance is
+  `stag_tol/relax` (2.5×–20× looser than configured). Fix: compute the residual from
+  the pre-relaxation iterate, or document that `stag_tol` is scaled by `relax`.
+  **Numerically sensitive — changing it shifts iteration counts and likely some
+  golds, so re-bless the suite if/when changed.**
+- [ ] **REVIEW-0615-2** — *Aitken Δ² dot-products are serial under MPI.*
+  `solver.py:~588-602` uses `np.dot` on the local owned+ghost array with no
+  `allreduce`, so under `mpirun -n>1` with `relax_aitken: true` ω is rank-dependent
+  (ghosts double-counted). Opt-in (default off) and cannot corrupt the final result
+  (gated by global PETSc norms); already documented in-code as serial-by-design. Fix:
+  `mesh.comm.allreduce(..., op=MPI.SUM)` over owned dofs, or `assert comm.size == 1`
+  when Aitken is enabled.
+- [ ] **REVIEW-0615-3** — *`direct_mumps` pathologically slow for
+  `verification/plasticity/j2_hardening_2D`* (~30 s/step, 19/21 steps in 10 min even
+  single-threaded), so the case stays on `iterative_hypre`. Investigate why MUMPS is
+  so slow on this small (~13k-dof) system (repeated symbolic factorisation? SNES
+  line-search residual count?). A working `direct_mumps` would give a deterministic CI
+  case under the "<1 min" budget.
+- [ ] **REVIEW-0615-4** — *Ramped per-step BCs are not interpolated within a bisected
+  adaptive sub-step.* `_value_at_step` (`solver.py:68-71`) indexes a ramp list by
+  `current_step`, which is identical for both halves of a bisected step; only `lhr`
+  is interpolated (`__main__.py` `_solve_interval`). A ramped Dirichlet/traction is
+  applied as a step at the sub-step level. It is warned (`_warn_ramped_bcs_under_adaptivity`)
+  but not prevented. Fix: interpolate the ramp by physical time in `_solve_interval`,
+  or hard-error when a ramp list coexists with `time_adaptivity.enabled`.
+- [ ] **REVIEW-0615-5** — *Gap Robin pairing has no parallel safety / geometric
+  pairing.* `solver.py:~259-264` copies the paired-surface temperature by DOF-index
+  position. Verified correct **serially** on the structured `pwr_rod_2D` mesh (DOFs
+  are z-monotonic on both surfaces, pair to ~2.6e-18 m), but it breaks under MPI
+  (unequal per-rank counts) and has no length assertion. Fix: KD-tree geometric
+  pairing of the two surfaces (as `average_gap_distance` already does for facets) +
+  `assert len(dofs_here) == len(dofs_other)`; or assert serial when a gap pair is active.
+- [ ] **REVIEW-0615-6** — *`contact_conductance` picks `k_f, k_c` by dict order.*
+  `gap_model.py:~108-117` takes the first two materials carrying a usable `k`.
+  Harmless for the 2-material rod cases (and the harmonic mean is symmetric), but a
+  3rd k-bearing material could select the wrong pair. Fix: select the two
+  conductivities from the gap's own paired Robin regions (`self.robin_thermal`)
+  rather than from `materials` insertion order.
+- [ ] **REVIEW-0615-7** — *(nit) `invalidate_dt_caches()` redundancy / fixed-grid
+  latent fragility.* The thermal/mechanical dt-baking form caches rebuild on every
+  `solve_staggered` call because they key on the freshly-allocated `T_new`/`u_new`
+  identity, so the adaptive path's `invalidate_dt_caches()` is currently a no-op. If
+  `solve_staggered` were ever refactored to reuse persistent `T_new`/`u_new`, the
+  fixed-grid path (which does not call it) would silently solve a stale-`dt` form.
+  Harden by keying the caches on `dt` explicitly.
+
 ## Resolved
 
 - **2026-06-10 — [CODE-P0-5](#code-p0-5) `plane_stress` missing from solver regime lists.** Added `"plane_stress"` to the traction-normal branch (solver.py:343) and the body-force branch (solver.py:366), matching the existing handling in `mechanical_model.py`. NOTE: no case currently exercises this regime (see [CASES-FOLLOWUP-2](#cases-followup-2)), so the fix is read-verified only.

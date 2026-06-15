@@ -243,6 +243,7 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
 
 % ---------------------------------------------------------------- 7
 \begin{frame}{Verified, reproducible, and easy to drive}
+  \small
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
       \textbf{Verified -- every solver, every physics}
@@ -265,9 +266,9 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
         \item per-step force--displacement streaming
         \item matrix diagnostics, structured logs
       \end{itemize}
-      \vspace{0.5em}
+      \vspace{0.2em}
       \centering
-      \includegraphics[width=0.82\textwidth]{figures/convergence_study.png}\\
+      \includegraphics[width=0.58\textwidth]{figures/convergence_study.png}\\
       {\scriptsize $L_2$ error at the theoretical rates ($T$: 2, $\sigma$: 1)}
     \end{column}
   \end{columns}
@@ -304,43 +305,39 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
 
 % ---------------------------------------------------------------- 9
 \begin{frame}{Open, and runnable on your laptop}
-  \small
+  \footnotesize
   \begin{columns}[T]
     \begin{column}{0.58\textwidth}
       \textbf{Z3ST is}
       \begin{itemize}
         \item energy-first constitutive modelling via UFL AD
-        \item coupled multi-physics, across bodies (gap conductance)
-        \item plasticity (J2 + crystal) and phase-field fracture
+        \item coupled thermo-mech-fracture across bodies; J2 + crystal plasticity
         \item YAML-driven, material-agnostic, verified
       \end{itemize}
       \vspace{0.4em}
       \textbf{Get it / See it live}
       \begin{itemize}
         \item \texttt{github.com/giozu/z3st} \quad(Apache-2.0)
-        \item docs: \texttt{giozu.github.io/z3st}
-        \item DOI: \texttt{10.5281/zenodo.17748028}
-        \item \alert{live demo} -- a coupled case end to end at the poster session
+        \item docs: \texttt{giozu.github.io/z3st} \quad DOI: \texttt{10.5281/zenodo.17748028}
+        \item \alert{live demo} at the poster session -- a coupled case end to end
       \end{itemize}
     \end{column}
     \begin{column}{0.42\textwidth}
       \textbf{Future developments}
       \begin{itemize}
-        \item \texttt{dolfinx\_mpc} for contact -- multi-point constraints give
-              per-facet contact pressure (axial ridging) and periodic BCs
-        \item coupling to fuel codes: \alert{SCIANTIX} (fission-gas behaviour) and
-              \alert{M\'erope} (microstructure)
+        \item \texttt{dolfinx\_mpc} contact: per-facet pressure (axial ridging),
+              periodic BCs
+        \item coupling to \alert{SCIANTIX} (fission gas) and \alert{M\'erope}
+              (microstructure)
         \item monolithic phase-field Newton for spontaneous nucleation
         \item full constitutive-law \alert{discovery} through the coupled adjoint
       \end{itemize}
-      \vspace{0.3em}
-      \centering
-      {\scriptsize Giovanni Zullo \\ Politecnico di Milano \\ \texttt{giovanni.zullo@polimi.it}}
     \end{column}
   \end{columns}
-  \vspace{0.3em}
+  \vspace{0.4em}
   \centering
-  \alert{\large Thank you -- questions welcome.}
+  \alert{\large Thank you -- questions welcome.}\\[2pt]
+  {\scriptsize \texttt{giovanni.zullo@polimi.it}}
 \end{frame}
 
 % ---------------------------------------------------------------- backup

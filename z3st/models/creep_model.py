@@ -117,7 +117,10 @@ class CreepModel:
         dg0 = self._creep_predictor(material["__label__"])
         base = ufl.max_value(sig_eq_tr - 3.0 * G * dg0, 0.0)
         f = dg0 - Adt * base**n - Cdt * base
-        fp = 1.0 + 3.0 * G * (n * Adt * base**(n - 1.0) + Cdt)
+        # floor the base inside the (n-1) power so a fractional Norton exponent
+        # (n < 1) cannot produce 0**(negative) = inf in the AD tangent; for the
+        # usual n >= 1 this is a no-op (and Adt = 0 when thermal creep is off).
+        fp = 1.0 + 3.0 * G * (n * Adt * ufl.max_value(base, 1.0)**(n - 1.0) + Cdt)
         dg = dg0 - f / fp
 
         flow_dir = 1.5 * s_tr / sig_eq_tr
@@ -222,7 +225,7 @@ class CreepModel:
             for _ in range(_PRED_NEWTON_ITS):
                 base = np.maximum(sig - 3.0 * G * x, 0.0)
                 g = x - Adt * base**n - Cdt * base
-                gp = 1.0 + 3.0 * G * (n * Adt * base ** (n - 1.0) + Cdt)
+                gp = 1.0 + 3.0 * G * (n * Adt * np.maximum(base, 1.0) ** (n - 1.0) + Cdt)
                 x = np.clip(x - g / gp, 0.0, sig / (3.0 * G) * (1 - 1e-12))
             pred.x.array[cells] = x
             pred.x.scatter_forward()

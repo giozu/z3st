@@ -12,6 +12,14 @@ from mpi4py import MPI
 from petsc4py import PETSc
 
 
+def _as_bool(v):
+    """Parse a config scalar to bool without the bool('false') == True footgun
+    (a quoted YAML boolean loads as the string 'false')."""
+    if isinstance(v, bool):
+        return v
+    return str(v).strip().lower() in ("1", "true", "yes", "on")
+
+
 class Solver:
     def __init__(self):
         print("[Solver] initializer")
@@ -29,7 +37,7 @@ class Solver:
         print(f"  → Displacement : {self.relax_u}")
         print(f"  → Damage       : {self.relax_D}")
 
-        self.relax_adaptive = bool(solver_settings.get("relax_adaptive", False))
+        self.relax_adaptive = _as_bool(solver_settings.get("relax_adaptive", False))
         self.relax_growth = float(solver_settings.get("relax_growth", 1.2))
         self.relax_shrink = float(solver_settings.get("relax_shrink", 0.5))
         self.relax_min = float(solver_settings.get("relax_min", 0.05))
@@ -39,7 +47,7 @@ class Solver:
         # quasi-optimal relaxation factor is computed each staggered iteration
         # from the last two raw residuals (see _mechanical_step). Takes
         # precedence over the heuristic grow/shrink controller for u.
-        self.relax_aitken = bool(solver_settings.get("relax_aitken", False))
+        self.relax_aitken = _as_bool(solver_settings.get("relax_aitken", False))
         if self.relax_aitken:
             print("  Aitken Δ² relaxation enabled for displacement")
 
@@ -362,11 +370,22 @@ class Solver:
 
         w = self.weight
 
-        # A creeping material makes the stress σ(u) nonlinear in u,
-        # so the step must go through the SNES path regardless of the
-        # configured solver.
+        # A creeping material, or a plasticity / hyperelastic constitutive
+        # mode, makes the stress σ(u) nonlinear in u, so the step must go
+        # through the SNES path regardless of the configured solver (otherwise
+        # the "linear" branch would assemble a non-bilinear form as if it were
+        # bilinear). The shipped nonlinear cases already set solver: newton;
+        # this guard protects against a solver: linear misconfiguration.
         creep_present = any(self.creep_active(m) for m in self.materials.values())
-        linear = self.mech_cfg["solver"] == "linear" and not creep_present
+        nonlinear_constitutive = any(
+            m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
+            for m in self.materials.values()
+        )
+        linear = (
+            self.mech_cfg["solver"] == "linear"
+            and not creep_present
+            and not nonlinear_constitutive
+        )
 
         # Creep predictor Δγ₀ at the current iterate, BEFORE assembling: a
         # stale predictor can zero the symbolic correction (base clamp) and

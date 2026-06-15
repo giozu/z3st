@@ -108,11 +108,15 @@ plane-strain half-disc, AT1, Amor split, hybrid, fully coupled temperature to
 elastic strain to damage — all from one `input.yaml`. (Backup has the quantitative
 match to McClenny 7b.)"
 
-## 9 · Open + demo invite — 9:05 → 9:45
+## 9 · Open + future work + demo invite — 9:05 → 9:45
 "Z3ST is open under Apache-2.0 on GitHub, documented, archived on Zenodo with a DOI.
-If you'd like to see it run, come to the software demonstration at the poster
-session — I'll take a coupled case end to end on my laptop and tune it while it
-solves. Thank you — I'm happy to take questions."
+Where it goes next: sharper contact through dolfinx-mpc — per-facet pressure for
+axial ridging — coupling to the fuel codes SCIANTIX and Mérope for fission gas and
+microstructure, a monolithic phase-field Newton for spontaneous nucleation, and
+pushing the differentiable foundation all the way to constitutive-law discovery
+through the coupled adjoint. And if you'd like to see it run today, come to the
+software demonstration at the poster session — I'll take a coupled case end to end
+on my laptop and tune it while it solves. Thank you — I'm happy to take questions."
 
 ---
 

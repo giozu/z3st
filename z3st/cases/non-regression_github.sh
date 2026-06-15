@@ -44,8 +44,7 @@ for case_name in "${CASES[@]}"; do
     chmod +x Allclean || true
 
     ./Allclean || true
-    ./Allrun > "${case_name//\//_}_log.txt" 2>&1
-    exit_code=$?
+    ./Allrun > "${case_name//\//_}_log.txt" 2>&1 && exit_code=0 || exit_code=$?
 
     # A numerical regression fails CI.
     fail_reason=""

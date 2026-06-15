@@ -6,16 +6,17 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BAKED="$HERE/baked"
+CASE14_OUT="$HERE/../../../cases/benchmarks/pellet_quench_2D_xy/output"
 
 case "${1:-}" in
   --baked)
-    # fall back to the pre-rendered images, no live ParaView needed
+    # smooth pre-rendered crack loop (attract.html plays baked/case14_crack.*.png)
     if command -v xdg-open >/dev/null 2>&1; then
-      xdg-open "$BAKED" >/dev/null 2>&1 &
-    elif command -v eog >/dev/null 2>&1; then
-      eog "$BAKED"/case14_crack*.png >/dev/null 2>&1 &
+      xdg-open "$HERE/attract.html" >/dev/null 2>&1 &
+      echo "Opened the baked crack loop: $HERE/attract.html"
     else
-      echo "Baked images are in: $BAKED"; ls -1 "$BAKED" 2>/dev/null
+      echo "Open the baked crack loop in a browser: $HERE/attract.html"
+      echo "(frames: $BAKED/case14_crack.*.png  ·  hero still: $BAKED/case14_hero.png)"
     fi
     ;;
   --render)
@@ -23,12 +24,13 @@ case "${1:-}" in
     pvpython "$HERE/paraview_case14.py" --render
     ;;
   *)
-    # interactive GUI; if it fails, point at the baked fallback
-    if command -v paraview >/dev/null 2>&1; then
+    # interactive GUI only when the live VTU series exists; otherwise the baked loop
+    nvtu=$(ls "$CASE14_OUT"/fields_*.vtu 2>/dev/null | wc -l)
+    if [ "$nvtu" -gt 1 ] && command -v paraview >/dev/null 2>&1; then
       paraview --script="$HERE/paraview_case14.py" >/dev/null 2>&1 &
       echo "ParaView launching… (if it does not appear, use: $0 --baked)"
     else
-      echo "paraview not on PATH — opening baked images instead."
+      echo "No live case-14 VTU series (or paraview missing) — using the baked crack loop."
       exec "$0" --baked
     fi
     ;;

@@ -22,6 +22,7 @@ To run the example:
 Optional flags:
 
 - ``--mesh_plot`` — displays the generated mesh before solving
+- ``--debug`` — verbose logging
 
 Example folder structure:
 
@@ -51,7 +52,7 @@ The staggered scheme alternates between thermal and mechanical solves until both
    materials:
      steel: ../../materials/steel.yaml
 
-  regime: 2D
+   regime: 2D
 
    solver_settings:
      coupling: staggered
@@ -379,7 +380,7 @@ Clamp
 
   **Clamp_z**
 
-  - Constrains :math:`u_y = 0` on the assigned region.
+  - Constrains :math:`u_z = 0` on the assigned region.
 
 - **Example**
 
@@ -528,7 +529,7 @@ Property Descriptions
 Available Materials
 ~~~~~~~~~~~~~~~~~~~
 
-Z3ST includes a database of pre-defined materials in ``z3st/materials/``:
+Z3ST ships a database of materials in ``z3st/materials/``; a representative subset:
 
 .. list-table::
    :header-rows: 1
@@ -624,7 +625,7 @@ To run a verification case:
 
 .. code-block:: bash
 
-   cd cases/1_thin_thermal_slab
+   cd cases/verification/thermal/thin_slab_neumann_3D
    ./Allrun
 
 Each verification folder contains:

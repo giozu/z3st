@@ -298,7 +298,9 @@ def extract_stress(vtu_path, component="xx", return_coords=True, prefer="cells")
             "xz": stress_tensors[:, 0, 2],
             "yz": stress_tensors[:, 1, 2],
         }
-        return x, y, z, comps if return_coords else comps
+        if return_coords:
+            return x, y, z, comps
+        return comps
 
     if component not in comp_map:
         raise ValueError(f"Invalid component '{component}'. Choose among {list(comp_map.keys())}.")
@@ -306,7 +308,9 @@ def extract_stress(vtu_path, component="xx", return_coords=True, prefer="cells")
     i, j = comp_map[component]
     stress_comp = stress_tensors[:, i, j]
 
-    return x, y, z, stress_comp if return_coords else stress_comp
+    if return_coords:
+        return x, y, z, stress_comp
+    return stress_comp
 
 
 def extract_principal_stresses(

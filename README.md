@@ -151,11 +151,12 @@ z3st/                                # repository root
     │   ├── contact_model.py         # penalty pellet-clad contact (PCMI)
     │   ├── gap_model.py             # Fixed / Gas gap conductance + contact coupling
     │   └── cluster_dynamic_model.py # 1D advection–diffusion (DG + SIPG + upwind)
+    ├── coupling/                    # external-code coupling (e.g. SCIANTIX fission gas)
     ├── materials/                   # YAML cards + Python callables
     │   ├── steel.yaml, austenitic_steel.yaml, ..., vessel_steel.yaml
     │   ├── uo2.yaml, zircaloy.yaml
     │   ├── ceramic.yaml, oxide.yaml, plastic.yaml, lead.yaml, h2o.yaml
-    │   └── ceramic.py, oxide.py     # k(T), Gc(mesh) callables
+    │   └── ceramic.py, oxide.py, fuel_*.py, zircaloy_E.py  # k(T), Gc(x), swelling, E(T) callables
     ├── utils/                       # post-processing + helpers
     │   ├── writer.py                # unified VTU / XDMF OutputWriter
     │   ├── mesh_builder.py
@@ -168,6 +169,7 @@ z3st/                                # repository root
     │   ├── output.py                # stdout / JSON helpers
     │   ├── z-gui.py                 # interactive PyVista viewer
     │   └── geo_files/               # reusable Gmsh templates
+    ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
     ├── examples/                    # minimal didactic setups
     └── cases/                       # ~50 verification / validation / demo cases
         ├── verification/            # analytic closed-form checks
@@ -322,9 +324,9 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 
 ### Development roadmap
 
-* Contact mechanics
-* Nonlinear constitutive behavior
-* Coupling with microstructure generators
+* Frictional and mortar contact (current contact is penalty, uniform-pressure)
+* Monolithic phase-field Newton for spontaneous crack nucleation
+* Coupling with microstructure generators (Mérope)
 * Advanced cluster dynamics (1D, nucleation)
 * Coupling with rate-theory codes
 

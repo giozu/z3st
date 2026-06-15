@@ -12,13 +12,16 @@ import yaml
 
 def load(yaml_file):
     """
-    Load a YAML file. Convert top-level values to float unless key is 'name' or the value is a dict.
+    Load and parse a YAML file (plain ``yaml.safe_load``).
+
+    Numeric/symbolic-card resolution (including the ``200.0e9``-parses-as-string
+    quirk) is handled downstream in ``spine.load_materials``, not here.
 
     Parameters:
         yaml_file (str): Path to the .yaml file.
 
     Returns:
-        dict: Parsed dictionary with converted values where applicable.
+        dict: Parsed dictionary.
     """
     with open(yaml_file, "r") as f:
         data = yaml.safe_load(f)

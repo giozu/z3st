@@ -1,5 +1,4 @@
-# Cases excluded from non-regression_local.s.
+# Cases excluded from non-regression_local.sh
 
 regression/pwr_rod_2D
-regression/pwr_rod_2D_backup
 verification/fuel/creep_law_discovery

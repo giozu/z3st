@@ -127,23 +127,6 @@ class DamageModel:
                 f"Set damage.type in input.yaml accordingly."
             )
 
-    def gamma_density(self, D, grad_D, lc):
-
-        damage_type = self.dmg_cfg["type"]
-
-        if damage_type == "AT2":
-            # Fracture energy density gamma(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)
-            return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
-
-        elif damage_type == "AT1":
-            # Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
-            return D / lc + lc * ufl.dot(grad_D, grad_D)
-        else:
-            raise ValueError(
-                f"Unknown damage type '{damage_type}'; expected 'AT1' or 'AT2'. "
-                f"Set damage.type in input.yaml accordingly."
-            )
-
     def psi_miehe_spectral(self, u, material, T=None):
         """
         Miehe spectral split of the elastic strain energy density.

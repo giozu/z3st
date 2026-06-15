@@ -131,13 +131,23 @@ _HOT_RELOAD_ALLOWLIST = {
     ),
 }
 
+
+def _to_bool(v):
+    """Parse a YAML scalar to bool without the bool('false') == True footgun:
+    a quoted boolean (relax_adaptive: "false") loads as the string 'false', and
+    bool('false') is True. Native YAML booleans pass straight through."""
+    if isinstance(v, bool):
+        return v
+    return str(v).strip().lower() in ("1", "true", "yes", "on")
+
+
 _SOLVER_SETTINGS_CASTS = {
     "max_iters":      int,
     "relax_T":        float,
     "relax_u":        float,
     "relax_D":        float,
-    "relax_adaptive": bool,
-    "relax_aitken":   bool,
+    "relax_adaptive": _to_bool,
+    "relax_aitken":   _to_bool,
     "relax_growth":   float,
     "relax_shrink":   float,
     "relax_min":      float,

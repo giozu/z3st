@@ -15,7 +15,7 @@ Presenter: Giovanni Zullo (Politecnico di Milano).
 ```
 fenics2026/
 ├── oral/
-│   ├── slides.tex      Beamer deck (metropolis theme, 16:9), 9 slides + 6 backup
+│   ├── slides.tex      Beamer deck (metropolis theme, 16:9), 10 slides + 9 backup
 │   ├── slides.pdf      built deck
 │   ├── SCRIPT.md       speaker script, timed to ~9:30 with anticipated Q&A
 │   └── figures/        figures used by the deck (force-tracked despite *.png ignore)
@@ -53,13 +53,13 @@ Requires a TeX Live with `beamer`, the `metropolis` theme and `listings`
 
 ```bash
 cd oral
-latexmk -pdf slides.tex      # -> slides.pdf (15 pages)
+latexmk -pdf slides.tex      # -> slides.pdf (19 pages)
 # clean intermediates:  latexmk -c
 ```
 
 ## Status
 
-- [x] Oral deck drafted and building cleanly (`oral/slides.pdf`, 15 pages).
+- [x] Oral deck drafted and building cleanly (`oral/slides.pdf`, 19 pages).
 - [x] Speaker script timed to the 10-minute format.
 - [x] Live-demonstration package: run-sheet, launcher, preflight, ParaView crack
       animation. All cases verified (`preflight.sh` passes).

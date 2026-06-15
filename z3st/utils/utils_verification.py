@@ -126,7 +126,12 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
     gold_results = gold_data.get("results", gold_data)
     reg_pass = True
 
-    for key in errors:
+    for key in sorted(set(errors) | set(gold_results)):
+        if key not in errors:
+            print(f"  {key:18s} → present in GOLD but MISSING from run → REGRESSION")
+            reg_pass = False
+            continue
+
         num_now = errors[key]["numerical"]
         num_gold = gold_results.get(key, {}).get("numerical", None)
 
@@ -143,6 +148,11 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         num_gold_arr = (
             np.array(num_gold, dtype=float) if isinstance(num_gold, list) else np.array([num_gold])
         )
+
+        if num_now_arr.shape != num_gold_arr.shape:
+            print(f"  {key:18s} → shape {num_now_arr.shape} vs GOLD {num_gold_arr.shape} → REGRESSION")
+            reg_pass = False
+            continue
 
         rel_diff_arr = np.abs(num_now_arr - num_gold_arr) / np.maximum(np.abs(num_gold_arr), 1e-12)
 
