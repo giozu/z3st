@@ -9,7 +9,8 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  solid: ../../materials/oxide.yaml
+  # solid: ../../materials/oxide.yaml
+  uo2: ../../materials/uo2.yaml
 
 regime: 2D
 
@@ -27,7 +28,7 @@ solver_settings:
 models:
   thermal: false
   mechanical: true
-  damage: true
+  damage: true # Enable damage to observe the plate fracture
 
 mechanical:
   solver: linear
@@ -51,7 +52,10 @@ damage:
   rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
-  lc: 0.004
+  # lc: 0.004
+  lc: 5.0e-7 #as the article 
+  hybrid_constraint: true
+
 
 lhr:
 - 0.0
@@ -59,8 +63,17 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 10
+n_steps: 101
+
+# # Fictive time for a static ramp
+# n_steps: 100
+# time: [0.0, 1.0]
+# lhr: [0.0, 0.0]
 
 output:
   format: "xdmf"
   filename: "results.xdmf"
+
+# output:
+#   format: vtu
+#   filename: simulation.vtu
