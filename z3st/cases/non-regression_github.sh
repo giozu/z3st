@@ -62,6 +62,13 @@ for case_name in "${CASES[@]}"; do
 
     if [[ $exit_code -ne 0 ]]; then
         echo "Case ${case_name} FAILED (exit code ${exit_code})${fail_reason}"
+        # Surface why it failed so CI logs are self-diagnosing (esp. crashes that
+        # leave no verdict json — solver divergence, missing output, import error).
+        echo "----- last 60 lines of ${case_name} run log (stderr + non-regression) -----"
+        tail -n 60 "${case_name//\//_}_log.txt" 2>/dev/null || echo "(no run log captured)"
+        echo "----- last 30 lines of solver log (log_z3st.md) -----"
+        tail -n 30 log_z3st.md 2>/dev/null || echo "(no solver log captured)"
+        echo "----- end ${case_name} logs -----"
         echo "Case: $case_name -> FAIL${fail_reason}" >> "$SUMMARY_FILE"
         global_status=1
     else
