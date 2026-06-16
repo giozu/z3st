@@ -10,7 +10,7 @@ To use **Z3ST**, create a new conda environment and install all required depende
 
    conda create -n z3st python=3.12 -y
    conda activate z3st
-   conda install -c conda-forge fenics-dolfinx pyvista meshio matplotlib pandas numpy ipywidgets jupyterlab pyqt pyyaml scipy sympy -y
+   conda install -c conda-forge fenics-dolfinx=0.11.0 pyvista meshio matplotlib pandas numpy ipywidgets jupyterlab pyqt pyyaml scipy sympy -y
    pip install gmsh
 
 .. note::
@@ -73,6 +73,13 @@ You should see an output similar to:
 .. code-block:: text
 
    dolfinx 0.11.0 | gmsh 4.15.2
+
+.. note::
+
+   Z3ST targets **dolfinx 0.11.0** -- the version pinned in continuous integration
+   (the ``dolfinx/dolfinx:v0.11.0`` image). Keep the ``=0.11.0`` pin above: newer
+   dolfinx releases may change the API, and an unpinned install would silently pull
+   whatever conda-forge currently ships as the latest stable build.
 
 
 Install z3st utility scripts

@@ -1,4 +1,4 @@
-Z3ST non-regression summary - Tue Jun  9 13:02:33 CEST 2026
+Z3ST non-regression summary - Tue Jun 16 13:07:36 CEST 2026
 
 Case: verification/thermal/thin_slab_dirichlet_2D -> OK
 Case: verification/thermal/thin_cylindrical_shell_dirichlet_2D -> OK
@@ -13,3 +13,9 @@ Case: verification/fuel/coaxial_contact -> OK
 Case: verification/fuel/swelling -> OK
 Case: verification/fuel/burnup -> OK
 Case: verification/fuel/fuel_swelling -> OK
+Case: verification/fuel/axial_power -> OK
+Case: verification/fuel/axial_table -> OK
+Case: verification/fuel/creep -> OK
+Case: verification/fuel/creep_relaxation -> OK
+Case: verification/fuel/creep_irradiation -> OK
+Case: verification/fuel/cracking -> OK

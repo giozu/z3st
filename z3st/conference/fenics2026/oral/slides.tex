@@ -55,34 +55,35 @@
 
 % ---------------------------------------------------------------- 2
 \begin{frame}{The problem we keep meeting}
-  Engineering components fail where \alert{heat, deformation and fracture meet}:
-  nuclear fuel pellets, thermal-shock cracking, welds, additive parts.
+  Nuclear-fuel components fail where \alert{heat, deformation and fracture interact}
+  -- and the modelling tools are either closed or heavy.
 
-  \vspace{0.6em}
+  \vspace{0.4em}
   \begin{columns}[T]
     \begin{column}{0.5\textwidth}
-      \textbf{Heavy multiphysics codes}\\(MOOSE, BISON)
+      \textbf{Fuel-performance codes today}
       \begin{itemize}
-        \item validated, production-grade
-        \item large, hard to extend quickly
-        \item weak-form changes are costly
+        \item proprietary: TRANSURANUS, FALCON, BISON
+        \item open FEM: essentially MOOSE
+        \item powerful, but heavy and monolithic
       \end{itemize}
     \end{column}
     \begin{column}{0.5\textwidth}
       \textbf{FEniCSx}
       \begin{itemize}
-        \item expressive weak forms in UFL
-        \item symbolic differentiation built in
-        \item but: no turnkey coupled\\ thermo-mechanical-fracture driver
+        \item expressive UFL forms, AD built in
+        \item a strong, open \alert{community}
+        \item no turnkey coupled fuel / fracture driver
       \end{itemize}
     \end{column}
   \end{columns}
 
-  \vspace{0.6em}
-  \begin{block}{Z3ST}
-    A small, open framework that turns FEniCSx into a \alert{configuration-driven}
-    solver for coupled thermo-mechanics, plasticity and phase-field fracture --
-    with the constitutive physics written as \alert{energies}, not hand-coded tangents.
+  \vspace{0.3em}
+  \begin{block}{Z3ST -- the missing layer}
+    An \alert{open}, FEniCSx-native solver where the \alert{whole coupled apparatus}
+    -- staggered thermo-mech-fracture, contact, gap, eigenstrains -- is
+    \alert{already assembled and verified}. A new problem is a \texttt{YAML} file;
+    new physics, a new energy.
   \end{block}
 \end{frame}
 
@@ -122,26 +123,21 @@
 
 % ---------------------------------------------------------------- 4
 \begin{frame}[fragile]{The core idea: write the energy, get everything else}
-  Constitutive models are entered as a \alert{strain-energy density}. UFL's
-  automatic differentiation produces the stress and the consistent tangent.
-
-  \vspace{0.4em}
+  A constitutive model is a \alert{strain-energy density}; UFL's automatic
+  differentiation gives the stress and the consistent tangent.
+  \vspace{0.2em}
   \begin{lstlisting}
 F   = ufl.variable(I + grad(u))                  # deformation gradient
 psi = (mu/2)*(Ic - 3) - mu*ufl.ln(J) \
       + (lmbda/2)*ufl.ln(J)**2                    # neo-Hookean energy
-
 P   = ufl.diff(psi, F)                            # 1st Piola-Kirchhoff = d psi / d F
 R   = ufl.inner(grad(v), P) * dx                  # residual
 Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also AD
   \end{lstlisting}
-
-  \vspace{0.2em}
   \begin{itemize}
-    \item one line, \texttt{P = ufl.diff(psi, F)}, replaces a hand-derived stress tensor
-    \item the Newton tangent comes from \texttt{ufl.derivative} -- no analytic Jacobian
+    \item \texttt{P = ufl.diff(psi, F)} is the stress; \texttt{ufl.derivative} the Newton tangent -- no analytic Jacobian, ever
     \item one path for all: elasticity, hyperelasticity, J2 \alert{and crystal} plasticity, phase-field
-    \item even slip-system crystal viscoplasticity gets its exact Jacobian from AD
+    \item \alert{$\Rightarrow$ this is why z3st exists:} the \alert{whole coupled apparatus} is assembled once on this path and driven by YAML -- never re-derived, never re-wired
   \end{itemize}
 \end{frame}
 
@@ -174,15 +170,15 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
         \node[s, fill=z3amber!20] (t) {thermal $T$\\{\tiny $k(T),\;q'''$}};
         \node[s, fill=z3blue!12, below=of t] (m) {mechanical $u$\\{\tiny eigenstrains, $g(D)\,\sigma$}};
         \node[s, fill=z3teal!15, below=of m] (d) {damage $D$\\{\tiny $\psi^+$, irreversible}};
-        \draw[-{Stealth}] (t) -- node[left=1pt]{\tiny $\alpha_u$} (m);
-        \draw[-{Stealth}] (m) -- node[left=1pt]{\tiny $\alpha_D$} (d);
-        \draw[-{Stealth}, z3grey] (d.east) to[bend left=60] (t.east);
+        \draw[-{Stealth}] (t) -- node[right=1pt]{\tiny $\alpha_u$} (m);
+        \draw[-{Stealth}] (m) -- node[right=1pt]{\tiny $\alpha_D$} (d);
+        \draw[-{Stealth}, z3grey] (d.west) to[bend left=60] (t.west);
       \end{tikzpicture}\\[3pt]
       {\tiny staggered loop -- under-relax each field, repeat until all converge}
       \vspace{0.6em}
 
-      {\scriptsize Damage degrades \alert{both} elastic and thermal-stress terms
-      via a consistent $g(D)$ -- essential for tractable thermal-shock fracture.}
+      {\scriptsize Damage degrades the stress -- thermal-stress included --
+      via a consistent $g(D)$; essential for tractable thermal-shock fracture.}
     \end{column}
   \end{columns}
 \end{frame}
@@ -195,7 +191,7 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
       \begin{itemize}
         \item thermal $+$ mechanical $+$ damage / phase-field, two-way coupled
         \item temperature drives thermal strain and stress
-        \item damage degrades both the elastic \alert{and} the thermal-stress terms
+        \item damage degrades the stress, thermal-stress \alert{included}
         \item phase-field: AT1 / AT2, Miehe / Amor, hybrid
       \end{itemize}
     \end{column}
@@ -226,7 +222,7 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
     \begin{column}{0.5\textwidth}
       \begin{itemize}
         \item fuel swells with burnup and \alert{closes the gap} ($\sim$21\,MWd/kgU)
-        \item contact pressure \alert{emerges} (penalty, \alert{AD} tangent) and
+        \item contact pressure \alert{emerges} (explicit penalty) and
               \alert{creep-saturates} near 25\,MPa
       \end{itemize}
     \end{column}
@@ -248,15 +244,15 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
     \begin{column}{0.5\textwidth}
       \textbf{Verified -- every solver, every physics}
       \begin{itemize}
-        \item $\sim$50 cases, each checked numerically against an \alert{analytical} solution
+        \item $\sim$45 cases, each checked numerically against an \alert{analytical} solution
         \item thermal, mechanical, plasticity, fracture -- all covered
-        \item re-run on \alert{every commit} (CI)
+        \item fast subset in \alert{CI on every push}; full suite run locally
       \end{itemize}
       \vspace{0.4em}
       \textbf{Teaching cases}
       \begin{itemize}
-        \item 1D bar on a line mesh and the same bar in full 3D
-        \item identical $u(L)=PL/E$ -- regime selection, not re-meshing
+        \item 1D bar and the same bar in full 3D
+        \item identical $u(L)=PL/E$ -- pick a regime, don't rewrite the model
       \end{itemize}
     \end{column}
     \begin{column}{0.5\textwidth}
@@ -310,11 +306,11 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
     \begin{column}{0.58\textwidth}
       \textbf{Z3ST is}
       \begin{itemize}
-        \item energy-first constitutive modelling via UFL AD
-        \item coupled thermo-mech-fracture across bodies; J2 + crystal plasticity
-        \item YAML-driven, material-agnostic, verified
+        \item \alert{open + FEniCSx-native} -- the whole coupled apparatus, assembled for you
+        \item thermo-mech-fracture across bodies; J2 + crystal plasticity; energy-first via AD
+        \item YAML-driven, material-agnostic, \alert{verified} ($\sim$45 analytic cases; subset in CI)
       \end{itemize}
-      \vspace{0.4em}
+      \vspace{0.2em}
       \textbf{Get it / See it live}
       \begin{itemize}
         \item \texttt{github.com/giozu/z3st} \quad(Apache-2.0)
@@ -334,8 +330,10 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.4em}
+  \vspace{0.1em}
   \centering
+  {\scriptsize Already in use at PoliMi: grant proposals (irradiated materials, coated
+  claddings, advanced fuels; Euratom calls), three student projects, didactic support.}\\[2pt]
   \alert{\large Thank you -- questions welcome.}\\[2pt]
   {\scriptsize \texttt{giovanni.zullo@polimi.it}}
 \end{frame}
@@ -462,8 +460,9 @@ fixed-point iteration stable across linear elasticity through thermal-shock frac
     \end{column}
   \end{columns}
   \vspace{0.2em}
-  {\scriptsize The penalty tangent? Again \alert{AD} -- the same
-  \texttt{ufl.derivative} path, no hand-coded contact Jacobian.}
+  {\scriptsize Contact is an \alert{explicit} penalty for now -- the pressure is frozen
+  from the previous iterate and the staggered loop drives it to a fixed point (no
+  consistent contact tangent yet).}
 \end{frame}
 
 \begin{frame}{Backup: integral rod -- end-of-life stress state}
@@ -499,7 +498,7 @@ fixed-point iteration stable across linear elasticity through thermal-shock frac
 \begin{frame}{Backup: hero case verified against McClenny (2022)}
   \centering
   \includegraphics[width=0.70\textwidth]{figures/case14_results.png}\\[2pt]
-  {\scriptsize radial $T$ profile, $T$ history, damage penetration -- cf.\ McClenny (2022), \textit{J.\ Nucl.\ Mater.} 565, Fig.\ 7b}\\[3pt]
+  {\scriptsize radial $T$ profile, $T$ history, damage penetration -- cf.\ McClenny (2022), \textit{J.\ Nucl.\ Mater.} 565}\\[3pt]
   \includegraphics[width=0.40\textwidth]{figures/case14_damage_angular.png}\\[-1pt]
   {\scriptsize angular damage scan: \alert{discrete peaks = individual radial cracks}, confined to the cold-contact wedge}
 \end{frame}

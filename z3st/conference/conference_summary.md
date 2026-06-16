@@ -62,7 +62,7 @@ will not stay for.
 
 1. The problem: components fail where heat, deformation and fracture meet (nuclear fuel, thermal shock). Heavy codes (MOOSE/BISON) are validated but hard to extend; FEniCSx is expressive but has no turnkey coupled thermo-mechanical-fracture driver.
 2. Z3ST: a configuration-driven (`input.yaml`) solver on FEniCSx. One driver, `Spine`, composes physics as mixins; regimes `1D/2D/3D/axisymmetric/plane-stress`. Materials live in their own folder and the solver is material-agnostic (any solid, not liquids); a property can be a constant or a Python function of state -- e.g. `k: materials.ceramic.k` in `ceramic.yaml` points at `k(T)` in `ceramic.py`, returning a UFL expression. A gentle on-ramp for young engineers.
-3. **The core idea — automatic differentiation:** constitutive models are entered as a strain-energy density; UFL gives stress and tangent for free. The money line is `P = ufl.diff(psi, F)` in `z3st/models/mechanical_model.py:665`, with the Newton tangent from `ufl.derivative`. One path serves all: elasticity, hyperelasticity, J2 (macroscopic) and crystal (single-grain slip-system) plasticity, and phase-field — even the slip-system Jacobian is differentiated automatically. Both plasticity examples are backed by verified stress-strain curves (J2 vs analytical; crystal plasticity to saturation theory).
+3. **The core idea — automatic differentiation:** constitutive models are entered as a strain-energy density; UFL gives stress and tangent for free. The money line is `P = ufl.diff(psi, F)` in `z3st/models/mechanical_model.py:656`, with the Newton tangent from `ufl.derivative`. One path serves all: elasticity, hyperelasticity, J2 (macroscopic) and crystal (single-grain slip-system) plasticity, and phase-field — even the slip-system Jacobian is differentiated automatically. Both plasticity examples are backed by verified stress-strain curves (J2 vs analytical; crystal plasticity to saturation theory).
 4. Coupled thermo-mechanics: staggered solver with adaptive relaxation; thermal eigenstrain; damage degrades both elastic and thermal-stress terms via a consistent `g(D)`.
 5. Coupled multi-physics, across bodies: thermal + mechanical + damage/phase-field genuinely two-way coupled; gap conductance carries heat across a gap between separate bodies/regions (fuel pellet -> cladding), essential for fuel-performance modelling. Cluster dynamics is a newer, exploratory capability (defect-population evolution in cluster-size space), implemented but not yet investigated -- the path towards a micro-to-continuum link. NB: the framework's strength is multi-physics/multi-body coupling; "multiscale" (in the talk title) is genuinely carried only by the nascent cluster-dynamics work, so do not over-claim it.
 6. Verified -- every solver, every physics: ~50 cases, each a numerical-vs-analytical comparison (thermal, mechanical, plasticity, fracture), re-run on every commit (CI). Verification is a deliberate priority. Teaching cases show 1D and 3D giving identical displacement by regime selection.
@@ -77,9 +77,9 @@ Links: `github.com/giozu/z3st` · `giozu.github.io/z3st` · DOI `10.5281/zenodo.
 fenics2026/
 ├── README.md
 ├── oral/
-│   ├── slides.tex        Beamer deck, metropolis theme, 16:9, 9 slides + 6 backup
-│   ├── slides.pdf        built deck (15 pages)
-│   ├── SCRIPT.md         speaker script, cumulative timings (~9:30), anticipated Q&A
+│   ├── slides.tex        Beamer deck, metropolis theme, 16:9, 10 slides + 9 backup
+│   ├── slides.pdf        built deck (19 pages)
+│   ├── SCRIPT.md         speaker script, cumulative timings (~9:45), anticipated Q&A
 │   └── figures/          deck figures (force-tracked despite the repo's *.png ignore)
 ├── demo/
 │   ├── DEMO.md           run-sheet: prize strategy, core loop A–E, recovery, checklist
@@ -104,7 +104,7 @@ latexmk -pdf slides.tex          # -> slides.pdf
 
 ### Run the demo
 ```bash
-conda activate z3st              # dolfinx 0.10.0 lives here, not in base
+conda activate z3st11            # dolfinx 0.11.0 lives here, not in base (z3st = 0.10 fallback)
 cd fenics2026/demo
 ./preflight.sh                   # all green before you present
 ./run_demo.sh                    # full core loop A–E, or  ./run_demo.sh A
@@ -114,7 +114,7 @@ cd fenics2026/demo
 
 ## 7. Verified technical facts (as of build)
 
-- Runtime lives in the **`z3st` conda env**: dolfinx 0.10.0, gmsh 4.14.1. Base python has z3st importable but **not** dolfinx — always `conda activate z3st` first.
+- Runtime lives in the **`z3st11` conda env**: dolfinx 0.11.0, gmsh 4.15.2 (the older **`z3st`** env, dolfinx 0.10.0, is kept as the stage fallback). Base python has z3st importable but **not** dolfinx — always `conda activate z3st11` first.
 - **ParaView 6.0.1** at `/opt/ParaView-6.0.1-MPI-Linux-Python3.12-x86_64/bin` (headless pvpython rendering works).
 - Demo cases, all verified to run/pass via `preflight.sh`:
   - `teaching/01_1D`, `teaching/01_3D` — fast; show 1D≡3D regime equivalence.
@@ -124,7 +124,7 @@ cd fenics2026/demo
 
 ## 8. Status
 
-- [x] Oral deck — drafted, builds cleanly (`oral/slides.pdf`, 15 pages).
+- [x] Oral deck — drafted, builds cleanly (`oral/slides.pdf`, 19 pages).
 - [x] Speaker script — timed to the 10-minute format, with anticipated Q&A.
 - [x] Live-demo package — run-sheet, launcher, preflight, ParaView crack animation; all cases verified.
 - [x] Screen **attract-loop** for the idle demo table (`demo/attract.html` + `attract.sh`) — offline HTML, loops the crack animation with the pitch and QR codes.
@@ -133,9 +133,9 @@ cd fenics2026/demo
 
 ## 9. Pre-flight reminders (see `demo/DEMO.md` §5 for the full list)
 
-- `conda activate z3st`; large terminal font; notifications + screen-sleep off; mains power.
+- `conda activate z3st11`; large terminal font; notifications + screen-sleep off; mains power.
 - Run `./preflight.sh`; confirm the ParaView animation plays smoothly.
-- Editor tabs open on `mechanical_model.py` (AD lines 619–665) and `verification/thermal/thin_slab_neumann_2D/input.yaml` (for the hot-reload edit).
+- Editor tabs open on `mechanical_model.py` (AD lines 635–656: `psi` at 635, `P = ufl.diff(psi, F_def)` at 656) and `verification/thermal/thin_slab_neumann_2D/input.yaml` (for the hot-reload edit).
 - Everything runs **offline**; only the GitHub/DOI links need a network, and those are on the handout/QR, not the laptop.
 
 ## 10. Decisions and open notes (build discussion log)

@@ -88,7 +88,7 @@ def _write_regression_verdict(case_dir, verdict):
         pass
 
 
-def regression_check(errors, case_dir, regression_tol=1e-3):
+def regression_check(errors, case_dir, regression_tol=1e-3, near_zero_factor=5e-2):
     """
     This function evaluates the qualitative performance of the current run compared to the 
     GOLD benchmark. It normalizes error data (handling both scalars and sequences) and 
@@ -154,10 +154,26 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
             reg_pass = False
             continue
 
-        rel_diff_arr = np.abs(num_now_arr - num_gold_arr) / np.maximum(np.abs(num_gold_arr), 1e-12)
-
-        passed = np.all(rel_diff_arr < regression_tol)
+        abs_diff_arr = np.abs(num_now_arr - num_gold_arr)
+        rel_diff_arr = abs_diff_arr / np.maximum(np.abs(num_gold_arr), 1e-12)
         rel_diff_display = float(np.max(rel_diff_arr))
+
+        # Fields whose analytical reference is exactly zero are 'should-be-zero'
+        # residuals: their numerical value is floating-point noise (build- and
+        # BLAS-dependent), so a RELATIVE comparison to ~0 is ill-defined -- a few
+        # parts in 1e8 of a ~1e-6 residual spuriously flips the gold. Compare these
+        # by an ABSOLUTE tolerance scaled to the residual's own (near-zero)
+        # magnitude instead. This can only rescue brittle near-zero fields: a field
+        # already inside the relative band stays inside this looser absolute band.
+        ref_val = gold_results.get(key, {}).get("reference", errors[key].get("reference"))
+        near_zero_ref = ref_val is not None and np.all(
+            np.abs(np.atleast_1d(np.asarray(ref_val, dtype=float))) <= 0.0
+        )
+        if near_zero_ref:
+            atol_eff = max(1e-12, near_zero_factor * float(np.max(np.abs(num_gold_arr))))
+            passed = bool(np.all(abs_diff_arr <= atol_eff))
+        else:
+            passed = bool(np.all(rel_diff_arr < regression_tol))
 
 
         # --- Accuracy trend analysis ---

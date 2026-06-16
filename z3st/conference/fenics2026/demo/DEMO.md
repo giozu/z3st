@@ -174,8 +174,8 @@ Have these ready; do not volunteer them in the core loop.
 | If… | Do this |
 |---|---|
 | A live run hangs or errors | Ctrl-C, say *"let me show you the baked result"* and open the pre-rendered PNG/animation. Never debug in front of a group. |
-| dolfinx import fails | The env was not activated — `conda activate z3st`. `preflight.sh` checks this; run it before the session. |
-| ParaView is slow / wrong screen | Fall back to the pre-rendered MP4/PNG sequence in `demo/baked/` — `open_paraview.sh --baked` just opens the images. |
+| dolfinx import fails | The env was not activated — `conda activate z3st11` (0.11 primary; `z3st` 0.10 is the fallback). `preflight.sh` checks this; run it before the session. |
+| ParaView is slow / wrong screen | Fall back to the pre-rendered PNG sequence in `demo/baked/` — `open_paraview.sh --baked` just opens the images. |
 | Projector resolution is bad | Pre-set ParaView and terminal font large (see checklist). Use the PNG sequence, not interactive, if rotation stutters. |
 | No internet | Everything here runs **offline**. The only online things are the GitHub/DOI links — those live on the handout and the attract screen, not the laptop. |
 | Someone asks something you do not know | *"Good question — I am not certain; here is how I would find out."* Judges score *thoughtful* answers, not bluffing. |
@@ -191,7 +191,7 @@ dependency.
 Run `./preflight.sh` first — it verifies the env, the cases, and the baked
 artifacts. Then, by hand:
 
-- [ ] `conda activate z3st` in the demo terminal; leave it activated.
+- [ ] `conda activate z3st11` in the demo terminal; leave it activated (`z3st` 0.10 is the fallback).
 - [ ] Terminal font size large (≥ 18 pt); dark-on-light or high-contrast theme.
 - [ ] Laptop on mains power; screen-sleep and notifications **off**.
 - [ ] ParaView opens the baked case-14 series and the animation plays smoothly.

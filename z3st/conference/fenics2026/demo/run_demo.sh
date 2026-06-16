@@ -28,8 +28,8 @@ if python -c "import dolfinx" >/dev/null 2>&1; then
     RUN() { "$@"; }
     ENVNOTE="${G}env: active in this shell${Z}"
 else
-    RUN() { conda run --no-capture-output -n z3st "$@"; }
-    ENVNOTE="${Y}env: using 'conda run -n z3st' (tip: 'conda activate z3st' is snappier)${Z}"
+    RUN() { conda run --no-capture-output -n z3st11 "$@"; }
+    ENVNOTE="${Y}env: using 'conda run -n z3st11' (tip: 'conda activate z3st11' is snappier)${Z}"
 fi
 
 pause()  { echo; read -rp "${B}↵ Enter to continue…${Z}" _; echo; }
@@ -70,11 +70,18 @@ seg_A() {
 seg_B() {
   hr; say "B · The core idea — automatic differentiation"
   cue "This one line IS the stress. I differentiate the energy. The tangent is another ufl.derivative."
-  echo "  ${B}$MECH${Z}  (lines 619–665)"; echo
-  if command -v sed >/dev/null; then
-    sed -n '619,666p' "$MECH" | sed 's/^/    /'
+  echo "  ${B}$MECH${Z}"; echo
+  # locate the key lines dynamically so the snippet never goes stale
+  psi_ln=$(grep -nE "psi = \(mu" "$MECH" | head -1 | cut -d: -f1)
+  p_ln=$(grep -nE "P = ufl\.diff\(psi" "$MECH" | head -1 | cut -d: -f1)
+  if command -v sed >/dev/null && [ -n "$psi_ln" ] && [ -n "$p_ln" ]; then
+    sed -n "$((psi_ln-1)),$((psi_ln+1))p" "$MECH" | sed 's/^/    /'
+    echo "      ..."
+    sed -n "$((p_ln-1)),$((p_ln+1))p" "$MECH" | sed 's/^/    /'
+    echo; echo "${G}  key lines:  neo-Hookean psi  (line $psi_ln)   ·   P = ufl.diff(psi, F_def)  (line $p_ln)${Z}"
+  else
+    echo "    (open $MECH and show the neo-Hookean psi and  P = ufl.diff(psi, F_def))"
   fi
-  echo; echo "${G}  key lines:  psi = …  (644)   ·   P = ufl.diff(psi, F_def)  (665)${Z}"
 }
 
 seg_C() {

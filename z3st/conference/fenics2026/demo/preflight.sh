@@ -16,12 +16,12 @@ FAIL=0
 if python -c "import dolfinx" >/dev/null 2>&1; then
   RUN(){ "$@"; }; ok "dolfinx importable in the active shell"
 else
-  RUN(){ conda run --no-capture-output -n z3st "$@"; }
-  warn "dolfinx not active here — using 'conda run -n z3st' (consider: conda activate z3st)"
-  if conda run -n z3st python -c "import dolfinx" >/dev/null 2>&1; then
-    ok "dolfinx importable via conda env 'z3st'"
+  RUN(){ conda run --no-capture-output -n z3st11 "$@"; }
+  warn "dolfinx not active here — using 'conda run -n z3st11' (consider: conda activate z3st11)"
+  if conda run -n z3st11 python -c "import dolfinx" >/dev/null 2>&1; then
+    ok "dolfinx importable via conda env 'z3st11'"
   else
-    no "dolfinx not importable even via 'conda run -n z3st' — fix the env first"
+    no "dolfinx not importable even via 'conda run -n z3st11' — fix the env first"
   fi
 fi
 
