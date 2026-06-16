@@ -1,0 +1,7 @@
+name: swelling-test
+# A minimal elastic material carrying a constant volumetric swelling, used to
+# verify the eigenstrain bus. swelling = ΔV/V.
+E: 200.0e9       # (Pa) Young's modulus
+nu: 0.3          # (-)  Poisson's ratio
+rho: 8000.0      # (kg/m³)
+swelling: 0.18   # (-)  constant volumetric swelling ΔV/V = 18%

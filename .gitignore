@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 # --. IDE / editor files --..
@@ -17,11 +17,14 @@ cache/
 
 # --. Batch and temporary scripts --..
 ba_*
+pwr_rod_2D_backup
 
 # --. Log and JSON files --..
 log.*
 *.log
 non-regression.json
+z3st/cases/**/log_*.md
+!z3st/cases/verification/mechanics/uniaxial_tension/log_*.md
 
 # --. Data / results / figures --..
 *.csv
@@ -33,3 +36,17 @@ non-regression.json
 *.h5
 *.xdmf
 *.vtu
+energies.txt
+
+# --. LaTeX build artifacts (slides.pdf is force-tracked) --..
+*.aux
+*.fdb_latexmk
+*.fls
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+*.synctex.gz
+*.bbl
+*.blg

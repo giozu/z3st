@@ -2,7 +2,7 @@
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
-Version: 0.1.0 (2025)
+Version: 0.2.0 (2026)
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 
@@ -11,7 +11,7 @@ from importlib import metadata
 try:
     __version__ = metadata.version("z3st")
 except metadata.PackageNotFoundError:
-    __version__ = "0.1.0"
+    __version__ = "0.2.0"
 
 def __getattr__(name):
     """Lazy import of heavy modules (dolfinx-dependent) to allow
@@ -29,7 +29,6 @@ def __getattr__(name):
         "gap_model": (".models", "gap_model"),
         "cluster_dynamic_model": (".models", "cluster_dynamic_model"),
         "Cluster": (".models.cluster_dynamic_model", "ClusterDynamicsModel"),
-        "export_vtu": (".utils", "export_vtu"),
         "plot_convergence": (".utils", "plot_convergence"),
     }
 
@@ -50,6 +49,5 @@ __all__ = [
     "mechanical_model",
     "gap_model",
     "cluster_dynamic_model",
-    "export_vtu",
     "plot_convergence",
 ]

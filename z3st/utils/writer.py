@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 OutputWriter: unified VTU / XDMF writer for z3st.
@@ -44,18 +44,28 @@ from dolfinx.io import XDMFFile
 # ---------------------------------------------------------------------------
 
 def _von_mises(sig):
-    """Von Mises equivalent stress for an (..., 3, 3) batch."""
+    """Von Mises equivalent stress for an (..., 3, 3) batch.
+
+    In the axisymmetric regime the hoop strain eps_tt = u_r / r is singular at
+    the axis r=0, so the stress carries NaN at axis nodes. Suppress the
+    resulting 'invalid value' warning and return a finite field (0 at the
+    singular nodes) rather than poisoning the exported VonMises field with NaN.
+    """
     s_xx, s_yy, s_zz = sig[..., 0, 0], sig[..., 1, 1], sig[..., 2, 2]
     s_xy, s_yz, s_zx = sig[..., 0, 1], sig[..., 1, 2], sig[..., 2, 0]
-    return np.sqrt(
-        0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
-        + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
-    )
+    with np.errstate(invalid="ignore"):
+        vm = np.sqrt(
+            0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
+            + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
+        )
+    return np.nan_to_num(vm, nan=0.0, posinf=0.0, neginf=0.0)
 
 
 def _hydrostatic(sig):
-    """Hydrostatic pressure p = tr(sigma) / 3 on an (..., 3, 3) batch."""
-    return (sig[..., 0, 0] + sig[..., 1, 1] + sig[..., 2, 2]) / 3.0
+    """Hydrostatic pressure p = tr(sigma) / 3 on an (..., 3, 3) batch. Guarded
+    for the same axisymmetric r=0 NaN as :func:`_von_mises`."""
+    p = (sig[..., 0, 0] + sig[..., 1, 1] + sig[..., 2, 2]) / 3.0
+    return np.nan_to_num(p, nan=0.0, posinf=0.0, neginf=0.0)
 
 
 # ---------------------------------------------------------------------------
@@ -138,16 +148,18 @@ class OutputWriter:
         self._strain_fn_points = None
         self._strain_expr_cells = None
         self._strain_expr_points = None
-        self._stress_fn_cells = {}
-        self._stress_fn_points = {}
-        self._stress_expr_cells = {}
-        self._stress_expr_points = {}
-        self._psi_fn_cells = {}
-        self._psi_fn_points = {}
-        self._psi_expr_cells = {}
-        self._psi_expr_points = {}
-        self._heatflux_fn = {}
-        self._heatflux_expr = {}
+        # Merged output: single domain-wide fields (one Stress, one HeatFlux, ...)
+        # instead of one per material. Each material fills only its own cells, so
+        # cell values are bit-identical to the old per-material fields; point
+        # values can differ only at material interfaces (last writer wins).
+        self._stress_fn_cells = None
+        self._stress_fn_points = None
+        self._psi_fn_cells = None
+        self._psi_fn_points = None
+        self._heatflux_fn = None
+        self._stress_sources = []      # list of (expr_cells, expr_points, cells)
+        self._psi_sources = []         # list of (expr_cells, expr_points, cells)
+        self._heatflux_sources = []    # list of (expr_cells, cells)
         self._D_cell_fn = None
         self._D_cell_expr = None
         self._H_cell_fn = None
@@ -164,44 +176,54 @@ class OutputWriter:
             self._strain_expr_cells = self._make_interp_or_proj(problem.strain, self.V_tensor_cells)
             self._strain_expr_points = self._make_interp_or_proj(problem.strain, self.V_tensor_points)
 
-        # Per-material stress, strain-energy density, heat flux
-        for name, material in problem.materials.items():
-            if on.get("mechanical", False) and name in problem.stress:
-                self._stress_fn_cells[name] = dolfinx.fem.Function(
-                    self.V_tensor_cells, name=f"Stress_{name}"
-                )
-                self._stress_fn_points[name] = dolfinx.fem.Function(
-                    self.V_tensor_points, name=f"Stress_{name}"
-                )
-                self._stress_expr_cells[name] = self._make_interp_or_proj(
-                    problem.stress[name], self.V_tensor_cells
-                )
-                self._stress_expr_points[name] = self._make_interp_or_proj(
-                    problem.stress[name], self.V_tensor_points
-                )
+        # Per-material expressions feed the single merged fields. Allocate each
+        # merged field once (if any material contributes), then collect every
+        # material's interpolation source together with the cells it must fill.
+        cell_tags = getattr(problem, "cell_tags", None) or getattr(problem, "tags", None)
 
+        def _mat_cells(name):
+            # Local cell indices of a material's subdomain, for cell-restricted
+            # interpolation. None -> fill the whole mesh (single-domain case).
+            if cell_tags is None:
+                return None
+            try:
+                return cell_tags.find(problem.label_map[name])
+            except Exception:
+                return None
+
+        mats = problem.materials
+        mech = on.get("mechanical", False)
+        therm = on.get("thermal", False) and getattr(problem, "T", None) is not None
+
+        if mech and any(n in problem.stress for n in mats):
+            self._stress_fn_cells = dolfinx.fem.Function(self.V_tensor_cells, name="Stress")
+            self._stress_fn_points = dolfinx.fem.Function(self.V_tensor_points, name="Stress")
+        if mech and any(n in problem.energy_density for n in mats):
+            self._psi_fn_cells = dolfinx.fem.Function(self.V_scalar_cells, name="StrainEnergyDensity")
+            self._psi_fn_points = dolfinx.fem.Function(self.V_scalar_points, name="StrainEnergyDensity")
+        if therm:
+            self._heatflux_fn = dolfinx.fem.Function(self.V_vector_cells, name="HeatFlux")
+
+        for name, material in mats.items():
+            cells = _mat_cells(name)
+            if mech and name in problem.stress:
+                self._stress_sources.append((
+                    self._make_interp_or_proj(problem.stress[name], self.V_tensor_cells),
+                    self._make_interp_or_proj(problem.stress[name], self.V_tensor_points),
+                    cells,
+                ))
                 if name in problem.energy_density:
-                    self._psi_fn_cells[name] = dolfinx.fem.Function(
-                        self.V_scalar_cells, name=f"StrainEnergyDensity_{name}"
-                    )
-                    self._psi_fn_points[name] = dolfinx.fem.Function(
-                        self.V_scalar_points, name=f"StrainEnergyDensity_{name}"
-                    )
-                    self._psi_expr_cells[name] = self._make_interp_or_proj(
-                        problem.energy_density[name], self.V_scalar_cells
-                    )
-                    self._psi_expr_points[name] = self._make_interp_or_proj(
-                        problem.energy_density[name], self.V_scalar_points
-                    )
-
-            if on.get("thermal", False) and getattr(problem, "T", None) is not None:
+                    self._psi_sources.append((
+                        self._make_interp_or_proj(problem.energy_density[name], self.V_scalar_cells),
+                        self._make_interp_or_proj(problem.energy_density[name], self.V_scalar_points),
+                        cells,
+                    ))
+            if therm:
                 q_expr = -material["k"] * ufl.grad(problem.T)
-                self._heatflux_fn[name] = dolfinx.fem.Function(
-                    self.V_vector_cells, name=f"HeatFlux_{name}"
-                )
-                self._heatflux_expr[name] = self._make_interp_or_proj(
-                    q_expr, self.V_vector_cells
-                )
+                self._heatflux_sources.append((
+                    self._make_interp_or_proj(q_expr, self.V_vector_cells),
+                    cells,
+                ))
 
         # Damage + crack-driving-force, cell projections
         if on.get("damage", False) and getattr(problem, "D", None) is not None:
@@ -289,14 +311,19 @@ class OutputWriter:
             )
 
     @staticmethod
-    def _refresh_into(target_fn, source):
-        """Update ``target_fn`` from a pre-prepared source (Expression or
-        cached projection LinearProblem)."""
+    def _refresh_into(target_fn, source, cells=None):
+        """Update ``target_fn`` from a pre-prepared source (Expression or cached
+        projection LinearProblem). When ``cells`` is given (the local cell
+        indices of a material's subdomain), the interpolation fills only those
+        cells of the shared field, leaving the rest for the other materials."""
         if isinstance(source, dolfinx.fem.Expression):
-            target_fn.interpolate(source)
+            if cells is None:
+                target_fn.interpolate(source)
+            else:
+                target_fn.interpolate(source, cells0=cells)
         else:
-            # LinearProblem path. solve() returns its internal Function;
-            # copy its values into our pre-allocated target.
+            # LinearProblem path (quadrature-sourced, e.g. custom plasticity).
+            # Only used by single-material cases, so a whole-mesh copy is exact.
             result = source.solve()
             target_fn.x.array[:] = result.x.array[:]
 
@@ -306,16 +333,16 @@ class OutputWriter:
             self._refresh_into(self._strain_fn_cells, self._strain_expr_cells)
             self._refresh_into(self._strain_fn_points, self._strain_expr_points)
 
-        for name, src in self._stress_expr_cells.items():
-            self._refresh_into(self._stress_fn_cells[name], src)
-            self._refresh_into(self._stress_fn_points[name], self._stress_expr_points[name])
+        for src_c, src_p, cells in self._stress_sources:
+            self._refresh_into(self._stress_fn_cells, src_c, cells)
+            self._refresh_into(self._stress_fn_points, src_p, cells)
 
-        for name, src in self._psi_expr_cells.items():
-            self._refresh_into(self._psi_fn_cells[name], src)
-            self._refresh_into(self._psi_fn_points[name], self._psi_expr_points[name])
+        for src_c, src_p, cells in self._psi_sources:
+            self._refresh_into(self._psi_fn_cells, src_c, cells)
+            self._refresh_into(self._psi_fn_points, src_p, cells)
 
-        for name, src in self._heatflux_expr.items():
-            self._refresh_into(self._heatflux_fn[name], src)
+        for src_c, cells in self._heatflux_sources:
+            self._refresh_into(self._heatflux_fn, src_c, cells)
 
         if self._D_cell_expr is not None:
             self._refresh_into(self._D_cell_fn, self._D_cell_expr)
@@ -338,16 +365,18 @@ class OutputWriter:
             write(p.u, t)
         if self._strain_fn_cells is not None:
             write(self._strain_fn_cells, t)
-        for fn in self._stress_fn_cells.values():
-            write(fn, t)
-        for fn in self._psi_fn_cells.values():
-            write(fn, t)
-        for fn in self._heatflux_fn.values():
-            write(fn, t)
+        if self._stress_fn_cells is not None:
+            write(self._stress_fn_cells, t)
+        if self._psi_fn_cells is not None:
+            write(self._psi_fn_cells, t)
+        if self._heatflux_fn is not None:
+            write(self._heatflux_fn, t)
         if on.get("damage", False) and p.D is not None:
             write(p.D, t)
         if self._c_cg_fn is not None:
             write(self._c_cg_fn, t)
+        if getattr(p, "burnup", None) is not None:
+            write(p.burnup, t)
 
     def _write_vtu(self, step):
         p = self.problem
@@ -382,29 +411,34 @@ class OutputWriter:
             grid.cell_data["Strain (cells)"] = self._strain_fn_cells.x.array.reshape(-1, 9)
             grid.point_data["Strain (points)"] = self._strain_fn_points.x.array.reshape(n_points, 9)
 
-        # Stress + derived (von Mises, hydrostatic) per material
-        for name, fn_cells in self._stress_fn_cells.items():
-            s_cells = fn_cells.x.array.reshape(-1, 3, 3)
-            s_points = self._stress_fn_points[name].x.array.reshape(n_points, 3, 3)
-            grid.cell_data[f"Stress_{name} (cells)"] = s_cells.reshape(-1, 9)
-            grid.point_data[f"Stress_{name} (points)"] = s_points.reshape(n_points, 9)
-            grid.cell_data[f"VonMises_{name} (cells)"] = _von_mises(s_cells)
-            grid.point_data[f"VonMises_{name} (points)"] = _von_mises(s_points)
-            grid.cell_data[f"Hydrostatic_{name} (cells)"] = _hydrostatic(s_cells)
-            grid.point_data[f"Hydrostatic_{name} (points)"] = _hydrostatic(s_points)
+        # Stress + derived (von Mises, hydrostatic) — single domain-wide field,
+        # each cell/node filled from its own material's stress.
+        if self._stress_fn_cells is not None:
+            s_cells = self._stress_fn_cells.x.array.reshape(-1, 3, 3)
+            s_points = self._stress_fn_points.x.array.reshape(n_points, 3, 3)
+            grid.cell_data["Stress (cells)"] = s_cells.reshape(-1, 9)
+            grid.point_data["Stress (points)"] = s_points.reshape(n_points, 9)
+            grid.cell_data["VonMises (cells)"] = _von_mises(s_cells)
+            grid.point_data["VonMises (points)"] = _von_mises(s_points)
+            grid.cell_data["Hydrostatic (cells)"] = _hydrostatic(s_cells)
+            grid.point_data["Hydrostatic (points)"] = _hydrostatic(s_points)
 
-        # Strain-energy density per material
-        for name, fn in self._psi_fn_cells.items():
-            grid.cell_data[f"StrainEnergyDensity_{name} (cells)"] = fn.x.array.copy()
-            grid.point_data[f"StrainEnergyDensity_{name} (points)"] = self._psi_fn_points[name].x.array.copy()
+        # Strain-energy density — single domain-wide field
+        if self._psi_fn_cells is not None:
+            grid.cell_data["StrainEnergyDensity (cells)"] = self._psi_fn_cells.x.array.copy()
+            grid.point_data["StrainEnergyDensity (points)"] = self._psi_fn_points.x.array.copy()
 
-        # Heat flux per material (cells)
-        for name, fn in self._heatflux_fn.items():
-            grid.cell_data[f"HeatFlux_{name} (cells)"] = fn.x.array.reshape(-1, 3)
+        # Heat flux — single domain-wide field (cells)
+        if self._heatflux_fn is not None:
+            grid.cell_data["HeatFlux (cells)"] = self._heatflux_fn.x.array.reshape(-1, 3)
 
         # Cluster density
         if self._c_cg_fn is not None:
             grid.point_data["ClusterDensity"] = self._c_cg_fn.x.array
+
+        # Burnup (nodal fuel state, MWd/kgU)
+        if getattr(p, "burnup", None) is not None:
+            grid.point_data["Burnup"] = p.burnup.x.array
 
         # Damage + crack-driving-force
         if on.get("damage", False) and p.D is not None:

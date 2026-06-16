@@ -1,0 +1,5 @@
+thermal:
+  fuel:
+  - type: Dirichlet
+    region: outer
+    temperature: 600.0   # (K) pellet surface held at coolant-side temperature

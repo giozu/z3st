@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 from datetime import datetime
@@ -12,13 +12,16 @@ import yaml
 
 def load(yaml_file):
     """
-    Load a YAML file. Convert top-level values to float unless key is 'name' or the value is a dict.
+    Load and parse a YAML file (plain ``yaml.safe_load``).
+
+    Numeric/symbolic-card resolution (including the ``200.0e9``-parses-as-string
+    quirk) is handled downstream in ``spine.load_materials``, not here.
 
     Parameters:
         yaml_file (str): Path to the .yaml file.
 
     Returns:
-        dict: Parsed dictionary with converted values where applicable.
+        dict: Parsed dictionary.
     """
     with open(yaml_file, "r") as f:
         data = yaml.safe_load(f)
@@ -35,7 +38,12 @@ def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_his
     Parameters:
     - t_points (list of float): Time values in seconds.
     - lhr_points (list of float): Corresponding LHR values in W/m.
-    - n_steps (int): Total number of output points (including input points).
+    - n_steps (int or list of int): If an int, total number of output points,
+      distributed across segments proportionally to their duration. If a list
+      (one entry per segment, i.e. len(t_points) - 1), the number of time
+      intervals in each segment — this decouples temporal resolution from
+      segment duration (e.g. resolve a gap-closure transition finely while
+      striding across a slow creep plateau).
     - filename (str): Output filename (TSV format).
 
     Returns:
@@ -51,11 +59,25 @@ def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_his
     if not np.all(np.diff(t_points) > 0):
         raise ValueError("Time points must be strictly increasing.")
 
+    # Per-segment interval counts: explicit list, or proportional to duration.
+    if isinstance(n_steps, (list, tuple)):
+        if len(n_steps) != len(t_points) - 1:
+            raise ValueError(
+                f"n_steps list must have one entry per segment "
+                f"({len(t_points) - 1}), got {len(n_steps)}."
+            )
+        seg_steps = [max(1, int(m)) for m in n_steps]
+    else:
+        seg_steps = None
+
     # Generate interpolated time points for each segment
     times = list(t_points)
     for i in range(len(t_points) - 1):
         t0, t1 = t_points[i], t_points[i + 1]
-        n_segment = max(2, int(n_steps * (t1 - t0) / (t_points[-1] - t_points[0])))
+        if seg_steps is not None:
+            n_segment = seg_steps[i]
+        else:
+            n_segment = max(2, int(n_steps * (t1 - t0) / (t_points[-1] - t_points[0])))
         new_times = np.linspace(t0, t1, n_segment, endpoint=False)[1:]  # exclude t0, keep t1
         times.extend(new_times)
 

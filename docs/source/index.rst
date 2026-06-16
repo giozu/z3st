@@ -36,12 +36,12 @@ Overview
 
 Z3ST integrates the following main modules:
 
-- :mod:`z3st.solver` - FEM solver interface for thermal and mechanical problems
+- :mod:`z3st.core.solver` - FEM solver interface for thermal and mechanical problems
 - :mod:`z3st.models` - physics models (mechanical, thermal, phase-field fracture, cluster dynamics, etc.)
-- :mod:`z3st.mesh` - geometry and mesh generation utilities
-- :mod:`z3st.config` - YAML-based parameter management
-- :mod:`z3st.export_vtu` - post-processing and result export tools
-- :mod:`z3st.utils_load` - I/O helpers for simulation data
+- :mod:`z3st.core.mesh.manager` - geometry and mesh generation utilities
+- :mod:`z3st.core.config` - YAML-based parameter management
+- :mod:`z3st.utils.writer` - unified VTU / XDMF output writer and post-processing tools
+- :mod:`z3st.utils.utils_load` - I/O helpers for simulation data
 
 The framework supports both steady-state and transient analyses,
 and includes a collection of benchmark problems to ensure

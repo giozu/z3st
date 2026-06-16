@@ -1,0 +1,33 @@
+{
+    "results": {
+        "T_max": {
+            "numerical": 566.6324113290586,
+            "reference": 474.30000637518634,
+            "abs_error": 92.3324049538723,
+            "rel_error": 0.19467089123510245,
+            "status": "PASS"
+        },
+        "sigma1_mean": {
+            "numerical": -260644084.82996973,
+            "reference": 0.0,
+            "abs_error": 260644084.82996973,
+            "rel_error": 0.001472565451016778,
+            "status": "PASS"
+        },
+        "sigma2_mean": {
+            "numerical": -1248473964.5097995,
+            "reference": 0.0,
+            "abs_error": 1248473964.5097995,
+            "rel_error": 0.007053525223219206,
+            "status": "PASS"
+        },
+        "sigma3_mean": {
+            "numerical": -1266292639.021121,
+            "reference": 0.0,
+            "abs_error": 1266292639.021121,
+            "rel_error": 0.0071541957006843,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.6
+}

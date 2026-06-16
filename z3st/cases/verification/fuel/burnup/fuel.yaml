@@ -1,0 +1,27 @@
+name: fuel-burnup-test
+# Fissile fuel used to verify the burnup state + radial-power source buses. A
+# rim-peaking radial form factor f(r) shapes the deposited power, so the burnup
+# accumulates faster at the pellet rim than in the core. The verification then
+# checks both the accumulation magnitude (nodal-mean burnup = closed form) and
+# the radial shape (rim/core ratio = 1 + A, normalisation-independent).
+fissile: true
+
+# Radial power form factor: resolved by spine.load_materials, applied in set_power.
+radial_profile: materials.fuel_profiles.rim_peaking
+radial_peak_amplitude: 3.0      # A — rim peak height above the core (f(Ro)/f(0) = 1 + A)
+radial_peak_exponent: 8.0       # p — how tightly peaked at the rim
+
+E: 358.0e9                      # (Pa) (only the thermal-stress output field needs these;
+nu: 0.23                        # (-)  mechanical is off)
+
+k: 5.0                          # (W/(m·K)) thermal conductivity
+cp: 280.0                       # (J/(kg·K)) specific heat
+rho: 10970.0                    # (kg/m³) density
+heavy_metal_fraction: 0.8815    # (-) M_U / M_UO2; burnup is per kg heavy metal
+
+alpha: 1.0e-5                   # (1/K) thermal expansion
+T_ref: 300.0                    # (K)
+T_initial: 300.0                # (K)
+
+mu_gamma: 0.0
+gamma_heating: 0.0

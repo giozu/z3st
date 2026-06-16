@@ -1,0 +1,37 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+solver_settings:
+  coupling: staggered
+  max_iters: 100
+
+models:
+  cluster: true
+
+cluster:
+  advection_velocity: 1.0
+  diffusion_coefficient: 0.5
+  initial_condition:
+    type: gaussian
+    mean: 1.0
+    std_dev: 1.0
+    amplitude: 1000.0
+
+output:
+  format: xdmf
+  filename: results.xdmf
+
+lhr: 
+  - 0.0
+  - 0.0
+time:
+  - 0.0
+  - 1.0
+n_steps: 20

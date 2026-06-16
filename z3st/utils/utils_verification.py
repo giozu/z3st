@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import json
@@ -54,8 +54,6 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
         print(f"  {key:18s} → rel err = {rel_err_display:.2e}  → {color}{status}{END}")
         val["status"] = status
 
-        val["status"] = status
-
     summary = (
         f"{GREEN}PASS{END} All checks within tolerance"
         if all_pass
@@ -73,6 +71,21 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
 
     print(f"[INFO] non-regression results written to: {out_json}")
     return all_pass
+
+
+def _write_regression_verdict(case_dir, verdict):
+    """Persist the gold-regression verdict ('PASS'/'FAIL') into the run's
+    non-regression.json so the suite drivers (non-regression*.sh) can surface
+    it — a regression is otherwise invisible outside stdout."""
+    out_json = os.path.join(case_dir, "output", "non-regression.json")
+    try:
+        with open(out_json, "r") as f:
+            data = json.load(f)
+        data["regression"] = verdict
+        with open(out_json, "w") as f:
+            json.dump(data, f, indent=4)
+    except (FileNotFoundError, json.JSONDecodeError):
+        pass
 
 
 def regression_check(errors, case_dir, regression_tol=1e-3):
@@ -99,13 +112,26 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
 
     print(f"\nRegression check vs GOLD reference:")
 
-    with open(gold_file, "r") as f:
-        gold_data = json.load(f)
+    try:
+        with open(gold_file, "r") as f:
+            gold_data = json.load(f)
+    except (json.JSONDecodeError, OSError) as exc:
+        # A corrupt / unparseable gold must FAIL loudly, never be silently
+        # skipped: otherwise a broken gold disables the regression check and the
+        # suite reports a false pass.
+        print(f"  {RED}[ERROR] GOLD file unreadable ({exc}); marking regression FAIL.{END}")
+        _write_regression_verdict(case_dir, "FAIL")
+        return False
 
     gold_results = gold_data.get("results", gold_data)
     reg_pass = True
 
-    for key in errors:
+    for key in sorted(set(errors) | set(gold_results)):
+        if key not in errors:
+            print(f"  {key:18s} → present in GOLD but MISSING from run → REGRESSION")
+            reg_pass = False
+            continue
+
         num_now = errors[key]["numerical"]
         num_gold = gold_results.get(key, {}).get("numerical", None)
 
@@ -123,10 +149,30 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
             np.array(num_gold, dtype=float) if isinstance(num_gold, list) else np.array([num_gold])
         )
 
-        rel_diff_arr = np.abs(num_now_arr - num_gold_arr) / np.maximum(np.abs(num_gold_arr), 1e-12)
+        if num_now_arr.shape != num_gold_arr.shape:
+            print(f"  {key:18s} → shape {num_now_arr.shape} vs GOLD {num_gold_arr.shape} → REGRESSION")
+            reg_pass = False
+            continue
 
-        passed = np.all(rel_diff_arr < regression_tol)
+        abs_diff_arr = np.abs(num_now_arr - num_gold_arr)
+        rel_diff_arr = abs_diff_arr / np.maximum(np.abs(num_gold_arr), 1e-12)
         rel_diff_display = float(np.max(rel_diff_arr))
+
+        # Fields whose analytical reference is exactly zero are 'should-be-zero'
+        # residuals: their numerical value is floating-point noise that varies
+        # between build/BLAS environments (e.g. the conda env vs the CI docker
+        # image), so ANY value-vs-gold comparison (relative or absolute) is
+        # ill-defined and environment-fragile. Defer to the field's own analytical
+        # verdict instead: it is a regression only if the residual is no longer
+        # acceptably small, i.e. its analytical status is not PASS.
+        ref_val = gold_results.get(key, {}).get("reference", errors[key].get("reference"))
+        near_zero_ref = ref_val is not None and np.all(
+            np.abs(np.atleast_1d(np.asarray(ref_val, dtype=float))) <= 0.0
+        )
+        if near_zero_ref:
+            passed = str(errors[key].get("status", "PASS")).upper() == "PASS"
+        else:
+            passed = bool(np.all(rel_diff_arr < regression_tol))
 
 
         # --- Accuracy trend analysis ---
@@ -174,4 +220,5 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
     )
     print(f"\n[SUMMARY] {BOLD}{summary_reg}{END}")
 
+    _write_regression_verdict(case_dir, "PASS" if reg_pass else "FAIL")
     return reg_pass

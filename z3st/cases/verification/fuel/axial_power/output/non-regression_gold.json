@@ -1,0 +1,47 @@
+{
+    "results": {
+        "burnup_mean_closed_form": {
+            "numerical": 27.19699824399601,
+            "reference": 27.196998243996006,
+            "abs_error": 3.552713678800501e-15,
+            "rel_error": 1.306288895166876e-16,
+            "status": "PASS"
+        },
+        "axial_peaking_factor": {
+            "numerical": 1.3262074673259312,
+            "reference": 1.3213063996776495,
+            "abs_error": 0.004901067648281687,
+            "rel_error": 0.003709258995095588,
+            "status": "PASS"
+        },
+        "end_peak_ratio": {
+            "numerical": 0.30901699437494745,
+            "reference": 0.30901699437494745,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "dT_centre_mid": {
+            "numerical": 530.7853608629125,
+            "reference": 525.7311121191335,
+            "abs_error": 5.054248743778999,
+            "rel_error": 0.009613752405495224,
+            "status": "PASS"
+        },
+        "elongation_u_top": {
+            "numerical": 0.0008782059789048599,
+            "reference": 0.0008753521870054244,
+            "abs_error": 2.8537918994354927e-06,
+            "rel_error": 0.0032601642422329475,
+            "status": "PASS"
+        },
+        "total_power": {
+            "numerical": 8029.509,
+            "reference": 8000.0,
+            "abs_error": 29.509000000000015,
+            "rel_error": 0.003688625000000002,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.03
+}

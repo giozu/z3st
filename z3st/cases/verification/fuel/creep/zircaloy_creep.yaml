@@ -1,0 +1,17 @@
+name: zircaloy-creep-test
+
+E: 99.3e9     # (Pa) Young's modulus
+nu: 0.37      # (-)  Poisson's ratio
+
+k: 17.0       # (W/(m·K)) thermal conductivity
+cp: 350.0     # (J/(kg·K)) specific heat
+rho: 6500.0   # (kg/m³) density
+
+alpha: 7.5e-6 # (1/K) thermal expansion
+T_ref: 600.0      # (K)
+T_initial: 600.0  # (K)
+
+creep: norton
+creep_A0: 2.82e-24   # (Pa^-n s^-1)
+creep_n: 3.0         # (-)
+creep_Q: 1.2e5       # (J/mol)

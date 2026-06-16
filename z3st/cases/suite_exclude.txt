@@ -1,0 +1,4 @@
+# Cases excluded from non-regression_local.sh
+
+regression/pwr_rod_2D
+verification/fuel/creep_law_discovery

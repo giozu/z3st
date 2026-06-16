@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import os
@@ -13,9 +13,7 @@ import yaml
 
 
 # --. Markdown stdout filter --..
-# When stdout is redirected to a file (e.g., `python -m z3st > log.md`),
-# rewrite line-by-line to produce a readable Markdown document. Pass-through
-# when the terminal is interactive. Disable explicitly with Z3ST_PLAIN_LOG=1.
+# Disable explicitly with Z3ST_PLAIN_LOG=1.
 def _install_markdown_stdout():
     if os.environ.get("Z3ST_PLAIN_LOG"):
         return
@@ -99,7 +97,7 @@ print(
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
-Version: 0.1.0 (2025)
+Version: 0.2.0 (2026)
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 [DESCRIPTION]
@@ -117,15 +115,9 @@ from z3st.utils.writer import OutputWriter
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
-# ─── Hot-reload of input.yaml parameters ──────────────────────────────
+# --. Hot-reload of input.yaml parameters --..
 # Some run-time parameters can be safely changed mid-simulation: the user
-# edits input.yaml, and the next time-step picks up the new value. The
-# allow-list below covers tolerances, iteration limits, relaxation factors,
-# and a couple of split-controlling damage params. Anything outside this
-# list (mesh, regime, models, materials, time history, n_steps, damage.type
-# / split / lc, mechanical.constitutive, ...) is intentionally NOT reloaded
-# because changing it mid-run would invalidate pre-allocated FE structures
-# or pre-compiled UFL Expressions held by the OutputWriter.
+# edits input.yaml, and the next time-step picks up the new value.
 _MISSING = object()
 _HOT_RELOAD_ALLOWLIST = {
     "damage":          ("stag_tol", "rtol", "hybrid_constraint", "gamma_star"),
@@ -134,25 +126,28 @@ _HOT_RELOAD_ALLOWLIST = {
     "solver_settings": (
         "max_iters",
         "relax_T", "relax_u", "relax_D",
-        "relax_adaptive", "relax_growth", "relax_shrink",
+        "relax_adaptive", "relax_aitken", "relax_growth", "relax_shrink",
         "relax_min", "relax_max",
     ),
 }
 
-# ``solver_settings`` values are cached on the Spine instance as plain
-# attributes at ``Solver.__init__`` time (e.g. ``self.relax_D``), and the
-# staggered loop reads those attributes directly — NOT the
-# ``self.solver_settings`` dict. So for a hot-reload to actually reach
-# the solver, we must additionally ``setattr`` on the Spine. The cast
-# matches the type imposed by ``Solver.__init__``. (``max_iters`` is
-# re-read from ``input_file`` per step in the time loop, so attribute
-# propagation is redundant but harmless.)
+
+def _to_bool(v):
+    """Parse a YAML scalar to bool without the bool('false') == True footgun:
+    a quoted boolean (relax_adaptive: "false") loads as the string 'false', and
+    bool('false') is True. Native YAML booleans pass straight through."""
+    if isinstance(v, bool):
+        return v
+    return str(v).strip().lower() in ("1", "true", "yes", "on")
+
+
 _SOLVER_SETTINGS_CASTS = {
     "max_iters":      int,
     "relax_T":        float,
     "relax_u":        float,
     "relax_D":        float,
-    "relax_adaptive": bool,
+    "relax_adaptive": _to_bool,
+    "relax_aitken":   _to_bool,
     "relax_growth":   float,
     "relax_shrink":   float,
     "relax_min":      float,
@@ -162,13 +157,7 @@ _SOLVER_SETTINGS_CASTS = {
 
 def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
     """Re-read input.yaml and propagate allow-listed parameter changes
-    in-place into ``input_file`` (and, by reference-sharing, into
-    ``problem.dmg_cfg`` / ``mech_cfg`` / ``th_cfg``). For
-    ``solver_settings`` keys, also ``setattr`` on the Spine instance
-    (those values are cached as plain attributes by ``Solver.__init__``
-    and not re-read from the dict at each step). Silent on read errors
-    (a mid-edit file may be transiently malformed). Prints a one-line
-    notice only when a value actually changes."""
+    in-place into ``input_file``."""
     try:
         with open(input_path, "r") as f:
             new_input = yaml.safe_load(f)
@@ -189,9 +178,6 @@ def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
             if new_val is _MISSING or new_val == old_val:
                 continue
             old_block[key] = new_val
-            # Solver-settings values are also cached as plain attributes on
-            # the Spine instance — propagate so the change actually reaches
-            # the solver's staggered loop on the next iteration.
             if block == "solver_settings" and hasattr(problem, key):
                 caster = _SOLVER_SETTINGS_CASTS.get(key, lambda v: v)
                 try:
@@ -199,6 +185,85 @@ def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
                 except (TypeError, ValueError):
                     pass  # keep the previous attribute value silently
             print(f"  [hot-reload] {block}.{key}: {old_val} → {new_val}")
+
+
+def _solve_interval(problem, t0, t1, lhr0, lhr1, step_idx, n_grid, max_iters, adapt_cfg, depth):
+    """Adaptively solve the time interval (t0, t1] of original grid step
+    ``step_idx`.
+    """
+    dt = t1 - t0
+    dt_min = float(adapt_cfg.get("dt_min", 1.0e3))
+    max_cuts = int(adapt_cfg.get("max_cuts", 6))
+    snap = problem.snapshot_state()
+
+    problem.current_step = step_idx
+    problem.parameters(lhr=lhr1)
+    problem.set_power()
+
+    problem.invalidate_dt_caches()
+
+    problem.update_state(dt)
+    converged = problem.solve(max_iters=max_iters, dt=dt)
+
+    if converged:
+        return True
+
+    problem.restore_state(snap)
+
+    if dt <= dt_min or depth >= max_cuts:
+        msg = (
+            f"[substep] step {step_idx+1}/{n_grid}: solve did NOT converge even "
+            f"at dt={dt:.3e} s (floor dt_min={dt_min:.1e} s, depth {depth}/{max_cuts}). "
+            f"State rolled back to the last converged step. Lower the load rate, "
+            f"loosen tolerances, increase max_iters, or lower dt_min."
+        )
+        print(f"  [ERROR] {msg}")
+        raise RuntimeError(msg)
+
+    tm = 0.5 * (t0 + t1)
+    lhrm = 0.5 * (lhr0 + lhr1)
+    print(
+        f"  [substep] step {step_idx+1}/{n_grid}: dt={dt:.3e} s stalled → "
+        f"bisecting into 2 × dt={0.5*dt:.3e} s (depth {depth+1}/{max_cuts})"
+    )
+    _solve_interval(problem, t0, tm, lhr0, lhrm, step_idx, n_grid, max_iters, adapt_cfg, depth + 1)
+    _solve_interval(problem, tm, t1, lhrm, lhr1, step_idx, n_grid, max_iters, adapt_cfg, depth + 1)
+    return True
+
+
+def _warn_ramped_bcs_under_adaptivity(problem):
+    """Warn when a per-step BC ramp list coexists with adaptive time-stepping.
+    """
+    def _is_ramp(raw):
+        try:
+            vals = list(raw)
+        except TypeError:
+            return False
+        if len(vals) <= 1:
+            return False
+        first = repr(vals[0])
+        return any(repr(v) != first for v in vals[1:])
+
+    ramped = []
+    for mat, bclist in getattr(problem, "dirichlet_mechanical", {}).items():
+        for bc in bclist:
+            if isinstance(bc, dict) and _is_ramp(bc.get("raw", [])):
+                ramped.append(f"Dirichlet[{mat}/{bc.get('id')}]")
+    for mat, bclist in getattr(problem, "traction", {}).items():
+        for bc in bclist:
+            if isinstance(bc, dict) and _is_ramp(bc.get("raw", [])):
+                ramped.append(f"Neumann[{mat}/{bc.get('id')}]")
+
+    if ramped:
+        print(
+            "[WARNING] Adaptive time-stepping with per-step ramped BC list(s): "
+            + ", ".join(ramped)
+            + ". Ramp values are applied at the grid-step value within a "
+            "bisected step (NOT interpolated to sub-step times); only lhr is "
+            "interpolated. Sub-stepped results for these BCs may differ from a "
+            "finer fixed grid."
+        )
+
 
 # ---------------------------------------------------------------
 # MAIN EXECUTION BLOCK
@@ -241,7 +306,8 @@ if __name__ == "__main__":
     # --. History --..
     t_points = input_file.get("time")
     lhr_points = input_file.get("lhr")
-    n_increments = input_file.get("n_steps") - 1
+    raw_n_steps = input_file.get("n_steps")
+    n_increments = raw_n_steps if isinstance(raw_n_steps, (list, tuple)) else raw_n_steps - 1
 
     times, lhrs, n_steps = generate_power_history(
         t_points, lhr_points, n_steps=n_increments, filename=None
@@ -255,8 +321,7 @@ if __name__ == "__main__":
     problem.set_boundary_conditions()
 
     # Populate symbolic stress / strain / energy_density UFL expressions, then
-    # construct the writer (which compiles those expressions to dolfinx
-    # Expression objects exactly once).
+    # construct the writer
     problem.get_results()
     writer = OutputWriter(
         problem,
@@ -267,11 +332,6 @@ if __name__ == "__main__":
     )
 
     # --. Optional case-local diagnostics module --..
-    # A case can drop a ``diagnostics.py`` in its working directory exposing
-    # a function ``per_step(problem, step, t) -> None`` that runs after every
-    # solve. Useful for streaming derived quantities (e.g. force-displacement,
-    # slip rate, integrated reactions) that would otherwise require post-hoc
-    # VTU extraction.
     case_diagnostics = None
     if os.path.isfile(os.path.join(os.getcwd(), "diagnostics.py")):
         try:
@@ -290,6 +350,15 @@ if __name__ == "__main__":
     # --. Time loop --..
     start_time = time.time()
 
+    adapt_cfg = input_file.get("time_adaptivity", {})
+    if adapt_cfg.get("enabled", False):
+        print(
+            f"[INFO] Adaptive time-stepping ON: dt_min="
+            f"{float(adapt_cfg.get('dt_min', 1.0e3)):.1e} s, "
+            f"max_cuts={int(adapt_cfg.get('max_cuts', 6))} (bisect dt on a stalled step)."
+        )
+        _warn_ramped_bcs_under_adaptivity(problem)
+
     print(
         "\n[INFO] Hot-reload of allow-listed input.yaml parameters is active. "
         "Edit input.yaml during the run; changes apply at the next step boundary. "
@@ -298,33 +367,52 @@ if __name__ == "__main__":
         "solver_settings.{max_iters,relax_*}."
     )
 
+    aborted = False
     for step, (t, lhr) in enumerate(zip(times, lhrs)):
         print(f"\n[STEP {step+1:02d}/{len(times)}] t = {t:.2e} s | LHR = {lhr:.2e} W/m")
 
-        # Hot-reload: pick up any in-flight edits to input.yaml. No-op when
-        # the file is unchanged (no print in that case).
+        # Hot-reload
         _reload_hot_params(problem, "input.yaml", input_file)
 
         problem.current_step = step
-
-        # Update source term
-        problem.parameters(lhr=lhr)
-        problem.set_power()
-
-        # Calculate dt
-        if step == 0:
-            dt = t
-        else:
-            dt = t - times[step-1]
-
-        if dt == 0.0:
-            print(f"  → dt=0: solving static step / initial condition")
-            problem.get_results()
-
-        # Solve
         max_iters = int(input_file.get("solver_settings", {}).get("max_iters", 100))
-        problem.solve(max_iters=max_iters, dt=dt)
+
+        t_prev = 0.0 if step == 0 else times[step - 1]
+        lhr_prev = lhrs[0] if step == 0 else lhrs[step - 1]
+        dt = t - t_prev
+
+        try:
+            if adapt_cfg.get("enabled", False) and dt > 0.0:
+                # Adaptive path
+                converged = _solve_interval(
+                    problem, t_prev, t, lhr_prev, lhr,
+                    step, len(times), max_iters, adapt_cfg, depth=0,
+                )
+            else:
+                # Fixed-grid path
+                problem.parameters(lhr=lhr)
+                problem.set_power()
+                problem.update_state(dt)
+                if dt == 0.0:
+                    print(f"  → dt=0: solving static step / initial condition")
+                    problem.get_results()
+                converged = problem.solve(max_iters=max_iters, dt=dt)
+        except RuntimeError as exc:
+            print(f"\n[ERROR] {exc}")
+            aborted = True
+            break
+
+        if not converged:
+            print(
+                f"  [time-loop] step {step+1}/{len(times)} did NOT converge "
+                f"— proceeding with last-iteration state."
+            )
         problem.get_results()
+
+        # Per-material average heat-flux diagnostic (debug-only: the writer
+        # already exports the HeatFlux field; this is the printed summary).
+        if DEBUG_MODE and problem.on.get("thermal"):
+            problem.heat_flux(problem.T)
 
         # Writing energies.txt
         if problem.on.get("damage"):
@@ -353,6 +441,14 @@ if __name__ == "__main__":
                 print(f"[WARNING] diagnostics.per_step failed at step {step}: {e}")
 
     writer.close()
+
+    if aborted:
+        print(
+            "\n[ERROR] Simulation aborted: adaptive time-stepping could not "
+            "converge a step even at dt_min. Output was written up to the last "
+            "converged step."
+        )
+        sys.exit(1)
 
     end_time = time.time()
     elapsed_time = end_time - start_time

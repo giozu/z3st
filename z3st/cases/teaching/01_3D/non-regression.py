@@ -100,7 +100,7 @@ list_fields(VTU_FILE)
 # --.. ..- .-.. .-.. --- extract FE fields --.. ..- .-.. .-.. ---
 # Stress is per-cell. Sample at mid-cross-section (y ≈ Ly/2, z ≈ Lz/2) and
 # sort by x to get a clean axial profile.
-x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
 y_mid = Ly / 2.0
 z_mid = Lz / 2.0
 mask_tol_y = Ly / (2 * max(ny, 1))

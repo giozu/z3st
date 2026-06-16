@@ -1,0 +1,20 @@
+{
+    "results": {
+        "selected_cubic_norton_only": {
+            "numerical": 1.0,
+            "reference": 1.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "identified_cubic_coefficient": {
+            "numerical": 1.2807463049452177e-11,
+            "reference": 1.2601872955975901e-11,
+            "abs_error": 2.055900934762759e-13,
+            "rel_error": 0.01631424901635622,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.1,
+    "summary": "PASS"
+}

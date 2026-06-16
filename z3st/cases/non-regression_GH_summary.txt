@@ -1,11 +1,21 @@
-Z3ST non-regression summary - Fri Jun  5 11:53:20 CEST 2026
+Z3ST non-regression summary - Tue Jun 16 13:07:36 CEST 2026
 
-Case: 1_thin_slab_2D -> OK
-Case: 2_thin_cylindrical_shell_2D -> OK
-Case: 3_thick_slab_adiabatic_3D -> OK
-Case: 7_box_heated -> OK
-Case: 14_full_cylinder -> OK
-Case: 16_coaxial_cylinders_3D -> OK
-Case: 18_box_crack_2D -> OK
-Case: 20_plasticity_2D -> OK
-Case: demo_CP_single_grain -> OK
+Case: verification/thermal/thin_slab_dirichlet_2D -> OK
+Case: verification/thermal/thin_cylindrical_shell_dirichlet_2D -> OK
+Case: verification/thermal/thick_slab_adiabatic_3D -> OK
+Case: verification/thermal/box_heated -> OK
+Case: verification/mechanics/full_cylinder -> OK
+Case: regression/coaxial_gap_3D -> OK
+Case: regression/box_crack_2D -> OK
+Case: verification/plasticity/j2_hardening_2D -> OK
+Case: verification/plasticity/crystal_single_grain -> OK
+Case: verification/fuel/coaxial_contact -> OK
+Case: verification/fuel/swelling -> OK
+Case: verification/fuel/burnup -> OK
+Case: verification/fuel/fuel_swelling -> OK
+Case: verification/fuel/axial_power -> OK
+Case: verification/fuel/axial_table -> OK
+Case: verification/fuel/creep -> OK
+Case: verification/fuel/creep_relaxation -> OK
+Case: verification/fuel/creep_irradiation -> OK
+Case: verification/fuel/cracking -> OK

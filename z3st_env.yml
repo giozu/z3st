@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 name: z3st
@@ -15,7 +15,7 @@ dependencies:
 - pip
 
   # --. FEniCSx --..
-- fenics-dolfinx    # includes ufl, basix, petsc, slepc, mpi4py
+- fenics-dolfinx=0.11.0    # includes ufl, basix, petsc, slepc, mpi4py; Z3ST targets 0.11.0 (matches CI image dolfinx/dolfinx:v0.11.0)
 
   # --. Scientific stack --..
 - numpy

@@ -18,7 +18,7 @@ Linear thermo-mechanics
 Thin Slab: Thermo-Mechanical Coupling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. **Case Directory:** ``cases/1_thin_slab_neumann_3D``
+.. **Case Directory:** ``cases/verification/thermal/thin_slab_neumann_3D``
 
 This example demonstrates coupled thermo-mechanical analysis of a thin slab subjected to thermal loading.
 The case serves as a **verification benchmark** for:
@@ -73,7 +73,7 @@ The case serves as a **verification benchmark** for:
 Cylindrical Shell: Lamé Solution Verification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. **Case Directory:** ``cases/4_thick_cylindrical_shell_adiabatic_2D``
+.. **Case Directory:** ``cases/verification/thermal/thick_cylindrical_shell_adiabatic_2D``
 
 This example verifies the mechanical solver against the **analytical Lamé solution** for a thick-walled cylindrical shell under internal pressure.
 
@@ -140,7 +140,7 @@ Plasticity and Material Nonlinearity
 J2 Plasticity: Stress-Strain Curve
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/20_plasticity_2D``
+**Case Directory:** ``cases/verification/plasticity/j2_hardening_2D``
 
 This example demonstrates **J2 (von Mises) plasticity** with isotropic hardening in a 2D plane-strain setting.
 
@@ -174,7 +174,7 @@ This example demonstrates **J2 (von Mises) plasticity** with isotropic hardening
 Crystal Plasticity with Automatic Differentiation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/demo_CP_single_grain``
+**Case Directory:** ``cases/verification/plasticity/crystal_single_grain``
 
 This advanced example demonstrates **single crystal plasticity** using **automatic differentiation** via UFL for exact Jacobian computation.
 
@@ -227,7 +227,7 @@ This eliminates **hundreds of lines** of error-prone manual derivative code!
 Stress-Strain Curves: Displacement-Controlled Loading
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/17_stress_strain_curve_displacement``
+**Case Directory:** ``cases/verification/plasticity/stress_strain_displacement``
 
 This example generates stress-strain curves under **displacement-controlled** loading, useful for:
 
@@ -255,7 +255,7 @@ Phase-Field Fracture
 Box with Initial Crack (2D)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/18_box_crack_2D``
+**Case Directory:** ``cases/regression/box_crack_2D``
 
 This example demonstrates **phase-field fracture** using the AT2 model. The simulation captures:
 
@@ -302,7 +302,7 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 Single-Edge-Notched Shear Test (Miehe 2010 benchmark)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/19_single-edge_notched_shear_test``
+**Case Directory:** ``cases/benchmarks/sen_shear``
 
 A standard phase-field-fracture benchmark: a square specimen with a horizontal
 pre-notch is loaded in shear. The curved crack path that develops reproduces the
@@ -334,7 +334,7 @@ result of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010)
 UO\ :sub:`2` Pellet Thermal-Shock Cracking (McClenny 2022)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/14_full_cylinder_cracking_2D_xy``
+**Case Directory:** ``cases/benchmarks/pellet_quench_2D_xy``
 
 The fully coupled showpiece, in which thermal, mechanical, and phase-field damage
 all meet. A 2D plane-strain transverse cross-section of a UO\ :sub:`2` pellet has
@@ -382,7 +382,7 @@ Numerical analysis
 Mesh Convergence Study
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/I_mesh_sensitivity_2D``
+**Case Directory:** ``cases/studies/mesh_sensitivity_2D``
 
 This example demonstrates **mesh convergence** for a 2D thermal problem, showing how solution accuracy improves with mesh refinement.
 

@@ -132,7 +132,7 @@ list_fields(VTU_FILE)
 # --.. ..- .-.. .-.. --- extract FE fields --.. ..- .-.. .-.. ---
 # Stress is per-cell. On a 1D mesh every cell is on the "axis", so we just
 # extract everything and sort by x.
-x_S, _, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+x_S, _, _, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
 sort_idx = np.argsort(x_S)
 x_s = x_S[sort_idx]
 sigma_xx = S_all[sort_idx, 0]

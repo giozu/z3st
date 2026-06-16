@@ -1,0 +1,25 @@
+thermal:
+  fuel:
+  - type: Dirichlet
+    region: outer
+    temperature: 600.0   # (K)
+
+  - type: Neumann
+    region: bottom
+    flux: 0.0            # adiabatic end
+
+  - type: Neumann
+    region: top
+    flux: 0.0            # adiabatic end
+
+  - type: Neumann
+    region: inner
+    flux: 0.0            # symmetry axis (r = 0)
+
+mechanical:
+  fuel:
+  - type: Clamp_x
+    region: inner        # u_r = 0 on the symmetry axis
+
+  - type: Clamp_y
+    region: bottom       # u_z = 0 (removes axial rigid-body mode)

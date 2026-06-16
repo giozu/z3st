@@ -1,0 +1,26 @@
+{
+    "results": {
+        "sigma_zz_final": {
+            "numerical": 780913898.6814573,
+            "reference": 808565333.7576076,
+            "abs_error": 27651435.076150298,
+            "rel_error": 0.034198145680630516,
+            "status": "PASS"
+        },
+        "epsilon_zz_final": {
+            "numerical": 0.009999999999992355,
+            "reference": 0.01,
+            "abs_error": 7.644926358629789e-15,
+            "rel_error": 7.644926358629789e-13,
+            "status": "PASS"
+        },
+        "saturation_convergence": {
+            "numerical": 3.419814568063052,
+            "reference": 0.0,
+            "abs_error": 3.419814568063052,
+            "rel_error": 0.034198145680630516,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.25
+}

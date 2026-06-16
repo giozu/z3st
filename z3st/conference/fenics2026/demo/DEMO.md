@@ -11,12 +11,15 @@ the pre-flight checklist.
 
 ## 0 · Prize strategy (read this once, internalise it)
 
-At FEniCS 2025 the awards were:
-- **Best presentation** — separate PhD and postdoc categories (Ridgway Scott Foundation).
-- **Best poster.**
-- **Nate Sime award for visualization.**
+The FEniCS 2026 awards (confirmed by the final-info email and the website):
+- **Best Presentation by a PhD Candidate** — $500.
+- **Best Presentation by a Postdoctoral Researcher** — $500.
+- **Best FEniCS 2026 Poster** — $500.
+- **Nate Sime's Exceptional Visualization** — surprise prize; "most beautiful
+  according to the committee's subjective sense of aesthetics", composed from
+  data generated primarily with FEniCS. The case-14 animation qualifies.
 
-Judging was on a 7-point scale across two axes:
+Judging is on a 0–7 scale across two axes:
 1. **Comprehension & content** — clear background, transparent strategy and results, articulated impact.
 2. **Engagement & communication** — clarity, organisation, *enthusiasm*, thoughtful answers to questions, holding attention.
 
@@ -32,6 +35,9 @@ What this means for you, concretely:
 Two non-obvious wins:
 - **Demos cycle.** A small group leaves, a new one arrives. Your core loop must be tight (~4 min) and repeatable from a clean state. Practise the *restart*, not just the run.
 - **Judges wander the poster session.** They may catch any 4 minutes of you. Every loop must contain the animation and the one-sentence pitch — never bury the best thing waiting for a "later" that a judge will not stay for.
+- **The abstract is a promise.** Visitors who read it expect *crystal plasticity*
+  and *automated constitutive-law discovery* — segments K and M deliver both on
+  demand. Offer them unprompted to anyone who mentions the abstract.
 
 ---
 
@@ -67,7 +73,7 @@ control the pace while you talk. Talking points below.
     material is just a new energy."*
 
 ### C. Coupled thermo-mechanics + the hot-reload "wow" — 90 s
-- Start the **coupled slab** (`1_thin_slab_neumann_2D`): thermal + mechanical,
+- Start the **coupled slab** (`verification/thermal/thin_slab_neumann_2D`): thermal + mechanical,
   staggered. It solves in a few seconds and prints the staggered iteration count.
   - *"Now it is coupled: heat conduction drives thermal strain, which drives stress.
     Staggered loop with adaptive relaxation."*
@@ -87,8 +93,63 @@ control the pace while you talk. Talking points below.
 ### E. Close — 30 s
 - *"It is open, Apache-2.0, on GitHub, archived on Zenodo with a DOI, documented.
   Your case is a YAML file. Clone it tonight."*
-- Hand them a card / point at the QR on the poster.
+- Hand them the handout / point at the QR codes on the attract screen.
   - `github.com/giozu/z3st` · `giozu.github.io/z3st` · DOI `10.5281/zenodo.17748028`
+
+### P. (optional) Multi-body: pellet–cladding contact, verified — 60 s
+*Not in the default tight loop — pull it up for a fuel-interested visitor or a
+judge who lingers (`./run_demo.sh P`; it opens the baked figures). It pairs with
+the oral's PCMI slide.*
+- *"A fuel pellet heats, expands, closes the gap, and contacts the cladding — all
+  coupled. Contact is a penalty: pressure proportional to penetration. Nothing is
+  prescribed — the pressure **emerges**, and the cladding is driven outward, load
+  transfer. And it feeds back: contact raises the gap conductance, so the fuel
+  cools the moment it touches."*
+- Impact: *"and it's **verified** — 3.5% against the analytical Lamé interference
+  fit, the stress state confirmed plane-stress."*
+- Tie back to the one sentence: *"the penalty tangent is the same AD path —
+  `ufl.derivative` — no hand-coded contact Jacobian."*
+- **The burnup beat (the fuel-performance closer):** open
+  `baked/pcmi_burnup_curves.png`. *"That was a power ramp. Here is the same
+  physics over an **1800-day irradiation**: burnup accumulates as a material
+  state field, swelling is an eigenstrain that reads it — handled like any other
+  material property, no solver change — and the gap closes at ~21 MWd/kgU. Watch the right panel:
+  the moment contact engages, the gap conductance jumps and the **peak fuel
+  temperature drops**. That is the two-way coupling, visible in one figure. And
+  the burnup itself is verified against the closed form to 2e-8."*
+- Optional live (during a longer chat): run the case and watch the gap close and
+  contact switch on in the streamed `[contact] … CLOSED` lines.
+
+### K. (optional) Crystal plasticity — the demo abstract's first headline — 90 s
+*Pull it up for anyone who read the abstract, a plasticity person, or a judge
+(`./run_demo.sh K`; runs live in ~11 s, baked fallback `baked/cp_stress_strain.png`).*
+- Run `verification/plasticity/crystal_single_grain` live: single crystal, one FCC slip system
+  (111)[0-11], power-law viscoplasticity, backward Euler with history variables
+  in quadrature spaces.
+- *"The slip-rate derivative through the Schmid tensor is the Jacobian nobody
+  wants to derive by hand. Here it comes from `ufl.diff` — exactly. That's why
+  Newton converges quadratically: 2 iterations per step."*
+- Point at the stress-strain curve: elastic, yield at τ = g₀, saturation at the
+  **semi-analytical σ_sat to 3.4%**.
+- Tie back: *"the constitutive law is ~10 lines of Python — same AD path as
+  everything else."*
+
+### M. (optional) Toward constitutive-law discovery — identification from data — 90 s
+*The demo abstract's second headline (Flaschel et al. 2022 — EUCLID), shown as
+the first preliminary step (`./run_demo.sh M`; runs live in ~2 s, bakes
+`baked/creep_identification.png`).*
+- *"Same AD idea, pointed the other way: differentiate the **solver** with
+  respect to the **material parameters**, and you can learn the law from data."*
+- Run `identify_creep.py` live: Norton creep relaxation (the verified case),
+  51 synthetic data points with 2% noise, forward-mode AD propagated through
+  every implicit backward-Euler step, Gauss-Newton least squares.
+- Land the numbers: *"the creep exponent comes back to ~2%, the rate to ~1%,
+  in ten iterations — about a second."*
+- Be honest and forward-pointing: *"this is **parametric identification**
+  today; EUCLID-style sparse-regression discovery over a library of candidate
+  energies is the roadmap — the differentiable foundation you just saw is the
+  hard part."* (If asked: independent implementation; the EUCLID codes are
+  GPL-3.0 and nothing here derives from them.)
 
 ---
 
@@ -113,10 +174,10 @@ Have these ready; do not volunteer them in the core loop.
 | If… | Do this |
 |---|---|
 | A live run hangs or errors | Ctrl-C, say *"let me show you the baked result"* and open the pre-rendered PNG/animation. Never debug in front of a group. |
-| dolfinx import fails | The env was not activated — `conda activate z3st`. `preflight.sh` checks this; run it before the session. |
-| ParaView is slow / wrong screen | Fall back to the pre-rendered MP4/PNG sequence in `demo/baked/` — `open_paraview.sh --baked` just opens the images. |
+| dolfinx import fails | The env was not activated — `conda activate z3st11` (0.11 primary; `z3st` 0.10 is the fallback). `preflight.sh` checks this; run it before the session. |
+| ParaView is slow / wrong screen | Fall back to the pre-rendered PNG sequence in `demo/baked/` — `open_paraview.sh --baked` just opens the images. |
 | Projector resolution is bad | Pre-set ParaView and terminal font large (see checklist). Use the PNG sequence, not interactive, if rotation stutters. |
-| No internet | Everything here runs **offline**. The only online things are the GitHub/DOI links — those live on the poster, not the laptop. |
+| No internet | Everything here runs **offline**. The only online things are the GitHub/DOI links — those live on the handout and the attract screen, not the laptop. |
 | Someone asks something you do not know | *"Good question — I am not certain; here is how I would find out."* Judges score *thoughtful* answers, not bluffing. |
 
 **Golden rule:** the baked artifacts in `demo/baked/` mean you can deliver the
@@ -130,16 +191,18 @@ dependency.
 Run `./preflight.sh` first — it verifies the env, the cases, and the baked
 artifacts. Then, by hand:
 
-- [ ] `conda activate z3st` in the demo terminal; leave it activated.
+- [ ] `conda activate z3st11` in the demo terminal; leave it activated (`z3st` 0.10 is the fallback).
 - [ ] Terminal font size large (≥ 18 pt); dark-on-light or high-contrast theme.
 - [ ] Laptop on mains power; screen-sleep and notifications **off**.
 - [ ] ParaView opens the baked case-14 series and the animation plays smoothly.
-- [ ] `teaching/01_1D`, `teaching/01_3D`, `1_thin_slab_neumann_2D` each run clean once (warms the dolfinx import cache too).
-- [ ] `demo/baked/` contains the fallback PNGs.
+- [ ] `teaching/01_1D`, `teaching/01_3D`, `verification/thermal/thin_slab_neumann_2D` each run clean once (warms the dolfinx import cache too).
+- [ ] `demo/baked/` contains the fallback PNGs (incl. `pcmi_curves.png`, `pcmi_verification.png` for segment P, `cp_stress_strain.png` for segment K, `creep_identification.png` for segment M).
+- [ ] `verification/plasticity/crystal_single_grain` runs clean once (segment K live run, ~11 s) and `python3 identify_creep.py` converges (segment M, ~2 s) — both checked by `preflight.sh`.
 - [ ] Open `attract.html` once (`./attract.sh`) and confirm the loop plays and the QR codes scan.
 - [ ] `../handout/handout.pdf` printed (a small stack to hand out); QR codes scan.
-- [ ] Editor open on `mechanical_model.py` (AD lines) and `1_thin_slab_neumann_2D/input.yaml` (for the hot-reload edit) in separate tabs.
-- [ ] Poster has the QR codes (repo, docs, DOI) and your email.
+- [ ] Editor open on `mechanical_model.py` (AD lines) and `verification/thermal/thin_slab_neumann_2D/input.yaml` (for the hot-reload edit) in separate tabs.
+- [ ] No poster was submitted — the attract screen and the handout are the
+      stand-ins; both carry the QR codes (repo, docs, DOI) and your email.
 - [ ] A few business cards / a printed one-pager to hand out.
 - [ ] Water. You will talk for two hours straight in loops.
 
@@ -150,10 +213,11 @@ artifacts. Then, by hand:
 ```
 demo/
 ├── DEMO.md            this run-sheet
-├── run_demo.sh        interactive, segmented core-loop launcher
+├── run_demo.sh        interactive, segmented launcher (A–E core + P/K/M optional)
 ├── preflight.sh       environment + cases + artifacts check
 ├── open_paraview.sh   opens the case-14 crack animation (live or --baked)
 ├── paraview_case14.py pvpython script: builds the damage animation / PNG sequence
+├── identify_creep.py  segment M: gradient-based creep-law identification (own AD)
 ├── attract.html       idle-table attract loop (crack animation + pitch + QR codes)
 ├── attract.sh         opens the attract loop full-screen in a browser
 ├── qr/                QR codes for the attract loop (repo, docs, DOI) + make_qr.sh

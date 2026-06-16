@@ -1,0 +1,18 @@
+thermal:
+  uo2:
+  - type: Dirichlet
+    region: contact_wall
+    temperature: 263.15  # (K)
+
+mechanical:
+  uo2:
+  - type: Clamp_y
+    region: symmetry
+  - type: Clamp_x
+    region: pin
+
+damage:
+  uo2:
+  - type: Dirichlet
+    region: crack_seed
+    value: 1.0

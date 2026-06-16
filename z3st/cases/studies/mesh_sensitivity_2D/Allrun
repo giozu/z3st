@@ -1,0 +1,9 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+set -e
+
+echo "Mesh sensitivity script..."
+
+python3 mesh_sensitivity.py
+
+echo "Done."

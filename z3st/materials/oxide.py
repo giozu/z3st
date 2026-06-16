@@ -1,5 +1,20 @@
 import ufl
 
+# Grain-boundary-weakened fracture toughness (pJ/micron²). Single source of
+# truth, shared by the UFL assembly path `Gc(mesh)` and the numpy
+# post-processing path `Gc_numpy(y)`, so a verification script can never drift
+# from the material model (e.g. an accidental unit factor).
+GC_GB = 0.1          # toughness at the grain boundary (y = 0)
+GC_BULK = 100.0      # bulk toughness
+GC_HALF_WIDTH = 10e-3  # micron — GB -> bulk transition width
+
+
+def _gc_profile(y, tanh):
+    """Gc(|y|) with a tanh GB->bulk transition. ``tanh`` is ``ufl.tanh`` or
+    ``np.tanh`` so the same formula serves UFL and numpy callers."""
+    return GC_GB + (GC_BULK - GC_GB) * tanh(abs(y) / GC_HALF_WIDTH)
+
+
 def k(T):
     """
     Compute the thermal conductivity.
@@ -15,16 +30,14 @@ def Gc(mesh):
     Compute the fracture toughness.
 
     Returns:
-        Gc: Fracture toughness as a UFL expression
+        Gc: Fracture toughness as a UFL expression (pJ/micron²)
     """
-    coords = ufl.SpatialCoordinate(mesh)
-    y = coords[1] 
+    y = ufl.SpatialCoordinate(mesh)[1]
+    return _gc_profile(y, ufl.tanh)
 
-    Gc_gb = 0.1     # pJ/micron²
-    Gc_bulk = 100.0 # pJ/micron²
-    
-    half_width = 10e-3 # micron
 
-    transition = ufl.tanh(abs(y) / half_width)
-    
-    return (Gc_gb + (Gc_bulk - Gc_gb) * transition)
+def Gc_numpy(y):
+    """The same toughness profile evaluated on numpy y-coordinates
+    (pJ/micron²), for verification / post-processing."""
+    import numpy as np
+    return _gc_profile(np.asarray(y, dtype=float), np.tanh)

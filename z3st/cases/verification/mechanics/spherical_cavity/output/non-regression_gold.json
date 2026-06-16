@@ -1,0 +1,20 @@
+{
+    "results": {
+        "sigma_rr": {
+            "rel_error": 0.0379685652263154,
+            "numerical": -42177.68054583161,
+            "status": "PASS"
+        },
+        "sigma_tt": {
+            "rel_error": 0.04463596463830326,
+            "numerical": 21708.0067030097,
+            "status": "PASS"
+        },
+        "sigma_vm": {
+            "rel_error": 0.01497427848983031,
+            "numerical": 63885.68724884132,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.2
+}

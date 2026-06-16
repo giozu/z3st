@@ -1,10 +1,11 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import importlib
+import sys
 
 import dolfinx
 import ufl
@@ -17,6 +18,9 @@ from z3st.core.finite_element_setup import FiniteElementSetup
 from z3st.core.mesh import load_mesh
 from z3st.core.mesh.manager import MeshManager
 from z3st.core.solver import Solver
+from z3st.models.contact_model import ContactModel
+from z3st.models.cracking_model import CrackingModel
+from z3st.models.creep_model import CreepModel
 from z3st.models.damage_model import DamageModel
 from z3st.models.gap_model import GapModel
 from z3st.models.mechanical_model import MechanicalModel
@@ -26,7 +30,7 @@ from z3st.models.plasticity_model import PlasticityModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, DamageModel, ClusterDynamicsModel, PlasticityModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -65,6 +69,8 @@ class Spine(
             MechanicalModel.__init__(self)
         if self.on.get("gap", False):
             GapModel.__init__(self)
+        if self.on.get("contact", False):
+            ContactModel.__init__(self)
         if self.on.get("damage", False):
             DamageModel.__init__(self)
         if self.on.get("cluster", False):
@@ -75,6 +81,9 @@ class Spine(
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
         self.lhr = lhr
+        # Rescale the elastic constants
+        if getattr(self, "materials", None):
+            self.update_cracking()
 
     def resolve_function(self, path: str):
         module_path, func_name = path.rsplit(".", 1)
@@ -92,11 +101,37 @@ class Spine(
             print(f"Material loaded: {name}")
 
             if "E" in mat and "nu" in mat:
-                mat["E"] = float(mat["E"])
-                mat["nu"] = float(mat["nu"])
-                mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
-                mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
-                mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
+                # E and/or nu may be given as a symbolic "module.func" card,
+                # Then, the derived elastic constants are built as UFL expressions in the T field by
+                # initialize_fields (T does not exist yet here). 
+                # NOTE: a symbolic E/nu is not yet compatible with the per-step cracking rescale or
+                # the numpy creep predictor.
+                def _is_symbolic(v):
+                    if not isinstance(v, str):
+                        return False
+                    try:
+                        float(v)
+                        return False
+                    except ValueError:
+                        return True
+                E_sym = _is_symbolic(mat["E"])
+                nu_sym = _is_symbolic(mat["nu"])
+                if E_sym:
+                    print(f"  → E defined as symbolic function: {mat['E']}")
+                    mat["_E_func"] = self.resolve_function(mat["E"])
+                else:
+                    mat["E"] = float(mat["E"])
+                if nu_sym:
+                    print(f"  → nu defined as symbolic function: {mat['nu']}")
+                    mat["_nu_func"] = self.resolve_function(mat["nu"])
+                else:
+                    mat["nu"] = float(mat["nu"])
+                if E_sym or nu_sym:
+                    print(f"  → '{name}': elastic constants deferred to UFL(T)")
+                else:
+                    mat["lmbda"] = mat["E"] * mat["nu"] / ((1 + mat["nu"]) * (1 - 2 * mat["nu"]))
+                    mat["G"] = mat["E"] / (2 * (1 + mat["nu"]))
+                    mat["bulk_modulus"] = mat["E"] / (3 * (1 - 2 * mat["nu"]))
             else:
                 print(
                     f"  [INFO] '{name}' has no elasticity parameters — skipping mechanical properties."
@@ -117,7 +152,7 @@ class Spine(
 
             # YAML quirk: scientific notation without explicit +/- in the exponent
             # (e.g. `1.0e9`) is parsed as a *string*, not a float. Coerce defensively
-            # so users don't hit a confusing TypeError downstream. A genuine symbolic
+            # so users don't hit a confusing TypeError downstream. A symbolic
             # Gc string (e.g. "module.func") will fail the float() and keep its string
             # form for the resolver below.
             if isinstance(sigma_c, str):
@@ -131,7 +166,7 @@ class Spine(
                     Gc = float(Gc)
                     mat["Gc"] = Gc
                 except ValueError:
-                    pass  # genuine "module.func" symbolic path — handled below
+                    pass  # "module.func" symbolic path, handled below
 
             if "Gc" in mat:
                 if isinstance(mat["Gc"], str):
@@ -180,10 +215,84 @@ class Spine(
                 constitutive_mode = "plasticity"
                 print(f"  → constitutive model promoted to: plasticity (yield_strength present)")
 
+            # Material inelastic eigenstrain
+            # A material card may expose an ``eigenstrain`` callable "module.func"
+            # It is resolved here and consumed by MechanicalModel.eigenstrain
+            if isinstance(mat.get("eigenstrain"), str):
+                print(f"  → eigenstrain defined as callable: {mat['eigenstrain']}")
+                mat["_eigenstrain_func"] = self.resolve_function(mat["eigenstrain"])
+
+            # Radial power form factor f(r, bu), source-bus analogue of the eigenstrain callable
+            # Resolved here and consumed by set_power
+            if isinstance(mat.get("radial_profile"), str):
+                print(f"  → radial_profile defined as callable: {mat['radial_profile']}")
+                mat["_radial_profile_func"] = self.resolve_function(mat["radial_profile"])
+
+            # Axial power form factor f(z)
+            if isinstance(mat.get("axial_profile"), str):
+                print(f"  → axial_profile defined as callable: {mat['axial_profile']}")
+                mat["_axial_profile_func"] = self.resolve_function(mat["axial_profile"])
+
+            if mat.get("cracking") is not None:
+                if str(mat["cracking"]).lower() != "isotropic":
+                    raise ValueError(
+                        f"Material '{name}': cracking model '{mat['cracking']}' unknown "
+                        f"(only 'isotropic' is implemented)."
+                    )
+                for key in ("cracking_lhr0", "cracking_n0", "cracking_n_inf", "cracking_tau"):
+                    if key in mat:
+                        mat[key] = float(mat[key])
+                if "lmbda" in mat:
+                    mat["lmbda"] = dolfinx.fem.Constant(
+                        self.mesh, dolfinx.default_scalar_type(mat["lmbda"]))
+                    mat["G"] = dolfinx.fem.Constant(
+                        self.mesh, dolfinx.default_scalar_type(mat["G"]))
+                print(f"  → cracking: Isotropic softening "
+                      f"(LHR0 = {float(mat.get('cracking_lhr0', 5.0e3))/1e3:.1f} kW/m, "
+                      f"n_inf = {float(mat.get('cracking_n_inf', 12.0)):.0f})")
+
+            if mat.get("creep") is not None:
+                if str(mat["creep"]).lower() != "norton":
+                    raise ValueError(
+                        f"Material '{name}': creep model '{mat['creep']}' unknown "
+                        f"(only 'norton' is implemented)."
+                    )
+                for key in ("creep_A0", "creep_n", "creep_Q"):
+                    if key not in mat:
+                        raise ValueError(f"Material '{name}': creep requires '{key}'.")
+                    mat[key] = float(mat[key])
+                # Optional irradiation creep ε̇_irr = B·φ·σ_eq: both keys or neither.
+                has_B, has_phi = "creep_irr_B" in mat, "fast_flux" in mat
+                if has_B != has_phi:
+                    raise ValueError(
+                        f"Material '{name}': irradiation creep requires BOTH "
+                        f"'creep_irr_B' and 'fast_flux' (got only one)."
+                    )
+                if has_B:
+                    mat["creep_irr_B"] = float(mat["creep_irr_B"])
+                    mat["fast_flux"] = float(mat["fast_flux"])
+                    print(f"  → irradiation creep: B = {mat['creep_irr_B']:.3e} Pa^-1/(n/m^2), "
+                          f"phi = {mat['fast_flux']:.3e} n/(m^2.s)")
+                if constitutive_mode != "lame":
+                    raise ValueError(
+                        f"Material '{name}': creep is only supported with the "
+                        f"'lame' constitutive route (got '{constitutive_mode}')."
+                    )
+                if self.on.get("damage", False) or self.on.get("plasticity", False):
+                    raise ValueError(
+                        "Creep cannot yet be combined with damage or plasticity "
+                        "in the same run."
+                    )
+                print(f"  → creep: Norton, A0 = {mat['creep_A0']:.3e} Pa^-n/s, "
+                      f"n = {mat['creep_n']:.2f}, Q = {mat['creep_Q']:.3e} J/mol")
+
+            mat["__label__"] = name
             self.materials[name] = mat
-            for k in sorted(mat.keys()):
-                v = mat[k]
-                print(f"  {k:<15} → {v} ({type(v).__name__})")
+            # Full per-key material dump only under --debug (CODE-P2-4)
+            if "--debug" in sys.argv:
+                for k in sorted(mat.keys()):
+                    v = mat[k]
+                    print(f"  {k:<15} → {v} ({type(v).__name__})")
 
     def set_boundary_conditions(self):
         print("\n")
@@ -206,6 +315,7 @@ class Spine(
         print(f"[spine.initialize_fields]")
 
         self.q_third = None
+        self.burnup = None
         self.T = None
         self.u = None
         self.D = None
@@ -216,6 +326,16 @@ class Spine(
             self.q_third = dolfinx.fem.Function(self.V_t, name="q_third")
             self.q_third.x.array[:] = 0.0
             self.set_power()
+
+            # Burnup state field (MWd/kgU). A fissile material accumulates its own
+            # local burnup from the deposited fission power (see update_state).
+            # Created once, here, and *never* zeroed — it is history, not a per-step
+            # source. Absent when no material is fissile, so non-fuel runs pay
+            # nothing.
+            if any(m.get("fissile", False) for m in self.materials.values()):
+                self.burnup = dolfinx.fem.Function(self.V_t, name="Burnup")
+                self.burnup.x.array[:] = 0.0
+                print("Initialized burnup field (fissile material present).")
 
             print("\nInitializing the temperature field...")
             self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
@@ -262,17 +382,29 @@ class Spine(
             print("\nSetting cluster initial conditions...")
             self.set_cluster_initial_conditions()
 
-        # if self.u:
-        #      print(f"  Displacement space (self.u):          {self.u.function_space.ufl_element()}")
-        # if self.T:
-        #      print(f"  Temperature space (self.T):           {self.T.function_space.ufl_element()}")
-
         # Material properties
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
                 k_func = mat["_k_func"]
                 mat["k"] = k_func(self.T)
                 print("\nk expression for", name, "→", mat["k"])
+
+            # Temperature-dependent elastic constants: build lmbda/G/bulk_modulus
+            # as UFL expressions in the live T field, so the per-iteration T
+            # propagates by reference into both the mechanical form and the
+            # (pre-compiled) output-writer stress expression.
+            if "_E_func" in mat or "_nu_func" in mat:
+                if getattr(self, "T", None) is None:
+                    raise ValueError(
+                        f"Material '{name}': temperature-dependent E/nu requires an "
+                        f"active thermal field (set models.thermal: true)."
+                    )
+                E_T = mat["_E_func"](self.T) if "_E_func" in mat else mat["E"]
+                nu_T = mat["_nu_func"](self.T) if "_nu_func" in mat else mat["nu"]
+                mat["lmbda"] = E_T * nu_T / ((1 + nu_T) * (1 - 2 * nu_T))
+                mat["G"] = E_T / (2 * (1 + nu_T))
+                mat["bulk_modulus"] = E_T / (3 * (1 - 2 * nu_T))
+                print(f"\nE/nu expression for {name} → lmbda, G built as UFL(T)")
 
             if "_Gc_func" in mat:
                 Gc_func = mat["_Gc_func"]
@@ -305,12 +437,67 @@ class Spine(
             if mat.get("fissile", False):
                 print("Fissile material")
                 q_val = self.lhr / self.area
+
+                # Power form factors — the source bus. A fissile material may
+                # shape its own volumetric source through the callables
+                # ``radial_profile`` f(r, bu) (the natural home of a TUBRNP-style
+                # rim profile later) and/or ``axial_profile`` f(z) (e.g. the
+                # chopped cosine). Each callable receives the dof coordinates and
+                # the *current* local burnup. The composite f_r·f_z is normalised
+                # ONCE to nodal mean 1, so the shaping *redistributes* the linear
+                # heat rate without changing its integral — with a single profile
+                # this reduces exactly to the previous behaviour. Default (no
+                # callables): f ≡ 1, the flat source.
+                shape = np.ones(len(dofs))
+                rprof = mat.get("_radial_profile_func")
+                zprof = mat.get("_axial_profile_func")
+                if rprof is not None or zprof is not None:
+                    coords = self.V_t.tabulate_dof_coordinates()[dofs]
+                    bu_vals = (
+                        self.burnup.x.array[dofs]
+                        if self.burnup is not None
+                        else np.zeros(len(dofs))
+                    )
+                    if rprof is not None:
+                        shape = shape * np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
+                    if zprof is not None:
+                        shape = shape * np.asarray(zprof(coords, bu_vals, mat, model=self), dtype=float)
+                    # Nodal-mean normalisation of the composite; the area-weighted
+                    # integral refinement lands with the TUBRNP profile.
+                    mean = shape.mean()
+                    if mean > 0:
+                        shape = shape / mean
+
                 # Accumulate: if multiple sources are configured on the same
                 # material (e.g. fissile + gamma_heating below), they should
                 # add — not overwrite.
-                self.q_third.x.array[dofs] += q_val
-                print(f"  q_third += {q_val:.3e} W/m³ (fissile: {mat.get('fissile', False)})")
+                self.q_third.x.array[dofs] += q_val * shape
+                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
+
+                # Integrated-power diagnostic: the exact FE integral of the
+                # fissile source over this material, with the regime weight
+                # (2πr in axisymmetric). For a rod this should track LHR·Lz;
+                # a radially peaked profile deviates slightly because the
+                # mean-1 normalisation is nodal, not area-weighted — printing
+                # the integral makes that approximation visible. The form is
+                # compiled once and cached (q_third updates in place).
+                if not hasattr(self, "_power_forms"):
+                    self._power_forms = {}
+                if name not in self._power_forms:
+                    x_sc = ufl.SpatialCoordinate(self.mesh)
+                    w_int = 2.0 * ufl.pi * x_sc[0] if self.regime == "axisymmetric" else 1.0
+                    dx_mat = ufl.Measure(
+                        "dx", domain=self.mesh,
+                        subdomain_data=self.cell_tags,
+                        subdomain_id=self.label_map[name],
+                    )
+                    self._power_forms[name] = dolfinx.fem.form(w_int * self.q_third * dx_mat)
+                P_int = dolfinx.fem.assemble_scalar(self._power_forms[name])
+                P_int = self.mesh.comm.allreduce(P_int, op=MPI.SUM)
+                unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
+                        "plane_stress": "W/m", "1d": "W/m²"}.get(self.regime, "W")
+                print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
                 # Cylindrical and spherical gamma-decay correlations use
@@ -331,8 +518,15 @@ class Spine(
 
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
+                # Per-material reference surface for the cylindrical/spherical
+                # decay correlation. Defaults to the geometry inner_radius
+                # (backward-compatible). A material that sits inboard of the
+                # geometry reference (e.g. a thermal shield in front of the
+                # vessel) sets `gamma_inner_radius` so its K_0 profile is
+                # normalised at its own inner surface rather than the vessel's.
+                gamma_Ri = float(mat.get("gamma_inner_radius", self.inner_radius))
 
-                def f(x, q_third_0=q_third_0, mu=mu):
+                def f(x, q_third_0=q_third_0, mu=mu, gamma_Ri=gamma_Ri):
                     if self.geometry_type == "rect":
                         return q_third_0 * np.exp(-x[0] * mu)
                     elif self.geometry_type in ["cyl", "cylinder"]:
@@ -349,13 +543,13 @@ class Spine(
                             # 3D cartesian case, x[0] = x, x[1] = y
                             radius = np.sqrt(x[0] ** 2 + x[1] ** 2)
 
-                        return q_third_0 * sp.k0(mu * radius) / sp.k0(mu * self.inner_radius)
+                        return q_third_0 * sp.k0(mu * radius) / sp.k0(mu * gamma_Ri)
                     elif self.geometry_type == "sphere":
                         r = np.sqrt(x[0] ** 2 + x[1] ** 2 + x[2] ** 2)
                         return (
                             q_third_0
-                            * (self.inner_radius / r)
-                            * np.exp(-mu * (r - self.inner_radius))
+                            * (gamma_Ri / r)
+                            * np.exp(-mu * (r - gamma_Ri))
                         )
 
                 f_func = dolfinx.fem.Function(self.V_t)
@@ -365,6 +559,127 @@ class Spine(
                 self.q_third.x.array[dofs] += f_func.x.array[dofs]
 
         self.q_third.x.scatter_forward()
+
+    def update_state(self, dt):
+        """Advance each material's own history over a step of ``dt`` seconds — the
+        state channel of the "fuel is a material" contract (alongside the property
+        and eigenstrain buses). Called once per step, *after* the solve.
+
+        Burnup: a fissile material accumulates its local burnup from the deposited
+        fission power. The volumetric source ``q_third`` [W/m³] is the energy
+        deposited per unit fuel volume per second; dividing by the heavy-metal mass
+        density ``ρ·HM_frac`` gives the specific power per unit heavy metal [W/kgU],
+        whose time integral is the burnup. The unit conversion W·s/kgU → MWd/kgU
+        divides by 86400 s/day × 1e6 W/MW = 8.64e10::
+
+            Δbu = q_third · dt / (ρ · HM_frac · 8.64e10)   [MWd/kgU]
+
+        No feedback is applied here — burnup is *recorded*. The downstream
+        behaviours that consume it (fuel-k(bu), swelling(bu,T), FGR) read this
+        field through their own buses, so a fissile case with no such behaviour is
+        unaffected in its solve (only the new burnup field changes).
+        """
+        if self.burnup is None or dt <= 0.0:
+            return
+
+        SECONDS_PER_MWD = 8.64e10  # 86400 s/day × 1e6 W/MW
+
+        for name, mat in self.materials.items():
+            if not mat.get("fissile", False):
+                continue
+            rho = mat.get("rho")
+            if rho is None:
+                print(f"  [update_state] '{name}' is fissile but has no 'rho'; "
+                      f"skipping burnup accumulation.")
+                continue
+            hm = float(mat.get("heavy_metal_fraction", 0.8815))
+            dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+            q = self.q_third.x.array[dofs]
+            self.burnup.x.array[dofs] += q * dt / (float(rho) * hm * SECONDS_PER_MWD)
+
+        self.burnup.x.scatter_forward()
+        print(f"[update_state] burnup max = {self.burnup.x.array.max():.4e} MWd/kgU")
+
+    _SNAPSHOT_FIELDS = (
+        "T", "u", "D", "H", "burnup", "c", "c_n",
+        "p", "ep", "p_n", "ep_n",
+    )  # dolfinx Functions
+    _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
+    _SNAPSHOT_MATERIAL_KEYS = ("E", "nu", "bulk_modulus", "_lhr_max")
+    _SNAPSHOT_MATERIAL_CONSTANTS = ("lmbda", "G")
+
+    def snapshot_state(self):
+        """Deep-copy every step-level state field so a time step can be rolled
+        back and retried at a smaller dt (adaptive time-stepping, piece B).
+
+        The roster of what is captured lives in the class constants
+        ``_SNAPSHOT_FIELDS`` / ``_SNAPSHOT_DICTS`` / ``_SNAPSHOT_MATERIAL_*`` —
+        extend those when adding new persistent state. Captured (only those
+        present, per active physics):
+
+        - primary fields T, u, D and the crack-driving history H;
+        - the burnup accumulator and the cluster pair c / c_n;
+        - the plasticity history p, ep, p_n, ep_n;
+        - the per-material creep dicts eps_cr and _dgamma0 (predictor,
+          updated every iteration, so polluted even by a failed attempt);
+        - per-material cracking scalars (``_lhr_max`` is a running max that
+          does NOT decrease, so without rollback a bisected sub-step inherits
+          the failed attempt's stiffness degradation) and the live lmbda/G
+          Constants.
+
+        NOT captured: iteration scratch (``_aitken_R_prev``, ``_h_gap_prev``) —
+        solve_staggered resets those at entry.
+
+        IMPORTANT: take the snapshot at the very start of a (sub)step, BEFORE
+        parameters()/set_power()/update_state() run, so ``_lhr_max`` and burnup
+        are captured at their last-converged values.
+        """
+        snap = {"fields": {}, "dicts": {}, "materials": {}}
+        for name in self._SNAPSHOT_FIELDS:
+            fn = getattr(self, name, None)
+            if isinstance(fn, dolfinx.fem.Function):
+                snap["fields"][name] = fn.x.array.copy()
+        for name in self._SNAPSHOT_DICTS:
+            d = getattr(self, name, None)
+            if isinstance(d, dict):
+                snap["dicts"][name] = {
+                    k: v.x.array.copy()
+                    for k, v in d.items()
+                    if isinstance(v, dolfinx.fem.Function)
+                }
+        for mname, mat in getattr(self, "materials", {}).items():
+            msnap = {k: mat[k] for k in self._SNAPSHOT_MATERIAL_KEYS if k in mat}
+            for k in self._SNAPSHOT_MATERIAL_CONSTANTS:
+                v = mat.get(k)
+                if hasattr(v, "value"):  # live dolfinx Constant
+                    msnap[k + ".value"] = float(v.value)
+            if msnap:
+                snap["materials"][mname] = msnap
+        return snap
+
+    def restore_state(self, snap):
+        """Inverse of :meth:`snapshot_state`: write every captured field, dict
+        and material scalar back in place, undoing a failed or oversized step so
+        it can be retried at a smaller dt. scatter_forward keeps ghost dofs
+        consistent after the in-place array overwrite."""
+        for name, arr in snap.get("fields", {}).items():
+            fn = getattr(self, name)
+            fn.x.array[:] = arr
+            fn.x.scatter_forward()
+        for name, saved in snap.get("dicts", {}).items():
+            d = getattr(self, name)
+            for k, arr in saved.items():
+                d[k].x.array[:] = arr
+                d[k].x.scatter_forward()
+        for mname, msnap in snap.get("materials", {}).items():
+            mat = self.materials[mname]
+            for key, val in msnap.items():
+                if key.endswith(".value"):
+                    target = mat.get(key[: -len(".value")])
+                    if hasattr(target, "value"):
+                        target.value = val
+                else:
+                    mat[key] = val
 
     def solve(self, max_iters=100, dt=0.0):
         print("\n")
@@ -377,7 +692,9 @@ class Spine(
         print(f"Coupling = {self.coupling}")
 
         if self.coupling == "staggered":
-            self.solve_staggered(
+            # Return the convergence verdict so the time loop can react to a
+            # stalled step. solve_staggered returns True on convergence, False if it exhausts max_iter.
+            return self.solve_staggered(
                 max_iter=max_iters,
                 dt=dt,
                 rtol_th=self.th_cfg.get("rtol", 1e-6) if self.on.get("thermal") else 1e-6,
@@ -422,4 +739,10 @@ class Spine(
                 self.stress[name] = self.stress_mech[name]
             elif name in self.stress_th:
                 self.stress[name] = self.stress_th[name]
+            
+            if self.on.get("mechanical", False) and self.creep_active(mat):
+                T_field = self.T if self.on.get("thermal", False) else None
+                sigma_cr, eps_el_cr = self.creep_output_stress(self.u, mat, T_field)
+                self.stress[name] = sigma_cr
+                self.energy_density[name] = 0.5 * ufl.inner(sigma_cr, eps_el_cr)
 

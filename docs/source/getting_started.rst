@@ -87,7 +87,7 @@ You should see output similar to:
 
 .. code-block:: text
 
-   dolfinx 0.10.0 | gmsh 4.14.1
+   dolfinx 0.11.0 | gmsh 4.15.2
 
 ---
 
@@ -101,7 +101,7 @@ Step 1: Navigate to the Example Directory
 
 .. code-block:: bash
 
-   cd z3st/cases/00_example
+   cd z3st/cases/verification/mechanics/uniaxial_tension
 
 Step 2: Generate the Mesh
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -274,7 +274,7 @@ Running a Single Case
 
 .. code-block:: bash
 
-   cd z3st/cases/1_thin_slab_neumann_3D
+   cd z3st/cases/verification/thermal/thin_slab_neumann_3D
    ./Allrun
 
 This script:
@@ -290,18 +290,16 @@ Running All Verification Cases
 .. code-block:: bash
 
    cd z3st/cases
-   ./non-regression.sh
+   ./non-regression_local.sh
 
 This executes all test cases and generates a summary report.
 
 Post-Processing Results
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-**Extract fields to VTU format**:
-
-.. code-block:: bash
-
-   python3 -m z3st.utils.export_vtu
+Output fields are written by the unified ``OutputWriter`` (``z3st/utils/writer.py``)
+during the run: set ``output: format: vtu`` for per-step ``fields_NNNN.vtu`` files or
+``output: format: xdmf`` for a single time-series file, both directly readable in ParaView.
 
 **Plot convergence history**:
 

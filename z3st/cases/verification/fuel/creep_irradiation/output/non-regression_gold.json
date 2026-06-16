@@ -1,0 +1,28 @@
+{
+    "results": {
+        "axial_strain_total": {
+            "numerical": 0.015007049345419163,
+            "reference": 0.015007049345417925,
+            "abs_error": 1.2385925618474403e-15,
+            "rel_error": 8.253405005465764e-14,
+            "status": "PASS"
+        },
+        "irradiation_creep_strain": {
+            "numerical": 0.014000000000001237,
+            "reference": 0.013999999999999999,
+            "abs_error": 1.2385925618474403e-15,
+            "rel_error": 8.847089727481717e-14,
+            "status": "PASS"
+        },
+        "radial_strain_deviatoric": {
+            "numerical": -0.007372608257805239,
+            "reference": -0.007372608257804632,
+            "abs_error": 6.071532165918825e-16,
+            "rel_error": 8.23525671459827e-14,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.001,
+    "summary": "PASS",
+    "regression": "PASS"
+}

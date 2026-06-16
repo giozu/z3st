@@ -1,0 +1,14 @@
+name: UO2-fuel
+fissile: true
+
+E: 200.0e9          # (Pa)
+nu: 0.345           # (-)
+
+k: 5.0              # (W/(m·K))
+cp: 280.0           # (J/(kg·K))
+rho: 10970.0        # (kg/m³)
+
+alpha: 1.1e-5       # (1/K)
+
+T_ref: 293.15       # (K)
+T_initial: 580.0    # (K)

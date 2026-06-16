@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
@@ -127,30 +127,15 @@ class DamageModel:
                 f"Set damage.type in input.yaml accordingly."
             )
 
-    def gamma_density(self, D, grad_D, lc):
-
-        damage_type = self.dmg_cfg["type"]
-
-        if damage_type == "AT2":
-            # Fracture energy density gamma(D, ∇D) = 0.5*(D**2/lc + lc*|∇D|²)
-            return 0.5 * (D**2 / lc + lc * ufl.dot(grad_D, grad_D))
-
-        elif damage_type == "AT1":
-            # Fracture energy density: gamma(D, ∇D) = (1 / 4*cw) * (w(D)/lc + lc*|∇D|²)
-            return D / lc + lc * ufl.dot(grad_D, grad_D)
-        else:
-            raise ValueError(
-                f"Unknown damage type '{damage_type}'; expected 'AT1' or 'AT2'. "
-                f"Set damage.type in input.yaml accordingly."
-            )
-
     def psi_miehe_spectral(self, u, material, T=None):
         """
         Miehe spectral split of the elastic strain energy density.
 
-        Returns the tuple (psi_pos, psi_neg) with
+        Returns the tuple (psi_pos, psi_neg) with::
+
             psi_pos = (lambda/2) <tr eps_el>_+^2 + mu * sum_i <eps_el_i>_+^2
             psi_neg = (lambda/2) <tr eps_el>_-^2 + mu * sum_i <eps_el_i>_-^2
+
         where <.>_+ and <.>_- are the positive and negative parts and
         eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic (mechanical)
         strain (the total strain when T is None or thermal props are absent).
@@ -242,9 +227,11 @@ class DamageModel:
         """
         Amor (volumetric/deviatoric) split of the elastic strain energy density.
 
-        Returns (psi_pos, psi_neg) with
+        Returns (psi_pos, psi_neg) with::
+
             psi_pos = (lambda/2) <tr eps_el>_+^2 + mu * dev(eps_el):dev(eps_el)
             psi_neg = (lambda/2) <tr eps_el>_-^2
+
         where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
         (total strain when T is None). Note: this uses lambda rather than
         the n-dimensional bulk modulus K_n. Same convention as the existing
@@ -275,7 +262,7 @@ class DamageModel:
         Lorenzis 2024 — Int. J. Fract. 247:291-317, Eqs. (38)-(39)).
 
         A one-parameter generalisation of the Amor volumetric/deviatoric
-        split:
+        split::
 
             psi_pos = G |dev(eps_el)|^2
                       + (lambda/2) [<tr eps_el>_+^2 - gamma_star <tr eps_el>_-^2]
@@ -436,7 +423,8 @@ class DamageModel:
         """
         Compute total elastic and fracture energies for the conservation diagnostic.
 
-        Surface (fracture) energy density:
+        Surface (fracture) energy density::
+
             AT2:  gamma = (Gc/2) * (D^2/lc + lc * |grad D|^2)
             AT1:  gamma = (3*Gc/8) * (D/lc + lc * |grad D|^2)
 

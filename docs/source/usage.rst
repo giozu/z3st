@@ -6,7 +6,7 @@ This section describes how to configure and run a Z3ST simulation using the refe
 Input files
 -----------
 
-A minimal demonstration case is provided in ``cases/00_example``.
+A minimal demonstration case is provided in ``cases/verification/mechanics/uniaxial_tension``.
 It illustrates the complete workflow of a thermo-mechanical simulation:
 - YAML-based configuration input;
 - mesh generation and region tagging;
@@ -16,18 +16,19 @@ To run the example:
 
 .. code-block:: bash
 
-   cd cases/00_example
+   cd cases/verification/mechanics/uniaxial_tension
    python3 -m z3st
 
 Optional flags:
 
 - ``--mesh_plot`` — displays the generated mesh before solving
+- ``--debug`` — verbose logging
 
 Example folder structure:
 
 .. code-block:: text
 
-   00_example/
+   verification/mechanics/uniaxial_tension/
    ├── input.yaml
    ├── geometry.yaml
    ├── boundary_conditions.yaml
@@ -51,7 +52,7 @@ The staggered scheme alternates between thermal and mechanical solves until both
    materials:
      steel: ../../materials/steel.yaml
 
-  regime: 2D
+   regime: 2D
 
    solver_settings:
      coupling: staggered
@@ -59,6 +60,7 @@ The staggered scheme alternates between thermal and mechanical solves until both
      relax_T: 0.9
      relax_u: 0.7
      relax_adaptive: true
+     relax_aitken: false
      relax_growth: 1.2
      relax_shrink: 0.8
      relax_min: 0.05
@@ -98,6 +100,101 @@ The staggered scheme alternates between thermal and mechanical solves until both
    time:
    - 0
    n_steps: 1
+
+Two relaxation strategies are available for the displacement update. The
+default adaptive controller grows or shrinks ``relax_u`` heuristically from
+the residual trend; setting ``relax_aitken: true`` replaces it with Aitken
+delta-squared dynamic relaxation, which computes a quasi-optimal factor each
+staggered iteration from the last two residuals (clamped to
+``[relax_min, relax_max]``, restarted from ``relax_u`` at every time step).
+Aitken is recommended for strongly coupled physics. 
+Both ``relax_*`` settings and the tolerances are hot-reloadable: edits to
+``input.yaml`` during a run are picked up at the next step boundary (see
+`Hot-reloaded parameters`_ below for the full allow-list).
+
+The time grid is built from the piecewise-linear ``time``/``lhr`` history.
+``n_steps`` accepts either an integer (total number of points, distributed
+across segments proportionally to their duration) or a list with one entry
+per segment giving the number of time intervals in that segment — useful to
+resolve a fast transition finely while striding across a slow plateau:
+
+.. code-block:: yaml
+
+   time: [0.0, 1.728e6, 6.048e7, 1.5552e8]
+   lhr: [0.0, 20000.0, 20000.0, 20000.0]
+   n_steps: [8, 60, 40]   # intervals per segment
+
+
+Time adaptivity (optional)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+By default the time grid above is fixed: every step is solved once at its
+prescribed ``dt``. When several non-linear physics are active at once (for
+example contact onset in a fuel-rod run), a step can occasionally fail to
+converge within ``max_iters`` at that ``dt``. The optional ``time_adaptivity``
+block lets the solver recover by sub-stepping the offending step instead of
+aborting the run:
+
+.. code-block:: yaml
+
+   time_adaptivity:
+     enabled: true     # default false — fixed grid unless turned on
+     dt_min: 1.0e3     # (s) smallest dt to attempt before giving up
+     max_cuts: 6       # maximum bisection depth per original-grid step
+
+When a step does not converge, the solver rolls the state back to the last
+converged step, halves ``dt``, and re-solves the step as two sub-steps; each
+sub-step may bisect again, recursively, up to ``max_cuts`` levels or until
+``dt`` reaches ``dt_min``. The roll-back and retry are exact: the full step
+state (primary fields, history variables, plasticity and creep accumulators,
+per-material cracking scalars) is snapshotted before the attempt and restored
+on failure, so a failed attempt never pollutes the retry. Output is still
+written on the **original grid** — sub-steps are internal and do not appear in
+the time series. If a step cannot converge even at ``dt_min``, the run rolls
+back to the last converged step, prints the reason, writes the output up to
+that step, and exits with a non-zero status.
+
+The feature is off by default and adds no cost to a run that converges. Two
+caveats:
+
+- Only the linear heat rate ``lhr`` is interpolated to sub-step times.
+  Per-step ramped boundary-condition lists are applied at their grid-step value
+  within a bisected step (not re-interpolated to the sub-step times); a warning
+  is printed at start-up when a ramped BC coexists with adaptivity.
+- ``dt_min`` is a floor in seconds; set it well below the smallest physically
+  meaningful step so the bisection has room to work before the run aborts.
+
+
+Hot-reloaded parameters
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A subset of ``input.yaml`` can be changed **while a simulation is running**:
+edit and save the file mid-run and the new value is picked up at the next step
+boundary, with a ``[hot-reload]`` line logged. This is meant for steering a long
+run — tightening or loosening tolerances, nudging relaxation — without
+restarting it. Only an explicit allow-list is reloaded; structural settings
+(mesh, geometry, materials, model on/off switches, the time grid) are read once
+at start-up and ignored if edited mid-run:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Block
+     - Hot-reloadable keys
+   * - ``solver_settings``
+     - ``max_iters``, ``relax_T``, ``relax_u``, ``relax_D``, ``relax_adaptive``,
+       ``relax_aitken``, ``relax_growth``, ``relax_shrink``, ``relax_min``,
+       ``relax_max``
+   * - ``mechanical``
+     - ``stag_tol``, ``rtol``
+   * - ``thermal``
+     - ``stag_tol``, ``rtol``
+   * - ``damage``
+     - ``stag_tol``, ``rtol``, ``hybrid_constraint``, ``gamma_star``
+
+A malformed or half-written file (caught mid-save) is ignored for that cycle,
+so saving over ``input.yaml`` during a run is always safe.
 
 
 geometry.yaml
@@ -283,7 +380,7 @@ Clamp
 
   **Clamp_z**
 
-  - Constrains :math:`u_y = 0` on the assigned region.
+  - Constrains :math:`u_z = 0` on the assigned region.
 
 - **Example**
 
@@ -372,7 +469,7 @@ Material Properties
 Materials in Z3ST are defined using YAML files stored in the ``materials/`` directory. Each material file specifies thermal and mechanical properties used in the simulation.
 
 Material File Format
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 A typical material file contains the following properties:
 
@@ -409,7 +506,7 @@ All properties must use **SI units**:
 - **Power**: Watts (W)
 
 Property Descriptions
-^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 **Mechanical Properties:**
 
@@ -430,9 +527,9 @@ Property Descriptions
 - ``gamma_heating`` — Volumetric heating (W/m³): Internal heat generation rate
 
 Available Materials
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
-Z3ST includes a database of pre-defined materials in ``z3st/materials/``:
+Z3ST ships a database of materials in ``z3st/materials/``; a representative subset:
 
 .. list-table::
    :header-rows: 1
@@ -454,7 +551,7 @@ Z3ST includes a database of pre-defined materials in ``z3st/materials/``:
      - Water properties
 
 Using Materials in Simulations
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use a material in your simulation, reference it in ``input.yaml``:
 
@@ -467,7 +564,7 @@ To use a material in your simulation, reference it in ``input.yaml``:
 Multiple materials can be defined for multi-material simulations.
 
 Temperature-Dependent Properties
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For temperature-dependent material properties, you can define a Python module instead of a YAML file (future enhancement), or use piecewise definitions.
 
@@ -489,7 +586,7 @@ For temperature-dependent material properties, you can define a Python module in
        return 50.0 - 0.01 * (T - 300.0)
 
 Creating Custom Materials
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To create a custom material:
 
@@ -528,7 +625,7 @@ To run a verification case:
 
 .. code-block:: bash
 
-   cd cases/1_thin_thermal_slab
+   cd cases/verification/thermal/thin_slab_neumann_3D
    ./Allrun
 
 Each verification folder contains:
@@ -548,7 +645,7 @@ Run all tests with:
 .. code-block:: bash
 
    cd cases
-   ./non-regression.sh
+   ./non-regression_local.sh
 
 This script executes verification tests, compares each new result with its reference,
 and logs the outcome to ``non-regression_summary.txt``.

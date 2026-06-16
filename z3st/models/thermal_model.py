@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import sys
@@ -84,31 +84,37 @@ class ThermalModel:
                         )
                         sys.exit(1)
 
-                    # Step-dependent temperature lists are not yet supported by
-                    # the thermal block (the mechanical block does support them
-                    # via the ``raw`` mechanism). Reject the input up-front with
-                    # a clear message instead of silently fixing T to the first
-                    # element or crashing inside dolfinx.
+                    # Step-dependent temperature: a list of length n_steps gives
+                    # a time-varying Dirichlet temperature. The Constant is updated per step by the
+                    # solver; a scalar is broadcast to every step.
                     if isinstance(temperature, list):
-                        print(
-                            f"  [ERROR] Thermal Dirichlet BC on '{label}' for region '{region_name}' "
-                            f"was given a list of length {len(temperature)}, but step-dependent "
-                            f"temperatures are not yet supported. Use a constant scalar; see "
-                            f"mechanical_model.py for the planned extension pattern."
-                        )
-                        sys.exit(1)
+                        # Step index is capped at the last entry by the solver,
+                        # so a length mismatch with n_steps is tolerated (the
+                        # final value simply holds). Warn if they differ.
+                        if len(temperature) != self.n_steps:
+                            print(
+                                f"  [WARNING] Thermal Dirichlet list on '{label}' region "
+                                f"'{region_name}' has length {len(temperature)} != n_steps "
+                                f"{self.n_steps}; the last value will hold for extra steps."
+                            )
+                        raw_value = [float(t) for t in temperature]
+                    else:
+                        raw_value = [float(temperature)] * self.n_steps
 
-                    T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(temperature))
+                    T_d = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(raw_value[0]))
 
                     # locate dofs
                     dofs = dolfinx.fem.locate_dofs_topological(
                         V_t, self.fdim, self.facet_tags.find(region_id)
                     )
                     bc = dolfinx.fem.dirichletbc(T_d, dofs, V_t)
-                    self.dirichlet_thermal[label].append(bc)
+                    self.dirichlet_thermal[label].append(
+                        {"id": region_id, "value": bc, "const": T_d, "raw": raw_value}
+                    )
 
                     print(
-                        f"  [INFO] Dirichlet thermal BC on '{label}' → {temperature} K at region '{region_name}'"
+                        f"  [INFO] Dirichlet thermal BC on '{label}' → {raw_value[0]} K "
+                        f"(first step) at region '{region_name}'"
                     )
 
                 elif bc_type == "Neumann":
@@ -155,11 +161,18 @@ class ThermalModel:
 
     def heat_flux(self, T):
         """
-        Compute average heat flux (magnitude and x-y-z components) per materials
+        Compute the average heat flux (magnitude and per-component) per material.
 
+        Dimension-aware: only the mesh's geometric components are assembled
+        (a 2D mesh has no z-flux). Supports both scalar conductivity and
+        symbolic k(T) material cards (where ``material["k"]`` is already a
+        UFL expression resolved at field initialisation).
         """
 
         print("\n--- Average heat flux magnitude per material ---")
+        gdim = self.mesh.geometry.dim
+        comp_labels = ("r", "z") if self.regime == "axisymmetric" else ("x", "y", "z")[:gdim]
+
         for label, material in self.materials.items():
             tag = self.label_map[label]
 
@@ -168,23 +181,22 @@ class ThermalModel:
                 "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag
             )
 
-            k = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(material["k"]))
+            k_val = material.get("k")
+            if isinstance(k_val, (int, float)):
+                k = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(k_val))
+            else:
+                # symbolic card: spine resolved k(T) to a UFL expression
+                k = k_val
 
-            grad_T = ufl.grad(T)
-
-            q_vec = -k * grad_T
-
-            qx = q_vec[0]
-            qy = q_vec[1]
-            qz = q_vec[2]
-
+            q_vec = -k * ufl.grad(T)
             q_mag = ufl.sqrt(ufl.dot(q_vec, q_vec))
 
             # Directly assemble the integral of the UFL expression over the subdomain
             q_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(q_mag * dx))
-            qx_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qx * dx))
-            qy_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qy * dx))
-            qz_integral = dolfinx.fem.assemble_scalar(dolfinx.fem.form(qz * dx))
+            comp_integrals = [
+                dolfinx.fem.assemble_scalar(dolfinx.fem.form(q_vec[i] * dx))
+                for i in range(gdim)
+            ]
 
             # Assemble the volume (or area in 2D) of the subdomain
             volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx))
@@ -194,19 +206,12 @@ class ThermalModel:
             # rank-0 share of the subdomain.
             comm = self.mesh.comm
             q_integral = comm.allreduce(q_integral, op=MPI.SUM)
-            qx_integral = comm.allreduce(qx_integral, op=MPI.SUM)
-            qy_integral = comm.allreduce(qy_integral, op=MPI.SUM)
-            qz_integral = comm.allreduce(qz_integral, op=MPI.SUM)
+            comp_integrals = [comm.allreduce(c, op=MPI.SUM) for c in comp_integrals]
             volume = comm.allreduce(volume, op=MPI.SUM)
 
             # Compute the average
             q_avg = q_integral / volume if volume > 0 else 0.0
-            qx_avg = qx_integral / volume if volume > 0 else 0.0
-            qy_avg = qy_integral / volume if volume > 0 else 0.0
-            qz_avg = qz_integral / volume if volume > 0 else 0.0
-
             print(f"[INFO] Average heat flux magnitude in {label:<10}: {q_avg:.2f} W/m²")
-
-            print(f"[INFO] Average heat flux -x in {label:<10}: {qx_avg:.2f} W/m²")
-            print(f"[INFO] Average heat flux -y in {label:<10}: {qy_avg:.2f} W/m²")
-            print(f"[INFO] Average heat flux -z in {label:<10}: {qz_avg:.2f} W/m²")
+            for name, integral in zip(comp_labels, comp_integrals):
+                c_avg = integral / volume if volume > 0 else 0.0
+                print(f"[INFO] Average heat flux -{name} in {label:<10}: {c_avg:.2f} W/m²")

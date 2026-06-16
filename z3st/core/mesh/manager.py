@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import dolfinx
@@ -71,7 +71,7 @@ class MeshManager:
         self._init_geometry_parameters()
 
     def _init_geometry_parameters(self):
-        """Compute derived geometry quantities (area, perimeter, etc.)."""
+        """Compute useful geometric quantities (like area, perimeter, etc.)."""
         g = self.geometry
         self.Lz = float(g.get("Lz", 0.0))
         log.info(f"  Lz = {self.Lz:.3f} m")

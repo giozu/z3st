@@ -1,0 +1,22 @@
+name: fuel-swelling-test
+fissile: true
+
+
+eigenstrain: materials.fuel_swelling.solid_gas_densification
+swelling_rate: 1.0e-3          # (ΔV/V) per MWd/kgU (verification value)
+gas_swelling_rate: 0.0
+densification_dv: 0.0
+
+E: 200.0e9                      # (Pa) Young's modulus
+nu: 0.3                         # (-)  Poisson's ratio
+
+k: 5.0                          # (W/(m·K)) thermal conductivity
+cp: 280.0                       # (J/(kg·K)) specific heat
+rho: 10970.0                    # (kg/m³) density
+heavy_metal_fraction: 0.8815    # (-) M_U / M_UO2
+
+T_ref: 300.0                    # (K)
+T_initial: 300.0                # (K)
+
+mu_gamma: 0.0
+gamma_heating: 0.0

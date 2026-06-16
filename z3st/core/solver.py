@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import dolfinx
@@ -10,6 +10,14 @@ import ufl
 from dolfinx.fem.petsc import NonlinearProblem
 from mpi4py import MPI
 from petsc4py import PETSc
+
+
+def _as_bool(v):
+    """Parse a config scalar to bool without the bool('false') == True footgun
+    (a quoted YAML boolean loads as the string 'false')."""
+    if isinstance(v, bool):
+        return v
+    return str(v).strip().lower() in ("1", "true", "yes", "on")
 
 
 class Solver:
@@ -22,17 +30,26 @@ class Solver:
         self.relax_T = float(solver_settings.get("relax_T", 0.9))
         self.relax_u = float(solver_settings.get("relax_u", 0.4))
         self.relax_D = float(solver_settings.get("relax_D", 0.4))
+        self._relax_u0 = self.relax_u  # initial value, restored per step by Aitken
 
         print("  Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
         print(f"  → Displacement : {self.relax_u}")
         print(f"  → Damage       : {self.relax_D}")
 
-        self.relax_adaptive = bool(solver_settings.get("relax_adaptive", False))
+        self.relax_adaptive = _as_bool(solver_settings.get("relax_adaptive", False))
         self.relax_growth = float(solver_settings.get("relax_growth", 1.2))
         self.relax_shrink = float(solver_settings.get("relax_shrink", 0.5))
         self.relax_min = float(solver_settings.get("relax_min", 0.05))
         self.relax_max = float(solver_settings.get("relax_max", 1.0))
+
+        # Aitken Δ² dynamic relaxation on the displacement update: the
+        # quasi-optimal relaxation factor is computed each staggered iteration
+        # from the last two raw residuals (see _mechanical_step). Takes
+        # precedence over the heuristic grow/shrink controller for u.
+        self.relax_aitken = _as_bool(solver_settings.get("relax_aitken", False))
+        if self.relax_aitken:
+            print("  Aitken Δ² relaxation enabled for displacement")
 
         if self.relax_adaptive:
             print("  Adaptive relaxation enabled")
@@ -44,6 +61,33 @@ class Solver:
             print("  Adaptive relaxation disabled")
 
         print("\n")
+
+    @staticmethod
+    def _bc_objects(dirichlet_dict):
+        """Flatten a {label: [bc | {"value": bc, ...}]} store into the list of
+        actual dolfinx DirichletBC objects (BCs may be stored directly or as a
+        dict carrying step-dependent metadata)."""
+        return [
+            bc["value"] if isinstance(bc, dict) else bc
+            for bc_list in dirichlet_dict.values()
+            for bc in bc_list
+        ]
+
+    def _value_at_step(self, raw):
+        """The entry of a per-step list ``raw`` for the current step, clamped to
+        the last entry when the step index runs past the end."""
+        return raw[min(self.current_step, len(raw) - 1)]
+
+    # Cached assembled forms keyed on (current_step, u_new, T)
+    _DT_DEPENDENT_CACHES = ("_th_cache", "_mech_cache")
+
+    def invalidate_dt_caches(self):
+        """Drop every cached form that bakes dt in, forcing a rebuild at the
+        current dt on the next solve. Single owner of the dt-dependent cache
+        list: add any new dt-baking cache to ``_DT_DEPENDENT_CACHES`` rather
+        than nulling it ad hoc from the time loop."""
+        for name in self._DT_DEPENDENT_CACHES:
+            setattr(self, name, None)
 
     def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
         """
@@ -130,104 +174,119 @@ class Solver:
 
         analysis = self.th_cfg.get("analysis", "stationary")
 
+        # update step-dependent Dirichlet temperatures
+        for bc_list in self.dirichlet_thermal.values():
+            for bc in bc_list:
+                if isinstance(bc, dict) and isinstance(bc.get("raw"), list):
+                    bc["const"].value = PETSc.ScalarType(self._value_at_step(bc["raw"]))
+
         # Transient mode with dt=0: preserve IC, only apply BCs
         if analysis == "transient" and self.dt <= 0:
             print("\n[INFO] Transient thermal: dt=0 → preserving initial condition (applying BCs only)")
-            bcs_thermal_actual = [
-                bc["value"] if isinstance(bc, dict) else bc
-                for _, bc_list in self.dirichlet_thermal.items()
-                for bc in bc_list
-            ]
+            bcs_thermal_actual = self._bc_objects(self.dirichlet_thermal)
             dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
             T_new.x.scatter_forward()
             return True, 0.0, 0.0, prev_res_T
 
         T_old.x.array[:] = T_new.x.array
 
-        print("\n[INFO] Assembling thermal problem...")
-        u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
-        a_t = 0
-        L_t = 0
-
         w = self.weight
         dt = self.dt
         transient = analysis == "transient"
 
-        # Volume integrals
-        for label, material in self.materials.items():
-            tag = self.label_map[label]
-            dx = self.dx_tags[tag]
+        # The compiled forms are step-invariant: between staggered iterations
+        # only Functions (T_new, T_other, q_third) and Constants (h_gap) change,
+        # all consumed by reference at assembly. Build the LinearProblem once
+        # per time step and only refresh those objects per iteration —
+        # LinearProblem.solve() reassembles A and b from the stored forms.
+        cache = getattr(self, "_th_cache", None)
+        rebuild = (
+            cache is None
+            or cache["step"] != self.current_step
+            or cache["T_new"] is not T_new
+        )
 
-            print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
-            k = material["k"]
-            rho = material["rho"]
-            cp = material["cp"]
-            rho_cp = rho * cp
+        if rebuild:
+            print("\n[INFO] Assembling thermal problem...")
+            u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
+            a_t = 0
+            L_t = 0
 
-            # Diffusion + source (always present)
-            a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
-            L_t += w * self.q_third * v_t * dx
+            # Volume integrals
+            for label, material in self.materials.items():
+                tag = self.label_map[label]
+                dx = self.dx_tags[tag]
 
-            # Mass term (backward Euler, only for transient)
-            # self.T holds the converged temperature from the previous time step (T^n)
-            # T_old is used for stagger relaxation only, not for backward Euler
-            if transient:
-                rho_cp_dt = rho_cp / dt
-                a_t += w * rho_cp_dt * u_t * v_t * dx
-                L_t += w * rho_cp_dt * self.T * v_t * dx
+                print(f"\n  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+                k = material["k"]
+                rho = material["rho"]
+                cp = material["cp"]
+                rho_cp = rho * cp
 
-            dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
-            q_vals = self.q_third.x.array[dofs]
-            print(
-                f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, "
-                f"max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
-            )
+                # Diffusion + source (always present)
+                a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
+                L_t += w * self.q_third * v_t * dx
 
-        # Neumann
-        for label in self.materials:
-            for bc_info in self.neumann_thermal[label]:
-                print(f"  Applying flux on subdomain id = {bc_info['id']}")
-                ds_neumann = self.ds_tags[bc_info["id"]]
-                L_t += w * (-bc_info["value"]) * v_t * ds_neumann
+                # Mass term (backward Euler, only for transient)
+                # self.T holds the converged temperature from the previous time step (T^n)
+                # T_old is used for stagger relaxation only, not for backward Euler
+                if transient:
+                    rho_cp_dt = rho_cp / dt
+                    a_t += w * rho_cp_dt * u_t * v_t * dx
+                    L_t += w * rho_cp_dt * self.T * v_t * dx
 
-        # Robin BCs (gap or convective)
-        h_gap = self.set_gap_conductance(T_new)
+                dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
+                q_vals = self.q_third.x.array[dofs]
+                print(
+                    f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, "
+                    f"max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
+                )
 
-        for label in self.materials:
-            for bc_info in self.robin_thermal[label]:
-                region_id = bc_info["id"]
-                ds_robin = self.ds_tags[region_id]
+            # Neumann
+            for label in self.materials:
+                for bc_info in self.neumann_thermal[label]:
+                    print(f"  Applying flux on subdomain id = {bc_info['id']}")
+                    ds_neumann = self.ds_tags[bc_info["id"]]
+                    L_t += w * (-bc_info["value"]) * v_t * ds_neumann
 
-                if "pair" in bc_info:
-                    # Gap mode: h from gap model, T_ext from paired subdomain
-                    pair_region = bc_info["pair"]
-                    T_other = dolfinx.fem.Function(self.V_t)
-                    dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
-                    dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
-                    T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
+            # Robin BCs (gap or convective). h_gap is a persistent Constant
+            # owned by the gap model; T_other are persistent Functions refreshed
+            # every iteration below.
+            h_gap = self.set_gap_conductance(T_new)
+            gap_aux = []
 
-                    a_t += w * h_gap * u_t * v_t * ds_robin
-                    L_t += w * h_gap * T_other * v_t * ds_robin
-                    print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'")
+            for label in self.materials:
+                for bc_info in self.robin_thermal[label]:
+                    region_id = bc_info["id"]
+                    ds_robin = self.ds_tags[region_id]
 
-                else:
-                    # Convective mode: fixed h_conv and T_ext
-                    h_conv = bc_info["h_conv"]
-                    T_ext = bc_info["T_ext"]
-                    a_t += w * h_conv * u_t * v_t * ds_robin
-                    L_t += w * h_conv * T_ext * v_t * ds_robin
-                    print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
+                    if "pair" in bc_info:
+                        # Gap mode: h from gap model, T_ext from paired subdomain
+                        pair_region = bc_info["pair"]
+                        T_other = dolfinx.fem.Function(self.V_t)
+                        dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
+                        dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
+                        T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
+                        gap_aux.append(
+                            {"fn": T_other, "dofs_here": dofs_here, "dofs_other": dofs_other}
+                        )
 
-        # Extract actual DirichletBC objects (handles both dict and direct BCs)
-        bcs_thermal_actual = [
-            bc["value"] if isinstance(bc, dict) else bc
-            for _, bc_list in self.dirichlet_thermal.items()
-            for bc in bc_list
-        ]
+                        a_t += w * h_gap * u_t * v_t * ds_robin
+                        L_t += w * h_gap * T_other * v_t * ds_robin
+                        print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'")
 
-        # Solve
-        if self.th_cfg["solver"] == "linear":
-            print("  Linear solver")
+                    else:
+                        # Convective mode: fixed h_conv and T_ext
+                        h_conv = bc_info["h_conv"]
+                        T_ext = bc_info["T_ext"]
+                        a_t += w * h_conv * u_t * v_t * ds_robin
+                        L_t += w * h_conv * T_ext * v_t * ds_robin
+                        print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
+
+            if self.th_cfg["solver"] != "linear":
+                print("  [ERROR] Non-linear thermal solver not yet implemented.")
+                return True, 0.0, 0.0, prev_res_T
+
             petsc_opts_thermal = self.get_solver_options(
                 solver_type=self.th_cfg["linear_solver"],
                 physics="thermal",
@@ -241,13 +300,27 @@ class Solver:
                 petsc_options=petsc_opts_thermal,
                 petsc_options_prefix="thermal_",
             )
-            dolfinx.fem.set_bc(T_new.x.array, bcs_t)
-            problem_t.solve()
-            print(f"  T_new: min={T_new.x.array.min():.2f} K, max={T_new.x.array.max():.2f} K, mean={T_new.x.array.mean():.2f} K")
-            if transient:
-                print(f"  T^n (self.T): min={self.T.x.array.min():.2f} K, max={self.T.x.array.max():.2f} K")
+            self._th_cache = {
+                "step": self.current_step,
+                "T_new": T_new,
+                "problem": problem_t,
+                "gap_aux": gap_aux,
+            }
         else:
-            print("  [ERROR] Non-linear thermal solver not yet implemented.")
+            # Per-iteration refresh of the cached problem's mutable inputs:
+            # gap conductance Constant and paired-surface temperatures.
+            self.set_gap_conductance(T_new)
+            for aux in cache["gap_aux"]:
+                aux["fn"].x.array[aux["dofs_here"]] = T_new.x.array[aux["dofs_other"]]
+
+        bcs_thermal_actual = self._bc_objects(self.dirichlet_thermal)
+
+        problem_t = self._th_cache["problem"]
+        dolfinx.fem.set_bc(T_new.x.array, bcs_t)
+        problem_t.solve()
+        print(f"  T_new: min={T_new.x.array.min():.2f} K, max={T_new.x.array.max():.2f} K, mean={T_new.x.array.mean():.2f} K")
+        if transient:
+            print(f"  T^n (self.T): min={self.T.x.array.min():.2f} K, max={self.T.x.array.max():.2f} K")
 
         # Relax
         T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
@@ -294,167 +367,260 @@ class Solver:
     def _mechanical_step(self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current):
 
         u_old.x.array[:] = u_new.x.array
-        print("\n[INFO] Assembling mechanical problem...")
 
-        # --- update step-dependent displacement ---
-        for _, bc_list in self.dirichlet_mechanical.items():
-            for bc in bc_list:
-                # Skip BCs that are Clamp, Slip, etc. (not yet step-dependent)
-                if not isinstance(bc, dict):
-                    continue
+        w = self.weight
 
-                raw = bc.get("raw", None)
-                if isinstance(raw, list):
-                    idx = min(self.current_step, len(raw) - 1)
-                    val = raw[idx]
+        # A creeping material, or a plasticity / hyperelastic constitutive
+        # mode, makes the stress σ(u) nonlinear in u, so the step must go
+        # through the SNES path regardless of the configured solver (otherwise
+        # the "linear" branch would assemble a non-bilinear form as if it were
+        # bilinear). The shipped nonlinear cases already set solver: newton;
+        # this guard protects against a solver: linear misconfiguration.
+        creep_present = any(self.creep_active(m) for m in self.materials.values())
+        nonlinear_constitutive = any(
+            m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
+            for m in self.materials.values()
+        )
+        linear = (
+            self.mech_cfg["solver"] == "linear"
+            and not creep_present
+            and not nonlinear_constitutive
+        )
+
+        # Creep predictor Δγ₀ at the current iterate, BEFORE assembling: a
+        # stale predictor can zero the symbolic correction (base clamp) and
+        # let |Δu| pass spuriously. Its change feeds the convergence test.
+        creep_pred_change = 0.0
+        if creep_present:
+            creep_pred_change = self.update_creep_predictor(u_new, T_current)
+
+        # Penalty contact: update the contact pressure from the current
+        # displacement iterate (explicit / fixed-point) — a persistent Constant
+        # consumed by the cached form. The contact traction t = -p*n is treated
+        # as an external load, driven to consistency by the staggered loop.
+        if self.on.get("contact", False):
+            self.update_contact_pressure(u_new)
+
+        # The compiled forms are step-invariant: between staggered iterations
+        # only Functions (u_new, T_current, creep predictor/state, burnup) and
+        # Constants (contact pressure, BC values) change, all consumed by
+        # reference at assembly time. Build the problem once per time step;
+        # solve() reassembles from the stored forms.
+        cache = getattr(self, "_mech_cache", None)
+        rebuild = (
+            cache is None
+            or cache["step"] != self.current_step
+            or cache["u_new"] is not u_new
+            or cache["T"] is not T_current
+        )
+
+        bcs_mech = self._bc_objects(self.dirichlet_mechanical)
+
+        if rebuild:
+            print("\n[INFO] Assembling mechanical problem...")
+            if self.mech_cfg["solver"] == "linear" and creep_present:
+                print("  [INFO] creep active → mechanical step promoted to the nonlinear (SNES) path")
+
+            # --- update step-dependent displacement ---
+            for _, bc_list in self.dirichlet_mechanical.items():
+                for bc in bc_list:
+                    # Skip BCs that are Clamp, Slip, etc. (not yet step-dependent)
+                    if not isinstance(bc, dict):
+                        continue
+
+                    raw = bc.get("raw", None)
+                    if isinstance(raw, list):
+                        val = self._value_at_step(raw)
+                        bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
+                        print(f"  [INFO] Updating Displacement Dirichlet on region {bc['id']} → {val}")
+
+            # --- update step-dependent tractions ---
+            for _, bc_list in self.traction.items():
+                for bc in bc_list:
+                    raw = bc.get("raw", None)
+
+                    if isinstance(raw, list):
+                        val = self._value_at_step(raw)
+                    elif isinstance(raw, (int, float)):
+                        val = raw
+                    else:
+                        raise RuntimeError(
+                            f"Invalid traction 'raw' format (got {type(raw).__name__}: {raw!r}); "
+                            f"expected a scalar or a list of length n_steps"
+                        )
+
                     bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
-                    print(f"  [INFO] Updating Displacement Dirichlet on region {bc['id']} → {val}")
+                    print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
 
-        # --- update step-dependent tractions ---
-        for _, bc_list in self.traction.items():
-            for bc in bc_list:
-                raw = bc.get("raw", None)
-                
-                if isinstance(raw, list):
-                    idx = min(self.current_step, len(raw) - 1)
-                    val = raw[idx]
-                elif isinstance(raw, (int, float)):
-                    val = raw
-                else:
-                    raise RuntimeError("Invalid traction 'raw' format")
+                    regime = self.regime
+                    if self.mgr.tdim == 1:
+                        n_vec = ufl.as_vector([self.normal[0]])
+                    elif regime in ["axisymmetric", "2d", "plane_stress"]:
+                        n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
+                    else:
+                        n_vec = self.normal
 
-                bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
-                print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
+                    bc["value"] = bc["const"] * n_vec
+
+            u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
+            a_m, L_m = 0, 0
+            F_m = 0
+
+            for label, material in self.materials.items():
+                tag = self.label_map[label]
+                dx = self.dx_tags[tag]
+                print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+
+                rho = dolfinx.default_scalar_type(material["rho"])
+                g = dolfinx.default_scalar_type(self.g)
 
                 regime = self.regime
                 if self.mgr.tdim == 1:
-                    n_vec = ufl.as_vector([self.normal[0]])
-                elif regime in ["axisymmetric", "2d"]:
-                    n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
+                    body_force = dolfinx.fem.Constant(self.mesh, (-rho * g,))
+                elif regime in ["axisymmetric", "2d", "plane_stress"]:
+                    # 2D: (F_r, F_z) or (F_x, F_y)
+                    body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
                 else:
-                    n_vec = self.normal
+                    # 3D: (F_x, F_y, F_z)
+                    body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
 
-                bc["value"] = bc["const"] * n_vec
-
-        u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
-        a_m, L_m = 0, 0
-        F_m = 0
-        w = self.weight
-
-        for label, material in self.materials.items():
-            tag = self.label_map[label]
-            dx = self.dx_tags[tag]
-            print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
-
-            rho = dolfinx.default_scalar_type(material["rho"])
-            g = dolfinx.default_scalar_type(self.g)
-
-            regime = self.regime
-            if self.mgr.tdim == 1:
-                body_force = dolfinx.fem.Constant(self.mesh, (-rho * g,))
-            elif regime == "axisymmetric" or regime == "2d":
-                # 2D: (F_r, F_z) or (F_x, F_y)
-                body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
-            else:
-                # 3D: (F_x, F_y, F_z)
-                body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
-
-            if self.mech_cfg["solver"] == "linear":
-                sigma = self.sigma_mech(u_m, material)
-                a_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
-                L_m += w * ufl.dot(body_force, v_m) * dx
-                if self.on.get("thermal", False):
-                    L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
-            else:
-                mode = material.get("constitutive_mode", "lame")
-                if mode == "hyperelastic":
-                    F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
-                    F_m -= w * ufl.dot(body_force, v_m) * dx
-                    if self.on.get("thermal", False):
-                        F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+                if linear:
+                    sigma = self.sigma_mech(u_m, material)
+                    a_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
+                    L_m += w * ufl.dot(body_force, v_m) * dx
+                    # Eigenstress -C:ε* (thermal + material eigenstrains, assembled when the material requires it.
+                    if self.applies_eigenstress(material):
+                        L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
                 else:
-                    sigma = self.sigma_mech(u_new, material)
-                    F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
+                    mode = material.get("constitutive_mode", "lame")
+                    if self.creep_active(material):
+                        # Condensed implicit creep stress (creep_model.py). The
+                        # eigenstrain ε* is inside σ(u) — no separate eigenstress.
+                        sigma = self.creep_stress(u_new, material, T_current, self.dt)
+                        F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
+                        F_m -= w * ufl.dot(body_force, v_m) * dx
+                    elif mode == "hyperelastic":
+                        F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
+                        F_m -= w * ufl.dot(body_force, v_m) * dx
+                        if self.applies_eigenstress(material):
+                            F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+                    else:
+                        sigma = self.sigma_mech(u_new, material)
+                        F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
+                        # Eigenstress on the residual — mirrors the linear path
+                        # (previously missing here; only exercised once non-lame /
+                        # creep runs route lame materials through SNES).
+                        if self.applies_eigenstress(material):
+                            F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
 
-        # Traction BCs
-        for label in self.materials:
-            for bc_info in self.traction[label]:
-                print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
-                ds = self.ds_tags[bc_info["id"]]
-                if self.mech_cfg["solver"] == "linear":
-                    L_m += w * ufl.dot(bc_info["value"], v_m) * ds
+            # Traction BCs
+            for label in self.materials:
+                for bc_info in self.traction[label]:
+                    print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
+                    ds = self.ds_tags[bc_info["id"]]
+                    if linear:
+                        L_m += w * ufl.dot(bc_info["value"], v_m) * ds
+                    else:
+                        F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
+
+            # Contact traction (persistent pressure Constant, updated above)
+            if self.on.get("contact", False):
+                contact_form = self.contact_traction(v_m)
+                if linear:
+                    L_m += contact_form
                 else:
-                    F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
+                    F_m -= contact_form
 
-        # --- Extract actual DirichletBC objects (handles both dict and direct BCs) ---
-        bcs_mech = [
-            bc["value"] if isinstance(bc, dict) else bc
-            for _, bc_list in self.dirichlet_mechanical.items()
-            for bc in bc_list
-        ]
-
-        # Solve
-        if self.mech_cfg["solver"] == "linear":
-            print("  Linear solver")
-            petsc_opts_mech = self.get_solver_options(
-                solver_type=self.mech_cfg["linear_solver"],
-                physics="mechanical",
-                rtol=rtol_mech,
-            )
-            problem_m = dolfinx.fem.petsc.LinearProblem(
-                a_m,
-                L_m,
-                bcs=bcs_mech,
-                u=u_new,
-                petsc_options=petsc_opts_mech,
-                petsc_options_prefix="mechanical_",
-            )
-            dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
-            problem_m.solve()
-        else:
-            print("  Non-linear solver (SNES Newton)")
-            linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")
-
-            # SNES Newton options + inner linear solver
-            if linear_solver == "direct_mumps":
-                petsc_opts_mech = {
-                    "snes_type": "newtonls",
-                    "snes_linesearch_type": "basic",
-                    "snes_atol": rtol_mech,
-                    "snes_rtol": rtol_mech,
-                    "snes_max_it": int(self.mech_cfg.get("snes_max_it", 50)),
-                    "ksp_type": "preonly",
-                    "pc_type": "lu",
-                    "pc_factor_mat_solver_type": "mumps",
-                }
-            else:
-                # Iterative inner solver (AMG / HYPRE)
-                ksp_opts = self.get_solver_options(
-                    solver_type=linear_solver,
+            if linear:
+                print("  Linear solver")
+                petsc_opts_mech = self.get_solver_options(
+                    solver_type=self.mech_cfg["linear_solver"],
                     physics="mechanical",
                     rtol=rtol_mech,
                 )
-                petsc_opts_mech = {
-                    "snes_type": "newtonls",
-                    "snes_linesearch_type": "bt",
-                    "snes_atol": rtol_mech,
-                    "snes_rtol": rtol_mech,
-                    "snes_max_it": 100,
-                    "snes_divergence_tolerance": 1e10,
-                    **ksp_opts,
-                }
+                problem_m = dolfinx.fem.petsc.LinearProblem(
+                    a_m,
+                    L_m,
+                    bcs=bcs_mech,
+                    u=u_new,
+                    petsc_options=petsc_opts_mech,
+                    petsc_options_prefix="mechanical_",
+                )
+            else:
+                print("  Non-linear solver (SNES Newton)")
+                linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")
 
-            problem_m = NonlinearProblem(
-                F_m,
-                u_new,
-                bcs=bcs_mech,
-                petsc_options=petsc_opts_mech,
-                petsc_options_prefix="elasticity_",
-            )
-            dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
-            problem_m.solve()
+                # SNES Newton options + inner linear solver
+                if linear_solver == "direct_mumps":
+                    petsc_opts_mech = {
+                        "snes_type": "newtonls",
+                        "snes_linesearch_type": "basic",
+                        "snes_atol": rtol_mech,
+                        "snes_rtol": rtol_mech,
+                        "snes_max_it": int(self.mech_cfg.get("snes_max_it", 50)),
+                        "ksp_type": "preonly",
+                        "pc_type": "lu",
+                        "pc_factor_mat_solver_type": "mumps",
+                    }
+                else:
+                    # Iterative inner solver (AMG / HYPRE)
+                    ksp_opts = self.get_solver_options(
+                        solver_type=linear_solver,
+                        physics="mechanical",
+                        rtol=rtol_mech,
+                    )
+                    petsc_opts_mech = {
+                        "snes_type": "newtonls",
+                        "snes_linesearch_type": "bt",
+                        "snes_atol": rtol_mech,
+                        "snes_rtol": rtol_mech,
+                        "snes_max_it": 100,
+                        "snes_divergence_tolerance": 1e10,
+                        **ksp_opts,
+                    }
 
-        # Relax
+                problem_m = NonlinearProblem(
+                    F_m,
+                    u_new,
+                    bcs=bcs_mech,
+                    petsc_options=petsc_opts_mech,
+                    petsc_options_prefix="elasticity_",
+                )
+
+            self._mech_cache = {
+                "step": self.current_step,
+                "u_new": u_new,
+                "T": T_current,
+                "problem": problem_m,
+            }
+
+        problem_m = self._mech_cache["problem"]
+        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
+        problem_m.solve()
+
+        # Relax. With Aitken Δ² enabled the relaxation factor is recomputed
+        # each iteration from the last two raw residuals R_k = ũ_k − u_old_k:
+        #   ω_{k+1} = −ω_k · (R_{k−1} · ΔR)/|ΔR|²,  ΔR = R_k − R_{k−1},
+        # clamped to [relax_min, relax_max]. (Serial dot products: the suite
+        # runs single-rank; an MPI allreduce belongs here if that changes.)
+        if getattr(self, "relax_aitken", False):
+            R = u_new.x.array - u_old.x.array
+            R_prev = getattr(self, "_aitken_R_prev", None)
+            omega = float(getattr(self, "_aitken_omega", self.relax_u))
+            if R_prev is not None and R_prev.shape == R.shape:
+                dR = R - R_prev
+                denom = float(np.dot(dR, dR))
+                # Noise guard: when the residual barely changed (converged or
+                # zero-load step), the quotient is numerical garbage — keep ω.
+                R_norm = float(np.linalg.norm(R))
+                if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(R_norm, 1e-300):
+                    omega = -omega * float(np.dot(R_prev, dR)) / denom
+                    omega = float(min(max(omega, self.relax_min), self.relax_max))
+            self._aitken_R_prev = R.copy()
+            self._aitken_omega = omega
+            self.relax_u = omega
+            print(f"  [aitken] relax_u={omega:.3f}")
+
         u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
         dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
 
@@ -481,7 +647,15 @@ class Solver:
             conv_mech = rel_norm_du < stag_tol_mech
             res_curr = rel_norm_du
 
-        if self.relax_adaptive:
+        # The creep predictor must be consistent with u as well — |Δu| alone
+        # can pass on the first iteration of a step while Δγ₀ is still moving.
+        if creep_present:
+            print(f"  [creep] predictor rel change = {creep_pred_change:.3e}")
+            pred_tol = max(stag_tol_mech, 1e-8)
+            conv_mech = conv_mech and creep_pred_change < pred_tol
+
+        # Heuristic grow/shrink controller — superseded by Aitken when enabled
+        if self.relax_adaptive and not getattr(self, "relax_aitken", False):
             if prev_res_u is not None:
                 ema_alpha = 0.3
                 ema_u = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_u
@@ -694,7 +868,7 @@ class Solver:
         if pe > 1:
             print(f"    [INFO] Advection-dominated system. DG Upwind will provide stability.")
 
-        # Variational form (Implicit uler + DG)
+        # Variational form (Implicit Euler + DG)
         # Mass matrix (time derivative)
         a = (u_c / dt_c) * v_c * ufl.dx
         L = (c_old / dt_c) * v_c * ufl.dx
@@ -770,9 +944,11 @@ class Solver:
         self,
         max_iter=20,
         dt=0.0,
-        stag_tol_th=1e-3,
-        stag_tol_mech=1e-3,
-        stag_tol_dmg=1e-3,
+        # stag_tol defaults mirror Spine.solve (the only caller, which always
+        # passes them explicitly) — keep the two in sync.
+        stag_tol_th=1e-4,
+        stag_tol_mech=1e-4,
+        stag_tol_dmg=1e-4,
         rtol_th=1e-6,
         rtol_mech=1e-6,
         rtol_dmg=1e-5,
@@ -797,8 +973,7 @@ class Solver:
             T_new.x.array[:] = self.T.x.array
             T_old = dolfinx.fem.Function(self.V_t)
 
-            bcs_t = []
-            [bcs_t.extend(bc_list) for bc_list in self.dirichlet_thermal.values()]
+            bcs_t = self._bc_objects(self.dirichlet_thermal)
         else:
             T_new = T_old = None
             bcs_t = []
@@ -809,7 +984,8 @@ class Solver:
             u_old = dolfinx.fem.Function(self.V_m)
 
             bcs_m = []
-            [bcs_m.extend(bc_list) for bc_list in self.dirichlet_mechanical.values()]
+            for bc_list in self.dirichlet_mechanical.values():
+                bcs_m.extend(bc_list)
         else:
             u_new = u_old = None
             bcs_m = []
@@ -831,6 +1007,18 @@ class Solver:
         prev_res_T = None
         prev_res_u = None
         prev_res_D = None
+
+        # Per-step reset of the iteration-coupling accelerators: the Aitken
+        # residual history and the gap-conductance damping memory belong to a
+        # single staggered solve, not across time steps. The Aitken factor
+        # restarts from the configured relax_u: the recursion scales each new
+        # ω from the previous one, so a clamped-at-the-floor ω from a noisy
+        # step (e.g. the zero-power initial step) must not be carried over.
+        self._aitken_R_prev = None
+        if getattr(self, "relax_aitken", False):
+            self._aitken_omega = getattr(self, "_relax_u0", self.relax_u)
+            self.relax_u = self._aitken_omega
+        self._h_gap_prev = None
 
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
@@ -891,6 +1079,11 @@ class Solver:
 
                 if self.on.get("mechanical", False) and self.on.get("plasticity", False):
                     self.update_plastic_history(u_new)
+
+                if self.on.get("mechanical", False) and any(
+                    self.creep_active(m) for m in self.materials.values()
+                ):
+                    self.update_creep_state(u_new, T_new)
 
                 return True
 

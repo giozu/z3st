@@ -1,0 +1,13 @@
+name: disc_2D_xy
+geometry_type: cyl
+
+Ro: 0.01
+Lz: 1.0
+
+labels:
+  uo2: 10
+  contact_wall: 20
+  insulated_wall: 21
+  pin: 30
+  symmetry: 40
+  crack_seed: 50

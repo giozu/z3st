@@ -1,0 +1,13 @@
+name: cylinder
+geometry_type: cyl
+
+Ri: 0.000   # solid pellet, no central hole (m)
+Ro: 0.0041  # pellet outer radius (m)
+Lz: 0.010   # height (m)
+
+labels:
+  inner: 1
+  outer: 2
+  bottom: 3
+  top: 4
+  fuel: 10

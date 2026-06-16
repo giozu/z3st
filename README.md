@@ -48,16 +48,16 @@ Install in editable/development mode
 
 Then, it is possible to execute in each case folder, for instance:
   ```bash
-  cd ~/z3st/z3st/cases/00_example/
+  cd ~/z3st/z3st/cases/verification/mechanics/uniaxial_tension/
   gmsh mesh.geo -3 > log_mesh.md
   python3 -m z3st > log_z3st.md
   python3 non-regression.py
-  python3 ../../utils/plot_convergence.py
+  python3 ../../../../utils/plot_convergence.py
   ```
 
 Or, with less instructions:
   ```bash
-  cd ~/z3st/z3st/cases/00_example/
+  cd ~/z3st/z3st/cases/verification/mechanics/uniaxial_tension/
   ./Allrun
   ```
 
@@ -87,10 +87,15 @@ These cases serve both as:
 
 ## Key features
 
-* **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling and adaptive relaxation
+* **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling; adaptive or Aitken Δ² dynamic relaxation, per-step form caching, optional gap-conductance damping
+* **Adaptive time-stepping** — optional, off by default; when a step stalls under strongly coupled non-linear physics the solver snapshots the converged state, bisects `dt`, and re-solves the step as internal sub-steps (output stays on the original grid), aborting cleanly only if it cannot converge at `dt_min`
+* **Hot-reloadable parameters** — an allow-listed subset of `input.yaml` (tolerances, relaxation factors, `max_iters`) can be edited mid-run and is picked up at the next step boundary, for steering long simulations without restarting
 * **Multi-regime kinematics** — `2d` plane strain, `3d`, `axisymmetric`, and `plane_stress` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
 * **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
 * **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral or Amor volumetric/deviatoric energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
+* **Creep** — implicit Norton + Arrhenius via the incremental variational principle (radial return condensed onto the displacement space, exact consistent tangent by automatic differentiation), with an optional flux-driven irradiation-creep term for in-pile cladding
+* **Fuel cracking** — Isotropic softening: the number of macro-cracks follows the rod-average linear heat rate and rescales the fuel elastic constants, irreversibly
+* **Engineering fuel behaviour** — burnup-driven solid and gaseous swelling with early-life densification (eigenstrain bus), Fink UO₂ k(T), rim-peaking radial and chopped-cosine/tabulated axial power profiles
 * **Multi-material domains** — independent thermal, mechanical, and damage properties per material; per-cell-tag integration measures handle interfaces naturally
 * **Volumetric heating** — fissile (LHR/area), analytic γ-heating decay in rectangular / cylindrical / spherical geometry, or arbitrary user-defined `q'''(x)`
 * **Flexible boundary conditions** — thermal (Dirichlet / Neumann / Robin with convective or gap-coupled mode), mechanical (Dirichlet vector / per-component / Neumann / Clamp / Slip), damage (Dirichlet); step-dependent value histories on mechanical BCs
@@ -141,16 +146,19 @@ z3st/                                # repository root
     │   ├── mechanical_model.py      # lame / voigt / hyperelastic / plasticity / custom
     │   ├── damage_model.py          # AT1 / AT2, Miehe / Amor splits, hybrid constraint
     │   ├── plasticity_model.py      # J2 + custom CP hook
-    │   ├── gap_model.py             # Fixed / Gas gap conductance
+    │   ├── creep_model.py           # implicit Norton + irradiation creep, AD tangent
+    │   ├── cracking_model.py        # Isotropic-softening fuel cracking
+    │   ├── contact_model.py         # penalty pellet-clad contact (PCMI)
+    │   ├── gap_model.py             # Fixed / Gas gap conductance + contact coupling
     │   └── cluster_dynamic_model.py # 1D advection–diffusion (DG + SIPG + upwind)
+    ├── coupling/                    # external-code coupling (e.g. SCIANTIX fission gas)
     ├── materials/                   # YAML cards + Python callables
     │   ├── steel.yaml, austenitic_steel.yaml, ..., vessel_steel.yaml
     │   ├── uo2.yaml, zircaloy.yaml
     │   ├── ceramic.yaml, oxide.yaml, plastic.yaml, lead.yaml, h2o.yaml
-    │   └── ceramic.py, oxide.py     # k(T), Gc(mesh) callables
+    │   └── ceramic.py, oxide.py, fuel_*.py, zircaloy_E.py  # k(T), Gc(x), swelling, E(T) callables
     ├── utils/                       # post-processing + helpers
     │   ├── writer.py                # unified VTU / XDMF OutputWriter
-    │   ├── export_vtu.py            # legacy VTU writer (backward compat)
     │   ├── mesh_builder.py
     │   ├── plot_convergence.py
     │   ├── utils_extract_vtu.py     # field extraction from VTU
@@ -161,16 +169,22 @@ z3st/                                # repository root
     │   ├── output.py                # stdout / JSON helpers
     │   ├── z-gui.py                 # interactive PyVista viewer
     │   └── geo_files/               # reusable Gmsh templates
+    ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
     ├── examples/                    # minimal didactic setups
     └── cases/                       # ~50 verification / validation / demo cases
-        ├── 00_example/              # tutorial: uniaxial steel block 3D
-        ├── 1_thin_slab_2D/          # first thermal slab
-        ├── ...
-        ├── 14_full_cylinder_cracking_2D_xy/   # UO2 thermal-shock + AT1 (paper flagship)
-        ├── 19_single-edge_notched_*/          # SENT / SENS phase-field benchmarks
-        ├── 20_plasticity_2D/
-        ├── demo_CP_single_grain/             # custom crystal-plasticity demo
-        ├── non-regression.sh / .py / _github.sh   # regression infrastructure
+        ├── verification/            # analytic closed-form checks
+        │   ├── thermal/             #   slabs, shells, heated box
+        │   ├── mechanics/           #   Lamé, GPS, Mariotte, cylinders, cavities
+        │   ├── plasticity/          #   J2 hardening, crystal-plasticity demo
+        │   └── fuel/                #   swelling, burnup, creep, contact, law discovery
+        ├── benchmarks/              # literature reproducers (SENT/SENS, pellet quench)
+        ├── regression/              # gold-only guards (incl. PWR fuel-rod PCMI)
+        ├── studies/                 # mesh sensitivity, attenuation map
+        ├── sandbox/                 # work in progress (never in the suite)
+        ├── teaching/
+        ├── non-regression_local.sh  # discovery-based local suite
+        ├── non-regression_github.sh # CI suite (reads cases_ci.txt)
+        ├── cases_ci.txt / suite_exclude.txt
         └── non-regression_summary.txt
 ```
 
@@ -245,6 +259,11 @@ time:
   - 0
 n_steps: 1
 
+# time_adaptivity:                 # optional, off by default; bisect dt on a stalled step
+#   enabled: true
+#   dt_min: 1.0e3                  # (s) smallest dt to attempt before aborting
+#   max_cuts: 6                    # max bisection depth per original-grid step
+
 output:
   format: vtu                     # vtu | xdmf
 ```
@@ -259,7 +278,7 @@ Full compatibility with **ParaView** and **PyVista** enables both automated and 
 
 | Tool                   | Description                                                                             |
 | ---------------------- | --------------------------------------------------------------------------------------- |
-| `export_vtu.py`        | Exports temperature, displacement, strain, and stress fields to `.vtu` format           |
+| `writer.py`            | Unified `OutputWriter`: per-step VTU files or single-file XDMF time series              |
 | `utils_extract_vtu.py` | Extracts scalar/vector fields and stress components from VTU outputs                    |
 | `utils_plot.py`        | Generates 1D and radial plots (e.g. T(r), σ<sub>rr</sub>(r)) and can be easily extended |
 | `z-gui.py`             | Interactive 3D viewer built on PyVista for exploratory visualization                    |
@@ -305,9 +324,9 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 
 ### Development roadmap
 
-* Contact mechanics
-* Nonlinear constitutive behavior
-* Coupling with microstructure generators
+* Frictional and mortar contact (current contact is penalty, uniform-pressure)
+* Monolithic phase-field Newton for spontaneous crack nucleation
+* Coupling with microstructure generators (Mérope)
 * Advanced cluster dynamics (1D, nucleation)
 * Coupling with rate-theory codes
 
@@ -381,16 +400,16 @@ Z3ST is built on the **FEniCSx** ecosystem. Recommended citations include:
 If you use Z3ST in your research, please cite this little work.
 
 ```bibtex
-@misc{Z3ST2025,
+@misc{Z3ST2026,
   author       = {Giovanni Zullo},
   title        = {Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis},
-  year         = {2025},
+  year         = {2026},
   howpublished = {\url{https://github.com/giozu/z3st}},
-  note         = {Version 0.1.0}
+  note         = {Version 0.2.0}
 }
 ```
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
-* **Version:** 0.1.0 (2025)
+* **Version:** 0.2.0 (2026)
 * **License:** Apache 2.0

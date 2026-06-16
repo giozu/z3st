@@ -1,0 +1,16 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1  # Run from this directory
+
+echo "Cleaning current directory..."
+
+# Remove the regenerable baseline-run outputs only. PRESERVE
+# output/non-regression_gold.json (the blessed gold the suite checks against)
+# and the parametric_study sweep deliverables (pcrit_*/sweep_* figures).
+rm -f output/non-regression.json
+rm -f output/results.xdmf output/results.h5
+rm -f output/fields_overview.png output/stress_profile_tip.png output/gc_profile_check.png
+rm -f *.msh
+rm -f log_*.md
+rm -rf __pycache__
+
+echo "Done. Output and temporary files deleted (gold + sweep figures preserved)."

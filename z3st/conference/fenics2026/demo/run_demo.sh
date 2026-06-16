@@ -6,6 +6,9 @@
 #
 #   ./run_demo.sh            full core loop A->E
 #   ./run_demo.sh A          jump to a single segment (A|B|C|D|E)
+#   ./run_demo.sh P          optional PCMI segment (pellet-clad contact, verified)
+#   ./run_demo.sh K          optional crystal-plasticity segment (abstract headline)
+#   ./run_demo.sh M          optional model-identification segment (EUCLID-style)
 #   ./run_demo.sh --check    quick non-interactive smoke test of A and C
 # =====================================================================
 set -uo pipefail
@@ -15,6 +18,7 @@ DEMO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$DEMO_DIR/../../../.." && pwd)"     # -> /.../z3st
 CASES="$REPO_ROOT/z3st/cases"
 MECH="$REPO_ROOT/z3st/models/mechanical_model.py"
+BAKED="$DEMO_DIR/baked"
 
 # --- colours -----------------------------------------------------------------
 B=$'\e[1m'; C=$'\e[36m'; G=$'\e[32m'; Y=$'\e[33m'; R=$'\e[31m'; Z=$'\e[0m'
@@ -24,8 +28,8 @@ if python -c "import dolfinx" >/dev/null 2>&1; then
     RUN() { "$@"; }
     ENVNOTE="${G}env: active in this shell${Z}"
 else
-    RUN() { conda run --no-capture-output -n z3st "$@"; }
-    ENVNOTE="${Y}env: using 'conda run -n z3st' (tip: 'conda activate z3st' is snappier)${Z}"
+    RUN() { conda run --no-capture-output -n z3st11 "$@"; }
+    ENVNOTE="${Y}env: using 'conda run -n z3st11' (tip: 'conda activate z3st11' is snappier)${Z}"
 fi
 
 pause()  { echo; read -rp "${B}↵ Enter to continue…${Z}" _; echo; }
@@ -33,6 +37,17 @@ say()    { echo; echo "${C}${B}▶ $*${Z}"; }
 cue()    { echo "${Y}  say: \"$*\"${Z}"; }
 
 hr() { printf '%s\n' "────────────────────────────────────────────────────────────"; }
+
+# open one or more images in the system viewer; fall back to listing paths
+open_imgs() {
+  if command -v xdg-open >/dev/null 2>&1; then
+    for f in "$@"; do xdg-open "$f" >/dev/null 2>&1 & done
+  elif command -v eog >/dev/null 2>&1; then
+    eog "$@" >/dev/null 2>&1 &
+  else
+    echo "  images:"; for f in "$@"; do echo "    $f"; done
+  fi
+}
 
 # =====================================================================
 seg_A() {
@@ -55,23 +70,30 @@ seg_A() {
 seg_B() {
   hr; say "B · The core idea — automatic differentiation"
   cue "This one line IS the stress. I differentiate the energy. The tangent is another ufl.derivative."
-  echo "  ${B}$MECH${Z}  (lines 619–665)"; echo
-  if command -v sed >/dev/null; then
-    sed -n '619,666p' "$MECH" | sed 's/^/    /'
+  echo "  ${B}$MECH${Z}"; echo
+  # locate the key lines dynamically so the snippet never goes stale
+  psi_ln=$(grep -nE "psi = \(mu" "$MECH" | head -1 | cut -d: -f1)
+  p_ln=$(grep -nE "P = ufl\.diff\(psi" "$MECH" | head -1 | cut -d: -f1)
+  if command -v sed >/dev/null && [ -n "$psi_ln" ] && [ -n "$p_ln" ]; then
+    sed -n "$((psi_ln-1)),$((psi_ln+1))p" "$MECH" | sed 's/^/    /'
+    echo "      ..."
+    sed -n "$((p_ln-1)),$((p_ln+1))p" "$MECH" | sed 's/^/    /'
+    echo; echo "${G}  key lines:  neo-Hookean psi  (line $psi_ln)   ·   P = ufl.diff(psi, F_def)  (line $p_ln)${Z}"
+  else
+    echo "    (open $MECH and show the neo-Hookean psi and  P = ufl.diff(psi, F_def))"
   fi
-  echo; echo "${G}  key lines:  psi = …  (644)   ·   P = ufl.diff(psi, F_def)  (665)${Z}"
 }
 
 seg_C() {
   hr; say "C · Coupled thermo-mechanics + the hot-reload wow"
   cue "Now it is coupled: heat drives thermal strain, which drives stress. Staggered, adaptive relaxation."
   pause
-  ( cd "$CASES/1_thin_slab_neumann_2D" \
+  ( cd "$CASES/verification/thermal/thin_slab_neumann_2D" \
       && RUN gmsh mesh.geo -2 > log_mesh.md 2>&1 \
       && RUN python3 -m z3st 2>&1 | grep -E "iteration|converged|Simulation completed|staggered|Δ" | tail -8 )
   echo
   echo "${Y}${B}  HOT-RELOAD MOMENT:${Z}"
-  echo "  Open  ${B}$CASES/1_thin_slab_neumann_2D/input.yaml${Z}  in your editor,"
+  echo "  Open  ${B}$CASES/verification/thermal/thin_slab_neumann_2D/input.yaml${Z}  in your editor,"
   echo "  change e.g. ${B}relax_u: 0.4 → 0.2${Z}  or  ${B}stag_tol${Z}, save, and re-run this segment."
   cue "I can retune the solver while it runs — it picks up the change at the next step."
 }
@@ -90,6 +112,63 @@ seg_E() {
   echo "  ${B}github.com/giozu/z3st${Z}  ·  ${B}giozu.github.io/z3st${Z}  ·  DOI ${B}10.5281/zenodo.17748028${Z}"
 }
 
+seg_P() {
+  hr; say "P · Multi-body: pellet–cladding contact (PCMI), verified  (optional)"
+  cue "A fuel pellet heats, expands, closes the gap, and contacts the cladding — fully coupled."
+  echo "  baked story: ${B}$BAKED/pcmi_curves.png${Z}  +  ${B}$BAKED/pcmi_verification.png${Z}"
+  open_imgs "$BAKED/pcmi_curves.png" "$BAKED/pcmi_verification.png"
+  echo
+  cue "Contact is a penalty — pressure proportional to penetration, equal/opposite tractions."
+  cue "Nothing is prescribed: the pressure EMERGES, the cladding is pushed outward — that is load transfer."
+  cue "And it feeds back thermally: contact raises the gap conductance, so the fuel cools the moment it touches."
+  echo "${G}  → verified to 3.5% against the analytical Lamé interference-fit (stress state confirmed plane-stress).${Z}"
+  cue "The penalty tangent? The same AD path — ufl.derivative — no hand-coded contact Jacobian."
+  echo
+  cue "The burnup beat: same physics over an 1800-DAY irradiation — swelling closes the gap at ~21 MWd/kgU,"
+  cue "and the peak fuel temperature DROPS the moment contact engages (gap conductance jumps). Two-way, one figure."
+  echo "  baked story: ${B}$BAKED/pcmi_burnup_curves.png${Z}"
+  open_imgs "$BAKED/pcmi_burnup_curves.png"
+  echo
+  echo "${Y}  (optional, live — watch the gap close and contact switch on):${Z}"
+  echo "    ${B}cd $CASES/sandbox/U_coaxial_contact_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
+}
+
+seg_K() {
+  hr; say "K · Crystal plasticity — the case nobody wants to differentiate by hand  (optional)"
+  cue "Single crystal, one FCC slip system, power-law viscoplasticity. The slip-rate"
+  cue "derivative through the Schmid tensor is the Jacobian nobody enjoys deriving —"
+  cue "here it comes from ufl.diff, exactly. Watch the Newton counts."
+  pause
+  ( cd "$CASES/verification/plasticity/crystal_single_grain" \
+      && RUN gmsh mesh.geo -3 > log_mesh.md 2>&1 \
+      && RUN python3 -m z3st > log_z3st.md 2>&1 \
+      && RUN python3 non-regression.py 2>&1 \
+         | grep -E "Schmid|σ_sat|sigma_zz_final|saturation|SUMMARY|EXCELLENT" )
+  echo
+  echo "  curve: ${B}$CASES/verification/plasticity/crystal_single_grain/output/stress_strain_curve.png${Z}"
+  open_imgs "$CASES/verification/plasticity/crystal_single_grain/output/stress_strain_curve.png"
+  echo "${G}  → elastic, yield at τ = g₀, saturation at the semi-analytical σ_sat — "
+  echo "    quadratic Newton convergence because the AD tangent is exact.${Z}"
+  cue "History variables live in quadrature spaces; the law is ~10 lines of Python."
+  echo "  (baked fallback: ${B}$BAKED/cp_stress_strain.png${Z})"
+}
+
+seg_M() {
+  hr; say "M · Toward constitutive-law discovery — identification from data  (optional)"
+  cue "Same AD idea, pointed the other way: differentiate the SOLVER with respect to"
+  cue "the MATERIAL PARAMETERS, and you can learn the law from data."
+  pause
+  ( cd "$DEMO_DIR" && RUN python3 identify_creep.py )
+  echo
+  open_imgs "$BAKED/creep_identification.png"
+  cue "Norton creep relaxation — the verified case. 51 noisy synthetic points,"
+  cue "forward-mode AD through every implicit backward-Euler step, Gauss-Newton:"
+  cue "the exponent n comes back to ~2% in ten iterations, in about a second."
+  echo "${G}  → this is parametric identification today; EUCLID-style sparse-regression"
+  echo "    discovery over a library of candidate energies is the roadmap"
+  echo "    (Flaschel et al. 2022 — independent implementation, no GPL code).${Z}"
+}
+
 # --- quick non-interactive smoke test ---------------------------------------
 smoke() {
   echo "${B}smoke test: 1D case + coupled slab${Z}  ($ENVNOTE)"
@@ -97,7 +176,7 @@ smoke() {
       && RUN python3 -m z3st >/dev/null 2>&1 \
       && RUN python3 non-regression.py 2>&1 | grep -E "SUMMARY" ) \
     && echo "${G}  1D OK${Z}" || echo "${R}  1D FAILED${Z}"
-  ( cd "$CASES/1_thin_slab_neumann_2D" && RUN gmsh mesh.geo -2 >/dev/null 2>&1 \
+  ( cd "$CASES/verification/thermal/thin_slab_neumann_2D" && RUN gmsh mesh.geo -2 >/dev/null 2>&1 \
       && RUN python3 -m z3st 2>&1 | grep -qE "Simulation completed" ) \
     && echo "${G}  coupled slab OK${Z}" || echo "${R}  coupled slab FAILED${Z}"
 }
@@ -112,7 +191,10 @@ case "${1:-all}" in
   C) seg_C ;;
   D) seg_D ;;
   E) seg_E ;;
+  P) seg_P ;;
+  K) seg_K ;;
+  M) seg_M ;;
   all|"") seg_A; pause; seg_B; pause; seg_C; pause; seg_D; pause; seg_E ;;
-  *) echo "usage: $0 [A|B|C|D|E | --check]"; exit 2 ;;
+  *) echo "usage: $0 [A|B|C|D|E|P|K|M | --check]   (P = PCMI · K = crystal plasticity · M = identification)"; exit 2 ;;
 esac
 echo; echo "${G}${B}done.${Z}"

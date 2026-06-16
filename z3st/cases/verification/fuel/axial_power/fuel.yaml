@@ -1,0 +1,21 @@
+name: UO2-fuel-axial
+fissile: true
+heavy_metal_fraction: 0.8815    # (-) M_U / M_UO2
+
+# Axial power form factor: resolved by spine.load_materials, applied in set_power.
+axial_profile: materials.fuel_profiles.chopped_cosine
+axial_extrapolated_length: 0.5  # L' (m)
+
+E: 200.0e9          # (Pa)
+nu: 0.32            # (-)
+alpha: 1.1e-5       # (1/K)
+
+k: 4.0              # (W/(m·K))
+cp: 280.0           # (J/(kg·K))
+rho: 10970.0        # (kg/m³)
+
+T_ref: 600.0        # (K)
+T_initial: 600.0    # (K)
+
+mu_gamma: 0.0
+gamma_heating: 0.0

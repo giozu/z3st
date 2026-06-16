@@ -1,39 +1,16 @@
 #!/bin/bash
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-# Z3ST Non-regression test suite for github
+# Z3ST Non-regression test suite for GitHub
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Author: Giovanni Zullo
-# Date: 2025-12-12
+# Date: 2026-06-13
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 set -e
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
-# CI case-inclusion policy (see CONTEXT.md §6 / punch_list.md CASES-P1-5):
-# This list is a tight subset of the local non-regression.sh suite, chosen
-# for fast CI turnaround under the dolfinx/dolfinx:stable container budget.
-# Each case here:
-#   - has a stable output/non-regression_gold.json,
-#   - runs in well under one minute,
-#   - exercises one physics path that's not covered by another listed case
-#     (linear elasticity, axisymmetric thermal, 3D thermal, volumetric
-#     heating, multi-material with Robin pair gap, 2D damage, J2 plasticity,
-#     custom-plasticity hook).
-# Active WIP cases (14_full_cylinder_cracking, 14_full_cylinder_cracking_2D_xy,
-# 14_full_cylinder_thermal_2D_rz, 19_single-edge_notched_*) are intentionally
-# excluded — they are too long for CI and their golds are still being
-# blessed. Run them locally via cases/non-regression.sh.
-CASES=(
-    "1_thin_slab_2D"
-    "2_thin_cylindrical_shell_2D"
-    "3_thick_slab_adiabatic_3D"
-    "7_box_heated"
-    "14_full_cylinder"
-    "16_coaxial_cylinders_3D"
-    "18_box_crack_2D"
-    "20_plasticity_2D"
-    "demo_CP_single_grain"
-)
+# The CI case list lives in cases/cases_ci.txt
+mapfile -t CASES < <(grep -vE '^[[:space:]]*(#|$)' "${ROOT_DIR}/cases/cases_ci.txt" | awk '{print $1}')
 SUMMARY_FILE="${ROOT_DIR}/cases/non-regression_GH_summary.txt"
 
 echo "Running minimal non-regression suite..."
@@ -64,15 +41,34 @@ for case_name in "${CASES[@]}"; do
 
     cd "$case_dir"
     chmod +x Allrun || true
-    chmod +x Allclean || true
+    # Allclean is optional
+    if [[ -f Allclean ]]; then chmod +x Allclean || true; ./Allclean || true; fi
+    ./Allrun > "${case_name//\//_}_log.txt" 2>&1 && exit_code=0 || exit_code=$?
 
-    ./Allclean || true
-    ./Allrun > "${case_name}_log.txt" 2>&1
-    exit_code=$?
+    # A numerical regression fails CI.
+    fail_reason=""
+    if [[ $exit_code -eq 0 && -f "output/non-regression.json" ]]; then
+        summary_status=$(grep -o '"summary": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
+        regression_status=$(grep -o '"regression": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
+        if [[ "$summary_status" == "FAIL" ]]; then
+            exit_code=1
+            fail_reason=" (analytic tolerance)"
+        elif [[ "$regression_status" == "FAIL" ]]; then
+            exit_code=1
+            fail_reason=" (regression vs gold)"
+        fi
+    fi
 
     if [[ $exit_code -ne 0 ]]; then
-        echo "Case ${case_name} FAILED (exit code ${exit_code})"
-        echo "Case: $case_name -> FAIL" >> "$SUMMARY_FILE"
+        echo "Case ${case_name} FAILED (exit code ${exit_code})${fail_reason}"
+        # Surface why it failed so CI logs are self-diagnosing (esp. crashes that
+        # leave no verdict json — solver divergence, missing output, import error).
+        echo "----- last 60 lines of ${case_name} run log (stderr + non-regression) -----"
+        tail -n 60 "${case_name//\//_}_log.txt" 2>/dev/null || echo "(no run log captured)"
+        echo "----- last 30 lines of solver log (log_z3st.md) -----"
+        tail -n 30 log_z3st.md 2>/dev/null || echo "(no solver log captured)"
+        echo "----- end ${case_name} logs -----"
+        echo "Case: $case_name -> FAIL${fail_reason}" >> "$SUMMARY_FILE"
         global_status=1
     else
         echo "Case ${case_name} PASSED"

@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
@@ -41,17 +41,39 @@ class Config:
             "damage": models.get("damage", False),
             "cluster": models.get("cluster", False),
             "plasticity": models.get("plasticity", False),
+            "contact": bool(models.get("contact", False)),
         }
         gap_config = self.input_file.get("models", {}).get("gap_conductance", {})
         self.gap_model = gap_config.get("type", None)
         self.h_gap_value = gap_config.get("value", 0.0)
+
+        # Contact-coupled gap conductance (Todreas & Kazimi, Nuclear Systems I,
+        # 3rd ed., Eq. 8.141/8.142): on gap closure a contact term proportional
+        # to the pellet-clad contact pressure is added to the open-gap value.
+        cc = gap_config.get("contact_coupling", {})
+        self.gap_contact_coupling = bool(cc.get("enabled", False))
+        self.gap_meyer_hardness = float(cc.get("meyer_hardness", 9.65e8))   # Pa (Zircaloy ~ 14e4 psi)
+        self.gap_contact_thickness = float(cc.get("gas_thickness", 4.0e-6))  # m (roughness-based gas space on contact)
+
+        # Under-relaxation of the gap conductance between staggered iterations
+        # (h ← ω·h_new + (1−ω)·h_prev). The contact-pressure → conductance →
+        # temperature → expansion → pressure feedback is the loop that chatters
+        # on gap closure; damping h attacks it at the source. 1.0 = off.
+        self.gap_relax = float(gap_config.get("relax", 1.0))
         
         # --. Paths --..
         self.geometry_path = self.input_file.get("geometry_path", None)
         self.mesh_path = self.input_file.get("mesh_path", None)
         self.boundary_conditions_path = self.input_file.get("boundary_conditions_path", None)
         self.n_steps = self.input_file.get("n_steps", 10)
+        # Normalised to lowercase ("2D" → "2d"); downstream regime branches
+        # assume one of these five values, so reject anything else up front.
         self.regime = self.input_file.get("regime", "2d").lower()
+        valid_regimes = {"1d", "2d", "3d", "axisymmetric", "plane_stress"}
+        if self.regime not in valid_regimes:
+            raise ValueError(
+                f"Invalid regime '{self.regime}'. Must be one of {sorted(valid_regimes)}."
+            )
 
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")

@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.1.0 (2025)
+# Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
@@ -90,8 +90,12 @@ class ClusterDynamicsModel:
                         dolfinx.fem.assemble_scalar(flux_form), op=MPI.SUM
                     )
 
-                    # Normalize to target mass
-                    target_mass = float(ic_config.get("value", 1000.0))
+                    # Normalize to the conserved total mass C_tot = ∫ c·n dn.
+                    # Default to the current mass (no rescale) so a constant IC
+                    # keeps the requested density value; an explicit 'total_mass'
+                    # key overrides. (The 'value' key is the per-DOF density, not
+                    # a mass target — reusing it here was a units conflation.)
+                    target_mass = float(ic_config.get("total_mass", current_mass))
                     if current_mass > 0.0:
                         scaling_factor = target_mass / current_mass
                         self.c.x.array[:] *= scaling_factor
