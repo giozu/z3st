@@ -4,8 +4,9 @@
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-# --. IDE / editor files --..
+# --. IDE / editor / assistant files --..
 .vscode/
+.claude/
 
 # --. Python --..
 __pycache__/
