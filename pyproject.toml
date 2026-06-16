@@ -27,6 +27,7 @@ dependencies = [
     "matplotlib",
     "pyvista>=0.42",
     "meshio",
+    "h5py",
     "pyyaml",
     "gmsh",
 ]
