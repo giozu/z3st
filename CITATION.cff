@@ -6,7 +6,7 @@ authors:
     given-names: Giovanni
     affiliation: Politecnico di Milano
 version: 0.2.0
-date-released: 2026-06-11
+date-released: 2026-06-16
 license: Apache-2.0
 repository-code: "https://github.com/giozu/z3st"
 url: "https://giozu.github.io/z3st/"
