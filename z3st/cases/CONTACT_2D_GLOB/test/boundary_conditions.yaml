@@ -1,0 +1,18 @@
+mechanical:
+  steel_in:
+    - type: Clamp_x
+      region: steel_in_left  # Encastrement à gauche
+      value: 0.0
+
+    - type: Neumann
+      region: steel_in_top
+      traction: 0.0  # Pas de traction sur le dessus (ou autre valeur si nécessaire)
+
+  steel_o:
+    - type: Neumann
+      region: steel_o_right  # Pression externe
+      traction: -1.0e+6     # Pression sur le bord droit
+
+    - type: Neumann
+      region: steel_o_top
+      traction: 0.0

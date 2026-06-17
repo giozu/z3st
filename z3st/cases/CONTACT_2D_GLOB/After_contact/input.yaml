@@ -9,8 +9,9 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel_o: ../../../materials/steel_2.yaml
-  steel_in: ../../../materials/steel.yaml
+  steel_o: ../../../materials/steel.yaml
+  steel_in: ../../../materials/uo2.yaml
+  gap_region: ../../../materials/steel_2.yaml
 
 regime: axisymmetric
 
@@ -28,6 +29,7 @@ solver_settings:
 models:
   thermal: true
   mechanical: true
+  contact: false
 
 mechanical:
   solver: linear # linear | nonlinear

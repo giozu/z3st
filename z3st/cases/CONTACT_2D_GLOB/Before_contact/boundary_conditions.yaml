@@ -9,11 +9,12 @@ mechanical:
 
   - type: Neumann
     region: right_radius_o
-    traction: 0.0   # (Pa)
+    traction: -1.0e+6   # (Pa)
 
   - type: Neumann
     region: right_radius_in
-    traction: -1.0e+6   # (Pa)
+    traction: -1000000000   # (Pa)
+
 
   steel_in:
 
@@ -22,6 +23,7 @@ mechanical:
     value: 0.0   # (Pa)
 
   - type: Neumann
-    region: left_radius_in
-    traction: -1.0e+6   # (Pa)
+    region: left_radius_o
+    traction: -0.0   # (Pa)
+
 

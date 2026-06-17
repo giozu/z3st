@@ -9,43 +9,43 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel_o: ../../materials/steel.yaml
-  steel_mid: ../../materials/steel.yaml
+  steel_in: ../../../materials/steel_2.yaml
+  steel_o: ../../../materials/steel.yaml
 
+regime: 2d  # ou "axisymmetric" si tu préfères
 
 solver_settings:
   coupling: staggered
   max_iters: 100
-  relax_T: 0.9
   relax_u: 0.4
   relax_adaptive: true
   relax_growth: 1.1
   relax_shrink: 0.7
   relax_min: 0.05
-  relax_max: 1.0
+  relax_max: 0.95
 
 models:
-  thermal: true
+  thermal: false  # Désactive le thermique pour simplifier
   mechanical: true
+  contact: true   # Active le contact
 
 mechanical:
-  solver: linear # linear | nonlinear
-  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
-  # constitutive: hyperelastic
+  solver: nonlinear  # Le contact nécessite un solveur non-linéaire
+  linear_solver: direct_mumps
   rtol: 1.0e-6
   stag_tol: 1.0e-6
-  convergence: rel_norm # rel_norm | norm
-  debug: false
+  convergence: rel_norm
 
-thermal:
-  solver: linear
-  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-6
-  stag_tol: 1.0e-6
-  convergence: rel_norm # rel_norm | norm
+contact:
+  penalty: 1e8      # Coefficient de pénalité (Pa/m)
+  gap: 0.0          # Jeu initial (m)
+  friction: 0.0     # Coefficient de frottement (0 = sans frottement)
 
 lhr:
-- 0.0     # load history ratio (LHR) at time 0.0
+  - 0.0
 time:
-- 0.0
+  - 0.0
 n_steps: 1
+
+output:
+  format: vtu

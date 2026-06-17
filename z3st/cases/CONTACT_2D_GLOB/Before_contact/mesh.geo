@@ -5,16 +5,17 @@ R_o = 0.05;   // Longueur totale du domaine (m)
 Ly_rect = 0.1;   // Hauteur du domaine (m)
 R_mid = 0.03;  // Largeur de rectangle du milieu (m)
 R_int = 0.01;  // Décalage du centre des rectangles par rapport à l'axe central (m)
+gap = 0.001;
 
 // === Points des deux rectangles adjacents ===
 Point(1) = {R_int, 0, 0};
-Point(2) = {R_mid, 0, 0};
-Point(3) = {R_mid, Ly_rect, 0};
+Point(2) = {R_mid - gap/2, 0, 0};
+Point(3) = {R_mid - gap/2, Ly_rect, 0};
 Point(4) = {R_int, Ly_rect, 0};
 Point(5) = {R_o, 0, 0};
 Point(6) = {R_o, Ly_rect, 0};
-Point(7) = {R_o-R_int, Ly_rect, 0};
-Point(8) = {R_o-R_int, 0, 0};
+Point(7) = {R_mid + gap/2, Ly_rect, 0};
+Point(8) = {R_mid + gap/2, 0, 0};
 
 // === Lignes du rectangle gauche ===
 Line(1) = {1, 2};
