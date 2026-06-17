@@ -1,26 +1,38 @@
+thermal:
+  steel_in:
+  - type: Dirichlet
+    region: inner_radius
+    temperature: 300.0   # (K)
 
 mechanical:
   steel_o:
-  - type: Clamp_y
-    region: bottom
-    value: 0.0   # (m)   Clamp on bottom edge
 
-  - type: Clamp_y
-    region: top
-    value: 0.0   # (m)   Clamp on top edge
+    - type: Neumann
+      region: outer_radius
+      traction: -1.0e+6   # (Pa)   Pressure on the external boundary
+
+    - type: Clamp_y
+      region: bottom_o
+
+    - type: Clamp_y
+      region: top_o
+
+  gap_region:
+    - type: Clamp_y
+      region: bottom_gap
+
+    - type: Clamp_y
+      region: top_gap
+
+  steel_in:
 
 
-  - type: Neumann
-    region: interface
-    traction: 1.0e+6   # (Pa)   Pressure at the interface
+    - type: Clamp_x
+      region: inner_radius
+      value: 0.0
 
-  - type: Neumann
-    region: outer_radius
-    traction: -1.0e+6   # (Pa)   Pressure on the external boundary
+    - type: Clamp_y
+      region: bottom_in
 
-  - type : Clamp_x
-    region: inner_radius
-    value: 0.0
-
-
- 
+    - type: Clamp_y
+      region: top_in

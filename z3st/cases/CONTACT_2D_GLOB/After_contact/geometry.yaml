@@ -1,22 +1,29 @@
 name: contact_2d
 geometry_type: cyl
 
-Lx: 0.004 # (m) total width between R_int and R_o
-Ly: 0.30  # (m) height of the rectangles
+Lx: 0.04 # (m) total width between R_int and R_o
+Ly: 0.10  # (m) height of the rectangles
 
-R_int: 0.001  # (m) x-coordinate of the left boundary of the first rectangle
-R_mid: 0.004  # (m) x-coordinate of the interface between the two rectangles
-R_o: 0.005    # (m) x-coordinate of the right boundary of the second rectangle
-Ly_rect: 0.010 # (m) rectangle height
-Lz: 0.01 # (m) rectangle hight
-Ri: 0.004 # (m) inner radius of the circular part
-Ro: 0.005 # (m) outer radius of the circular part
+R_int: 0.01  # (m) x-coordinate of the left boundary of the first rectangle
+R_mid: 0.04  # (m) x-coordinate of the center of the gap region
+R_o: 0.05    # (m) x-coordinate of the right boundary of the second rectangle
+Ly_rect: 0.10 # (m) rectangle height
+Lz: 0.1 # (m) rectangle hight
+Ri: 0.04 # (m) inner radius of the circular part
+Ro: 0.05 # (m) outer radius of the circular part
+gap: 0.0001   # (m) width of the gap region
 
 labels:
-  bottom: 1
-  top: 2
+  bottom_in: 1
+  top_in: 2
   inner_radius: 3
   outer_radius: 4
-  interface: 5
-  steel_in: 6
-  steel_o: 7
+  interface_in: 5
+  bottom_o: 6
+  top_o: 7
+  bottom_gap: 8
+  top_gap: 9
+  interface_out: 10
+  steel_in: 11
+  gap_region: 12
+  steel_o: 13

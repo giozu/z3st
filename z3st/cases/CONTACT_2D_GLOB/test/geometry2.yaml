@@ -1,0 +1,33 @@
+# Dans z3st/core/spine.py
+from z3st.models.contact_model import ContactModel  # Ajout
+
+class Spine:
+    def __init__(self, config):
+        # ... (code existant)
+        self.config = config
+
+        # Initialiser le modèle de contact si activé
+        self.contact_model = None
+        if self.config.get("models", {}).get("contact", False):
+            self._init_contact_model()
+
+    def _init_contact_model(self):
+        """Initialise le modèle de contact."""
+        contact_config = self.config.get("contact", {})
+        self.contact_model = ContactModel(
+            mesh=self.mesh_manager.mesh,
+            subdomains=self.mesh_manager.subdomains,
+            V_m=self.V_m,
+            geometry_config=self.config["geometry"],
+            contact_config=contact_config,
+        )
+        print("[INFO] Contact model initialized.")
+
+    def _mechanical_step(self, rtol_mech, stag_tol_mech, prev_res_u, T_current=None):
+        # ... (code existant pour assembler F_m)
+
+        # Ajouter le résidu de contact si activé
+        if self.contact_model is not None:
+            F_m = self.contact_model.add_contact_residual(F_m, self.u_new)
+
+        # ... (reste du code pour résoudre le système)

@@ -35,6 +35,8 @@ R_o = float(geom.get("R_o", 0.005))
 Ly_rect = float(geom.get("Ly_rect", 0.01))
 R_int = float(geom.get("R_int", 0.001))
 R_mid = float(geom.get("R_mid", 0.003))
+gap=0.001
+delta=gap
 
 # Les Lx sont maintenant des rayons directs (coordonnées x du maillage)
 Ri = R_o - R_int  # Rayon interne de la gaine (0.004)
@@ -49,9 +51,13 @@ y_target = Ly_rect / 2.0
 y_tol = 0.01
 Lz = float(geom.get("Lz", Ly_rect))
 
-Pi, Po = 1.0e6, 0.0  # Pa         internal and external pressure
-E, nu = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
-P_gap= (Ro-Ri)/(Ri*(1/E) * ( (Ro**2+Ri**2)/(Ro**2-Ri**2) + nu) + Ri*(1-nu)/E)  # (Pa)    
+Pi, Po = 0.0, 0.0  # Pa         internal and external pressure
+E_in, nu_in = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
+E_o, nu_o = 2.0e11, 0.3  # Pa, -      Young modulus, Poisson ratio
+
+P_gap=(gap+delta_exp) / (R_mid * ( (1/E_in) * (nu_in-(R_mid**2 + R_int**2) / (R_mid**2 - R_int**2)) + (1 / E_o) * ( nu_o+ (R_o**2 + R_mid**2) / (-R_mid**2 + R_o**2 ) )))   # Pa on the interface (inward)    
+
+
 for i in range(1,5) :    
     print("\n")
 print(P_gap)
@@ -61,16 +67,20 @@ TOLERANCE = 5.0e-3  # -          tolerance for non-regression
 eps_zz_GPS = -2.718310e-06
 
 # Lamé solutions
-A = (Pi * Ri**2 - Po * Ro**2) / (Ro**2 - Ri**2)
-B = (Ri**2 * Ro**2 * (Pi - Po)) / (Ro**2 - Ri**2)
-sigma_zz_ana_L = 2 * nu * A + E * eps_zz_GPS  # Generalized plane strain (epsilon_z = const)
+A_in = (Pi * R_int**2 - P_gap * R_mid**2) / (R_mid**2 - R_int**2)
+B_in = -(R_int**2 * R_mid**2 * (Pi - P_gap)) / (R_mid**2 - R_int**2)
+
+A_o = (P_gap * Ri**2 - Po * Ro**2) / (Ro**2 - Ri**2)
+B_o = (Ri**2 * Ro**2 * (P_gap - Po)) / (Ro**2 - Ri**2)
+sigma_zz_ana_L_in = 2 * nu_in * A_in + E_in * eps_zz_GPS  # Generalized plane strain (epsilon_z = const)
+sigma_zz_ana_L_o = 2 * nu_o * A_o + E_o * eps_zz_GPS  # Generalized plane strain (epsilon_z = const)
 
 
-def epsilon_rr_ref(r):
+def epsilon_rr_ref(r,E,nu,A,B):
     return (1 + nu) / E * (A * (1 - 2 * nu) - B / r**2) - nu * eps_zz_GPS
 
 
-def epsilon_tt_ref(r):
+def epsilon_tt_ref(r,nu,E,A,B):
     return (1 + nu) / E * (A * (1 - 2 * nu) + B / r**2) - nu * eps_zz_GPS
 
 
@@ -89,8 +99,8 @@ print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
 # Extraction of the Stress
 x_S, y_S, z_S, S_all = extract_field(VTU_FILE, field_name="Stress_steel_o (cells)")
 
-outer_mask_x = (x_S >= Ri) & (x_S <= Ro)
-inner_mask_x = (x_S >= R_int) & (x_S <= R_mid)
+outer_mask_x = (x_S >= R_mid+gap/2) & (x_S <= R_o)
+inner_mask_x = (x_S >= R_int) & (x_S <= R_mid-gap/2)
 
 x_S_o, y_S_o, z_S_o, S_all_o = x_S[outer_mask_x], y_S[outer_mask_x], z_S[outer_mask_x], S_all[outer_mask_x]
 x_S_in, y_S_in, z_S_in, S_all_in = x_S[inner_mask_x], y_S[inner_mask_x], z_S[inner_mask_x], S_all[inner_mask_x]
@@ -105,32 +115,31 @@ r_s_o = x_S_o[mask_o][sort_idx_o]
 r_s_in = x_S_in[mask_in][sort_idx_in]
 
 
-for i in range(1,5) :
+""" for i in range(1,5) :
     print("\n")
 
-print(len(y_S_o), "taille de y_S_o")
+print(len(S_all_o), "taille de y_S_o")
 print(len(x_S_o)," taille de x_S_o")
 print(len(r_s_o), " taille de rs_o")
 print(len(r_s_in), " taille de rs_in")
-
+ """
 sigma_rr_o = S_all_o[mask_o, 0][sort_idx_o]
 sigma_tt_o = S_all_o[mask_o, 4][sort_idx_o]
 sigma_zz_o = S_all_o[mask_o, 8][sort_idx_o]
-
-print(len(sigma_rr_o), "taille de sigma_rr_o")
-
 
 
 sigma_rr_in = S_all_in[mask_in, 0][sort_idx_in]
 sigma_tt_in = S_all_in[mask_in, 4][sort_idx_in]
 sigma_zz_in = S_all_in[mask_in, 8][sort_idx_in]
 
-print(len(sigma_rr_in))
 
+""" print(len(sigma_rr_in), "taille de sigma_rr_in")
+print(sigma_rr_in)
+ """
 # Extraction of the Strain
 x_E, y_E, z_E, E_all = extract_field(VTU_FILE, field_name="Strain (cells)")
-outer_mask_x_E = (x_E >= Ri) & (x_E <= Ro)
-inner_mask_x_E = (x_E >= R_int) & (x_E <= R_mid)
+outer_mask_x_E = (x_E >= R_mid+gap/2) & (x_E <= R_o)
+inner_mask_x_E = (x_E >= R_int) & (x_E <= R_mid-gap/2)
 
 x_E_o, y_E_o, z_E_o, E_all_o = x_E[outer_mask_x_E], y_E[outer_mask_x_E], z_E[outer_mask_x_E], E_all[outer_mask_x_E]
 x_E_in, y_E_in, z_E_in, E_all_in = x_E[inner_mask_x_E], y_E[inner_mask_x_E], z_E[inner_mask_x_E], E_all[inner_mask_x_E]
@@ -155,25 +164,25 @@ epsilon_zz_in = E_all_in[mask_e_in, 8][sort_idx_e_in]
 # Analytical results for the outer cylinder
 
 
-sigma_rr_ana_L_o = A - B / r_s_o**2
-sigma_tt_ana_L_o = A + B / r_s_o**2
-sigma_zz_ana_L_o = sigma_zz_ana_L * np.ones_like(r_s_o)
+sigma_rr_ana_L_o = A_o - B_o / r_s_o**2
+sigma_tt_ana_L_o = A_o + B_o / r_s_o**2
+sigma_zz_ana_L_o = sigma_zz_ana_L_o * np.ones_like(r_s_o)
 
 print(len(sigma_rr_ana_L_o), " taille de sigma_rr_ana_L_o")
 
 
-epsilon_rr_ana_L_o = epsilon_rr_ref(r_e_o)
-epsilon_tt_ana_L_o = epsilon_tt_ref(r_e_o)
+epsilon_rr_ana_L_o = epsilon_rr_ref(r_e_o, E_o, nu_o, A_o, B_o)
+epsilon_tt_ana_L_o = epsilon_tt_ref(r_e_o, nu_o, E_o, A_o, B_o)
 epsilon_zz_ana_L_o = np.ones_like(r_e_o) * eps_zz_GPS
 
-# Analytical results for in
+# Analytical results for the inner cylinder
 
-sigma_rr_ana_L_in = A - B / r_s_in**2 
-sigma_tt_ana_L_in = A + B / r_s_in**2
-sigma_zz_ana_L_in = sigma_zz_ana_L * np.ones_like(r_s_in)
+sigma_rr_ana_L_in = A_in - B_in / r_s_in**2 
+sigma_tt_ana_L_in = A_in + B_in / r_s_in**2
+sigma_zz_ana_L_in = sigma_zz_ana_L_in * np.ones_like(r_s_in)
 
-epsilon_rr_ana_L_in = epsilon_rr_ref(r_e_in)
-epsilon_tt_ana_L_in = epsilon_tt_ref(r_e_in)
+epsilon_rr_ana_L_in = epsilon_rr_ref(r_e_in, E_in, nu_in, A_in, B_in)
+epsilon_tt_ana_L_in = epsilon_tt_ref(r_e_in, nu_in, E_in, A_in, B_in)
 epsilon_zz_ana_L_in = np.ones_like(r_e_in) * eps_zz_GPS
 
 # Average stress
@@ -358,3 +367,21 @@ pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 regression_check(errors, CASE_DIR)
 
 print("\n[INFO]Non-regression completed.\n")
+
+delta_exp=epsilon_tt_o[0]*R_mid
+
+
+
+
+print( abs(delta_exp**2-delta**2)/delta**2, "erreur en r=R_mid")
+print((delta_exp), "delta_exp")
+print(len(S_all_o),len(S_all_o[0]))
+print(epsilon_tt_o[0], "epsilon_tt at r=R_mid")
+print(x_S_o[-1], "x_S_0 last point")
+print(x_S_in[-1], "x_S_in last point")
+
+# Filtrer les coordonnées x (rayons) par la tolérance en y, puis les trier
+mask_for_x_S_print = np.abs(y_S - y_target) < y_tol
+x_S_filtered_sorted = np.sort(x_S[mask_for_x_S_print])
+with np.printoptions(threshold=np.inf):
+    print(x_S_filtered_sorted)

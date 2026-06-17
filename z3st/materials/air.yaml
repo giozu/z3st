@@ -1,0 +1,15 @@
+name: air
+
+# Propriétés mécaniques (valeurs de substitution pour la stabilité numérique)
+E: 1.0e5              # Module de Young fictif (Pa) - très faible pour un gaz
+nu: 0.0               # Coefficient de Poisson (-)
+
+# Propriétés thermiques (Conditions standards ~300K)
+k: 0.0262             # Conductivité thermique (W/m·K)
+cp: 1006.0            # Capacité thermique massique (J/kg·K)
+alpha: 3.33e-3        # Coefficient de dilatation thermique (1/K) - (1/T pour gaz parfait)
+rho: 1.17             # Masse volumique (kg/m³)
+T_ref: 300.0          # Température de référence (K)
+
+mu_gamma: 0.0         # Coefficient d'atténuation gamma linéaire (1/m)
+gamma_heating: 0.0    # Source volumique par échauffement gamma (W/m³)

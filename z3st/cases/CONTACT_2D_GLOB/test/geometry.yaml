@@ -1,0 +1,23 @@
+name: contact_2d
+geometry_type: cyl  # Problème 2D
+
+# Rayons (x-coordinates)
+R_int: 0.01      # Bord gauche de steel_in
+R_mid: 0.04      # Position de l'interface (centre entre les deux rectangles)
+R_o: 0.05        # Bord droit de steel_o
+Ly_rect: 0.1     # Hauteur des rectangles
+gap: 0.001       # Espace entre les deux rectangles (pour éviter les nœuds partagés)
+Lz: 0.1
+
+# Labels pour les régions physiques (doivent correspondre aux tags dans mesh.geo)
+labels:
+  steel_in: 1      # Tag de la surface steel_in
+  steel_o: 2       # Tag de la surface steel_o
+  steel_in_bottom: 1  # Tag du bord inférieur de steel_in
+  steel_in_top: 2     # Tag du bord supérieur de steel_in
+  steel_in_left: 3   # Tag du bord gauche de steel_in
+  steel_in_right: 4 # Tag du bord droit de steel_in (surface de contact)
+  steel_o_bottom: 5  # Tag du bord inférieur de steel_o
+  steel_o_top: 6     # Tag du bord supérieur de steel_o
+  steel_o_right: 7   # Tag du bord droit de steel_o
+  steel_o_left: 8    # Tag du bord gauche de steel_o (surface de contact)
