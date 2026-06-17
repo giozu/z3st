@@ -55,68 +55,77 @@
 
 % ---------------------------------------------------------------- 2
 \begin{frame}{The problem we keep meeting}
-  Nuclear-fuel components fail where \alert{heat, deformation and fracture interact}
-  -- and the modelling tools are either closed or heavy.
-
-  \vspace{0.4em}
   \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \textbf{Fuel-performance codes today}
-      \begin{itemize}
-        \item proprietary: TRANSURANUS, FALCON, BISON
-        \item open FEM: essentially MOOSE
-        \item powerful, but heavy and monolithic
-      \end{itemize}
+    % --- left: fuel-rod schematic, full height ---
+    \begin{column}{0.15\textwidth}
+      \centering
+      \includegraphics[height=0.78\textheight]{figures/FR_slide_2.png}
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \textbf{FEniCSx}
-      \begin{itemize}
-        \item expressive UFL forms, AD built in
-        \item a strong, open \alert{community}
-        \item no turnkey coupled fuel / fracture driver
-      \end{itemize}
+    % --- right: the problem framing ---
+    \begin{column}{0.82\textwidth}
+      \footnotesize
+      In the materials of nuclear fuel elements (fuel, cladding), \alert{heat,
+      deformation and fracture are tightly coupled} -- and the modelling tools are
+      either closed or heavy.
+
+      \vspace{0.3em}
+      \begin{minipage}[t]{0.49\linewidth}
+        \textbf{Fuel-performance codes today}
+        \begin{itemize}
+          \item proprietary: TRANSURANUS, FALCON, BISON
+          \item open FEM: essentially MOOSE
+          \item powerful, but heavy and monolithic
+        \end{itemize}
+      \end{minipage}\hfill
+      \begin{minipage}[t]{0.49\linewidth}
+        \textbf{FEniCSx}
+        \begin{itemize}
+          \item expressive UFL forms, AD built in
+          \item a strong, open \alert{community}
+          \item no turnkey coupled fuel / fracture driver
+        \end{itemize}
+      \end{minipage}
+
+      \vspace{0.3em}
+      \begin{block}{Z3ST -- the missing layer}
+        An \alert{open}, FEniCSx-native solver where the \alert{whole coupled apparatus} is
+        \alert{already assembled and verified}. A new problem is a \texttt{YAML} file; new
+        physics, a new energy.
+      \end{block}
     \end{column}
   \end{columns}
-
-  \vspace{0.3em}
-  \begin{block}{Z3ST -- the missing layer}
-    An \alert{open}, FEniCSx-native solver where the \alert{whole coupled apparatus}
-    -- staggered thermo-mech-fracture, contact, gap, eigenstrains -- is
-    \alert{already assembled and verified}. A new problem is a \texttt{YAML} file;
-    new physics, a new energy.
-  \end{block}
 \end{frame}
 
 % ---------------------------------------------------------------- 3
-\begin{frame}{Design at a glance: one driver, many regimes}
+\begin{frame}{Design: a light, modular pipeline -- files in, fields out}
   \begin{columns}[T]
-    \begin{column}{0.54\textwidth}
-      A single driver, \texttt{Spine}, composes the physics as mixins:
+    \begin{column}{0.52\textwidth}
+      \alert{Light and modular} -- a thin layer on FEniCSx, nothing to compile.
       \begin{itemize}
-        \item thermal $\;+\;$ mechanical $\;+\;$ damage
-        \item plasticity $\;+\;$ cluster dynamics $\;+\;$ gap
-      \end{itemize}
-      \vspace{0.4em}
-      Everything else is \alert{data}:
-      \begin{itemize}
-        \item geometry, BCs, materials, solver $\to$ \texttt{input.yaml}
-        \item \alert{material-agnostic} (any solid): properties are constants
-              or \alert{Python functions}, e.g.\ $k(T)$
-        \item regimes \texttt{1D / 2D / 3D / axisym. / plane-stress}
+        \item your problem is \alert{plain text}: geometry, BCs, materials, solver $\to$ YAML
+        \item mesh with \alert{GMSH}; results as VTU / XDMF $\to$ \alert{ParaView}
+        \item one driver, \texttt{Spine}, composes physics as mixins -- switch on what you need
+        \item \alert{material-agnostic}: a property is a constant or a \alert{Python function}
+              of state, e.g.\ $k(T)$ -- or a full custom law
+        \item one model, regimes \texttt{1D / 2D / 3D / axisym. / plane-stress}
       \end{itemize}
     \end{column}
-    \begin{column}{0.46\textwidth}
+    \begin{column}{0.48\textwidth}
       \centering
-      \begin{tikzpicture}[font=\scriptsize, node distance=4mm,
-        box/.style={draw, rounded corners, fill=z3blue!10, minimum width=26mm, align=center, inner sep=3pt}]
-        \node[box] (yaml) {\texttt{input.yaml}\\geometry $\cdot$ BCs $\cdot$ materials};
-        \node[box, fill=z3amber!20, below=of yaml] (spine) {\texttt{Spine} driver\\thermal $\cdot$ mech $\cdot$ damage\\plasticity $\cdot$ cluster $\cdot$ gap};
-        \node[box, fill=z3teal!15, below=of spine] (solve) {staggered solve\\(UFL $\to$ dolfinx kernels)};
-        \node[box, below=of solve] (out) {VTU / XDMF\\force--displacement\\diagnostics};
-        \draw[-{Stealth}] (yaml) -- (spine);
+      \vspace{1.3em}
+      \scalebox{1.15}{%
+      \begin{tikzpicture}[font=\scriptsize, node distance=3.5mm,
+        box/.style={draw, rounded corners, minimum width=27mm, align=center, inner sep=3pt}]
+        \node[box, fill=z3grey!12] (in) {\texttt{mesh.geo} (GMSH) $+$\\\texttt{input.yaml}\\{\tiny geometry $\cdot$ BCs $\cdot$ materials}};
+        \node[box, fill=z3amber!20, below=of in] (spine) {\texttt{Spine} driver -- mixins\\{\tiny thermal $\cdot$ mech $\cdot$ damage}\\{\tiny plast. $\cdot$ cluster $\cdot$ gap}};
+        \node[box, fill=z3teal!12, right=3mm of spine, minimum width=15mm, font=\tiny] (py) {custom\\Python\\law};
+        \node[box, fill=z3teal!15, below=of spine] (solve) {staggered solve\\{\tiny UFL $\to$ dolfinx}};
+        \node[box, below=of solve] (out) {VTU / XDMF $\to$ \alert{ParaView}};
+        \draw[-{Stealth}] (in) -- (spine);
         \draw[-{Stealth}] (spine) -- (solve);
         \draw[-{Stealth}] (solve) -- (out);
-      \end{tikzpicture}
+        \draw[-{Stealth}, z3teal] (py) -- (spine);
+      \end{tikzpicture}}
     \end{column}
   \end{columns}
 \end{frame}
@@ -205,39 +214,15 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
     \end{column}
   \end{columns}
   \vspace{0.7em}
-  \begin{block}{}
+  \begin{block}{New / exploratory: cluster dynamics}
     \footnotesize
-    \alert{New / exploratory:} cluster dynamics -- defect-population evolution in
-    cluster-size space ($\partial_t c = -v\,\partial_n c + D\,\partial_{nn} c$).
-    Implemented, not yet investigated; a path towards a genuine micro-to-continuum link.
+    Defect-population evolution in cluster-size space
+    ($\partial_t c = -v\,\partial_n c + D\,\partial_{nn} c$). Implemented, not yet
+    investigated; a path towards a genuine micro-to-continuum link.
   \end{block}
 \end{frame}
 
-% ---------------------------------------------------------------- 6b (PCMI -- fuel rod)
-\begin{frame}{Pellet--cladding interaction (PCMI) over a full irradiation}
-  \centering
-  \includegraphics[width=0.86\textwidth]{figures/pcmi_burnup_curves.png}\\[3pt]
-  \footnotesize
-  \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item fuel swells with burnup and \alert{closes the gap} ($\sim$21\,MWd/kgU)
-        \item contact pressure \alert{emerges} (explicit penalty) and
-              \alert{creep-saturates} near 25\,MPa
-      \end{itemize}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{itemize}
-        \item contact raises gap conductance -- peak fuel $T$ \alert{drops}
-              1126 $\to$ 976\,K (two-way feedback)
-        \item one \texttt{input.yaml}: $k(T)$, swelling, creep, gap, contact;
-              verified vs Lam\'e (backup)
-      \end{itemize}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% ---------------------------------------------------------------- 7
+% ---------------------------------------------------------------- 6 (Verification)
 \begin{frame}{Verified, reproducible, and easy to drive}
   \small
   \begin{columns}[T]
@@ -266,6 +251,36 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
       \centering
       \includegraphics[width=0.58\textwidth]{figures/convergence_study.png}\\
       {\scriptsize $L_2$ error at the theoretical rates ($T$: 2, $\sigma$: 1)}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 7 (PCMI -- fuel rod)
+\begin{frame}{A demanding mechanical interaction: PCMI over a full irradiation}
+  \begin{columns}[T]
+    \begin{column}{0.13\textwidth}
+      \centering
+      \includegraphics[height=0.74\textheight]{figures/FR_slide_2.png}
+    \end{column}
+    \begin{column}{0.82\textwidth}
+      \centering
+      \includegraphics[width=0.96\linewidth]{figures/pcmi_burnup_curves.png}\\[3pt]
+      \scriptsize
+      \begin{minipage}[t]{0.49\linewidth}
+        \begin{itemize}
+          \item fuel swells with burnup and \alert{closes the gap} ($\sim$21\,MWd/kgU)
+          \item contact pressure \alert{emerges} (explicit penalty) and
+                \alert{creep-saturates} near 25\,MPa
+        \end{itemize}
+      \end{minipage}\hfill
+      \begin{minipage}[t]{0.49\linewidth}
+        \begin{itemize}
+          \item contact raises gap conductance -- peak fuel $T$ \alert{drops}
+                1126 $\to$ 976\,K (two-way feedback)
+          \item one \texttt{input.yaml}: $k(T)$, swelling, creep, gap, contact;
+                verified vs Lam\'e (backup)
+        \end{itemize}
+      \end{minipage}
     \end{column}
   \end{columns}
 \end{frame}
@@ -302,38 +317,36 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
 % ---------------------------------------------------------------- 9
 \begin{frame}{Open, and runnable on your laptop}
   \footnotesize
+  \alert{Open, FEniCSx-native}, energy-first via AD, YAML-driven, \alert{verified} --
+  your problem is a YAML file.
+  \vspace{0.4em}
   \begin{columns}[T]
-    \begin{column}{0.58\textwidth}
-      \textbf{Z3ST is}
+    \begin{column}{0.5\textwidth}
+      \textbf{Get it / see it live}
       \begin{itemize}
-        \item \alert{open + FEniCSx-native} -- the whole coupled apparatus, assembled for you
-        \item thermo-mech-fracture across bodies; J2 + crystal plasticity; energy-first via AD
-        \item YAML-driven, material-agnostic, \alert{verified} ($\sim$45 analytic cases; subset in CI)
-      \end{itemize}
-      \vspace{0.2em}
-      \textbf{Get it / See it live}
-      \begin{itemize}
-        \item \texttt{github.com/giozu/z3st} \quad(Apache-2.0)
-        \item docs: \texttt{giozu.github.io/z3st} \quad DOI: \texttt{10.5281/zenodo.17748028}
-        \item \alert{live demo} at the poster session -- a coupled case end to end
+        \item \texttt{github.com/giozu/z3st} (Apache-2.0)
+        \item docs \texttt{giozu.github.io/z3st}
+        \item DOI \texttt{10.5281/zenodo.17748028}
+        \item \alert{live demo} at the poster session
       \end{itemize}
     \end{column}
-    \begin{column}{0.42\textwidth}
-      \textbf{Future developments}
+    \begin{column}{0.5\textwidth}
+      \textbf{Next}
       \begin{itemize}
-        \item \texttt{dolfinx\_mpc} contact: per-facet pressure (axial ridging),
-              periodic BCs
-        \item coupling to \alert{SCIANTIX} (fission gas) and \alert{M\'erope}
-              (microstructure)
-        \item monolithic phase-field Newton for spontaneous nucleation
-        \item full constitutive-law \alert{discovery} through the coupled adjoint
+        \item \texttt{dolfinx\_mpc} contact: per-facet pressure
+        \item couple \alert{SCIANTIX} $+$ \alert{M\'erope}
+        \item monolithic nucleation; constitutive \alert{discovery} via adjoint
       \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.1em}
+  \vspace{0.45em}
+  \begin{block}{Already in use at PoliMi}
+    \footnotesize grant proposals \& applications (engineering, meso-scale modelling,
+    advanced materials, EU proposals \& activities) $\cdot$ coupling with open-source
+    codes $\cdot$ MSc \& internship students $\cdot$ didactic activities
+  \end{block}
+  \vspace{0.25em}
   \centering
-  {\scriptsize Already in use at PoliMi: grant proposals (irradiated materials, coated
-  claddings, advanced fuels; Euratom calls), three student projects, didactic support.}\\[2pt]
   \alert{\large Thank you -- questions welcome.}\\[2pt]
   {\scriptsize \texttt{giovanni.zullo@polimi.it}}
 \end{frame}
@@ -501,6 +514,28 @@ fixed-point iteration stable across linear elasticity through thermal-shock frac
   {\scriptsize radial $T$ profile, $T$ history, damage penetration -- cf.\ McClenny (2022), \textit{J.\ Nucl.\ Mater.} 565}\\[3pt]
   \includegraphics[width=0.40\textwidth]{figures/case14_damage_angular.png}\\[-1pt]
   {\scriptsize angular damage scan: \alert{discrete peaks = individual radial cracks}, confined to the cold-contact wedge}
+\end{frame}
+
+\begin{frame}{Backup: micro scale -- single-grain mechanics}
+  \begin{columns}[T]
+    \begin{column}{0.40\textwidth}
+      \centering
+      \includegraphics[width=\textwidth]{figures/grain.png}
+    \end{column}
+    \begin{column}{0.56\textwidth}
+      \small
+      Alongside the engineering-scale fuel models in this talk, we work at the
+      \alert{grain scale} -- a physics-based model of grain-boundary bubble
+      \alert{overpressurisation} and its role in \alert{fuel fragmentation}.
+
+      \vspace{0.5em}
+      Micro-mechanical FEM at this scale feeds \alert{meso-scale} fuel-performance
+      models -- the micro-to-continuum bridge.
+
+      \vspace{0.8em}
+      {\scriptsize Cappellari et al., \textit{J.\ Nucl.\ Mater.} \textbf{617} (2025) 156116.}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \end{document}
