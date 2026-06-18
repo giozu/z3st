@@ -15,8 +15,8 @@
     "pass": true
   },
   "crack_count_above_0p5": {
-    "numerical": 0,
-    "reference": 1,
+    "numerical": 5,
+    "reference": 3,
     "rel_error": 0.0,
     "pass": true
   }

@@ -868,13 +868,6 @@ Amor + hybrid, fully coupled :math:`T \to \boldsymbol{\varepsilon}_{el} \to D`).
    Simulated damage with discrete radial cracks at the rim (left) against a
    cross-section of a real cracked UO\ :sub:`2` pellet (right).
 
-.. figure:: images/full_cylinder_cracking/thermal_shock_results.png
-   :width: 90%
-   :align: center
-
-   Quantitative verification: radial temperature profile, temperature history at
-   the contact rim, and damage penetration, against McClenny Fig. 7b.
-
 **See also**
 
 - :doc:`examples` -- the full verification-case catalogue

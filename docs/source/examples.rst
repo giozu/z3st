@@ -366,13 +366,6 @@ radial cracks. It reproduces McClenny et al., *J. Nucl. Mater.* 565 (2022).
 
    Damage field D at t = 0.1 s.
 
-.. figure:: images/full_cylinder_cracking/thermal_shock_results.png
-   :width: 90%
-   :align: center
-
-   Quantitative verification: radial temperature profile, temperature history at
-   the contact rim, and damage penetration, against McClenny Fig. 7b.
-
 Numerical analysis
 ------------------
 
