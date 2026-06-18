@@ -79,7 +79,7 @@ class Solver:
         return raw[min(self.current_step, len(raw) - 1)]
 
     # Cached assembled forms keyed on (current_step, u_new, T)
-    _DT_DEPENDENT_CACHES = ("_th_cache", "_mech_cache")
+    _DT_DEPENDENT_CACHES = ("_th_cache", "_mech_cache", "_th_nl_cache")
 
     def invalidate_dt_caches(self):
         """Drop every cached form that bakes dt in, forcing a rebuild at the
@@ -290,10 +290,6 @@ class Solver:
                         L_t += w * h_conv * T_ext * v_t * ds_robin
                         print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
 
-            if self.th_cfg["solver"] != "linear":
-                print("  [ERROR] Non-linear thermal solver not yet implemented.")
-                return True, 0.0, 0.0, prev_res_T
-
             petsc_opts_thermal = self.get_solver_options(
                 solver_type=self.th_cfg["linear_solver"],
                 physics="thermal",
@@ -486,6 +482,7 @@ class Solver:
         dT_sol = dolfinx.fem.Function(self.V_t)
         max_it = int(self.th_cfg.get("newton_max_it", 25))
         r0 = None
+        converged = False
         for it in range(max_it):
             ev = evaluate_operands(F_ops)
             evaluate_external_operators(F_ops, ev)   # fill k from NN(T_new)
@@ -517,7 +514,12 @@ class Solver:
             if (rnorm < 1e-8
                     or (r0 > 0 and rnorm / r0 < rtol_th)
                     or (Tnorm > 0 and dnorm / Tnorm < 1e-12)):
+                converged = True
                 break
+
+        if not converged:
+            print(f"  [WARNING] thermal Newton did NOT converge in {max_it} iterations "
+                  f"(last |residual|={rnorm:.3e}, |correction|={dnorm:.3e})")
 
         print(f"  T_new: min={T_new.x.array.min():.2f} K, max={T_new.x.array.max():.2f} K, "
               f"mean={T_new.x.array.mean():.2f} K")

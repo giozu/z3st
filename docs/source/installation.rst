@@ -91,6 +91,27 @@ To install locally the utilities (recommended) to post-process the simulation ou
 
    pip install -e .
 
+Optional: neural-network material laws
+--------------------------------------
+
+The :ref:`neural-network conductivity <nn-material-laws>` feature needs two
+optional packages that are not pulled in by default. After creating the
+environment, install them with:
+
+.. code-block:: bash
+
+   # CPU build of PyTorch is sufficient
+   pip install --index-url https://download.pytorch.org/whl/cpu torch
+
+   # external-operator package; --no-deps because its metadata pins
+   # fenics-dolfinx<0.11 although the code runs fine on 0.11
+   pip install --no-deps "git+https://github.com/a-latyshev/dolfinx-external-operator.git@cf5255e0b0ed21f350f931d4d0755181a3126456"
+
+``torch`` requires ``setuptools<82`` while ``fenics-ffcx`` requires
+``setuptools>=77.0.3``; if pip drifts, pin a compatible version with
+``pip install "setuptools>=77.0.3,<82"``. The ``torch`` part is also available
+as the ``nn`` extra of the project (``pip install -e .[nn]``).
+
 Building the documentation
 --------------------------
 

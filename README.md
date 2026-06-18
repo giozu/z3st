@@ -389,6 +389,22 @@ Z3ST is built on the **FEniCSx** ecosystem. Recommended citations include:
 }
 ```
 
+### External operators (optional, neural-network material laws)
+
+The neural-network material-law feature builds on **dolfinx-external-operator**
+(LGPL-3.0, https://github.com/a-latyshev/dolfinx-external-operator), gratefully
+acknowledged:
+
+```bibtex
+@article{latyshev2025externaloperators,
+  author  = {Latyshev, Andrey and Bleyer, J{\'e}r{\'e}my and Maurini, Corrado and Hale, Jack S.},
+  title   = {Expressing general constitutive models in {FEniCSx} using external operators and algorithmic automatic differentiation},
+  journal = {Journal of Theoretical, Computational and Applied Mechanics},
+  year    = {2025},
+  doi     = {10.46298/jtcam.14449}
+}
+```
+
 
 * **DOLFINx tutorial (J. S. Dokken):** https://jsdokken.com/dolfinx-tutorial/
 * **FEniCS project documentation:** https://fenicsproject.org/documentation/

@@ -84,6 +84,57 @@ Implemented in :class:`z3st.models.thermal_model.ThermalModel`.
    Coupled thermo-mechanical thin slab: temperature and thermal stress through
    the thickness, numerical (markers) against the analytical solution (lines).
 
+.. _nn-material-laws:
+
+Neural-Network Material Laws
+----------------------------
+
+A material property can be supplied as a trained **neural network** rather than a
+constant or a symbolic ``k(T)`` Python function -- useful when the constitutive
+law is learned from data (or from a reference correlation) instead of written in
+closed form. The current hook is the thermal conductivity
+:math:`k = \mathrm{NN}(T)`, a small smooth MLP (``tanh``/``softplus`` activations,
+so :math:`\mathrm{d}k/\mathrm{d}T` is continuous) trained offline and stored as a
+checkpoint.
+
+**Material card.** The ``k`` entry becomes a mapping instead of a scalar:
+
+.. code-block:: yaml
+
+   k:
+     type: neural_network
+     weights: knet.pt        # checkpoint, resolved relative to the case directory
+
+The checkpoint stores the weights, the architecture and the input normalisation,
+and is produced by an offline training script (see the reference case below).
+
+**Two solver routes** select how the resulting non-linearity is handled, through
+``thermal.solver`` in ``input.yaml``:
+
+- ``solver: linear`` -- *lagged / Picard*. The network is evaluated at the current
+  temperature, interpolated into a coefficient field, and reused in the existing
+  linear thermal form; the outer staggered loop absorbs the non-linearity. No
+  tangent is needed.
+- ``solver: newton`` -- *external operator + Newton*. The network is wrapped as a
+  ``FEMExternalOperator`` so it behaves as a symbolic UFL coefficient: the form
+  can be differentiated and the exact tangent :math:`\mathrm{d}k/\mathrm{d}T` is
+  supplied by automatic differentiation of the network. This yields quadratic
+  Newton convergence and follows the external-operator framework of Latyshev et
+  al. (2025).
+
+Both routes produce the same temperature field; Newton converges in far fewer
+iterations. They require the optional dependencies ``torch`` and
+``dolfinx-external-operator`` (the ``nn`` extra -- see :doc:`installation`); the
+rest of Z3ST imports without them. The reference case
+``cases/verification/thermal/nn_conductivity_slab_2D`` trains a network on a known
+:math:`k(T)` law and verifies the solve against the closed-form analytic profile.
+Implemented in :mod:`z3st.models.nn_conductivity`.
+
+The external-operator route builds on the open-source ``dolfinx-external-operator``
+package by Latyshev, Bleyer, Maurini and Hale (*J. Theor. Comput. Appl. Mech.*,
+2025, https://doi.org/10.46298/jtcam.14449,
+https://github.com/a-latyshev/dolfinx-external-operator), gratefully acknowledged.
+
 Power Shaping (Radial and Axial Form Factors)
 ---------------------------------------------
 
