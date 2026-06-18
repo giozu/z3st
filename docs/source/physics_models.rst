@@ -774,6 +774,14 @@ simultaneously,
    \|\boldsymbol{u}^{k+1} - \boldsymbol{u}^k\| < \mathrm{tol}_u, \qquad
    \|D^{k+1} - D^k\| < \mathrm{tol}_D .
 
+.. seealso::
+
+   For *why* this staggered scheme is mathematically sound -- its variational
+   structure, separate convexity and convergence to a critical point, the
+   equivalence with a monolithic solve at convergence, why local (not global)
+   minimization is the correct concept, and the role of second-order stability --
+   see :ref:`staggered-theory`.
+
 **Solvers.** Each block is a separate variational problem solved through PETSc: a
 direct LU solver (MUMPS), or CG/GMRES with smoothed-aggregation AMG (PETSc GAMG)
 or HYPRE BoomerAMG. Symmetric positive-definite blocks (thermal, damage) use

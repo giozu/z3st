@@ -9,6 +9,7 @@
 .claude/
 CONTEXT.md
 CLAUDE.md
+punch_list.md
 
 # --. Python --..
 __pycache__/

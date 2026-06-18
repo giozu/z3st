@@ -31,7 +31,7 @@ README) and as a numbered PNG frame sequence under figures/anim_<name>/ for
 LaTeX \animategraphics in slides.tex.
 
 Run with the project env:
-    export PATH="/home/giovanni/miniconda3/envs/z3st11/bin:$PATH"
+    export PATH="/home/giovanni/miniconda3/envs/z3st/bin:$PATH"
     export HDF5_USE_FILE_LOCKING=FALSE
     python3 make_gifs.py
 """

@@ -76,6 +76,7 @@ Documentation Contents
 
    usage
    physics_models
+   staggered_theory
    examples
 
 .. toctree::

@@ -28,8 +28,8 @@ if python -c "import dolfinx" >/dev/null 2>&1; then
     RUN() { "$@"; }
     ENVNOTE="${G}env: active in this shell${Z}"
 else
-    RUN() { conda run --no-capture-output -n z3st11 "$@"; }
-    ENVNOTE="${Y}env: using 'conda run -n z3st11' (tip: 'conda activate z3st11' is snappier)${Z}"
+    RUN() { conda run --no-capture-output -n z3st "$@"; }
+    ENVNOTE="${Y}env: using 'conda run -n z3st' (tip: 'conda activate z3st' is snappier)${Z}"
 fi
 
 pause()  { echo; read -rp "${B}↵ Enter to continue…${Z}" _; echo; }
