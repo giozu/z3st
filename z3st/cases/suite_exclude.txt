@@ -2,3 +2,4 @@
 
 regression/pwr_rod_2D
 verification/fuel/creep_law_discovery
+benchmarks/damage/plate_thermal_shock_2D

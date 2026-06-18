@@ -1,0 +1,10 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+echo "Cleaning current directory..."
+
+rm -rf output/ __pycache__/
+rm -f log_*.md log.z3st
+rm -f energies.txt
+
+echo "Done. Output and temporary files deleted (mesh preserved)."

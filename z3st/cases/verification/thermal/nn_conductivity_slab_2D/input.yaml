@@ -1,0 +1,39 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  slab: nn_conductor.yaml
+
+regime: 2D
+
+solver_settings:
+  coupling: staggered
+  max_iters: 100
+  relax_T: 1.0
+  relax_adaptive: false
+
+models:
+  thermal: true
+  mechanical: false
+
+thermal:
+  solver: newton # external-operator Newton (k=NN(T), autodiff dk/dT)
+  linear_solver: direct_mumps
+  rtol: 1.0e-10
+  newton_max_it: 25
+  quadrature_degree: 2 # must match the external operator's quadrature element
+  stag_tol: 1.0e-8
+  convergence: rel_norm
+
+lhr:
+- 0
+time:
+- 0
+n_steps: 1

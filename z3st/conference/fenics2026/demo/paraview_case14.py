@@ -26,7 +26,7 @@ except NameError:
     HERE = os.environ.get("Z3ST_DEMO_DIR") or os.getcwd()
 PKG = os.path.abspath(os.path.join(HERE, "..", "..", ".."))           # -> z3st package dir
 CASE_OUT = os.environ.get("Z3ST_CASE14_OUT") or os.path.join(
-    PKG, "cases", "benchmarks/pellet_quench_2D_xy", "output"
+    PKG, "cases", "benchmarks/damage/pellet_quench_2D_xy", "output"
 )
 BAKED = os.path.join(HERE, "baked")
 
@@ -45,7 +45,7 @@ if not files:
 if not files:
     sys.stderr.write(
         "[paraview_case14] no VTU files found in:\n  %s\n"
-        "Run the case first:  (cd .../benchmarks/pellet_quench_2D_xy && ./Allrun)\n"
+        "Run the case first:  (cd .../benchmarks/damage/pellet_quench_2D_xy && ./Allrun)\n"
         % CASE_OUT
     )
     sys.exit(1)

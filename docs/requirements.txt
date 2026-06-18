@@ -1,0 +1,19 @@
+# Documentation build dependencies for Z3ST (Sphinx).
+#
+#   pip install -r docs/requirements.txt
+#   cd docs && make clean html
+#
+# NOTE: the FEniCSx runtime stack (dolfinx, basix, ufl, mpi4py, petsc4py,
+# pyvista, h5py, gmsh) is NOT required to build the docs. Those heavy compiled
+# dependencies are mocked via `autodoc_mock_imports` in docs/source/conf.py, so
+# the documentation builds in a plain environment (local base env or CI) without
+# the dolfinx-enabled `z3st` env.
+#
+# Version floors are the ones verified to build the docs cleanly; they are lower
+# bounds, not exact pins, to stay compatible with the GitHub Actions deploy.
+
+sphinx>=7.2
+myst-parser>=3.0
+sphinx-book-theme>=1.1
+sphinx-rtd-theme>=2.0
+sphinx-autodoc-typehints>=2.0

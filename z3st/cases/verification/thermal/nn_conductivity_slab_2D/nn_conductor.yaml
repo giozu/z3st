@@ -1,0 +1,25 @@
+name: nn_conductor
+
+# Thermal conductivity from a trained neural network, k = NN(T).
+# The network is trained offline by train_knet.py and stored in knet.pt.
+k:
+  type: neural_network
+  weights: knet.pt
+
+# Reference law the network is trained to reproduce. The solver ignores this
+# block (it only reads the NN card above); train_knet.py and non-regression.py
+# read it as source for the law k(T).
+k_law:
+  a: 0.05                   # W/m/K
+  b: 3.75e-4                # W/m/K^2
+
+cp: 200.0                   # J/kg/K
+rho: 8000.0                 # kg/m^3
+T_ref: 300.0                # K
+
+E: 1.77e+11                 # Pa
+nu: 0.30                    # -
+alpha: 1.7e-5               # 1/K
+
+mu_gamma: 24.0              # 1/m
+gamma_heating: 0.0          # W/m^3

@@ -10,6 +10,7 @@
 \renewcommand{\familydefault}{\sfdefault}
 \usepackage{xcolor}
 \usepackage{graphicx}
+\usepackage{animate}   % animated PCMI / damage strip (plays in Adobe; poster=last for print)
 \usepackage{tikz}
 \usepackage[nolinks]{qrcode}
 \usepackage{enumitem}
@@ -70,14 +71,22 @@
 
   \vspace{2mm}
   {\bfseries Run it}\\[1mm]
-  {\ttfamily\small conda activate z3st11\\ python -m z3st\ \ \ \textcolor{z3ink!60}{\# reads input.yaml}}
+  {\ttfamily\small conda activate z3st\\ python -m z3st\ \ \ \textcolor{z3ink!60}{\# reads input.yaml}}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.40\linewidth}
   \centering
-  \fbox{\includegraphics[width=\linewidth]{../oral/figures/case14_damage.png}}\\[1.5mm]
+  % animations play in Adobe Reader / pdfpc; poster=last shows the
+  % fully-developed final frame in print / static viewers.
+  \fbox{\animategraphics[autoplay,loop,poster=last,width=\linewidth]{7}%
+    {../oral/figures/anim_pcmi/frame_}{0}{38}}\\[1mm]
+  {\footnotesize\color{z3ink!75} PCMI over a full irradiation: the gap closes,
+  contact pressure builds, and peak fuel $T$ drops as conductance recovers.}\\[2.5mm]
+  \fbox{\animategraphics[autoplay,loop,poster=last,width=\linewidth]{9}%
+    {../oral/figures/anim_damage/frame_}{0}{50}}\\[1mm]
   {\footnotesize\color{z3ink!75} UO\textsubscript{2} pellet thermal-shock cracking:
   fully coupled temperature $\to$ elastic strain $\to$ phase-field damage. A 2D
-  plane-strain reproducer of McClenny et al. (JNM 2022).}
+  plane-strain reproducer of McClenny et al. (JNM 2022).}\\[1mm]
+  {\scriptsize\color{z3ink!55}\itshape animated in Adobe Reader / pdfpc}
 \end{minipage}
 
 \vspace{5mm}

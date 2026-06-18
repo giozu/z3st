@@ -1,0 +1,28 @@
+{
+    "results": {
+        "L2_error_T": {
+            "numerical": 0.2155440997287189,
+            "reference": 0.0,
+            "abs_error": 0.2155440997287189,
+            "rel_error": 0.0002907812027500347,
+            "status": "PASS"
+        },
+        "Linf_error_T": {
+            "numerical": 0.3275730307524327,
+            "reference": 0.0,
+            "abs_error": 0.3275730307524327,
+            "rel_error": 0.0004419145779937821,
+            "status": "PASS"
+        },
+        "T_max": {
+            "numerical": 1200.0,
+            "reference": 1200.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.005,
+    "summary": "PASS",
+    "regression": "PASS"
+}

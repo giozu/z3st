@@ -79,7 +79,7 @@ class Solver:
         return raw[min(self.current_step, len(raw) - 1)]
 
     # Cached assembled forms keyed on (current_step, u_new, T)
-    _DT_DEPENDENT_CACHES = ("_th_cache", "_mech_cache")
+    _DT_DEPENDENT_CACHES = ("_th_cache", "_mech_cache", "_th_nl_cache")
 
     def invalidate_dt_caches(self):
         """Drop every cached form that bakes dt in, forcing a rebuild at the
@@ -171,6 +171,13 @@ class Solver:
         }
 
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
+
+        # A non-linear thermal solver (k = NN(T) external operator,
+        # Newton with autodiff tangent). Dispatched before the linear assembly.
+        if self.th_cfg.get("solver", "linear") != "linear":
+            return self._thermal_step_nonlinear(
+                T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
+            )
 
         analysis = self.th_cfg.get("analysis", "stationary")
 
@@ -283,10 +290,6 @@ class Solver:
                         L_t += w * h_conv * T_ext * v_t * ds_robin
                         print(f"  Robin (convective) BC on region {region_id}: h={h_conv:.1f} W/(m²·K), T_ext={T_ext:.1f} K")
 
-            if self.th_cfg["solver"] != "linear":
-                print("  [ERROR] Non-linear thermal solver not yet implemented.")
-                return True, 0.0, 0.0, prev_res_T
-
             petsc_opts_thermal = self.get_solver_options(
                 solver_type=self.th_cfg["linear_solver"],
                 physics="thermal",
@@ -312,6 +315,15 @@ class Solver:
             self.set_gap_conductance(T_new)
             for aux in cache["gap_aux"]:
                 aux["fn"].x.array[aux["dofs_here"]] = T_new.x.array[aux["dofs_other"]]
+
+        # Lagged update of any neural-network conductivity field: re-evaluate
+        # k = NN(T) at the current iterate so the (linear) form sees the updated
+        # coefficient on the next solve (Picard). Mutates the Function in place;
+        # the cached form consumes it by reference.
+        for material in self.materials.values():
+            if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
+                material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
+                material["k"].x.scatter_forward()
 
         bcs_thermal_actual = self._bc_objects(self.dirichlet_thermal)
 
@@ -362,6 +374,173 @@ class Solver:
                 prev_res_T = res_curr
             print(f"  [adaptive] relax_T={self.relax_T:.2f}")
 
+        return conv_th, norm_dT, rel_norm_dT, prev_res_T
+
+    def _thermal_step_nonlinear(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
+        """Tier-2 thermal solve: k = NN(T) as a FEMExternalOperator, solved by
+        Newton with the autodiff tangent dk/dT (Latyshev et al. external
+        operators). Showcase scope: STATIONARY conduction with Dirichlet (and
+        Neumann) BCs. Transient mass terms and Robin/gap BCs are not yet handled
+        on this path — they raise a clear NotImplementedError.
+        """
+        from dolfinx_external_operator import (
+            evaluate_external_operators,
+            evaluate_operands,
+            replace_external_operators,
+        )
+        from dolfinx.fem.petsc import apply_lifting, assemble_matrix, assemble_vector, set_bc
+
+        from z3st.models.nn_conductivity import make_external_operator
+
+        # --- scope guards -------------------------------------------------
+        if self.th_cfg.get("analysis", "stationary") == "transient":
+            raise NotImplementedError(
+                "Tier-2 (newton) thermal: transient analysis not yet supported."
+            )
+        if any(self.robin_thermal.get(label) for label in self.materials):
+            raise NotImplementedError(
+                "Tier-2 (newton) thermal: Robin/gap BCs not yet supported."
+            )
+        for label, material in self.materials.items():
+            if "_k_nn" not in material:
+                raise NotImplementedError(
+                    f"Tier-2 (newton) thermal requires a neural-network k card; "
+                    f"material '{label}' has none."
+                )
+
+        # step-dependent Dirichlet temperatures (mirror the linear path)
+        for bc_list in self.dirichlet_thermal.values():
+            for bc in bc_list:
+                if isinstance(bc, dict) and isinstance(bc.get("raw"), list):
+                    bc["const"].value = PETSc.ScalarType(self._value_at_step(bc["raw"]))
+
+        T_old.x.array[:] = T_new.x.array
+        w = self.weight
+        deg = int(self.th_cfg.get("quadrature_degree", 2))
+
+        # Build the residual/Jacobian and external operators once per time step;
+        # the operators wrap T_new (the function Newton iterates) by reference.
+        cache = getattr(self, "_th_nl_cache", None)
+        rebuild = (
+            cache is None
+            or cache["step"] != self.current_step
+            or cache["T_new"] is not T_new
+        )
+        if rebuild:
+            print("\n[INFO] Assembling NON-LINEAR thermal problem "
+                  "(k = NN(T) external operator, Newton)...")
+            v_t = ufl.TestFunction(self.V_t)
+            dT = ufl.TrialFunction(self.V_t)
+            nl_meta = {"quadrature_degree": deg, "quadrature_scheme": "default"}
+            dx_nl = {
+                tag: ufl.Measure("dx", domain=self.mesh, subdomain_data=self.cell_tags,
+                                 subdomain_id=tag, metadata=nl_meta)
+                for tag in np.unique(self.cell_tags.values)
+            }
+
+            F = 0
+            for label, material in self.materials.items():
+                tag = self.label_map[label]
+                dx = dx_nl[tag]
+                # NB: do not overwrite material["k"] (the writer's heat-flux
+                # Function); the external operator is the solver's own object.
+                k_op = make_external_operator(material["_k_nn"], T_new, quadrature_degree=deg)
+                # residual of  ∫ k ∇T·∇v dx − ∫ q''' v dx
+                F += w * k_op * ufl.inner(ufl.grad(T_new), ufl.grad(v_t)) * dx
+                F += -w * self.q_third * v_t * dx
+
+            # Neumann (residual sign: linear path uses L_t += w*(-value)*v)
+            for label in self.materials:
+                for bc_info in self.neumann_thermal[label]:
+                    ds_neumann = self.ds_tags[bc_info["id"]]
+                    F += w * bc_info["value"] * v_t * ds_neumann
+
+            J = ufl.algorithms.expand_derivatives(ufl.derivative(F, T_new, dT))
+            F_replaced, F_ops = replace_external_operators(F)
+            J_replaced, J_ops = replace_external_operators(J)
+            ksp = PETSc.KSP().create(self.mesh.comm)
+            ksp.setType("preonly")
+            ksp.getPC().setType("lu")
+            self._th_nl_cache = {
+                "step": self.current_step,
+                "T_new": T_new,
+                "F_ops": F_ops,
+                "J_ops": J_ops,
+                "F_form": dolfinx.fem.form(F_replaced),
+                "J_form": dolfinx.fem.form(J_replaced),
+                "ksp": ksp,
+            }
+
+        cache = self._th_nl_cache
+        F_ops, J_ops = cache["F_ops"], cache["J_ops"]
+        F_form, J_form, ksp = cache["F_form"], cache["J_form"], cache["ksp"]
+
+        # Dirichlet on the initial guess so Newton corrections stay homogeneous
+        dolfinx.fem.set_bc(T_new.x.array, bcs_t)
+        T_new.x.scatter_forward()
+
+        dT_sol = dolfinx.fem.Function(self.V_t)
+        max_it = int(self.th_cfg.get("newton_max_it", 25))
+        r0 = None
+        converged = False
+        for it in range(max_it):
+            ev = evaluate_operands(F_ops)
+            evaluate_external_operators(F_ops, ev)   # fill k from NN(T_new)
+            evaluate_external_operators(J_ops, ev)   # fill dk/dT from NN'(T_new)
+
+            Amat = assemble_matrix(J_form, bcs=bcs_t)
+            Amat.assemble()
+            bvec = assemble_vector(F_form)
+            apply_lifting(bvec, [J_form], [bcs_t], [T_new.x.petsc_vec], -1.0)
+            bvec.ghostUpdate(addv=PETSc.InsertMode.ADD, mode=PETSc.ScatterMode.REVERSE)
+            set_bc(bvec, bcs_t, T_new.x.petsc_vec, -1.0)
+
+            rnorm = bvec.norm()
+            if r0 is None:
+                r0 = rnorm
+            ksp.setOperators(Amat)
+            ksp.solve(bvec, dT_sol.x.petsc_vec)
+            dT_sol.x.scatter_forward()
+            T_new.x.petsc_vec.axpy(-1.0, dT_sol.x.petsc_vec)
+            T_new.x.scatter_forward()
+            dnorm = dT_sol.x.petsc_vec.norm()
+            Tnorm = T_new.x.petsc_vec.norm()
+            Amat.destroy()
+            bvec.destroy()
+            print(f"  [newton] it {it:2d}: |residual| = {rnorm:.3e}   |correction| = {dnorm:.3e}")
+            # converged on: small absolute residual, OR relative residual drop,
+            # OR a negligible correction (handles the already-converged outer
+            # iteration, where the residual sits at the assembly floor)
+            if (rnorm < 1e-8
+                    or (r0 > 0 and rnorm / r0 < rtol_th)
+                    or (Tnorm > 0 and dnorm / Tnorm < 1e-12)):
+                converged = True
+                break
+
+        if not converged:
+            print(f"  [WARNING] thermal Newton did NOT converge in {max_it} iterations "
+                  f"(last |residual|={rnorm:.3e}, |correction|={dnorm:.3e})")
+
+        print(f"  T_new: min={T_new.x.array.min():.2f} K, max={T_new.x.array.max():.2f} K, "
+              f"mean={T_new.x.array.mean():.2f} K")
+
+        # Refresh the writer-facing k Function (a coefficient on V_t) from the
+        # converged temperature, so the output heat flux -k·∇T is consistent.
+        for material in self.materials.values():
+            if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
+                material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
+                material["k"].x.scatter_forward()
+
+        # Staggered-convergence bookkeeping (same metrics as the linear path)
+        T_new.x.scatter_forward()
+        T_old.x.scatter_forward()
+        diff_T = T_new.x.petsc_vec.copy()
+        diff_T.axpy(-1.0, T_old.x.petsc_vec)
+        norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
+        norm_T = T_new.x.petsc_vec.norm(PETSc.NormType.NORM_2)
+        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-15 else norm_dT
+        conv_th = (norm_dT < stag_tol_th) if self.th_cfg["convergence"] == "norm" \
+            else (rel_norm_dT < stag_tol_th)
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
     def _mechanical_step(self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current):

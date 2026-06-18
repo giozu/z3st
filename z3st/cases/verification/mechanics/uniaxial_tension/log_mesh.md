@@ -1,4 +1,4 @@
-Info    : Running '/home/giovanni/miniconda3/envs/z3st11/bin/gmsh mesh.geo -3' [Gmsh 4.15.2, 1 node, max. 1 thread]
+Info    : Running '/home/giovanni/miniconda3/envs/z3st/bin/gmsh mesh.geo -3' [Gmsh 4.15.2, 1 node, max. 1 thread]
 Info    : Started on Mon Jun 15 21:39:53 2026
 Info    : Reading 'mesh.geo'...
 Info    : Done reading 'mesh.geo'

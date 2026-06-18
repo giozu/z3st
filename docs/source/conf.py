@@ -56,6 +56,22 @@ language = "en"
 
 autodoc_member_order = "bysource"  # preserves order of code
 autodoc_typehints = "description"  # show type hints in function docs
+
+# Heavy compiled dependencies (FEniCSx stack, MPI, mesh/visualisation) are not
+# importable in a plain docs/CI environment. Mock them so autodoc can introspect
+# the z3st modules from their source without importing the real packages. This
+# lets the documentation build cleanly in any environment (base conda, CI, the
+# GitHub Actions deploy) -- not only in the dolfinx-enabled `z3st` env.
+autodoc_mock_imports = [
+    "dolfinx",
+    "basix",
+    "ufl",
+    "mpi4py",
+    "petsc4py",
+    "pyvista",
+    "h5py",
+    "gmsh",
+]
 autodoc_default_options = {
     "members": True,
     "undoc-members": True,

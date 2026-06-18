@@ -16,6 +16,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{booktabs}
+\usepackage{animate}   % \animategraphics for the PCMI / damage frame sequences
 \usepackage{tikz}
 \usetikzlibrary{positioning, arrows.meta, fit, backgrounds}
 
@@ -285,6 +286,17 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
   \end{columns}
 \end{frame}
 
+% ---------------------------------------------------------------- 7b (PCMI animation)
+\begin{frame}{PCMI in motion: gap closes, contact pressure builds}
+  \centering
+  % 39 frames (frame_0000..frame_0038); ~7 fps. Plays in Adobe/pdfpc-class viewers.
+  \animategraphics[autoplay,loop,width=0.96\linewidth]{7}%
+    {figures/anim_pcmi/frame_}{0}{38}\\[-2pt]
+  {\scriptsize fuel + clad warped by the \alert{true} displacement (gap is 65\,\textmu m,
+   unscaled) while the three tracked quantities -- \alert{gap width}, \alert{contact
+   pressure}, peak/edge \alert{temperature} -- advance with the marker.}
+\end{frame}
+
 % ---------------------------------------------------------------- 8
 \begin{frame}{Hero case: thermal-shock cracking of a UO\textsubscript{2} pellet}
   \begin{columns}[T]
@@ -312,6 +324,16 @@ Jac = ufl.derivative(R, u, du)                    # consistent tangent -- also A
        bottom: \alert{simulated} cracks vs a \alert{real} UO\textsubscript{2} cross-section}
     \end{column}
   \end{columns}
+\end{frame}
+
+% ---------------------------------------------------------------- 8b (damage animation)
+\begin{frame}{Cracks nucleating and propagating (AT1 phase field)}
+  \centering
+  % 51 frames (frame_0000..frame_0050); ~9 fps.
+  \animategraphics[autoplay,loop,width=0.80\linewidth]{9}%
+    {figures/anim_damage/frame_}{0}{50}\\[-2pt]
+  {\scriptsize damage field $d$ over the thermal-shock transient -- discrete radial
+   cracks nucleate at the quenched rim and propagate inward.}
 \end{frame}
 
 % ---------------------------------------------------------------- 9

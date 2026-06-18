@@ -1,0 +1,12 @@
+name: box
+geometry_type: rect
+
+Lx: 0.10 # (m)
+Ly: 1.00 # (m)
+
+labels:
+  ymin: 1
+  xmax: 2
+  ymax: 3
+  xmin: 4
+  slab: 5

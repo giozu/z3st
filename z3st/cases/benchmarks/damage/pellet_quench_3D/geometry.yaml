@@ -1,0 +1,12 @@
+name: cylinder
+geometry_type: cyl
+
+Ro: 0.01    # (m)
+Lz: 0.01    # (m)
+
+labels:
+  uo2: 10
+  contact_wall: 20
+  insulated_wall: 21
+  bottom: 30
+  top: 40

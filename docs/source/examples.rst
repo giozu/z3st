@@ -302,7 +302,7 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 Single-Edge-Notched Shear Test (Miehe 2010 benchmark)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/benchmarks/sen_shear``
+**Case Directory:** ``cases/benchmarks/damage/sen_shear``
 
 A standard phase-field-fracture benchmark: a square specimen with a horizontal
 pre-notch is loaded in shear. The curved crack path that develops reproduces the
@@ -331,10 +331,10 @@ result of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010)
 
    Von Mises stress concentration at the propagating crack tip.
 
-UO\ :sub:`2` Pellet Thermal-Shock Cracking (McClenny 2022)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pellet Thermal-Shock Cracking
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/benchmarks/pellet_quench_2D_xy``
+**Case Directory:** ``cases/benchmarks/damage/pellet_quench_2D_xy``
 
 The fully coupled showpiece, in which thermal, mechanical, and phase-field damage
 all meet. A 2D plane-strain transverse cross-section of a UO\ :sub:`2` pellet has
@@ -358,23 +358,13 @@ radial cracks. It reproduces McClenny et al., *J. Nucl. Mater.* 565 (2022).
    Cold-contact wedge cools the rim (left); the tensile hoop-stress ring it sets
    up drives the cracking (right).
 
-**Results -- simulation against experiment:**
+**Results -- simulated damage:**
 
 .. figure:: images/full_cylinder_cracking/damage_field.png
-   :width: 48%
-
-.. figure:: images/full_cylinder_cracking/UO2_damage_sample.png
-   :width: 48%
-
-   Simulated damage with discrete radial cracks (left) against a cross-section of
-   a real cracked UO\ :sub:`2` pellet (right).
-
-.. figure:: images/full_cylinder_cracking/thermal_shock_results.png
-   :width: 90%
+   :width: 60%
    :align: center
 
-   Quantitative verification: radial temperature profile, temperature history at
-   the contact rim, and damage penetration, against McClenny Fig. 7b.
+   Damage field D at t = 0.1 s.
 
 Numerical analysis
 ------------------
