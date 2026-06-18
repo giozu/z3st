@@ -184,20 +184,9 @@ if H_arr is not None:
 
 
 # ----- global energy balance from energies.txt ------------------------------
-# NOTE: the same plot is reproduced by `plot_energy_balance.py` as a
-# standalone script that accepts an `OUTPUT_DIR` positional argument. Use
-# that script for post-hoc plotting against a saved backup directory
-# (e.g. output_starconvex_g00/) without disturbing the live-run state at
-# the case root. The block below is preserved here so a single
-# `./Allrun` end-to-end pipeline still produces every diagnostic.
 energy_file = os.path.join(CASE_DIR, "energies.txt")
 if os.path.exists(energy_file):
     data = np.genfromtxt(energy_file, names=True, skip_header=0)
-    # Total expected E_frac at Ambati's hybrid arrest = Gc * (Dn + arc), where
-    # arc ~= 0.55 mm is the additional propagated length from the notch tip
-    # to the arrest point (estimated from Ambati Fig. 12d, p.398). The Dn
-    # contribution is the Gamma-convergent fracture energy of the prescribed
-    # D = 1 BC on the notch slit, already counted in E_frac from step 0.
     ambati_arc       = 0.55e-3
     ambati_total_len = Dn + ambati_arc
     E_frac_notch     = Gc * Dn

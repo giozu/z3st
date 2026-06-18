@@ -1,0 +1,10 @@
+thermal:
+  slab:
+  - type: Dirichlet
+    region: xmin
+    temperature: 1200.0   # (K)
+
+  - type: Dirichlet
+    region: xmax
+    temperature: 400.0    # (K)
+    

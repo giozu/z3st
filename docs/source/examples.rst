@@ -302,7 +302,7 @@ This example demonstrates **phase-field fracture** using the AT2 model. The simu
 Single-Edge-Notched Shear Test (Miehe 2010 benchmark)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/benchmarks/sen_shear``
+**Case Directory:** ``cases/benchmarks/damage/sen_shear``
 
 A standard phase-field-fracture benchmark: a square specimen with a horizontal
 pre-notch is loaded in shear. The curved crack path that develops reproduces the
@@ -334,7 +334,7 @@ result of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010)
 UO\ :sub:`2` Pellet Thermal-Shock Cracking (McClenny 2022)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Case Directory:** ``cases/benchmarks/pellet_quench_2D_xy``
+**Case Directory:** ``cases/benchmarks/damage/pellet_quench_2D_xy``
 
 The fully coupled showpiece, in which thermal, mechanical, and phase-field damage
 all meet. A 2D plane-strain transverse cross-section of a UO\ :sub:`2` pellet has

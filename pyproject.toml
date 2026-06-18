@@ -50,6 +50,12 @@ dev = [
     "rich",
 ]
 
+# Optional: Neural network material laws, via FEniCSx external operators.
+nn = [
+    "torch",
+    "setuptools>=77.0.3,<82",  # torch requires <82; fenics-ffcx requires >=77.0.3
+]
+
 [tool.black]
 line-length = 100
 target-version = ['py310']

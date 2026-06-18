@@ -22,7 +22,7 @@ Two animations:
      faithful animation is factor = 1.0; the quantitative gap-closure / contact
      story is carried by the side-panel curves.
 
-  2. damage_evolution.gif (benchmarks/pellet_quench_2D_xy)
+  2. damage_evolution.gif (benchmarks/damage/pellet_quench_2D_xy)
      AT1 phase-field damage field over the thermal-shock transient, cracks
      nucleating and propagating from the quenched surface inward.
 

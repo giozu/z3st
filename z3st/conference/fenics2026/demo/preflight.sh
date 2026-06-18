@@ -48,12 +48,12 @@ echo "  (running 5 live cases serially — about 1-2 minutes; please wait, this 
   || no "identify_creep.py (segment M)"
 
 echo "${B}showpiece (case 14):${Z}"
-C14="$CASES/benchmarks/pellet_quench_2D_xy/output"
+C14="$CASES/benchmarks/damage/pellet_quench_2D_xy/output"
 n=$(ls "$C14"/fields_*.vtu 2>/dev/null | wc -l)
 nbk=$(ls "$HERE"/baked/case14_crack*.png 2>/dev/null | wc -l)
 if [ "$n" -gt 1 ]; then ok "case-14 live VTU series present ($n steps) — interactive ParaView available";
 elif [ "$nbk" -gt 0 ]; then ok "case-14 live VTU absent, but baked crack loop present ($nbk frames) — showpiece runs from baked (open_paraview.sh auto-falls-back)";
-else no "case-14 showpiece has NEITHER live VTU nor baked frames — it will be empty; run (cd $CASES/benchmarks/pellet_quench_2D_xy && ./Allrun) then ./open_paraview.sh --render"; fi
+else no "case-14 showpiece has NEITHER live VTU nor baked frames — it will be empty; run (cd $CASES/benchmarks/damage/pellet_quench_2D_xy && ./Allrun) then ./open_paraview.sh --render"; fi
 
 echo "${B}paraview + baked fallback:${Z}"
 command -v paraview >/dev/null 2>&1 && ok "paraview on PATH" || warn "paraview not on PATH (baked images still work)"

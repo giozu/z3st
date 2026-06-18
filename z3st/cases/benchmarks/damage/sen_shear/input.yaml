@@ -9,7 +9,7 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../../materials/high_carbon_steel.yaml
+  steel: ../../../../materials/high_carbon_steel.yaml
 
 regime: 2d
 
@@ -35,11 +35,14 @@ mechanical:
 damage:
   type: AT2
   solver: linear
-  linear_solver: iterative_hypre
+  linear_solver: direct_mumps
   rtol: 1.0e-5
-  stag_tol: 1.0e-5
+  stag_tol: 1.0e-7
   convergence: rel_norm
   lc: 4.0e-6
+  hybrid_constraint: true
+  split: star_convex
+  gamma_star: 5.0
 
 lhr:
 - 0.0
@@ -47,4 +50,6 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 701
+
+n_steps: 796
+

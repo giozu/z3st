@@ -6,7 +6,7 @@
 set -uo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BAKED="$HERE/baked"
-CASE14_OUT="$HERE/../../../cases/benchmarks/pellet_quench_2D_xy/output"
+CASE14_OUT="$HERE/../../../cases/benchmarks/damage/pellet_quench_2D_xy/output"
 # paraview_case14.py reads these (paraview --script does not define __file__):
 export Z3ST_DEMO_DIR="$HERE"
 export Z3ST_CASE14_OUT="$CASE14_OUT"

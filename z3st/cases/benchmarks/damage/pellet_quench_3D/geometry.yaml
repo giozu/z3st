@@ -1,8 +1,8 @@
 name: cylinder
 geometry_type: cyl
 
-Ro: 0.01    # outer radius (m) = 10 mm
-Lz: 0.01    # height (m) = 10 mm
+Ro: 0.01    # (m)
+Lz: 0.01    # (m)
 
 labels:
   uo2: 10

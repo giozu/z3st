@@ -793,7 +793,7 @@ Application: thermal-shock cracking of a UO\ :sub:`2` pellet
 ------------------------------------------------------------
 
 The full coupled set -- thermal, mechanical, and phase-field damage -- meets in
-the UO\ :sub:`2` thermal-shock case (``benchmarks/pellet_quench_2D_xy``), a 2D
+the UO\ :sub:`2` thermal-shock case (``benchmarks/damage/pellet_quench_2D_xy``), a 2D
 plane-strain transverse cross-section reproducer of McClenny et al.,
 *J. Nucl. Mater.* 565 (2022). A cold-contact wedge cools the rim of a hot disc;
 the tensile hoop-stress ring it sets up drives discrete radial cracks (AT1 +

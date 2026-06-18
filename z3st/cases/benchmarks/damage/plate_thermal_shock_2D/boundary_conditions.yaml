@@ -1,0 +1,12 @@
+thermal:
+  plate:
+  - type: Dirichlet
+    region: quench
+    temperature: 300.0   # (K)
+
+mechanical:
+  plate:
+  - type: Clamp_x
+    region: symmetry
+  - type: Clamp_y
+    region: pin

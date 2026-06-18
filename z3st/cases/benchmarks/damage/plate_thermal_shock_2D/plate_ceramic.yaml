@@ -1,0 +1,15 @@
+name: plate_ceramic
+
+E: 340.0e+9      # (Pa)  Young's modulus
+nu: 0.22         # (-)   Poisson coefficient
+
+Gc: 42.47        # (J/m^2) critical fracture energy
+
+k: 300.0         # (W/(m.K))
+cp: 880.0        # (J/(kg.K))
+rho: 3900.0      # (kg/m^3)
+
+alpha: 8.0e-6    # (1/K)
+
+T_ref: 550.0     # (K)  stress-free reference
+T_initial: 550.0 # (K)  uniform hot plate

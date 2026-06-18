@@ -1,0 +1,10 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+echo "Cleaning current directory..."
+
+rm -rf output/
+rm -f energies.txt
+rm -f log_*.md log.z3st
+
+echo "Done. Output and temporary files deleted (mesh preserved)."

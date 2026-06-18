@@ -1,0 +1,11 @@
+name: plate_thermal_shock
+geometry_type: rect
+
+Lx: 0.025    # (m)
+Ly: 0.0098   # (m)
+
+labels:
+  plate: 10
+  quench: 20
+  symmetry: 30
+  pin: 40

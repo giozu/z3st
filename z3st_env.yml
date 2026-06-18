@@ -46,6 +46,13 @@ dependencies:
   # - pytest-cov       # coverage reports
   # - pre-commit       # git hook management
 
+  # --. (Optional) neural-network --..
+  # After creating the env, run:
+  #   pip install --index-url https://download.pytorch.org/whl/cpu torch   # CPU build is enough
+  #   pip install --no-deps "git+https://github.com/a-latyshev/dolfinx-external-operator.git@cf5255e0b0ed21f350f931d4d0755181a3126456"
+  # Note: torch needs setuptools<82 while fenics-ffcx needs >=77.0.3; pin 81 if pip drifts:
+  #   pip install "setuptools>=77.0.3,<82"
+
   # --. Install via pip (not conda!) --..
 - pip:
   - gmsh

@@ -3,8 +3,6 @@ cd "${0%/*}" || exit 1
 
 echo "Cleaning current directory..."
 
-# Inside output/: remove everything EXCEPT the last fields_*.vtu and the
-# force_displacement.csv.
 if [ -d output ]; then
     LAST_VTU=$(ls -1 output/fields_*.vtu 2>/dev/null | sort -V | tail -1 | xargs -r -n1 basename)
     find output -mindepth 1 -maxdepth 1 \
@@ -17,7 +15,5 @@ fi
 
 rm -f log_*.md
 rm -f energies.txt
-# mesh.msh is intentionally preserved -- it's an input, regenerated only if
-# mesh.geo changes. For a full deep-clean (incl. the mesh), `rm -f *.msh`.
 
 echo "Done."

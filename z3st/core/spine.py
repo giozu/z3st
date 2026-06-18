@@ -138,7 +138,12 @@ class Spine(
                 )
 
             if "k" in mat:
-                if isinstance(mat["k"], str):
+                if isinstance(mat["k"], dict) and \
+                        str(mat["k"].get("type", "")).lower() in ("neural_network", "nn"):
+                    print(f"  → k defined as neural network: {mat['k'].get('weights')}")
+                    from z3st.models.nn_conductivity import load_from_card
+                    mat["_k_nn"] = load_from_card(mat["k"])
+                elif isinstance(mat["k"], str):
                     print(f"  → k defined as symbolic function: {mat['k']}")
                     k_func = self.resolve_function(mat["k"])
                     mat["_k_func"] = k_func
@@ -388,6 +393,15 @@ class Spine(
                 k_func = mat["_k_func"]
                 mat["k"] = k_func(self.T)
                 print("\nk expression for", name, "→", mat["k"])
+
+            # Neural-network conductivity
+            if "_k_nn" in mat and self.T is not None:
+                k_fn = dolfinx.fem.Function(self.V_t, name=f"k_nn_{name}")
+                k_fn.x.array[:] = mat["_k_nn"](self.T.x.array)
+                k_fn.x.scatter_forward()
+                mat["k"] = k_fn
+                print(f"\nk neural-network field for {name} → Function on V_t "
+                      f"(min={k_fn.x.array.min():.3f}, max={k_fn.x.array.max():.3f} W/m/K)")
 
             # Temperature-dependent elastic constants: build lmbda/G/bulk_modulus
             # as UFL expressions in the live T field, so the per-iteration T

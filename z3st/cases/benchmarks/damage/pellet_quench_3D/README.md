@@ -19,14 +19,14 @@ faithfully:
 
 The 2D variants serve more limited roles:
 
-- `benchmarks/pellet_quench_2D_xy/` is the 2D plane-strain analogue
+- `benchmarks/damage/pellet_quench_2D_xy/` is the 2D plane-strain analogue
   (transverse cross-section with the 60-deg arc). It captures the
   Fig. 8 crack pattern at much lower compute cost. Justified by the
   alumina-spacer's suppression of axial gradients.
 - An axisymmetric (r-z) variant is deliberately absent: axisymmetric
   mode cannot represent the 60-deg wedge, so it is unsuitable for the
-  cracking benchmark (a thermal-only verification variant,
-  `14_full_cylinder_thermal_2D_rz/`, existed until 2026-06-11).
+  cracking benchmark (a thermal-only verification variant existed
+  until 2026-06-11).
 
 ### Reference
 McClenny, Butt, Abdoelatef et al.,
@@ -97,9 +97,9 @@ Z3ST solves the Ambati *hybrid* formulation (Ambati et al. Eq. 27):
   physical under unloading).
 
 The implementation lives in `z3st/models/damage_model.py` and
-`z3st/core/solver.py::_damage_step`. The two SENT/SENS classical
-benchmarks (`cases/19_single-edge_notched_*`) verify the formulation
-against the Miehe-Ambati canonical results.
+`z3st/core/solver.py::_damage_step`. The single-edge-notched benchmark
+(`benchmarks/notched_plate_2D`) verifies the formulation against the
+Miehe-Ambati canonical results.
 
 The methodological point of running this case is therefore not just
 reproducing McClenny's UO2 thermal-shock crack pattern, but doing so with
@@ -150,7 +150,7 @@ viscosity-tuned crack kinetics entirely.
 
 ### Running the case
 ```bash
-cd benchmarks/pellet_quench_3D/
+cd benchmarks/damage/pellet_quench_3D/
 gmsh -3 mesh.geo -format msh2
 python3 -m z3st > log.z3st
 python3 non-regression.py

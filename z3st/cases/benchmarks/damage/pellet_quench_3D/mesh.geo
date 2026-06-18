@@ -13,7 +13,6 @@ lc_outer = 2.5e-5;       // Mesh size at outer edge (m)  = lc/2 (lc_phase_field 
 lc_center = 2.0e-4;      // Mesh size at center (m)      = 4*lc (was 5e-4 = 10*lc, too coarse for crack path)
 n_layers = 20;           // Number of layers in extrusion
 
-// Circle split into: 60° contact + 300° insulated
 // Contact region: from 0° to 60° (1/6 of circumference)
 Point(1) = {0, 0, 0, lc_center};                          // Center
 Point(2) = {R, 0, 0, lc_outer};                           // 0°
@@ -39,9 +38,6 @@ out[] = Extrude {0, 0, H} {
 };
 
 // Physical groups
-// out[0] = top, out[1] = volume
-// out[2] = lateral from curve 1 (contact, 60°)
-// out[3..6] = lateral from curves 2-5 (insulated, 300°)
 Physical Volume("uo2", 10) = {out[1]};
 Physical Surface("contact_wall", 20) = {out[2]};                            // 1/6 quench
 Physical Surface("insulated_wall", 21) = {out[3], out[4], out[5], out[6]};  // 5/6 insulated
@@ -60,8 +56,7 @@ Field[2].InField = 1;
 Field[2].SizeMin = lc_outer;
 Field[2].SizeMax = lc_center;
 Field[2].DistMin = 0.0;
-Field[2].DistMax = 8.0e-3;       // extends fine mesh to r = 2 mm so it covers the expected crack path
-                                 // (McClenny long cracks penetrate ~half the pellet)
+Field[2].DistMax = 8.0e-3;
 
 Background Field = 2;
 Mesh.MeshSizeExtendFromBoundary = 0;
