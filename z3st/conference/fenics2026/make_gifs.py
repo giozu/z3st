@@ -62,7 +62,7 @@ CASES = os.path.normpath(os.path.join(HERE, "..", "..", "cases"))
 FIG = os.path.join(HERE, "oral", "figures")
 
 PCMI_OUT = os.path.join(CASES, "regression", "pwr_rod_2D", "output")
-QUENCH_OUT = os.path.join(CASES, "benchmarks", "pellet_quench_2D_xy", "output")
+QUENCH_OUT = os.path.join(CASES, "benchmarks", "damage", "pellet_quench_2D_xy", "output")
 
 
 def _fig_to_array(fig):

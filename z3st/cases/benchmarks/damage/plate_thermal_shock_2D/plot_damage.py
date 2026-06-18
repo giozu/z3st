@@ -32,11 +32,12 @@ with h5py.File(h5_files[0], "r") as h:
     X = h["Mesh/mesh/geometry"][:]      # (N, 3) node coordinates
     topo = h["Mesh/mesh/topology"][:]   # (M, 3) triangle connectivity
     steps = sorted(h["Function/Damage"].keys())
-    D = h["Function/Damage/" + steps[-1]][:].ravel()
+    step = steps[49]
+    D = h["Function/Damage/" + step][:].ravel()
 
 # Localisation diagnostics (printed to the run log).
 d_edge = np.minimum.reduce([X[:, 1], H - X[:, 1], X[:, 0]])
-print(f"[plot_damage] final step '{steps[-1]}': "
+print(f"[plot_damage] step '{step}': "
       f"max D = {D.max():.3f}, crack-core fraction (D>0.9) = {(D > 0.9).mean():.3f}, "
       f"interior max D = {D[d_edge > 1.5e-3].max():.2e}")
 
@@ -49,7 +50,7 @@ ax.set_xlim(0, L * 1e3)
 ax.set_ylim(0, H * 1e3)
 ax.set_xlabel("x (mm)")
 ax.set_ylabel("y (mm)")
-ax.set_title("Plate thermal shock — damage D (final step)")
+ax.set_title("Plate thermal shock — damage D")
 fig.colorbar(tc, ax=ax, fraction=0.025, pad=0.01, label="D")
 fig.tight_layout()
 

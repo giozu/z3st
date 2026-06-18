@@ -331,8 +331,8 @@ result of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010)
 
    Von Mises stress concentration at the propagating crack tip.
 
-UO\ :sub:`2` Pellet Thermal-Shock Cracking (McClenny 2022)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Pellet Thermal-Shock Cracking
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Case Directory:** ``cases/benchmarks/damage/pellet_quench_2D_xy``
 
@@ -358,16 +358,13 @@ radial cracks. It reproduces McClenny et al., *J. Nucl. Mater.* 565 (2022).
    Cold-contact wedge cools the rim (left); the tensile hoop-stress ring it sets
    up drives the cracking (right).
 
-**Results -- simulation against experiment:**
+**Results -- simulated damage:**
 
 .. figure:: images/full_cylinder_cracking/damage_field.png
-   :width: 48%
+   :width: 60%
+   :align: center
 
-.. figure:: images/full_cylinder_cracking/UO2_damage_sample.png
-   :width: 48%
-
-   Simulated damage with discrete radial cracks (left) against a cross-section of
-   a real cracked UO\ :sub:`2` pellet (right).
+   Damage field D at t = 0.1 s.
 
 .. figure:: images/full_cylinder_cracking/thermal_shock_results.png
    :width: 90%

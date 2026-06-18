@@ -1,0 +1,23 @@
+{
+  "T_final_mean_in_range": {
+    "numerical": 735.3725777021808,
+    "reference": [
+      263.15,
+      1023.15
+    ],
+    "rel_error": 0.0,
+    "pass": true
+  },
+  "D_max_final": {
+    "numerical": 1.0,
+    "reference": 1.0,
+    "rel_error": 0.0,
+    "pass": true
+  },
+  "crack_count_above_0p5": {
+    "numerical": 0,
+    "reference": 1,
+    "rel_error": 0.0,
+    "pass": true
+  }
+}

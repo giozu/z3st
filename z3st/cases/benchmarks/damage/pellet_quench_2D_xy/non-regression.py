@@ -418,7 +418,6 @@ try:
     last_mesh_pv = pv.read(vtu_files[-1])
     triang, x_pts, y_pts = _build_triangulation(last_mesh_pv)
     last_t = times_all[-1]
-    src_name = os.path.basename(vtu_files[-1])
 
     # ------ Damage field ------
     damage_name = None
@@ -431,9 +430,7 @@ try:
         plot_field_2d(
             triang, D_field,
             output_path=os.path.join(OUT_DIR, "damage_field.png"),
-            title=(f"Damage field D at t = {last_t:.3e} s  "
-                   f"(McClenny Fig. 8 reproducer; upper half by mirror symmetry)\n"
-                   f"Source: {src_name}"),
+            title=f"Damage field D at t = {last_t:.3e} s",
             cbar_label="Damage D", cmap="hot_r", vmin=0.0, vmax=1.0,
             contact_R=Ro, contact_half_angle_deg=CONTACT_HALF_ANGLE_DEG,
         )
