@@ -96,12 +96,28 @@ H_STEAM_PRESSURE_OLD = 9  # (atm)
 H_STEAM_PRESSURE_NEW = 10
 
 # --. variables[] layout — outputs the host READS --..
-# (src/operations/SetVariablesFunctions.C::initializeSciantixVariable)
-V_XE_PRODUCED = 1               # (at/m^3)
-V_XE_RELEASED = 6               # (at/m^3)
+# (src/operations/SetVariablesFunctions.C::initializeSciantixVariable; verified
+# against the named SciantixVariable("Xe ...", variables[i]) registrations)
+V_XE_PRODUCED = 1               # (at/m^3)  "Xe produced"
+V_XE_INGRAIN = 2                # (at/m^3)  "Xe in grain"          (intragranular)
+V_XE_GRAINBOUNDARY = 5          # (at/m^3)  "Xe at grain boundary"
+V_XE_RELEASED = 6               # (at/m^3)  "Xe released"
+V_KR_PRODUCED = 7               # (at/m^3)  "Kr produced"
+V_KR_INGRAIN = 8                # (at/m^3)  "Kr in grain"
+V_KR_GRAINBOUNDARY = 11         # (at/m^3)  "Kr at grain boundary"
+V_KR_RELEASED = 12              # (at/m^3)  "Kr released"
 V_INTRAGRAN_GAS_SWELLING = 24   # (/)  intragranular gas-bubble swelling, DV/V
 V_INTERGRAN_GAS_SWELLING = 36   # (/)  intergranular gas swelling, DV/V  (dominant at high T)
 V_BURNUP = 38                   # (MWd/kgUO2)
+
+# Total fission gas (Xe + Kr) in each state -> (produced, in-grain, gb, released)
+# variables[] index pairs; summed to a single per-state concentration (at/m^3).
+_FG_STATES = {
+    "produced":       (V_XE_PRODUCED, V_KR_PRODUCED),
+    "in_grain":       (V_XE_INGRAIN, V_KR_INGRAIN),
+    "grain_boundary": (V_XE_GRAINBOUNDARY, V_KR_GRAINBOUNDARY),
+    "released":       (V_XE_RELEASED, V_KR_RELEASED),
+}
 
 # --. initial-conditions slot map: (variables[] start index, count) per data
 # line of a standalone input_initial_conditions.txt, IN FILE ORDER. Mirrors
@@ -347,6 +363,27 @@ class SciantixField:
             res = pt.advance(dt, float(T[i]), float(T[i]), float(fission_rate[i]),
                              hydro_stress=hs, burnup_old=bo, burnup_new=bn)
             out[i] = res["gaseous_swelling"]
+        return out
+
+    def gas_concentrations(self):
+        """Per-dof total fission-gas (Xe + Kr) concentrations in each state.
+
+        Reads the *current* ``variables[]`` of every point (call after :meth:`step`)
+        and returns a dict of numpy arrays, each length ``n_points`` (units at/m^3):
+
+            ``produced``        gas created so far (Xe + Kr produced)
+            ``in_grain``        retained intragranular (in grain)
+            ``grain_boundary``  accumulated on grain faces (intergranular)
+            ``released``        released to the free volume (FGR numerator)
+
+        These are diagnostic/output fields (the eigenstrain only needs the swelling
+        from :meth:`step`); Z3ST writes them to the Paraview output and the FG plots.
+        """
+        out = {key: np.empty(self.n_points, dtype=np.float64) for key in _FG_STATES}
+        for i, pt in enumerate(self.points):
+            v = pt.variables
+            for key, (i_xe, i_kr) in _FG_STATES.items():
+                out[key][i] = v[i_xe] + v[i_kr]
         return out
 
     # --. checkpoint / restore — for adaptive time-stepping rollback (CODE-FEATURE-4

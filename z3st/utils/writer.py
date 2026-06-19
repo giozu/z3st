@@ -166,6 +166,7 @@ class OutputWriter:
         self._H_cell_expr = None
         self._c_cg_fn = None
         self._p_proj_problem = None  # cumulative plastic strain (lazy)
+        self._u_out_fn = None        # CG1 vertex view of u for P2+ output (lazy)
 
         on = problem.on
 
@@ -310,6 +311,26 @@ class OutputWriter:
                 petsc_options_prefix=f"z3st_proj_{id(ufl_expr):x}_",
             )
 
+    def _u_for_output(self, u):
+        """Return displacement as a CG1 vertex field for VTU/XDMF.
+
+        VTU and legacy XDMF expect one value per mesh vertex, but a P2 (or higher)
+        mechanical space carries extra dofs (edge midpoints), so ``u.x.array`` is
+        longer than ``#vertices × tdim`` and a direct reshape/write fails. For such
+        spaces we interpolate ``u`` once per step onto a cached CG1 vector field;
+        for P1 ``u`` (already vertex-resolution) it is returned unchanged.
+        """
+        n_vert = self.mesh.geometry.x.shape[0]
+        tdim = self.mesh.topology.dim
+        if u.x.array.size == n_vert * tdim:
+            return u
+        if self._u_out_fn is None:
+            V = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (tdim,)))
+            self._u_out_fn = dolfinx.fem.Function(V, name="Displacement")
+        self._u_out_fn.interpolate(u)
+        self._u_out_fn.x.scatter_forward()
+        return self._u_out_fn
+
     @staticmethod
     def _refresh_into(target_fn, source, cells=None):
         """Update ``target_fn`` from a pre-prepared source (Expression or cached
@@ -362,7 +383,7 @@ class OutputWriter:
         if on.get("thermal", False) and p.T is not None:
             write(p.T, t)
         if on.get("mechanical", False) and p.u is not None:
-            write(p.u, t)
+            write(self._u_for_output(p.u), t)
         if self._strain_fn_cells is not None:
             write(self._strain_fn_cells, t)
         if self._stress_fn_cells is not None:
@@ -377,6 +398,12 @@ class OutputWriter:
             write(self._c_cg_fn, t)
         if getattr(p, "burnup", None) is not None:
             write(p.burnup, t)
+        # SCIANTIX coupling fields (only present when models.fission_gas is on)
+        if getattr(p, "gas_swelling", None) is not None:
+            write(p.gas_swelling, t)
+        if getattr(p, "fg_fields", None):
+            for fn in p.fg_fields.values():
+                write(fn, t)
 
     def _write_vtu(self, step):
         p = self.problem
@@ -390,7 +417,8 @@ class OutputWriter:
         if on.get("thermal", False) and p.T is not None:
             grid.point_data["Temperature"] = p.T.x.array
         if on.get("mechanical", False) and p.u is not None:
-            grid.point_data["Displacement"] = p.u.x.array.reshape(n_points, self.tdim)
+            u_out = self._u_for_output(p.u)
+            grid.point_data["Displacement"] = u_out.x.array.reshape(n_points, self.tdim)
 
         # Material IDs
         ct = getattr(p, "cell_tags", None) or getattr(p, "tags", None)
@@ -439,6 +467,14 @@ class OutputWriter:
         # Burnup (nodal fuel state, MWd/kgU)
         if getattr(p, "burnup", None) is not None:
             grid.point_data["Burnup"] = p.burnup.x.array
+
+        # SCIANTIX coupling fields (only present when models.fission_gas is on):
+        # total gaseous swelling ΔV/V and the Xe+Kr concentrations (at/m^3).
+        if getattr(p, "gas_swelling", None) is not None:
+            grid.point_data["Gaseous swelling"] = p.gas_swelling.x.array
+        if getattr(p, "fg_fields", None):
+            for fn in p.fg_fields.values():
+                grid.point_data[fn.name] = fn.x.array
 
         # Damage + crack-driving-force
         if on.get("damage", False) and p.D is not None:

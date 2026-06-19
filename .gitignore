@@ -29,6 +29,7 @@ log.*
 non-regression.json
 z3st/cases/**/log_*.md
 !z3st/cases/verification/mechanics/uniaxial_tension/log_*.md
+input_check.txt
 
 # --. Data / results / figures --..
 *.csv

@@ -1,0 +1,26 @@
+name: UO2-fuel
+fissile: true
+
+radial_profile: materials.fuel_profiles.rim_peaking
+radial_peak_amplitude: 2.0
+radial_peak_exponent: 8.0
+
+E: 200.0e9          # (Pa)
+nu: 0.345           # (-)
+
+cracking: isotropic
+
+k: materials.fuel_thermal.k    # W/(m·K)
+cp: 280.0           # (J/(kg·K))
+rho: 10970.0        # (kg/m³)
+heavy_metal_fraction: 0.8815   # (/) M_U/M_UO2
+
+alpha: 1.1e-5       # (1/K) thermal expansion
+
+eigenstrain: materials.sciantix_swelling.gaseous_swelling
+# swelling_rate: 7.0e-4          # (ΔV/V) per MWd/kgU   solid FP
+# densification_dv: 0.010        # (ΔV/V) as-fabricated porosity recovered
+# densification_bu: 2.0          # (MWd/kgU) densification burnup constant
+
+T_ref: 293.15       # (K)
+T_initial: 580.0    # (K)

@@ -1,0 +1,87 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  fuel: fuel.yaml
+  clad: clad.yaml
+
+regime: axisymmetric
+
+solver_settings:
+  coupling: staggered
+  max_iters: 100
+  relax_T: 0.9
+  relax_u: 0.3
+  relax_adaptive: true
+  relax_aitken: true
+  relax_growth: 1.1
+  relax_shrink: 0.6
+  relax_min: 0.03
+  relax_max: 0.9
+
+models:
+  thermal: true
+  mechanical: true
+  fission_gas:
+    enabled: true   # SCIANTIX
+    initial_conditions: input_initial_conditions.txt
+    energy_per_fission: 3.2e-11
+  gap_conductance:
+    type: Gas
+    value: 15.8                 # (He)
+    relax: 0.5                  # under-relax h_gap: damps the gap-h-T feedback
+    contact_coupling:
+      enabled: true
+      meyer_hardness: 9.65e8    # (Pa) Zry
+      gas_thickness: 4.0e-6     # (m)
+  contact:
+    surface_a: lateral_1        # pellet outer
+    surface_b: inner_2          # clad inner
+    penalty_stiffness: 5.0e13   # (Pa/m)
+    initial_gap: 65.0e-6        # (m)
+
+mechanical:
+  order: 2                 # P2 displacement → P1 stress/cell: sharper σ_rr recovery
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-4
+  stag_tol: 1.0e-4
+  convergence: rel_norm
+
+thermal:
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
+  convergence: rel_norm
+  analysis: stationary
+
+lhr:
+- 0.0
+- 20000.0
+- 20000.0
+- 20000.0
+time:
+- 0.0
+- 1.728e+6     # 20 days
+- 6.048e+7     # 700 days
+- 1.5552e+8    # 1800 days
+n_steps:
+- 10
+- 14
+- 14
+
+time_adaptivity:
+  enabled: true
+  dt_min: 1.0e+4
+  max_cuts: 8
+
+output:
+  format: vtu

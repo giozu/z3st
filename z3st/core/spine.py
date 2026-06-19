@@ -322,6 +322,7 @@ class Spine(
         self.q_third = None
         self.burnup = None
         self.gas_swelling = None      # SCIANTIX total gaseous swelling ΔV/V (eigenstrain bus)
+        self.fg_fields = None         # dict of per-dof FG concentration Functions (at/m^3, output)
         self.sciantix_field = None    # the per-dof SciantixField driver
         self._sciantix_dofs = None    # V_t dof indices the field covers
         self.T = None
@@ -652,6 +653,18 @@ class Spine(
         self.gas_swelling = dolfinx.fem.Function(self.V_t, name="Gaseous swelling")
         self.gas_swelling.x.array[:] = 0.0
 
+        # Per-dof total fission-gas (Xe + Kr) concentration fields [at/m^3], for the
+        # Paraview output and the FG plots — one Function per SCIANTIX gas state.
+        # Names mirror SciantixField.gas_concentrations() keys.
+        self.fg_fields = {
+            "produced":       dolfinx.fem.Function(self.V_t, name="FG produced (at_m3)"),
+            "in_grain":       dolfinx.fem.Function(self.V_t, name="FG in grain (at_m3)"),
+            "grain_boundary": dolfinx.fem.Function(self.V_t, name="FG at grain boundary (at_m3)"),
+            "released":       dolfinx.fem.Function(self.V_t, name="FG released (at_m3)"),
+        }
+        for fn in self.fg_fields.values():
+            fn.x.array[:] = 0.0
+
         n = int(self._sciantix_dofs.size)
         if n == 0:
             print("[sciantix] no fissile dofs; gaseous-swelling field stays zero.")
@@ -681,6 +694,17 @@ class Spine(
         self.gas_swelling.x.array[dofs] = gs
         self.gas_swelling.x.scatter_forward()
         print(f"[update_state] gaseous swelling max = {self.gas_swelling.x.array.max():.4e} (ΔV/V)")
+
+        # Fission-gas (Xe + Kr) concentration fields for output / FG plots.
+        conc = self.sciantix_field.gas_concentrations()
+        for key, fn in self.fg_fields.items():
+            fn.x.array[dofs] = conc[key]
+            fn.x.scatter_forward()
+        prod = self.fg_fields["produced"].x.array[dofs]
+        rel = self.fg_fields["released"].x.array[dofs]
+        fgr = float(rel.sum() / prod.sum()) if prod.sum() > 0 else 0.0
+        print(f"[update_state] fission gas: produced max = {prod.max():.4e} at/m³, "
+              f"fuel-avg FGR = {fgr:.4f}")
 
     _SNAPSHOT_FIELDS = (
         "T", "u", "D", "H", "burnup", "gas_swelling", "c", "c_n",

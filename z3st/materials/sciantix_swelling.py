@@ -42,6 +42,7 @@ def gaseous_swelling(T, material, model=None, dim=3):
     (no field), so a card may carry this callable harmlessly when SCIANTIX is
     disabled.
     """
+    del T, material   # bus-contract args, unused here (depends only on the field)
     I = ufl.Identity(dim)
     gs = getattr(model, "gas_swelling", None)
     if gs is None:
@@ -67,15 +68,15 @@ def with_solid(T, material, model=None, dim=3):
 
 def with_solid_densification(T, material, model=None, dim=3):
     """SCIANTIX gaseous swelling plus burnup-linear solid-FP swelling and early-life
-    densification — the SCIANTIX face of ``fuel_swelling.solid_gas_densification``.
+    densification — the SCIANTIX equivalent of ``fuel_swelling.solid_gas_densification``.
 
         ΔV/V = (ΔV/V)_gas(SCIANTIX)                            (intra+intergranular)
              + rate_s · bu                                     (solid FP)
              - d0 · (1 - exp(- bu / bu_d))                     (densification)
         ε*   = (ΔV/V) / 3 · I
 
-    Drop-in replacement when a card already used ``solid_gas_densification``: only the
-    gaseous term moves from the analytic sigmoid to the SCIANTIX field; the solid and
+    Use this in place of ``solid_gas_densification`` to take the gaseous term from the
+    SCIANTIX field instead of the analytic sigmoid; the solid and
     densification terms (cards ``swelling_rate``, ``densification_dv``,
     ``densification_bu``) are unchanged and stay UFL expressions in ``model.burnup``,
     so the u-tangent is untouched. SCIANTIX runs with ``iDensification = 0`` — Z3ST
