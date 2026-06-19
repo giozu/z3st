@@ -18,7 +18,7 @@ heavy_metal_fraction: 0.8815   # (/) M_U/M_UO2
 alpha: 1.1e-5       # (1/K) thermal expansion
 
 eigenstrain: materials.sciantix_swelling.gaseous_swelling
-swelling_rate: 7.0e-4          # (ΔV/V) per MWd/kgU   solid FP
+swelling_rate: 7.0e-4          # (ΔV/V) per MWd/kgU, solid FP
 densification_dv: 0.010        # (ΔV/V) as-fabricated porosity recovered
 densification_bu: 2.0          # (MWd/kgU) densification burnup constant
 

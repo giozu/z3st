@@ -1,0 +1,13 @@
+thermal:
+  fuel:
+  - type: Dirichlet
+    region: lateral_1
+    temperature: 500 # (K)
+
+mechanical:
+  fuel:
+  - type: Clamp_x
+    region: axis_1        # u_r = 0
+
+  - type: Clamp_y
+    region: bottom_1      # u_z = 0

@@ -6,7 +6,7 @@ nu: 0.345           # (-)  Poisson's ratio
 
 k: 5.0              # (W/(m·K)) thermal conductivity (representative)
 cp: 280.0           # (J/(kg·K))
-rho: 10970.0        # (kg/m³)
+rho: 10960.0        # (kg/m³)
 
 alpha: 1.1e-5       # (1/K) thermal expansion
 

@@ -12,7 +12,7 @@ cracking: isotropic
 
 k: materials.fuel_thermal.k    # W/(m·K)
 cp: 280.0           # (J/(kg·K))
-rho: 10970.0        # (kg/m³)
+rho: 10960.0        # (kg/m³)
 heavy_metal_fraction: 0.8815   # (/) M_U/M_UO2
 
 alpha: 1.1e-5       # (1/K) thermal expansion

@@ -26,10 +26,7 @@ export SCIANTIX_LIB=$PWD/build/libsciantix.so
 (`callSciantix` is already `extern "C"`, so the symbol is undecorated and
 `ctypes`-callable; `-fPIC` is the only build flag the shared lib needs.)
 
-**Production: build with `-DCOUPLING_TU`.** This makes SCIANTIX skip its own
-burnup/effective-burnup/densification and consume the host's burnup instead (see
-§3, "Burnup ownership"), which is the intended Z3ST design — Z3ST's RADAR model owns
-burnup. A no-CMake one-liner that the validation below uses:
+**Build with `-DCOUPLING_TU`.**.
 ```bash
 g++ -O2 -std=c++17 -DCOUPLING_TU -fPIC -shared $(find include -type d | sed 's/^/-I/') \
     $(find src -name '*.C') -o /tmp/libsciantix_tu.so

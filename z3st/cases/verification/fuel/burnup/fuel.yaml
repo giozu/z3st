@@ -15,7 +15,7 @@ nu: 0.23                        # (-)  mechanical is off)
 
 k: 5.0                          # (W/(m·K)) thermal conductivity
 cp: 280.0                       # (J/(kg·K)) specific heat
-rho: 10970.0                    # (kg/m³) density
+rho: 10960.0                    # (kg/m³) density
 heavy_metal_fraction: 0.8815    # (-) M_U / M_UO2; burnup is per kg heavy metal
 
 alpha: 1.0e-5                   # (1/K) thermal expansion
