@@ -30,7 +30,7 @@ class Solver:
         self.relax_T = float(solver_settings.get("relax_T", 0.9))
         self.relax_u = float(solver_settings.get("relax_u", 0.4))
         self.relax_D = float(solver_settings.get("relax_D", 0.4))
-        self._relax_u0 = self.relax_u  # initial value, restored per step by Aitken
+        self._relax_u0 = self.relax_u  # restored per step by Aitken
 
         print("  Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
@@ -83,9 +83,8 @@ class Solver:
 
     def invalidate_dt_caches(self):
         """Drop every cached form that bakes dt in, forcing a rebuild at the
-        current dt on the next solve. Single owner of the dt-dependent cache
-        list: add any new dt-baking cache to ``_DT_DEPENDENT_CACHES`` rather
-        than nulling it ad hoc from the time loop."""
+        current dt on the next solve. Add any new dt-baking cache to
+        ``_DT_DEPENDENT_CACHES`` rather than nulling it ad hoc from the time loop."""
         for name in self._DT_DEPENDENT_CACHES:
             setattr(self, name, None)
 
@@ -138,12 +137,8 @@ class Solver:
         """Build dx_tags and ds_tags measures with axisymmetric and cartesian support."""
         x = ufl.SpatialCoordinate(self.mesh)
         regime = self.regime
-        
-        # Integration weight logic:
-        # - Axisymmetric: 2*pi*r
-        # - Cartesian 2D: 1.0 (Area)
-        # - 3D: 1.0 (Volume)
 
+        # Integration weight: 2*pi*r for axisymmetric, 1.0 for Cartesian 2D/3D.
         if regime == "axisymmetric":
             self.weight = 2.0 * ufl.pi * x[0]
         elif regime == "2d":
@@ -172,8 +167,8 @@ class Solver:
 
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
 
-        # A non-linear thermal solver (k = NN(T) external operator,
-        # Newton with autodiff tangent). Dispatched before the linear assembly.
+        # Non-linear thermal solver (k = NN(T) external operator, Newton with
+        # autodiff tangent), dispatched before the linear assembly.
         if self.th_cfg.get("solver", "linear") != "linear":
             return self._thermal_step_nonlinear(
                 T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
@@ -377,11 +372,11 @@ class Solver:
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
     def _thermal_step_nonlinear(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
-        """k = NN(T) as a FEMExternalOperator, solved by
-        Newton with the autodiff tangent dk/dT (Latyshev et al. external
-        operators). Showcase scope: STATIONARY conduction with Dirichlet (and
-        Neumann) BCs. Transient mass terms and Robin/gap BCs are not yet handled
-        on this path — they raise a clear NotImplementedError.
+        """k = NN(T) as a FEMExternalOperator, solved by Newton with the
+        autodiff tangent dk/dT (Latyshev et al. external operators). Scope:
+        STATIONARY conduction with Dirichlet (and Neumann) BCs. Transient mass
+        terms and Robin/gap BCs are not yet handled here — they raise
+        NotImplementedError.
         """
         from dolfinx_external_operator import (
             evaluate_external_operators,
@@ -549,12 +544,11 @@ class Solver:
 
         w = self.weight
 
-        # A creeping material, or a plasticity / hyperelastic constitutive
-        # mode, makes the stress σ(u) nonlinear in u, so the step must go
-        # through the SNES path regardless of the configured solver (otherwise
-        # the "linear" branch would assemble a non-bilinear form as if it were
-        # bilinear). The shipped nonlinear cases already set solver: newton;
-        # this guard protects against a solver: linear misconfiguration.
+        # Creep, or a plasticity / hyperelastic constitutive mode, makes σ(u)
+        # nonlinear in u, so the step must go through the SNES path regardless
+        # of the configured solver (the "linear" branch would otherwise assemble
+        # a non-bilinear form as if it were bilinear). Guards against a
+        # solver: linear misconfiguration.
         creep_present = any(self.creep_active(m) for m in self.materials.values())
         nonlinear_constitutive = any(
             m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
@@ -575,8 +569,8 @@ class Solver:
 
         # Penalty contact: update the contact pressure from the current
         # displacement iterate (explicit / fixed-point) — a persistent Constant
-        # consumed by the cached form. The contact traction t = -p*n is treated
-        # as an external load, driven to consistency by the staggered loop.
+        # consumed by the cached form. The traction t = -p*n is an external
+        # load, driven to consistency by the staggered loop.
         if self.on.get("contact", False):
             self.update_contact_pressure(u_new)
 
@@ -996,17 +990,12 @@ class Solver:
     def _cluster_step(self, c_new, c_old, dt):
         """
         Solve the cluster dynamics step with mass conservation using DG.
-        
-        Solves: ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n²
 
-        Case v > 0: The clusters grow. The distribution moves to the right (larger n).
-        Case v < 0: The clusters shrink (evaporation/dissolution). The distribution moves to the left (towards n=1).
+        Solves ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n² (v > 0 grows clusters, v < 0
+        shrinks them) under the constraint C_tot = ∫ c·n dn = constant.
 
-        C_tot = ∫ c·n dn = constant
-        
-        DG formulation:
-        - Upwind for advection
-        - Symmetric Interior Penalty (SIPG) for diffusion
+        DG formulation: upwind for advection, Symmetric Interior Penalty (SIPG)
+        for diffusion.
         """
         c_old.x.array[:] = c_new.x.array
         

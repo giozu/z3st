@@ -3,11 +3,8 @@
 """
 Z3ST case: thin_cylindrical_shell_Mariotte
 
-non-regression script
----------------------
-Analytical non-regression for a 2D thin-walled cylindrical shell under
-internal (Pi) pressure, using the Mariotte solution.
-
+2D thin-walled cylindrical shell under internal (Pi) pressure. Reference is the
+Mariotte solution.
 """
 
 import os

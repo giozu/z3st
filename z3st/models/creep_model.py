@@ -26,9 +26,9 @@ thermal Norton). g is increasing and concave with g(0) ≤ 0, so Newton
 converges monotonically and the base (σ_eq_trial − 3GΔγ) never goes
 negative at the root — the linear term preserves both properties.
 
-The scalar equation is solved by a **predictor–corrector split** that keeps
-the exact consistent tangent without symbolic nesting (a fully unrolled
-symbolic Newton makes the AD Jacobian explode combinatorially in FFCx):
+The scalar equation is solved by a predictor–corrector split that keeps the
+exact consistent tangent without symbolic nesting (a fully unrolled symbolic
+Newton makes the AD Jacobian grow combinatorially in FFCx):
 
 * a DG0 *predictor* field Δγ₀ holds the exact root, computed cell-wise by a
   vectorised numpy Newton after every mechanical solve (cheap, warm-started);
@@ -37,10 +37,9 @@ symbolic Newton makes the AD Jacobian explode combinatorially in FFCx):
 
 At staggered convergence the predictor equals the root, the correction
 vanishes, and ``ufl.derivative`` of the one-step formula yields exactly the
-implicit-function-theorem derivative −(∂g/∂u)/g' — the textbook consistent
-tangent — through an expression tree of trivial size. The global problem
-stays on the displacement space alone, so every BC / traction / contact path
-is reused unchanged.
+implicit-function-theorem consistent tangent −(∂g/∂u)/g' through a small
+expression tree. The global problem stays on the displacement space alone, so
+every BC / traction / contact path is reused unchanged.
 
 The accumulated ε_cr lives on a DG0 tensor space per creeping material and is
 advanced once per converged time step (mirroring ``update_plastic_history``).

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Visualize the crystal plasticity material law to understand its complexity.
-This shows WHY automatic differentiation is essential.
+Visualize the crystal plasticity material law and its derivative, motivating
+the use of automatic differentiation.
 """
 
 import numpy as np
@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 
 def plot_slip_law():
     """
-    Visualize the power-law slip rate and its derivative.
-    Shows the highly nonlinear behavior that makes manual Jacobians difficult.
+    Plot the power-law slip rate and its derivative (strongly nonlinear).
     """
 
     # Parameters from single_crystal_law.py
@@ -21,10 +20,10 @@ def plot_slip_law():
     # Resolved shear stress range
     tau = np.linspace(-150e6, 150e6, 1000)
 
-    # Slip rate (the material law)
+    # Slip rate
     gamma_dot = gamma0 * np.abs(tau / g0)**n_pow * np.sign(tau)
 
-    # Derivative (what UFL computes automatically)
+    # Derivative dgamma_dot/dtau
     dgamma_dtau = gamma0 * n_pow * np.abs(tau / g0)**(n_pow - 1) / g0
 
     # Create figure
@@ -87,7 +86,7 @@ def plot_slip_law():
     plt.savefig('output/material_law_visualization.png', dpi=300, bbox_inches='tight')
     print("\n[INFO] Material law visualization saved to: output/material_law_visualization.png")
 
-    # Print key insights with detailed analysis
+    # Print derivative analysis
     print("\n" + "="*70)
     print("MATERIAL LAW COMPLEXITY ANALYSIS")
     print("="*70)

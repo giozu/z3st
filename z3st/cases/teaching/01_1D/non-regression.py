@@ -244,9 +244,9 @@ errors = {
 #     K_e = E / L_e * [[+1, -1], [-1, +1]]
 #
 # (the engineering-bar element stiffness, regime: 1d). This block is purely
-# diagnostic / pedagogical -- it does not affect the pass/fail of the case, but
-# it makes z3st's FE assembly visible and lets the student verify it by hand
-# against the textbook formula.
+# diagnostic / pedagogical -- it does not affect the pass/fail of the case; it
+# makes z3st's FE assembly visible so the student can check it by hand against
+# Bower's formula.
 
 print("\n" + "=" * 72)
 print("Stiffness matrix extraction (Bower ch. 7.2 / 8.1.5)")

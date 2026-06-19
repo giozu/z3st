@@ -9,15 +9,12 @@ class Config:
     """
     Configuration manager for Z3ST simulations.
 
-    This class parses the user input YAML file and initializes the
-    global configuration used by all other modules (mesh, solvers, models).
-
-    It loads:
+    Parses the user input YAML and initializes the global configuration used by
+    the other modules. Loads:
       * active physical models (thermal, mechanical, gap conductance)
       * solver settings (linear/non-linear, tolerances, coupling scheme)
       * paths for geometry, mesh, and boundary conditions
       * number of time steps
-
     """
 
     def __init__(self, input_file):

@@ -98,7 +98,7 @@ n = 5
 
 **Z3ST Result:** σ_zz = 707.9 MPa (error: +12.5%)
 
-The curve is **approaching saturation** but hasn't reached steady state yet (would require ~2-3% strain).
+The curve is approaching saturation but has not reached steady state yet (would require ~2-3% strain).
 
 ## Automatic Differentiation
 
@@ -111,17 +111,17 @@ With n=5 power law, the slip rate derivative is:
 dγ̇/dτ = (n·γ₀/g₀) · (τ/g₀)^(n-1)
 ```
 
-At τ = 2×g₀, this derivative varies by **16×** compared to τ = g₀!
+At τ = 2×g₀, this derivative varies by 16× compared to τ = g₀.
 
-Manual Jacobian implementation would be:
-- ❌ Error-prone (complex chain rule through Schmid tensor)
-- ❌ Hard to maintain (changes in constitutive law require re-derivation)
-- ❌ Difficult to verify
+Manual Jacobian implementation is:
+- Error-prone (chain rule through the Schmid tensor)
+- Hard to maintain (changes in the constitutive law require re-derivation)
+- Difficult to verify
 
-**UFL Automatic Differentiation:**
-- ✅ Exact symbolic derivatives
-- ✅ No manual calculations needed
-- ✅ Automatically consistent with stress formula
+UFL automatic differentiation provides:
+- Exact symbolic derivatives
+- No manual calculations
+- Consistency with the stress formula by construction
 
 ### Implementation
 
@@ -179,7 +179,7 @@ Step 10:
   ✓ Converged in 2 iterations
 ```
 
-**Why so fast?** Exact Jacobian from automatic differentiation!
+The fast convergence comes from the exact Jacobian supplied by automatic differentiation.
 
 ### Schmid Factor Calculation
 
@@ -204,7 +204,7 @@ For uniaxial stress σ_zz:
 ======================================================================
 ```
 
-Three independent methods verify the same result!
+Three independent methods give the same result.
 
 ## Non-Regression Tests
 
@@ -268,10 +268,10 @@ Output: [`output/material_law_visualization.png`](output/material_law_visualizat
 
 ### Why Viscoplasticity?
 
-Unlike rate-independent plasticity (J2, von Mises), viscoplastic models:
-- ✅ No yield surface singularity → better Newton convergence
-- ✅ Rate-dependent response (realistic for metals at high strain rates)
-- ✅ Regularized problem (no complementarity conditions)
+Unlike rate-independent plasticity (J2, von Mises), viscoplastic models have:
+- No yield-surface singularity, giving better Newton convergence
+- Rate-dependent response (realistic for metals at high strain rates)
+- A regularized problem (no complementarity conditions)
 
 ### Backward Euler Integration
 
@@ -295,12 +295,12 @@ where P is the **Schmid tensor** that projects stress onto the slip system.
 
 This case demonstrates:
 
-1. **UFL Symbolic Differentiation** eliminates error-prone manual Jacobian derivation
-2. **FEniCSx Quadrature Spaces** enable efficient history variable storage
-3. **Custom Constitutive Models** integrate seamlessly with Newton solver
-4. **Semi-Analytical Verification** validates numerical implementation
+1. UFL symbolic differentiation in place of manual Jacobian derivation
+2. FEniCSx quadrature spaces for history-variable storage
+3. Custom constitutive models integrated with the Newton solver
+4. Semi-analytical verification of the numerical implementation
 
-**Key Innovation:** Combining crystal plasticity (complex constitutive law) with automatic differentiation (exact Jacobians) in a production-quality FEM code.
+It combines crystal plasticity (a nonlinear constitutive law) with automatic differentiation (exact Jacobians) in a production FEM code.
 
 ## Future Work: Comparison with MFront/MGIS
 
@@ -324,28 +324,19 @@ For the FEniCS 2026 conference, a comparison is planned with:
 
 ### Why This Comparison Matters
 
-MFront is the **industry standard** for constitutive modeling in:
-- Industry (CEA, EDF)
-- Aerospace (Safran, Airbus)
-- Research institutions worldwide
-
-Demonstrating that **Z3ST+UFL achieves equivalent accuracy** with:
-- ✅ **90% less code**
-- ✅ **Zero manual derivatives**
-- ✅ **Easier maintenance and extension**
-
-...makes a strong case for **automatic differentiation in production FEM codes**.
+MFront is widely used for constitutive modelling in industry (CEA, EDF),
+aerospace (Safran, Airbus), and research. The aim of the comparison is to show
+that Z3ST+UFL reaches equivalent accuracy with less code, no manual derivatives,
+and easier maintenance and extension.
 
 ### Planned Verification
 
 The comparison will include:
-1. **Same material parameters** (E, ν, g₀, γ₀, n)
-2. **Same loading conditions** (uniaxial tension, 0.5% strain)
-3. **Same time integration** (Backward Euler)
-4. **Stress-strain curve comparison** (should match within numerical precision)
-5. **Convergence comparison** (iterations per step, wall time)
-
-This will provide **quantitative evidence** that automatic differentiation is ready for industrial applications.
+1. Same material parameters (E, ν, g₀, γ₀, n)
+2. Same loading conditions (uniaxial tension, 0.5% strain)
+3. Same time integration (backward Euler)
+4. Stress-strain curve comparison (expected to match within numerical precision)
+5. Convergence comparison (iterations per step, wall time)
 
 ## References
 

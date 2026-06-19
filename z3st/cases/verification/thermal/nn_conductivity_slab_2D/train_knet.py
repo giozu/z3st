@@ -2,10 +2,9 @@
 # --.. ..- .-.. .-.. --- Z3ST: train k(T) = NN(T) --.. ..- .-.. .-.. ---
 """Offline training of the thermal-conductivity network.
 
-Fits a small smooth MLP to the law k(T) (read from
-nn_conductor.yaml::k_law) over the temperature range spanned by the Dirichlet
-boundary conditions, then saves a checkpoint (knet.pt) in the format expected
-by z3st.models.nn_conductivity.NNConductivity.
+Fits a small smooth MLP to k(T) (from nn_conductor.yaml::k_law) over the
+temperature range spanned by the Dirichlet BCs, then saves a checkpoint
+(knet.pt) in the format expected by z3st.models.nn_conductivity.NNConductivity.
 
 Run once before the solve:  python3 train_knet.py
 """

@@ -20,8 +20,7 @@ build/
 cache/
 
 # --. Batch and temporary scripts --..
-ba_*
-pwr_rod_2D_backup
+*.batch
 
 # --. Log and JSON files --..
 log.*

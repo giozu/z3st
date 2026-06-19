@@ -135,12 +135,10 @@ def single_crystal_stress(u, T, material, model=None):
 
 def get_cp_internal_variables(u, T, material, model=None):
     """
-    Calculate updated plastic strain tensor for crystal plasticity.
+    Updated plastic strain tensor for crystal plasticity.
 
-    This function mirrors the calculation in single_crystal_stress() but returns
-    the updated plastic strain tensor for history variable update.
-
-    Called by PlasticityModel after convergence to update ep_n → ep.
+    Mirrors single_crystal_stress(); called by PlasticityModel after
+    convergence to update ep_n -> ep.
 
     Parameters:
         u: Displacement field

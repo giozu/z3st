@@ -12,7 +12,7 @@ With A(T) = A0·exp(-Q/RT) and uniaxial Norton flow (eps_cr_zz rate = A·sigma^n
 lateral rates -1/2 of that):
 
   1. total axial strain    u_z(L)/L = sigma/E + A·sigma^n·t
-  2. creep part            u_z(L)/L - sigma/E = A·sigma^n·t   (sharper)
+  2. creep part            u_z(L)/L - sigma/E = A·sigma^n·t
   3. radial strain         u_r(Ro)/Ro = -nu·sigma/E - (1/2)·A·sigma^n·t
      (checks the deviatoric flow direction, not just the magnitude)
 

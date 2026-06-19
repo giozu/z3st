@@ -3,15 +3,15 @@
 """
 Sparse identification of the creep mechanism from finite-element data.
 
-The data-generating "experiment" is this case's own FEM simulation: the
-verified axisymmetric stress-relaxation problem (a zircaloy bar held at
-constant total strain, ../creep_relaxation) re-run with 500
-implicit time steps so that the time-discretisation defect of the data
-(~0.2%) sits well below the measurement noise. The mean axial stress history
-sigma_zz(t), observed at 51 equally spaced times, is extracted from the XDMF
-output and perturbed with 2% multiplicative noise. The inverse model is an
-independent material-point integrator on a different time grid (400 steps),
-so data generation and identification share no discretisation.
+The data-generating experiment is this case's own FEM simulation: the verified
+axisymmetric stress-relaxation problem (a zircaloy bar held at constant total
+strain, ../creep_relaxation) re-run with 500 implicit time steps so that the
+time-discretisation defect of the data (~0.2%) sits well below the measurement
+noise. The mean axial stress history sigma_zz(t), observed at 51 equally spaced
+times, is extracted from the XDMF output and perturbed with 2% multiplicative
+noise. The inverse model is an independent material-point integrator on a
+different time grid (400 steps), so data generation and identification share no
+discretisation.
 
 The candidate creep-rate library, in the dimensionless stress S = sigma/sigma_ref,
 

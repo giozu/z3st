@@ -64,10 +64,10 @@ def elastic_stress(epsilon, E, nu):
 
 def viscoplastic_saturation_stress(strain_rate, schmid_factor, g0, gamma0, n_pow):
     """
-    Analytical saturation stress for viscoplastic power law.
+    Analytical saturation stress for the viscoplastic power law.
 
-    For a viscoplastic material without hardening under constant strain rate,
-    the stress saturates when plastic strain rate equals total strain rate.
+    Without hardening under constant strain rate, the stress saturates when
+    the plastic strain rate equals the total strain rate.
 
     At steady state (dσ/dt = 0):
         ε̇_total = ε̇_plastic

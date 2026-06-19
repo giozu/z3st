@@ -14,34 +14,26 @@ SCIANTIX already exposes, for the TRANSURANUS coupling, an ``extern "C"`` API in
 
 so no new C/C++ is needed beyond compiling SCIANTIX as a SHARED library (see
 README.md). This wrapper loads that library, owns the per-point state arrays,
-and exposes a single ``advance(dt, T0, T1, fission_rate, ...)`` step that returns
-the engineering outputs Z3ST consumes — gaseous swelling (for the eigenstrain
-bus) and burnup / FGR.
+and exposes a single ``advance(dt, T0, T1, fission_rate, ...)`` step returning
+the engineering outputs Z3ST consumes — gaseous swelling, burnup, FGR.
 
-The design intentionally mirrors the way SCIANTIX is *meant* to be driven by a
-host code: arrays in, arrays out, all state carried in ``history`` (old/new
-pairs) and ``variables`` between calls — exactly the per-point, stateful-via-
-arrays pattern Z3ST already uses for the burnup and creep DG0 states. One
-``SciantixSolver`` instance == one integration point (a radial ring, to start).
+Arrays in, arrays out: all state is carried in ``history`` (old/new pairs) and
+``variables`` between calls. One ``SciantixSolver`` instance == one integration
+point (e.g. a radial ring).
 
-STATUS: draft. The index map and array sizes below were verified 2026-06-18
-against SCIANTIX v2.2.1 source (``include/MainVariables.h``,
-``src/operations/SetVariablesFunctions.C``, ``src/operations/SetVariables.C``,
-``src/coupling/TUSrcCoupling.C``): array sizes options[40]/history[20]/
-variables[300]/scaling_factors[20]/diffusion_modes[720]; history slots and the
-swelling(24/36)/burnup(38) output slots all confirmed; ``history[6]`` is the
-time step in seconds (drives ``physics_variable["Time step"]``).
+Index map and array sizes verified 2026-06-18 against SCIANTIX v2.2.1 source
+(``include/MainVariables.h``, ``src/operations/SetVariablesFunctions.C``,
+``src/operations/SetVariables.C``, ``src/coupling/TUSrcCoupling.C``): array sizes
+options[40]/history[20]/variables[300]/scaling_factors[20]/diffusion_modes[720];
+history slots and the swelling(24/36)/burnup(38) output slots confirmed;
+``history[6]`` is the time step in seconds (drives ``physics_variable["Time step"]``).
 
-VALIDATED end-to-end 2026-06-18 against SCIANTIX's own standalone regression case
-``regression/baker/test_Baker1977__1273K`` (see ``validate_baker.py``): built
-SCIANTIX as a shared lib (g++ -fPIC -shared over src/*.C), seeded initial
-conditions via ``load_initial_conditions``, and drove the same 1273 K / 1e19
-fiss/m3 s / 100x55 h history. All four engineering outputs match the standalone
-gold to ~1e-7 relative error (FGR 0.132097, intragranular swelling 3.07e-4,
-intergranular swelling 0.0417, burnup 6.719).
+Validated end-to-end against the SCIANTIX standalone regression case
+``regression/baker/test_Baker1977__1273K`` (see ``validate_baker.py``): all four
+engineering outputs match the standalone gold to ~1e-7 relative error.
 
-Two non-obvious facts the validation surfaced, both handled in
-``load_initial_conditions`` / ``_apply_initialization``:
+Two non-obvious facts, both handled in ``load_initial_conditions`` /
+``_apply_initialization``:
   1. In coupling mode SCIANTIX does NOT read input_initial_conditions.txt (that is
      standalone-only, file_manager/InputReading.C) — the host must seed
      ``variables[]`` first (grain radius, fuel density, U content, ...).
@@ -51,16 +43,15 @@ Two non-obvious facts the validation surfaced, both handled in
      U% -> at/m3 using density. Without the grain-boundary defaults the
      intergranular model returns nan and releases nothing.
 
-Burnup ownership (2026-06-19): the production design is a -DCOUPLING_TU build, where
-SCIANTIX skips its own Burnup()/EffectiveBurnup()/Densification (Simulation.C:43)
-and reads burnup from history[7] (old) / history[8] (new) (SetVariables.C:74). The
-HOST owns burnup — Z3ST computes it with its RADAR model and feeds it via
+Burnup ownership: the production design is a -DCOUPLING_TU build, where SCIANTIX
+skips its own Burnup()/EffectiveBurnup()/Densification (Simulation.C:43) and reads
+burnup from history[7] (old) / history[8] (new) (SetVariables.C:74). The host owns
+burnup — Z3ST computes it with its RADAR model and feeds it via
 ``advance(..., burnup_old=, burnup_new=)``. Verified against the Baker gold with a
--DCOUPLING_TU lib: feeding the gold burnup trajectory reproduces gas swelling/FGR to
-~1e-7 and burnup exactly.
+-DCOUPLING_TU lib.
 
 Z3ST integration is wired in (SciantixField + spine + materials.sciantix_swelling;
-README section 4). Remaining: fresh-fuel only (the diffusion-mode projection for a
+README section 4). Limitation: fresh-fuel only (the diffusion-mode projection for a
 pre-irradiated restart is not implemented).
 """
 
@@ -314,14 +305,14 @@ class SciantixSolver:
 class SciantixField:
     """A field of SCIANTIX integration points, one per finite-element dof.
 
-    This is what Z3ST drives: ``spine.initialize_fields`` builds one of these over
-    the fissile dofs, ``spine.update_state(dt)`` calls :meth:`step` with the local
-    temperature and fission-rate arrays each step, and the returned gaseous-swelling
-    array is written into a dolfinx Function that the ``sciantix_swelling``
-    eigenstrain callable reads (the eigenstrain bus). The library is loaded once and
-    the model selection (``options``/``scaling_factors``) is read once, then shared
-    across all points; only the per-point state arrays (history/variables/
-    diffusion_modes) are independent.
+    Z3ST drives this: ``spine.initialize_fields`` builds one over the fissile dofs,
+    ``spine.update_state(dt)`` calls :meth:`step` with the local temperature and
+    fission-rate arrays each step, and the returned gaseous-swelling array is written
+    into a dolfinx Function that the ``sciantix_swelling`` eigenstrain callable reads.
+    The library is loaded once and the model selection
+    (``options``/``scaling_factors``) is read once, then shared across all points;
+    only the per-point state arrays (history/variables/diffusion_modes) are
+    independent.
 
     The SCIANTIX C++ ``Simulation`` is a singleton scratch object re-initialised
     from the passed arrays on every call, so points are independent as long as each

@@ -1,9 +1,7 @@
 name: fuel-axial-table-test
-# Fissile fuel used to verify the TABULATED axial power source bus. A
-# piecewise-linear table f(z_i) (node-wise peaking factors, the standard
-# fuel-performance input from a core-physics calculation) shapes the deposited
-# power. Only the table's shape matters — set_power normalises the composite
-# form factor to mean 1, so the absolute scale of the entries is irrelevant.
+# Fissile fuel verifying the tabulated axial power source bus. A piecewise-linear
+# table f(z_i) of node-wise peaking factors shapes the deposited power. set_power
+# normalises the form factor to mean 1, so only the table shape matters.
 fissile: true
 
 # Tabulated axial form factor: resolved by spine.load_materials, applied in

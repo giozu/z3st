@@ -1,6 +1,6 @@
 # Z3ST cases
 
-Every case directory is self-contained and runs the same way. This file documents the **case taxonomy** — what the top-level folders mean and how a case joins the non-regression suite — so new cases land in the right place.
+Every case directory is self-contained and runs the same way. This file documents the case taxonomy — what the top-level folders mean and how a case joins the non-regression suite — so new cases land in the right place.
 
 ## Category = directory
 
@@ -9,7 +9,7 @@ Every case directory is self-contained and runs the same way. This file document
 | `verification/` | Checked against a **closed-form / analytical** solution. | yes | yes (gold + analytic) |
 | `regression/`   | No closed-form truth; **only a blessed gold**. | no | yes (gold only) |
 | `benchmarks/`   | Phenomenological demonstrators, often qualitative. | sometimes | case-by-case |
-| `studies/`      | Parameter sweeps and custom-driver work. Free by convention.Custom `run_*.py`/`plot_*.py`, not the `Allrun`+gold pattern. | n/a | no |
+| `studies/`      | Parameter sweeps and custom-driver work. Custom `run_*.py`/`plot_*.py`, not the `Allrun`+gold pattern. | n/a | no |
 | `teaching/`     | Minimal pedagogical starters (`01_1D`, `01_3D`). | n/a | no |
 | `sandbox/`      | Explicitly **unprotected** work-in-progress. Keeps the historical `U_` prefix. | n/a | never (pruned) |
 

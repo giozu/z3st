@@ -3,10 +3,9 @@
 """
 Z3ST case: verification/thermal/nn_conductivity_slab_2D
 
-Steady 1D conduction in a slab whose thermal conductivity is a neural network
-k = NN(T), trained to fit the law k(T) = 1/(a + b T). For that law the continuum
-temperature profile is closed-form (via the Kirchhoff potential), so we verify
-the NN-driven solve against the analytic solution.
+Steady 1D conduction in a slab with k = NN(T) trained to fit k(T) = 1/(a + b T).
+For that law the temperature profile is closed-form (via the Kirchhoff potential),
+so the NN-driven solve is verified against the analytic solution.
 """
 
 import os

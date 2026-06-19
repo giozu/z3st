@@ -163,7 +163,7 @@ rel_error_E = np.zeros_like(strains_np)
 rel_error_E[~mask_zero] = np.abs(strains_np[~mask_zero] - strain_ref_np[~mask_zero]) / np.abs(strain_ref_np[~mask_zero])
 rel_error_E[mask_zero] = np.abs(strains_np[mask_zero] - strain_ref_np[mask_zero])
 
-# Stress - comparing against ANALYTICAL reference for now to show user
+# Stress (compared against the analytical reference)
 rel_error_S = np.zeros_like(stresses_np)
 mask_zero_S = np.isclose(stresses_analytic_np, 0.0)
 rel_error_S[~mask_zero_S] = np.abs(stresses_np[~mask_zero_S] - stresses_analytic_np[~mask_zero_S]) / np.abs(stresses_analytic_np[~mask_zero_S])

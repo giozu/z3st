@@ -5,17 +5,15 @@
 """
 Isotropic softening model for cracking due to thermal stresses in oxide materials (Barani et al., NED 342, 2019).
 
-In oxide fuel, the temperature gradient cracks the pellet as
-soon as the thermal tensile stress exceeds the fracture stress.
-Resolving the crack pattern is neither affordable in an
-engineering rod; instead, the cracked material is represented as an
-ISOTROPICALLY SOFTENED solid: the elastic constants are rescaled as a function
-of the number of macroscopic cracks n, conserving principal strains and
-minimising the squared deviation of the principal stresses between the cracked
-(anisotropic) and the equivalent isotropic description.
+The temperature gradient cracks the pellet once the thermal tensile stress
+exceeds the fracture stress. Rather than resolve the crack pattern, the cracked
+material is represented as an ISOTROPICALLY SOFTENED solid: the elastic
+constants are rescaled as a function of the number of macroscopic cracks n,
+conserving principal strains and minimising the squared deviation of the
+principal stresses between the cracked (anisotropic) and equivalent isotropic
+descriptions.
 
-Scaling of the elastic constants, applied from the VIRGIN
-constants (E, nu):
+Scaling of the elastic constants, applied from the VIRGIN constants (E, nu):
 
     f(nu)      = (2/3) * (2 - nu)/(2 + nu) * 1/(1 - nu)
     E_iso(n)   = f(nu)^n * E

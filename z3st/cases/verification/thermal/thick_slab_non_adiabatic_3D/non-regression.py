@@ -69,7 +69,7 @@ list_fields(VTU_FILE)
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
-# Numerical results
+# Numerical temperature and stress (averaged on the extraction plane)
 x_T, y_T, z_T, T_all = extract_temperature(VTU_FILE)
 x_T, T = average_section(x_T, y_T, z_T, T_all, y_target, z_target, mask_tol, label="T", decimals=5)
 

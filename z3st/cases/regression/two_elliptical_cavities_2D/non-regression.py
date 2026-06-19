@@ -59,8 +59,8 @@ ay_ax = (1 - np.cos(theta)) / np.sin(theta)
 intensification_factor = 2 / ay_ax - 1 # theoretical pressure intensification
 print(f"[INFO] Theoretical intensification factor (single bubble): {intensification_factor:.2f}")
 
-# Applied bubble pressure = peak of the committed Neumann ramp on the cavity
-# (read it, never hardcode — the ramp ends at 15 MPa in boundary_conditions.yaml).
+# Applied bubble pressure = peak of the Neumann ramp on the cavity, read from
+# boundary_conditions.yaml (the ramp ends at 15 MPa).
 with open(BC_FILE, 'r') as f:
     bc_data = yaml.safe_load(f)
 p_applied = max(
@@ -175,20 +175,20 @@ except Exception as e:
     print(f"[WARNING] field overview plot skipped: {e}")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-# The committed config is the *equilibrium baseline* (15 MPa, no fracture), so
-# the analytic references describe that regime:
-#   - max_damage: the baseline must NOT crack -> d_max ~ 0 (percolation is 0.9).
+# The config is the equilibrium baseline (15 MPa, no fracture), so the analytic
+# references describe that regime:
+#   - max_damage: baseline must not crack -> d_max ~ 0 (percolation is 0.9).
 #   - max_stress_yy: bubble-tip stress concentration. The isolated pressurised-
 #     ellipse factor K_t underpredicts ~2x because the two bubbles share the load
 #     through the intact ligament; the ligament-corrected estimate
 #     K_t/(1-Fc)*p_applied is accurate to ~20% (the 2-bubble interaction and
-#     finite domain are not captured by a closed form). The precise drift guard
-#     is regression_check vs the gold below (rtol 1e-3), not this estimate.
+#     finite domain have no closed form). Drift is guarded by regression_check
+#     vs gold (rtol 1e-3), not this estimate.
 sigma_yy_ref = intensification_factor / (1.0 - Fc_area) * p_applied
 
 # Loose analytic tolerance: the tip-concentration estimate is approximate. A
-# pass here means "right regime" (no fracture, expected concentration); the
-# strict guard against code/mesh drift is regression_check vs gold.
+# pass means the right regime (no fracture, expected concentration); drift vs
+# code/mesh is guarded by regression_check vs gold.
 TOLERANCE = 0.25
 
 errors = {

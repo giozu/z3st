@@ -410,8 +410,8 @@ def plot_fields():
 
     # ---- (b) radial displacement field u_r on the (undeformed) mesh ----
     # NB: a warped mesh is misleading for contact -- each body warps by its own
-    # displacement, so the pellet (large u_r) visually overruns the clad. The
-    # quantitative gap-closure story is told by plot_radial_profile() instead.
+    # displacement, so the pellet (large u_r) visually overruns the clad. Use
+    # plot_radial_profile() for the quantitative gap closure.
     p = pv.Plotter(off_screen=True, window_size=(560, 1050))
     p.add_mesh(grid, scalars="u_r_um", cmap="viridis", show_edges=False,
                scalar_bar_args=_bar_args("u_r (um)"))

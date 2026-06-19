@@ -269,29 +269,23 @@ class DamageModel:
             psi_neg = (1 + gamma_star) (lambda/2) <tr eps_el>_-^2
 
         gamma_star >= -1 controls the compressive-vs-tensile critical-stress
-        asymmetry. The standard Amor split is recovered at gamma_star = 0;
-        gamma_star > 0 raises the compressive strength relative to tensile
-        and introduces a strain-space asymptote below which compressive
-        loading cannot grow damage further (Vicentini et al. 2024 Fig. 7).
+        asymmetry. gamma_star = 0 recovers the Amor split; gamma_star > 0
+        raises compressive strength relative to tensile and introduces a
+        strain-space asymptote below which compressive loading cannot grow
+        damage further (Vicentini et al. 2024 Fig. 7).
 
         Per Vicentini et al. 2024 Table 2, the star-convex model satisfies
-        all five criteria for an ideal multi-axial energy decomposition
-        (strain-hardening, stress-softening, tens./compr. asymmetry,
-        flexibility, crack-like residual stress) — none of the other
-        decompositions in z3st (Amor, Miehe spectral) achieve full
-        flexibility.
+        all five criteria for an ideal multi-axial energy decomposition;
+        Amor and Miehe spectral do not achieve full flexibility.
 
-        gamma_star is read from ``self.dmg_cfg["gamma_star"]`` (i.e. the
-        ``damage:`` block of input.yaml, alongside ``lc`` and
-        ``hybrid_constraint``) and defaults to 0.0 (silently reduces to
-        Amor). It is intentionally a *model* parameter, not a material
-        property: the same energy-split machinery is shared across every
-        material in the simulation.
+        gamma_star is read from ``self.dmg_cfg["gamma_star"]`` (the
+        ``damage:`` block of input.yaml) and defaults to 0.0 (reduces to
+        Amor). It is a model parameter, not a material property: the
+        energy-split machinery is shared across every material.
 
-        Note: z3st's Amor implementation uses the Lame parameter ``lambda``
-        rather than the n-dimensional bulk modulus ``K_n``; star-convex
-        mirrors that convention so that ``gamma_star = 0`` recovers
-        ``psi_amor_split`` exactly.
+        z3st's Amor implementation uses the Lame parameter ``lambda`` rather
+        than the n-dimensional bulk modulus ``K_n``; star-convex mirrors that
+        convention so that ``gamma_star = 0`` recovers ``psi_amor_split``.
         """
         lam = material["lmbda"]
         G = material["G"]

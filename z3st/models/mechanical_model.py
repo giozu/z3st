@@ -475,7 +475,7 @@ class MechanicalModel:
         --.--.-----
 
         If ``self.mech_regime == "plane_stress"``, the returned tensor is modified
-        to enforce σ_zz = 0 in an x–y plane-stress sense (same behaviour as before).
+        to enforce σ_zz = 0 in an x–y plane-stress sense.
 
 
         Notes

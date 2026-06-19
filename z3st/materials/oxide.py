@@ -1,9 +1,9 @@
 import ufl
 
-# Grain-boundary-weakened fracture toughness (pJ/micron²). Single source of
-# truth, shared by the UFL assembly path `Gc(mesh)` and the numpy
-# post-processing path `Gc_numpy(y)`, so a verification script can never drift
-# from the material model (e.g. an accidental unit factor).
+# Grain-boundary-weakened fracture toughness (pJ/micron²). Shared by the UFL
+# assembly path `Gc(mesh)` and the numpy post-processing path `Gc_numpy(y)`, so
+# a verification script cannot drift from the material model (e.g. an accidental
+# unit factor).
 GC_GB = 0.1          # toughness at the grain boundary (y = 0)
 GC_BULK = 100.0      # bulk toughness
 GC_HALF_WIDTH = 10e-3  # micron — GB -> bulk transition width

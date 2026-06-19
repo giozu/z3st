@@ -3,12 +3,8 @@
 """
 Z3ST case: verification/mechanics/lame_plane_strain_2D
 
-non-regression script
----------------------
-Analytical non-regression for a thick-walled cylindrical shell under
-internal (Pi) and external (Po) pressure.
+Thick-walled cylindrical shell under internal (Pi) and external (Po) pressure.
 Reference is the Lamé solution.
-
 """
 
 import os

@@ -7,9 +7,8 @@
 """
 Diagnostics for regression/pwr_rod_2D.
 
-Streams a one-row-per-step summary to ``output/history.csv``.
-It records scalars the solver has already computed
-``plots.py`` reads this CSV for the PCMI curves; field snapshots come from VTU (short runs) or ParaView (the single XDMF).
+Streams a one-row-per-step summary to ``output/history.csv`` of scalars the
+solver has already computed. ``plots.py`` reads this CSV for the PCMI curves.
 
 ``__main__`` loads this module automatically when present in the case directory
 and calls ``per_step(problem, step, t)`` after every converged step.

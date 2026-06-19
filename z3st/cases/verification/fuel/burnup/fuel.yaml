@@ -1,9 +1,8 @@
 name: fuel-burnup-test
-# Fissile fuel used to verify the burnup state + radial-power source buses. A
-# rim-peaking radial form factor f(r) shapes the deposited power, so the burnup
-# accumulates faster at the pellet rim than in the core. The verification then
-# checks both the accumulation magnitude (nodal-mean burnup = closed form) and
-# the radial shape (rim/core ratio = 1 + A, normalisation-independent).
+# Fissile fuel verifying the burnup state + radial-power source buses. A
+# rim-peaking radial form factor f(r) makes burnup accumulate faster at the rim
+# than in the core. Checks accumulation magnitude (nodal-mean burnup vs closed
+# form) and radial shape (rim/core ratio = 1 + A).
 fissile: true
 
 # Radial power form factor: resolved by spine.load_materials, applied in set_power.

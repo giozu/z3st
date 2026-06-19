@@ -3,11 +3,8 @@
 """
 Z3ST case: annular_cylinder
 
-non-regression script
------------------------
-Analytical solution for radial temperature in a 2D
-annular cylinder with uniform volumetric heat generation.
-
+2D annular cylinder with uniform volumetric heat generation. Reference is the
+analytical radial temperature profile.
 """
 
 import os

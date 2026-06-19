@@ -101,11 +101,11 @@ class Spine(
             print(f"Material loaded: {name}")
 
             if "E" in mat and "nu" in mat:
-                # E and/or nu may be given as a symbolic "module.func" card,
-                # Then, the derived elastic constants are built as UFL expressions in the T field by
-                # initialize_fields (T does not exist yet here). 
-                # NOTE: a symbolic E/nu is not yet compatible with the per-step cracking rescale or
-                # the numpy creep predictor.
+                # E and/or nu may be a symbolic "module.func" card; the derived
+                # elastic constants are then built as UFL expressions in the T
+                # field by initialize_fields (T does not exist yet here).
+                # NOTE: symbolic E/nu is not yet compatible with the per-step
+                # cracking rescale or the numpy creep predictor.
                 def _is_symbolic(v):
                     if not isinstance(v, str):
                         return False
@@ -461,16 +461,14 @@ class Spine(
                 print("Fissile material")
                 q_val = self.lhr / self.area
 
-                # Power form factors — the source bus. A fissile material may
-                # shape its own volumetric source through the callables
-                # ``radial_profile`` f(r, bu) (the natural home of a TUBRNP-style
-                # rim profile later) and/or ``axial_profile`` f(z) (e.g. the
-                # chopped cosine). Each callable receives the dof coordinates and
-                # the *current* local burnup. The composite f_r·f_z is normalised
-                # ONCE to nodal mean 1, so the shaping *redistributes* the linear
-                # heat rate without changing its integral — with a single profile
-                # this reduces exactly to the previous behaviour. Default (no
-                # callables): f ≡ 1, the flat source.
+                # Power form factors. A fissile material may shape its own
+                # volumetric source through the callables ``radial_profile``
+                # f(r, bu) (intended for a TUBRNP-style rim profile later) and/or
+                # ``axial_profile`` f(z) (e.g. the chopped cosine). Each callable
+                # receives the dof coordinates and the current local burnup. The
+                # composite f_r·f_z is normalised once to nodal mean 1, so the
+                # shaping redistributes the linear heat rate without changing its
+                # integral. Default (no callables): f ≡ 1, the flat source.
                 shape = np.ones(len(dofs))
                 rprof = mat.get("_radial_profile_func")
                 zprof = mat.get("_axial_profile_func")
@@ -485,8 +483,8 @@ class Spine(
                         shape = shape * np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
                     if zprof is not None:
                         shape = shape * np.asarray(zprof(coords, bu_vals, mat, model=self), dtype=float)
-                    # Nodal-mean normalisation of the composite; the area-weighted
-                    # integral refinement lands with the TUBRNP profile.
+                    # Nodal-mean normalisation (area-weighted refinement to come
+                    # with the TUBRNP profile).
                     mean = shape.mean()
                     if mean > 0:
                         shape = shape / mean
@@ -501,10 +499,9 @@ class Spine(
                 # Integrated-power diagnostic: the exact FE integral of the
                 # fissile source over this material, with the regime weight
                 # (2πr in axisymmetric). For a rod this should track LHR·Lz;
-                # a radially peaked profile deviates slightly because the
-                # mean-1 normalisation is nodal, not area-weighted — printing
-                # the integral makes that approximation visible. The form is
-                # compiled once and cached (q_third updates in place).
+                # a radially peaked profile deviates slightly because the mean-1
+                # normalisation is nodal, not area-weighted. The form is compiled
+                # once and cached (q_third updates in place).
                 if not hasattr(self, "_power_forms"):
                     self._power_forms = {}
                 if name not in self._power_forms:
@@ -584,9 +581,8 @@ class Spine(
         self.q_third.x.scatter_forward()
 
     def update_state(self, dt):
-        """Advance each material's own history over a step of ``dt`` seconds — the
-        state channel of the "fuel is a material" contract (alongside the property
-        and eigenstrain buses). Called once per step, *after* the solve.
+        """Advance each material's own history over a step of ``dt`` seconds.
+        Called once per step, *after* the solve.
 
         Burnup: a fissile material accumulates its local burnup from the deposited
         fission power. The volumetric source ``q_third`` [W/m³] is the energy
@@ -597,10 +593,9 @@ class Spine(
 
             Δbu = q_third · dt / (ρ · HM_frac · 8.64e10)   [MWd/kgU]
 
-        No feedback is applied here — burnup is *recorded*. The downstream
-        behaviours that consume it (fuel-k(bu), swelling(bu,T), FGR) read this
-        field through their own buses, so a fissile case with no such behaviour is
-        unaffected in its solve (only the new burnup field changes).
+        No feedback is applied here — burnup is recorded. Downstream behaviours
+        that consume it (fuel-k(bu), swelling(bu,T), FGR) read this field, so a
+        fissile case without such behaviour is unaffected in its solve.
         """
         if self.burnup is None or dt <= 0.0:
             return
@@ -635,11 +630,10 @@ class Spine(
         """Build the per-dof SCIANTIX field over the fissile region (opt-in coupling).
 
         One SCIANTIX integration point per ``V_t`` dof of every fissile material,
-        seeded from the case's ``input_initial_conditions.txt``; the shared library
-        and model settings are read once. Requires ``libsciantix.so``
-        (``config.sciantix_lib`` or ``$SCIANTIX_LIB``) plus ``input_settings.txt``
-        and ``input_initial_conditions.txt`` in the run directory — the same files a
-        SCIANTIX standalone run needs.
+        seeded from the case's ``input_initial_conditions.txt``. Requires
+        ``libsciantix.so`` (``config.sciantix_lib`` or ``$SCIANTIX_LIB``) plus
+        ``input_settings.txt`` and ``input_initial_conditions.txt`` in the run
+        directory — the same files a SCIANTIX standalone run needs.
         """
         from z3st.coupling.sciantix.sciantix_binding import SciantixField
 
@@ -804,8 +798,8 @@ class Spine(
         print(f"Coupling = {self.coupling}")
 
         if self.coupling == "staggered":
-            # Return the convergence verdict so the time loop can react to a
-            # stalled step. solve_staggered returns True on convergence, False if it exhausts max_iter.
+            # Return the convergence result so the time loop can react to a
+            # stalled step: True on convergence, False if it exhausts max_iter.
             return self.solve_staggered(
                 max_iter=max_iters,
                 dt=dt,

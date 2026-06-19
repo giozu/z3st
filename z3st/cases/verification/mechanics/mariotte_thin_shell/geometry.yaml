@@ -1,9 +1,9 @@
 name: cylindrical_shell
 geometry_type: cyl
 
-Ri: 2.40 # Inner radius (m)
-Ro: 2.50 # Outer radius (m)
-Lz: 15.0 # Height
+Ri: 2.40 # inner radius (m)
+Ro: 2.50 # outer radius (m)
+Lz: 15.0 # height (m)
 
 labels:
   inner_radius: 1

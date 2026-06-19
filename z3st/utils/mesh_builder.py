@@ -9,7 +9,7 @@ from mpi4py import MPI
 class MeshBuilder:
     def __init__(self, geometry_file: str, comm=MPI.COMM_WORLD):
         """
-        Build a box from geomtry.yaml file.
+        Build a box from a geometry.yaml file.
         """
         with open(geometry_file, "r") as f:
             self.geometry = yaml.safe_load(f)

@@ -70,7 +70,7 @@ def analytic_T(x):
 
 
 def sigma_th(x, T_num):
-    """Analytical thermal stress profile, reasonable estimation from temperature profile."""
+    """Approximate analytical thermal stress from the temperature profile."""
     # Constraints in 1, 2 or 3 directions:
     # c = 0, 1, 2, respectively
     c = 3.0

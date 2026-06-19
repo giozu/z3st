@@ -100,8 +100,7 @@ def plot_stress_profiles():
             sigma_rr(r)    = p bci^2/(c^2-bci^2) (1 - c^2/r^2)
             sigma_theta(r) = p bci^2/(c^2-bci^2) (1 + c^2/r^2)
 
-    sigma_rr is continuous, -p across the gap interface, and sigma_theta is
-    compressive in the pellet but tensile in the clad.
+    sigma_rr is continuous (-p) across the gap interface.
     """
     if not files or not mask.any():
         print("[INFO] no closed-gap step: skipping stress profile")

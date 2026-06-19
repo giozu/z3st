@@ -5,9 +5,7 @@ Z3ST case: stress_strain_curve_displacement
 
 non-regression script
 ---------------------
-
-This script processes multiple VTU files (fields_0000.vtu, ...),
-extracts σ_xx and ε_xx for each step, and reconstructs the stress-strain curve.
+Reconstructs the stress-strain curve from the per-step VTU files (imposed displacement).
 """
 
 import os
@@ -63,7 +61,7 @@ displacements = []
 for step, vtufile in enumerate(VTU_FILES):
     print(f"\n[STEP {step}] Processing {os.path.basename(vtufile)}")
 
-    # Stress extraction - usa vtufile (minuscolo)
+    # Stress extraction
     x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress (cells)")
     mask = np.abs(y_S - y_target) < mask_tol
     stresses.append(float(np.mean(S_all[mask, 0])))

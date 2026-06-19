@@ -22,12 +22,11 @@ Naming conventions (preserved from the previous code path):
   - XDMF                                 : single ``output/<basename>.xdmf`` + ``.h5``
 
 A ``vtkhdf`` backend was prototyped against dolfinx 0.10 but reverted: the
-0.10 ``dolfinx.io.vtkhdf`` submodule exposes a functional API
-(``write_mesh / write_point_data / write_cell_data``) that has no
-field-name parameter, so writing the many named z3st fields (T, u, strain,
-per-material stress, von Mises, hydrostatic, heat flux, ...) into a single
-file is not currently expressible. Revisit when dolfinx ships a class-based
-``VTKHDFFile`` with per-field naming.
+0.10 ``dolfinx.io.vtkhdf`` functional API
+(``write_mesh / write_point_data / write_cell_data``) has no field-name
+parameter, so the many named z3st fields cannot be written into a single
+file. Revisit when dolfinx ships a class-based ``VTKHDFFile`` with per-field
+naming.
 """
 
 import os
@@ -113,9 +112,9 @@ class OutputWriter:
             filename = f"fields{self._DEFAULT_EXT[fmt]}"
         self.filename = filename
 
-        # The UFL expressions we pre-compile below live on problem.strain,
-        # problem.stress[name], etc., which are populated by get_results().
-        # Call once now if the user hasn't already.
+        # The UFL expressions pre-compiled below live on problem.strain,
+        # problem.stress[name], etc., populated by get_results(). Call it now
+        # if the user hasn't.
         if not hasattr(problem, "stress") or not hasattr(problem, "strain"):
             problem.get_results()
 
@@ -142,8 +141,7 @@ class OutputWriter:
         self.V_c_cg = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
 
         # Pre-allocate Function targets and compile Expressions for each
-        # symbolic UFL field the problem exposes. Each block is gated on
-        # the relevant physics being active.
+        # symbolic UFL field, gated on the relevant physics being active.
         self._strain_fn_cells = None
         self._strain_fn_points = None
         self._strain_expr_cells = None

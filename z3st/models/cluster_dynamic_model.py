@@ -14,12 +14,10 @@ from petsc4py import PETSc
 
 class ClusterDynamicsModel:
     """
-    Cluster dynamics model for defect evolution.
+    1D cluster dynamics model for defect cluster size distributions.
 
-    This module implements a 1D cluster dynamics model for simulating
-    the evolution of defect cluster size distributions.
-
-    Solves the diffusion equation for cluster density c(n,t) where n is cluster size.
+    Solves an advection-diffusion equation for cluster density c(n,t),
+    where n is cluster size.
     """
     
     def __init__(self):

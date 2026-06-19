@@ -67,8 +67,7 @@ def sigma_th(x, T_num, c=1.0):
 print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
-# Numerical results
-# Temperature
+# Numerical temperature
 x_T, y_T, z_T, T_all = extract_field(VTU_FILE, field_name="Temperature")
 mask = (np.abs(y_T - y_target) < mask_tol) & (np.abs(z_T - z_target) < mask_tol)
 sort_idx = np.argsort(x_T[mask])

@@ -2,10 +2,6 @@
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: verification/mechanics/uniaxial_tension_nonlinear
-
-non-regression script
----------------------
-
 """
 
 import os

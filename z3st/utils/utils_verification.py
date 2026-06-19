@@ -74,9 +74,9 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
 
 
 def _write_regression_verdict(case_dir, verdict):
-    """Persist the gold-regression verdict ('PASS'/'FAIL') into the run's
-    non-regression.json so the suite drivers (non-regression*.sh) can surface
-    it — a regression is otherwise invisible outside stdout."""
+    """Persist the gold-regression result ('PASS'/'FAIL') into the run's
+    non-regression.json so the suite drivers (non-regression*.sh) can read it;
+    a regression is otherwise invisible outside stdout."""
     out_json = os.path.join(case_dir, "output", "non-regression.json")
     try:
         with open(out_json, "r") as f:
@@ -90,10 +90,10 @@ def _write_regression_verdict(case_dir, verdict):
 
 def regression_check(errors, case_dir, regression_tol=1e-3):
     """
-    This function evaluates the qualitative performance of the current run compared to the 
-    GOLD benchmark. It normalizes error data (handling both scalars and sequences) and 
-    determines if the solver's accuracy has improved or degraded, providing immediate 
-    visual feedback on the impact of recent code changes or mesh refinements.
+    Compare the current run against the GOLD benchmark.
+
+    Normalizes error data (scalars or sequences) and reports whether accuracy
+    has improved or degraded relative to gold.
 
     Parameters
     ----------
@@ -161,10 +161,10 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         # Fields whose analytical reference is exactly zero are 'should-be-zero'
         # residuals: their numerical value is floating-point noise that varies
         # between build/BLAS environments (e.g. the conda env vs the CI docker
-        # image), so ANY value-vs-gold comparison (relative or absolute) is
-        # ill-defined and environment-fragile. Defer to the field's own analytical
-        # verdict instead: it is a regression only if the residual is no longer
+        # image), so any value-vs-gold comparison (relative or absolute) is
+        # ill-defined. It is a regression only if the residual is no longer
         # acceptably small, i.e. its analytical status is not PASS.
+        # Defer to the field's own analytical status instead.
         ref_val = gold_results.get(key, {}).get("reference", errors[key].get("reference"))
         near_zero_ref = ref_val is not None and np.all(
             np.abs(np.atleast_1d(np.asarray(ref_val, dtype=float))) <= 0.0
@@ -175,23 +175,20 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
             passed = bool(np.all(rel_diff_arr < regression_tol))
 
 
-        # --- Accuracy trend analysis ---
+        # --- Accuracy trend ---
 
-        # Normalize relative errors: if the error is a sequence (e.g., an error field over a mesh), 
-        # extract the maximum value to represent the 'worst-case' scenario.
-        if rel_err_now is not None and isinstance(rel_err_now, collections.abc.Sequence): # if rel_err_now is a list
+        # Normalize relative errors: for a sequence, take the max (worst case).
+        if rel_err_now is not None and isinstance(rel_err_now, collections.abc.Sequence):
             err_now_val = float(np.max(rel_err_now))
-        else: # if rel_err_now is a scalar
+        else:
             err_now_val = rel_err_now
 
-        if rel_err_gold is not None and isinstance(rel_err_gold, collections.abc.Sequence): # if rel_err_gold is a list
+        if rel_err_gold is not None and isinstance(rel_err_gold, collections.abc.Sequence):
             err_gold_val = float(np.max(rel_err_gold))
-        else: # if rel_err_gold is a scalar
+        else:
             err_gold_val = rel_err_gold
 
-        # Determine if the current accuracy has improved (lower error) 
-        # or worsened (higher error) relative to the GOLD reference.
-        # This logic triggers visual indicators ('better'/'worse') in the terminal output.
+        # 'better'/'worse' indicators in the terminal output.
         improvement = (
             err_now_val is not None and err_gold_val is not None and err_now_val < err_gold_val
         )

@@ -5,23 +5,21 @@ GB-fracture parametric study for two_elliptical_cavities_2D.
 
 Physics
 -------
-Fission-gas bubbles sitting on a grain boundary (GB) in oxide fuel do two
-things: they concentrate stress at their tips and they reduce the load-bearing
-GB ligament. This script predicts the critical bubble pressure ``p_crit`` to
-fail the GB, as a function of the bubble areal coverage ``Fc`` and the GB
-toughness ``Gc`` — the actual deliverable of this case (a GB-failure map),
-rather than a single ``max_damage`` number.
+Fission-gas bubbles on a grain boundary (GB) in oxide fuel concentrate stress at
+their tips and reduce the load-bearing GB ligament. This script predicts the
+critical bubble pressure ``p_crit`` to fail the GB, as a function of bubble areal
+coverage ``Fc`` and GB toughness ``Gc``, producing a GB-failure map.
 
 Two analytical references (both plotted on the map)
 ---------------------------------------------------
-1. Strength estimate (superseded — kept for contrast), ``p_crit_ref``:
+1. Strength estimate (superseded, kept for contrast), ``p_crit_ref``:
        sigma_c = sqrt(27 * E * Gc / (256 * lc))          (AT2 peak stress)
        K_t     = 2*(ax/ay) - 1                           (elliptical-tip conc.)
        p_crit  = sigma_c * (1 - Fc) / K_t
    This mixes a pointwise stress concentration with an lc-scale strength and
-   predicts *tip nucleation*, not GB *percolation* — it sits ~17x below the FEM.
+   predicts tip nucleation, not GB percolation — it sits ~17x below the FEM.
 
-2. Fracture-mechanics estimate (recommended), ``p_crit_sif`` — Chakraborty,
+2. Fracture-mechanics estimate, ``p_crit_sif`` — Chakraborty,
    Tonks & Pastore, J. Nucl. Mater. 452 (2014) 95-101, doi:10.1016/j.jnucmat.2014.04.023.
    A Mode-I stress-intensity factor for a pressurised lenticular GB bubble:
        K_I = F(Fc) * p * sqrt(pi*(R+a))                  (their Eq. 3)
@@ -29,23 +27,21 @@ Two analytical references (both plotted on the map)
    at initiation (a -> 0, R = ax = GB-projected bubble half-width) gives
        p_crit = K_Ic / (F(Fc) * sqrt(pi*R))  +  sigma_h  (their Eqs. 7/9)
    F(Fc) is the non-dimensional SIF they tabulated (see ``F_sif``); sigma_h is a
-   compressive hydrostatic restraint (raises p_crit, their Eqs. 6/8) — the
-   "external restraint" lever from the GB-overpressurisation literature.
+   compressive hydrostatic restraint (raises p_crit, their Eqs. 6/8).
 
-   This carries the right fracture-mechanics basis, trend and magnitude
-   (hundreds of MPa). A residual ~4-6x below the FEM is expected and physical:
-   the phase-field bubble tip is a *smooth* ellipse (rho = ay^2/ax ~ 22 nm) with
-   finite lc (4 nm), so the case sits in the strength<->toughness transition
-   (characteristic length l_ch = K_Ic^2/sigma_c^2 ~ 42 nm ~ rho), and the FEM
-   measures *percolation*, not first initiation. See README "OPEN DECISION".
+   The trend and magnitude (hundreds of MPa) match. A residual ~4-6x below the
+   FEM is expected: the phase-field bubble tip is a smooth ellipse
+   (rho = ay^2/ax ~ 22 nm) with finite lc (4 nm), so the case sits in the
+   strength<->toughness transition (characteristic length
+   l_ch = K_Ic^2/sigma_c^2 ~ 42 nm ~ rho), and the FEM measures percolation, not
+   first initiation. See README "OPEN DECISION".
 
 Coverage <-> spacing (areal, GB-surface convention)
 ---------------------------------------------------
       Fc = pi * a^2 / lambda^2   ->   lambda = a * sqrt(pi / Fc)
-This is the convention mesh.geo uses (Lx = 2*ax*sqrt(pi/Fc_target)); it is the
-physically correct one for a *surface* (the GB), distinct from the linear
-coverage 2a/lambda and from any volumetric porosity (which involves the lens
-height ay, not the footprint ax).
+The convention mesh.geo uses (Lx = 2*ax*sqrt(pi/Fc_target)); the surface (GB)
+convention, distinct from the linear coverage 2a/lambda and from volumetric
+porosity (which involves the lens height ay, not the footprint ax).
 
 Usage
 -----
@@ -99,7 +95,7 @@ GC_VALUES = (GC_GB, 1.0, 5.0)
 # dependent) or "pressure_free" (gas stays in bubble, Eq. 9, ~constant 0.67).
 CRACK_FACES = "pressurised"
 # Compressive hydrostatic restraint sigma_h (MPa); 0 for this case (no far-field
-# load). Raises p_crit via Chakraborty Eqs. 6/8 — the external-restraint lever.
+# load). Raises p_crit via Chakraborty Eqs. 6/8.
 SIGMA_H = 0.0
 
 
@@ -133,7 +129,7 @@ def K_Ic(Gc):
 def p_crit_sif(Fc, Gc, sigma_h=None, faces=None):
     """Fracture-mechanics critical bubble pressure (MPa), Chakraborty Eqs. 7/9:
     p_crit = K_Ic / (F(Fc) * sqrt(pi*R)) + sigma_h, with R = ax (GB-projected
-    bubble half-width). The recommended reference — see module docstring."""
+    bubble half-width)."""
     sigma_h = SIGMA_H if sigma_h is None else sigma_h
     return K_Ic(Gc) / (F_sif(Fc, faces) * np.sqrt(np.pi * ax)) + sigma_h
 
@@ -152,7 +148,7 @@ def reference_map(gc_values=GC_VALUES, fc=np.linspace(0.02, 0.9, 200), ax_plot=N
     for Gc in gc_values:
         ax_plot.plot(fc, p_crit_sif(fc, Gc),
                      label=f"SIF  Gc = {Gc:g} J/m²  (K_Ic = {K_Ic(Gc):.2f} MPa·µm½)")
-    # superseded strength estimate, GB toughness only, for visual contrast
+    # superseded strength estimate, GB toughness only, for contrast
     ax_plot.plot(fc, p_crit_ref(fc, GC_GB), "0.5", ls="--",
                  label=f"strength est. (superseded), Gc = {GC_GB:g} J/m²")
     ax_plot.set_xlabel("GB bubble coverage  Fc  (areal)")
@@ -243,8 +239,8 @@ def run_fem_point(Fc, p_max, n_steps=15, band=None, threshold=0.9, verbose=True)
 
 
 def plot_case(Fc, p_crit, out_png):
-    """Representative figure for one swept Fc: the final Damage field (the GB
-    crack) next to sigma_yy, read straight from this run's results.h5."""
+    """Figure for one swept Fc: the final Damage field (the GB crack) next to
+    sigma_yy, read from this run's results.h5."""
     from matplotlib.tri import Triangulation
     with h5py.File(os.path.join(OUT, "results.h5"), "r") as f:
         g = np.array(f["Mesh/mesh/geometry"]); xn, yn = g[:, 0], g[:, 1]
@@ -276,9 +272,8 @@ def plot_case(Fc, p_crit, out_png):
 
 
 def fem_sweep(cases):
-    """Run every configured case (each a dict with Fc/p_max/n_steps). Each point
-    fractures at its energy-regime load, saves a per-Fc figure, and returns its
-    percolation pressure as (Fc, p_crit)."""
+    """Run every configured case (each a dict with Fc/p_max/n_steps). Saves a
+    per-Fc figure and returns the percolation pressure as (Fc, p_crit)."""
     pts = []
     for c in cases:
         Fc, p_max, n_steps = c["Fc"], c.get("p_max", DEFAULT_P_MAX), c.get("n_steps", DEFAULT_N_STEPS)

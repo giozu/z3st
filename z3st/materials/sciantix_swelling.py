@@ -4,17 +4,17 @@
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
-SCIANTIX gaseous swelling as a state-dependent eigenstrain (the eigenstrain bus).
+SCIANTIX gaseous swelling as a state-dependent eigenstrain.
 
-This is the mechanical face of the Z3ST <-> SCIANTIX coupling. SCIANTIX runs
-pointwise (one integration point per dof, see ``z3st.coupling.sciantix``) and its
-total gaseous swelling ΔV/V is written each step into the dolfinx Function
-``model.gas_swelling`` by ``spine.update_state``. This callable simply reads that
-field and returns the isotropic eigenstrain::
+The mechanical side of the Z3ST <-> SCIANTIX coupling. SCIANTIX runs pointwise
+(one integration point per dof, see ``z3st.coupling.sciantix``) and its total
+gaseous swelling ΔV/V is written each step into the dolfinx Function
+``model.gas_swelling`` by ``spine.update_state``. This callable reads that field
+and returns the isotropic eigenstrain::
 
     ε* = (ΔV/V) / 3 · I
 
-exactly like ``fuel_swelling.solid_swelling`` reads ``model.burnup`` — so the
+like ``fuel_swelling.solid_swelling`` reads ``model.burnup`` — so the
 eigenstress -C:ε* needs no further change and the Newton tangent stays automatic.
 
 A fuel material card opts in with::
@@ -26,7 +26,7 @@ drives SCIANTIX). To combine SCIANTIX gaseous swelling with a solid-FP swelling
 term, use :func:`with_solid` (adds the burnup-linear solid law on top of the
 SCIANTIX gaseous field).
 
-Signature (the eigenstrain-bus contract)::
+Signature::
 
     fn(T, material, model=None, dim=3) -> UFL tensor (dim x dim)
 """

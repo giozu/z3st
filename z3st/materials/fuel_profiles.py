@@ -12,7 +12,7 @@ them together, normalises the composite to mean 1 (so the shaping only
 *redistributes* the linear heat rate, never changes its integral) and multiplies
 the volumetric source by it.
 
-Signature (the source-bus contract)::
+Signature::
 
     f(coords, burnup, material, model=None) -> ndarray   # one multiplier per dof
 
@@ -21,10 +21,9 @@ Signature (the source-bus contract)::
 - ``material`` : the material card dict (read parameters from it).
 - ``model``    : the solver/spine (regime, geometry, ...).
 
-These are the *parametric* stand-ins of the "parametric first, TUBRNP behind it"
-plan: a mechanistic TUBRNP profile (Pu-239 build-up from U-238 resonance capture,
-flux depression) drops in here later behind exactly this interface, with no
-change to set_power or the burnup bus.
+These are parametric stand-ins: a mechanistic TUBRNP profile (Pu-239 build-up
+from U-238 resonance capture, flux depression) can replace them later behind the
+same interface, with no change to set_power or the burnup bus.
 """
 
 import numpy as np
@@ -51,8 +50,7 @@ def _axial_coord(coords, model):
 
 
 def chopped_cosine(coords, burnup, material, model=None):
-    """Chopped-cosine axial form factor (Todreas & Kazimi, the "1-D axial
-    problem"):
+    """Chopped-cosine axial form factor (Todreas & Kazimi, 1-D axial problem):
 
         f(z) = cos(pi (z - z_mid) / L')
 

@@ -182,9 +182,9 @@ git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -D
 
 ## Writing commit messages
 
-Write every commit message as a **categorised, conventional commit** instead of
-vague notes like `minor`, `update`, or `did this`. The category makes the history
-skimmable, groups related work, and lets tools generate changelogs.
+Write every commit message as a categorised, conventional commit rather than
+vague notes like `minor`, `update`, or `did this`. The category keeps the history
+readable, groups related work, and lets tools generate changelogs.
 
 **Format**
 

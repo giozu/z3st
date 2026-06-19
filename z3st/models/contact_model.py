@@ -29,9 +29,9 @@ class ContactModel:
     iterate it enters the linear mechanical solve on the RHS (an updated
     Neumann load); the staggered relaxation loop drives the fixed point.
 
-    This is the explicit counterpart of constraint-based (Lagrange) contact:
-    cheap, robust, and idiomatic to the existing staggered solver — intended
-    as the conference-demo PCMI engine, not a production contact algorithm.
+    This is the explicit counterpart of constraint-based (Lagrange) contact and
+    reuses the existing staggered solver; it is a demo PCMI engine, not a
+    production contact algorithm.
 
     Mean radial displacement on a surface is computed as a boundary-integral
     average  <u_r>_Γ = (∫_Γ u_r ds) / (∫_Γ ds)  via assemble_scalar, which is

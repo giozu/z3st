@@ -2,10 +2,6 @@
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: verification/mechanics/thermal_gradient_2D
-
-non-regression script
----------------------
-
 """
 
 import os
