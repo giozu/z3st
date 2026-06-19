@@ -3,17 +3,15 @@
 # Z3ST <-> SCIANTIX binding — standalone smoke test (PROTOTYPE)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
-Drives one SCIANTIX point from Python with no Z3ST involved: a single grain at
-a fixed fission rate, temperature ramped up over a few steps, printing gaseous
-swelling / burnup / FGR each step. If this runs and the numbers move sensibly
-(swelling rises with temperature/burnup), the ctypes binding is sound and the
-array layout is correct.
+Drive one SCIANTIX point (no Z3ST): fixed fission rate, T ramped over a few
+steps, printing swelling / burnup / FGR. Swelling rising with T/burnup means the
+ctypes binding and array layout are sound.
 
-Run (after building SCIANTIX as a shared lib — see README.md):
+Run from a case dir holding input_settings.txt + input_initial_conditions.txt:
     SCIANTIX_LIB=/path/to/libsciantix.so python3 smoke_test.py
 
-This deliberately mirrors a SCIANTIX standalone input_history.txt run, so its
-output can be diffed against a reference standalone run for validation.
+ICs must be seeded here: coupling mode skips SCIANTIX's Initialization(), so
+without it the intergranular model returns nan and burnup diverges (README §3).
 """
 
 import numpy as np
@@ -26,6 +24,7 @@ DT = 1.0e6                     # s per step (~11.6 days)
 TEMPS = np.linspace(800.0, 1500.0, 8)   # K
 
 pt = SciantixSolver()
+pt.load_initial_conditions("input_initial_conditions.txt")
 print(f"{'step':>4} {'T (K)':>8} {'bu':>8} {'gas_swell':>11} {'interg':>11} {'FGR':>8}")
 T_old = TEMPS[0]
 for k, T_new in enumerate(TEMPS):
