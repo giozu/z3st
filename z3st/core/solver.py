@@ -377,7 +377,7 @@ class Solver:
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
     def _thermal_step_nonlinear(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
-        """Tier-2 thermal solve: k = NN(T) as a FEMExternalOperator, solved by
+        """k = NN(T) as a FEMExternalOperator, solved by
         Newton with the autodiff tangent dk/dT (Latyshev et al. external
         operators). Showcase scope: STATIONARY conduction with Dirichlet (and
         Neumann) BCs. Transient mass terms and Robin/gap BCs are not yet handled
@@ -395,16 +395,16 @@ class Solver:
         # --- scope guards -------------------------------------------------
         if self.th_cfg.get("analysis", "stationary") == "transient":
             raise NotImplementedError(
-                "Tier-2 (newton) thermal: transient analysis not yet supported."
+                "Newton, thermal: transient analysis not yet supported."
             )
         if any(self.robin_thermal.get(label) for label in self.materials):
             raise NotImplementedError(
-                "Tier-2 (newton) thermal: Robin/gap BCs not yet supported."
+                "Newton, thermal: Robin/gap BCs not yet supported."
             )
         for label, material in self.materials.items():
             if "_k_nn" not in material:
                 raise NotImplementedError(
-                    f"Tier-2 (newton) thermal requires a neural-network k card; "
+                    f"Newton, thermal requires a neural-network k card; "
                     f"material '{label}' has none."
                 )
 

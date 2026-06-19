@@ -43,6 +43,25 @@ class Config:
             "plasticity": models.get("plasticity", False),
             "contact": bool(models.get("contact", False)),
         }
+
+        # --. Fission-gas behaviour via SCIANTIX coupling (default OFF) --..
+        # ``models.fission_gas`` may be a bool or a block:
+        #   fission_gas:
+        #     enabled: true
+        #     lib: /path/to/libsciantix.so       # else $SCIANTIX_LIB
+        #     initial_conditions: input_initial_conditions.txt
+        #     energy_per_fission: 3.2e-11        # J/fission (≈ 200 MeV)
+        # SCIANTIX also reads input_settings.txt from the run directory.
+        fg = models.get("fission_gas", False)
+        if fg is True:
+            fg = {"enabled": True}            # bare "fission_gas: true" shorthand
+        elif not isinstance(fg, dict):
+            fg = {"enabled": bool(fg)}         # any other scalar (False/0/None)
+        self.on["fission_gas"] = bool(fg.get("enabled", False))
+        self.sciantix_lib = fg.get("lib", None)
+        self.sciantix_ic = fg.get("initial_conditions", "input_initial_conditions.txt")
+        self.sciantix_energy_per_fission = float(fg.get("energy_per_fission", 3.2e-11))
+
         gap_config = self.input_file.get("models", {}).get("gap_conductance", {})
         self.gap_model = gap_config.get("type", None)
         self.h_gap_value = gap_config.get("value", 0.0)

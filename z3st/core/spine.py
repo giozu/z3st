@@ -321,6 +321,9 @@ class Spine(
 
         self.q_third = None
         self.burnup = None
+        self.gas_swelling = None      # SCIANTIX total gaseous swelling ΔV/V (eigenstrain bus)
+        self.sciantix_field = None    # the per-dof SciantixField driver
+        self._sciantix_dofs = None    # V_t dof indices the field covers
         self.T = None
         self.u = None
         self.D = None
@@ -341,6 +344,11 @@ class Spine(
                 self.burnup = dolfinx.fem.Function(self.V_t, name="Burnup")
                 self.burnup.x.array[:] = 0.0
                 print("Initialized burnup field (fissile material present).")
+
+                # SCIANTIX gaseous-swelling field (fission-gas coupling, opt-in via
+                # models.fission_gas; default off).
+                if self.on.get("fission_gas", False):
+                    self._init_sciantix_field()
 
             print("\nInitializing the temperature field...")
             self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
@@ -598,6 +606,10 @@ class Spine(
 
         SECONDS_PER_MWD = 8.64e10  # 86400 s/day × 1e6 W/MW
 
+        # Capture burnup at step-start so SCIANTIX gets the (old, new) pair
+        bu_old = (self.burnup.x.array[self._sciantix_dofs].copy()
+                  if self.sciantix_field is not None else None)
+
         for name, mat in self.materials.items():
             if not mat.get("fissile", False):
                 continue
@@ -614,8 +626,64 @@ class Spine(
         self.burnup.x.scatter_forward()
         print(f"[update_state] burnup max = {self.burnup.x.array.max():.4e} MWd/kgU")
 
+        # --. SCIANTIX gaseous swelling (opt-in; rides the eigenstrain bus) --..
+        if self.sciantix_field is not None:
+            self._update_sciantix(dt, bu_old)
+
+    def _init_sciantix_field(self):
+        """Build the per-dof SCIANTIX field over the fissile region (opt-in coupling).
+
+        One SCIANTIX integration point per ``V_t`` dof of every fissile material,
+        seeded from the case's ``input_initial_conditions.txt``; the shared library
+        and model settings are read once. Requires ``libsciantix.so``
+        (``config.sciantix_lib`` or ``$SCIANTIX_LIB``) plus ``input_settings.txt``
+        and ``input_initial_conditions.txt`` in the run directory — the same files a
+        SCIANTIX standalone run needs.
+        """
+        from z3st.coupling.sciantix.sciantix_binding import SciantixField
+
+        dof_lists = [
+            self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+            for name, mat in self.materials.items() if mat.get("fissile", False)
+        ]
+        self._sciantix_dofs = (
+            np.unique(np.concatenate(dof_lists)) if dof_lists else np.array([], dtype=np.int64)
+        )
+        self.gas_swelling = dolfinx.fem.Function(self.V_t, name="Gaseous swelling")
+        self.gas_swelling.x.array[:] = 0.0
+
+        n = int(self._sciantix_dofs.size)
+        if n == 0:
+            print("[sciantix] no fissile dofs; gaseous-swelling field stays zero.")
+            return
+        print(f"[sciantix] building SCIANTIX field over {n} fissile dofs ...")
+        self.sciantix_field = SciantixField(
+            n, libpath=self.sciantix_lib, ic_path=self.sciantix_ic
+        )
+        print("[sciantix] field initialised (library loaded, initial conditions seeded).")
+
+    def _update_sciantix(self, dt, bu_old):
+        """Advance every SCIANTIX point by ``dt`` and refresh ``gas_swelling``.
+
+        Local conditions per dof: temperature from ``self.T``; volumetric fission
+        rate from the deposited power, ``fission_rate = q_third / E_fission``
+        [fiss/m³ s] with ``E_fission`` from ``config.sciantix_energy_per_fission``;
+        and the host burnup pair (``bu_old`` captured at step-start, ``bu_new`` the
+        just-updated ``self.burnup``) transferred to SCIANTIX (it does not compute
+        burnup in a coupling build — Z3ST's RADAR model owns it).
+        """
+        dofs = self._sciantix_dofs
+        T = self.T.x.array[dofs]
+        fission_rate = self.q_third.x.array[dofs] / self.sciantix_energy_per_fission
+        bu_new = self.burnup.x.array[dofs]
+        gs = self.sciantix_field.step(dt, T, fission_rate,
+                                      burnup_old=bu_old, burnup_new=bu_new)
+        self.gas_swelling.x.array[dofs] = gs
+        self.gas_swelling.x.scatter_forward()
+        print(f"[update_state] gaseous swelling max = {self.gas_swelling.x.array.max():.4e} (ΔV/V)")
+
     _SNAPSHOT_FIELDS = (
-        "T", "u", "D", "H", "burnup", "c", "c_n",
+        "T", "u", "D", "H", "burnup", "gas_swelling", "c", "c_n",
         "p", "ep", "p_n", "ep_n",
     )  # dolfinx Functions
     _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
@@ -669,6 +737,10 @@ class Spine(
                     msnap[k + ".value"] = float(v.value)
             if msnap:
                 snap["materials"][mname] = msnap
+        # SCIANTIX per-point C-state (variables/diffusion_modes/history) — the
+        # gas_swelling dolfinx field alone is not enough to roll back a step.
+        if self.sciantix_field is not None:
+            snap["sciantix"] = self.sciantix_field.snapshot()
         return snap
 
     def restore_state(self, snap):
@@ -694,6 +766,8 @@ class Spine(
                         target.value = val
                 else:
                     mat[key] = val
+        if "sciantix" in snap and self.sciantix_field is not None:
+            self.sciantix_field.restore(snap["sciantix"])
 
     def solve(self, max_iters=100, dt=0.0):
         print("\n")

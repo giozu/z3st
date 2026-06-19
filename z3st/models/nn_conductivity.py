@@ -70,7 +70,7 @@ class NNConductivity:
 def make_external_operator(nn, T, quadrature_degree=2, scheme="default"):
     """Build k = NN(T) as a FEMExternalOperator on a scalar quadrature space.
 
-    This is the Tier-2 entry point: the network becomes a UFL symbol that can be
+    The network becomes a UFL symbol that can be
     placed in a form and differentiated (ufl.derivative spawns the dk/dT
     operator). Requires the optional `dolfinx-external-operator` package.
 
