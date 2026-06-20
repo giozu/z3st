@@ -20,6 +20,47 @@ def _as_bool(v):
     return str(v).strip().lower() in ("1", "true", "yes", "on")
 
 
+def build_rigid_body_nullspace(V):
+    """Rigid-body near-nullspace (kernel of the elastic operator) for GAMG.
+
+    Without it the Krylov count per elasticity solve is large and scaling
+    suffers. 3 modes in 2D (2 translations + 1 rotation), 6 in 3D, orthonormalised.
+    Consumed by GAMG via MatSetNearNullSpace; ignored by Hypre/LU."""
+    # displacement dimension is the block size, not mesh.geometry.dim (a planar
+    # mesh is embedded in 3D: geometry.dim == 3 but the displacement has 2 comps)
+    bs = V.dofmap.index_map_bs
+    n_modes = 3 if bs == 2 else 6
+    modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
+
+    x = V.tabulate_dof_coordinates()  # one row per node (block); columns are x,y,z
+
+    # translations: unit displacement along each axis
+    for i in range(bs):
+        modes[i].x.array[i::bs] = 1.0
+
+    # rotations: infinitesimal rigid rotation fields
+    if bs == 2:
+        modes[2].x.array[0::bs] = -x[:, 1]
+        modes[2].x.array[1::bs] = x[:, 0]
+    else:
+        modes[3].x.array[1::bs] = -x[:, 2]
+        modes[3].x.array[2::bs] = x[:, 1]
+        modes[4].x.array[0::bs] = x[:, 2]
+        modes[4].x.array[2::bs] = -x[:, 0]
+        modes[5].x.array[0::bs] = -x[:, 1]
+        modes[5].x.array[1::bs] = x[:, 0]
+
+    for m in modes:
+        m.x.scatter_forward()
+
+    basis = [m.x for m in modes]
+    dolfinx.la.orthonormalize(basis)
+
+    return PETSc.NullSpace().create(
+        vectors=[m.x.petsc_vec for m in modes], comm=V.mesh.comm
+    )
+
+
 class Solver:
     def __init__(self):
         print("[Solver] initializer")
@@ -719,6 +760,10 @@ class Solver:
                     petsc_options=petsc_opts_mech,
                     petsc_options_prefix="mechanical_",
                 )
+                # Elasticity AMG needs the rigid-body kernel to scale; attach
+                # it to the operator (GAMG consumes it, LU/Hypre ignore it).
+                if self.mech_cfg["linear_solver"].startswith("iterative"):
+                    problem_m.A.setNearNullSpace(build_rigid_body_nullspace(self.V_m))
             else:
                 print("  Non-linear solver (SNES Newton)")
                 linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")

@@ -32,7 +32,7 @@ class GmshMeshReader:
             mesh_data = dolfinx.io.gmsh.read_from_msh(
                 str(mesh_path),
                 MPI.COMM_WORLD,
-                rank=self.rank,
+                rank=0,
             )
             mesh, cell_tags, facet_tags = (
                 mesh_data.mesh,
@@ -46,7 +46,7 @@ class GmshMeshReader:
             mesh, cell_tags, facet_tags = io.gmshio.read_from_msh(
                 str(mesh_path),
                 comm=self.comm,
-                rank=self.rank,
+                rank=0,
                 gdim=gdim,
             )
 

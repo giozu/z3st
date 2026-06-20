@@ -60,9 +60,9 @@ time:
 - 6.048e+7     # 700 days
 - 1.5552e+8    # 1800 days
 n_steps:
-- 10
-- 14
-- 14
+- 8
+- 8
+- 8
 
 time_adaptivity:
   enabled: true
@@ -70,4 +70,4 @@ time_adaptivity:
   max_cuts: 8
 
 output:
-  format: xdmf
+  format: vtu
