@@ -102,6 +102,14 @@ class OutputWriter:
                 "('vtkhdf' was prototyped but reverted — see module docstring.)"
             )
 
+        # Fallback
+        if fmt == "vtu" and problem.mesh.comm.size > 1:
+            if problem.mesh.comm.rank == 0:
+                print(f"[WARNING] VTU output is serial-only; running on "
+                      f"{problem.mesh.comm.size} MPI ranks -> switching to XDMF "
+                      "to avoid a corrupted file. Set 'format: xdmf' to silence this.")
+            fmt = "xdmf"
+
         self.problem = problem
         self.format = fmt
         self.output_dir = output_dir
