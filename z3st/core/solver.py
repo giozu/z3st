@@ -192,19 +192,29 @@ class Solver:
             metadata = {"quadrature_degree": self.q_degree, "quadrature_scheme": "default"}
             print(f"  [Solver] Using quadrature degree {self.q_degree} for integration measures.")
 
+        # Build a measure per GLOBAL tag, not per locally-present tag: under MPI
+        # a rank may hold no cells/facets of some material or boundary region,
+        # but the assembly loops iterate over all of them. A measure whose tag
+        # has no local entities just contributes nothing on this rank.
         self.dx_tags = {
             tag: ufl.Measure(
                 "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag, metadata=metadata
             )
-            for tag in np.unique(self.cell_tags.values)
+            for tag in self._global_tags(self.cell_tags.values)
         }
 
         self.ds_tags = {
             id_: ufl.Measure(
                 "ds", domain=self.mesh, subdomain_data=self.facet_tags, subdomain_id=id_
             )
-            for id_ in np.unique(self.facet_tags.values)
+            for id_ in self._global_tags(self.facet_tags.values)
         }
+
+    def _global_tags(self, local_values):
+        """Union of unique tag values across all MPI ranks (sorted)."""
+        local = np.unique(local_values)
+        gathered = self.mesh.comm.allgather(local)
+        return np.unique(np.concatenate(gathered)) if gathered else local
 
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
 
@@ -280,10 +290,14 @@ class Solver:
 
                 dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
                 q_vals = self.q_third.x.array[dofs]
-                print(
-                    f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, "
-                    f"max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
-                )
+                # under MPI a rank may hold no cells of this material -> empty slice
+                if q_vals.size:
+                    print(
+                        f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, "
+                        f"max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
+                    )
+                else:
+                    print(f"  → q_third[{label}](W/m3): no local cells on this rank")
 
             # Neumann
             for label in self.materials:
@@ -471,7 +485,7 @@ class Solver:
             dx_nl = {
                 tag: ufl.Measure("dx", domain=self.mesh, subdomain_data=self.cell_tags,
                                  subdomain_id=tag, metadata=nl_meta)
-                for tag in np.unique(self.cell_tags.values)
+                for tag in self._global_tags(self.cell_tags.values)
             }
 
             F = 0
