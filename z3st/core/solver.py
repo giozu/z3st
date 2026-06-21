@@ -130,11 +130,8 @@ class Solver:
             setattr(self, name, None)
 
     def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
-        """
-        Returns PETSc options for the linear solver based on the physics.
-
-        physics: "thermal", "mechanical" or "damage".
-        """
+        """PETSc options for the linear solver of ``physics`` (thermal, mechanical
+        or damage) and ``solver_type``."""
         if physics not in ["thermal", "mechanical", "damage"]:
             raise ValueError(
                 f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical' or 'damage'."
@@ -192,10 +189,9 @@ class Solver:
             metadata = {"quadrature_degree": self.q_degree, "quadrature_scheme": "default"}
             print(f"  [Solver] Using quadrature degree {self.q_degree} for integration measures.")
 
-        # Build a measure per GLOBAL tag, not per locally-present tag: under MPI
-        # a rank may hold no cells/facets of some material or boundary region,
-        # but the assembly loops iterate over all of them. A measure whose tag
-        # has no local entities just contributes nothing on this rank.
+        # Measures over the GLOBAL tag set, not per locally-present tag: under MPI
+        # a rank may hold no entities of a tag the assembly still loops over (its
+        # measure then contributes nothing on that rank).
         self.dx_tags = {
             tag: ufl.Measure(
                 "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag, metadata=metadata
@@ -247,11 +243,9 @@ class Solver:
         dt = self.dt
         transient = analysis == "transient"
 
-        # The compiled forms are step-invariant: between staggered iterations
-        # only Functions (T_new, T_other, q_third) and Constants (h_gap) change,
-        # all consumed by reference at assembly. Build the LinearProblem once
-        # per time step and only refresh those objects per iteration —
-        # LinearProblem.solve() reassembles A and b from the stored forms.
+        # Forms are step-invariant: only Functions (T_new, T_other, q_third) and
+        # Constants (h_gap) change between iterations, consumed by reference. Build
+        # the LinearProblem once per step; solve() reassembles A,b from the forms.
         cache = getattr(self, "_th_cache", None)
         rebuild = (
             cache is None
@@ -629,11 +623,9 @@ class Solver:
         if self.on.get("contact", False):
             self.update_contact_pressure(u_new)
 
-        # The compiled forms are step-invariant: between staggered iterations
-        # only Functions (u_new, T_current, creep predictor/state, burnup) and
-        # Constants (contact pressure, BC values) change, all consumed by
-        # reference at assembly time. Build the problem once per time step;
-        # solve() reassembles from the stored forms.
+        # Forms are step-invariant: only Functions (u_new, T_current, creep
+        # predictor/state, burnup) and Constants (contact pressure, BC values)
+        # change between iterations, consumed by reference. Build once per step.
         cache = getattr(self, "_mech_cache", None)
         rebuild = (
             cache is None
@@ -833,20 +825,24 @@ class Solver:
         # Relax. With Aitken Δ² enabled the relaxation factor is recomputed
         # each iteration from the last two raw residuals R_k = ũ_k − u_old_k:
         #   ω_{k+1} = −ω_k · (R_{k−1} · ΔR)/|ΔR|²,  ΔR = R_k − R_{k−1},
-        # clamped to [relax_min, relax_max]. (Serial dot products: the suite
-        # runs single-rank; an MPI allreduce belongs here if that changes.)
+        # clamped to [relax_min, relax_max]. Dot products are global: restricted
+        # to owned dofs (ghosts would be double-counted) and allreduce'd, so omega
+        # is rank-independent under MPI. In serial this reduces to the local dot.
         if getattr(self, "relax_aitken", False):
             R = u_new.x.array - u_old.x.array
             R_prev = getattr(self, "_aitken_R_prev", None)
             omega = float(getattr(self, "_aitken_omega", self.relax_u))
             if R_prev is not None and R_prev.shape == R.shape:
                 dR = R - R_prev
-                denom = float(np.dot(dR, dR))
+                no = self.V_m.dofmap.index_map.size_local * self.V_m.dofmap.index_map_bs
+                comm = self.mesh.comm
+                denom = comm.allreduce(float(np.dot(dR[:no], dR[:no])), op=MPI.SUM)
+                num = comm.allreduce(float(np.dot(R_prev[:no], dR[:no])), op=MPI.SUM)
                 # Noise guard: when the residual barely changed (converged or
                 # zero-load step), the quotient is numerical garbage — keep ω.
-                R_norm = float(np.linalg.norm(R))
+                R_norm = comm.allreduce(float(np.dot(R[:no], R[:no])), op=MPI.SUM) ** 0.5
                 if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(R_norm, 1e-300):
-                    omega = -omega * float(np.dot(R_prev, dR)) / denom
+                    omega = -omega * num / denom
                     omega = float(min(max(omega, self.relax_min), self.relax_max))
             self._aitken_R_prev = R.copy()
             self._aitken_omega = omega

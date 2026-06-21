@@ -1,0 +1,31 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+#   ./Allrun_mpi        # 4 ranks (default)
+#   ./Allrun_mpi 2      # 2 ranks
+NP="${1:-4}"
+
+# Pin BLAS to 1 thread per rank so the MPI ranks do not oversubscribe the cores.
+export PATH="/home/giovanni/miniconda3/envs/z3st/bin:$PATH" # conda activate z3st
+export OMP_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+# Fission-gas coupling needs the SCIANTIX shared library.
+export SCIANTIX_LIB="${SCIANTIX_LIB:-/tmp/libsciantix_tu.so}"
+if [ ! -f "$SCIANTIX_LIB" ]; then
+  echo "[Allrun_mpi] WARNING: SCIANTIX_LIB='$SCIANTIX_LIB' not found; the fission_gas"
+  echo "         coupling will fail to load. Rebuild a -DCOUPLING_TU lib (README.md),"
+  echo "         or 'export SCIANTIX_LIB=...' to a stable path before ./Allrun_mpi."
+fi
+
+echo "[Allrun_mpi] Solving on $NP rank(s)..."
+gmsh mesh.geo -2 > log_mesh.md
+start=$SECONDS
+Z3ST_PLAIN_LOG=1 mpirun -n "$NP" python3 -m z3st > log_z3st.md
+echo "[Allrun_mpi] Solve completed in $((SECONDS - start)) s on $NP rank(s)  (solver log: log_z3st.md)"
+
+# post-processing runs serially
+python3 non-regression.py
+python3 plots.py
+
+echo "[Allrun_mpi] Done."

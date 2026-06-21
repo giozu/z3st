@@ -8,12 +8,14 @@
 Diagnostics for regression/fg_test_fuel.
 
 Streams a per-step summary to ``output/history.csv`` (burnup, temperatures,
-fission-gas scalars) for ``plots.py``. ``__main__`` calls ``per_step`` after
-every converged step.
+fission-gas scalars) for ``plots.py``. ``__main__`` calls ``per_step`` on every
+rank after each converged step; the reductions are collective (global) and only
+rank 0 writes.
 """
 
 import os
 import numpy as np
+from mpi4py import MPI
 
 _CSV = os.path.join(os.path.dirname(__file__), "output", "history.csv")
 _HEADER = ("step,time_s,time_days,burnup_avg_MWdkgU,burnup_max_MWdkgU,"
@@ -21,39 +23,59 @@ _HEADER = ("step,time_s,time_days,burnup_avg_MWdkgU,burnup_max_MWdkgU,"
            "fg_produced_avg,fg_ingrain_avg,fg_gb_avg,fg_released_avg,fgr_frac\n")
 
 
+def _owned(fn):
+    """Number of owned (non-ghost) dofs of a scalar Function."""
+    return fn.function_space.dofmap.index_map.size_local
+
+
 def _fg_averages(problem):
-    """Fuel-average total fission gas (Xe+Kr) [at/m^3] and fractional release,
-    over the fissile dofs (``problem._sciantix_dofs``). Zeros when coupling off."""
+    """Global fuel-average total fission gas (Xe+Kr) (at/m^3) and fractional
+    release over the fissile dofs. Collective; zeros when the coupling is off."""
+    comm = problem.mesh.comm
     fields = getattr(problem, "fg_fields", None)
     dofs = getattr(problem, "_sciantix_dofs", None)
-    if not fields or dofs is None or len(dofs) == 0:
+    if not fields or dofs is None:   # coupling on/off is global -> no rank mismatch
         return 0.0, 0.0, 0.0, 0.0, 0.0
-    prod = np.asarray(fields["produced"].x.array)[dofs]
-    avgs = [float(np.asarray(fields[k].x.array)[dofs].mean())
+    dofs = np.asarray(dofs)
+    dofs_own = dofs[dofs < _owned(fields["produced"])]   # owned only: ghosts would double-count
+    cnt = comm.allreduce(int(dofs_own.size), op=MPI.SUM)
+
+    def gsum(key):
+        return comm.allreduce(float(np.asarray(fields[key].x.array)[dofs_own].sum()), op=MPI.SUM)
+
+    sums = {k: gsum(k) for k in ("produced", "in_grain", "grain_boundary", "released")}
+    avgs = [sums[k] / cnt if cnt > 0 else 0.0
             for k in ("produced", "in_grain", "grain_boundary", "released")]
-    rel_sum = float(np.asarray(fields["released"].x.array)[dofs].sum())
-    fgr = rel_sum / float(prod.sum()) if prod.sum() > 0 else 0.0
+    fgr = sums["released"] / sums["produced"] if sums["produced"] > 0 else 0.0
     return (*avgs, fgr)
 
 
 def per_step(problem, step, t):
+    comm = problem.mesh.comm
 
     bu_avg = bu_max = 0.0
     bu_fn = getattr(problem, "burnup", None)
     if bu_fn is not None:
-        bu = np.asarray(bu_fn.x.array)
-        if np.any(bu > 0):
-            bu_avg = float(bu[bu > 0].mean())
-            bu_max = float(bu.max())
+        bu = np.asarray(bu_fn.x.array)[:_owned(bu_fn)]
+        pos = bu > 0
+        s = comm.allreduce(float(bu[pos].sum()), op=MPI.SUM)
+        c = comm.allreduce(int(pos.sum()), op=MPI.SUM)
+        bu_avg = s / c if c > 0 else 0.0
+        bu_max = comm.allreduce(float(bu.max()) if bu.size else 0.0, op=MPI.MAX)
 
     T_fn = getattr(problem, "T", None)
-    t_max = float(np.asarray(T_fn.x.array).max()) if T_fn is not None else float("nan")
-    t_min = float(np.asarray(T_fn.x.array).min()) if T_fn is not None else float("nan")
+    if T_fn is not None:
+        Ta = np.asarray(T_fn.x.array)   # owned+ghost ok for max/min
+        t_max = comm.allreduce(float(Ta.max()), op=MPI.MAX)
+        t_min = comm.allreduce(float(Ta.min()), op=MPI.MIN)
+    else:
+        t_max = t_min = float("nan")
 
     fg_prod, fg_ingrain, fg_gb, fg_rel, fgr = _fg_averages(problem)
 
-    # truncate at step 0 so a stale CSV can't graft a second burnup sweep onto this one
-    fresh = (step == 0)
+    if comm.rank != 0:   # all ranks reduced the same globals; only rank 0 writes
+        return
+    fresh = (step == 0)   # truncate at step 0 so a stale CSV can't graft a second sweep
     with open(_CSV, "w" if fresh else "a") as f:
         if fresh or not os.path.exists(_CSV):
             f.write(_HEADER)

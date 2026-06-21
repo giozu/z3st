@@ -116,8 +116,11 @@ class OutputWriter:
         self.n_steps = max(1, int(n_steps))
         os.makedirs(output_dir, exist_ok=True)
 
+        # Normalise to the format's extension
+        ext = self._DEFAULT_EXT[fmt]
         if filename is None:
-            filename = f"fields{self._DEFAULT_EXT[fmt]}"
+            filename = "fields"
+        filename = os.path.splitext(filename)[0] + ext
         self.filename = filename
 
         # The UFL expressions pre-compiled below live on problem.strain,

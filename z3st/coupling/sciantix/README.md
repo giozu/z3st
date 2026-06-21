@@ -26,10 +26,13 @@ export SCIANTIX_LIB=$PWD/build/libsciantix.so
 (`callSciantix` is already `extern "C"`, so the symbol is undecorated and
 `ctypes`-callable; `-fPIC` is the only build flag the shared lib needs.)
 
-**Build with `-DCOUPLING_TU`.**.
+**Build with `-DCOUPLING_TU`.** Build to a persistent path (not `/tmp`, which is
+wiped on reboot) and put the export in your shell profile (`~/.bashrc`) so the
+binding finds it across sessions:
 ```bash
 g++ -O2 -std=c++17 -DCOUPLING_TU -fPIC -shared $(find include -type d | sed 's/^/-I/') \
-    $(find src -name '*.C') -o /tmp/libsciantix_tu.so
+    $(find src -name '*.C') -o build/libsciantix_tu.so
+export SCIANTIX_LIB=$PWD/build/libsciantix_tu.so   # add this line to ~/.bashrc
 ```
 
 ## 2. Validate the binding (standalone)
