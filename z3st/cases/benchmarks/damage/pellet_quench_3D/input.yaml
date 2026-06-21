@@ -32,7 +32,7 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: direct_mumps
+  linear_solver: iterative_amg
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
@@ -48,7 +48,7 @@ thermal:
 damage:
   type: AT1
   solver: linear
-  linear_solver: direct_mumps
+  linear_solver: iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm
@@ -66,5 +66,5 @@ lhr:
 n_steps: 50
 
 output:
-  format: vtu
+  format: xdmf
   filename: fields

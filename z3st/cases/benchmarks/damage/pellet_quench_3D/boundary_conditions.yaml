@@ -2,10 +2,9 @@ thermal:
   uo2:
   - type: Dirichlet
     region: contact_wall
-    temperature: 263.15  # (K) = -10°C, instantaneous quench
+    temperature: 263.15  # (K)
 
 mechanical:
   uo2:
-  - type: Dirichlet
+  - type: Clamp_z
     region: bottom
-    displacement: [0.0, 0.0, 0.0]

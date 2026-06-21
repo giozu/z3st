@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: benchmarks/pellet_quench_3D (3D)
+Z3ST case: benchmarks/pellet_quench_3D
 
-Non-regression script for UO2 pellet thermal-shock fracture.
-Reference: McClenny et al., JNM 565 (2022) 153719.
-
-Phase-field formulation: Ambati hybrid (Comput Mech 55:383-405, Eq. 27).
+Reads the XDMF/H5 time series (output.format: xdmf) so it works for both
+serial and MPI runs (VTU output is serial-only). Temperature, Damage and
+Displacement are nodal; Stress is a per-cell field (cell-centre coordinates).
 
 Diagnostic outputs (all in output/):
   - thermal_shock_results.png : T radial profile + T(t) histories + D_max(r)
@@ -18,12 +17,14 @@ Diagnostic outputs (all in output/):
 
 import os
 import json
-import glob
 
+import h5py
 import matplotlib.pyplot as plt
 import numpy as np
-import pyvista as pv
 import yaml
+
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf
+from z3st.utils.utils_load import generate_power_history
 
 # --.. ..- .-.. .-.. --- load parameters from files --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -121,14 +122,24 @@ def midplane_mask(z, Lz, frac=0.10):
     return np.abs(z - z_mid) < frac * Lz
 
 
-# --.. ..- .-.. .-.. --- read VTU results --.. ..- .-.. .-.. ---
-vtu_files = sorted(glob.glob(os.path.join(OUT_DIR, "fields_*.vtu")))
-n_times = len(vtu_files)
-print(f"\n[INFO] Found {n_times} VTU files in {OUT_DIR}")
-if n_times == 0:
-    raise FileNotFoundError(f"No VTU files found in {OUT_DIR}")
+# --.. ..- .-.. .-.. --- read XDMF results --.. ..- .-.. .-.. ---
+xdmf_path = os.path.join(OUT_DIR, "fields.xdmf")
+h5_path = xdmf_path.replace(".xdmf", ".h5")
+if not os.path.exists(h5_path):
+    raise FileNotFoundError(
+        f"No XDMF output found: {h5_path}. Run the case first "
+        "(input.yaml must set output.format: xdmf)."
+    )
 
-from z3st.utils.utils_load import generate_power_history
+with h5py.File(h5_path, "r") as f:
+    avail = set(f["Function"].keys()) if "Function" in f else set()
+    n_times = len(f["Function/Temperature"]) if "Temperature" in avail else 0
+print(f"\n[INFO] {n_times} time steps in {xdmf_path}  (fields: {sorted(avail)})")
+if n_times == 0:
+    raise RuntimeError(f"No 'Temperature' steps found in {h5_path}")
+have_damage = "Damage" in avail
+have_stress = "Stress" in avail
+
 times_all, _, _ = generate_power_history(
     cfg["time"], cfg["lhr"], n_steps=cfg.get("n_steps", len(cfg["time"])) - 1, filename=None
 )
@@ -136,36 +147,29 @@ if len(times_all) < n_times:
     times_all = np.append(times_all, [times_all[-1]] * (n_times - len(times_all)))
 times_all = times_all[:n_times]
 
+# Nodal coordinates are fixed across steps; read them once from any nodal field.
+xn, yn, zn, _ = extract_field_xdmf(xdmf_path, "Temperature", step_index=0)
+rn = np.sqrt(xn**2 + yn**2)
+theta_n = np.degrees(np.arctan2(yn, xn)) % 360
+
+
+def nodal(field, step):
+    """Nodal field array at a step (coordinates are the shared xn/yn/zn)."""
+    return extract_field_xdmf(xdmf_path, field, step_index=step, return_coords=False)
+
 
 # --.. ..- .-.. .-.. --- read all snapshots --.. ..- .-.. .-.. ---
 N_PLOT = 6  # cap the legend / curve count regardless of n_times
-snapshot_indices = np.arange(n_times)
 plot_keep = set(np.unique(np.linspace(0, n_times - 1, N_PLOT, dtype=int)))
 
 all_snapshots = []
-for idx in snapshot_indices:
-    mesh_snap = pv.read(vtu_files[idx])
-    t_snap = times_all[idx]
-    coords = mesh_snap.points
-    x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
-    r_snap = np.sqrt(x**2 + y**2)
-
-    T_snap = None
-    for name in ["Temperature", "temperature", "T"]:
-        if name in mesh_snap.point_data:
-            T_snap = mesh_snap.point_data[name]
-            break
-
-    D_snap = None
-    for name in ["Damage", "damage", "D"]:
-        if name in mesh_snap.point_data:
-            D_snap = mesh_snap.point_data[name]
-            break
-
-    all_snapshots.append({"t": t_snap, "r": r_snap, "z": z, "T": T_snap, "D": D_snap, "idx": idx})
+for idx in range(n_times):
+    T_snap = nodal("Temperature", idx)
+    D_snap = nodal("Damage", idx) if have_damage else None
+    all_snapshots.append({"t": times_all[idx], "r": rn, "z": zn, "T": T_snap, "D": D_snap, "idx": idx})
     T_min, T_max = np.min(T_snap), np.max(T_snap)
     D_info = f" | D_max = {np.max(D_snap):.2e}" if D_snap is not None else ""
-    print(f"  idx={idx:3d} | t = {t_snap:.3e} s | T: [{T_min:.1f}, {T_max:.1f}] K{D_info}")
+    print(f"  idx={idx:3d} | t = {times_all[idx]:.3e} s | T: [{T_min:.1f}, {T_max:.1f}] K{D_info}")
 
 
 # --.. ..- .-.. .-.. --- checks --.. ..- .-.. .-.. ---
@@ -224,11 +228,9 @@ colors = cmap(np.linspace(0.0, 1.0, max(len(plot_snapshots), 1)))
 
 ax1 = axes[0]
 contact_angle = 30.0
+mid_mask_n = midplane_mask(zn, Lz)
 for i, snap in enumerate(plot_snapshots):
-    coords = pv.read(vtu_files[snap["idx"]]).points
-    x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
-    mid_mask = midplane_mask(z, Lz)
-    r_mid, T_line = radial_line(x, y, snap["T"], Ro, angle_deg=contact_angle, width_deg=10.0, mask=mid_mask)
+    r_mid, T_line = radial_line(xn, yn, snap["T"], Ro, angle_deg=contact_angle, width_deg=10.0, mask=mid_mask_n)
     valid = ~np.isnan(T_line)
     ax1.plot(r_mid[valid] * 1e3, T_line[valid] - 273.15, color=colors[i], linewidth=1.5,
              label=f"t={snap['t']:.2e}s")
@@ -242,14 +244,9 @@ ax1.set_ylim(-100, 850)
 
 ax2 = axes[1]
 T_center_hist, T_contact_hist, t_hist = [], [], []
+cm = mid_mask_n & (rn < 0.20 * Ro)
+contact_mask = mid_mask_n & (rn > 0.90 * Ro) & (theta_n < 60)
 for snap in all_snapshots:
-    coords = pv.read(vtu_files[snap["idx"]]).points
-    x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
-    r = np.sqrt(x**2 + y**2)
-    theta = np.degrees(np.arctan2(y, x)) % 360
-    mid_mask = midplane_mask(z, Lz)
-    cm = mid_mask & (r < 0.20 * Ro)
-    contact_mask = mid_mask & (r > 0.90 * Ro) & (theta < 60)
     T_center_hist.append(np.mean(snap["T"][cm]) - 273.15 if np.any(cm) else np.nan)
     T_contact_hist.append(np.mean(snap["T"][contact_mask]) - 273.15 if np.any(contact_mask) else np.nan)
     t_hist.append(max(snap["t"], 1e-6))
@@ -263,20 +260,17 @@ ax2.grid(True, alpha=0.3)
 ax2.set_ylim(-100, 850)
 
 ax3 = axes[2]
-has_damage = False
+damage_shown = False
 for i, snap in enumerate(plot_snapshots):
     if snap["D"] is None or np.max(snap["D"]) < 1e-3:
         continue
-    has_damage = True
-    coords = pv.read(vtu_files[snap["idx"]]).points
-    z = coords[:, 2]
-    mid_mask = midplane_mask(z, Lz)
+    damage_shown = True
     # circumferential MAX (not mean) so individual cracks are visible:
-    r_mid, D_max_r = radial_bin(snap["r"], snap["D"], Ro, mask=mid_mask, reduce="max")
+    r_mid, D_max_r = radial_bin(snap["r"], snap["D"], Ro, mask=mid_mask_n, reduce="max")
     valid = ~np.isnan(D_max_r)
     ax3.plot(r_mid[valid] * 1e3, D_max_r[valid], color=colors[i], linewidth=1.5,
              label=f"t={snap['t']:.2e}s")
-if has_damage:
+if damage_shown:
     ax3.set_xlabel("Radius (mm)")
     ax3.set_ylabel("Damage D_max(r)  (circumferential max, z=H/2)")
     ax3.set_title("Damage radial penetration")
@@ -305,44 +299,40 @@ def cartesian_to_cylindrical_stress(sigma_flat, x, y):
     sigma_tt = sin_t**2 * s_xx - 2 * cos_t * sin_t * s_xy + cos_t**2 * s_yy
     return sigma_rr, sigma_tt
 
-fig2, axes2 = plt.subplots(1, 2, figsize=(14, 6))
-# Zoom into the outer 20% of the pellet where the thermal-shock stress concentrates:
-r_zoom_min_mm = 0.80 * Ro * 1e3
-r_zoom_max_mm = Ro * 1e3
-for ax, title, si in [(axes2[0], "Radial stress σ_rr", 0), (axes2[1], "Hoop stress σ_θθ", 1)]:
-    for i, snap in enumerate(plot_snapshots):
-        m = pv.read(vtu_files[snap["idx"]])
-        sk = None
-        for name in ["Stress (points)", "Stress (points)"]:
-            if name in m.point_data:
-                sk = name
-                break
-        if sk is None:
-            continue
-        sf = m.point_data[sk]
-        coords = m.points
-        x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
-        r = np.sqrt(x**2 + y**2)
-        srr, stt = cartesian_to_cylindrical_stress(sf, x, y)
-        field = srr if si == 0 else stt
-        mid_mask = midplane_mask(z, Lz)
-        r_mid, s_binned = radial_bin(r, field / 1e6, Ro, mask=mid_mask)
-        valid = ~np.isnan(s_binned)
-        ax.plot(r_mid[valid] * 1e3, s_binned[valid], color=colors[i], linewidth=1.5,
-                label=f"t={snap['t']:.2e}s")
-    ax.set_xlabel("Radius (mm)")
-    ax.set_ylabel(f"{title} (MPa)  (z=H/2)")
-    ax.set_title(title + f"  [zoom: r ≥ {r_zoom_min_mm:.1f} mm]")
-    ax.legend(fontsize=7, loc="upper left")
-    ax.grid(True, alpha=0.3)
-    ax.set_xlim(r_zoom_min_mm, r_zoom_max_mm)
-    ax.axhline(0, color="k", linewidth=0.5, ls="--")
+if have_stress:
+    # Stress is a per-cell field in XDMF -> cell-centre coordinates (fixed in time).
+    xc, yc, zc, _ = extract_field_xdmf(xdmf_path, "Stress", step_index=0)
+    rc = np.sqrt(xc**2 + yc**2)
+    mid_mask_c = midplane_mask(zc, Lz)
 
-plt.suptitle("UO2 Thermal Shock - Stress evolution (mid-plane slice)", fontsize=13)
-plt.tight_layout()
-plot_path2 = os.path.join(OUT_DIR, "stress_evolution.png")
-plt.savefig(plot_path2, dpi=300)
-print(f"[INFO] Stress plot saved: {plot_path2}")
+    fig2, axes2 = plt.subplots(1, 2, figsize=(14, 6))
+    # Zoom into the outer 20% of the pellet where the thermal-shock stress concentrates:
+    r_zoom_min_mm = 0.80 * Ro * 1e3
+    r_zoom_max_mm = Ro * 1e3
+    for ax, title, si in [(axes2[0], "Radial stress σ_rr", 0), (axes2[1], "Hoop stress σ_θθ", 1)]:
+        for i, snap in enumerate(plot_snapshots):
+            sf = extract_field_xdmf(xdmf_path, "Stress", step_index=snap["idx"], return_coords=False)
+            srr, stt = cartesian_to_cylindrical_stress(sf, xc, yc)
+            field = srr if si == 0 else stt
+            r_mid, s_binned = radial_bin(rc, field / 1e6, Ro, mask=mid_mask_c)
+            valid = ~np.isnan(s_binned)
+            ax.plot(r_mid[valid] * 1e3, s_binned[valid], color=colors[i], linewidth=1.5,
+                    label=f"t={snap['t']:.2e}s")
+        ax.set_xlabel("Radius (mm)")
+        ax.set_ylabel(f"{title} (MPa)  (z=H/2)")
+        ax.set_title(title + f"  [zoom: r ≥ {r_zoom_min_mm:.1f} mm]")
+        ax.legend(fontsize=7, loc="upper left")
+        ax.grid(True, alpha=0.3)
+        ax.set_xlim(r_zoom_min_mm, r_zoom_max_mm)
+        ax.axhline(0, color="k", linewidth=0.5, ls="--")
+
+    plt.suptitle("UO2 Thermal Shock - Stress evolution (mid-plane slice)", fontsize=13)
+    plt.tight_layout()
+    plot_path2 = os.path.join(OUT_DIR, "stress_evolution.png")
+    plt.savefig(plot_path2, dpi=300)
+    print(f"[INFO] Stress plot saved: {plot_path2}")
+else:
+    print("[INFO] No Stress field in output; skipping stress plot.")
 
 
 # --.. ..- .-.. .-.. --- plot 3: energy balance vs time --.. ..- .-.. .-.. ---
@@ -380,19 +370,14 @@ else:
 
 # --.. ..- .-.. .-.. --- plot 4: angular damage scan at r ~ 0.95 Ro --.. ..- .-.. .-.. ---
 if last["D"] is not None and np.max(last["D"]) > 1e-3:
-    coords = pv.read(vtu_files[last["idx"]]).points
-    x, y, z = coords[:, 0], coords[:, 1], coords[:, 2]
-    r = np.sqrt(x**2 + y**2)
-    theta = np.degrees(np.arctan2(y, x)) % 360
-    mid_mask = midplane_mask(z, Lz)
-    near_surf = mid_mask & (r > 0.90 * Ro) & (r < 0.99 * Ro)
+    near_surf = mid_mask_n & (rn > 0.90 * Ro) & (rn < 0.99 * Ro)
     if np.any(near_surf):
         n_bins = 180
         theta_bins = np.linspace(0, 360, n_bins + 1)
         theta_mid = 0.5 * (theta_bins[:-1] + theta_bins[1:])
         D_theta = np.full(n_bins, np.nan)
         for i in range(n_bins):
-            sel = near_surf & (theta >= theta_bins[i]) & (theta < theta_bins[i + 1])
+            sel = near_surf & (theta_n >= theta_bins[i]) & (theta_n < theta_bins[i + 1])
             if np.any(sel):
                 D_theta[i] = np.max(last["D"][sel])
         fig4, ax = plt.subplots(figsize=(10, 4))
