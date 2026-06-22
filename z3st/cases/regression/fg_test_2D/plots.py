@@ -500,7 +500,10 @@ def plot_fg_axial():
     fuel = r <= R_PELLET + 1e-9
     rf = r[fuel]
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6), sharey=True)
+    # constrained layout, not tight_layout: tight_layout produces a NaN axes
+    # position on matplotlib >= 3.11 for this near-flat profile and crashes.
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6), sharey=True,
+                             layout="constrained")
     for ax, r_target, rname in [(axes[0], 0.0, "centreline"),
                                 (axes[1], R_PELLET, "pellet surface")]:
         # snap to the single nearest radial node-column: a fixed-r band would
@@ -518,7 +521,6 @@ def plot_fg_axial():
     axes[0].legend(fontsize=8)
     fig.suptitle("Axial fission-gas profile (last step) — "
                  "near-flat under the uniform axial power")
-    fig.tight_layout()
     fig.savefig(os.path.join(OUT, "fg_axial_profile.png"), dpi=150)
     plt.close(fig)
     print("  wrote output/fg_axial_profile.png")

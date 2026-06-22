@@ -290,8 +290,10 @@ def plot_fg_axial():
     fuel = r <= R_PELLET + 1e-9
     rf = r[fuel]
 
-    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6), sharey=True)
-    finite_vals = []
+    # constrained layout, not tight_layout: tight_layout produces a NaN axes
+    # position on matplotlib >= 3.11 for this near-flat profile and crashes.
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6), sharey=True,
+                             layout="constrained")
     for ax, r_target, rname in [(axes[0], 0.0, "centreline"),
                                 (axes[1], R_PELLET, "pellet surface")]:
         # snap to the single nearest radial node-column: a fixed-r band would
@@ -301,37 +303,14 @@ def plot_fg_axial():
         for key, label, color in _FG_KEYS:
             v = g.point_data[key]
             o = np.argsort(z[sel])
-            zz, vv = z[sel][o] * 1e3, v[sel][o]
-            # drop non-finite nodes (the r=0 centreline column carries NaNs in
-            # cylindrical geometry).
-            finite = np.isfinite(zz) & np.isfinite(vv)
-            if not finite.any():
-                continue
-            finite_vals.append(vv[finite])
-            ax.plot(zz[finite], vv[finite], "-", color=color, lw=1.6, label=label)
+            ax.plot(z[sel][o] * 1e3, v[sel][o], "-", color=color, lw=1.6, label=label)
         ax.set_xlabel("axial position z (mm)")
         ax.set_title(f"{rname}  (r = {r_near * 1e3:.2f} mm)")
         ax.grid(alpha=0.3)
-
-    if not finite_vals:
-        plt.close(fig)
-        print("  [plots] FG axial profile is all-NaN: skipping")
-        return
-
-    # force finite shared y-limits: an empty subplot (centreline column all-NaN)
-    # under sharey=True would otherwise leave NaN view limits and crash the tick
-    # locator at savefig.
-    allv = np.concatenate(finite_vals)
-    lo, hi = float(allv.min()), float(allv.max())
-    pad = 0.05 * (hi - lo) if hi > lo else max(abs(hi), 1.0)
-    axes[0].set_ylim(lo - pad, hi + pad)
-
     axes[0].set_ylabel("fission gas Xe+Kr (at/m³)")
-    if axes[0].get_legend_handles_labels()[0]:
-        axes[0].legend(fontsize=8)
+    axes[0].legend(fontsize=8)
     fig.suptitle("Axial fission-gas profile (last step) — "
                  "near-flat under the uniform axial power")
-    fig.tight_layout()
     fig.savefig(os.path.join(OUT, "fg_axial_profile.png"), dpi=150)
     plt.close(fig)
     print("  wrote output/fg_axial_profile.png")
