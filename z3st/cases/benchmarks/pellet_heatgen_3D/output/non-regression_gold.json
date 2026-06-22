@@ -1,0 +1,77 @@
+{
+    "results": {
+        "L2_error_T": {
+            "numerical": 0.36260752301280125,
+            "reference": 0.0,
+            "abs_error": 0.36260752301280125,
+            "rel_error": 0.0004619834905182685,
+            "status": "PASS"
+        },
+        "T_max": {
+            "numerical": 997.377552019246,
+            "reference": 997.8873577297384,
+            "abs_error": 0.509805710492401,
+            "rel_error": 0.0005108850277973695,
+            "status": "PASS"
+        },
+        "u_max": {
+            "numerical": 3.424436565395865e-05,
+            "reference": 3.424436565395865e-05,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "vonMises_max": {
+            "numerical": 904271950.5221877,
+            "reference": 904271950.5221877,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "azimuthal_nonuniformity_T": {
+            "numerical": 0.03271058490320049,
+            "reference": 0.0,
+            "abs_error": 0.03271058490320049,
+            "rel_error": 0.03271058490320049,
+            "status": "PASS"
+        },
+        "azimuthal_nonuniformity_vonMises": {
+            "numerical": 0.08311105927251473,
+            "reference": 0.0,
+            "abs_error": 0.08311105927251473,
+            "rel_error": 0.08311105927251473,
+            "status": "PASS"
+        },
+        "orthocylindricity_shear": {
+            "numerical": 0.0021173764494752823,
+            "reference": 0.0,
+            "abs_error": 0.0021173764494752823,
+            "rel_error": 0.0021173764494752823,
+            "status": "PASS"
+        },
+        "L2_error_sigma_rr": {
+            "numerical": 0.2140056211324022,
+            "reference": 0.0,
+            "abs_error": 0.2140056211324022,
+            "rel_error": 0.2140056211324022,
+            "status": "PASS"
+        },
+        "L2_error_sigma_tt": {
+            "numerical": 0.2724803212043379,
+            "reference": 0.0,
+            "abs_error": 0.2724803212043379,
+            "rel_error": 0.2724803212043379,
+            "status": "PASS"
+        },
+        "L2_error_sigma_zz": {
+            "numerical": 0.2715552929335791,
+            "reference": 0.0,
+            "abs_error": 0.2715552929335791,
+            "rel_error": 0.2715552929335791,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.35,
+    "summary": "PASS",
+    "regression": "PASS"
+}

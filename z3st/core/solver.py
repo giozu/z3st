@@ -61,6 +61,77 @@ def build_rigid_body_nullspace(V):
     )
 
 
+def build_constrained_rigid_nullspace(V, bcs, tol=1e-9):
+    """The rigid-body modes that satisfy the homogeneous mechanical Dirichlet
+    BCs, returned as a PETSc nullspace to attach to the operator with
+    MatSetNullSpace (not the near-nullspace: that only scales GAMG).
+
+    Use for a body that is left rigid-body singular by its BCs -- e.g. a full
+    cylinder with only ``Clamp_z`` on one face has 3 floating modes (two
+    in-plane translations + the axial rotation). A self-equilibrated load
+    (free thermal expansion) is orthogonal to that kernel, so the system is
+    consistent; once the nullspace is on the operator, KSP projects it out of
+    the RHS and the solution, giving the unique minimal-norm displacement
+    instead of one that drifts between staggered iterations.
+
+    Each of the 6 (3 in 2D) candidate rigid modes is kept only if it is already
+    zero on every constrained dof, i.e. it satisfies the homogeneous BC and so
+    still lies in the kernel of the constrained operator; a mode the BCs touch
+    is no longer rigid and is dropped. Returns ``None`` when nothing survives
+    (the BCs pin every rigid mode -> the system is non-singular), so the caller
+    can skip the attachment.
+    """
+    bs = V.dofmap.index_map_bs
+    n_modes = 3 if bs == 2 else 6
+    modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
+    x = V.tabulate_dof_coordinates()
+
+    for i in range(bs):
+        modes[i].x.array[i::bs] = 1.0
+    if bs == 2:
+        modes[2].x.array[0::bs] = -x[:, 1]
+        modes[2].x.array[1::bs] = x[:, 0]
+    else:
+        modes[3].x.array[1::bs] = -x[:, 2]
+        modes[3].x.array[2::bs] = x[:, 1]
+        modes[4].x.array[0::bs] = x[:, 2]
+        modes[4].x.array[2::bs] = -x[:, 0]
+        modes[5].x.array[0::bs] = -x[:, 1]
+        modes[5].x.array[1::bs] = x[:, 0]
+    for m in modes:
+        m.x.scatter_forward()
+
+    # constrained (owned) dof indices across all BCs, unrolled into V
+    n_owned = V.dofmap.index_map.size_local * bs
+    idx_lists = []
+    for bc in bcs:
+        dofs = bc._cpp_object.dof_indices()[0]
+        idx_lists.append(np.asarray(dofs, dtype=np.int64))
+    constrained = (
+        np.unique(np.concatenate(idx_lists)) if idx_lists else np.empty(0, dtype=np.int64)
+    )
+    constrained = constrained[constrained < n_owned]
+
+    kept = []
+    for m in modes:
+        a = m.x.array
+        scale = float(np.max(np.abs(a[:n_owned]))) if n_owned else 0.0
+        scale = V.mesh.comm.allreduce(scale, op=MPI.MAX)
+        viol = float(np.max(np.abs(a[constrained]))) if constrained.size else 0.0
+        viol = V.mesh.comm.allreduce(viol, op=MPI.MAX)
+        if scale == 0.0 or viol <= tol * scale:
+            kept.append(m)
+
+    if not kept:
+        return None
+
+    basis = [m.x for m in kept]
+    dolfinx.la.orthonormalize(basis)
+    return PETSc.NullSpace().create(
+        vectors=[m.x.petsc_vec for m in kept], comm=V.mesh.comm
+    )
+
+
 class Solver:
     def __init__(self):
         print("[Solver] initializer")
@@ -770,6 +841,18 @@ class Solver:
                 # it to the operator (GAMG consumes it, LU/Hypre ignore it).
                 if self.mech_cfg["linear_solver"].startswith("iterative"):
                     problem_m.A.setNearNullSpace(build_rigid_body_nullspace(self.V_m))
+
+                # Opt-in: project the floating rigid-body modes out of the solve
+                # for a body the BCs leave rigid-singular (e.g. a full cylinder
+                # with only Clamp_z). KSP then removes the kernel from RHS and
+                # solution -> unique minimal-norm displacement, far fewer
+                # staggered iterations. Default off; the standard BC-pinned case
+                # has no nullspace and must not get one.
+                if _as_bool(self.mech_cfg.get("remove_rigid_nullspace", False)):
+                    ns = build_constrained_rigid_nullspace(self.V_m, bcs_mech)
+                    if ns is not None:
+                        problem_m.A.setNullSpace(ns)
+                        print("  [INFO] rigid-body nullspace removed from mechanical solve")
             else:
                 print("  Non-linear solver (SNES Newton)")
                 linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")

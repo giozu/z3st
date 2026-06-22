@@ -1,0 +1,10 @@
+thermal:
+  uo2:
+  - type: Dirichlet
+    region: outer
+    temperature: 600.0   # (K)
+
+mechanical:
+  uo2:
+  - type: Clamp_z
+    region: bottom

@@ -1,0 +1,17 @@
+name: UO2_fuel
+fissile: true
+
+E: 358.0e9          # (Pa)
+nu: 0.23            # (-)
+
+k: 5.0              # (W/(m·K))
+cp: 280.0           # (J/(kg·K))
+rho: 10960.0        # (kg/m³)
+
+heavy_metal_fraction: 0.8815  # (-)
+
+alpha: 1.0e-5       # (1/K)
+T_ref: 298.15       # (K)
+
+mu_gamma: 0.0
+gamma_heating: 0.0

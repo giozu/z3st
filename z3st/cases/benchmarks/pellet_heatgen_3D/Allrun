@@ -1,0 +1,11 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+./Allclean
+
+echo "Executing z3st (pellet_heatgen_3D)..."
+
+gmsh -3 mesh.geo -format msh2 > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 non-regression.py
+python3 plot_deformed.py

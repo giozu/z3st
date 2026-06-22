@@ -300,7 +300,11 @@ def plot_fg_axial():
         for key, label, color in _FG_KEYS:
             v = g.point_data[key]
             o = np.argsort(z[sel])
-            ax.plot(z[sel][o] * 1e3, v[sel][o], "-", color=color, lw=1.6, label=label)
+            zz, vv = z[sel][o] * 1e3, v[sel][o]
+            finite = np.isfinite(zz) & np.isfinite(vv)
+            if not finite.any():
+                continue
+            ax.plot(zz[finite], vv[finite], "-", color=color, lw=1.6, label=label)
         ax.set_xlabel("axial position z (mm)")
         ax.set_title(f"{rname}  (r = {r_near * 1e3:.2f} mm)")
         ax.grid(alpha=0.3)
