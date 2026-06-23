@@ -66,17 +66,26 @@ class GPRConductivity:
         if self.mode not in ("mean", "affine"):
             raise ValueError("GPR conductivity mode must be 'mean' or 'affine'")
 
-    def _features(self, T_array):
+    @staticmethod
+    def _local(value, fallback, shape):
+        if value is None:
+            return np.full(int(np.prod(shape)), fallback, dtype=float)
+        arr = np.asarray(value, dtype=float)
+        if arr.size == 1:
+            return np.full(int(np.prod(shape)), float(arr), dtype=float)
+        return arr.reshape(shape).ravel()
+
+    def _features(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
         values = {
             "Temp": T.ravel(),
             "T": T.ravel(),
-            "Pu": np.full(T.size, self.Pu),
-            "Am": np.full(T.size, self.Am),
-            "Np": np.full(T.size, self.Np),
-            "x": np.full(T.size, self.x),
-            "p": np.full(T.size, self.p),
-            "burnup": np.full(T.size, self.burnup),
+            "Pu": self._local(Pu, self.Pu, T.shape),
+            "Am": self._local(Am, self.Am, T.shape),
+            "Np": self._local(Np, self.Np, T.shape),
+            "x": self._local(x, self.x, T.shape),
+            "p": self._local(p, self.p, T.shape),
+            "burnup": self._local(burnup, self.burnup, T.shape),
         }
         return np.column_stack([values[name] for name in self.feature_names])
 
@@ -85,8 +94,8 @@ class GPRConductivity:
         sqdist = np.sum(diff * diff, axis=2)
         return self.signal_variance * np.exp(-0.5 * sqdist)
 
-    def residual_mean_std(self, T_array):
-        X = self._features(T_array)
+    def residual_mean_std(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
+        X = self._features(T_array, Pu=Pu, Am=Am, Np=Np, x=x, p=p, burnup=burnup)
         Xn = (X - self.x_mean) / self.x_scale
         Ks = self._kernel_to_train(Xn)
         mean_n = Ks @ self.alpha
@@ -98,9 +107,9 @@ class GPRConductivity:
         std = self.y_scale * np.sqrt(var_n)
         return mean.reshape(np.asarray(T_array).shape), std.reshape(np.asarray(T_array).shape)
 
-    def _residual_and_dT(self, T_array):
+    def _residual_and_dT(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        X = self._features(T)
+        X = self._features(T, Pu=Pu, Am=Am, Np=Np, x=x, p=p, burnup=burnup)
         Xn = (X - self.x_mean) / self.x_scale
         Ks = self._kernel_to_train(Xn)
         mean_n = Ks @ self.alpha
@@ -114,7 +123,7 @@ class GPRConductivity:
         residual = self.y_mean + self.y_scale * mean_n
 
         if self.mode == "affine" and self.xi != 0.0:
-            mean, std = self.residual_mean_std(T)
+            mean, std = self.residual_mean_std(T, Pu=Pu, Am=Am, Np=Np, x=x, p=p, burnup=burnup)
             # For UQ sweeps, keep the Newton tangent simple and robust by using
             # the mean derivative.  The sampled offset is smooth but its exact
             # derivative is not needed for a deterministic scenario solve.
@@ -122,17 +131,29 @@ class GPRConductivity:
 
         return residual.reshape(T.shape), dmean_dT.reshape(T.shape)
 
-    def __call__(self, T_array):
+    def __call__(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        residual, _ = self._residual_and_dT(T)
-        base = k_numpy(T, Pu=self.Pu, Am=self.Am, Np=self.Np, x=self.x, p=self.p, burnup=self.burnup)
+        Pu_v = self.Pu if Pu is None else self._local(Pu, self.Pu, T.shape).reshape(T.shape)
+        Am_v = self.Am if Am is None else self._local(Am, self.Am, T.shape).reshape(T.shape)
+        Np_v = self.Np if Np is None else self._local(Np, self.Np, T.shape).reshape(T.shape)
+        x_v = self.x if x is None else self._local(x, self.x, T.shape).reshape(T.shape)
+        p_v = self.p if p is None else self._local(p, self.p, T.shape).reshape(T.shape)
+        burnup_v = self.burnup if burnup is None else self._local(burnup, self.burnup, T.shape).reshape(T.shape)
+        residual, _ = self._residual_and_dT(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
+        base = k_numpy(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
         return (base * np.exp(residual)).astype(T.dtype).reshape(T.shape)
 
-    def value_and_grad(self, T_array):
+    def value_and_grad(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        residual, dres_dT = self._residual_and_dT(T)
-        base = k_numpy(T, Pu=self.Pu, Am=self.Am, Np=self.Np, x=self.x, p=self.p, burnup=self.burnup)
-        dbase = dk_dT_numpy(T, Pu=self.Pu, Am=self.Am, Np=self.Np, x=self.x, p=self.p, burnup=self.burnup)
+        Pu_v = self.Pu if Pu is None else self._local(Pu, self.Pu, T.shape).reshape(T.shape)
+        Am_v = self.Am if Am is None else self._local(Am, self.Am, T.shape).reshape(T.shape)
+        Np_v = self.Np if Np is None else self._local(Np, self.Np, T.shape).reshape(T.shape)
+        x_v = self.x if x is None else self._local(x, self.x, T.shape).reshape(T.shape)
+        p_v = self.p if p is None else self._local(p, self.p, T.shape).reshape(T.shape)
+        burnup_v = self.burnup if burnup is None else self._local(burnup, self.burnup, T.shape).reshape(T.shape)
+        residual, dres_dT = self._residual_and_dT(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
+        base = k_numpy(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
+        dbase = dk_dT_numpy(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
         exp_r = np.exp(residual)
         k = base * exp_r
         dk = exp_r * (dbase + base * dres_dT)

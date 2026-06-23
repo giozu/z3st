@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+cd "${0%/*}" || exit 1
+if [ -d "/home/giovanni/miniconda3/envs/z3st/bin" ]; then
+  export PATH="/home/giovanni/miniconda3/envs/z3st/bin:$PATH"
+fi
+export PYTHONPATH="/usr/lib/python3/dist-packages:/usr/lib/petsc/lib/python3/dist-packages:/usr/lib/slepc/lib/python3/dist-packages:/home/giovanni/GN/z3st:${PYTHONPATH}"
+/usr/bin/gmsh mesh.geo -2 > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 non-regression.py

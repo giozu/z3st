@@ -1,0 +1,11 @@
+{
+  "case": "olander_Pu_burnup_GPR",
+  "model": "Magni+GPR",
+  "olander": true,
+  "T_min_K": 650.0,
+  "T_max_K": 1438.1120804024247,
+  "burnup_mean_MWd_kgHM": 64.26025290643558,
+  "burnup_max_MWd_kgHM": 79.29825892938642,
+  "Pu_min": 0.19809801217926404,
+  "Pu_max": 0.29407057896985905
+}

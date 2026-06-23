@@ -1,0 +1,46 @@
+{
+  "uniform_Pu_porosity_magni": {
+    "case": "uniform_Pu_porosity_magni",
+    "model": "Magni",
+    "olander": false,
+    "T_min_K": 650.0,
+    "T_max_K": 1521.360159888144,
+    "burnup_mean_MWd_kgHM": 0.0,
+    "burnup_max_MWd_kgHM": 0.0,
+    "Pu_min": 0.2,
+    "Pu_max": 0.2
+  },
+  "uniform_Pu_porosity_GPR": {
+    "case": "uniform_Pu_porosity_GPR",
+    "model": "Magni+GPR",
+    "olander": false,
+    "T_min_K": 650.0,
+    "T_max_K": 1457.5147474990483,
+    "burnup_mean_MWd_kgHM": 0.0,
+    "burnup_max_MWd_kgHM": 0.0,
+    "Pu_min": 0.2,
+    "Pu_max": 0.2
+  },
+  "olander_Pu_burnup_magni": {
+    "case": "olander_Pu_burnup_magni",
+    "model": "Magni",
+    "olander": true,
+    "T_min_K": 650.0,
+    "T_max_K": 1500.2902898661275,
+    "burnup_mean_MWd_kgHM": 64.26025290643558,
+    "burnup_max_MWd_kgHM": 79.29825892938642,
+    "Pu_min": 0.19809801217926404,
+    "Pu_max": 0.29407057896985905
+  },
+  "olander_Pu_burnup_GPR": {
+    "case": "olander_Pu_burnup_GPR",
+    "model": "Magni+GPR",
+    "olander": true,
+    "T_min_K": 650.0,
+    "T_max_K": 1438.1120804024247,
+    "burnup_mean_MWd_kgHM": 64.26025290643558,
+    "burnup_max_MWd_kgHM": 79.29825892938642,
+    "Pu_min": 0.19809801217926404,
+    "Pu_max": 0.29407057896985905
+  }
+}

@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+cd "${0%/*}" || exit 1
+
+for case in \
+  uniform_Pu_porosity_magni \
+  uniform_Pu_porosity_GPR \
+  olander_Pu_burnup_magni \
+  olander_Pu_burnup_GPR
+do
+  (cd "$case" && bash ./Allrun)
+done
+
+export PYTHONPATH="/usr/lib/python3/dist-packages:/usr/lib/petsc/lib/python3/dist-packages:/usr/lib/slepc/lib/python3/dist-packages:/home/giovanni/GN/z3st:${PYTHONPATH}"
+python3 compare_cases.py

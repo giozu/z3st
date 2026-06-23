@@ -67,7 +67,8 @@ class NNConductivity:
         return k_np, dk_np
 
 
-def make_external_operator(nn, T, quadrature_degree=2, scheme="default"):
+def make_external_operator(nn, T, quadrature_degree=2, scheme="default",
+                           aux_operands=None, aux_names=None):
     """Build k = NN(T) as a FEMExternalOperator on a scalar quadrature space.
 
     The network becomes a UFL symbol that can be
@@ -90,17 +91,27 @@ def make_external_operator(nn, T, quadrature_degree=2, scheme="default"):
     )
     Q = dolfinx.fem.functionspace(mesh, Qe)
 
+    aux_operands = tuple(aux_operands or ())
+    aux_names = tuple(aux_names or ())
+    if len(aux_operands) != len(aux_names):
+        raise ValueError("aux_operands and aux_names must have the same length")
+    operands = (T,) + aux_operands
+
+    def _kwargs(aux_values):
+        return {name: value for name, value in zip(aux_names, aux_values)}
+
     def k_external(derivatives):
-        # multi-index has one entry per operand: (0,) -> value k, (1,) -> dk/dT.
+        # multi-index has one entry per operand. Only the first operand, T, is
+        # differentiated in the Newton tangent; auxiliaries are frozen fields.
         # The package fills a FLAT ref_coefficient, so ravel (operands arrive
         # shaped (ncells, nquad)).
-        if derivatives == (0,):
-            return lambda T_np: nn(T_np).ravel()
-        if derivatives == (1,):
-            return lambda T_np: nn.value_and_grad(T_np)[1].ravel()
+        if derivatives == (0,) * len(operands):
+            return lambda T_np, *aux: nn(T_np, **_kwargs(aux)).ravel()
+        if derivatives == (1,) + (0,) * len(aux_operands):
+            return lambda T_np, *aux: nn.value_and_grad(T_np, **_kwargs(aux))[1].ravel()
         raise NotImplementedError(f"k(T) derivative {derivatives} not implemented")
 
-    return FEMExternalOperator(T, function_space=Q, external_function=k_external)
+    return FEMExternalOperator(*operands, function_space=Q, external_function=k_external)
 
 
 def load_from_card(card, base_dir=None):

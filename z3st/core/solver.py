@@ -491,6 +491,37 @@ class Solver:
 
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
+    def _thermal_conductivity_aux_operands(self, material):
+        """Auxiliary operands for data-driven k(T, ...).
+
+        These operands are evaluated at quadrature points by
+        dolfinx-external-operator and passed to the conductivity model by name.
+        They are intentionally treated as frozen fields in the Newton tangent;
+        only T is differentiated.
+        """
+        aux_operands = []
+        aux_names = []
+        k_card = material.get("k", {}) if isinstance(material.get("k"), dict) else {}
+
+        if str(material.get("Pu_profile", "")).lower() == "olander":
+            from z3st.materials.fuel_profiles import olander_plutonium_ufl
+
+            x = ufl.SpatialCoordinate(self.mesh)
+            r = ufl.sqrt(x[0] * x[0] + x[1] * x[1]) if self.regime == "3d" else x[0]
+            R = float(material.get("olander_radius", 0.0))
+            if R <= 0.0:
+                R = max(float(getattr(self, "inner_radius", 0.0) or 0.0),
+                        (float(self.area) / np.pi) ** 0.5 if float(self.area) > 0.0 else 1.0)
+            bu = self.burnup if self.burnup is not None else None
+            aux_operands.append(olander_plutonium_ufl(r, bu, material, R))
+            aux_names.append("Pu")
+
+        if _as_bool(k_card.get("use_burnup_field", False)) and self.burnup is not None:
+            aux_operands.append(self.burnup)
+            aux_names.append("burnup")
+
+        return aux_operands, aux_names
+
     def _thermal_step_nonlinear(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
         """k = model(T) as a FEMExternalOperator, solved by Newton with the
         autodiff tangent dk/dT (Latyshev et al. external operators). Scope:
@@ -559,7 +590,11 @@ class Solver:
                 dx = dx_nl[tag]
                 # NB: do not overwrite material["k"] (the writer's heat-flux
                 # Function); the external operator is the solver's own object.
-                k_op = make_external_operator(material["_k_model"], T_new, quadrature_degree=deg)
+                aux_operands, aux_names = self._thermal_conductivity_aux_operands(material)
+                k_op = make_external_operator(
+                    material["_k_model"], T_new, quadrature_degree=deg,
+                    aux_operands=aux_operands, aux_names=aux_names,
+                )
                 # residual of  ∫ k ∇T·∇v dx − ∫ q''' v dx
                 F += w * k_op * ufl.inner(ufl.grad(T_new), ufl.grad(v_t)) * dx
                 F += -w * self.q_third * v_t * dx

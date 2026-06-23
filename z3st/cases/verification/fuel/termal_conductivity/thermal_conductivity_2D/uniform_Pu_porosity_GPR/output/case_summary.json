@@ -1,0 +1,11 @@
+{
+  "case": "uniform_Pu_porosity_GPR",
+  "model": "Magni+GPR",
+  "olander": false,
+  "T_min_K": 650.0,
+  "T_max_K": 1457.5147474990483,
+  "burnup_mean_MWd_kgHM": 0.0,
+  "burnup_max_MWd_kgHM": 0.0,
+  "Pu_min": 0.2,
+  "Pu_max": 0.2
+}

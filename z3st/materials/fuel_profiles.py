@@ -123,3 +123,77 @@ def rim_peaking(coords, burnup, material, model=None):
     A = float(material.get("radial_peak_amplitude", 3.0))
     p = float(material.get("radial_peak_exponent", 8.0))
     return 1.0 + A * (r / R) ** p
+
+
+def _olander_rstar_fraction(alpha):
+    """Return r*/R such that the Olander profile conserves Pu inventory."""
+    alpha = float(alpha)
+
+    def mean_g(rstar):
+        x = np.linspace(0.0, 1.0, 2001)
+        eta = x - rstar
+        g = np.exp(-2.0 * alpha * eta) - 2.0 * np.exp(-alpha * eta)
+        return float(np.trapz(2.0 * x * g, x))
+
+    lo, hi = 0.0, 1.0
+    flo, fhi = mean_g(lo), mean_g(hi)
+    if flo == 0.0:
+        return lo
+    if fhi == 0.0:
+        return hi
+    if flo * fhi > 0.0:
+        grid = np.linspace(0.0, 1.0, 501)
+        vals = np.array([abs(mean_g(v)) for v in grid])
+        return float(grid[int(np.argmin(vals))])
+    for _ in range(80):
+        mid = 0.5 * (lo + hi)
+        fm = mean_g(mid)
+        if flo * fm <= 0.0:
+            hi, fhi = mid, fm
+        else:
+            lo, flo = mid, fm
+    return 0.5 * (lo + hi)
+
+
+def _olander_params(material):
+    alpha = float(material.get("olander_alpha", 10.0))
+    D = float(material.get("olander_D", 0.01))
+    rstar = material.get("olander_rstar_fraction", "conserve")
+    if isinstance(rstar, str) and rstar.strip().lower() in ("conserve", "mass_conserving"):
+        rstar = _olander_rstar_fraction(alpha)
+    bu_scale = float(material.get("olander_burnup_scale", 0.0))
+    return D, alpha, float(rstar), bu_scale
+
+
+def olander_plutonium_factor(coords, burnup, material, model=None):
+    """Olander empirical radial plutonium redistribution factor."""
+    r = _radius(coords, model)
+    R = float(material.get("olander_radius", 0.0))
+    if R <= 0.0:
+        R = r.max() if r.max() > 0 else 1.0
+    D, alpha, rstar, bu_scale = _olander_params(material)
+    D_eff = D
+    if bu_scale > 0.0:
+        bu = np.asarray(burnup, dtype=float)
+        D_eff = D * (1.0 - np.exp(-np.maximum(bu, 0.0) / bu_scale))
+    eta = r / R - rstar
+    return 1.0 + D_eff * (np.exp(-2.0 * alpha * eta) - 2.0 * np.exp(-alpha * eta))
+
+
+def olander_plutonium_redistribution(coords, burnup, material, model=None):
+    """Radial power form factor tied to Olander's Pu redistribution profile."""
+    return olander_plutonium_factor(coords, burnup, material, model=model)
+
+
+def olander_plutonium_ufl(r, burnup, material, R):
+    """UFL expression for the local Pu fraction implied by Olander."""
+    import ufl
+
+    Pu0 = float(material.get("Pu", material.get("pu", 0.0)))
+    D, alpha, rstar, bu_scale = _olander_params(material)
+    D_eff = D
+    if bu_scale > 0.0 and burnup is not None:
+        D_eff = D * (1.0 - ufl.exp(-burnup / bu_scale))
+    eta = r / float(R) - rstar
+    factor = 1.0 + D_eff * (ufl.exp(-2.0 * alpha * eta) - 2.0 * ufl.exp(-alpha * eta))
+    return Pu0 * factor

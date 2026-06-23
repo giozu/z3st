@@ -1,0 +1,11 @@
+{
+  "case": "uniform_Pu_porosity_magni",
+  "model": "Magni",
+  "olander": false,
+  "T_min_K": 650.0,
+  "T_max_K": 1521.360159888144,
+  "burnup_mean_MWd_kgHM": 0.0,
+  "burnup_max_MWd_kgHM": 0.0,
+  "Pu_min": 0.2,
+  "Pu_max": 0.2
+}

@@ -21,29 +21,50 @@ class MagniConductivity:
         self.p = float(p)
         self.burnup = float(burnup)
 
-    def __call__(self, T_array):
+    @staticmethod
+    def _local(value, fallback, shape):
+        if value is None:
+            return fallback
+        arr = np.asarray(value, dtype=float)
+        if arr.size == 1:
+            return float(arr)
+        return arr.reshape(shape)
+
+    def __call__(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
+        Pu = self._local(Pu, self.Pu, T.shape)
+        Am = self._local(Am, self.Am, T.shape)
+        Np = self._local(Np, self.Np, T.shape)
+        x = self._local(x, self.x, T.shape)
+        p = self._local(p, self.p, T.shape)
+        burnup = self._local(burnup, self.burnup, T.shape)
         return k_numpy(
             T,
-            Pu=self.Pu,
-            Am=self.Am,
-            Np=self.Np,
-            x=self.x,
-            p=self.p,
-            burnup=self.burnup,
+            Pu=Pu,
+            Am=Am,
+            Np=Np,
+            x=x,
+            p=p,
+            burnup=burnup,
         ).reshape(T.shape)
 
-    def value_and_grad(self, T_array):
+    def value_and_grad(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        k = self(T)
+        Pu = self._local(Pu, self.Pu, T.shape)
+        Am = self._local(Am, self.Am, T.shape)
+        Np = self._local(Np, self.Np, T.shape)
+        x = self._local(x, self.x, T.shape)
+        p = self._local(p, self.p, T.shape)
+        burnup = self._local(burnup, self.burnup, T.shape)
+        k = self(T, Pu=Pu, Am=Am, Np=Np, x=x, p=p, burnup=burnup)
         dk = dk_dT_numpy(
             T,
-            Pu=self.Pu,
-            Am=self.Am,
-            Np=self.Np,
-            x=self.x,
-            p=self.p,
-            burnup=self.burnup,
+            Pu=Pu,
+            Am=Am,
+            Np=Np,
+            x=x,
+            p=p,
+            burnup=burnup,
         ).reshape(T.shape)
         return k, dk
 
