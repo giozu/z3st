@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+cd "${0%/*}" || exit 1
+
+(cd thermal_conductivity_magni && bash ./Allrun)
+(cd thermal_conductivity_GPR && bash ./Allrun)
+
+export PYTHONPATH="/usr/lib/python3/dist-packages:/usr/lib/petsc/lib/python3/dist-packages:/usr/lib/slepc/lib/python3/dist-packages:/home/giovanni/GN/z3st:${PYTHONPATH}"
+python3 compare_cases.py

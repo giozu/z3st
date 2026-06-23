@@ -1,0 +1,8 @@
+{
+  "model": "Magni+GPR",
+  "T_center_reference_K": 1362.2808834784219,
+  "T_center_numerical_K": 1363.222392306789,
+  "T_center_magni_reference_K": 1316.7380598905993,
+  "T_center_shift_vs_magni_K": 45.54282358782257,
+  "T_center_shift_vs_magni_percent": 3.4587610835526754
+}
