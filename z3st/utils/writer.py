@@ -413,6 +413,8 @@ class OutputWriter:
         if getattr(p, "fg_fields", None):
             for fn in p.fg_fields.values():
                 write(fn, t)
+        if on.get("porosity", False) and getattr(p, "p", None) is not None:
+            write(p.p, t)
 
     def _write_vtu(self, step):
         p = self.problem
@@ -492,6 +494,10 @@ class OutputWriter:
                 grid.cell_data["Damage"] = self._D_cell_fn.x.array.copy()
             if self._H_cell_fn is not None:
                 grid.cell_data["CrackDrivingForce"] = self._H_cell_fn.x.array.copy()
+
+        # Porosity
+        if on.get("porosity", False) and getattr(p, "p", None) is not None:
+            grid.point_data["Porosity"] = p.p.x.array.copy()
 
         # Plasticity: cumulative plastic strain p lives on a quadrature space.
         # Projection per step is needed; the LinearProblem is built once.

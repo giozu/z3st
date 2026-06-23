@@ -27,10 +27,11 @@ from z3st.models.mechanical_model import MechanicalModel
 from z3st.models.thermal_model import ThermalModel
 from z3st.models.cluster_dynamic_model import ClusterDynamicsModel
 from z3st.models.plasticity_model import PlasticityModel
+from z3st.models.porosity_migration_model import PorosityMigrationModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel, PorosityMigrationModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -77,6 +78,8 @@ class Spine(
             ClusterDynamicsModel.__init__(self)
         if self.on.get("plasticity", False):
             PlasticityModel.__init__(self)
+        if self.on.get("porosity", False):
+            PorosityMigrationModel.__init__(self)
 
     def parameters(self, lhr):
         self.g = 0.0  # m/s2
@@ -329,6 +332,7 @@ class Spine(
         self.u = None
         self.D = None
         self.c = None
+        self.p = None
 
         # Temperature
         if self.on.get("thermal", False):
@@ -396,6 +400,17 @@ class Spine(
             print("\nSetting cluster initial conditions...")
             self.set_cluster_initial_conditions()
 
+        # Porosity variables
+        if self.on.get("porosity", False):
+            print("\nInitializing the porosity field...")
+            self.p = dolfinx.fem.Function(self.V_p, name="Porosity")
+            self.p.x.array[:] = 0.0
+            self.p_n = dolfinx.fem.Function(self.V_p, name="Porosity_old")
+            self.p_n.x.array[:] = 0.0
+
+            print("\nSetting porosity initial conditions...")
+            self.set_porosity_initial_conditions()
+
         # Material properties
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
@@ -411,6 +426,12 @@ class Spine(
                 mat["k"] = k_fn
                 print(f"\nk neural-network field for {name} → Function on V_t "
                       f"(min={k_fn.x.array.min():.3f}, max={k_fn.x.array.max():.3f} W/m/K)")
+
+            # Porosity-dependent conductivity
+            if mat.get("thermal_conductivity_model") == "kato_porosity" and self.T is not None:
+                k_fn = dolfinx.fem.Function(self.V_t, name=f"k_porosity_{name}")
+                mat["k"] = k_fn
+                print(f"\nInitialized porosity-dependent thermal conductivity field for {name}")
 
             # Temperature-dependent elastic constants: build lmbda/G/bulk_modulus
             # as UFL expressions in the live T field, so the per-iteration T
@@ -442,9 +463,12 @@ class Spine(
                     mat["sigma_c"] = ufl.sqrt((27 * mat["E"] * mat["Gc"]) / (256 * lc))
                     print(f"  - Material '{name}': sigma_c (AT2) evaluated from Gc expression")
 
-                elif dmg_type == "AT1" and "E" in mat:
+                if dmg_type == "AT1" and "E" in mat:
                     mat["sigma_c"] = ufl.sqrt((3 * mat["E"] * mat["Gc"]) / (8 * lc))
                     print(f"  - Material '{name}': sigma_c (AT1) evaluated from Gc expression")
+
+        if self.on.get("porosity", False):
+            self.update_porosity_dependent_properties(self.T, self.p)
 
 
     def set_power(self):

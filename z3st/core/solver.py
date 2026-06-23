@@ -193,11 +193,11 @@ class Solver:
             setattr(self, name, None)
 
     def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
-        """PETSc options for the linear solver of ``physics`` (thermal, mechanical
-        or damage) and ``solver_type``."""
-        if physics not in ["thermal", "mechanical", "damage"]:
+        """PETSc options for the linear solver of ``physics`` (thermal, mechanical,
+        damage or porosity) and ``solver_type``."""
+        if physics not in ["thermal", "mechanical", "damage", "porosity"]:
             raise ValueError(
-                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical' or 'damage'."
+                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical', 'damage' or 'porosity'."
             )
 
         # 1) KSP type
@@ -275,7 +275,7 @@ class Solver:
         gathered = self.mesh.comm.allgather(local)
         return np.unique(np.concatenate(gathered)) if gathered else local
 
-    def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
+    def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=None):
 
         # Non-linear thermal solver (k = NN(T) external operator, Newton with
         # autodiff tangent), dispatched before the linear assembly.
@@ -335,7 +335,14 @@ class Solver:
 
                 # Diffusion + source (always present)
                 a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
-                L_t += w * self.q_third * v_t * dx
+                if self.on.get("porosity", False) and p_new is not None:
+                    p0 = float(material.get("initial_porosity", 0.0))
+                    if p0 < 0.99:
+                        L_t += w * self.q_third * ((1.0 - p_new) / (1.0 - p0)) * v_t * dx
+                    else:
+                        L_t += w * self.q_third * v_t * dx
+                else:
+                    L_t += w * self.q_third * v_t * dx
 
                 # Mass term (backward Euler, only for transient)
                 # self.T holds the converged temperature from the previous time step (T^n)
@@ -431,6 +438,10 @@ class Solver:
             if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
                 material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
                 material["k"].x.scatter_forward()
+
+        # Lagged update of porosity-dependent material properties
+        if self.on.get("porosity", False) and p_new is not None:
+            self.update_porosity_dependent_properties(T_new, p_new)
 
         bcs_thermal_actual = self._bc_objects(self.dirichlet_thermal)
 
@@ -1305,6 +1316,16 @@ class Solver:
         else:
             c_new = None
 
+        if self.on.get("porosity", False):
+            p_new = dolfinx.fem.Function(self.V_p)
+            p_new.x.array[:] = self.p.x.array
+            self.p_n.x.array[:] = self.p.x.array
+            conv_porosity = True
+            prev_res_p = None
+        else:
+            p_new = None
+            conv_porosity = True
+
         prev_res_T = None
         prev_res_u = None
         prev_res_D = None
@@ -1332,7 +1353,7 @@ class Solver:
             # --. THERMAL STEP --..
             if self.on.get("thermal", False):
                 conv_th, _, _, prev_res_T = self._thermal_step(
-                    T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
+                    T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=p_new
                 )
 
             # --. MECHANICAL STEP --..
@@ -1360,10 +1381,14 @@ class Solver:
             if self.on.get("cluster", False):
                 self._cluster_step(c_new, self.c_n, dt)
 
+            # --. POROSITY STEP --..
+            if self.on.get("porosity", False):
+                conv_porosity, _, _, prev_res_p = self._porosity_step(p_new, self.p_n, dt, T_new, stag_tol_th, prev_res_p)
+
             # --.. GLOBAL CONVERGENCE --..
             print("\nConvergence check")
 
-            if conv_th and conv_mech and conv_damage:
+            if conv_th and conv_mech and conv_damage and conv_porosity:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
 
                 if self.on.get("thermal", False):
@@ -1377,6 +1402,9 @@ class Solver:
                 
                 if self.on.get("cluster", False):
                     self.c.x.array[:] = c_new.x.array
+
+                if self.on.get("porosity", False):
+                    self.p.x.array[:] = p_new.x.array
 
                 if self.on.get("mechanical", False) and self.on.get("plasticity", False):
                     self.update_plastic_history(u_new)
@@ -1399,5 +1427,7 @@ class Solver:
             self.D.x.array[:] = D_new.x.array
         if self.on.get("cluster", False):
             self.c.x.array[:] = c_new.x.array
+        if self.on.get("porosity", False):
+            self.p.x.array[:] = p_new.x.array
 
         return False

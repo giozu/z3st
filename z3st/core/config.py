@@ -39,6 +39,7 @@ class Config:
             "cluster": models.get("cluster", False),
             "plasticity": models.get("plasticity", False),
             "contact": bool(models.get("contact", False)),
+            "porosity": models.get("porosity", False),
         }
 
         # --. Fission-gas behaviour via SCIANTIX coupling (default OFF) --..

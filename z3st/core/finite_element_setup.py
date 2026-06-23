@@ -45,6 +45,11 @@ class FiniteElementSetup:
         if self.on.get("cluster", False):
             self.V_c = dolfinx.fem.functionspace(self.mesh, ("DG", 1))
             print("Cluster function space (V_c):", self.V_c)
+            
+        # --. Porosity migration --..
+        if self.on.get("porosity", False):
+            self.V_p = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
+            print("Porosity function space (V_p):", self.V_p)
     
         # --. Plasticity --..
         if self.on.get("plasticity", False):
