@@ -33,6 +33,7 @@ models:
 mechanical:
   solver: linear
   linear_solver: iterative_amg
+  remove_rigid_nullspace: true
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm

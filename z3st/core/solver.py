@@ -20,38 +20,55 @@ def _as_bool(v):
     return str(v).strip().lower() in ("1", "true", "yes", "on")
 
 
-def build_rigid_body_nullspace(V):
-    """Rigid-body near-nullspace (kernel of the elastic operator) for GAMG.
+def _rigid_body_modes(V, regime=None):
+    """Zero-strain rigid-body displacement modes of the elastic operator, as a
+    list of Functions.
 
-    Without it the Krylov count per elasticity solve is large and scaling
-    suffers. 3 modes in 2D (2 translations + 1 rotation), 6 in 3D, orthonormalised.
-    Consumed by GAMG via MatSetNearNullSpace; ignored by Hypre/LU."""
-    # displacement dimension is the block size, not mesh.geometry.dim (a planar
-    # mesh is embedded in 3D: geometry.dim == 3 but the displacement has 2 comps)
+    Cartesian: 3 modes in 2D (2 translations + 1 in-plane rotation), 6 in 3D. 
+    Axisymmetric (r,z): only axial translation
+    """
+
     bs = V.dofmap.index_map_bs
-    n_modes = 3 if bs == 2 else 6
-    modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
-
     x = V.tabulate_dof_coordinates()  # one row per node (block); columns are x,y,z
 
-    # translations: unit displacement along each axis
-    for i in range(bs):
-        modes[i].x.array[i::bs] = 1.0
-
-    # rotations: infinitesimal rigid rotation fields
-    if bs == 2:
-        modes[2].x.array[0::bs] = -x[:, 1]
-        modes[2].x.array[1::bs] = x[:, 0]
+    if regime == "axisymmetric":
+        # components are (u_r, u_z) since x[0]=r, x[1]=z; keep only u_z=const
+        mode = dolfinx.fem.Function(V)
+        mode.x.array[1::bs] = 1.0
+        modes = [mode]
     else:
-        modes[3].x.array[1::bs] = -x[:, 2]
-        modes[3].x.array[2::bs] = x[:, 1]
-        modes[4].x.array[0::bs] = x[:, 2]
-        modes[4].x.array[2::bs] = -x[:, 0]
-        modes[5].x.array[0::bs] = -x[:, 1]
-        modes[5].x.array[1::bs] = x[:, 0]
+        n_modes = 3 if bs == 2 else 6
+        modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
+
+        # translations: unit displacement along each axis
+        for i in range(bs):
+            modes[i].x.array[i::bs] = 1.0
+
+        # rotations: infinitesimal rigid rotation fields
+        if bs == 2:
+            modes[2].x.array[0::bs] = -x[:, 1]
+            modes[2].x.array[1::bs] = x[:, 0]
+        else:
+            modes[3].x.array[1::bs] = -x[:, 2]
+            modes[3].x.array[2::bs] = x[:, 1]
+            modes[4].x.array[0::bs] = x[:, 2]
+            modes[4].x.array[2::bs] = -x[:, 0]
+            modes[5].x.array[0::bs] = -x[:, 1]
+            modes[5].x.array[1::bs] = x[:, 0]
 
     for m in modes:
         m.x.scatter_forward()
+    return modes
+
+
+def build_rigid_body_nullspace(V, regime=None):
+    """Rigid-body near-nullspace (kernel of the elastic operator) for GAMG.
+
+    Without it the Krylov count per elasticity solve is large and scaling
+    suffers. 3 modes in 2D (2 translations + 1 rotation), 6 in 3D, 1 in
+    axisymmetric, orthonormalised. Used by GAMG via
+    MatSetNearNullSpace; ignored by Hypre/LU."""
+    modes = _rigid_body_modes(V, regime)
 
     basis = [m.x for m in modes]
     dolfinx.la.orthonormalize(basis)
@@ -61,45 +78,20 @@ def build_rigid_body_nullspace(V):
     )
 
 
-def build_constrained_rigid_nullspace(V, bcs, tol=1e-9):
-    """The rigid-body modes that satisfy the homogeneous mechanical Dirichlet
-    BCs, returned as a PETSc nullspace to attach to the operator with
-    MatSetNullSpace (not the near-nullspace: that only scales GAMG).
+def build_constrained_rigid_nullspace(V, bcs, tol=1e-9, regime=None):
+    """Nullspace of the rigid-body modes the BCs leave free, to attach with
+    MatSetNullSpace when the mechanical system is singular (the BCs do not pin
+    every rigid mode, e.g. a cylinder clamped only in z). KSP then projects
+    these modes out of the solve.
 
-    Use for a body that is left rigid-body singular by its BCs -- e.g. a full
-    cylinder with only ``Clamp_z`` on one face has 3 floating modes (two
-    in-plane translations + the axial rotation). A self-equilibrated load
-    (free thermal expansion) is orthogonal to that kernel, so the system is
-    consistent; once the nullspace is on the operator, KSP projects it out of
-    the RHS and the solution, giving the unique minimal-norm displacement
-    instead of one that drifts between staggered iterations.
-
-    Each of the 6 (3 in 2D) candidate rigid modes is kept only if it is already
-    zero on every constrained dof, i.e. it satisfies the homogeneous BC and so
-    still lies in the kernel of the constrained operator; a mode the BCs touch
-    is no longer rigid and is dropped. Returns ``None`` when nothing survives
-    (the BCs pin every rigid mode -> the system is non-singular), so the caller
-    can skip the attachment.
+    Of the candidate modes (6 in 3D, 3 in cartesian 2D, 1 in axisymmetric), keep
+    only those already zero on every constrained dof -- those still in the
+    kernel of the constrained operator. 
+    Return ``None`` if none survive (the BCs
+    pin every mode -> system non-singular), so the caller can skip attaching.
     """
     bs = V.dofmap.index_map_bs
-    n_modes = 3 if bs == 2 else 6
-    modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
-    x = V.tabulate_dof_coordinates()
-
-    for i in range(bs):
-        modes[i].x.array[i::bs] = 1.0
-    if bs == 2:
-        modes[2].x.array[0::bs] = -x[:, 1]
-        modes[2].x.array[1::bs] = x[:, 0]
-    else:
-        modes[3].x.array[1::bs] = -x[:, 2]
-        modes[3].x.array[2::bs] = x[:, 1]
-        modes[4].x.array[0::bs] = x[:, 2]
-        modes[4].x.array[2::bs] = -x[:, 0]
-        modes[5].x.array[0::bs] = -x[:, 1]
-        modes[5].x.array[1::bs] = x[:, 0]
-    for m in modes:
-        m.x.scatter_forward()
+    modes = _rigid_body_modes(V, regime)
 
     # constrained (owned) dof indices across all BCs, unrolled into V
     n_owned = V.dofmap.index_map.size_local * bs
@@ -315,7 +307,7 @@ class Solver:
         transient = analysis == "transient"
 
         # Forms are step-invariant: only Functions (T_new, T_other, q_third) and
-        # Constants (h_gap) change between iterations, consumed by reference. Build
+        # Constants (h_gap) change between iterations, used by reference. Build
         # the LinearProblem once per step; solve() reassembles A,b from the forms.
         cache = getattr(self, "_th_cache", None)
         rebuild = (
@@ -434,7 +426,7 @@ class Solver:
         # Lagged update of any neural-network conductivity field: re-evaluate
         # k = NN(T) at the current iterate so the (linear) form sees the updated
         # coefficient on the next solve (Picard). Mutates the Function in place;
-        # the cached form consumes it by reference.
+        # the cached form uses it by reference.
         for material in self.materials.values():
             if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
                 material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
@@ -689,14 +681,14 @@ class Solver:
 
         # Penalty contact: update the contact pressure from the current
         # displacement iterate (explicit / fixed-point) — a persistent Constant
-        # consumed by the cached form. The traction t = -p*n is an external
+        # used by the cached form. The traction t = -p*n is an external
         # load, driven to consistency by the staggered loop.
         if self.on.get("contact", False):
             self.update_contact_pressure(u_new)
 
         # Forms are step-invariant: only Functions (u_new, T_current, creep
         # predictor/state, burnup) and Constants (contact pressure, BC values)
-        # change between iterations, consumed by reference. Build once per step.
+        # change between iterations, used by reference. Build once per step.
         cache = getattr(self, "_mech_cache", None)
         rebuild = (
             cache is None
@@ -838,18 +830,21 @@ class Solver:
                     petsc_options_prefix="mechanical_",
                 )
                 # Elasticity AMG needs the rigid-body kernel to scale; attach
-                # it to the operator (GAMG consumes it, LU/Hypre ignore it).
+                # it to the operator (GAMG use it, LU/Hypre ignore it).
                 if self.mech_cfg["linear_solver"].startswith("iterative"):
-                    problem_m.A.setNearNullSpace(build_rigid_body_nullspace(self.V_m))
+                    problem_m.A.setNearNullSpace(
+                        build_rigid_body_nullspace(self.V_m, regime=self.regime)
+                    )
 
                 # Opt-in: project the floating rigid-body modes out of the solve
-                # for a body the BCs leave rigid-singular (e.g. a full cylinder
-                # with only Clamp_z). KSP then removes the kernel from RHS and
-                # solution -> unique minimal-norm displacement, far fewer
+                # for a body the BCs leave rigid-singular. KSP then removes the kernel from RHS and
+                # solution -> unique minimal-norm displacement, fewer
                 # staggered iterations. Default off; the standard BC-pinned case
                 # has no nullspace and must not get one.
                 if _as_bool(self.mech_cfg.get("remove_rigid_nullspace", False)):
-                    ns = build_constrained_rigid_nullspace(self.V_m, bcs_mech)
+                    ns = build_constrained_rigid_nullspace(
+                        self.V_m, bcs_mech, regime=self.regime
+                    )
                     if ns is not None:
                         problem_m.A.setNullSpace(ns)
                         print("  [INFO] rigid-body nullspace removed from mechanical solve")

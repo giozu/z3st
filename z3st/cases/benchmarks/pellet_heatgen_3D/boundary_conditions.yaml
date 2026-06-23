@@ -8,3 +8,6 @@ mechanical:
   uo2:
   - type: Clamp_z
     region: bottom
+  - type: Dirichlet_z # remove for hourglassing
+    region: top
+    value: 2.504e-5 # (m) u_z = eps_zz * Lz = alpha * (T_mean - T_ref) * Lz

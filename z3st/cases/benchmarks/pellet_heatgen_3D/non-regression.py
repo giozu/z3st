@@ -3,11 +3,7 @@
 """
 Z3ST case: pellet_heatgen_3D
 
-Solid UO2 pellet (diameter 1 cm) in 3D at ~25 kW/m, rim at 600 K. Half model:
-5 mm meshed with a symmetry plane (u_z = 0) on the bottom face. Constant k keeps
-the analytic radial temperature profile valid; the script also checks for
-spurious (hourglass-like) modes:
-
+Solid pellet in 3D
   - axisymmetry: azimuthal scatter of T and von Mises at fixed radius;
   - orthocylindricity: in-plane shear sigma_r-theta vs peak hoop;
   - bulk response: peak temperature, displacement, von Mises.
@@ -48,10 +44,7 @@ n_z = 12  # extrusion layers (mesh.geo)
 z_target = 0.0
 z_tol = Lz / n_z
 
-# Loose stress tolerance: a 1 cm pellet is too short for plane strain, so the
-# infinite-cylinder analytic is only ~30 % accurate. The tight checks are the
-# analytic temperature and the regression vs gold; stress is a diagnostic only.
-TOLERANCE = 3.5e-1
+TOLERANCE = 1.0e-1
 
 
 # --.. ..- .-.. .-.. --- analytic temperature (constant k) --.. ..- .-.. .-.. ---

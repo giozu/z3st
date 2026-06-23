@@ -1,77 +1,77 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 0.36260752301280125,
+            "numerical": 0.36260837655190487,
             "reference": 0.0,
-            "abs_error": 0.36260752301280125,
-            "rel_error": 0.0004619834905182685,
+            "abs_error": 0.36260837655190487,
+            "rel_error": 0.0004619845779777098,
             "status": "PASS"
         },
         "T_max": {
-            "numerical": 997.377552019246,
+            "numerical": 997.3775457303711,
             "reference": 997.8873577297384,
-            "abs_error": 0.509805710492401,
-            "rel_error": 0.0005108850277973695,
+            "abs_error": 0.5098119993672299,
+            "rel_error": 0.0005108913299864694,
             "status": "PASS"
         },
         "u_max": {
-            "numerical": 3.424436565395865e-05,
-            "reference": 3.424436565395865e-05,
+            "numerical": 3.5393349265898475e-05,
+            "reference": 3.5393349265898475e-05,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "vonMises_max": {
-            "numerical": 904271950.5221877,
-            "reference": 904271950.5221877,
+            "numerical": 908130089.7975531,
+            "reference": 908130089.7975531,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "azimuthal_nonuniformity_T": {
-            "numerical": 0.03271058490320049,
+            "numerical": 0.03271058581355647,
             "reference": 0.0,
-            "abs_error": 0.03271058490320049,
-            "rel_error": 0.03271058490320049,
+            "abs_error": 0.03271058581355647,
+            "rel_error": 0.03271058581355647,
             "status": "PASS"
         },
         "azimuthal_nonuniformity_vonMises": {
-            "numerical": 0.08311105927251473,
+            "numerical": 0.06412556503476505,
             "reference": 0.0,
-            "abs_error": 0.08311105927251473,
-            "rel_error": 0.08311105927251473,
+            "abs_error": 0.06412556503476505,
+            "rel_error": 0.06412556503476505,
             "status": "PASS"
         },
         "orthocylindricity_shear": {
-            "numerical": 0.0021173764494752823,
+            "numerical": 0.0022855620403321474,
             "reference": 0.0,
-            "abs_error": 0.0021173764494752823,
-            "rel_error": 0.0021173764494752823,
+            "abs_error": 0.0022855620403321474,
+            "rel_error": 0.0022855620403321474,
             "status": "PASS"
         },
         "L2_error_sigma_rr": {
-            "numerical": 0.2140056211324022,
+            "numerical": 0.01388931214037302,
             "reference": 0.0,
-            "abs_error": 0.2140056211324022,
-            "rel_error": 0.2140056211324022,
+            "abs_error": 0.01388931214037302,
+            "rel_error": 0.01388931214037302,
             "status": "PASS"
         },
         "L2_error_sigma_tt": {
-            "numerical": 0.2724803212043379,
+            "numerical": 0.01889051724386443,
             "reference": 0.0,
-            "abs_error": 0.2724803212043379,
-            "rel_error": 0.2724803212043379,
+            "abs_error": 0.01889051724386443,
+            "rel_error": 0.01889051724386443,
             "status": "PASS"
         },
         "L2_error_sigma_zz": {
-            "numerical": 0.2715552929335791,
+            "numerical": 0.01964887514377323,
             "reference": 0.0,
-            "abs_error": 0.2715552929335791,
-            "rel_error": 0.2715552929335791,
+            "abs_error": 0.01964887514377323,
+            "rel_error": 0.01964887514377323,
             "status": "PASS"
         }
     },
-    "tolerance": 0.35,
+    "tolerance": 0.1,
     "summary": "PASS",
-    "regression": "PASS"
+    "regression": "FAIL"
 }
