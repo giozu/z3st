@@ -1,0 +1,23 @@
+name: MA-MOX-Magni
+fissile: true
+
+# Magni et al. MA-MOX thermal conductivity:
+# k(T, x, Pu, Am, Np, p, burnup)
+k: materials.magni_mox_thermal.k
+
+# Composition/state parameters are fractions unless otherwise stated.
+Pu: 0.20
+Am: 0.00
+Np: 0.00
+x: 0.02        # O/M = 2 - x
+p: 0.05        # porosity fraction
+
+E: 170e+9
+nu: 0.29
+cp: 330.0
+alpha: 1.45e-5
+T_ref: 300.0
+rho: 11000.0
+heavy_metal_fraction: 0.88
+mu_gamma: 0.0
+gamma_heating: 0.0

@@ -1,0 +1,20 @@
+{
+  "n": 563,
+  "features": [
+    "Temp",
+    "Pu",
+    "Am",
+    "x",
+    "p"
+  ],
+  "residual": "log(k_data / k_magni)",
+  "holdout_fraction": 0.2,
+  "magni_rmse_all": 0.2544673429934078,
+  "magni_mae_all": 0.20153274712627578,
+  "gpr_rmse_all": 0.04020205755569931,
+  "gpr_mae_all": 0.028537609797875806,
+  "gpr_rmse_holdout": 0.057849707589316374,
+  "gpr_mae_holdout": 0.03963984542607879,
+  "lengthscale": 1.0,
+  "noise": 0.06
+}
