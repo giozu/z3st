@@ -1318,8 +1318,8 @@ class Solver:
 
         if self.on.get("porosity", False):
             p_new = dolfinx.fem.Function(self.V_p)
-            p_new.x.array[:] = self.p.x.array
-            self.p_n.x.array[:] = self.p.x.array
+            p_new.x.array[:] = self.porosity.x.array
+            self.porosity_n.x.array[:] = self.porosity.x.array
             conv_porosity = True
             prev_res_p = None
         else:
@@ -1383,7 +1383,7 @@ class Solver:
 
             # --. POROSITY STEP --..
             if self.on.get("porosity", False):
-                conv_porosity, _, _, prev_res_p = self._porosity_step(p_new, self.p_n, dt, T_new, stag_tol_th, prev_res_p)
+                conv_porosity, _, _, prev_res_p = self._porosity_step(p_new, self.porosity_n, dt, T_new, stag_tol_th, prev_res_p)
 
             # --.. GLOBAL CONVERGENCE --..
             print("\nConvergence check")
@@ -1404,7 +1404,7 @@ class Solver:
                     self.c.x.array[:] = c_new.x.array
 
                 if self.on.get("porosity", False):
-                    self.p.x.array[:] = p_new.x.array
+                    self.porosity.x.array[:] = p_new.x.array
 
                 if self.on.get("mechanical", False) and self.on.get("plasticity", False):
                     self.update_plastic_history(u_new)
@@ -1428,6 +1428,6 @@ class Solver:
         if self.on.get("cluster", False):
             self.c.x.array[:] = c_new.x.array
         if self.on.get("porosity", False):
-            self.p.x.array[:] = p_new.x.array
+            self.porosity.x.array[:] = p_new.x.array
 
         return False

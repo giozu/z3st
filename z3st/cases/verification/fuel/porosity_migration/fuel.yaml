@@ -1,0 +1,17 @@
+name: fuel-porosity-migration-test
+fissile: true
+
+initial_porosity: 0.15            # (/) as-fabricated initial porosity
+thermal_conductivity_model: kato_porosity
+stoichiometry_deviation: 0.025    # (/) x in (U,Pu)O_{2-x}
+helium_conductivity: 0.69         # (W/(m·K)) conductivity of helium in pores
+
+E: 358.0e9                        # (Pa) Young's modulus
+nu: 0.23                          # (-) Poisson's ratio
+cp: 280.0                         # (J/(kg·K)) specific heat capacity
+rho: 10960.0                      # (kg/m³) density
+heavy_metal_fraction: 0.8815      # (-) M_U/M_UO2 fraction
+
+alpha: 1.0e-5                     # (1/K) thermal expansion
+T_ref: 298.15                     # (K) reference temperature
+T_initial: 623.0                  # (K) initial temperature

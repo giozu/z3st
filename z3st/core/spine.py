@@ -332,7 +332,7 @@ class Spine(
         self.u = None
         self.D = None
         self.c = None
-        self.p = None
+        self.porosity = None
 
         # Temperature
         if self.on.get("thermal", False):
@@ -403,10 +403,10 @@ class Spine(
         # Porosity variables
         if self.on.get("porosity", False):
             print("\nInitializing the porosity field...")
-            self.p = dolfinx.fem.Function(self.V_p, name="Porosity")
-            self.p.x.array[:] = 0.0
-            self.p_n = dolfinx.fem.Function(self.V_p, name="Porosity_old")
-            self.p_n.x.array[:] = 0.0
+            self.porosity = dolfinx.fem.Function(self.V_p, name="Porosity")
+            self.porosity.x.array[:] = 0.0
+            self.porosity_n = dolfinx.fem.Function(self.V_p, name="Porosity_old")
+            self.porosity_n.x.array[:] = 0.0
 
             print("\nSetting porosity initial conditions...")
             self.set_porosity_initial_conditions()
@@ -468,7 +468,7 @@ class Spine(
                     print(f"  - Material '{name}': sigma_c (AT1) evaluated from Gc expression")
 
         if self.on.get("porosity", False):
-            self.update_porosity_dependent_properties(self.T, self.p)
+            self.update_porosity_dependent_properties(self.T, self.porosity)
 
 
     def set_power(self):
