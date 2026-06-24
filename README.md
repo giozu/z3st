@@ -119,7 +119,6 @@ z3st/                                # repository root
 ├── LICENSE                          # Apache 2.0
 ├── README.md
 ├── CITATION.cff
-├── CONTEXT.md                       # design + work-log document
 ├── pyproject.toml / setup.py
 ├── z3st_env.yml                     # Conda env recipe (FEniCSx + deps)
 ├── docs/                            # Sphinx documentation
@@ -169,6 +168,7 @@ z3st/                                # repository root
     │   ├── output.py                # stdout / JSON helpers
     │   ├── z-gui.py                 # interactive PyVista viewer
     │   └── geo_files/               # reusable Gmsh templates
+    ├── ai/                          # agent onboarding (PROMPT.md, CONTEXT.md)
     ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
     ├── examples/                    # minimal didactic setups
     └── cases/                       # ~50 verification / validation / demo cases
@@ -188,7 +188,7 @@ z3st/                                # repository root
         └── non-regression_summary.txt
 ```
 
-The full case catalogue and per-module details are in `CONTEXT.md`.
+The full case catalogue and per-module details are in `z3st/ai/CONTEXT.md`.
 
 ---
 

@@ -7,7 +7,6 @@
 # --. IDE / editor / assistant files --..
 .vscode/
 .claude/
-CONTEXT.md
 CLAUDE.md
 punch_list.md
 
