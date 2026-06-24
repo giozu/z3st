@@ -12,7 +12,8 @@ then gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
 
     p = delta / { b [ (1/E_c)((c^2+b^2)/(c^2-b^2) + nu_c) + (1/E_f)(1 - nu_f) ] }
 
-(plane-stress form, consistent with the axially-free pellet)
+plane-stress form, consistent with the axially-free pellet
+
 """
 
 import os

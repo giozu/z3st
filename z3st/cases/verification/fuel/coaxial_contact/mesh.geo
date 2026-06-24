@@ -13,9 +13,9 @@ r_2_i = 0.00413;    // clad inner radius (m)          4.13 mm  -> gap = 30 um
 r_2_o = 0.00475;    // clad outer radius (m)          4.75 mm
 h     = 0.010;      // axial segment height (m)       10 mm
 
-n_r1 = 25;          // radial divisions, pellet
-n_r2 = 7;           // radial divisions, clad
-n_z  = 31;          // axial divisions (shared)
+n_r1 = 8;           // radial divisions, pellet
+n_r2 = 4;           // radial divisions, clad
+n_z  = 11;          // axial divisions (shared)
 
 // --- cyl_1 : fuel pellet, rectangle [0, r_1_o] x [0, h] ---
 Point(1) = {0,     0, 0};

@@ -35,6 +35,7 @@ models:
     initial_gap: 30.0e-6
 
 mechanical:
+  order: 2
   solver: linear
   linear_solver: direct_mumps
   rtol: 1.0e-6
