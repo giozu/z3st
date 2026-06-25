@@ -36,6 +36,8 @@ complex geometries, and user-defined boundary conditions.
       cluster    → OFF
       plasticity → OFF
       contact    → OFF
+      porosity   → OFF
+      fission_gas → OFF
   → Gap conductance     : None (value = 0.0)
 
 
@@ -241,5 +243,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 15.10 s
+Simulation completed in 2.88 s
 Total time steps solved: 1
