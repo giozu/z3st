@@ -41,6 +41,9 @@ input_check.txt
 *.vtu
 energies.txt
 
+# --. Trained model weights --..
+*.pt
+
 # --. LaTeX build artifacts (slides.pdf is force-tracked) --..
 *.aux
 *.fdb_latexmk

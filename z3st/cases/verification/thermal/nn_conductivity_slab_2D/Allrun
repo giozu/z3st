@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e # the script will exit if any command fails
 cd "${0%/*}" || exit 1
 
 echo "Training the conductivity network..."
