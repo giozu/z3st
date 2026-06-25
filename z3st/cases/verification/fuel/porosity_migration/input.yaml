@@ -23,6 +23,9 @@ models:
   thermal: true
   porosity: true
 
+output:
+  format: xdmf
+
 thermal:
   analysis: transient
   solver: linear
@@ -36,7 +39,10 @@ porosity:
   rtol: 1.0e-8
   stag_tol_rel: 1.0e-6
   stag_tol_abs: 1.0e-8
-  relax: 0.8
+  stabilisation: supg
+  # relax: 0.8
+  aitken: true
+  aitken_omega0: 0.5
 
 lhr:
 - 0.0

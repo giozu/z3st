@@ -134,11 +134,19 @@ class PorosityMigrationModel:
         mobility = self.v0 * poly * (T_current**(-2.5)) * ufl.exp(-Hs / (R * T_current))
         v_vec = mobility * ufl.grad(T_current)
 
-        # SU stabilisation: streamline diffusion K = (h_e / 2|v|) v⊗v (Barani Eq. 3-4),
-        # contributing ∫ (h_e/2|v|) (v·∇p)(v·∇w) dx to the bilinear form.
+        # Stabilisation for the advection-dominated pore transport, selected by
+        # porosity.stabilisation:
+        #  - "su"   (default): streamline-upwind artificial diffusion
+        #            K = (h_e/2|v|) v⊗v (Barani Eq. 3-4), added only to the
+        #            bilinear form. Robust but inconsistent — it also diffuses the
+        #            converged solution, smearing the void front.
+        #  - "supg": streamline-upwind Petrov-Galerkin. The test function is
+        #            perturbed by tau (v·∇w) and weighted against the full strong
+        #            residual p/dt + ∇·(v p) - p_n/dt, so the added diffusion
+        #            vanishes at the exact solution (consistent -> sharper front).
         h_e = ufl.CellDiameter(self.mesh)
         v_mag = ufl.sqrt(ufl.dot(v_vec, v_vec) + 1e-30)
-        K_term = (h_e / (2.0 * v_mag)) * ufl.dot(v_vec, ufl.grad(u_p)) * ufl.dot(v_vec, ufl.grad(v_test))
+        stab = str(self.porosity_cfg.get("stabilisation", "su")).lower()
 
         # Conservative advection integrated by parts:
         #   ∫ ∇·(v p) w dx = -∫ p v·∇w dx + ∫_∂Ω p (v·n) w ds
@@ -148,9 +156,21 @@ class PorosityMigrationModel:
         # imposed value. Set porosity.rim_inflow_porosity to force a rim value.
         a_p = (u_p / dt_const) * v_test * ufl.dx
         a_p -= u_p * ufl.dot(v_vec, ufl.grad(v_test)) * ufl.dx
-        a_p += K_term * ufl.dx
 
         L_p = (p_n / dt_const) * v_test * ufl.dx
+
+        if stab == "supg":
+            # SUPG parameter for transient advection: reduces to the cell transit
+            # time h_e/(2|v|) for small dt, bounded by ~dt/2 for fast flow. For P1
+            # the second derivative in div(v u_p) = u_p div(v) + v·grad(u_p) drops,
+            # so the strong residual is exact on the element interiors.
+            tau = 1.0 / ufl.sqrt((2.0 / dt_const) ** 2 + (2.0 * v_mag / h_e) ** 2)
+            supg_w = tau * ufl.dot(v_vec, ufl.grad(v_test))
+            a_p += (u_p / dt_const + ufl.div(v_vec * u_p)) * supg_w * ufl.dx
+            L_p += (p_n / dt_const) * supg_w * ufl.dx
+        else:
+            K_term = (h_e / (2.0 * v_mag)) * ufl.dot(v_vec, ufl.grad(u_p)) * ufl.dot(v_vec, ufl.grad(v_test))
+            a_p += K_term * ufl.dx
 
         rim_inflow = self.porosity_cfg.get("rim_inflow_porosity", None)
         if rim_inflow is not None:
@@ -175,11 +195,44 @@ class PorosityMigrationModel:
         p_new.x.array[:] = np.clip(p_new.x.array, 0.0, 1.0)
         p_new.x.scatter_forward()
 
-        # Under-relaxation against the previous staggered iterate.
-        relax_p = float(self.porosity_cfg.get("relax", 1.0))
-        if relax_p < 1.0:
-            p_new.x.array[:] = relax_p * p_new.x.array + (1.0 - relax_p) * p_prev_iter
+        # Under-relaxation against the previous staggered iterate. Two options:
+        #  - fixed factor porosity.relax in (0, 1];
+        #  - Aitken Δ² (porosity.aitken: true): the factor is recomputed each
+        #    staggered iteration from the last two raw residuals r_k = p_raw - p_k,
+        #    ω_{k+1} = -ω_k (r_{k-1}·Δr)/|Δr|², Δr = r_k - r_{k-1}, clamped to a
+        #    sane band. p_raw is the clamped solve output, so ω in [0.05, 1] keeps
+        #    p_new a convex combination of two values in [0, 1] — no re-clamp.
+        #    State (_aitken_p_*) is reset per time step by solve_staggered and is
+        #    kept separate from the displacement Aitken (_aitken_*).
+        if bool(self.porosity_cfg.get("aitken", False)):
+            r_k = p_new.x.array - p_prev_iter
+            r_prev = getattr(self, "_aitken_p_R_prev", None)
+            omega0 = float(self.porosity_cfg.get("aitken_omega0", 0.5))
+            if r_prev is not None and r_prev.shape == r_k.shape:
+                no = self.V_p.dofmap.index_map.size_local
+                comm = self.mesh.comm
+                dr = r_k - r_prev
+                # Owned-dof dot products, allreduce'd so omega is rank-independent.
+                denom = comm.allreduce(float(np.dot(dr[:no], dr[:no])), op=MPI.SUM)
+                num = comm.allreduce(float(np.dot(r_prev[:no], dr[:no])), op=MPI.SUM)
+                r_norm = comm.allreduce(float(np.dot(r_k[:no], r_k[:no])), op=MPI.SUM) ** 0.5
+                omega = float(getattr(self, "_aitken_p_omega", omega0))
+                # Noise guard: a barely-changed residual gives a garbage quotient.
+                if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(r_norm, 1e-300):
+                    omega = float(np.clip(-omega * num / denom, 0.05, 1.0))
+            else:
+                # First staggered iteration of the step (R_prev reset by driver).
+                omega = omega0
+            self._aitken_p_R_prev = r_k.copy()
+            self._aitken_p_omega = omega
+            p_new.x.array[:] = p_prev_iter + omega * r_k
             p_new.x.scatter_forward()
+            print(f"  Porosity step: Aitken omega = {omega:.4f}")
+        else:
+            relax_p = float(self.porosity_cfg.get("relax", 1.0))
+            if relax_p < 1.0:
+                p_new.x.array[:] = relax_p * p_new.x.array + (1.0 - relax_p) * p_prev_iter
+                p_new.x.scatter_forward()
 
         # Convergence: mixed relative/absolute criterion between successive
         # staggered iterates (Barani Eq. 2), reduced over owned DOFs across ranks.

@@ -1341,6 +1341,10 @@ class Solver:
             self._aitken_omega = getattr(self, "_relax_u0", self.relax_u)
             self.relax_u = self._aitken_omega
         self._h_gap_prev = None
+        # Porosity Aitken state (porosity.aitken) — separate from the displacement
+        # accelerator above; nulling R_prev restarts ω from porosity.aitken_omega0.
+        self._aitken_p_R_prev = None
+        self._aitken_p_omega = None
 
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")

@@ -751,8 +751,8 @@ class Spine(
           the failed attempt's stiffness degradation) and the live lmbda/G
           Constants.
 
-        NOT captured: iteration scratch (``_aitken_R_prev``, ``_h_gap_prev``) —
-        solve_staggered resets those at entry.
+        NOT captured: iteration scratch (``_aitken_R_prev``, ``_aitken_p_R_prev``,
+        ``_h_gap_prev``) — solve_staggered resets those at entry.
 
         IMPORTANT: take the snapshot at the very start of a (sub)step, BEFORE
         parameters()/set_power()/update_state() run, so ``_lhr_max`` and burnup

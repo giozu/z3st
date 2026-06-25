@@ -79,6 +79,31 @@ p_sorted = p_vals[order]
 T_sorted = T_vals[order]
 r_rel = r_sorted / Ro
 
+
+def radial_bin_mean(r_rel_vals, field_vals, nbins=50):
+    """Average a 2D field onto radial bins for a smooth 1D profile.
+
+    The plot collapses a 2D wedge onto radius, so several nodes at different
+    angles share one radius. Connecting them sorted by radius produces a
+    sawtooth at the steep void front (angular spread reaches ~0.5 there). The
+    bin mean removes that angular projection noise; the radial mean itself is
+    monotone, so the curve is faithful, not just cosmetically smoothed.
+    """
+    edges = np.linspace(0.0, r_rel_vals.max(), nbins + 1)
+    idx = np.digitize(r_rel_vals, edges)
+    centres, means = [], []
+    for b in range(1, nbins + 1):
+        sel = idx == b
+        if not np.any(sel):
+            continue
+        centres.append(0.5 * (edges[b - 1] + edges[b]))
+        means.append(field_vals[sel].mean())
+    return np.asarray(centres), np.asarray(means)
+
+
+r_bin, p_bin = radial_bin_mean(r_rel, p_sorted)
+_, T_bin = radial_bin_mean(r_rel, T_sorted)
+
 # --. Derived quantities --..
 VOID_THRESHOLD = 0.90          # p above this counts as central void
 COLUMNAR_THRESHOLD = 0.02      # p below this counts as restructured (Barani Sec. 5.2)
@@ -145,7 +170,8 @@ temperature_info = {
 # --. Plot 1: porosity radial profile --..
 try:
     plt.figure(figsize=(7, 5))
-    plt.plot(r_rel, p_sorted, "r-", lw=2.5, label="Z3ST porosity")
+    plt.scatter(r_rel, p_sorted, s=6, color="r", alpha=0.18, label="nodes (all angles)")
+    plt.plot(r_bin, p_bin, "r-", lw=2.5, label="Z3ST porosity (radial mean)")
     plt.axhline(0.15, color="gray", ls="--", label="initial porosity (0.15)")
     plt.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="Barani void radius ~0.2")
     plt.xlabel("Relative radius r / Ro (-)")
@@ -162,7 +188,8 @@ except Exception as e:
 # --. Plot 2: temperature radial profile --..
 try:
     plt.figure(figsize=(7, 5))
-    plt.plot(r_rel, T_sorted, "b-", lw=2.5, label="Z3ST temperature")
+    plt.scatter(r_rel, T_sorted, s=6, color="b", alpha=0.18, label="nodes (all angles)")
+    plt.plot(r_bin, T_bin, "b-", lw=2.5, label="Z3ST temperature (radial mean)")
     plt.xlabel("Relative radius r / Ro (-)")
     plt.ylabel("Temperature (K)")
     plt.title("Radial temperature profile at t = 10,000 s")
