@@ -174,6 +174,7 @@ class OutputWriter:
         self._H_cell_fn = None
         self._H_cell_expr = None
         self._c_cg_fn = None
+        self._p_cg_fn = None         # CG1 view of DG porosity for output (lazy)
         self._p_proj_problem = None  # cumulative plastic strain (lazy)
         self._u_out_fn = None        # CG1 vertex view of u for P2+ output (lazy)
 
@@ -248,6 +249,16 @@ class OutputWriter:
         # Cluster: pre-allocated CG1 Function for XDMF visualisation.
         if on.get("cluster", False) and getattr(problem, "c", None) is not None:
             self._c_cg_fn = dolfinx.fem.Function(self.V_c_cg, name="ClusterDensity")
+
+        # Porosity: with the DG discretisation, point_data needs a CG1 projection
+        # (the same DG->CG1 interpolation the cluster field uses). The CG path
+        # writes its Lagrange-1 field directly, so no helper is needed there.
+        if (
+            on.get("porosity", False)
+            and getattr(problem, "porosity", None) is not None
+            and getattr(problem, "porosity_discretisation", "cg") == "dg"
+        ):
+            self._p_cg_fn = dolfinx.fem.Function(self.V_c_cg, name="Porosity")
 
         # XDMF: open file once and write mesh header.
         self._ts_file = None
@@ -383,6 +394,10 @@ class OutputWriter:
         if self._c_cg_fn is not None:
             self._c_cg_fn.interpolate(self.problem.c)
 
+        # Porosity (DG only): same DG1 → CG1 projection for output.
+        if self._p_cg_fn is not None:
+            self._p_cg_fn.interpolate(self.problem.porosity)
+
     def _write_timeseries(self, t):
         """Append the current state to the open XDMF file at time ``t``."""
         p = self.problem
@@ -414,7 +429,7 @@ class OutputWriter:
             for fn in p.fg_fields.values():
                 write(fn, t)
         if on.get("porosity", False) and getattr(p, "porosity", None) is not None:
-            write(p.porosity, t)
+            write(self._p_cg_fn if self._p_cg_fn is not None else p.porosity, t)
 
     def _write_vtu(self, step):
         p = self.problem
@@ -495,9 +510,10 @@ class OutputWriter:
             if self._H_cell_fn is not None:
                 grid.cell_data["CrackDrivingForce"] = self._H_cell_fn.x.array.copy()
 
-        # Porosity
+        # Porosity (DG is projected to CG1 first; CG writes its nodal field).
         if on.get("porosity", False) and getattr(p, "porosity", None) is not None:
-            grid.point_data["Porosity"] = p.porosity.x.array.copy()
+            poro_out = self._p_cg_fn if self._p_cg_fn is not None else p.porosity
+            grid.point_data["Porosity"] = poro_out.x.array.copy()
 
         # Plasticity: cumulative plastic strain p lives on a quadrature space.
         # Projection per step is needed; the LinearProblem is built once.

@@ -73,10 +73,23 @@ class PorosityMigrationModel:
         This modifies mat["k"] in place so the staggered conduction step sees the
         updated field.
         """
+        # k, T and p must be sampled at the same DOFs to combine pointwise. T and
+        # k live on V_t (Lagrange-1). With the CG porosity discretisation p is
+        # also Lagrange-1, so the arrays align directly. With the DG one p lives
+        # on V_p (DG-1) and has a different layout/size, so first interpolate it
+        # onto a cached Lagrange-1 helper before the Maxwell-Eucken arithmetic.
+        T_vals = T_eval.x.array
+        if p_eval.x.array.shape == T_vals.shape:
+            p_vals_aligned = p_eval.x.array
+        else:
+            if getattr(self, "_p_on_Vt", None) is None:
+                self._p_on_Vt = dolfinx.fem.Function(self.V_t)
+            self._p_on_Vt.interpolate(p_eval)
+            p_vals_aligned = self._p_on_Vt.x.array
+
         for name, mat in self.materials.items():
             if mat.get("thermal_conductivity_model") == "kato_porosity":
-                T_vals = T_eval.x.array
-                p_vals = p_eval.x.array
+                p_vals = p_vals_aligned
 
                 x = float(mat.get("stoichiometry_deviation", 0.025))
                 k_He = float(mat.get("helium_conductivity", 0.69))
@@ -144,40 +157,87 @@ class PorosityMigrationModel:
         #            perturbed by tau (v·∇w) and weighted against the full strong
         #            residual p/dt + ∇·(v p) - p_n/dt, so the added diffusion
         #            vanishes at the exact solution (consistent -> sharper front).
+        #  - "dg":  upwind discontinuous Galerkin (porosity.discretisation: dg),
+        #            the same operator family as cluster dynamics. The upwind
+        #            facet flux is the stabilisation (no SU/SUPG, no mass-matrix
+        #            surgery); an optional SIPG block adds physical diffusion.
         h_e = ufl.CellDiameter(self.mesh)
-        v_mag = ufl.sqrt(ufl.dot(v_vec, v_vec) + 1e-30)
-        stab = str(self.porosity_cfg.get("stabilisation", "su")).lower()
+        n_vec = ufl.FacetNormal(self.mesh)
+        disc = str(self.porosity_cfg.get("discretisation", "cg")).lower()
 
-        # Conservative advection integrated by parts:
-        #   ∫ ∇·(v p) w dx = -∫ p v·∇w dx + ∫_∂Ω p (v·n) w ds
-        # Default: drop the boundary term (homogeneous natural BC, as in Barani
-        # Sec. 4.1 for SU). v·n = 0 on the symmetry faces and is negligible at the
-        # cold outer rim, so the rim keeps its fabrication porosity without an
-        # imposed value. Set porosity.rim_inflow_porosity to force a rim value.
-        a_p = (u_p / dt_const) * v_test * ufl.dx
-        a_p -= u_p * ufl.dot(v_vec, ufl.grad(v_test)) * ufl.dx
+        if disc == "dg":
+            # Conservative form, integrated by parts cell-wise:
+            #   ∫ (p/dt) w dx - ∫ p v·∇w dx + Σ_facets <flux,[w]> = ∫ (p_n/dt) w dx
+            a_p = (u_p / dt_const) * v_test * ufl.dx
+            a_p -= u_p * ufl.dot(v_vec, ufl.grad(v_test)) * ufl.dx
+            L_p = (p_n / dt_const) * v_test * ufl.dx
 
-        L_p = (p_n / dt_const) * v_test * ufl.dx
+            # Interior facets: pure upwinding on the (discontinuous, since T is
+            # P1) normal velocity vn = avg(v)·n⁺. The upwind trace is taken from
+            # the cell the flow comes from; jump(w) = w⁺ - w⁻.
+            vn = ufl.dot(ufl.avg(v_vec), n_vec("+"))
+            p_up = ufl.conditional(vn > 0, u_p("+"), u_p("-"))
+            a_p += vn * p_up * ufl.jump(v_test) * ufl.dS
 
-        if stab == "supg":
-            # SUPG parameter for transient advection: reduces to the cell transit
-            # time h_e/(2|v|) for small dt, bounded by ~dt/2 for fast flow. For P1
-            # the second derivative in div(v u_p) = u_p div(v) + v·grad(u_p) drops,
-            # so the strong residual is exact on the element interiors.
-            tau = 1.0 / ufl.sqrt((2.0 / dt_const) ** 2 + (2.0 * v_mag / h_e) ** 2)
-            supg_w = tau * ufl.dot(v_vec, ufl.grad(v_test))
-            a_p += (u_p / dt_const + ufl.div(v_vec * u_p)) * supg_w * ufl.dx
-            L_p += (p_n / dt_const) * supg_w * ufl.dx
+            # Exterior facets: outflow (v·n>0) carries the interior value (kept in
+            # the bilinear form); inflow (v·n<0) carries an upstream value, moved
+            # to the RHS. Default inflow value is p_n on the boundary, so the cold
+            # rim keeps its fabrication porosity (matching the CG natural-BC
+            # intent); porosity.rim_inflow_porosity overrides it with a constant.
+            vn_b = ufl.dot(v_vec, n_vec)
+            rim_inflow = self.porosity_cfg.get("rim_inflow_porosity", None)
+            p_in = (
+                dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(float(rim_inflow)))
+                if rim_inflow is not None else p_n
+            )
+            a_p += ufl.conditional(vn_b > 0, vn_b * u_p * v_test, 0.0) * ufl.ds
+            L_p -= ufl.conditional(vn_b < 0, vn_b * p_in * v_test, 0.0) * ufl.ds
+
+            # Optional SIPG diffusion (off by default -> pure advection, since the
+            # micrometric pore diffusivity is negligible in Barani's model).
+            D_p = float(self.porosity_cfg.get("diffusion", 0.0))
+            if D_p > 0.0:
+                D_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(D_p))
+                gamma = float(self.porosity_cfg.get("sipg_penalty", 10.0))
+                h_avg = (h_e("+") + h_e("-")) / 2.0
+                a_p += D_const * ufl.dot(ufl.grad(u_p), ufl.grad(v_test)) * ufl.dx
+                a_p -= D_const * ufl.dot(ufl.avg(ufl.grad(u_p)), ufl.jump(v_test, n_vec)) * ufl.dS
+                a_p -= D_const * ufl.dot(ufl.avg(ufl.grad(v_test)), ufl.jump(u_p, n_vec)) * ufl.dS
+                a_p += D_const * (gamma / h_avg) * ufl.jump(u_p) * ufl.jump(v_test) * ufl.dS
         else:
-            K_term = (h_e / (2.0 * v_mag)) * ufl.dot(v_vec, ufl.grad(u_p)) * ufl.dot(v_vec, ufl.grad(v_test))
-            a_p += K_term * ufl.dx
+            v_mag = ufl.sqrt(ufl.dot(v_vec, v_vec) + 1e-30)
+            stab = str(self.porosity_cfg.get("stabilisation", "su")).lower()
 
-        rim_inflow = self.porosity_cfg.get("rim_inflow_porosity", None)
-        if rim_inflow is not None:
-            n_vec = ufl.FacetNormal(self.mesh)
-            ds_outer = self.ds_tags[self.label_map["outer"]]
-            p_inflow_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(float(rim_inflow)))
-            L_p -= p_inflow_const * ufl.dot(v_vec, n_vec) * v_test * ds_outer
+            # Conservative advection integrated by parts:
+            #   ∫ ∇·(v p) w dx = -∫ p v·∇w dx + ∫_∂Ω p (v·n) w ds
+            # Default: drop the boundary term (homogeneous natural BC, as in Barani
+            # Sec. 4.1 for SU). v·n = 0 on the symmetry faces and is negligible at
+            # the cold outer rim, so the rim keeps its fabrication porosity without
+            # an imposed value. Set porosity.rim_inflow_porosity to force a value.
+            a_p = (u_p / dt_const) * v_test * ufl.dx
+            a_p -= u_p * ufl.dot(v_vec, ufl.grad(v_test)) * ufl.dx
+
+            L_p = (p_n / dt_const) * v_test * ufl.dx
+
+            if stab == "supg":
+                # SUPG parameter for transient advection: reduces to the cell
+                # transit time h_e/(2|v|) for small dt, bounded by ~dt/2 for fast
+                # flow. For P1 the second derivative in div(v u_p) = u_p div(v) +
+                # v·grad(u_p) drops, so the strong residual is exact on element
+                # interiors.
+                tau = 1.0 / ufl.sqrt((2.0 / dt_const) ** 2 + (2.0 * v_mag / h_e) ** 2)
+                supg_w = tau * ufl.dot(v_vec, ufl.grad(v_test))
+                a_p += (u_p / dt_const + ufl.div(v_vec * u_p)) * supg_w * ufl.dx
+                L_p += (p_n / dt_const) * supg_w * ufl.dx
+            else:
+                K_term = (h_e / (2.0 * v_mag)) * ufl.dot(v_vec, ufl.grad(u_p)) * ufl.dot(v_vec, ufl.grad(v_test))
+                a_p += K_term * ufl.dx
+
+            rim_inflow = self.porosity_cfg.get("rim_inflow_porosity", None)
+            if rim_inflow is not None:
+                ds_outer = self.ds_tags[self.label_map["outer"]]
+                p_inflow_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(float(rim_inflow)))
+                L_p -= p_inflow_const * ufl.dot(v_vec, n_vec) * v_test * ds_outer
 
         petsc_opts = self.get_solver_options(
             solver_type=self.porosity_cfg.get("linear_solver", "direct_mumps"),
