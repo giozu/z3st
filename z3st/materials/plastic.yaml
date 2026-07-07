@@ -3,6 +3,7 @@ type: structural
 fissile: false
 
 # constitutive: voigt
+# Engineering-Voigt convention: the shear rows act on gamma = 2*eps
 # C_matrix can be omitted, the code creates:
 # C_matrix:
 #   - [2.70e11, 1.10e11, 1.00e11, 0.0,    0.0,    0.0   ]

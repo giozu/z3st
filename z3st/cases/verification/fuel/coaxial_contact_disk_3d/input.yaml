@@ -1,0 +1,63 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  cyl_1: fuel.yaml
+  cyl_2: clad.yaml
+
+regime: 3d   # r-theta quarter disk extruded along z, clamped ends (plane strain)
+
+# NOTE: this case runs with softer elastic constants than coaxial_contact_disk
+# (fuel E = 100 GPa, clad E = 59.3 GPa), which doubles the penalty fixed-point
+# loop gain k_pen * compliance — hence the lower relaxation floor and the
+# larger iteration budget for the contact-onset step.
+solver_settings:
+  coupling: staggered
+  max_iters: 500
+  relax_T: 1.0
+  relax_u: 0.3
+  relax_adaptive: true
+  relax_growth: 1.1
+  relax_shrink: 0.5
+  relax_min: 0.015
+  relax_max: 0.9
+
+models:
+  thermal: true
+  mechanical: true
+  contact:
+    surface_a: lateral_1
+    surface_b: inner_2
+    penalty_stiffness: 1.0e14
+    initial_gap: 30.0e-6
+
+mechanical:
+  order: 2
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-6
+  stag_tol: 1.0e-5
+  convergence: rel_norm
+
+thermal:
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-7
+  stag_tol: 1.0e-6
+  convergence: rel_norm
+  analysis: stationary
+
+lhr:
+- 0.0
+- 0.0
+time:
+- 0.0
+- 1.0
+n_steps: 7

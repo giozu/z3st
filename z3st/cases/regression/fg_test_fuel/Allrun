@@ -1,6 +1,8 @@
 #!/bin/bash
 cd "${0%/*}" || exit 1
 
+set -e
+
 export SCIANTIX_LIB="${SCIANTIX_LIB:-/tmp/libsciantix_tu.so}"
 if [ ! -f "$SCIANTIX_LIB" ]; then
   echo "[Allrun] WARNING: SCIANTIX_LIB='$SCIANTIX_LIB' not found; the fission_gas"

@@ -1,6 +1,8 @@
 #!/bin/bash
 cd "${0%/*}" || exit 1
 
+set -e
+
 # SCIANTIX coupling (models.fission_gas) needs a -DCOUPLING_TU shared library.
 # Default to the local build; an externally-set SCIANTIX_LIB still wins.
 export SCIANTIX_LIB="${SCIANTIX_LIB:-/tmp/libsciantix_tu.so}"
