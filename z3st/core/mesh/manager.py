@@ -78,6 +78,18 @@ class MeshManager:
                 return g[k]
         return default
 
+    def _require_float(self, g: dict, keys: list, what: str):
+        """First-present key cast to float, with a geometry-level error when
+        absent — a missing radius otherwise surfaces later as None**2, and the
+        YAML 5.0e-3-without-signed-exponent quirk as a string multiply."""
+        val = self._first_present(g, keys, None)
+        if val is None:
+            raise KeyError(
+                f"geometry.yaml: missing {what} (one of {keys}) for "
+                f"geometry_type '{self.geometry_type}'."
+            )
+        return float(val)
+
     def _init_geometry_parameters(self):
         """Compute useful geometric quantities (like area, perimeter, etc.)."""
         g = self.geometry
@@ -96,8 +108,8 @@ class MeshManager:
         elif self.geometry_type in ["cyl", "cylinder"]:
             inner_radius_keys = ["inner_radius", "inner_radius_1", "Ri"]
             outer_radius_keys = ["outer_radius", "outer_radius_1", "Ro"]
-            self.inner_radius = self._first_present(g, inner_radius_keys, 0.0)
-            self.outer_radius = self._first_present(g, outer_radius_keys, None)
+            self.inner_radius = float(self._first_present(g, inner_radius_keys, 0.0))
+            self.outer_radius = self._require_float(g, outer_radius_keys, "outer radius")
             self.perimeter = 2.0 * np.pi * self.outer_radius
             self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
             log.info(f"  Ri = {self.inner_radius:.3e} m, Ro = {self.outer_radius:.3e} m")
@@ -107,10 +119,10 @@ class MeshManager:
             outer_1_keys = ["outer_radius_1", "Ro_1"]
             inner_2_keys = ["inner_radius_2", "Ri_2"]
             outer_2_keys = ["outer_radius_2", "Ro_2"]
-            self.inner_radius_1 = self._first_present(g, inner_1_keys, None)
-            self.outer_radius_1 = self._first_present(g, outer_1_keys, None)
-            self.inner_radius_2 = self._first_present(g, inner_2_keys, None)
-            self.outer_radius_2 = self._first_present(g, outer_2_keys, None)
+            self.inner_radius_1 = self._require_float(g, inner_1_keys, "inner radius 1")
+            self.outer_radius_1 = self._require_float(g, outer_1_keys, "outer radius 1")
+            self.inner_radius_2 = self._require_float(g, inner_2_keys, "inner radius 2")
+            self.outer_radius_2 = self._require_float(g, outer_2_keys, "outer radius 2")
             self.perimeter = 2.0 * np.pi * self.outer_radius_1
             self.area = np.pi * (self.outer_radius_1**2 - self.inner_radius_1**2)
             log.info(
@@ -121,8 +133,8 @@ class MeshManager:
             )
 
         elif self.geometry_type == "sphere":
-            self.inner_radius = g.get("Ri", None)
-            self.outer_radius = g.get("Ro", None)
+            self.inner_radius = float(self._first_present(g, ["Ri", "inner_radius"], 0.0))
+            self.outer_radius = self._require_float(g, ["Ro", "outer_radius"], "outer radius")
             self.perimeter = 2.0 * np.pi * self.outer_radius
             self.area = np.pi * (self.outer_radius**2 - self.inner_radius**2)
             log.info(f"  Ri = {self.inner_radius:.2e} m, Ro = {self.outer_radius:.2e} m")

@@ -106,8 +106,11 @@ class MeshBuilder:
 
         # Mesh
         gmsh.model.mesh.setSize(gmsh.model.getEntities(dim=0), self.h_box)
-        gmsh.model.mesh.setOrder(self.order)
         gmsh.model.mesh.generate(3)
+        # setOrder elevates an EXISTING mesh — called before generate() it is a
+        # no-op and an `order: 2` request silently yielded a P1 mesh.
+        if int(self.order) > 1:
+            gmsh.model.mesh.setOrder(self.order)
 
         types = gmsh.model.mesh.getElementTypes(3)
         print("Element types in 3D volume:", types)

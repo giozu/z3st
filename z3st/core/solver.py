@@ -387,10 +387,9 @@ class Solver:
                         T_other = dolfinx.fem.Function(self.V_t)
                         dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
                         dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
-                        T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
-                        gap_aux.append(
-                            {"fn": T_other, "dofs_here": dofs_here, "dofs_other": dofs_other}
-                        )
+                        aux = self._build_gap_pair_aux(T_other, dofs_here, dofs_other)
+                        self._refresh_gap_pair(aux, T_new)
+                        gap_aux.append(aux)
 
                         a_t += w * h_gap * u_t * v_t * ds_robin
                         L_t += w * h_gap * T_other * v_t * ds_robin
@@ -428,7 +427,7 @@ class Solver:
             # gap conductance Constant and paired-surface temperatures.
             self.set_gap_conductance(T_new)
             for aux in cache["gap_aux"]:
-                aux["fn"].x.array[aux["dofs_here"]] = T_new.x.array[aux["dofs_other"]]
+                self._refresh_gap_pair(aux, T_new)
 
         # Lagged update of any neural-network conductivity field: re-evaluate
         # k = NN(T) at the current iterate so the (linear) form sees the updated
@@ -1010,10 +1009,20 @@ class Solver:
             print(
                 f"Solving damage problem for '{label}' material"
             )
-            
+
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
 
+            missing = [k for k in ("Gc", "sigma_c", "E") if k not in material]
+            if missing:
+                # Every material in the domain participates in the phase-field
+                # problem; fail with a config-level message rather than a bare
+                # KeyError at the first damage assembly.
+                raise ValueError(
+                    f"Damage model is ON but material '{label}' lacks "
+                    f"{missing}. Give it sigma_c or Gc on its card (the other "
+                    "is derived at load time), or disable damage for this run."
+                )
             Gc = material["Gc"]
             sigma_c = material["sigma_c"]
             E = material["E"]
@@ -1086,7 +1095,14 @@ class Solver:
             D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
-        D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
+        # Irreversibility against the last CONVERGED step (anchor captured in
+        # solve_staggered), not the previous staggered iterate: an overshooting
+        # early iterate must remain retractable within the step, while D can
+        # never drop below its converged history.
+        D_floor = getattr(self, "_D_step_start", None)
+        D_new.x.array[:] = np.maximum(
+            D_new.x.array, D_floor if D_floor is not None else D_old.x.array
+        )
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         # Convergence
@@ -1140,9 +1156,14 @@ class Solver:
 
         DG formulation: upwind for advection, Symmetric Interior Penalty (SIPG)
         for diffusion.
+
+        ``c_old`` is the t^n time level (``self.c_n``, frozen by solve_staggered
+        at the start of the step) and must not be overwritten here: this step is
+        re-solved from the same t^n state on every staggered iteration (exactly
+        like the porosity model's ``p_n`), copying the current iterate into
+        ``c_old`` would advance the cluster field by an extra dt per iteration.
         """
-        c_old.x.array[:] = c_new.x.array
-        
+
         u_c, v_c = ufl.TrialFunction(self.V_c), ufl.TestFunction(self.V_c)
         
         # Parameters
@@ -1190,9 +1211,12 @@ class Solver:
             # Volume term
             a += - u_c * v_vel * v_c.dx(0) * ufl.dx
             
-            # Interior facets
+            # Interior facets: standard upwind flux v_n·avg(u) + ½|v_n|·jump(u).
+            # (avg(u*v*n) alone collapses to ½ v_n jump(u) — the consistent
+            # central term must be written explicitly or the facet coupling
+            # vanishes for continuous solutions and the scheme is inconsistent.)
             v_n = v_vel * n[0]
-            a += (ufl.avg(u_c * v_vel * n[0]) * ufl.jump(v_c) \
+            a += (v_n('+') * ufl.avg(u_c) * ufl.jump(v_c) \
                  + 0.5 * abs(v_n('+')) * ufl.jump(u_c) * ufl.jump(v_c)) * ufl.dS
             
             # Boundary facets (outflow/inflow)
@@ -1211,7 +1235,9 @@ class Solver:
             # Solve
             petsc_options = {
                 "ksp_type": "gmres",
-                "pc_type": "ilu",
+                # bjacobi(+ilu per block) — plain ilu is serial-only in PETSc
+                # and fails on distributed (mpiaij) matrices.
+                "pc_type": "bjacobi",
                 "ksp_rtol": 1e-12,
                 "ksp_atol": 1e-15,
                 "ksp_max_it": 1000,
@@ -1238,19 +1264,75 @@ class Solver:
         )
         
         if self.C_tot_target is not None:
-            if abs(C_tot_curr_new) > 0.0:
+            # Rescale only when the current mass is a sane same-sign quantity:
+            # a near-zero or sign-flipped ∫c·n (possible with DG undershoots)
+            # would otherwise scale the whole field by a huge/negative factor.
+            if (C_tot_curr_new * self.C_tot_target > 0.0
+                    and abs(C_tot_curr_new) > 1e-12 * abs(self.C_tot_target)):
                 renorm_factor = self.C_tot_target / C_tot_curr_new
                 c_new.x.array[:] *= renorm_factor
-                
+
                 print(f"  [Cluster] Mass conservation: target = {self.C_tot_target:.6e}")
                 print(f"  [Cluster] Mass conservation: before = {C_tot_curr_new:.6e}")
                 print(f"  [Cluster] Mass conservation: factor = {renorm_factor:.8f}")
             else:
-                print("  [Cluster] Warning: mass is zero, cannot renormalize.")
+                print(f"  [Cluster] WARNING: current mass {C_tot_curr_new:.3e} is "
+                      f"degenerate vs target {self.C_tot_target:.3e}; skipping "
+                      "renormalization this iteration.")
 
         c_max_local = float(np.max(c_new.x.array)) if c_new.x.array.size > 0 else float("-inf")
         c_max = self.mesh.comm.allreduce(c_max_local, op=MPI.MAX)
         print(f"   [Diagnostics] Max density c_max: {c_max:.2f}")
+
+    def _build_gap_pair_aux(self, fn, dofs_here, dofs_other):
+        """Geometric matching between two paired gap surfaces (built once per
+        step alongside the cached thermal form).
+
+        Each here-surface dof is paired with its geometrically nearest dof on
+        the other surface. The previous positional copy
+        ``T_other[dofs_here] = T[dofs_other]`` assumed the two index-sorted dof
+        arrays had equal length and matching order — not guaranteed even in
+        serial, and never with the surfaces split across MPI ranks. Owned
+        other-side coordinates are allgathered once here; per iteration only
+        the surface *values* travel (:meth:`_refresh_gap_pair`).
+        """
+        from scipy.spatial import cKDTree
+
+        comm = self.mesh.comm
+        coords = self.V_t.tabulate_dof_coordinates()
+        n_owned = self.V_t.dofmap.index_map.size_local
+        dofs_here = np.asarray(dofs_here)
+        dofs_other = np.asarray(dofs_other)
+        other_owned = dofs_other[dofs_other < n_owned] if dofs_other.size else dofs_other
+
+        other_xyz = coords[other_owned]
+        if comm.size > 1:
+            gdim = coords.shape[1]
+            other_xyz = np.concatenate(
+                [a.reshape(-1, gdim) for a in comm.allgather(other_xyz)]
+            )
+        if other_xyz.shape[0] == 0:
+            raise RuntimeError(
+                "Gap pair: the paired surface has no dofs on any rank — check "
+                "the 'pair:' label in boundary_conditions.yaml."
+            )
+        nn = (cKDTree(other_xyz).query(coords[dofs_here], k=1)[1]
+              if dofs_here.size else np.array([], dtype=np.int64))
+        return {"fn": fn, "dofs_here": dofs_here, "other_owned": other_owned,
+                "nn": nn}
+
+    def _refresh_gap_pair(self, aux, T_new):
+        """Copy the paired surface's current temperatures onto the persistent
+        T_other Function through the precomputed nearest-neighbour map. In
+        parallel the owned other-side values are allgathered in the same rank
+        order as the coordinates were at build time."""
+        comm = self.mesh.comm
+        vals = T_new.x.array[aux["other_owned"]]
+        if comm.size > 1:
+            vals = np.concatenate([np.atleast_1d(v) for v in comm.allgather(vals)])
+        if aux["dofs_here"].size:
+            aux["fn"].x.array[aux["dofs_here"]] = vals[aux["nn"]]
+        aux["fn"].x.scatter_forward()
 
     def solve_staggered(
         self,
@@ -1306,6 +1388,14 @@ class Solver:
             D_new = dolfinx.fem.Function(self.V_d)
             D_new.x.array[:] = self.D.x.array
             D_old = dolfinx.fem.Function(self.V_d)
+            # Irreversibility anchors: D and H ratchet against the last
+            # CONVERGED step, not against intermediate staggered iterates.
+            # Ratcheting per iterate let an overshooting early iterate (e.g.
+            # first mechanical pass with a not-yet-converged temperature)
+            # permanently inflate the crack driving force / damage field.
+            self._D_step_start = self.D.x.array.copy()
+            if getattr(self, "H", None) is not None:
+                self._H_step_start = self.H.x.array.copy()
         else:
             D_new = D_old = None
 
@@ -1433,5 +1523,17 @@ class Solver:
             self.c.x.array[:] = c_new.x.array
         if self.on.get("porosity", False):
             self.porosity.x.array[:] = p_new.x.array
+
+        # Advance the internal-variable history exactly as on the converged
+        # exit: the fields above are being ACCEPTED, and leaving ε_p / ε_cr at
+        # the previous step while time moves on hands the next step a
+        # displacement inconsistent with its internal state (the adaptive grid
+        # rolls all of this back anyway via snapshot/restore before a retry).
+        if self.on.get("mechanical", False) and self.on.get("plasticity", False):
+            self.update_plastic_history(u_new)
+        if self.on.get("mechanical", False) and any(
+            self.creep_active(m) for m in self.materials.values()
+        ):
+            self.update_creep_state(u_new, T_new)
 
         return False

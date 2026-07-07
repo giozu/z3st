@@ -336,7 +336,7 @@ class SciantixField:
         self.n_points = n_points
 
     def step(self, dt, T, fission_rate, hydro_stress=None,
-             burnup_old=None, burnup_new=None):
+             burnup_old=None, burnup_new=None, T_old=None):
         """Advance every point by ``dt`` (s) and return the per-point total gaseous
         swelling ΔV/V as a numpy array (length ``n_points``).
 
@@ -345,13 +345,21 @@ class SciantixField:
         ``burnup_new`` are per-point host burnup arrays (MWd/kgUO2) — pass them for a
         -DCOUPLING_TU build so SCIANTIX consumes Z3ST's RADAR burnup instead of
         computing its own (see :meth:`SciantixSolver.advance`).
+
+        ``T_old`` is the optional per-point temperature at the START of the
+        interval. When omitted the step is integrated isothermally at ``T`` —
+        the explicit pre-solve coupling in spine can only supply the last
+        converged temperature, so this is a first-order-in-dt approximation
+        during ramps/quenches (exact on plateaus). A caller that advances
+        SCIANTIX after the solve can pass the true (T_old, T_new) pair.
         """
         out = np.empty(self.n_points, dtype=np.float64)
         for i, pt in enumerate(self.points):
             hs = 0.0 if hydro_stress is None else float(hydro_stress[i])
             bo = None if burnup_old is None else float(burnup_old[i])
             bn = None if burnup_new is None else float(burnup_new[i])
-            res = pt.advance(dt, float(T[i]), float(T[i]), float(fission_rate[i]),
+            to = float(T[i]) if T_old is None else float(T_old[i])
+            res = pt.advance(dt, to, float(T[i]), float(fission_rate[i]),
                              hydro_stress=hs, burnup_old=bo, burnup_new=bn)
             out[i] = res["gaseous_swelling"]
         return out

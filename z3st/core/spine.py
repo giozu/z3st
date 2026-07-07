@@ -82,7 +82,8 @@ class Spine(
             PorosityMigrationModel.__init__(self)
 
     def parameters(self, lhr):
-        self.g = 0.0  # m/s2
+        # Gravity body force (m/s²), opt-in via mechanical.gravity
+        self.g = float(self.input_file.get("mechanical", {}).get("gravity", 0.0))
         self.lhr = lhr
         # Rescale the elastic constants
         if getattr(self, "materials", None):
@@ -189,6 +190,20 @@ class Spine(
             dmg_type = getattr(self, "dmg_cfg", {}).get("type")
 
             if lc:
+                if sigma_c is not None or (
+                    Gc is not None and isinstance(Gc, (int, float, np.floating, np.integer))
+                ):
+                    # The Gc ↔ sigma_c identities below need a NUMERIC Young's
+                    # modulus; with a symbolic "module.func" E card the raw
+                    # string would reach an arithmetic op as an opaque TypeError.
+                    if not isinstance(mat.get("E"), (int, float, np.floating, np.integer)):
+                        raise ValueError(
+                            f"Material '{name}': the Gc <-> sigma_c conversion "
+                            "requires a numeric E on the card; a symbolic "
+                            "(temperature-dependent) E cannot be combined with "
+                            "lc + sigma_c/Gc. Provide Gc AND sigma_c explicitly "
+                            "instead."
+                        )
                 if sigma_c is not None:
                     if dmg_type == "AT2":
                         Gc = (256/27) * lc * (sigma_c**2) / mat["E"]
@@ -507,11 +522,23 @@ class Spine(
                         shape = shape * np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
                     if zprof is not None:
                         shape = shape * np.asarray(zprof(coords, bu_vals, mat, model=self), dtype=float)
-                    # Nodal-mean normalisation (area-weighted refinement to come
-                    # with the TUBRNP profile).
-                    mean = shape.mean()
+                    # Nodal-mean normalisation. The mean is global over owned
+                    # dofs — a rank-local mean would normalise each partition
+                    # independently and make q''' partition-dependent.
+                    n_owned = self.V_t.dofmap.index_map.size_local
+                    dofs_arr = np.asarray(dofs)
+                    owned = dofs_arr < n_owned
+                    s_loc = float(shape[owned].sum()) if owned.any() else 0.0
+                    n_loc = int(np.count_nonzero(owned))
+                    s_glob = self.mesh.comm.allreduce(s_loc, op=MPI.SUM)
+                    n_glob = self.mesh.comm.allreduce(n_loc, op=MPI.SUM)
+                    mean = s_glob / n_glob if n_glob > 0 else 0.0
                     if mean > 0:
                         shape = shape / mean
+                    else:
+                        print(f"  [WARNING] power profile on '{name}' has "
+                              f"non-positive mean ({mean:.3e}); shaping skipped.")
+                        shape = np.ones(len(dofs))
 
                 # Accumulate: if multiple sources are configured on the same
                 # material (e.g. fissile + gamma_heating below), they should
@@ -668,6 +695,18 @@ class Spine(
         self._sciantix_dofs = (
             np.unique(np.concatenate(dof_lists)) if dof_lists else np.array([], dtype=np.int64)
         )
+        # Per-dof heavy-metal fraction for the burnup unit conversion at the
+        # handoff: Z3ST's RADAR burnup is MWd/kgU (per kg heavy metal), while the
+        # binding's H_BURNUP_OLD/NEW history slots are MWd/kgUO2 — SCIANTIX must
+        # see bu·hm or every burnup-driven model runs ~1/hm (≈13%) too burnt.
+        n_dofs = (self.V_t.dofmap.index_map.size_local
+                  + self.V_t.dofmap.index_map.num_ghosts)
+        hm_full = np.full(n_dofs, 0.8815)
+        for name, mat in self.materials.items():
+            if mat.get("fissile", False):
+                dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+                hm_full[dofs] = float(mat.get("heavy_metal_fraction", 0.8815))
+        self._sciantix_hm = hm_full[self._sciantix_dofs]
         self.gas_swelling = dolfinx.fem.Function(self.V_t, name="Gaseous swelling")
         self.gas_swelling.x.array[:] = 0.0
 
@@ -706,9 +745,11 @@ class Spine(
         dofs = self._sciantix_dofs
         T = self.T.x.array[dofs]
         fission_rate = self.q_third.x.array[dofs] / self.sciantix_energy_per_fission
-        bu_new = self.burnup.x.array[dofs]
+        # Convert MWd/kgU (Z3ST RADAR) → MWd/kgUO2 (SCIANTIX history slots).
+        bu_old_uo2 = bu_old * self._sciantix_hm if bu_old is not None else None
+        bu_new_uo2 = self.burnup.x.array[dofs] * self._sciantix_hm
         gs = self.sciantix_field.step(dt, T, fission_rate,
-                                      burnup_old=bu_old, burnup_new=bu_new)
+                                      burnup_old=bu_old_uo2, burnup_new=bu_new_uo2)
         self.gas_swelling.x.array[dofs] = gs
         self.gas_swelling.x.scatter_forward()
         print(f"[update_state] gaseous swelling max = {self.gas_swelling.x.array.max():.4e} (ΔV/V)")
@@ -727,6 +768,7 @@ class Spine(
     _SNAPSHOT_FIELDS = (
         "T", "u", "D", "H", "burnup", "gas_swelling", "c", "c_n",
         "p", "ep", "p_n", "ep_n",
+        "porosity", "porosity_n",
     )  # dolfinx Functions
     _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
     _SNAPSHOT_MATERIAL_KEYS = ("E", "nu", "bulk_modulus", "_lhr_max")

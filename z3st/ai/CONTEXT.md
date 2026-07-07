@@ -24,6 +24,9 @@ Z3ST provides a **modular and extensible** environment to simulate:
 - **phase-field fracture** (damage) with AT1 and AT2 models;
 - **gap conductance** between domains (fixed or gas-type);
 - **1D cluster-dynamics** advection–diffusion problems;
+- **thermal-gradient pore migration** (oxide-fuel restructuring: central void +
+  columnar zone) via a stabilised porosity-advection model two-way coupled to
+  the thermal solve (§4.9);
 - arbitrary, spatially-dependent **internal heat sources** (γ-heating, user-defined);
 - **fuel-performance behaviours carried at the material level**: burnup accumulation, radial power shaping `f(r, bu)`, burnup-driven swelling, and penalty **pellet-clad contact (PCMI)** with contact-coupled gap conductance;
 - fully **YAML-driven** configuration for reproducibility, with the ability to plug in user **Python material modules** at runtime.
@@ -76,7 +79,11 @@ z3st/
     │   ├── plasticity_model.py       J2 (return mapping) + custom crystal plasticity hook
     │   ├── gap_model.py              Fixed / Gas gap conductance (+ contact-coupled)
     │   ├── contact_model.py          penalty pellet-clad mechanical contact (gap closure)
-    │   └── cluster_dynamic_model.py  1D advection-diffusion (DG+SIPG+upwind)
+    │   ├── cluster_dynamic_model.py  1D advection-diffusion (DG+SIPG+upwind)
+    │   ├── creep_model.py            implicit Norton (+irradiation) creep, AD tangent
+    │   ├── cracking_model.py         Barani isotropic-softening fuel cracking
+    │   ├── porosity_migration_model.py  thermal-gradient pore migration (SU/SUPG)
+    │   └── nn_conductivity.py        neural-network k(T) (Picard / external-operator Newton)
     ├── materials/                    YAML material cards + Python modules
     │   ├── steel.yaml, austenitic_steel.yaml, martensitic_steel.yaml,
     │   │ high_carbon_steel.yaml, T91.yaml, 15_15Ti.yaml,
@@ -221,6 +228,7 @@ Allocates the FE function spaces on `self.mesh`:
 | `V_c`  | DG1 (scalar)                           | Cluster density (when `cluster` on)     |
 | `V_pl` | quadrature (3×3 tensor), degree `q_degree` | Plastic strain tensor ε_p (when `plasticity` on) |
 | `Q_pl` | quadrature (scalar), degree `q_degree`  | Cumulative plastic strain p             |
+| `V_p`  | Lagrange P1 (scalar)                   | Porosity (when `porosity` on)           |
 
 ### 3.3 `core/solver.py — Solver`
 
@@ -357,8 +365,8 @@ Phase-field fracture with two variational models:
 
 Elastic-energy splits (selectable via `damage.split: amor | miehe | star_convex`; if absent, defaults to Amor for AT1 and Miehe for AT2 — the historical pairing):
 - `psi_miehe_spectral(u, mat)` — 2D closed-form + 3D via Cardano's formula with smooth clamping.
-- `psi_amor_split(u, mat)` — `ψ⁺ = ½ λ ⟨tr ε⟩₊² + G dev(ε):dev(ε)`; `ψ⁻ = ½ λ ⟨tr ε⟩₋²`.
-- `psi_star_convex(u, mat)` — Vicentini, Zolesi, Carrara, Maurini, De Lorenzis 2024 (Int. J. Fract. 247:291-317). One-parameter generalisation of Amor controlled by `dmg_cfg["gamma_star"]` (a *model* parameter in the `damage:` block, default 0 → reduces to Amor; intentionally not a per-material property). `ψ⁺ = G|dev ε|² + (λ/2)[⟨tr ε⟩₊² − γ⋆⟨tr ε⟩₋²]`, `ψ⁻ = (1+γ⋆)(λ/2)⟨tr ε⟩₋²`. Satisfies all five criteria in the Vicentini 2024 Table 2 (the other splits do not). `γ⋆ > 0` raises the compressive-vs-tensile critical-stress ratio.
+- `psi_amor_split(u, mat)` — `ψ⁺ = ½ K_n ⟨tr ε⟩₊² + G dev(ε):dev(ε)`; `ψ⁻ = ½ K_n ⟨tr ε⟩₋²`, with `K_n = λ + 2G/n` Amor's n-dimensional bulk modulus (n = strain-tensor dimension) so ψ⁺+ψ⁻ = ψ_el exactly (2026-07-02; previously λ, which under-weighted hydrostatic tension by ~30 % at ν = 0.3).
+- `psi_star_convex(u, mat)` — Vicentini, Zolesi, Carrara, Maurini, De Lorenzis 2024 (Int. J. Fract. 247:291-317). One-parameter generalisation of Amor controlled by `dmg_cfg["gamma_star"]` (a *model* parameter in the `damage:` block, default 0 → reduces to Amor; intentionally not a per-material property). `ψ⁺ = G|dev ε|² + (K_n/2)[⟨tr ε⟩₊² − γ⋆⟨tr ε⟩₋²]`, `ψ⁻ = (1+γ⋆)(K_n/2)⟨tr ε⟩₋²` (same `K_n` as Amor, matching Vicentini's κ). Satisfies all five criteria in the Vicentini 2024 Table 2 (the other splits do not). `γ⋆ > 0` raises the compressive-vs-tensile critical-stress ratio.
 
 `update_history(u)` — vectorised, per-material update of the history field `H` on DG0. Supports **Ambati-Gerasimov-De Lorenzis hybrid constraint** (`dmg_cfg.hybrid_constraint`, default `True`): where `ψ⁻ > ψ⁺` locally, contribution to H is set to 0 to suppress crack growth in compression.
 
@@ -420,6 +428,47 @@ E_iso(n) = f(ν)^n · E            ν_iso(n) = ν / (2^n + (2^n − 1)·ν)
 ```
 
 The number of cracks follows the paper's empirical correlation on the rod-average LHR, n = n₀ + (n∞ − n₀)(1 − exp(−(LHR − LHR₀)/τ)) above LHR₀, with the fitted constants LHR₀ = 5 kW/m, n₀ = 1, n∞ = 12, τ = 21 kW/m (Oguma 1983 / Walton & Husser 1983 data; all overridable via `cracking_lhr0/n0/n_inf/tau`). No healing: n is driven by the maximum LHR seen in the history (irreversible, `_lhr_max` on the card). Opt-in per material card with `cracking: isotropic` (unknown values rejected at load like `creep:`); the rescale runs once per step from `spine.parameters()`, and since the mechanical form rebuilds per step (form cache), the softened lmbda/G are consumed with no extra plumbing. At 20 kW/m: n ≈ 6.6, E_iso/E ≈ 0.11, ν_iso ≈ 0.003 — order-of-magnitude lower fuel stresses, the paper's headline effect. Unit-checked against the paper (n = 1 at 5 kW/m with E_iso/E = f(ν); Fig. 3 curve at 10/20/40 kW/m; irreversibility). Scope: elastic softening only — Jankus-Weeks cracked-fuel creep correction and healing deliberately excluded, as in the paper.
+
+### 4.9 Porosity migration (`porosity_migration_model.py`)
+
+*(added 2026-06-23/25)* Thermal-gradient pore migration for oxide-fuel
+restructuring (central void + columnar zone), in the spirit of Barani et al.
+(JNM 2022) / Novascone et al. (2018). The porosity field `p(x,t)` (P1 on `V_p`)
+obeys the conservative advection law `∂p/∂t + ∇·(v p) = 0` with the pore
+velocity **up the thermal gradient**:
+
+```
+v = v0 · (c1 + c2·T + c3·T² + c4·T³) · T^-2.5 · exp(-Hs/RT) · ∇T   [m/s]
+```
+
+(Sens vapour-transport correlation; `v0 = 1.303427e8` reproduces Sens'
+4.2e-11 m/s benchmark; `Hs = 5.98e5` J/mol; all overridable in the
+`porosity:` block.)
+
+- **Discretisation:** CG P1 + streamline stabilisation, backward Euler,
+  point-wise clamp to `[0,1]` after each solve. `porosity.stabilisation:
+  su` (default, artificial diffusion K = (h/2|v|) v⊗v) or `supg` (consistent:
+  test perturbed by τ v·∇w against the full strong residual, τ =
+  ((2/dt)² + (2|v|/h)²)^-1/2 — sharper front). Note the clamp costs strict
+  mass conservation (~2.5 % on the reference transient); the conservative
+  DG+limiter variant lives on the `feature/DG` research branch.
+- **Boundary:** natural (zero-flux) by default — the rim keeps its fabrication
+  porosity as a *prediction*. `porosity.rim_inflow_porosity` (+ optional
+  `porosity.rim_label`, default `outer`) switches to a weak inflow/outflow
+  split (prescribed value only where `v·n < 0`).
+- **Two-way thermal coupling:** `q'''` is rescaled by `1/(1-p)` (LHR
+  conserved) and a material with `thermal_conductivity_model: kato_porosity`
+  gets `k(T,p)` = Kato matrix conductivity × Maxwell-Eucken porosity factor,
+  refreshed each staggered iteration (`update_porosity_dependent_properties`).
+- **Staggered contract:** `_porosity_step(p_new, p_n, dt, ...)` keeps `p_n`
+  frozen at tⁿ across staggered iterations (the pattern the cluster solver now
+  follows too); under-relaxation fixed factor `porosity.relax` or Aitken
+  (`porosity.aitken: true`); convergence on the mixed rel/abs criterion.
+- **State/rollback:** `porosity`/`porosity_n` are in `_SNAPSHOT_FIELDS`, so the
+  adaptive grid rolls them back on a failed step.
+- **Verification:** `verification/fuel/porosity_migration` (Barani (U,Pu)O2
+  sector: centre p → 1, void radius 0.18 r/Ro vs 0.20, rim 0.15 preserved,
+  centre T 2924 K gold-tracked).
 
 ---
 
@@ -831,6 +880,9 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/models/contact_model.py`                | Penalty pellet-clad mechanical contact (PCMI)         |
 | `z3st/models/creep_model.py`                  | Implicit Norton creep (incremental variational, IFT tangent by AD) |
 | `z3st/models/cluster_dynamic_model.py`        | 1D advection–diffusion cluster dynamics (DG/SIPG)     |
+| `z3st/models/cracking_model.py`               | Barani isotropic-softening fuel cracking (§4.8)       |
+| `z3st/models/porosity_migration_model.py`     | Thermal-gradient pore migration, SU/SUPG (§4.9)       |
+| `z3st/models/nn_conductivity.py`              | Neural-network k(T): Picard or external-operator Newton |
 | `z3st/materials/*.yaml`                       | Material cards                                        |
 | `z3st/materials/{ceramic,oxide}.py`           | Python callables for `k(T)`, `Gc(mesh)`                |
 | `z3st/materials/{fuel_profiles,fuel_swelling}.py` | Fuel-behaviour callables: radial power `f(r,bu)`, swelling(bu) |
@@ -847,3 +899,5 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 ---
 
 *Generated on 2026-04-16 for Z3ST v0.1.0; last updated 2026-06-10 (full four-agent re-audit folded into punch_list.md; CODE-P0-5 plane_stress solver fix + regime validation; gold-regression verdict now persisted to `non-regression.json` and gated in local summary + CI; 8 stale golds re-blessed; `heat_flux` fixed and re-wired under `--debug`; `regression/pwr_rod_2D` gold-protected and wired into the local suite together with the `V_*` cases).*
+
+*2026-07-02 update (six-agent review + fix pass): §4.9 porosity migration documented; SCIANTIX handoff now converts burnup MWd/kgU → MWd/kgUO2; CI fails on a missing `non-regression.json` and every case `Allrun` carries `set -e`; cluster solver fixed (tⁿ level no longer advanced per staggered iteration; consistent upwind flux `v_n·avg(u) + ½|v_n|·jump(u)`; cell-based constant IC; bjacobi PC); plane-stress `sigma_th`/energy use λ_ps; gap model, power-profile normalisation, creep predictor, hot-reload, and the gap-pair T transfer are MPI-safe (global reductions / nearest-neighbour matching); non-converged staggered exits advance ε_p/ε_cr consistently and porosity is in `_SNAPSHOT_FIELDS`; Voigt route switched to engineering shear strains (γ = 2ε, C44 = G — isotropic fallback unchanged); writer restricts projected fields per material and warns on widespread NaN; `mesh_builder` `order: 2` actually elevates; NN-k clamps to its training window with a positivity floor; `mechanical.gravity` config key wired; `fuel_thermal.k` correctly attributed to modified-NFI (not Fink). Numerics follow-up, same date: Amor/star-convex splits now use Amor's n-dimensional bulk modulus `K_n = λ + 2G/n` (exact orthogonal decomposition, ψ⁺+ψ⁻ = ψ_el; previously λ); damage irreversibility (D, and H for AT2) ratchets against the last CONVERGED step (`_D_step_start`/`_H_step_start` anchors captured in solve_staggered) instead of against intermediate staggered iterates; Barani cracking `f(ν)^n` closed form reviewed and deliberately KEPT (see the note in `cracking_model.py` — the paper's Fig. 3 unit check discriminates against the recursive-product reading). Damage golds re-blessed accordingly.*

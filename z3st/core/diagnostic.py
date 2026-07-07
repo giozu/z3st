@@ -7,6 +7,7 @@
 import logging
 
 import dolfinx
+import dolfinx.fem.petsc
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.sparse

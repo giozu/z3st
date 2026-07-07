@@ -29,6 +29,21 @@ same interface, with no change to set_power or the burnup bus.
 import numpy as np
 
 
+def _global_min_max(vals, model):
+    """Min/max of a per-dof array across all MPI ranks. The profile callables
+    infer geometry (fuel height, outer radius) from the dof coordinates; with a
+    partitioned mesh each rank sees only its own dofs, so rank-local extrema
+    would give every rank a different — and wrong — profile."""
+    lo = float(vals.min()) if vals.size else float("inf")
+    hi = float(vals.max()) if vals.size else float("-inf")
+    comm = getattr(getattr(model, "mesh", None), "comm", None)
+    if comm is not None and comm.size > 1:
+        from mpi4py import MPI
+        lo = comm.allreduce(lo, op=MPI.MIN)
+        hi = comm.allreduce(hi, op=MPI.MAX)
+    return lo, hi
+
+
 def _radius(coords, model):
     """In-plane radius from the dof coordinates, respecting the regime. For
     axisymmetric / 2-D cylindrical meshes the first coordinate *is* r (the mesh
@@ -69,7 +84,7 @@ def chopped_cosine(coords, burnup, material, model=None):
     the profile is clamped at zero (physically: no fission outside it).
     """
     z = _axial_coord(coords, model)
-    z_min, z_max = float(z.min()), float(z.max())
+    z_min, z_max = _global_min_max(z, model)
     L = z_max - z_min if z_max > z_min else 1.0
     z_mid = 0.5 * (z_min + z_max)
     L_prime = float(material.get("axial_extrapolated_length", 1.1 * L))
@@ -119,7 +134,8 @@ def rim_peaking(coords, burnup, material, model=None):
     power) is unchanged; only its radial distribution is shaped.
     """
     r = _radius(coords, model)
-    R = r.max() if r.max() > 0 else 1.0
+    _, r_max = _global_min_max(r, model)
+    R = r_max if r_max > 0 else 1.0
     A = float(material.get("radial_peak_amplitude", 3.0))
     p = float(material.get("radial_peak_exponent", 8.0))
     return 1.0 + A * (r / R) ** p

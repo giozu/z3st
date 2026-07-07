@@ -229,13 +229,16 @@ class DamageModel:
 
         Returns (psi_pos, psi_neg) with::
 
-            psi_pos = (lambda/2) <tr eps_el>_+^2 + mu * dev(eps_el):dev(eps_el)
-            psi_neg = (lambda/2) <tr eps_el>_-^2
+            psi_pos = (K_n/2) <tr eps_el>_+^2 + mu * dev(eps_el):dev(eps_el)
+            psi_neg = (K_n/2) <tr eps_el>_-^2
 
         where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
-        (total strain when T is None). Note: this uses lambda rather than
-        the n-dimensional bulk modulus K_n. Same convention as the existing
-        AT1 driving force in z3st.
+        (total strain when T is None) and K_n = lambda + 2*mu/n is Amor's
+        n-dimensional bulk modulus (Amor, Marigo & Maurini 2009), with n the
+        strain-tensor dimension. With K_n the split is an exact orthogonal
+        decomposition, psi_pos + psi_neg = psi_el; the previous lambda-based
+        convention dropped the (mu/n) tr^2 part of the volumetric energy
+        (~30 % of the hydrostatic-tension driving force at nu = 0.3).
         """
         lam = material["lmbda"]
         G = material["G"]
@@ -247,12 +250,14 @@ class DamageModel:
         if eth is not None:
             eps = eps - eth
 
+        k_n = lam + 2.0 * G / dim
+
         tr_eps = ufl.tr(eps)
         tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
         tr_eps_neg = 0.5 * (tr_eps - abs(tr_eps))
 
-        psi_pos = 0.5 * lam * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
-        psi_neg = 0.5 * lam * tr_eps_neg**2
+        psi_pos = 0.5 * k_n * tr_eps_pos**2 + G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
+        psi_neg = 0.5 * k_n * tr_eps_neg**2
 
         return psi_pos, psi_neg
 
@@ -265,8 +270,8 @@ class DamageModel:
         split::
 
             psi_pos = G |dev(eps_el)|^2
-                      + (lambda/2) [<tr eps_el>_+^2 - gamma_star <tr eps_el>_-^2]
-            psi_neg = (1 + gamma_star) (lambda/2) <tr eps_el>_-^2
+                      + (K_n/2) [<tr eps_el>_+^2 - gamma_star <tr eps_el>_-^2]
+            psi_neg = (1 + gamma_star) (K_n/2) <tr eps_el>_-^2
 
         gamma_star >= -1 controls the compressive-vs-tensile critical-stress
         asymmetry. gamma_star = 0 recovers the Amor split; gamma_star > 0
@@ -283,9 +288,9 @@ class DamageModel:
         Amor). It is a model parameter, not a material property: the
         energy-split machinery is shared across every material.
 
-        z3st's Amor implementation uses the Lame parameter ``lambda`` rather
-        than the n-dimensional bulk modulus ``K_n``; star-convex mirrors that
-        convention so that ``gamma_star = 0`` recovers ``psi_amor_split``.
+        Uses Amor's n-dimensional bulk modulus ``K_n = lambda + 2*mu/n`` (as in
+        Vicentini et al. 2024, who write kappa); ``gamma_star = 0`` recovers
+        ``psi_amor_split`` exactly, which uses the same modulus.
         """
         lam = material["lmbda"]
         G = material["G"]
@@ -298,15 +303,17 @@ class DamageModel:
         if eth is not None:
             eps = eps - eth
 
+        k_n = lam + 2.0 * G / dim
+
         tr_eps = ufl.tr(eps)
         tr_eps_pos = 0.5 * (tr_eps + abs(tr_eps))
         tr_eps_neg = 0.5 * (tr_eps - abs(tr_eps))
 
         psi_pos = (
             G * ufl.inner(ufl.dev(eps), ufl.dev(eps))
-            + 0.5 * lam * (tr_eps_pos**2 - gamma_star * tr_eps_neg**2)
+            + 0.5 * k_n * (tr_eps_pos**2 - gamma_star * tr_eps_neg**2)
         )
-        psi_neg = (1.0 + gamma_star) * 0.5 * lam * tr_eps_neg**2
+        psi_neg = (1.0 + gamma_star) * 0.5 * k_n * tr_eps_neg**2
 
         return psi_pos, psi_neg
 
@@ -409,7 +416,14 @@ class DamageModel:
         if damage_type == "AT1":
             self.H.x.array[:] = H_new_array
         elif damage_type == "AT2":
-            self.H.x.array[:] = np.maximum(self.H.x.array, H_new_array)
+            # Ratchet against the last CONVERGED step's history (anchor
+            # captured by solve_staggered at step start), not against the
+            # running iterate: maxing in place every staggered iteration let
+            # unconverged intermediate states permanently inflate H.
+            H_floor = getattr(self, "_H_step_start", None)
+            if H_floor is None:
+                H_floor = self.H.x.array
+            self.H.x.array[:] = np.maximum(H_floor, H_new_array)
 
         self.H.x.scatter_forward()
 
@@ -502,11 +516,19 @@ class DamageModel:
                     
                     if bc_type == "Dirichlet":
                         d_const = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(val_d))
-                        
+
                         dofs = dolfinx.fem.locate_dofs_topological(V_damage, self.fdim, facets)
-                        
+
                         bc = dolfinx.fem.dirichletbc(d_const, dofs, V_damage)
 
+                        if mat_type not in self.dirichlet_damage:
+                            # A typo'd material key in boundary_conditions.yaml
+                            # must degrade like the other malformed-BC paths,
+                            # not crash setup with a bare KeyError.
+                            print(f"  [ERROR] Damage BC block keyed by unknown "
+                                  f"material '{mat_type}' — known: "
+                                  f"{sorted(self.dirichlet_damage)}. Skipped.")
+                            continue
                         self.dirichlet_damage[mat_type].append({
                             "id": region_id,
                             "value": bc,

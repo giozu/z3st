@@ -62,7 +62,9 @@ class Config:
 
         gap_config = self.input_file.get("models", {}).get("gap_conductance", {})
         self.gap_model = gap_config.get("type", None)
-        self.h_gap_value = gap_config.get("value", 0.0)
+        self.h_gap_value = float(gap_config.get("value", 0.0))
+        self.gap_surface_a = gap_config.get("surface_a", "lateral_1")
+        self.gap_surface_b = gap_config.get("surface_b", "inner_2")
 
         # Contact-coupled gap conductance (Todreas & Kazimi, Nuclear Systems I,
         # 3rd ed., Eq. 8.141/8.142): on gap closure a contact term proportional

@@ -34,8 +34,12 @@ class ContactModel:
     production contact algorithm.
 
     Mean radial displacement on a surface is computed as a boundary-integral
-    average  <u_r>_Γ = (∫_Γ u_r ds) / (∫_Γ ds)  via assemble_scalar, which is
-    unambiguous under blocked vector spaces and MPI-parallel.
+    average  <u_r>_Γ = (∫_Γ u·n ds) / (∫_Γ ds)  via assemble_scalar, which is
+    unambiguous under blocked vector spaces and MPI-parallel. Projecting on
+    the outward facet normal (with the sign flipped on surface b, whose
+    outward normal points radially inward) makes the measure valid both for
+    axisymmetric r-z meshes (straight facets, n = ±e_x) and for in-plane
+    r-theta disk meshes (curved arcs, n = ±e_r).
     """
 
     def __init__(self):
@@ -88,9 +92,12 @@ class ContactModel:
         Measure the current gap from displacement iterate ``u`` and set the
         penalty contact pressure. Returns (current_gap, pressure).
         """
-        # Mean radial displacement (u_r = u[0]) on each facing surface.
-        ur_a = self._assemble(dolfinx.fem.form(u[0] * self._ds_a)) / self._area_a
-        ur_b = self._assemble(dolfinx.fem.form(u[0] * self._ds_b)) / self._area_b
+        # Mean radial displacement <u·n> on each facing surface. On surface a
+        # (inner body, outer face) the outward normal is +e_r; on surface b
+        # (outer body, inner face) it is -e_r, hence the sign flip.
+        n_vec = self._normal_as(u)
+        ur_a = self._assemble(dolfinx.fem.form(ufl.dot(u, n_vec) * self._ds_a)) / self._area_a
+        ur_b = -self._assemble(dolfinx.fem.form(ufl.dot(u, n_vec) * self._ds_b)) / self._area_b
 
         current_gap = self.g0 + ur_b - ur_a
         penetration = max(0.0, -current_gap)
@@ -118,9 +125,15 @@ class ContactModel:
         """
         w = self.weight
         p = self.contact_pressure
-        n = self.normal  # ufl.FacetNormal, outward on exterior facets
-        n_vec = ufl.as_vector([n[0], n[1]])
+        n_vec = self._normal_as(v)
         term = 0
         for ds_c in (self._ds_a, self._ds_b):
             term += w * ufl.dot(-p * n_vec, v) * ds_c
         return term
+
+    def _normal_as(self, u):
+        """Outward facet normal truncated to the vector size of ``u`` — the
+        displacement space has tdim components while the gmsh-read mesh keeps
+        gdim = 3, so the normal may carry a spurious trailing component."""
+        n = self.normal
+        return ufl.as_vector([n[i] for i in range(u.ufl_shape[0])])

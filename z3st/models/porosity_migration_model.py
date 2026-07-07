@@ -160,10 +160,11 @@ class PorosityMigrationModel:
         L_p = (p_n / dt_const) * v_test * ufl.dx
 
         if stab == "supg":
-            # SUPG parameter for transient advection: reduces to the cell transit
-            # time h_e/(2|v|) for small dt, bounded by ~dt/2 for fast flow. For P1
-            # the second derivative in div(v u_p) = u_p div(v) + v·grad(u_p) drops,
-            # so the strong residual is exact on the element interiors.
+            # SUPG parameter for transient advection: tends to dt/2 for small dt
+            # (time-step limited) and to the cell transit time h_e/(2|v|) for
+            # large dt / fast flow. For P1 the second derivative in
+            # div(v u_p) = u_p div(v) + v·grad(u_p) drops, so the strong
+            # residual is exact on the element interiors.
             tau = 1.0 / ufl.sqrt((2.0 / dt_const) ** 2 + (2.0 * v_mag / h_e) ** 2)
             supg_w = tau * ufl.dot(v_vec, ufl.grad(v_test))
             a_p += (u_p / dt_const + ufl.div(v_vec * u_p)) * supg_w * ufl.dx
@@ -174,10 +175,25 @@ class PorosityMigrationModel:
 
         rim_inflow = self.porosity_cfg.get("rim_inflow_porosity", None)
         if rim_inflow is not None:
+            rim_label = self.porosity_cfg.get("rim_label", "outer")
+            if rim_label not in self.label_map:
+                raise KeyError(
+                    f"porosity.rim_inflow_porosity: rim label '{rim_label}' is "
+                    "not in the geometry label map — set porosity.rim_label to "
+                    "the rim facet label."
+                )
             n_vec = ufl.FacetNormal(self.mesh)
-            ds_outer = self.ds_tags[self.label_map["outer"]]
+            ds_outer = self.ds_tags[self.label_map[rim_label]]
             p_inflow_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(float(rim_inflow)))
-            L_p -= p_inflow_const * ufl.dot(v_vec, n_vec) * v_test * ds_outer
+            # Standard weak inflow/outflow split: the prescribed value enters
+            # only where v·n < 0 (inflow); where the rim is locally outflow the
+            # unknown leaves through the LHS term. Applying the full v·n
+            # against p_inflow injected a spurious source on outflow segments.
+            v_n = ufl.dot(v_vec, n_vec)
+            v_n_in = ufl.conditional(ufl.lt(v_n, 0.0), v_n, 0.0)
+            v_n_out = ufl.conditional(ufl.gt(v_n, 0.0), v_n, 0.0)
+            a_p += v_n_out * u_p * v_test * ds_outer
+            L_p -= p_inflow_const * v_n_in * v_test * ds_outer
 
         petsc_opts = self.get_solver_options(
             solver_type=self.porosity_cfg.get("linear_solver", "direct_mumps"),

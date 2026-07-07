@@ -19,6 +19,17 @@ Scaling of the elastic constants, applied from the VIRGIN constants (E, nu):
     E_iso(n)   = f(nu)^n * E
     nu_iso(n)  = nu / (2^n + (2^n - 1) * nu)
 
+Note on the E closed form (reviewed 2026-07-02): nu_iso(n) is the closed form
+of the per-crack recursion nu_{k+1} = nu_k/(2 + nu_k), which admits an
+alternative reading in which E would follow the same recursion,
+E_{k+1} = f(nu_k) E_k (a product that differs from f(nu)^n by ~40 % at
+n = 6.6 and >2x at n = 10). The frozen-nu power form implemented here is the
+paper's published closed form: the 2026-06-12 unit check reproduced the
+paper's Fig. 3 E_iso/E curve at 10/20/40 kW/m, which discriminates decisively
+between the two at high n. The correlation also yields FRACTIONAL n, for
+which only the closed forms in continuous n are well-defined. Do not "fix"
+this to the recursive product without re-checking Fig. 3 of the paper.
+
 Number of cracks, an empirical correlation on the rod-average:
 
     n = 0                                                    LHR <  LHR0

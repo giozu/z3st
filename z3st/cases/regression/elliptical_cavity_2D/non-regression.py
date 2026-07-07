@@ -91,3 +91,4 @@ errors = {
 }
 TOLERANCE = 1.0e-2
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+regression_check(errors, CASE_DIR)

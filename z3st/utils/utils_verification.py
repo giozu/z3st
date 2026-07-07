@@ -84,8 +84,12 @@ def _write_regression_verdict(case_dir, verdict):
         data["regression"] = verdict
         with open(out_json, "w") as f:
             json.dump(data, f, indent=4)
-    except (FileNotFoundError, json.JSONDecodeError):
-        pass
+    except (FileNotFoundError, json.JSONDecodeError) as exc:
+        # Loud, not silent: without the 'regression' key the suite drivers
+        # report "(no verdict)" and a detected FAIL would vanish.
+        print(f"  {RED}[WARNING] could not persist regression verdict "
+              f"'{verdict}' into {out_json} ({exc}); the suite drivers will "
+              f"see no regression verdict for this case.{END}")
 
 
 def regression_check(errors, case_dir, regression_tol=1e-3):
@@ -132,7 +136,14 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
             reg_pass = False
             continue
 
-        num_now = errors[key]["numerical"]
+        try:
+            num_now = errors[key]["numerical"]
+        except (KeyError, TypeError):
+            # A malformed entry must count as a regression, not raise after the
+            # summary was already written (which would leave no verdict at all).
+            print(f"  {key:18s} → malformed entry (no 'numerical') → REGRESSION")
+            reg_pass = False
+            continue
         num_gold = gold_results.get(key, {}).get("numerical", None)
 
         rel_err_now = errors[key].get("rel_error", None)
@@ -170,7 +181,10 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
             np.abs(np.atleast_1d(np.asarray(ref_val, dtype=float))) <= 0.0
         )
         if near_zero_ref:
-            passed = str(errors[key].get("status", "PASS")).upper() == "PASS"
+            # Conservative default: an entry with no analytical status must not
+            # pass unconditionally (pass_fail_check always sets one; a missing
+            # status means this was called on raw data).
+            passed = str(errors[key].get("status", "FAIL")).upper() == "PASS"
         else:
             passed = bool(np.all(rel_diff_arr < regression_tol))
 

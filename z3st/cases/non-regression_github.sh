@@ -43,10 +43,17 @@ for case_name in "${CASES[@]}"; do
     chmod +x Allrun || true
     # Allclean is optional
     if [[ -f Allclean ]]; then chmod +x Allclean || true; ./Allclean || true; fi
+    # Stale verdicts from a previous run must not mask a crash of this one.
+    rm -f output/non-regression.json
+
     ./Allrun > "${case_name//\//_}_log.txt" 2>&1 && exit_code=0 || exit_code=$?
 
     # A numerical regression fails CI.
     fail_reason=""
+    if [[ $exit_code -eq 0 && ! -f "output/non-regression.json" ]]; then
+        exit_code=1
+        fail_reason=" (no non-regression.json written)"
+    fi
     if [[ $exit_code -eq 0 && -f "output/non-regression.json" ]]; then
         summary_status=$(grep -o '"summary": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
         regression_status=$(grep -o '"regression": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)

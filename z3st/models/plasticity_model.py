@@ -154,27 +154,36 @@ class PlasticityModel:
         Update the history variables (ep_n, p_n) with the converged values.
         """
         print("[PlasticityModel] Updating plastic history...")
-        
+
+        mode = self.plasticity_cfg.get("mode", "j2")
         for name, mat in self.materials.items():
+            # Mixed runs: skip materials that carry no plastic law (e.g. an
+            # elastic clad next to a plastic fuel) — the unconditional
+            # yield_strength read crashed such cases with a KeyError.
+            if mode != "custom" and "yield_strength" not in mat:
+                continue
             ep_expr, p_expr = self.get_plastic_internal_variables(u, mat)
-            
+
             tag = self.label_map[name]
             cells = self.cell_tags.find(tag)
-            
+
             V_ep = self.ep.function_space
             V_p = self.p.function_space
-            
+
             expr_ep = dolfinx.fem.Expression(ep_expr, V_ep.element.interpolation_points)
             expr_p = dolfinx.fem.Expression(p_expr, V_p.element.interpolation_points)
-            
+
             # Update current state variables (using old _n values)
             self.ep.interpolate(expr_ep, cells)
             self.p.interpolate(expr_p, cells)
 
-            # Then update history variables from current
-            self.ep_n.x.array[:] = self.ep.x.array[:]
-            self.p_n.x.array[:] = self.p.x.array[:]
-                                
+        # Refresh the history copies ONCE, after every material's cells have
+        # been interpolated: the per-material expressions reference ep_n/p_n,
+        # so overwriting them inside the loop would hand later materials an
+        # already-advanced trial state if cell sets ever overlapped.
+        self.ep_n.x.array[:] = self.ep.x.array[:]
+        self.p_n.x.array[:] = self.p.x.array[:]
+
         # Sync ghost
         self.ep_n.x.scatter_forward()
         self.p_n.x.scatter_forward()

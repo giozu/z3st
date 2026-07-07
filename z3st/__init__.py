@@ -17,26 +17,26 @@ def __getattr__(name):
     """Lazy import of heavy modules (dolfinx-dependent) to allow
     lightweight utilities (e.g., utils_extract_vtu) to be imported
     without requiring MPI / dolfinx at import time."""
-
+    
     _lazy_map = {
-        "solver": (".core", "solver"),
+        "solver": (".core.solver", None),
         "Spine": (".core.spine", "Spine"),
         "Solver": (".core.solver", "Solver"),
-        "thermal_model": (".models", "thermal_model"),
+        "thermal_model": (".models.thermal_model", None),
         "Thermal": (".models.thermal_model", "ThermalModel"),
-        "mechanical_model": (".models", "mechanical_model"),
+        "mechanical_model": (".models.mechanical_model", None),
         "Mechanical": (".models.mechanical_model", "MechanicalModel"),
-        "gap_model": (".models", "gap_model"),
-        "cluster_dynamic_model": (".models", "cluster_dynamic_model"),
+        "gap_model": (".models.gap_model", None),
+        "cluster_dynamic_model": (".models.cluster_dynamic_model", None),
         "Cluster": (".models.cluster_dynamic_model", "ClusterDynamicsModel"),
-        "plot_convergence": (".utils", "plot_convergence"),
+        "plot_convergence": (".utils.plot_convergence", None),
     }
 
     if name in _lazy_map:
         module_path, attr = _lazy_map[name]
         import importlib
         mod = importlib.import_module(module_path, __name__)
-        obj = getattr(mod, attr)
+        obj = mod if attr is None else getattr(mod, attr)
         globals()[name] = obj
         return obj
 

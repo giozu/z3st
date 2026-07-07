@@ -37,6 +37,16 @@ class NNConductivity:
         self.hidden = ckpt["hidden"]
         self.activation = ckpt.get("activation", "tanh")
         self.T0, self.Tscale = ckpt["norm"]
+        # Evaluation guards: extrapolating an MLP outside its training window
+        # can return k <= 0, which makes the conduction operator indefinite
+        # with no diagnostic. Clamp T to the stored training range (fallback:
+        # ±4·scale around the normalisation centre) and floor k at a small
+        # positive value; the tangent is zeroed wherever a guard is active.
+        self.T_min, self.T_max = ckpt.get(
+            "T_range", (self.T0 - 4.0 * self.Tscale, self.T0 + 4.0 * self.Tscale)
+        )
+        self.k_floor = float(ckpt.get("k_floor", 1.0e-3))
+        self._warned_clamp = False
         net = _build_mlp(self.hidden, self.activation)
         net.load_state_dict(ckpt["state_dict"])
         net.double().eval()
@@ -44,26 +54,44 @@ class NNConductivity:
         self._torch = torch
         self.weights_path = weights_path
 
+    def _clamp_T(self, T):
+        """Clamp temperatures to the training window, warning once per run."""
+        T_cl = np.clip(T, self.T_min, self.T_max)
+        if not self._warned_clamp and np.any(T_cl != T):
+            self._warned_clamp = True
+            print(f"  [NNConductivity] WARNING: temperatures outside the "
+                  f"training window [{self.T_min:.0f}, {self.T_max:.0f}] K "
+                  "clamped before evaluation (warning shown once).")
+        return T_cl
+
     def __call__(self, T_array):
         """T_array [K] -> k_array (W/m/K), same shape, evaluated in float64."""
         torch = self._torch
         T = np.asarray(T_array)
+        T_cl = self._clamp_T(T)
         with torch.no_grad():
-            t = torch.tensor((T.ravel() - self.T0) / self.Tscale,
+            t = torch.tensor((T_cl.ravel() - self.T0) / self.Tscale,
                              dtype=torch.float64).unsqueeze(-1)
             k = self._net(t).squeeze(-1).numpy()
+        k = np.maximum(k, self.k_floor)
         return k.astype(T.dtype).reshape(T.shape)
 
     def value_and_grad(self, T_array):
-        """(k, dk/dT) at T_array (K), for the external-operator tangent."""
+        """(k, dk/dT) at T_array (K), for the external-operator tangent.
+        Where the training-window clamp or the positivity floor is active the
+        tangent is zeroed, consistent with the guarded value."""
         torch = self._torch
         T = np.asarray(T_array)
-        t = torch.tensor((T.ravel() - self.T0) / self.Tscale,
+        T_cl = self._clamp_T(T)
+        t = torch.tensor((T_cl.ravel() - self.T0) / self.Tscale,
                          dtype=torch.float64, requires_grad=True)
         k = self._net(t.unsqueeze(-1)).squeeze(-1)
         (dk_dtn,) = torch.autograd.grad(k, t, torch.ones_like(k))
         k_np = k.detach().numpy().reshape(T.shape)
         dk_np = (dk_dtn.detach().numpy() / self.Tscale).reshape(T.shape)  # chain rule
+        guarded = (T != T_cl) | (k_np < self.k_floor)
+        k_np = np.maximum(k_np, self.k_floor)
+        dk_np = np.where(guarded, 0.0, dk_np)
         return k_np, dk_np
 
 

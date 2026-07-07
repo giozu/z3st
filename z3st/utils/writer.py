@@ -42,6 +42,20 @@ from dolfinx.io import XDMFFile
 # Derived-field helpers (numpy on host arrays after interpolation)
 # ---------------------------------------------------------------------------
 
+def _zero_nonfinite(arr, name):
+    """Replace non-finite entries by 0 for export, but WARN when they are
+    widespread: the legitimate source is the axisymmetric r=0 axis line (a
+    handful of nodes), whereas a diverged solve produces NaN everywhere — and
+    silently exporting an all-zero field would let a garbage run look clean."""
+    bad = ~np.isfinite(arr)
+    n_bad = int(np.count_nonzero(bad))
+    if n_bad > max(1, arr.size // 100):
+        print(f"  [OutputWriter] WARNING: {name}: {n_bad}/{arr.size} non-finite "
+              "values zeroed in output — far more than an axisymmetric axis "
+              "line; the solve may have produced NaN stresses.")
+    return np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
+
+
 def _von_mises(sig):
     """Von Mises equivalent stress for an (..., 3, 3) batch.
 
@@ -57,14 +71,14 @@ def _von_mises(sig):
             0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
             + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
         )
-    return np.nan_to_num(vm, nan=0.0, posinf=0.0, neginf=0.0)
+    return _zero_nonfinite(vm, "VonMises")
 
 
 def _hydrostatic(sig):
     """Hydrostatic pressure p = tr(sigma) / 3 on an (..., 3, 3) batch. Guarded
     for the same axisymmetric r=0 NaN as :func:`_von_mises`."""
     p = (sig[..., 0, 0] + sig[..., 1, 1] + sig[..., 2, 2]) / 3.0
-    return np.nan_to_num(p, nan=0.0, posinf=0.0, neginf=0.0)
+    return _zero_nonfinite(p, "Hydrostatic")
 
 
 # ---------------------------------------------------------------------------
@@ -196,10 +210,16 @@ class OutputWriter:
             # interpolation. None -> fill the whole mesh (single-domain case).
             if cell_tags is None:
                 return None
-            try:
-                return cell_tags.find(problem.label_map[name])
-            except Exception:
+            label = getattr(problem, "label_map", {}).get(name)
+            if label is None:
+                # Loud, not silent: with None this material's expression fills
+                # EVERY cell of the merged field (last writer wins) — correct
+                # only when it is the sole material.
+                print(f"[OutputWriter] WARNING: material '{name}' has no entry "
+                      "in the geometry label map; its output expressions will "
+                      "fill the whole mesh (single-material assumption).")
                 return None
+            return cell_tags.find(label)
 
         mats = problem.materials
         mech = on.get("mechanical", False)
@@ -316,7 +336,10 @@ class OutputWriter:
             L = ufl.inner(ufl_expr, v) * dx
             return dolfinx.fem.petsc.LinearProblem(
                 a, L,
-                petsc_options={"ksp_type": "preonly", "pc_type": "lu"},
+                # MUMPS: plain PETSc LU is serial-only and errors on
+                # distributed (mpiaij) matrices.
+                petsc_options={"ksp_type": "preonly", "pc_type": "lu",
+                               "pc_factor_mat_solver_type": "mumps"},
                 petsc_options_prefix=f"z3st_proj_{id(ufl_expr):x}_",
             )
 
@@ -353,9 +376,23 @@ class OutputWriter:
                 target_fn.interpolate(source, cells0=cells)
         else:
             # LinearProblem path (quadrature-sourced, e.g. custom plasticity).
-            # Only used by single-material cases, so a whole-mesh copy is exact.
+            # The projection solves on the whole mesh; restrict the copy to the
+            # material's own cells so it cannot clobber the other materials'
+            # entries in the shared merged field.
             result = source.solve()
-            target_fn.x.array[:] = result.x.array[:]
+            if cells is None:
+                target_fn.x.array[:] = result.x.array[:]
+            else:
+                V = target_fn.function_space
+                dofs = dolfinx.fem.locate_dofs_topological(
+                    V, V.mesh.topology.dim, np.asarray(cells, dtype=np.int32)
+                )
+                bs = V.dofmap.bs
+                if bs == 1:
+                    target_fn.x.array[dofs] = result.x.array[dofs]
+                else:
+                    for k in range(bs):
+                        target_fn.x.array[dofs * bs + k] = result.x.array[dofs * bs + k]
 
     def _refresh(self):
         """Refresh every interpolated/projected Function from its source."""

@@ -54,6 +54,7 @@ the same run — spine.load_materials guards this.
 import dolfinx
 import numpy as np
 import ufl
+from mpi4py import MPI
 
 R_GAS = 8.314462618          # (J/(mol·K)) universal gas constant
 _SIG_EQ_FLOOR = 1.0          # (Pa) regularisation of σ_eq_trial in the flow direction
@@ -189,6 +190,10 @@ class CreepModel:
             if dt <= 0.0:
                 pred.x.array[:] = 0.0
                 continue
+            if len(cells) == 0:
+                # This rank owns no cells of the creeping material (parallel
+                # partition); it still participates in the allreduce below.
+                continue
 
             # σ_eq_trial on the material's cells (DG0 interpolation)
             _, _, sig_eq_tr = self._creep_trial(u, material, T)
@@ -226,12 +231,29 @@ class CreepModel:
                 g = x - Adt * base**n - Cdt * base
                 gp = 1.0 + 3.0 * G * (n * Adt * np.maximum(base, 1.0) ** (n - 1.0) + Cdt)
                 x = np.clip(x - g / gp, 0.0, sig / (3.0 * G) * (1 - 1e-12))
+            # Loud check that the fixed-iteration Newton actually converged: a
+            # high Norton exponent with Δt·A·σⁿ ≫ σ/3G can need more than
+            # _PRED_NEWTON_ITS contractions, and a silently unconverged root
+            # would be treated as exact by the symbolic Newton step.
+            base = np.maximum(sig - 3.0 * G * x, 0.0)
+            g_res = x - Adt * base**n - Cdt * base
+            res_scale = np.maximum(np.abs(x), 1e-30)
+            worst = float(np.max(np.abs(g_res) / res_scale))
+            if worst > 1e-8:
+                print(f"  [WARNING] creep predictor Newton for '{name}' not "
+                      f"fully converged (max rel residual {worst:.2e}); "
+                      "consider smaller dt.")
             pred.x.array[cells] = x
             pred.x.scatter_forward()
 
             scale = max(float(np.abs(x).max()), 1e-30)
             change = float(np.abs(x - x_old).max()) / scale
             max_change = max(max_change, change)
+        # The predictor change gates the staggered convergence test: all ranks
+        # must agree on it, or one rank can exit solve_staggered while another
+        # re-enters a collective solve (deadlock).
+        if dt > 0.0 and self.mesh.comm.size > 1:
+            max_change = self.mesh.comm.allreduce(max_change, op=MPI.MAX)
         return max_change
 
     def update_creep_state(self, u, T):
