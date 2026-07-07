@@ -23,6 +23,17 @@ class ContactModel:
         g(u)  = g0 + <u_r>_clad - <u_r>_fuel        (current mean radial gap)
         p     = k_pen * max(0, -g)                  (penalty, compressive)
 
+    Because the mean gap is affine in the applied pressure, the pure
+    fixed-point update has loop gain k_pen * C (C = radial interface
+    compliance), typically 20-50, and converges only under heavy
+    under-relaxation. Once two (pressure, gap) samples are available the
+    update therefore switches to a SECANT step: the compliance is estimated
+    from the two samples and the pressure jumps directly to the value
+    consistent with the penalty equilibrium  g(p) = -p/k_pen. Guards fall
+    back to the explicit update whenever the secant slope is unusable
+    (no history, near-identical samples, non-physical slope, opening
+    contact).
+
     The pressure is applied as a normal traction t = -p * n on BOTH facing
     surfaces (each with its own outward facet normal), so the bodies are
     pushed apart on penetration. Because p is evaluated from the previous
@@ -77,6 +88,9 @@ class ContactModel:
 
         self._last_gap = self.g0
         self._last_pressure = 0.0
+        # (pressure, gap) sample from the previous iteration for the secant
+        # update; reset at every step boundary via reset_contact_history().
+        self._sample_prev = None
 
         print(f"  surfaces      : '{self.contact_surface_a}' (id {self.id_a}) <-> '{self.contact_surface_b}' (id {self.id_b})")
         print(f"  initial gap g0: {self.g0 * 1e6:.2f} um")
@@ -86,6 +100,12 @@ class ContactModel:
         """MPI-summed scalar assembly."""
         local = dolfinx.fem.assemble_scalar(form)
         return self.mesh.comm.allreduce(local, op=MPI.SUM)
+
+    def reset_contact_history(self):
+        """Drop the secant history. Call at a step boundary (or rollback):
+        the free-expansion part of the gap changes with the step's thermal
+        state, so a stale sample pair would produce a bogus slope."""
+        self._sample_prev = None
 
     def update_contact_pressure(self, u):
         """
@@ -100,9 +120,16 @@ class ContactModel:
         ur_b = -self._assemble(dolfinx.fem.form(ufl.dot(u, n_vec) * self._ds_b)) / self._area_b
 
         current_gap = self.g0 + ur_b - ur_a
-        penetration = max(0.0, -current_gap)
-        p = self.k_pen * penetration
 
+        # ``current_gap`` is the response to the pressure applied at the
+        # PREVIOUS update (still held by the Constant) — that pair is the
+        # newest secant sample.
+        p_applied = float(self.contact_pressure.value)
+        sample_now = (p_applied, current_gap)
+
+        p, method = self._next_pressure(sample_now)
+
+        self._sample_prev = sample_now
         self.contact_pressure.value = PETSc.ScalarType(p)
         self._last_gap = current_gap
         self._last_pressure = p
@@ -110,9 +137,43 @@ class ContactModel:
         print(
             f"  [contact] u_r(fuel)={ur_a*1e6:+.2f} um, u_r(clad)={ur_b*1e6:+.2f} um, "
             f"gap={current_gap*1e6:+.2f} um, p={p/1e6:.3f} MPa "
-            f"({'CLOSED' if penetration > 0 else 'open'})"
+            f"({'CLOSED' if p > 0 else 'open'}, {method})"
         )
         return current_gap, p
+
+    def _next_pressure(self, sample_now):
+        """Next contact pressure from the newest (pressure, gap) sample.
+
+        Secant: with two samples of the affine map g(p) = g_free + C*p, the
+        estimated compliance C gives the pressure consistent with the penalty
+        equilibrium g(p*) = -p*/k_pen in one jump:
+
+            p* = (C*p_now - g_now) / (C + 1/k_pen)
+
+        Falls back to the explicit update p = k_pen*max(0, -g) when the slope
+        is not usable. Returns (pressure, method_tag).
+        """
+        p_now, g_now = sample_now
+        p_explicit = self.k_pen * max(0.0, -g_now)
+
+        if self._sample_prev is None:
+            return p_explicit, "explicit"
+
+        p_old, g_old = self._sample_prev
+        dp = p_now - p_old
+        # Near-identical pressures give no slope information; a non-positive
+        # slope is non-physical (more pressure must open the gap) and means
+        # the samples straddle a thermal update or the open/closed switch.
+        if abs(dp) < max(1.0, 1.0e-6 * abs(p_now)):
+            return p_explicit, "explicit"
+        C_est = (g_now - g_old) / dp
+        if C_est <= 0.0:
+            return p_explicit, "explicit"
+
+        p_star = (C_est * p_now - g_now) / (C_est + 1.0 / self.k_pen)
+        if p_star <= 0.0:
+            return 0.0, "secant-open"
+        return p_star, "secant"
 
     def contact_traction(self, v):
         """

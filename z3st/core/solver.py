@@ -689,12 +689,9 @@ class Solver:
         if creep_present:
             creep_pred_change = self.update_creep_predictor(u_new, T_current)
 
-        # Penalty contact: update the contact pressure from the current
-        # displacement iterate (explicit / fixed-point) — a persistent Constant
-        # used by the cached form. The traction t = -p*n is an external
-        # load, driven to consistency by the staggered loop.
-        if self.on.get("contact", False):
-            self.update_contact_pressure(u_new)
+        # Penalty contact: the pressure Constant is updated AFTER each raw
+        # solve (below), so here the cached form simply reuses the pressure
+        # set by the previous iteration (or carried over from the last step).
 
         # Forms are step-invariant: only Functions (u_new, T_current, creep
         # predictor/state, burnup) and Constants (contact pressure, BC values)
@@ -909,6 +906,15 @@ class Solver:
         problem_m = self._mech_cache["problem"]
         dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
         problem_m.solve()
+
+        # Penalty contact: measure the gap from the RAW solve — an exact
+        # sample of the affine gap(p) response, uncorrupted by the
+        # u-relaxation below — and set the pressure used by the NEXT solve.
+        # On exact samples the secant update in ContactModel pins the
+        # consistent pressure within a couple of iterations, independent of
+        # the relaxation factor.
+        if self.on.get("contact", False):
+            self.update_contact_pressure(u_new)
 
         # Relax. With Aitken Δ² enabled the relaxation factor is recomputed
         # each iteration from the last two raw residuals R_k = ũ_k − u_old_k:
@@ -1435,6 +1441,10 @@ class Solver:
         # accelerator above; nulling R_prev restarts ω from porosity.aitken_omega0.
         self._aitken_p_R_prev = None
         self._aitken_p_omega = None
+        # Contact secant history: the free gap changes with the step's thermal
+        # state, so a cross-step sample pair would give a bogus slope.
+        if self.on.get("contact", False):
+            self.reset_contact_history()
 
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")

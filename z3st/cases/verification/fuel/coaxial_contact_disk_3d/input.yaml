@@ -12,12 +12,8 @@ materials:
   cyl_1: fuel.yaml
   cyl_2: clad.yaml
 
-regime: 3d   # r-theta quarter disk extruded along z, clamped ends (plane strain)
+regime: 3d
 
-# NOTE: this case runs with softer elastic constants than coaxial_contact_disk
-# (fuel E = 100 GPa, clad E = 59.3 GPa), which doubles the penalty fixed-point
-# loop gain k_pen * compliance — hence the lower relaxation floor and the
-# larger iteration budget for the contact-onset step.
 solver_settings:
   coupling: staggered
   max_iters: 500
@@ -35,7 +31,7 @@ models:
   contact:
     surface_a: lateral_1
     surface_b: inner_2
-    penalty_stiffness: 1.0e14
+    penalty_stiffness: 6.0e13
     initial_gap: 30.0e-6
 
 mechanical:

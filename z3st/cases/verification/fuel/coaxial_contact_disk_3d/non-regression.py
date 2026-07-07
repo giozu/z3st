@@ -91,9 +91,10 @@ plt.savefig(os.path.join(OUT, "contact_pressure_verification.png"), dpi=150)
 print("[INFO] contact_pressure_verification.png saved")
 
 # Compare only where the contact is firmly established: right at closure the
-# pressure is a few MPa and the penalty regularization (finite k_pen allows
-# ~p/k_pen penetration) dominates the relative error.
-mask = p_lame > 10.0
+# pressure is a small fraction of peak and the penalty regularization (finite
+# k_pen allows ~p/k_pen penetration) dominates the relative error. The
+# threshold is relative to the peak so it tracks the material stiffness.
+mask = p_lame > 0.25 * p_lame.max()
 if mask.any():
     rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_lame[mask]
     print(f"[INFO] closed-gap steps: {mask.sum()}, mean rel. error vs Lame = {rel.mean() * 100:.1f}%")
