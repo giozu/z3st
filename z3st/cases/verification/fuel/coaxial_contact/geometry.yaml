@@ -8,13 +8,15 @@ outer_radius_2: 0.00475  # (m)
 Lz: 0.010                # (m)
 
 labels:
-  bottom_1: 1
-  bottom_2: 2
-  lateral_1: 3
-  outer_2: 4
-  inner_2: 5
-  top_2: 6
-  top_1: 7
-  axis_1: 8
-  cyl_1: 1
-  cyl_2: 2
+  ymin_1: 1
+  xmax_1: 7
+  xmin_1: 5
+  ymax_1: 6
+
+  ymin_2: 2
+  xmax_2: 4
+  xmin_2: 8
+  ymax_2: 3
+
+  cyl_1: 10
+  cyl_2: 20

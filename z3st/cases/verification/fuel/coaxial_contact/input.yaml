@@ -29,8 +29,8 @@ models:
   thermal: true
   mechanical: true
   contact:
-    surface_a: lateral_1
-    surface_b: inner_2
+    surface_a: xmax_1
+    surface_b: xmin_2
     penalty_stiffness: 1.0e14
     initial_gap: 30.0e-6
 
@@ -52,7 +52,7 @@ thermal:
 
 lhr:
 - 0.0
-- 0.0
+- 120000.0
 time:
 - 0.0
 - 1.0
