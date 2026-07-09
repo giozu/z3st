@@ -8,10 +8,10 @@
 
 SetFactory("OpenCASCADE");
 
-r_1_o = 0.0041;     // outer radius (m)           4.10 mm
-r_2_i = 0.00413;    // inner radius (m)           4.13 mm  -> gap = 30 um
-r_2_o = 0.00475;    // outer radius (m)           4.75 mm
-h     = 0.010;      // axial segment height (m)   10 mm
+r_1_o = 0.0041;     // outer radius (m)
+r_2_i = 0.00411;    // inner radius (m)
+r_2_o = 0.00475;    // outer radius (m)
+h     = 0.010;      // axial segment height (m)
 
 n_r1 = 8;           // radial divisions, region 1
 n_r2 = 4;           // radial divisions, region 2 

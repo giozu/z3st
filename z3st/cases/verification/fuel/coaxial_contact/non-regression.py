@@ -54,23 +54,26 @@ comp = (1.0 / Ec) * ((c**2 + bci**2) / (c**2 - bci**2) + nuc) + (1.0 / Ef) * (1.
 surf = lambda v, r, r0: v[np.abs(r - r0) < 2e-5].mean()
 amean = lambda v, r, lo, hi: (lambda m: np.sum(v[m] * r[m]) / np.sum(r[m]))((r >= lo) & (r <= hi))
 
-T_pellet, p_z3st, p_lame = [], [], []
+T_pellet, p_z3st, p_lame, gap_z3st, gap_free = [], [], [], [], []
 for f in files:
     m = pv.read(f)
     r = m.points[:, 0]
     ur = m.point_data["Displacement"][:, 0]
     T = m.point_data["Temperature"]
 
-    Tp = amean(T, r, 0.0, b)                                  # uniform pellet temperature
+    Tp = amean(T, r, 0.0, b)                                  # mean pellet temperature
     T_pellet.append(Tp)
 
     gap = g0 + surf(ur, r, bci) - surf(ur, r, b)
+    gap_z3st.append(gap)
     p_z3st.append(k_pen * max(0.0, -gap) / 1e6)              # MPa
 
     delta = af * (Tp - Trf) * b - g0                          # exact interference
+    gap_free.append(-delta)                                   # analytic OPEN gap (no contact)
     p_lame.append((delta / (b * comp) / 1e6) if delta > 0 else 0.0)
 
-T_pellet, p_z3st, p_lame = map(np.array, (T_pellet, p_z3st, p_lame))
+T_pellet, p_z3st, p_lame, gap_z3st, gap_free = map(
+    np.array, (T_pellet, p_z3st, p_lame, gap_z3st, gap_free))
 
 plt.figure(figsize=(7, 5))
 plt.plot(T_pellet, p_lame, "k--", lw=1.5, label="Analytical Lame interference (exact)")
@@ -182,14 +185,38 @@ def plot_stress_profiles():
 plot_stress_profiles()
 
 # --. numerical results --..
-errors = {
-    "contact_pressure": {
-        "numerical": p_z3st[mask].max(),
-        "reference": p_lame[mask].max(),
-        "abs_error": float(rel.max()),
-        "rel_error": float(rel.max()),
-    },
-}
+if mask.any():
+    # Contact regime: verify the penalty pressure against the Lame
+    # interference fit.
+    errors = {
+        "contact_pressure": {
+            "numerical": p_z3st[mask].max(),
+            "reference": p_lame[mask].max(),
+            "abs_error": float(rel.max()),
+            "rel_error": float(rel.max()),
+        },
+    }
+else:
+    # Open-gap regime (the power/temperature never closes the gap): there is
+    # no contact pressure to verify, so verify the final gap width against the
+    # analytic free thermal expansion instead — and require that the solver
+    # also reports no spurious contact.
+    print("[INFO] gap never closes: verifying final open gap vs free expansion")
+    gap_err = abs(gap_z3st[-1] - gap_free[-1]) / g0
+    errors = {
+        "final_gap": {
+            "numerical": float(gap_z3st[-1]),
+            "reference": float(gap_free[-1]),
+            "abs_error": float(abs(gap_z3st[-1] - gap_free[-1])),
+            "rel_error": float(gap_err),
+        },
+        "spurious_contact_pressure": {
+            "numerical": float(p_z3st.max()),
+            "reference": 0.0,
+            "abs_error": float(p_z3st.max()),
+            "rel_error": float(p_z3st.max()),   # MPa; must be ~0
+        },
+    }
 
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE)
 regression_check(errors, CASE)

@@ -3,7 +3,7 @@ geometry_type: cyl-cyl
 
 inner_radius_1: 0.0      # (m)
 outer_radius_1: 0.0041   # (m)
-inner_radius_2: 0.00413  # (m)
+inner_radius_2: 0.00411  # (m)
 outer_radius_2: 0.00475  # (m)
 Lz: 0.010                # (m)
 
