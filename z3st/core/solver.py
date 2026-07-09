@@ -682,16 +682,12 @@ class Solver:
             and not nonlinear_constitutive
         )
 
-        # Creep predictor Δγ₀ at the current iterate, BEFORE assembling: a
+        # Creep predictor at the current iterate, befire assembling: a
         # stale predictor can zero the symbolic correction (base clamp) and
         # let |Δu| pass spuriously. Its change feeds the convergence test.
         creep_pred_change = 0.0
         if creep_present:
             creep_pred_change = self.update_creep_predictor(u_new, T_current)
-
-        # Penalty contact: the pressure Constant is updated AFTER each raw
-        # solve (below), so here the cached form simply reuses the pressure
-        # set by the previous iteration (or carried over from the last step).
 
         # Forms are step-invariant: only Functions (u_new, T_current, creep
         # predictor/state, burnup) and Constants (contact pressure, BC values)
@@ -907,9 +903,7 @@ class Solver:
         dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
         problem_m.solve()
 
-        # Penalty contact: measure the gap from the RAW solve — an exact
-        # sample of the affine gap(p) response, uncorrupted by the
-        # u-relaxation below — and set the pressure used by the NEXT solve.
+        # Penalty contact: measure the gap from the raw solve and set the pressure used by the next solve.
         # On exact samples the secant update in ContactModel pins the
         # consistent pressure within a couple of iterations, independent of
         # the relaxation factor.

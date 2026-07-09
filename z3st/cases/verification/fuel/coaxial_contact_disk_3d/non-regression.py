@@ -3,18 +3,20 @@
 """
 Verification of the penalty contact pressure against the analytical Lame
 interference-fit pressure, on a 3D quarter-disk segment (the r-theta quarter
-disk extruded along z with both end faces clamped axially, so the state is
-exactly plane strain). The inner disk is heated uniformly, so its free
-thermal expansion in plane strain is u(b) = (1 + nu_f) alpha_f (T - T_ref) b
-and the outer ring does not expand. The interference
+disk extruded along z, with the z0 face as axial mid-plane symmetry and the
+z1 face traction-free). The slice is axially FREE, so — unlike the
+plane-strain 2D disk case — the exact solution is the open-ended
+(plane-stress, sigma_zz = 0) Lame state. The inner disk is heated uniformly,
+so its free thermal expansion is exactly u(b) = alpha_f (T - T_ref) b and the
+outer ring does not expand. The interference
 
-    delta = (1 + nu_f) alpha_f (T_pellet - T_ref) * b - g0
+    delta = alpha_f (T_pellet - T_ref) * b - g0
 
 then gives the exact Lame shrink-fit pressure for a solid disk in a ring
-(plane-strain form, eps_zz = 0):
+(plane-stress form):
 
-    p = delta / { b [ (1+nu_c)/E_c ((1-nu_c)(c^2+b^2)/(c^2-b^2) + nu_c)
-                    + (1+nu_f)(1-2 nu_f)/E_f ] }
+    p = delta / { b [ (1/E_c)((c^2+b^2)/(c^2-b^2) + nu_c)
+                    + (1/E_f)(1 - nu_f) ] }
 
 """
 
@@ -50,9 +52,8 @@ Ef, nuf, af, Trf = (float(fuel[k]) for k in ("E", "nu", "alpha", "T_ref"))
 clad = yaml.safe_load(open(os.path.join(CASE, inp["materials"]["cyl_2"])))
 Ec, nuc = float(clad["E"]), float(clad["nu"])
 
-# Lame interference-fit compliance (plane strain): delta = p * b * comp
-comp = (1.0 + nuc) / Ec * ((1.0 - nuc) * (c**2 + bci**2) / (c**2 - bci**2) + nuc) \
-     + (1.0 + nuf) * (1.0 - 2.0 * nuf) / Ef
+# Lame interference-fit compliance (plane stress, axially free): delta = p * b * comp
+comp = (1.0 / Ec) * ((c**2 + bci**2) / (c**2 - bci**2) + nuc) + (1.0 / Ef) * (1.0 - nuf)
 
 surf = lambda v, r, r0: v[np.abs(r - r0) < 2e-5].mean()
 amean = lambda v, r, lo, hi: (lambda m: np.sum(v[m] * r[m]) / np.sum(r[m]))((r >= lo) & (r <= hi))
@@ -73,7 +74,7 @@ for f in files:
     gap = g0 + surf(ur, r, bci) - surf(ur, r, b)
     p_z3st.append(k_pen * max(0.0, -gap) / 1e6)              # MPa
 
-    delta = (1.0 + nuf) * af * (Tp - Trf) * b - g0            # exact interference (plane strain)
+    delta = af * (Tp - Trf) * b - g0                          # exact interference (axially free)
     p_lame.append((delta / (b * comp) / 1e6) if delta > 0 else 0.0)
 
 T_pellet, p_z3st, p_lame = map(np.array, (T_pellet, p_z3st, p_lame))
@@ -106,7 +107,7 @@ def plot_stress_profiles():
     Z3ST vs the analytical Lame interference-fit solution.
 
       * pellet (0 <= r <= b), solid disk under external pressure p ->
-        sigma_rr = sigma_theta = -p   (uniform, same in plane strain)
+        sigma_rr = sigma_theta = -p   (uniform)
       * clad (bci <= r <= c), ring with internal pressure p, free outer ->
             sigma_rr(r)    = p bci^2/(c^2-bci^2) (1 - c^2/r^2)
             sigma_theta(r) = p bci^2/(c^2-bci^2) (1 + c^2/r^2)

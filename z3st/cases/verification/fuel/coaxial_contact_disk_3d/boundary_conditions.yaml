@@ -1,6 +1,5 @@
 thermal:
   cyl_1:
-  # cyl_1 at uniform temperature, ramped from 300 K to 1500 K over 7 steps
   - type: Dirichlet
     region: lateral_1
     temperature:
@@ -11,60 +10,25 @@ thermal:
     - 1100.0
     - 1300.0
     - 1500.0
-  - type: Neumann
-    region: bottom_1
-    flux: 0.0
-  - type: Neumann
-    region: axis_1
-    flux: 0.0
-  - type: Neumann
-    region: z0_1
-    flux: 0.0
-  - type: Neumann
-    region: z1_1
-    flux: 0.0
 
   cyl_2:
-  # cyl_2 at reference temperature
   - type: Dirichlet
     region: outer_2
     temperature: 300.0
-  - type: Neumann
-    region: inner_2
-    flux: 0.0
-  - type: Neumann
-    region: bottom_2
-    flux: 0.0
-  - type: Neumann
-    region: axis_2
-    flux: 0.0
-  - type: Neumann
-    region: z0_2
-    flux: 0.0
-  - type: Neumann
-    region: z1_2
-    flux: 0.0
 
 mechanical:
   cyl_1:
   - type: Clamp_x
-    region: axis_1        # u_x = 0 on x = 0 symmetry plane
+    region: xmin_1        # symmetry plane
   - type: Clamp_y
-    region: bottom_1      # u_y = 0 on y = 0 symmetry plane
+    region: ymin_1        # symmetry plane
   - type: Clamp_z
-    region: z0_1          # u_z = 0 -> plane strain
-  - type: Clamp_z
-    region: z1_1          # u_z = 0 -> plane strain
-    # lateral_1: free until penalty contact engages
+    region: zmin_1
 
   cyl_2:
   - type: Clamp_x
-    region: axis_2        # u_x = 0 on x = 0 symmetry plane
+    region: xmin_2        # symmetry plane
   - type: Clamp_y
-    region: bottom_2      # u_y = 0 on y = 0 symmetry plane
+    region: ymin_2        # symmetry plane
   - type: Clamp_z
-    region: z0_2          # u_z = 0 -> plane strain
-  - type: Clamp_z
-    region: z1_2          # u_z = 0 -> plane strain
-    # inner_2: free until penalty contact engages
-    # outer_2: free
+    region: zmin_2

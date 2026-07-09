@@ -28,12 +28,10 @@ def _install_markdown_stdout():
     _tagged     = re.compile(r"^(\s*)\[(INFO|WARNING|ERROR|SUCCESS|DESCRIPTION)\](\s+.*)?$")
 
     def transform(line):
-        # Strip CR for safety on mixed line endings.
         s = line.rstrip("\r")
 
         if _morse_line.match(s):
-            # `***` (not `---`) avoids setext-heading ambiguity in markdown.
-            return ""  # blank line; the divider proper is emitted as a separate token
+            return ""
         m = _step.match(s)
         if m:
             num, rest = m.group(1), m.group(2).strip()
@@ -68,10 +66,9 @@ def _install_markdown_stdout():
                 return 0
             self._buf += s
             parts = self._buf.split("\n")
-            self._buf = parts.pop()  # last fragment may be partial
+            self._buf = parts.pop()
             for line in parts:
                 if _morse_line.match(line.rstrip("\r")):
-                    # `***` (not `---`) avoids markdown setext-heading ambiguity.
                     self._raw.write("\n***\n\n")
                 else:
                     self._raw.write(transform(line) + "\n")
