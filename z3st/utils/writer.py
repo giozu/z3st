@@ -180,6 +180,7 @@ class OutputWriter:
         self._psi_fn_cells = None
         self._psi_fn_points = None
         self._heatflux_fn = None
+        self._contact_pressure_fn = None
         self._stress_sources = []      # list of (expr_cells, expr_points, cells)
         self._psi_sources = []         # list of (expr_cells, expr_points, cells)
         self._heatflux_sources = []    # list of (expr_cells, cells)
@@ -233,6 +234,12 @@ class OutputWriter:
             self._psi_fn_points = dolfinx.fem.Function(self.V_scalar_points, name="StrainEnergyDensity")
         if therm:
             self._heatflux_fn = dolfinx.fem.Function(self.V_vector_cells, name="HeatFlux")
+
+        # Contact pressure: a single domain-wide scalar
+        if on.get("contact", False) and getattr(problem, "contact_pressure", None) is not None:
+            self._contact_pressure_fn = dolfinx.fem.Function(
+                self.V_scalar_cells, name="ContactPressure"
+            )
 
         for name, material in mats.items():
             cells = _mat_cells(name)
@@ -411,6 +418,9 @@ class OutputWriter:
         for src_c, cells in self._heatflux_sources:
             self._refresh_into(self._heatflux_fn, src_c, cells)
 
+        if self._contact_pressure_fn is not None:
+            self._contact_pressure_fn.x.array[:] = float(self.problem.contact_pressure.value)
+
         if self._D_cell_expr is not None:
             self._refresh_into(self._D_cell_fn, self._D_cell_expr)
         if self._H_cell_expr is not None:
@@ -438,6 +448,8 @@ class OutputWriter:
             write(self._psi_fn_cells, t)
         if self._heatflux_fn is not None:
             write(self._heatflux_fn, t)
+        if self._contact_pressure_fn is not None:
+            write(self._contact_pressure_fn, t)
         if on.get("damage", False) and p.D is not None:
             write(p.D, t)
         if self._c_cg_fn is not None:
@@ -507,6 +519,10 @@ class OutputWriter:
         # Heat flux — single domain-wide field (cells)
         if self._heatflux_fn is not None:
             grid.cell_data["HeatFlux (cells)"] = self._heatflux_fn.x.array.reshape(-1, 3)
+
+        # Contact pressure — uniform scalar broadcast over every cell
+        if self._contact_pressure_fn is not None:
+            grid.cell_data["ContactPressure"] = self._contact_pressure_fn.x.array.copy()
 
         # Cluster density
         if self._c_cg_fn is not None:

@@ -17,6 +17,7 @@ plane-stress form, consistent with the axially-free pellet
 """
 
 import os
+import re
 import glob
 import yaml
 import numpy as np
@@ -42,7 +43,6 @@ c = float(geo["outer_radius_2"])
 inp = yaml.safe_load(open(os.path.join(CASE, "input.yaml")))
 cc = inp["models"]["contact"]
 g0 = float(cc["initial_gap"])
-k_pen = float(cc["penalty_stiffness"])
 fuel = yaml.safe_load(open(os.path.join(CASE, inp["materials"]["cyl_1"])))
 Ef, nuf, af, Trf = (float(fuel[k]) for k in ("E", "nu", "alpha", "T_ref"))
 clad = yaml.safe_load(open(os.path.join(CASE, inp["materials"]["cyl_2"])))
@@ -51,22 +51,45 @@ Ec, nuc = float(clad["E"]), float(clad["nu"])
 # Lame interference-fit compliance (plane stress): delta = p * b * comp
 comp = (1.0 / Ec) * ((c**2 + bci**2) / (c**2 - bci**2) + nuc) + (1.0 / Ef) * (1.0 - nuf)
 
-surf = lambda v, r, r0: v[np.abs(r - r0) < 2e-5].mean()
 amean = lambda v, r, lo, hi: (lambda m: np.sum(v[m] * r[m]) / np.sum(r[m]))((r >= lo) & (r <= hi))
 
-T_pellet, p_z3st, p_lame, gap_z3st, gap_free = [], [], [], [], []
+# Pressure comes straight from the writer's "ContactPressure" cell field
+# (utils/writer.py), a uniform broadcast of the ContactModel's own live scalar
+# -- the value it actually applied as traction in the mechanical weak form.
+# Re-deriving it from the Displacement field is fragile (nodal-tolerance picks
+# between the two facing surfaces, mesh/geometry drift, etc.), so this reads
+# the solver's own number directly instead of reconstructing it.
+#
+# The gap itself is not (yet) an exported field, so it is still parsed from
+# the run log's "[contact] ... gap=... um" line (converged/last sample per
+# time step) -- only needed for the open-gap fallback check below.
+log_text = open(os.path.join(CASE, "log_z3st.md")).read()
+step_blocks = [blk for blk in re.split(r"(?=## Step \d+/\d+:)", log_text) if blk.startswith("## Step")]
+gap_re = re.compile(r"\[contact\].*?gap=([+-]?[\d.]+) um")
+
+gap_z3st = []
+for blk in step_blocks:
+    matches = gap_re.findall(blk)
+    if not matches:
+        raise RuntimeError("no '[contact]' line found in a step block of log_z3st.md")
+    gap_z3st.append(float(matches[-1]) * 1e-6)   # converged (last) sample of the step
+
+if len(step_blocks) != len(files):
+    raise RuntimeError(
+        f"log_z3st.md has {len(step_blocks)} step blocks but {len(files)} fields_*.vtu "
+        "files were found: cannot align contact pressure history with pellet temperature."
+    )
+
+T_pellet, p_z3st, p_lame, gap_free = [], [], [], []
 for f in files:
     m = pv.read(f)
     r = m.points[:, 0]
-    ur = m.point_data["Displacement"][:, 0]
     T = m.point_data["Temperature"]
 
     Tp = amean(T, r, 0.0, b)                                  # mean pellet temperature
     T_pellet.append(Tp)
 
-    gap = g0 + surf(ur, r, bci) - surf(ur, r, b)
-    gap_z3st.append(gap)
-    p_z3st.append(k_pen * max(0.0, -gap) / 1e6)              # MPa
+    p_z3st.append(float(m.cell_data["ContactPressure"][0]) / 1e6)   # MPa
 
     delta = af * (Tp - Trf) * b - g0                          # exact interference
     gap_free.append(-delta)                                   # analytic OPEN gap (no contact)
