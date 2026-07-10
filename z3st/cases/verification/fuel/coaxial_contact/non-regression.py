@@ -2,17 +2,34 @@
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Verification of the penalty contact pressure against the analytical Lame
-interference-fit pressure. The inner cylinder is heated uniformly, so its free thermal
-expansion is exactly u(b) = alpha_f (T - T_ref) b and the outer cylinder does not expand. 
-The interference
+interference-fit pressure. The pellet is NOT heated uniformly: volumetric
+heat generation gives it a radial gradient (centerline hottest, surface
+coolest). For a free axisymmetric solid disk/cylinder, the exact result for
+the outer-surface radial displacement is
 
-    delta = alpha_f (T_pellet - T_ref) * b - g0
+    u(R) = alpha * R * Tbar(R),   Tbar(R) = (2/R^2) int_0^R T(r) r dr
 
-then gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
+i.e. it depends only on the area-averaged cross-section temperature, not on
+the profile shape or Poisson's ratio. For the standard parabolic fuel-pellet
+profile (uniform heat generation, insulated ends) this area average reduces
+to the arithmetic mean of the centerline and surface temperatures:
+
+    Tbar(R) = (T_c + T_s) / 2
+
+so the interference is
+
+    delta = alpha_f ((T_c + T_s)/2 - T_ref) * b - g0
+
+which then gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
 
     p = delta / { b [ (1/E_c)((c^2+b^2)/(c^2-b^2) + nu_c) + (1/E_f)(1 - nu_f) ] }
 
-plane-stress form, consistent with the axially-free pellet
+plane-stress form, consistent with the axially-free pellet. Note this only
+gives the correct outer-boundary displacement (and hence delta/p); the
+pellet's own stress state is no longer uniform hydrostatic -p once in
+contact, since the radial gradient also produces self-equilibrated thermal
+stresses (sigma_rr = alpha*E*(Tbar(R)-Tbar(r)), not accounted for below in
+plot_stress_profiles()).
 
 """
 
@@ -91,7 +108,15 @@ for f in files:
 
     p_z3st.append(float(m.cell_data["ContactPressure"][0]) / 1e6)   # MPa
 
-    delta = af * (Tp - Trf) * b - g0                          # exact interference
+    # Driving temperature for the Lame interference: area-average of the
+    # pellet cross-section, which for the standard parabolic radial profile
+    # is exactly the mean of the centerline (r=0) and surface (r=b)
+    # temperatures -- see module docstring.
+    T_c = T[np.isclose(r, 0.0, atol=1e-9)].mean()
+    T_s = T[np.isclose(r, b, atol=1e-9)].mean()
+    Tp_lame = (T_c + T_s) / 2.0
+
+    delta = af * (Tp_lame - Trf) * b - g0                     # exact interference
     gap_free.append(-delta)                                   # analytic OPEN gap (no contact)
     p_lame.append((delta / (b * comp) / 1e6) if delta > 0 else 0.0)
 
