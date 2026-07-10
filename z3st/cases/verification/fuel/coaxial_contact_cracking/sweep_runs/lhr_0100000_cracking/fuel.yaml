@@ -1,0 +1,11 @@
+name: UO2-fuel
+fissile: true
+cracking: isotropic
+E: 200.0e9
+nu: 0.345
+k: 5.0
+cp: 280.0
+rho: 10960.0
+alpha: 1.1e-05
+T_ref: 293.15
+T_initial: 580.0

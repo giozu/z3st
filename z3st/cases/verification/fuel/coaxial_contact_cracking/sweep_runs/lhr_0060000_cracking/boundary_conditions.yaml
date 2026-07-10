@@ -1,0 +1,21 @@
+thermal:
+  cyl_1:
+  - type: Dirichlet
+    region: xmax_1
+    temperature: 300.0 # (K)
+
+  cyl_2:
+  - type: Dirichlet
+    region: xmax_2
+    temperature: 300.0 # (K)
+
+mechanical:
+  cyl_1:
+  - type: Clamp_x
+    region: xmin_1
+  - type: Clamp_y
+    region: ymin_1
+
+  cyl_2:
+  - type: Clamp_y
+    region: ymin_2

@@ -1,0 +1,13 @@
+name: zircaloy-4
+
+E: 99.3e9     # (Pa)
+nu: 0.37      # (-)
+
+k: 17.0       # (W/(m·K))
+alpha: 7.5e-6 # (1/K)
+cp: 350       # (J/kg·K)
+T_ref: 300        # (K)
+T_initial: 580.0  # (K)
+
+rho: 6500         # (kg/m³)
+melting_temperature: 2123  # (K)
