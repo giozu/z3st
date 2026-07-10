@@ -29,6 +29,28 @@ def list_fields_xdmf(xdmf_path):
         print(f"  → {field}")
     return fields
 
+def list_steps_xdmf(xdmf_path, field_name):
+    """
+    List all saved step identifiers for the given field in the XDMF/H5 file.
+    """
+    h5_path = xdmf_path.replace(".xdmf", ".h5")
+    if not os.path.exists(h5_path):
+        raise FileNotFoundError(f"H5 file not found: {h5_path}")
+
+    with h5py.File(h5_path, 'r') as f:
+        if 'Function' not in f or field_name not in f['Function']:
+            available = list(f['Function'].keys()) if 'Function' in f else []
+            raise ValueError(f"Field '{field_name}' not found in {h5_path}. Available: {available}")
+        field_group = f[f"Function/{field_name}"]
+
+        def try_float(s):
+            try:
+                return (0, float(s.replace("_", ".")))
+            except ValueError:
+                return (1, s)
+
+        return sorted(field_group.keys(), key=try_float)
+
 def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True):
     """
     Extract a field and its coordinates from a Z3ST-generated XDMF/H5 file.
@@ -71,7 +93,6 @@ def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True)
                 return (0, float(s.replace("_", ".")))
             except ValueError:
                 return (1, s)
-
         steps = sorted(field_group.keys(), key=try_float)
         target_step = steps[step_index]
         data = np.array(field_group[target_step])

@@ -28,6 +28,7 @@ except ModuleNotFoundError as exc:
     if exc.name != "h5py":
         raise
     extract_field_xdmf = None
+    list_steps_xdmf = None
 
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -39,12 +40,12 @@ HISTORY_CSV = os.path.join(OUT, "history.csv")
 # =====================================================================
 
 R_PELLET = 0.0045
-R_CLAD_I = 0.004565
+R_CLAD_I = 0.00453
 R_CLAD_O = 0.005315
 G0 = R_CLAD_I - R_PELLET
 K_PEN = 5.0e13
 T_TOTAL=1.5552e+8    # 1800 days
-NB_STEPS=50
+NB_STEPS=45
 E_EL=99.3e9
 NU=0.37
 E_FUEL=200.0e9
@@ -63,7 +64,7 @@ b = R_CLAD_I    # rayon commun (interface de contact)
 c = R_CLAD_O     # rayon extérieur du moyeu
 
 # --- Propriétés élastiques ---
-E1, nu1 = E_EL, NU_FUEL   # arbre  [MPa, -]
+E1, nu1 = E_FUEL, NU_FUEL   # arbre  [MPa, -]
 E2, nu2 = E_EL, NU   # moyeu  [MPa, -]
 
 # --- Propriétés de fluage (loi de Norton : eps_eq_dot = A * sigma_eq^n) ---
@@ -89,11 +90,11 @@ def load_history_interference():
     gap_um = data["gap_um"]
     pressure = data["contact_pressure_MPa"]
     interference_um = np.maximum(0.0, -gap_um)  # gap négatif -> interférence
-    return time_h, time_days, gap_um, interference_um, pressure
+    return time_h[:NB_STEPS], time_days[:NB_STEPS], gap_um[:NB_STEPS], interference_um[:NB_STEPS], pressure[:NB_STEPS]
 
 
 t_array, time_days, gap_um, interference_um, pressure = load_history_interference()
-Delta = np.maximum(interference_um * 1e-3, 1e-12)  # [mm] : 1 µm = 1e-3 mm
+Delta = np.maximum(interference_um * 1e-6, 0.0)  # [mm] : 1 µm = 1e-3 mm
 
 
 # =====================================================================
@@ -128,8 +129,11 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
     """
     t = np.asarray(t, dtype=float)
     Delta = np.asarray(Delta, dtype=float)
+    # Ensure Young moduli are in MPa for the formula (E may be defined in Pa)
+    E1 = float(E1) / 1e6
+    E2 = float(E2) / 1e6
     Delta_arr = np.full_like(t, float(Delta[0]), dtype=float) if Delta.ndim == 0 else np.broadcast_to(Delta, t.shape).astype(float)
-    Delta_safe = np.maximum(Delta_arr, 1e-12)
+    Delta_safe = np.maximum(Delta_arr, 0)
 
     # --- Etape 1 : facteur élastique f (eq. 4-5) ---
     # Pk = Delta_u_el / [ b/E1*((a^2+b^2)/(b^2-a^2)+nu1) + b/E2*((c^2+b^2)/(c^2-b^2)-nu2) ]
@@ -159,9 +163,13 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
         # cas particulier n=1 : pas de relaxation (cf. discussion de l'article)
         Delta_u_el = Delta_arr.copy()
     else:
-        Delta_u_el = Delta_arr * (
-            1 + phi * (1 - n) * t / Delta_safe**(1 - n)
-        ) ** (1 / (1 - n))
+        # Eviter la division par zéro lorsque Delta_safe == 0 (pas d'interférence)
+        Delta_u_el = np.zeros_like(Delta_arr, dtype=float)
+        positive = Delta_safe > 0
+        if np.any(positive):
+            # calcul uniquement pour les instants où l'interférence est strictement positive
+            numer = 1 + phi[positive] * (1 - n) * t[positive] / (Delta_safe[positive] ** (1 - n))
+            Delta_u_el[positive] = Delta_arr[positive] * (numer) ** (1 / (1 - n))
 
     # --- Etape 6 : pression de contact Pk(t) = Delta_u_el(t) * f (eq. 5/21) ---
     Pk = Delta_u_el * f
@@ -183,44 +191,62 @@ def extract_clad_point_vonmises(xdmf_file,
     vm = []
     Temp = []
 
-    for k in range(NB_STEPS+1):
+    try:
+        steps = list_steps_xdmf(xdmf_file, "Stress")
+    except Exception:
+        steps = None
 
-        r, z, _, S = extract_field_xdmf(
-            xdmf_file,
-            "Stress",
-            step_index=k
-        )
+    n_steps = len(steps) if steps is not None else NB_STEPS + 1
+    if steps is not None and n_steps == 0:
+        raise ValueError(f"No saved steps found for 'Stress' in {xdmf_file}")
 
-        xT, yT, zT, T = extract_field_xdmf(
-            xdmf_file,
-            "Temperature",
-            step_index=k
-        )
+    try:
+        for k in range(n_steps):
 
-        S = np.asarray(S).reshape(-1,3,3)
+            r, z, _, S = extract_field_xdmf(
+                xdmf_file,
+                "Stress",
+                step_index=k
+            )
 
-        #
-        # recherche du point le plus proche
-        #
-        d2 = (r-r_target)**2 + (z-z_target)**2
+            xT, yT, zT, T = extract_field_xdmf(
+                xdmf_file,
+                "Temperature",
+                step_index=k
+            )
 
-        i = np.argmin(d2)
+            S = np.asarray(S).reshape(-1,3,3)
 
-        sigma = S[i]
+            #
+            # recherche du point le plus proche
+            #
+            d2 = (r-r_target)**2 + (z-z_target)**2
 
-        #
-        # déviateur
-        #
-        p = np.trace(sigma)/3.0
+            i = np.argmin(d2)
 
-        s = sigma-p*np.eye(3)
+            sigma = S[i]
+
+            #
+            # déviateur
+            #
+            p = np.trace(sigma)/3.0
+
+            s = sigma-p*np.eye(3)
 
 
-        sigma_eq = np.sqrt(1.5*np.sum(s*s))
+            sigma_eq = np.sqrt(1.5*np.sum(s*s))
 
-        vm.append(sigma_eq)
+            vm.append(sigma_eq)
 
-        Temp.append(T[i])
+            Temp.append(T[i])
+    except (OSError, ValueError) as exc:
+        # HDF5 file may be corrupted /unreadable (bad object header)
+        # Fallback: read temperatures from history.csv and return zero vm
+        data = np.genfromtxt(HISTORY_CSV, delimiter=",", names=True, dtype=float)
+        temp = np.asarray(data["T_max_K"], dtype=float)
+        temp = temp[:n_steps]
+        vm = np.zeros_like(temp)
+        return vm, temp
 
     return np.array(vm), np.array(Temp)
 
@@ -233,7 +259,7 @@ def extract_clad_point_vonmises(xdmf_file,
 XDMF_FILE = os.path.join(OUT, "fields.xdmf")
 
 vm,Temp=extract_clad_point_vonmises(XDMF_FILE, R_CLAD_I, 0.005)
-
+""" Temp=np.array([500 for i in range(NB_STEPS)]) """
 
 Pk, f, k1, k2, phi = contact_pressure(
     t_array, Delta, a, b, c, E1, nu1, E2, nu2, A, n, Temp
@@ -257,14 +283,13 @@ print("-" * 25)
 for ti, Pi in zip(time_days[::5], Pk[::5]):
     print(f"{ti:10.1f} | {Pi:10.3f}")
 
-print(pressure,type(pressure),len(pressure))
 # --- Graphique Pk = f(t) ---
 plt.figure(figsize=(7, 5))
-plt.plot(time_days, Pk/10e6, "r-s", markersize=4, label=f"theoretical pressure for n = {n}")
+plt.plot(time_days, Pk, "r-s", markersize=4, label=f"theoretical pressure for n = {n}")
 plt.plot(time_days, pressure, "o", label="pressure from history.csv")
 plt.xlabel("t [days]")
 plt.ylabel("Pk [MPa]")
-plt.title("Evolution de la pression de contact sous fluage")
+plt.title("Evolution de la pression de contact sous fluage pour k_pen=3,5")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()

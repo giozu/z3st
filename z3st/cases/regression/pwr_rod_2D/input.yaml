@@ -40,8 +40,8 @@ models:
   contact:
     surface_a: lateral_1        # pellet outer
     surface_b: inner_2          # clad inner
-    penalty_stiffness: 5.0e13   # (Pa/m)
-    initial_gap: 65.0e-6        # (m)
+    penalty_stiffness: 3.5e12   # (Pa/m)
+    initial_gap: 30.0e-6        # (m)
 
 mechanical:
   solver: nonlinear
@@ -71,7 +71,7 @@ time:
 n_steps:
 - 10
 - 14
-- 26
+- 20
 
 time_adaptivity:
   enabled: true
