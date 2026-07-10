@@ -44,7 +44,7 @@ models:
     initial_gap: 65.0e-6        # (m)
 
 mechanical:
-  solver: linear
+  solver: nonlinear
   linear_solver: direct_mumps
   rtol: 1.0e-4
   stag_tol: 1.0e-4
@@ -67,11 +67,11 @@ time:
 - 0.0
 - 1.728e+6     # 20 days
 - 6.048e+7     # 700 days
-- 1.5552e+8    # 1800 days
+- 2.16e+8    # 2500 days
 n_steps:
 - 10
 - 14
-- 14
+- 26
 
 time_adaptivity:
   enabled: true

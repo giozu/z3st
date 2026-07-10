@@ -31,7 +31,7 @@ models:
   contact:
     surface_a: xmax_1
     surface_b: xmin_2
-    penalty_stiffness: 1.0e14
+    penalty_stiffness: 1.7e13
     initial_gap: 30.0e-6
 
 mechanical:

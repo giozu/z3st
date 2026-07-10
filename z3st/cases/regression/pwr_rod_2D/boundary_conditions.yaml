@@ -54,10 +54,13 @@ mechanical:
   - type: Clamp_y
     region: bottom_2      # u_z = 0
 
-  - type: Neumann
+  - type: Dirichlet_x
     region: outer_2
-    traction: -15.5e+6    # (Pa)
+    displacement: 0.0 # (m)
 
-  - type: Neumann
+  - type: Dirichlet_x
     region: inner_2
-    traction: -2.0e+6     # (Pa)
+    displacement: 5.0e-6 # (m)
+    
+
+

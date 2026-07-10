@@ -26,8 +26,13 @@ pass/fail gate ignores them, and are protected purely by the gold comparison
 import os
 import csv
 import yaml
+import h5py
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf, list_fields_xdmf
 from z3st.utils.utils_verification import pass_fail_check, regression_check
 from z3st.utils.utils_load import generate_power_history
 
@@ -35,6 +40,7 @@ CASE_DIR = os.path.dirname(__file__)
 OUT = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(OUT, "non-regression.json")
 HISTORY = os.path.join(OUT, "history.csv")
+XDMF_FILE = os.path.join(OUT, "fields.xdmf")
 
 TOLERANCE = 1e-2
 
@@ -107,5 +113,162 @@ errors = {
 
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 regression_check(errors, CASE_DIR)
+
+# --. Interference and contact pressure analysis --..
+def plot_interference_pressure():
+    """Calculate interference and plot contact pressure as function of interference.
+    
+    Following the formula from coaxial_contact verification:
+    gap = g0 + surf(ur, r, bci) - surf(ur, r, b)
+    where b is pellet outer radius, bci is clad inner radius
+    """
+    # Read geometry parameters
+    with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
+        geom = yaml.safe_load(f)
+    b = float(geom["outer_radius_1"])     # pellet outer radius
+    bci = float(geom["inner_radius_2"])  # clad inner radius
+    
+    # Read contact parameters
+    with open(os.path.join(CASE_DIR, "input.yaml")) as f:
+        inp = yaml.safe_load(f)
+    cc = inp["models"]["contact"]
+    g0 = float(cc["initial_gap"])
+    k_pen = float(cc["penalty_stiffness"])
+    
+    # Helper functions for surface average and area-weighted mean
+    def surf(v, r, r0):
+        return v[np.abs(r - r0) < 2e-5].mean()
+    
+    def amean(v, r, lo, hi):
+        mask = (r >= lo) & (r <= hi)
+        return np.sum(v[mask] * r[mask]) / np.sum(r[mask])
+    
+    # Load history data from CSV
+    with open(HISTORY) as f:
+        rows = list(csv.DictReader(f))
+    
+    # Extract data arrays
+    time_days = np.array([float(r["time_days"]) for r in rows])
+    contact_pressure = np.array([float(r["contact_pressure_MPa"]) for r in rows])
+    gap_um = np.array([float(r["gap_um"]) for r in rows])
+    
+    # Calculate interference from gap data (negative gap = interference)
+    # This is equivalent to: gap = g0 + surf(ur, r, bci) - surf(ur, r, b)
+    # where negative gap indicates interference
+    interference = np.maximum(0, -gap_um * 1e-6)  # convert um to m, take positive part
+    
+    # Calculate pellet temperature from history data (T_max is used as approximation)
+    # In a full implementation, this would use: Tp = amean(T, r, 0.0, b) from field data
+    T_pellet = np.array([float(r["T_max_K"]) for r in rows])
+    
+    # Create plot
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(15, 5))
+    
+    # Left plot: Contact pressure vs time
+    ax1.plot(time_days, contact_pressure, "r-o", lw=2, ms=4, label="Contact pressure")
+    ax1.set_xlabel("Time (days)")
+    ax1.set_ylabel("Contact pressure (MPa)")
+    ax1.set_title("Contact pressure evolution")
+    ax1.grid(True, ls=":", alpha=0.6)
+    ax1.legend()
+    
+    # Middle plot: Contact pressure vs interference
+    ax2.plot(interference * 1e6, contact_pressure, "b-s", lw=2, ms=4, label="p vs interference")
+    ax2.set_xlabel("Interference (μm)")
+    ax2.set_ylabel("Contact pressure (MPa)")
+    ax2.set_title("Contact pressure as function of interference")
+    ax2.grid(True, ls=":", alpha=0.6)
+    ax2.legend()
+    
+    # Right plot: Interference vs pellet temperature
+    ax3.plot(T_pellet, interference * 1e6, "g-^", lw=2, ms=4, label="interference vs T")
+    ax3.set_xlabel("Pellet temperature (K)")
+    ax3.set_ylabel("Interference (μm)")
+    ax3.set_title("Interference as function of pellet temperature")
+    ax3.grid(True, ls=":", alpha=0.6)
+    ax3.legend()
+    
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "interference_pressure.png"), dpi=150)
+    plt.close(fig)
+    print("[INFO] interference_pressure.png saved")
+    
+    # Print summary statistics
+    contact_steps = contact_pressure > 0
+    if contact_steps.any():
+        print(f"[INFO] Contact initiated at time: {time_days[contact_steps][0]:.1f} days")
+        print(f"[INFO] Contact initiated at interference: {interference[contact_steps][0]*1e6:.3f} μm")
+        print(f"[INFO] Contact initiated at pellet temperature: {T_pellet[contact_steps][0]:.1f} K")
+        print(f"[INFO] Final interference: {interference[-1]*1e6:.3f} μm")
+        print(f"[INFO] Final contact pressure: {contact_pressure[-1]:.2f} MPa")
+        print(f"[INFO] Final pellet temperature: {T_pellet[-1]:.1f} K")
+    else:
+        print("[INFO] No contact detected during simulation")
+
+
+def print_outer_cylinder_mean_stress():
+    """Extract the 3x3 stress tensor for each XDMF time step and print its mean."""
+    h5_path = XDMF_FILE.replace(".xdmf", ".h5")
+    with h5py.File(h5_path, "r") as f:
+        if "Function" not in f:
+            raise RuntimeError(f"No 'Function' group found in {h5_path}")
+
+        stress_candidates = [
+            name for name in f["Function"].keys()
+            if "stress" in name.lower()
+        ]
+        if not stress_candidates:
+            raise RuntimeError(
+                f"No stress field found in {h5_path}. Available: {list(f['Function'].keys())}"
+            )
+
+        stress_field = stress_candidates[0]
+        print(f"[INFO] Using stress field '{stress_field}' from {h5_path}")
+
+        def parse_step_name(value):
+            try:
+                return (0, float(value))
+            except Exception:
+                return (1, value)
+
+        step_names = sorted(
+            list(f["Function"][stress_field].keys()),
+            key=parse_step_name,
+        )
+
+    r2_i = float(geom["inner_radius_2"])
+    r2_o = float(geom["outer_radius_2"])
+
+    for step_index, step_name in enumerate(step_names):
+        x_s, y_s, z_s, stress_data = extract_field_xdmf(
+            XDMF_FILE, field_name=stress_field, step_index=step_index
+        )
+
+        if stress_data.ndim != 2 or stress_data.shape[1] != 9:
+            raise RuntimeError(
+                f"Expected stress tensor field with 9 components at step {step_name}, got shape {stress_data.shape}"
+            )
+
+        r = x_s
+        mask = (r >= r2_i - 1e-12) & (r <= r2_o + 1e-12)
+        if not np.any(mask):
+            print(
+                f"[WARNING] No points found in outer cylinder radius range [{r2_i}, {r2_o}] at step {step_name}"
+            )
+            continue
+
+        stress_tensors = stress_data.reshape(-1, 3, 3)
+        outer_stress = stress_tensors[mask]
+        mean_stress = outer_stress.mean(axis=0)
+
+        print(f"[INFO] Step {step_name} — Mean stress tensor in outer cylinder (Pa):")
+        print(
+            f"[[{mean_stress[0,0]: .6e}, {mean_stress[0,1]: .6e}, {mean_stress[0,2]: .6e}]"
+            f" [{mean_stress[1,0]: .6e}, {mean_stress[1,1]: .6e}, {mean_stress[1,2]: .6e}]"
+            f" [{mean_stress[2,0]: .6e}, {mean_stress[2,1]: .6e}, {mean_stress[2,2]: .6e}]"
+        )
+
+plot_interference_pressure()
+print_outer_cylinder_mean_stress()
 
 print("\n[INFO] non-regression completed.\n")

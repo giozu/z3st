@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import pyvista as pv
 
 from z3st.utils.utils_load import generate_power_history
+from z3st.utils.utils_extract_xdmf import *
 
 pv.OFF_SCREEN = True
 # start_xvfb is deprecated in recent PyVista but is the working headless path
@@ -37,7 +38,19 @@ R_CLAD_I = 0.004565
 R_CLAD_O = 0.005315
 G0 = R_CLAD_I - R_PELLET
 K_PEN = 5.0e13
-
+T_TOTAL=1.5552e+8    # 1800 days
+NB_STEPS=50
+E_EL=99.3e9
+E_FUEL=200.0e9
+NU_FUEL=0.345
+NU=0.37
+ALPHA=7.5e-6
+G=E_EL/(2*(1+NU))
+CREEP_A0 = 2.82e-24 
+CREEP_N = 3.0         # (-)
+CREEP_Q = 1.2e5
+SIGMA0=E_EL*5.0e-5/(R_CLAD_I-R_CLAD_O)
+R_GAS=8.3145
 
 def burnup_per_step(files):
     """Average burnup (MWd/kgU), from the Burnup VTU field"""
@@ -333,7 +346,6 @@ def plot_stress_profile():
         print("  [plots] no stress field in output: skipping stress profile")
         return
     r, s_rr, s_tt = data
-
     fig, ax = plt.subplots(figsize=(7.2, 4.8))
     first = True
     for lo, hi in [(0.0, R_PELLET + 1e-9), (R_CLAD_I - 1e-9, R_CLAD_O + 1e-9)]:
@@ -370,6 +382,153 @@ def plot_stress_profile():
         print(f"      {name:12s} r={rt * 1e3:6.3f} mm   "
               f"sigma_rr={srr:9.1f}   sigma_theta={stt:9.1f}")
 
+def sigma_exact(t,T, sigma0_actual=None):
+    """Exact solution for the Norton creep stress relaxation problem with variable temperature"""
+    # For variable temperature, we need to integrate the temperature-dependent creep rate
+    # dσ/dt = -E * A(T) * σ^n where A(T) = A0 * exp(-Q/RT)
+    # This requires numerical integration
+    # Note: Creep depends on the magnitude of stress, so we use absolute values
+    # and preserve the sign of the initial stress
+    
+    # Use actual initial stress if provided, otherwise use calculated SIGMA0
+    sigma0 = sigma0_actual if sigma0_actual is not None else SIGMA0
+    sigma_vals = [sigma0]  # Initial stress (compressive, negative)
+    sign = np.sign(sigma0)  # Preserve the sign
+    
+    for i in range(1, len(t)):
+        # Numerical integration using trapezoidal rule
+        dt = t[i] - t[i-1]
+        if dt <= 0:
+            sigma_vals.append(sigma_vals[-1])
+            continue
+        # Average temperature over the time step
+        T_avg = 0.5 * (T[i] + T[i-1])
+        # Temperature-dependent creep coefficient
+        A_T = CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T_avg))
+        # Analytical solution for constant A over small time step
+        # |σ(t+dt)| = [|σ(t)|^(1-n) + (n-1)*E*A*dt]^(-1/(n-1))
+        sigma_prev_abs = abs(sigma_vals[-1])
+        # Calculate the term carefully to avoid numerical issues
+        sigma_pow = sigma_prev_abs**(1 - CREEP_N)
+        creep_term = (CREEP_N - 1) * 3 * G * A_T * dt
+        term = sigma_pow + creep_term
+        # Ensure term is positive for the power calculation
+        if term <= 0:
+            # If term becomes negative or zero, use previous value
+            sigma_new_abs = sigma_prev_abs
+        else:
+            sigma_new_abs = term**(-1 / (CREEP_N - 1))
+        # Restore the original sign
+        sigma_new = sign * sigma_new_abs
+        sigma_vals.append(sigma_new)
+    return sigma_vals
+
+def sigma_exact_2(t,sigma0):
+    A=np.exp(-CREEP_Q/(R_GAS*600.0))*CREEP_A0
+    return (sigma0 ** (1.0 - CREEP_N) + (CREEP_N - 1.0) * E_EL * A * np.asarray(t)) ** (-1.0 / (CREEP_N - 1.0))
+
+def plot_sigma_eq_profile():
+    XDMF_FILE = os.path.join(OUT, "fields.xdmf")
+    # Load actual simulation times from history.csv
+    history_file = os.path.join(OUT, "history.csv")
+    if os.path.exists(history_file):
+        history_data = np.genfromtxt(history_file, delimiter=",", names=True)
+        times = np.atleast_1d(history_data["time_s"])
+    else:
+        # Fallback to synthetic times if history.csv doesn't exist
+        times = np.linspace(0.0, T_TOTAL, NB_STEPS + 1)
+
+    sig_steps = []
+    sigma, outer_clad_T = extract_clad_point_vonmises(XDMF_FILE)
+    # Use actual simulation time steps and temperatures
+    # Use the actual initial axial stress from the simulation instead of calculated SIGMA0
+    sigma_actual = sigma[0] if sigma is not None else None
+    sigma_vals = sigma_exact(times,outer_clad_T,sigma_actual)
+    plt.figure(figsize=(7, 5))
+    plt.plot(times / 86400.0, np.array(sigma_vals) / 1e6, "k-", lw=2.5, alpha=0.7,
+             label="Exact  [σ₀^{1−n} + 3(n−1) G integral(Gt)]^{−1/(n−1)}")
+    if sigma is not None:
+        plt.plot(times / 86400.0, np.array(sigma) / 1e6, "+", ms=8, mfc="none",
+                 mec="r", mew=2, label="Z3ST (implicit, AD tangent)")
+    plt.xlabel("time (days)")
+    plt.ylabel("equivalent stress von Mises σ_eq (MPa)")
+    plt.title("Norton creep stress relaxation with variable temperature\n"
+              f"σ₀ = {sigma_actual/1e6:.2f} MPa, T varies with time, n = {CREEP_N:.0f}")
+    plt.grid(True, ls=":", alpha=0.6)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(os.path.join(OUT, "stress_relaxation.png"), dpi=150)
+    print("[INFO] stress_relaxation.png saved")
+    # also extract outer-clad von Mises series and save CSV
+
+    # Calculate error statistics for the plotted points
+    if sigma is not None:
+        # Calculate absolute errors between exact solution and Z3ST results
+        errors = np.abs((np.array(sigma_vals) - np.array(sigma)))
+        print(f"Sigma vals: {sigma_vals}")
+        print(f"Sigma: {sigma}")
+        # Calculate biggest error (maximum absolute error)
+        max_error = np.max(errors)
+        # Calculate average error (mean absolute error)
+        avg_error = np.mean(errors)
+        print(f"[INFO] Error statistics for plotted points:")
+        print(f"      Biggest error: {max_error/1e6:.6f} MPa")
+        print(f"      Average error: {avg_error/1e6:.6f} MPa")
+
+    return 0
+
+
+def extract_clad_point_vonmises(xdmf_file,
+                                r_target=(R_CLAD_I+R_CLAD_O)/2,
+                                z_target=0.005):
+    """
+    Extract von Mises stress and temperature at one material point
+    located in the middle of the cladding thickness.
+    """
+
+    vm = []
+    Temp = []
+
+    for k in range(NB_STEPS+1):
+
+        r, z, _, S = extract_field_xdmf(
+            xdmf_file,
+            "Stress",
+            step_index=k
+        )
+
+        xT, yT, zT, T = extract_field_xdmf(
+            xdmf_file,
+            "Temperature",
+            step_index=k
+        )
+
+        S = np.asarray(S).reshape(-1,3,3)
+
+        #
+        # recherche du point le plus proche
+        #
+        d2 = (r-r_target)**2 + (z-z_target)**2
+
+        i = np.argmin(d2)
+
+        sigma = S[i]
+
+        #
+        # déviateur
+        #
+        p = np.trace(sigma)/3.0
+
+        s = sigma-p*np.eye(3)
+
+
+        sigma_eq = np.sqrt(1.5*np.sum(s*s))
+
+        vm.append(sigma_eq)
+
+        Temp.append(T[i])
+
+    return np.array(vm), np.array(Temp)
 
 # ----------------------------------------------------------------------
 # 3. FINAL-STEP FIELDS: temperature, radial displacement, clad von Mises
@@ -448,6 +607,7 @@ if __name__ == "__main__":
     plot_history()
     plot_pcmi_curves()           # CSV-preferred; works for XDMF-only runs too
     plot_stress_profile()        # VTU-preferred; falls back to the XDMF h5
+    plot_sigma_eq_profile()        # VTU-preferred; falls back to the XDMF h5
     if have_vtu:
         plot_mesh()
         plot_radial_profile()

@@ -14,3 +14,4 @@ echo "z3st solve completed in $((SECONDS - start)) s  (solver log: log_z3st.md)"
 
 python3 non-regression.py
 python3 plots.py
+python3 pressure_creep_analysis.py
