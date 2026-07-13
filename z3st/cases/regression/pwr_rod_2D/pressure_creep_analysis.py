@@ -94,7 +94,7 @@ def load_history_interference():
 
 
 t_array, time_days, gap_um, interference_um, pressure = load_history_interference()
-Delta = np.maximum(interference_um * 1e-6, 0.0)  # [mm] : 1 µm = 1e-3 mm
+Delta = np.maximum(interference_um * 1e-6, 0.0)  # [mm] : 1 µm = 1e-6 m
 
 
 # =====================================================================
