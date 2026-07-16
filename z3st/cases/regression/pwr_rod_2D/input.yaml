@@ -41,20 +41,20 @@ models:
     surface_a: lateral_1        # pellet outer
     surface_b: inner_2          # clad inner
     penalty_stiffness: 3.5e12   # (Pa/m)
-    initial_gap: 0        # (m)
+    initial_gap: 10.0e-6        # (m)
 
 mechanical:
   solver: nonlinear
   linear_solver: direct_mumps
-  rtol: 1.0e-2
-  stag_tol: 1.0e-2
+  rtol: 1.0e-4
+  stag_tol: 1.0e-4
   convergence: rel_norm
 
 thermal:
   solver: linear
   linear_solver: direct_mumps
-  rtol: 1.0e-2
-  stag_tol: 1.0e-2
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
   convergence: rel_norm
   analysis: stationary
 
@@ -62,14 +62,11 @@ lhr:
 - 0.0
 - 20000.0
 - 20000.0
-- 20000.0
 time:
 - 0.0
-- 1.728e+6     # 20 days
 - 6.048e+7     # 700 days
 - 2.16e+8    # 2500 days
 n_steps:
-- 10
 - 14
 - 20
 

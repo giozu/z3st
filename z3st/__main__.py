@@ -8,7 +8,7 @@ import os
 import sys
 import re
 import time
-
+import numpy as np
 import yaml
 
 
@@ -337,8 +337,8 @@ if __name__ == "__main__":
     problem.load_materials(**loaded_materials)
 
     # --. History --..
-    t_points = input_file.get("time")
-    lhr_points = input_file.get("lhr")
+    t_points = np.array(input_file.get("time"),dtype=float)
+    lhr_points = np.array(input_file.get("lhr"),dtype=float)
     # Default matches Config's n_steps default; without it an input.yaml with
     # no n_steps key crashed on None - 1 before the run started.
     raw_n_steps = input_file.get("n_steps", 10)

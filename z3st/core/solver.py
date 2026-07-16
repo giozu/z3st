@@ -672,10 +672,25 @@ class Solver:
         # a non-bilinear form as if it were bilinear). Guards against a
         # solver: linear misconfiguration.
         creep_present = any(self.creep_active(m) for m in self.materials.values())
-        nonlinear_constitutive = any(
-            m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
-            for m in self.materials.values()
-        )
+
+        cache = getattr(self, "_mech_cache", None)
+        rebuild = (
+            cache is None
+            or cache["step"] != self.current_step
+            or cache["u_new"] is not u_new
+            or cache["T"] is not T_current
+            or (creep_present and getattr(self, "_force_creep_rebuild", False))  # ← Ajoutez cette ligne
+            )
+
+        # Au début de solve_staggered, demandez au solver de forcer la reconstruction:
+        if creep_present and self.on.get("contact", False):
+            self._force_creep_rebuild = True
+        else:
+            self._force_creep_rebuild = False
+            nonlinear_constitutive = any(
+                m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
+                for m in self.materials.values()
+                )
         linear = (
             self.mech_cfg["solver"] == "linear"
             and not creep_present

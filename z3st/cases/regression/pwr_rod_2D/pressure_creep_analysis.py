@@ -96,7 +96,8 @@ def load_history_interference():
 t_array, time_days, gap_um, interference_um, pressure = load_history_interference()
 Delta = np.maximum(interference_um * 1e-6, 0.0)  # [mm] : 1 µm = 1e-6 m
 
-
+t_array=t_array*3600
+print(t_array)
 # =====================================================================
 # 2. FONCTION DE CALCUL DE LA PRESSION DE CONTACT
 # =====================================================================
@@ -130,8 +131,8 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
     t = np.asarray(t, dtype=float)
     Delta = np.asarray(Delta, dtype=float)
     # Ensure Young moduli are in MPa for the formula (E may be defined in Pa)
-    E1 = float(E1) / 1e6
-    E2 = float(E2) / 1e6
+    E1 = float(E1) 
+    E2 = float(E2) 
     Delta_arr = np.full_like(t, float(Delta[0]), dtype=float) if Delta.ndim == 0 else np.broadcast_to(Delta, t.shape).astype(float)
     Delta_safe = np.maximum(Delta_arr, 0)
 
@@ -157,6 +158,17 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
 
     # --- Etape 4 : phi, taux de relaxation (eq. 21-22) ---
     phi = -(CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T)) / b) * f**n * (k2 - k1)
+    print(f,k1,k2)
+    print(phi)
+    contact_mask = Delta_arr > 1e-9          # seuil physique, pas 1e-12
+    Pk = np.zeros_like(t)
+
+    if np.any(contact_mask):
+        idx0 = np.argmax(contact_mask)        # premier indice de contact
+        Delta0 = Delta_arr[idx0]              # interférence "initiale" du fluage
+        t0 = t[idx0]                          # instant où le fluage démarre
+        t_rel = t[idx0:] - t0   
+
 
     # --- Etape 5 : evolution de l'interference elastique Delta_u_el(t) (eq. 21) ---
     if n == 1:
@@ -165,18 +177,17 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
     else:
         # Eviter la division par zéro lorsque Delta_safe == 0 (pas d'interférence)
         Delta_u_el = np.zeros_like(Delta_arr, dtype=float)
-        positive = Delta_safe > 0
-        if np.any(positive):
-            # calcul uniquement pour les instants où l'interférence est strictement positive
-            numer = 1 + phi[positive] * (1 - n) * t[positive] / (Delta_safe[positive] ** (1 - n))
-            Delta_u_el[positive] = Delta_arr[positive] * (numer) ** (1 / (1 - n))
+
+
+        numer = 1 + phi[idx0:] * (1 - n) * t_rel / (Delta_safe[idx0:] ** (1 - n))
+        Delta_u_el[idx0:] = Delta_arr[idx0:] * (numer) ** (1 / (1 - n))
 
     # --- Etape 6 : pression de contact Pk(t) = Delta_u_el(t) * f (eq. 5/21) ---
     Pk = Delta_u_el * f
-    return Pk, f, k1, k2, phi
+    return Pk/1e6, f, k1, k2, phi
 
 def extract_clad_point_vonmises(xdmf_file,
-                                r_target=(R_CLAD_I+R_CLAD_O)/2,
+                                r_target=R_CLAD_I,
                                 z_target=0.005):
     """
     Extract von Mises stress and temperature at one material point
@@ -267,7 +278,7 @@ Pk, f, k1, k2, phi = contact_pressure(
 
 
 
-print(f"Facteur élastique f  = {f:.5f} MPa/mm")
+print(f"Facteur élastique f  = {f:.5f} MPa/m")
 print(f"k1                   = {k1:.5e}")
 print(f"k2                   = {k2:.5e}")
 print()
@@ -289,7 +300,7 @@ plt.plot(time_days, Pk, "r-s", markersize=4, label=f"theoretical pressure for n 
 plt.plot(time_days, pressure, "o", label="pressure from history.csv")
 plt.xlabel("t [days]")
 plt.ylabel("Pk [MPa]")
-plt.title("Evolution de la pression de contact sous fluage pour k_pen=3,5")
+plt.title("Contact pressure evolution with creep for k_pen=3,5e12")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()

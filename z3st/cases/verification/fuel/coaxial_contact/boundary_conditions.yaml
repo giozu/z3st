@@ -1,21 +1,69 @@
 thermal:
   cyl_1:
+  # cyl_1 at uniform temperature, ramped from 300 K to 1500 K over 13 steps
   - type: Dirichlet
-    region: xmax_1
-    temperature: 300.0 # (K)
+    region: lateral_1
+    temperature:
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+    - 600.0
+
+  - type: Neumann
+    region: bottom_1
+    flux: 0.0
+  - type: Neumann
+    region: top_1
+    flux: 0.0
+  - type: Neumann
+    region: axis_1
+    flux: 0.0
 
   cyl_2:
+  # cyl_2 at reference temperature
   - type: Dirichlet
-    region: xmax_2
-    temperature: 300.0 # (K)
+    region: outer_2
+    temperature: 300.0
+  - type: Neumann
+    region: inner_2
+    flux: 0.0
+  - type: Neumann
+    region: bottom_2
+    flux: 0.0
+  - type: Neumann
+    region: top_2
+    flux: 0.0
 
 mechanical:
   cyl_1:
   - type: Clamp_x
-    region: xmin_1
-  - type: Clamp_y
-    region: ymin_1
+    region: axis_1
 
+  - type: Clamp_y
+    region: bottom_1
+
+  - type: Dirichlet_x
+    region: lateral_1
+    displacement: 5.0e-6     # ← +5 μm vers l'extérieur
+
+    
   cyl_2:
   - type: Clamp_y
-    region: ymin_2
+    region: bottom_2
+
+  - type: Dirichlet_x
+    region: outer_2
+    displacement: 0.0
+
+  - type: Dirichlet_x
+    region: inner_2
+    displacement: -5.0e-6    # ← -5 μm vers l'intérieur
