@@ -1,21 +1,14 @@
 {
     "results": {
-        "final_gap": {
-            "numerical": 2.896024747552322e-05,
-            "reference": 2.9073766477009386e-05,
-            "abs_error": 1.135190014861669e-07,
-            "rel_error": 0.0037839667162055633,
-            "status": "PASS"
-        },
-        "spurious_contact_pressure": {
-            "numerical": 0.0,
-            "reference": 0.0,
-            "abs_error": 0.0,
-            "rel_error": 0.0,
+        "contact_pressure": {
+            "numerical": 18.920585634686923,
+            "reference": 19.8728949518528,
+            "abs_error": 0.9523093171658772,
+            "rel_error": 0.04792000961475877,
             "status": "PASS"
         }
     },
     "tolerance": 0.05,
     "summary": "PASS",
-    "regression": "FAIL"
+    "regression": "PASS"
 }

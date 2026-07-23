@@ -242,55 +242,69 @@ def strain_shares(z, active):
     return totals / totals.sum()
 
 
+def run_stages(verbose=False):
+    """Stages 1-3 of the identification on the current global ``sigma_data``:
+    per-candidate seeding, joint fit of the full library, then backward
+    elimination ranked by strain share with the one-standard-error parsimony
+    rule. Returns (active, z, z_full, shares_full, path, loss_full, loss_final),
+    where active/z describe the selected model. Reads ``sigma_data`` through
+    residuals_and_jacobian/strain_shares, so the caller sets that global before
+    invoking (the primary run and the robustness sweep both do)."""
+    # stage 1: seed each candidate alone by a coarse 1D scan
+    z_single = np.empty(K_FULL)
+    for i in range(K_FULL):
+        grid = np.linspace(np.log(1e-16), np.log(1e-6), 25)
+        losses = []
+        for zg in grid:
+            try:
+                r, _ = residuals_and_jacobian([zg], [i])
+                losses.append(0.5 * r @ r)
+            except (OverflowError, FloatingPointError, ZeroDivisionError):
+                losses.append(np.inf)
+        z_single[i] = grid[int(np.argmin(losses))]
+
+    # stage 2: joint fit of the full library
+    z_full0 = z_single - np.log(K_FULL)            # split the rate equally
+    active = list(range(K_FULL))
+    z_full, loss_full = fit(z_full0, active)
+    shares_full = strain_shares(z_full, active)
+    if verbose:
+        print("[INFO] full-library fit:")
+        for i, (name, *_), in enumerate(LIBRARY):
+            print(f"         c[{name:6s}] = {np.exp(z_full[i]):.3e} 1/s   "
+                  f"strain share = {shares_full[i]:.1%}")
+
+    # stage 3: backward elimination + one-standard-error parsimony rule
+    path = [(list(active), z_full.copy(), loss_full)]
+    z_cur, act_cur = z_full.copy(), list(active)
+    while len(act_cur) > 1:
+        shares = strain_shares(z_cur, act_cur)
+        drop = act_cur[int(np.argmin(shares))]
+        keep = [i for i in act_cur if i != drop]
+        z0 = np.array([z_cur[act_cur.index(i)] for i in keep])
+        z_cur, loss_cur = fit(z0, keep)
+        act_cur = keep
+        path.append((list(act_cur), z_cur.copy(), loss_cur))
+        if verbose:
+            print(f"[INFO] eliminated {LIBRARY[drop][0]:6s} -> "
+                  f"{[LIBRARY[i][0] for i in act_cur]}, loss = {loss_cur:.5f}")
+
+    loss_best = min(p[2] for p in path)
+    se = loss_best * np.sqrt(2.0 / sigma_data.size)   # SE of the loss at the floor
+    admissible = [p for p in path if p[2] <= loss_best + se]
+    active, z, loss_final = min(admissible, key=lambda p: len(p[0]))
+    if verbose:
+        print(f"[INFO] one-SE rule: best loss {loss_best:.5f}, SE {se:.5f} -> "
+              f"sparsest admissible model")
+    return active, z, z_full, shares_full, path, loss_full, loss_final
+
+
 # ---------------------------------------------------------------------------
-# stage 1: seed each candidate alone by a coarse 1D scan
+# identification on the primary noise realisation (seed SEED)
 # ---------------------------------------------------------------------------
 print(f"[INFO] data: {t_data.size} observations from the {N_FEM_STEPS}-step FEM "
       f"forward problem, {NOISE:.0%} noise, seed {SEED}")
-z_single = np.empty(K_FULL)
-for i in range(K_FULL):
-    grid = np.linspace(np.log(1e-16), np.log(1e-6), 25)
-    losses = []
-    for zg in grid:
-        try:
-            r, _ = residuals_and_jacobian([zg], [i])
-            losses.append(0.5 * r @ r)
-        except (OverflowError, FloatingPointError, ZeroDivisionError):
-            losses.append(np.inf)
-    z_single[i] = grid[int(np.argmin(losses))]
-
-# stage 2: joint fit of the full library
-z_full0 = z_single - np.log(K_FULL)            # split the rate equally
-active = list(range(K_FULL))
-z_full, loss_full = fit(z_full0, active)
-shares_full = strain_shares(z_full, active)
-print("[INFO] full-library fit:")
-for i, (name, *_), in enumerate(LIBRARY):
-    print(f"         c[{name:6s}] = {np.exp(z_full[i]):.3e} 1/s   "
-          f"strain share = {shares_full[i]:.1%}")
-
-# stage 3: backward elimination ranked by strain share, then the
-# one-standard-error parsimony rule (sparsest model whose loss lies within
-# one standard error of the best loss on the path)
-path = [(list(active), z_full.copy(), loss_full)]
-z_cur, act_cur = z_full.copy(), list(active)
-while len(act_cur) > 1:
-    shares = strain_shares(z_cur, act_cur)
-    drop = act_cur[int(np.argmin(shares))]
-    keep = [i for i in act_cur if i != drop]
-    z0 = np.array([z_cur[act_cur.index(i)] for i in keep])
-    z_cur, loss_cur = fit(z0, keep)
-    act_cur = keep
-    path.append((list(act_cur), z_cur.copy(), loss_cur))
-    print(f"[INFO] eliminated {LIBRARY[drop][0]:6s} -> "
-          f"{[LIBRARY[i][0] for i in act_cur]}, loss = {loss_cur:.5f}")
-
-loss_best = min(p[2] for p in path)
-se = loss_best * np.sqrt(2.0 / sigma_data.size)   # SE of the loss at the floor
-admissible = [p for p in path if p[2] <= loss_best + se]
-active, z, loss_final = min(admissible, key=lambda p: len(p[0]))
-print(f"[INFO] one-SE rule: best loss {loss_best:.5f}, SE {se:.5f} -> "
-      f"sparsest admissible model")
+active, z, z_full, shares_full, path, loss_full, loss_final = run_stages(verbose=True)
 
 c_id = np.exp(z)
 names_id = [LIBRARY[i][0] for i in active]
@@ -302,6 +316,34 @@ if active == [2]:
     print("[INFO] the cubic Norton mechanism is recovered; the residual "
           "coefficient error absorbs the data noise and the time-"
           "discretisation defect of the FEM data (model-form discrepancy).")
+
+# ---------------------------------------------------------------------------
+# robustness: repeat the identification over independent noise realisations,
+# so the "recovered in every realisation" claim is reproducible from the suite
+# rather than asserted. Each seed draws a fresh 2% multiplicative-noise vector
+# and runs the same three-stage selection.
+# ---------------------------------------------------------------------------
+N_SEEDS = 10
+robustness = []
+for _s in range(N_SEEDS):
+    _rng = np.random.default_rng(_s)
+    sigma_data = sigma_fem * (1.0 + NOISE * _rng.standard_normal(sigma_fem.size))
+    sigma_data[0] = sigma_fem[0]
+    _active, _z, *_ = run_stages(verbose=False)
+    _names = [LIBRARY[i][0] for i in _active]
+    _cubic_only = (_names == ["S^3"])
+    _c3_err = float(abs(np.exp(_z[0]) / C3_TRUE - 1.0)) if _cubic_only else None
+    robustness.append({"seed": _s, "selected": _names,
+                       "cubic_only": _cubic_only, "c3_rel_error": _c3_err})
+# restore the primary realisation so the plots below use the seed-SEED data
+sigma_data = sigma_fem * (1.0 + NOISE * np.random.default_rng(SEED).standard_normal(sigma_fem.size))
+sigma_data[0] = sigma_fem[0]
+
+n_cubic_only = sum(r["cubic_only"] for r in robustness)
+c3_errs = [r["c3_rel_error"] for r in robustness if r["cubic_only"]]
+print(f"[INFO] robustness over {N_SEEDS} noise seeds: cubic-Norton-only selected "
+      f"in {n_cubic_only}/{N_SEEDS}"
+      + (f", max cubic coeff error {max(c3_errs) * 100:.2f}%" if c3_errs else ""))
 
 # ---------------------------------------------------------------------------
 # outputs
@@ -325,6 +367,12 @@ result = {
     ],
     "noise": NOISE,
     "seed": SEED,
+    "robustness": {
+        "n_seeds": N_SEEDS,
+        "n_cubic_only": int(n_cubic_only),
+        "max_c3_rel_error": float(max(c3_errs)) if c3_errs else None,
+        "per_seed": robustness,
+    },
 }
 with open(OUT_JSON, "w") as f:
     json.dump(result, f, indent=4)

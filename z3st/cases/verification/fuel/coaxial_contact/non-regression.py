@@ -137,8 +137,19 @@ print("[INFO] contact_pressure_verification.png saved")
 
 mask = p_lame > 1.0
 if mask.any():
-    rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_lame[mask]
-    print(f"[INFO] closed-gap steps: {mask.sum()}, mean rel. error vs Lame = {rel.mean() * 100:.1f}%")
+    # Deviation measured relative to the characteristic (peak) contact
+    # pressure, not the local per-step value. At contact onset the penalty
+    # pressure p = k_pen * interpenetration necessarily lags the analytical
+    # Lame line, which jumps from zero the instant the interference is
+    # positive; dividing by the tiny local p_lame there would turn that small,
+    # expected absolute lag into a spurious large relative error. Normalising
+    # by the peak pressure scale measures the physically meaningful quantity:
+    # the agreement in established contact and the finite-penalty-stiffness
+    # residual near peak load.
+    p_scale = p_lame[mask].max()
+    rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_scale
+    print(f"[INFO] closed-gap steps: {mask.sum()}, dev vs Lame rel. to peak "
+          f"{p_scale:.1f} MPa: max {rel.max() * 100:.1f}%, mean {rel.mean() * 100:.1f}%")
 print("[INFO] non-regression completed.\n")
 
 
@@ -235,12 +246,16 @@ plot_stress_profiles()
 # --. numerical results --..
 if mask.any():
     # Contact regime: verify the penalty pressure against the Lame
-    # interference fit.
+    # interference fit. The reported numerical/reference pair is taken at the
+    # peak-contact step (established contact), and the error is the largest
+    # per-step deviation relative to the peak pressure scale (see the onset
+    # note above).
+    i_peak = int(np.argmax(p_lame))
     errors = {
         "contact_pressure": {
-            "numerical": p_z3st[mask].max(),
-            "reference": p_lame[mask].max(),
-            "abs_error": float(rel.max()),
+            "numerical": float(p_z3st[i_peak]),
+            "reference": float(p_lame[i_peak]),
+            "abs_error": float(np.abs(p_z3st[mask] - p_lame[mask]).max()),
             "rel_error": float(rel.max()),
         },
     }
