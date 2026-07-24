@@ -2,6 +2,7 @@
 cd "${0%/*}" || exit 1
 
 set -e
-gmsh mesh.geo -2 > log_mesh.md
-python3 -m z3st > log_z3st.md
-python3 non-regression.py
+# Fragmented-pellet relocation case (Phase 1: dedicated dolfinx_contact solver).
+# Requires dolfinx_contact built into the env (third_party/dolfinx_contact/build.sh).
+python3 make_mesh.py                       # fragmented fuel + cladding mesh
+python3 relocation_solve.py                # multi-body contact + relocation
