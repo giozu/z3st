@@ -1,0 +1,13 @@
+name: cracking_unit_block
+geometry_type: cyl
+
+Ri: 0.000    # (m)
+Ro: 0.0045   # (m)
+Lz: 0.010    # (m)
+
+labels:
+  inner: 1
+  outer: 2
+  bottom: 3
+  top: 4
+  fuel: 10

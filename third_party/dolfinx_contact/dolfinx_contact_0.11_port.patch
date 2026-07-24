@@ -1,0 +1,282 @@
+diff --git a/cpp/Contact.cpp b/cpp/Contact.cpp
+index b22a6e6..a7897ad 100644
+--- a/cpp/Contact.cpp
++++ b/cpp/Contact.cpp
+@@ -324,7 +324,7 @@ void Contact::create_distance_map(int pair)
+ 
+   // NOTE: More data that should be updated inside this code
+   const dolfinx::fem::CoordinateElement<double>& cmap
+-      = candidate_mesh->geometry().cmap();
++      = candidate_mesh->geometry().cmaps().front();
+   std::tie(_reference_basis, _reference_shape)
+       = tabulate(cmap, _quadrature_rule);
+ 
+@@ -356,7 +356,7 @@ std::pair<std::vector<PetscScalar>, int> Contact::pack_nx(int pair) const
+   int gdim = geometry.dim();
+   std::span<const double> x_g = geometry.x();
+   auto x_dofmap = geometry.dofmap();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   std::size_t num_dofs_g = cmap.dim();
+   auto topology = quadrature_mesh->topology();
+   int tdim = topology->dim();
+@@ -558,7 +558,7 @@ std::pair<std::vector<PetscScalar>, int> Contact::pack_gap(int pair) const
+   // Get information about submesh geometry and topology
+   std::span<const double> x_g = geometry.x();
+   auto x_dofmap = geometry.dofmap();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   std::size_t num_dofs_g = cmap.dim();
+   auto topology = candidate_mesh->topology();
+   int tdim = topology->dim();
+@@ -958,7 +958,7 @@ std::pair<std::vector<PetscScalar>, int> Contact::pack_gap_plane(int pair,
+ 
+   // Tabulate basis function on reference cell (_phi_ref_facets)
+   const dolfinx::fem::CoordinateElement<double>& cmap
+-      = _mesh->geometry().cmap();
++      = _mesh->geometry().cmaps().front();
+   std::tie(_reference_basis, _reference_shape)
+       = tabulate(cmap, _quadrature_rule);
+ 
+@@ -1029,7 +1029,7 @@ dolfinx_contact::Contact::pack_ny(int pair) const
+   // Get information about submesh geometry and topology
+   std::span<const double> x_g = geometry.x();
+   auto x_dofmap = geometry.dofmap();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   std::size_t num_dofs_g = cmap.dim();
+   auto topology = candidate_mesh->topology();
+   int tdim = topology->dim();
+@@ -1146,7 +1146,7 @@ void Contact::assemble_matrix(mat_set_fn& mat_set, int pair,
+       MDSPAN_IMPL_STANDARD_NAMESPACE::dextents<std::size_t, 2>>
+       x_dofmap = geometry.dofmap();
+   std::span<const double> x_g = geometry.x();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   std::size_t num_dofs_g = cmap.dim();
+   if (V.element()->needs_dof_transformations())
+   {
+@@ -1273,7 +1273,7 @@ void Contact::assemble_vector(std::span<PetscScalar> b, int pair,
+       x_dofmap = geometry.dofmap();
+   std::span<const double> x_g = geometry.x();
+ 
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   std::size_t num_dofs_g = cmap.dim();
+ 
+   // Extract function space data (assuming same test and trial space)
+diff --git a/cpp/KernelData.cpp b/cpp/KernelData.cpp
+index 455cb0b..3642880 100644
+--- a/cpp/KernelData.cpp
++++ b/cpp/KernelData.cpp
+@@ -17,7 +17,7 @@ dolfinx_contact::KernelData::KernelData(
+   assert(mesh);
+   // Get mesh info
+   const dolfinx::mesh::Geometry<double>& geometry = mesh->geometry();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+ 
+   _affine = cmap.is_affine();
+   _num_coordinate_dofs = cmap.dim();
+diff --git a/cpp/RayTracing.h b/cpp/RayTracing.h
+index 48b0c52..4c54cca 100644
+--- a/cpp/RayTracing.h
++++ b/cpp/RayTracing.h
+@@ -437,7 +437,7 @@ compute_ray(const dolfinx::mesh::Mesh<double>& mesh,
+   if (mesh.topology()->dim() != tdim or mesh.geometry().dim() != gdim)
+     throw std::invalid_argument("Invalid topological or geometrical dimension");
+ 
+-  const dolfinx::fem::CoordinateElement<double>& cmap = mesh.geometry().cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = mesh.geometry().cmaps().front();
+ 
+   // Get cell coordinates/geometry
+   const dolfinx::mesh::Geometry<double>& geometry = mesh.geometry();
+diff --git a/cpp/coefficients.cpp b/cpp/coefficients.cpp
+index 0264c79..2035e7f 100644
+--- a/cpp/coefficients.cpp
++++ b/cpp/coefficients.cpp
+@@ -154,7 +154,7 @@ dolfinx_contact::pack_coefficient_quadrature(
+         const std::int32_t,
+         MDSPAN_IMPL_STANDARD_NAMESPACE::dextents<std::size_t, 2>>
+         x_dofmap = mesh->geometry().dofmap();
+-    const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++    const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+     const std::size_t num_dofs_g = cmap.dim();
+     std::span<const double> x_g = geometry.x();
+ 
+@@ -386,7 +386,7 @@ dolfinx_contact::pack_gradient_quadrature(
+       const std::int32_t,
+       MDSPAN_IMPL_STANDARD_NAMESPACE::dextents<std::size_t, 2>>
+       x_dofmap = geometry.dofmap();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+ 
+   const std::size_t num_dofs_g = cmap.dim();
+   std::span<const double> x_g = geometry.x();
+@@ -560,7 +560,7 @@ dolfinx_contact::pack_circumradius(const dolfinx::mesh::Mesh<double>& mesh,
+   const dolfinx::mesh::Geometry<double>& geometry = mesh.geometry();
+ 
+   auto topology = mesh.topology();
+-  if (!geometry.cmap().is_affine())
++  if (!geometry.cmaps().front().is_affine())
+     throw std::invalid_argument("Non-affine circumradius is not implemented");
+ 
+   // Tabulate element at quadrature points
+@@ -579,7 +579,7 @@ dolfinx_contact::pack_circumradius(const dolfinx::mesh::Mesh<double>& mesh,
+   assert(q_rule.tdim() == (std::size_t)tdim);
+ 
+   // Tabulate coordinate basis for Jacobian computation
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   const std::array<std::size_t, 4> tab_shape
+       = cmap.tabulate_shape(1, sum_q_points);
+   std::vector<double> coordinate_basisb(
+diff --git a/cpp/parallel_mesh_ghosting.cpp b/cpp/parallel_mesh_ghosting.cpp
+index 42c7edb..4bd5536 100644
+--- a/cpp/parallel_mesh_ghosting.cpp
++++ b/cpp/parallel_mesh_ghosting.cpp
+@@ -195,8 +195,8 @@ dolfinx_contact::create_contact_mesh(
+   spdlog::warn("Repartition");
+   dolfinx::common::Timer trepart("~Contact: Add ghosts: Repartition");
+   auto new_mesh = dolfinx::mesh::create_mesh(
+-      mesh.comm(), mesh.comm(), topo_global, mesh.geometry().cmap(),
+-      mesh.comm(), x, xshape, partitioner);
++      mesh.comm(), mesh.comm(), topo_global, mesh.geometry().cmaps().front(),
++      mesh.comm(), x, xshape, partitioner, std::nullopt);
+   trepart.stop();
+ 
+   // Recreate facets
+@@ -279,7 +279,7 @@ dolfinx_contact::create_contact_mesh(
+ 
+   tlex2.stop();
+ 
+-  return {new_mesh, new_fmarker, new_cmarker};
++  return std::make_tuple(std::move(new_mesh), std::move(new_fmarker), std::move(new_cmarker));
+ }
+ //----------------------------------------------------------------------------
+ dolfinx::graph::AdjacencyList<std::int32_t>
+diff --git a/cpp/utils.cpp b/cpp/utils.cpp
+index 2ce5b16..f2151be 100644
+--- a/cpp/utils.cpp
++++ b/cpp/utils.cpp
+@@ -149,7 +149,7 @@ void dolfinx_contact::pull_back(
+           J(i, j, k) = 0;
+ 
+     mdspan_t<double, 2> Xs(X.data(), num_points, tdim);
+-    cmap.pull_back_nonaffine(Xs, x, coordinate_dofs);
++    cmap.pull_back_nonaffine(Xs, x, coordinate_dofs, 1e-6, 15);
+ 
+     /// Tabulate coordinate basis at pull back points to compute the Jacobian,
+     /// inverse and determinant
+@@ -254,7 +254,7 @@ void dolfinx_contact::update_geometry(
+   // The Function and the mesh must have identical element_dof_layouts
+   // (up to the block size)
+   assert(dofmap->element_dof_layout()
+-         == mesh.geometry().cmap().create_dof_layout());
++         == mesh.geometry().cmaps().front().create_dof_layout());
+ 
+   const int tdim = mesh.topology()->dim();
+   std::shared_ptr<const dolfinx::common::IndexMap> cell_map
+@@ -416,7 +416,7 @@ void dolfinx_contact::evaluate_basis_functions(
+       const std::int32_t,
+       MDSPAN_IMPL_STANDARD_NAMESPACE::dextents<std::size_t, 2>>
+       x_dofmap = geometry.dofmap();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   const std::size_t num_dofs_g = cmap.dim();
+ 
+   // Get element
+@@ -750,9 +750,9 @@ dolfinx_contact::entities_to_geometry_dofs(
+   // Get mesh geometry and topology data
+   const dolfinx::mesh::Geometry<double>& geometry = mesh.geometry();
+   const dolfinx::fem::ElementDofLayout layout
+-      = geometry.cmap().create_dof_layout();
++      = geometry.cmaps().front().create_dof_layout();
+   // FIXME: What does this return for prisms?
+-  const std::size_t num_entity_dofs = layout.num_entity_closure_dofs(dim);
++  const std::size_t num_entity_dofs = layout.entity_closure_dofs(dim, 0).size();
+   MDSPAN_IMPL_STANDARD_NAMESPACE::mdspan<
+       const std::int32_t,
+       MDSPAN_IMPL_STANDARD_NAMESPACE::dextents<std::size_t, 2>>
+@@ -940,7 +940,7 @@ void dolfinx_contact::compute_physical_points(
+   // Geometrical info
+   const dolfinx::mesh::Geometry<double>& geometry = mesh.geometry();
+   std::span<const double> mesh_geometry = geometry.x();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+   const std::size_t num_dofs_g = cmap.dim();
+   MDSPAN_IMPL_STANDARD_NAMESPACE::mdspan<
+       const std::int32_t,
+@@ -996,7 +996,7 @@ dolfinx_contact::compute_distance_map(
+ {
+   dolfinx::common::Timer t("~Contact: compute distance map");
+   const dolfinx::mesh::Geometry<double>& geometry = quadrature_mesh.geometry();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = geometry.cmaps().front();
+ 
+   std::size_t gdim = geometry.dim();
+   auto topology = quadrature_mesh.topology();
+diff --git a/cpp/utils.h b/cpp/utils.h
+index 18ec02b..d77ec19 100644
+--- a/cpp/utils.h
++++ b/cpp/utils.h
+@@ -439,7 +439,7 @@ compute_projection_map(const dolfinx::mesh::Mesh<double>& mesh,
+                                                   points);
+   std::vector<double> candidate_x(num_points * 3);
+   std::span<const double> mesh_geometry = mesh.geometry().x();
+-  const dolfinx::fem::CoordinateElement<double>& cmap = mesh.geometry().cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap = mesh.geometry().cmaps().front();
+   {
+     // Find displacement vector from each point to closest entity. As a
+     // point on the surface might have penetrated the cell in question,
+@@ -614,7 +614,7 @@ compute_raytracing_map(const dolfinx::mesh::Mesh<double>& quadrature_mesh,
+   // Get relevant information from quadrature mesh
+   const dolfinx::mesh::Geometry<double>& geom_q = quadrature_mesh.geometry();
+   const dolfinx::fem::CoordinateElement<double>& cmap_q
+-      = quadrature_mesh.geometry().cmap();
++      = quadrature_mesh.geometry().cmaps().front();
+   auto top_q = quadrature_mesh.topology();
+   std::span<const double> q_x = geom_q.x();
+   MDSPAN_IMPL_STANDARD_NAMESPACE::mdspan<
+@@ -646,7 +646,7 @@ compute_raytracing_map(const dolfinx::mesh::Mesh<double>& quadrature_mesh,
+   // Structures used for raytracing
+   dolfinx::mesh::CellType cell_type = candidate_mesh.topology()->cell_type();
+   const dolfinx::mesh::Geometry<double>& c_geometry = candidate_mesh.geometry();
+-  const dolfinx::fem::CoordinateElement<double>& cmap_c = c_geometry.cmap();
++  const dolfinx::fem::CoordinateElement<double>& cmap_c = c_geometry.cmaps().front();
+   MDSPAN_IMPL_STANDARD_NAMESPACE::mdspan<
+       const std::int32_t,
+       MDSPAN_IMPL_STANDARD_NAMESPACE::dextents<std::size_t, 2>>
+diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
+index 2d96ed8..d1bef73 100644
+--- a/python/CMakeLists.txt
++++ b/python/CMakeLists.txt
+@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ 
+-find_package(Python COMPONENTS Interpreter Development REQUIRED)
++find_package(Python COMPONENTS Interpreter Development Development.SABIModule REQUIRED)
+ 
+ # Detect the installed nanobind package and import it into CMake
+ execute_process(
+@@ -47,6 +47,7 @@ endif()
+ nanobind_add_module(
+   cpp
+   NOMINSIZE
++  STABLE_ABI
+   MODULE
+   dolfinx_contact/wrappers.cpp
+ )
+diff --git a/python/pyproject.toml b/python/pyproject.toml
+index 09c6960..8f32fd1 100644
+--- a/python/pyproject.toml
++++ b/python/pyproject.toml
+@@ -35,6 +35,7 @@ test = ["pytest", "coverage"]
+ all = ["dolfinx_contact[lint,test]"]
+ 
+ [tool.scikit-build]
++wheel.py-api = "cp312"
+ wheel.packages = ["dolfinx_contact"]
+ sdist.exclude = ["*.cpp"]
+ cmake.build-type = "Release"
