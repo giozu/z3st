@@ -98,7 +98,6 @@ t_array, time_days, gap_um, interference_um, pressure = load_history_interferenc
 Delta = np.maximum(interference_um * 1e-6, 0.0)  # [mm] : 1 µm = 1e-6 m
 
 t_array=t_array*3600
-print(t_array)
 # =====================================================================
 # 2. FONCTION DE CALCUL DE LA PRESSION DE CONTACT
 # =====================================================================
@@ -159,16 +158,20 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
 
     # --- Etape 4 : phi, taux de relaxation (eq. 21-22) ---
     phi = -(CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T)) / b) * f**n * (k2 - k1)
-    print(f,k1,k2)
-    print(phi)
     contact_mask = Delta_arr > 1e-9          # seuil physique, pas 1e-12
     Pk = np.zeros_like(t)
 
-    if np.any(contact_mask):
-        idx0 = np.argmax(contact_mask)        # premier indice de contact
-        Delta0 = Delta_arr[idx0]              # interférence "initiale" du fluage
-        t0 = t[idx0]                          # instant où le fluage démarre
-        t_rel = t[idx0:] - t0   
+    if not np.any(contact_mask):
+        # No interference at any recorded time, so there is no assembled shrink
+        # fit to relax and the analytical pressure is identically zero. Return
+        # here: idx0 and t_rel below are only meaningful once contact exists,
+        # and the step-5 branch used them unconditionally.
+        return Pk / 1e6, f, k1, k2, phi
+
+    idx0 = np.argmax(contact_mask)        # premier indice de contact
+    Delta0 = Delta_arr[idx0]              # interférence "initiale" du fluage
+    t0 = t[idx0]                          # instant où le fluage démarre
+    t_rel = t[idx0:] - t0
 
 
     # --- Etape 5 : evolution de l'interference elastique Delta_u_el(t) (eq. 21) ---

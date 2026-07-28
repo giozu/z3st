@@ -90,9 +90,19 @@ print("[INFO] contact_pressure_verification.png saved")
 # k_pen allows ~p/k_pen penetration) dominates the relative error. The
 # threshold is relative to the peak so it tracks the material stiffness.
 mask = p_lame > 0.25 * p_lame.max()
-if mask.any():
-    rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_lame[mask]
-    print(f"[INFO] closed-gap steps: {mask.sum()}, mean rel. error vs Lame = {rel.mean() * 100:.1f}%")
+if not mask.any():
+    # p_lame is identically zero, i.e. the interference never becomes
+    # positive, so there is no established contact to compare against the
+    # Lame fit. Stop with a verdict: the errors dict below indexes this mask
+    # and would otherwise raise NameError on `rel` and ValueError on an empty
+    # reduction.
+    raise SystemExit(
+        "[FAIL] the interference never becomes positive, so contact never "
+        "engages; the case premise (the gap closes under the temperature "
+        "ramp) does not hold"
+    )
+rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_lame[mask]
+print(f"[INFO] closed-gap steps: {mask.sum()}, mean rel. error vs Lame = {rel.mean() * 100:.1f}%")
 print("[INFO] non-regression completed.\n")
 
 

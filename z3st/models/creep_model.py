@@ -190,10 +190,19 @@ class CreepModel:
             if dt <= 0.0:
                 pred.x.array[:] = 0.0
                 continue
-            if len(cells) == 0:
-                # This rank owns no cells of the creeping material (parallel
-                # partition); it still participates in the allreduce below.
-                continue
+            # No early exit when this rank owns no cells of the material, so
+            # that every rank reaches pred.x.scatter_forward() below. pred lives
+            # on the whole mesh, not on a submesh restricted to this material,
+            # so its ghost update is a neighbourhood collective over the full
+            # mesh communicator, and letting some ranks skip it while others
+            # call it is asymmetric collective usage. Measured on 12 ranks of
+            # creep_shrink_fit_2D (9 of them owning no clad cells) it does not
+            # in fact hang - a rank with no owned cells of the material also
+            # assembles no integrals over it, so the ghost entries it fails to
+            # refresh are never read. This is symmetry hygiene, matching
+            # update_creep_state, not a fix for an observed failure.
+            # Empty-cell ranks fall through with zero-size arrays; only the
+            # reductions below need guarding.
 
             # σ_eq_trial on the material's cells (DG0 interpolation)
             _, _, sig_eq_tr = self._creep_trial(u, material, T)
@@ -240,7 +249,7 @@ class CreepModel:
             base = np.maximum(sig - 3.0 * G * x, 0.0)
             g_res = x - Adt * base**n - Cdt * base
             res_scale = np.maximum(np.abs(x), 1e-30)
-            worst = float(np.max(np.abs(g_res) / res_scale))
+            worst = float(np.max(np.abs(g_res) / res_scale)) if x.size else 0.0
             if worst > 1e-8:
                 print(f"  [WARNING] creep predictor Newton for '{name}' not "
                       f"fully converged (max rel residual {worst:.2e}); "
@@ -248,9 +257,10 @@ class CreepModel:
             pred.x.array[cells] = x
             pred.x.scatter_forward()
 
-            scale = max(float(np.abs(x).max()), 1e-30)
-            change = float(np.abs(x - x_old).max()) / scale
-            max_change = max(max_change, change)
+            if x.size:
+                scale = max(float(np.abs(x).max()), 1e-30)
+                change = float(np.abs(x - x_old).max()) / scale
+                max_change = max(max_change, change)
         # The predictor change gates the staggered convergence test: all ranks
         # must agree on it, or one rank can exit solve_staggered while another
         # re-enters a collective solve (deadlock).

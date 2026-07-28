@@ -9,13 +9,21 @@ All metrics are read from ``output/history.csv`` — the
 per-step trajectory streamed by the case-local ``diagnostics.py`` — so the
 check is independent of the output format (the run writes a single XDMF).
 
-One metric has a closed form and is checked analytically:
+One metric is checked analytically, and it asserts the absence of burnup:
 
-  * ``burnup_avg_final`` — the nodal-mean burnup over the fuel equals the flat
-    closed form  bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10), because the
-    radial form factor is area-normalised to mean 1 (the source bus preserves
-    the rating) and ``update_state`` accumulates with the right-endpoint rule
-    over the generated power history.
+  * ``burnup_avg_final`` — the pellet is ``fissile: false`` on purpose, so the
+    accumulated burnup must stay identically zero. Esposito eq. (21) relaxes a
+    shrink fit assembled at a FIXED interference; a fissile pellet grows the
+    interference through the swelling eigenstrain and the contact pressure
+    rises instead of relaxing, which is the failure mode documented in
+    README.md. This check is the guard against it being re-enabled unnoticed.
+
+    The error is scaled by ``BU_NOMINAL``, the burnup the nominal power history
+    in ``input.yaml`` would deposit if the pellet were fissile,
+    bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10). That keeps the metric relative
+    and dimensionless without dividing by the zero reference: any leaked
+    burnup is reported as a fraction of the full nominal value, so switching
+    ``fissile`` back on drives it to 1.0 and fails loudly.
 
 The PCMI end-state scalars (gap, contact pressure, temperatures) have no
 closed form — they are recorded with ``rel_error = 0`` so the analytic
@@ -79,11 +87,16 @@ times, lhrs, _ = generate_power_history(
     inp["time"], inp["lhr"], n_steps=n_increments, filename=None
 )
 energy_per_m = float(np.sum(np.asarray(lhrs)[1:] * np.diff(np.asarray(times))))
-BU_REF = energy_per_m / (area * rho * hm * SECONDS_PER_MWD)
+# Burnup the nominal power history would deposit on a fissile pellet. It is
+# not the expected value here - the pellet is non-fissile and the expected
+# value is zero - it is the scale the zero-assertion is measured against.
+BU_NOMINAL = energy_per_m / (area * rho * hm * SECONDS_PER_MWD)
+BU_SCALE = BU_NOMINAL if BU_NOMINAL > 0.0 else 1.0
 
-print(f"[INFO] final mean burnup : numerical = {bu_avg:.4f}, "
-      f"closed form = {BU_REF:.4f} MWd/kgU")
-print(f"[INFO] final peak burnup : {bu_max:.4f} MWd/kgU (rim)")
+print(f"[INFO] final mean burnup : numerical = {bu_avg:.4f} MWd/kgU "
+      f"(must be 0; nominal history would give {BU_NOMINAL:.4f} on a "
+      f"fissile pellet)")
+print(f"[INFO] final peak burnup : {bu_max:.4f} MWd/kgU (must be 0)")
 print(f"[INFO] final gap         : {gap_um:.4f} um "
       f"({'closed — PCMI active' if gap_um <= 0 else 'open'})")
 print(f"[INFO] contact pressure  : {p_mpa:.4f} MPa")
@@ -100,11 +113,16 @@ def _regression_only(value):
 errors = {
     "burnup_avg_final": {
         "numerical": bu_avg,
-        "reference": BU_REF,
-        "abs_error": float(abs(bu_avg - BU_REF)),
-        "rel_error": float(abs(bu_avg - BU_REF) / BU_REF),
+        "reference": 0.0,
+        "abs_error": float(abs(bu_avg)),
+        "rel_error": float(abs(bu_avg) / BU_SCALE),
     },
-    "burnup_max_final": _regression_only(bu_max),
+    "burnup_max_final": {
+        "numerical": bu_max,
+        "reference": 0.0,
+        "abs_error": float(abs(bu_max)),
+        "rel_error": float(abs(bu_max) / BU_SCALE),
+    },
     "gap_final_um": _regression_only(gap_um),
     "contact_pressure_final_MPa": _regression_only(p_mpa),
     "T_max_final_K": _regression_only(t_max_final),

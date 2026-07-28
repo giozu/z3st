@@ -37,24 +37,35 @@ geometric or material value is restated as a literal in a script — an
 analytical overlay computed with parameters that differ from the ones the
 solver ran is not a verification.
 
-`case_params.check_consistency()` fails loudly on the two traps that
-invalidate the comparison silently: a cold gap from `geometry.yaml` that
-disagrees with `models.contact.initial_gap`, and irradiation creep left
-switched on. `pressure_creep_analysis.py` calls it on every run and warns
-before plotting.
+`case_params.check_consistency()` fails loudly on the traps that invalidate
+the comparison silently: a cold gap from `geometry.yaml` whose magnitude
+disagrees with `models.contact.initial_gap`, an `initial_gap` that is a
+clearance rather than an interference, and irradiation creep left switched on.
+`pressure_creep_analysis.py` calls it on every run and warns before plotting.
 
-## Result (2026-07-28): the case reproduces Esposito to within the paper's own Tresca bias
+The gap check compares magnitudes, not signed values. A conforming mesh has to
+keep the pellet and the cladding disjoint, so `geometry.yaml` can only carry a
+positive clearance, while the interference is expressed by a negative
+`initial_gap` that the contact model uses in place of the mesh-derived value.
+The two therefore differ in sign by construction, and only their magnitudes are
+required to agree.
+
+## Result: the case reproduces Esposito to within the paper's own Tresca bias
+
+Regenerated 2026-07-28 from a clean serial `./Allrun` on the committed
+configuration (non-fissile pellet, cracking off, traction-free clad OD). The
+previous version of this table predated those changes and was never rerun.
 
 | t [days] | Z3ST [MPa] | eq. (21) [MPa] | ratio |
 |---|---|---|---|
 | 0 | 24.70 | 24.13 | 1.024 |
-| 500 | 7.30 | 5.14 | 1.421 |
-| 1240 | 5.20 | 3.33 | 1.559 |
-| 2500 | 3.88 | 2.45 | 1.586 |
+| 500 | 8.31 | 5.33 | 1.560 |
+| 1240 | 5.33 | 3.40 | 1.569 |
+| 2500 | 3.74 | 2.39 | 1.565 |
 
 The elastic starting point agrees to **2.4%**, which verifies the elastic
 factor `f`, the geometry and the material data. Both curves then relax as
-power laws and the ratio settles at ~1.58.
+power laws and the ratio settles at ~1.57, flat from day 500 onward.
 
 That residual is **expected and quantified**. Z3ST's creep is J2 (von Mises);
 eq. (11) of the paper adopts Tresca for the hub, and the paper's own
@@ -63,8 +74,8 @@ Pk decrease) compared to fem results ... due to the adoption of Tresca's
 equivalent criterion ... which slightly overestimates the equivalent von Mises
 stress adopted by the FEM solver". Tresca exceeds von Mises by 2/√3 on the
 equivalent stress here, and the creep rate goes as σ_eq^n, so the predicted
-bias is (2/√3)^n = **1.540** at n = 3 against **1.586** observed — agreement
-within 3% on the bias itself.
+bias is (2/√3)^n = **1.540** at n = 3 against **1.565** observed at 2500 days —
+agreement within 2% on the bias itself.
 
 So the disagreement is not a defect: it is a known criterion difference,
 reproduced at the right magnitude. A gold blessed on this case should gate on

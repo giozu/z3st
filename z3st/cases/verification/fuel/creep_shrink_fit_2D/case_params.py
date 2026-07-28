@@ -90,10 +90,26 @@ def check_consistency():
     """
     problems = []
 
-    if abs(G0 - INITIAL_GAP) > 1e-12:
+    # A conforming mesh has to keep the two bodies disjoint, so the geometry can
+    # only ever carry a positive clearance; the interference is expressed by a
+    # negative models.contact.initial_gap, which ContactModel uses verbatim in
+    # place of the mesh-derived value. What must agree is therefore the
+    # magnitude - the distance the mesh puts between the surfaces against the
+    # distance the solver applies - not the signed value. Comparing the signed
+    # values, as this check first did, can never pass for an interference fit.
+    if abs(abs(G0) - abs(INITIAL_GAP)) > 1e-12:
         problems.append(
-            f"cold gap from geometry.yaml ({G0:.3e} m) disagrees with "
-            f"models.contact.initial_gap in input.yaml ({INITIAL_GAP:.3e} m)"
+            f"cold gap from geometry.yaml ({G0:.3e} m) and "
+            f"models.contact.initial_gap in input.yaml ({INITIAL_GAP:.3e} m) "
+            f"differ in magnitude ({abs(G0):.3e} vs {abs(INITIAL_GAP):.3e} m)"
+        )
+
+    if INITIAL_GAP >= 0.0:
+        problems.append(
+            f"models.contact.initial_gap is {INITIAL_GAP:.3e} m, which is a "
+            "clearance, not an interference; Esposito eq. (21) relaxes a shrink "
+            "fit that is already assembled, so the case needs a negative "
+            "initial_gap and contact active from t = 0"
         )
 
     if CREEP_IRR_B * FAST_FLUX != 0.0:
