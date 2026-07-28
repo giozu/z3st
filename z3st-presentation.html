@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z3ST — An open-source FEniCSx framework for thermo-mechanical analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================================================
+   THEME TOKENS — change these to restyle the whole deck (Swiss Reactor)
+   =========================================================================== */
+:root{
+  --paper:#f7f6f2;      /* slide background */
+  --paper2:#efeee8;     /* subtle panel fill */
+  --ink:#0c0c0c;        /* primary text / borders */
+  --accent:#e63329;     /* single red accent */
+  --accent-d:#b71f17;   /* darker red for text on paper */
+  --grid:#e2e0d8;       /* Swiss grid lines */
+  --mut:#6b6b66;        /* muted text */
+  --line:#151515;
+  --font-d:'Archivo',sans-serif;
+  --font-b:'Nunito Sans',sans-serif;
+  --font-m:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+
+/* ===========================================================================
+   MANDATORY FIXED-STAGE BASE (from viewport-base.css)
+   =========================================================================== */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#111;}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:#111;}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;
+  transform-origin:0 0;background:var(--paper);}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;
+  visibility:hidden;opacity:0;pointer-events:none;background:var(--paper);}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1;}
+img,video,canvas,svg{max-width:100%;max-height:100%;}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000;}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible;background:#fff;}
+  .deck-viewport{position:static;overflow:visible;background:#fff;}
+  .deck-stage{position:static;width:auto;height:auto;transform:none!important;background:none;}
+  .slide{position:relative;display:block!important;visibility:visible!important;opacity:1!important;
+    pointer-events:auto!important;width:1920px;height:1080px;break-after:page;page-break-after:always;}
+  .slide:last-child{break-after:auto;page-break-after:auto;}
+  .deck-controls{display:none!important;}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.2s!important;}
+}
+
+/* ===========================================================================
+   SHARED CHROME — Swiss grid, header, footer, cards
+   =========================================================================== */
+.slide{font-family:var(--font-b);color:var(--ink);}
+/* Swiss grid backdrop on every slide */
+.slide::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:160px 160px;opacity:.5;}
+
+/* Header block: red index + kicker + title + rule */
+.head{position:absolute;left:104px;right:104px;top:88px;display:flex;align-items:flex-start;gap:34px;}
+.head .idx{font-family:var(--font-d);font-weight:900;font-size:104px;line-height:.8;color:var(--accent);}
+.head .htext{padding-top:6px;}
+.head .kick{font-family:var(--font-m);font-size:20px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--mut);margin-bottom:10px;}
+.head h2{font-family:var(--font-d);font-weight:800;font-size:60px;line-height:1.02;letter-spacing:-.01em;}
+.hrule{position:absolute;left:104px;right:104px;top:238px;height:3px;background:var(--ink);}
+
+/* Content band — everything lives safely between the rule and the footer */
+.body{position:absolute;left:104px;right:104px;top:286px;bottom:132px;}
+
+/* Footer */
+.foot{position:absolute;left:104px;right:104px;bottom:60px;display:flex;justify-content:space-between;
+  align-items:center;font-family:var(--font-m);font-size:19px;letter-spacing:.05em;color:var(--mut);}
+.foot .fl b{color:var(--ink);} .foot .fr{color:var(--ink);font-weight:700;}
+.foot .fr .accent{color:var(--accent);}
+
+/* Card primitives */
+.card{border:2px solid var(--ink);background:#fff;padding:24px 26px;display:flex;flex-direction:column;}
+.card.k{background:var(--ink);color:var(--paper);}
+.card.red{background:var(--accent);color:#fff;border-color:var(--accent);}
+.card .ctag{font-family:var(--font-m);font-size:16px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:10px;}
+.card.k .ctag{color:#ff8a80;} .card.red .ctag{color:#ffe3e0;}
+.card h3{font-family:var(--font-d);font-weight:800;font-size:27px;line-height:1.08;margin-bottom:9px;}
+.card p,.card li{font-size:20px;line-height:1.38;color:#2a2a28;}
+.card.k p,.card.k li,.card.red p,.card.red li{color:#efeee8;}
+.card ul{list-style:none;display:flex;flex-direction:column;gap:7px;}
+.card li{position:relative;padding-left:20px;}
+.card li::before{content:"";position:absolute;left:0;top:11px;width:9px;height:9px;background:var(--accent);}
+.card.k li::before,.card.red li::before{background:#fff;}
+
+/* Grids */
+.grid{display:grid;gap:22px;height:100%;}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:repeat(3,1fr);}
+.g4{grid-template-columns:repeat(4,1fr);}
+
+/* Reveal animation */
+.reveal{opacity:0;transform:translateY(26px);
+  transition:opacity .6s var(--ease),transform .6s var(--ease);}
+.slide.visible .reveal{opacity:1;transform:translateY(0);}
+.slide.visible .reveal:nth-child(1){transition-delay:.06s;}
+.slide.visible .reveal:nth-child(2){transition-delay:.13s;}
+.slide.visible .reveal:nth-child(3){transition-delay:.20s;}
+.slide.visible .reveal:nth-child(4){transition-delay:.27s;}
+.slide.visible .reveal:nth-child(5){transition-delay:.34s;}
+.slide.visible .reveal:nth-child(6){transition-delay:.41s;}
+.slide.visible .reveal:nth-child(7){transition-delay:.48s;}
+.slide.visible .reveal:nth-child(8){transition-delay:.55s;}
+
+/* ===========================================================================
+   TITLE SLIDE (approved preview A)
+   =========================================================================== */
+.title-slide::before{opacity:.5;}
+.ts-frame{position:absolute;inset:64px;border:2px solid var(--ink);}
+.ts-tag{position:absolute;top:104px;left:104px;font-family:var(--font-d);font-weight:800;
+  font-size:22px;letter-spacing:.32em;text-transform:uppercase;}
+.ts-tag .dot{color:var(--accent);}
+.ts-meta{position:absolute;top:104px;right:104px;text-align:right;font-family:var(--font-m);
+  font-size:19px;letter-spacing:.10em;text-transform:uppercase;color:var(--mut);line-height:1.7;}
+.ts-idx{position:absolute;left:104px;top:296px;font-family:var(--font-d);font-weight:900;
+  font-size:150px;line-height:.8;color:var(--accent);}
+.ts-rule{position:absolute;left:104px;top:432px;width:640px;height:8px;background:var(--ink);}
+.ts-title{position:absolute;left:100px;top:470px;font-family:var(--font-d);font-weight:900;
+  font-size:250px;line-height:.82;letter-spacing:-.02em;}
+.ts-title .z{color:var(--accent);}
+.ts-sub{position:absolute;left:110px;top:762px;max-width:1160px;font-family:var(--font-d);
+  font-weight:600;font-size:40px;line-height:1.28;}
+.ts-foot{position:absolute;left:104px;bottom:104px;font-family:var(--font-d);font-weight:800;
+  font-size:22px;letter-spacing:.04em;}
+.ts-foot .sep{color:var(--accent);margin:0 14px;}
+.ts-badge{position:absolute;right:104px;bottom:100px;padding:16px 26px;font-family:var(--font-d);
+  font-weight:800;font-size:22px;letter-spacing:.14em;text-transform:uppercase;background:var(--accent);color:#fff;}
+.ts-stack{position:absolute;right:104px;top:300px;display:flex;flex-direction:column;gap:14px;align-items:flex-end;}
+.ts-chip{border:2px solid var(--ink);padding:12px 22px;font-family:var(--font-d);font-weight:800;
+  font-size:24px;letter-spacing:.03em;background:var(--paper);}
+.ts-chip.k{background:var(--ink);color:var(--paper);}
+
+/* ===========================================================================
+   SLIDE-SPECIFIC HELPERS
+   =========================================================================== */
+/* Motivation split */
+.lead{font-family:var(--font-d);font-weight:600;font-size:33px;line-height:1.34;color:var(--ink);}
+.lead .hl{color:var(--accent-d);}
+
+/* Data table (physics models) */
+.ztable{width:100%;border-collapse:collapse;background:#fff;border:2px solid var(--ink);}
+.ztable th,.ztable td{text-align:left;padding:12px 18px;border-bottom:1px solid #d8d6cd;vertical-align:top;}
+.ztable thead th{background:var(--ink);color:var(--paper);font-family:var(--font-d);font-weight:700;
+  font-size:19px;letter-spacing:.06em;text-transform:uppercase;}
+.ztable tbody tr:last-child td{border-bottom:0;}
+.ztable td .m{font-family:var(--font-d);font-weight:800;font-size:21px;color:var(--ink);}
+.ztable td{font-size:19px;line-height:1.32;color:#2a2a28;}
+.ztable td.form{font-family:var(--font-m);font-size:17px;color:var(--accent-d);white-space:nowrap;}
+.ztable tbody tr:nth-child(even){background:var(--paper2);}
+
+/* Code block */
+.code{background:var(--ink);color:#efeee8;border:2px solid var(--ink);font-family:var(--font-m);
+  font-size:18px;line-height:1.55;padding:24px 26px;height:100%;overflow:hidden;
+  white-space:pre-wrap;overflow-wrap:anywhere;}
+.code .c{color:#8a8a84;} .code .k{color:#ff8a80;} .code .v{color:#9ecbff;} .code .s{color:#c3e88d;}
+
+/* Architecture diagram */
+.arch{position:relative;width:100%;height:100%;}
+.arch svg{width:100%;height:100%;}
+
+/* Stat row */
+.stat{border:2px solid var(--ink);background:#fff;padding:20px 24px;display:flex;flex-direction:column;justify-content:center;}
+.stat .n{font-family:var(--font-d);font-weight:900;font-size:58px;line-height:.9;color:var(--accent);}
+.stat .l{font-size:19px;line-height:1.3;color:#2a2a28;margin-top:8px;}
+
+/* Inline edit chrome */
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer;}
+.edit-toggle{position:fixed;top:16px;left:16px;z-index:10001;border:2px solid var(--ink);background:var(--paper);
+  font-size:22px;padding:6px 10px;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .3s;}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto;}
+.edit-toggle.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+[contenteditable="true"]{outline:2px dashed var(--accent);outline-offset:3px;cursor:text;}
+
+/* Progress / page dots */
+.deck-controls{display:flex;gap:8px;}
+.deck-controls .dot{width:9px;height:9px;border:1.5px solid var(--paper);background:transparent;border-radius:0;}
+.deck-controls .dot.on{background:var(--accent);border-color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+
+  <!-- ==================== SLIDE 1 · TITLE ==================== -->
+  <section class="slide title-slide active">
+    <div class="ts-frame reveal"></div>
+    <div class="ts-tag reveal">Z3ST<span class="dot">.</span> OPEN&nbsp;SOURCE&nbsp;FEM</div>
+    <div class="ts-meta reveal">FEniCSx · dolfinx<br>v0.2.0 — 2026</div>
+    <div class="ts-stack reveal">
+      <div class="ts-chip k">THERMO-MECHANICS</div>
+      <div class="ts-chip">PHASE-FIELD FRACTURE</div>
+      <div class="ts-chip">PLASTICITY · CREEP</div>
+      <div class="ts-chip k">NUCLEAR FUEL</div>
+    </div>
+    <div class="ts-idx reveal">00</div>
+    <div class="ts-rule reveal"></div>
+    <div class="ts-title reveal"><span class="z">Z</span>3ST</div>
+    <div class="ts-sub reveal">An open-source FEniCSx framework for coupled thermo-mechanical material analysis.</div>
+    <div class="ts-foot reveal">GIOVANNI ZULLO<span class="sep">/</span>POLITECNICO DI MILANO</div>
+    <div class="ts-badge reveal">Apache-2.0</div>
+  </section>
+
+  <!-- ==================== SLIDE 2 · MOTIVATION ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">01</div>
+      <div class="htext reveal"><div class="kick">Motivation</div><h2>Fuel and structural materials<br>behave as coupled physics</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g2">
+        <div style="display:flex;flex-direction:column;gap:22px;">
+          <p class="lead reveal">Under irradiation, temperature drives expansion, cracking and creep — while deformation reshapes the gap, conduction and contact. The physics is <span class="hl">two-way coupled, non-linear and multi-material</span>.</p>
+          <div class="card reveal">
+            <div class="ctag">The gap in the tooling</div>
+            <ul>
+              <li>Industrial fuel-performance codes are often closed, 1.5-D, and hard to extend with new constitutive laws.</li>
+              <li>Research needs a transparent 2-D / 3-D / axisymmetric platform where models can be prototyped and shared.</li>
+            </ul>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:22px;">
+          <div class="card red reveal">
+            <div class="ctag">The Z3ST answer</div>
+            <h3>An open, modular finite-element framework built on FEniCSx</h3>
+            <p>Couple heat conduction and solid mechanics in arbitrary geometries under transient power histories — and drop in your own physics.</p>
+          </div>
+          <div class="card k reveal">
+            <div class="ctag">Design principles</div>
+            <ul>
+              <li>Reproducible, diffable YAML inputs — three plain-text files per case.</li>
+              <li>Material laws as runtime Python — no core edits.</li>
+              <li>Easy coupling with external mesoscale &amp; microstructure codes.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">02 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 3 · CAPABILITIES ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">02</div>
+      <div class="htext reveal"><div class="kick">Capabilities</div><h2>What Z3ST does</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g4" style="grid-template-rows:1fr 1fr;">
+        <div class="card reveal"><div class="ctag">Solver</div><h3>Coupled thermo-mechanics</h3><p>Heat conduction (stationary or transient, backward Euler) staggered with mechanics.</p></div>
+        <div class="card reveal"><div class="ctag">Kinematics</div><h3>4 regimes, one entry</h3><p>2-D plane strain, 3-D, axisymmetric and plane stress via a single config key.</p></div>
+        <div class="card reveal"><div class="ctag">Constitutive</div><h3>Elastic → plastic</h3><p>Lamé, anisotropic Voigt, Neo-Hookean, J2 plasticity, and custom UFL stress hooks.</p></div>
+        <div class="card k reveal"><div class="ctag">Fracture</div><h3>Phase-field</h3><p>AT1 / AT2, Miehe &amp; Amor energy splits, irreversibility, hybrid constraint.</p></div>
+        <div class="card k reveal"><div class="ctag">Time-dependent</div><h3>Creep</h3><p>Implicit Norton + Arrhenius with an exact AD tangent; optional irradiation creep.</p></div>
+        <div class="card reveal"><div class="ctag">Fuel behaviour</div><h3>Engineering models</h3><p>Burnup swelling &amp; densification, Fink UO₂ k(T), rim-peaked radial &amp; axial power.</p></div>
+        <div class="card reveal"><div class="ctag">Interfaces</div><h3>Gap &amp; contact</h3><p>Fixed / Gas gap conductance and penalty pellet–clad contact (PCMI).</p></div>
+        <div class="card red reveal"><div class="ctag">Meso-scale</div><h3>Cluster dynamics</h3><p>1-D defect size-distribution: DG1 + upwind flux + SIPG diffusion.</p></div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">03 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 4 · ARCHITECTURE ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">03</div>
+      <div class="htext reveal"><div class="kick">Architecture</div><h2>One hub, many mixins</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g2" style="grid-template-columns:1.15fr 1fr;">
+        <div class="arch reveal">
+          <svg viewBox="0 0 760 620" preserveAspectRatio="xMidYMid meet">
+            <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 z" fill="#e63329"/></marker></defs>
+            <!-- connecting spokes -->
+            <g stroke="#c9c7bd" stroke-width="2">
+              <line x1="380" y1="310" x2="150" y2="90"/><line x1="380" y1="310" x2="380" y2="70"/>
+              <line x1="380" y1="310" x2="610" y2="90"/><line x1="380" y1="310" x2="680" y2="310"/>
+              <line x1="380" y1="310" x2="610" y2="530"/><line x1="380" y1="310" x2="380" y2="560"/>
+              <line x1="380" y1="310" x2="150" y2="530"/><line x1="380" y1="310" x2="80" y2="310"/>
+            </g>
+            <!-- mixin chips -->
+            <g font-family="Archivo,sans-serif" font-weight="700" font-size="18" text-anchor="middle">
+              <g><rect x="66" y="44" width="168" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="150" y="76">Thermal</text></g>
+              <g><rect x="296" y="30" width="168" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="380" y="62">Mechanical</text></g>
+              <g><rect x="526" y="44" width="168" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="610" y="76">Damage</text></g>
+              <g><rect x="596" y="284" width="164" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="678" y="316">Plasticity</text></g>
+              <g><rect x="526" y="504" width="168" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="610" y="536">Creep</text></g>
+              <g><rect x="296" y="534" width="168" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="380" y="566">Gap · Contact</text></g>
+              <g><rect x="66" y="504" width="168" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="150" y="536">Cracking</text></g>
+              <g><rect x="0" y="284" width="164" height="52" fill="#fff" stroke="#0c0c0c" stroke-width="2"/><text x="82" y="316">Cluster</text></g>
+            </g>
+            <!-- Spine hub -->
+            <g><rect x="272" y="256" width="216" height="108" fill="#e63329" stroke="#e63329"/>
+              <text x="380" y="300" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="900" font-size="34" fill="#fff">Spine</text>
+              <text x="380" y="332" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="15" fill="#ffe3e0">u · T · D · porosity</text>
+              <text x="380" y="352" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="15" fill="#ffe3e0">burnup · solve()</text>
+            </g>
+          </svg>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card reveal"><div class="ctag">Composition root</div><h3><code>Spine</code> multiply-inherits 13 mixins</h3><p>Each physics model is a mixin contributing residuals and state updates over one shared field namespace (<code>u, T, D, porosity, burnup…</code>).</p></div>
+          <div class="card k reveal"><div class="ctag">Composition, not inheritance</div><h3><code>MeshManager</code> held as <code>Spine.mgr</code></h3><p>Gmsh / XDMF readers, PyVista preview and per-tag DOF location live on their own object.</p></div>
+          <div class="card reveal"><div class="ctag">Config</div><h3>Three YAML files per case</h3><p><code>input.yaml</code> + <code>geometry.yaml</code> + <code>boundary_conditions.yaml</code> — reproducible &amp; version-controllable.</p></div>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">04 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 5 · PHYSICS MODELS ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">04</div>
+      <div class="htext reveal"><div class="kick">Physics models</div><h2>The constitutive library</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <table class="ztable reveal">
+        <thead><tr><th style="width:210px;">Model</th><th style="width:290px;">Formulation</th><th>Key detail</th></tr></thead>
+        <tbody>
+          <tr><td><span class="m">Thermal</span></td><td class="form">−∇·(k∇T)=q‴</td><td>Stationary or transient (backward Euler); temperature-dependent k(T) as Python.</td></tr>
+          <tr><td><span class="m">Mechanical</span></td><td class="form">Lamé / Voigt / Neo-Hooke</td><td>Small-strain isotropic &amp; anisotropic, hyperelastic (SNES Newton), or custom UFL stress.</td></tr>
+          <tr><td><span class="m">Damage</span></td><td class="form">AT1 / AT2 phase-field</td><td>Miehe spectral / Amor volumetric–deviatoric splits; hybrid (AGD) constraint.</td></tr>
+          <tr><td><span class="m">Plasticity</span></td><td class="form">J2 + isotropic hardening</td><td>Linear hardening; custom hook drives the crystal-plasticity demo.</td></tr>
+          <tr><td><span class="m">Creep</span></td><td class="form">Norton + Arrhenius</td><td>Implicit radial return condensed onto u; exact consistent tangent by AD; irradiation creep.</td></tr>
+          <tr><td><span class="m">Cracking</span></td><td class="form">Isotropic softening</td><td>Macro-crack count follows rod-average LHR and irreversibly rescales fuel elastic constants.</td></tr>
+          <tr><td><span class="m">Gap</span></td><td class="form">Fixed / Gas Robin pair</td><td>k<sub>gas</sub>=c·10⁻⁴·T<sub>gap</sub><sup>0.79</sup>; centroid gap sized once via cKDTree.</td></tr>
+          <tr><td><span class="m">Cluster dynamics</span></td><td class="form">DG1 + upwind + SIPG</td><td>1-D defect size distribution, implicit Euler, mass-conservation rescaling.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">05 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 6 · NUMERICS ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">05</div>
+      <div class="htext reveal"><div class="kick">Numerics &amp; solver</div><h2>How the coupling is driven</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g3" style="grid-template-rows:auto auto;">
+        <div class="card reveal"><div class="ctag">Coupling</div><h3>Staggered loop</h3><p>Fixed-point iteration with Aitken Δ² adaptive relaxation and per-step form caching; optional gap-conductance damping.</p></div>
+        <div class="card reveal"><div class="ctag">Robustness</div><h3>Adaptive time-stepping</h3><p>On a stalled step: snapshot state, bisect dt, re-solve as internal sub-steps, roll back on failure — output stays on the original grid.</p></div>
+        <div class="card k reveal"><div class="ctag">Steering</div><h3>Hot-reloadable params</h3><p>An allow-listed subset of <code>input.yaml</code> (tolerances, relaxation, max_iters) is re-read at the next step boundary — no restart.</p></div>
+        <div class="card reveal"><div class="ctag">State transport</div><h3>The eigenstrain bus</h3><p>Stateful per-point fields — swelling, creep, burnup, gaseous swelling — ride a shared bus with snapshot / restore for rollback.</p></div>
+        <div class="card reveal"><div class="ctag">Linear algebra</div><h3>PETSc backends</h3><p>MUMPS direct, or GAMG / HYPRE BoomerAMG iterative; MPI via <code>MPI.COMM_WORLD</code>.</p></div>
+        <div class="card red reveal"><div class="ctag">Output</div><h3>Unified writer</h3><p>VTU per step or single-file XDMF time series; interpolation expressions compiled once at setup. ParaView &amp; PyVista ready.</p></div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">06 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 7 · INSTALL & USE ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">06</div>
+      <div class="htext reveal"><div class="kick">Getting started</div><h2>Install &amp; run a case</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g2" style="grid-template-columns:1fr 1.05fr;">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="code reveal" style="height:auto;">
+<span class="c"># FEniCSx comes from Conda, not pip</span>
+conda env create -f z3st_env.yml
+conda activate z3st
+pip install -e .
+
+<span class="c"># run any case folder</span>
+cd cases/verification/mechanics/uniaxial_tension
+gmsh mesh.geo -3 &gt; log_mesh.md
+python3 -m z3st &gt; log_z3st.md
+python3 non-regression.py    <span class="c"># or: ./Allrun</span></div>
+          <div class="card reveal"><div class="ctag">Outputs</div><ul>
+            <li>VTU / XDMF fields → ParaView &amp; PyVista.</li>
+            <li><code>utils_plot.py</code> radial profiles: T(r), σ<sub>rr</sub>(r).</li>
+            <li><code>--mesh_plot</code> previews surface tags in PyVista.</li>
+          </ul></div>
+        </div>
+        <div class="code reveal">
+<span class="c"># input.yaml — a minimal coupled run</span>
+<span class="k">regime</span>: <span class="v">2d</span>            <span class="c"># 2d|3d|axisymmetric|plane_stress</span>
+<span class="k">materials</span>:
+  <span class="k">steel</span>: <span class="v">../../materials/steel.yaml</span>
+
+<span class="k">models</span>:
+  <span class="k">thermal</span>: <span class="v">true</span>
+  <span class="k">mechanical</span>: <span class="v">true</span>
+  <span class="c"># damage / plasticity / cluster / gap …</span>
+
+<span class="k">solver_settings</span>:
+  <span class="k">coupling</span>: <span class="v">staggered</span>
+  <span class="k">relax_adaptive</span>: <span class="v">true</span>
+  <span class="k">max_iters</span>: <span class="v">100</span>
+
+<span class="k">thermal</span>: {<span class="k">analysis</span>: <span class="v">stationary</span>, <span class="k">linear_solver</span>: <span class="v">iterative_hypre</span>}
+<span class="k">mechanical</span>: {<span class="k">solver</span>: <span class="v">linear</span>, <span class="k">convergence</span>: <span class="v">rel_norm</span>}
+
+<span class="k">lhr</span>: [<span class="v">0</span>]
+<span class="k">time</span>: [<span class="v">0</span>]
+<span class="k">output</span>: {<span class="k">format</span>: <span class="v">vtu</span>}</div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">07 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 8 · COUPLING & ECOSYSTEM ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">07</div>
+      <div class="htext reveal"><div class="kick">Coupling &amp; ecosystem</div><h2>Talking to other codes</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g2" style="grid-template-columns:1.1fr 1fr;">
+        <div class="card red reveal">
+          <div class="ctag">SCIANTIX — fission gas (prototype)</div>
+          <h3>Mesoscale gas behaviour → eigenstrain bus</h3>
+          <p style="margin-bottom:10px;">Z3ST drives SCIANTIX per fuel point for gaseous swelling &amp; fission-gas release, wrapping its existing C-linkage entry — <b>no SCIANTIX physics is re-implemented in Python</b>.</p>
+          <ul>
+            <li>Reuses SCIANTIX's TRANSURANUS-style coupling shim (<code>-DCOUPLING_TU</code>).</li>
+            <li>Host owns burnup (RADAR) and feeds it in; swelling rides the eigenstrain bus.</li>
+            <li>Validated end-to-end vs the SCIANTIX Baker 1977 gold — see next slide.</li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card k reveal"><div class="ctag">FEniCSx ecosystem</div><ul>
+            <li><code>dolfinx_mpc</code> — multi-point constraints (planned).</li>
+            <li><code>dolfinx_materials</code> — standard material libraries (planned).</li>
+            <li>Neural-network material laws via <code>dolfinx-external-operator</code>.</li>
+          </ul></div>
+          <div class="card reveal"><div class="ctag">Multi-scale pipeline (envisaged)</div><ul>
+            <li>Mérope — synthetic microstructure generation.</li>
+            <li>Rate-theory solvers for irradiation defects.</li>
+            <li>Monte-Carlo workflows for stochastic processes.</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">08 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 9 · VALIDATION ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">08</div>
+      <div class="htext reveal"><div class="kick">Validation &amp; results</div><h2>Verified against theory,<br>literature and CI</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div style="display:flex;flex-direction:column;gap:22px;height:100%;">
+        <div class="grid g4" style="height:auto;">
+          <div class="stat reveal"><div class="n">90+</div><div class="l">self-contained cases (verification · benchmark · regression)</div></div>
+          <div class="stat reveal"><div class="n">26</div><div class="l">cases in the GitHub Actions CI suite, run on every commit</div></div>
+          <div class="stat reveal"><div class="n">~1e-7</div><div class="l">rel. error vs SCIANTIX Baker gold (FGR, swelling, burnup)</div></div>
+          <div class="stat reveal"><div class="n">3</div><div class="l">tiers: analytic checks, literature reproducers, gold guards</div></div>
+        </div>
+        <div class="grid g3" style="height:auto;">
+          <div class="card reveal"><div class="ctag">Verification</div><h3>Closed-form</h3><p>Lamé &amp; GPS shells, annular cylinders, elliptical cavities, J2 hardening, crystal plasticity.</p></div>
+          <div class="card k reveal"><div class="ctag">Benchmarks</div><h3>Literature</h3><p>Ambati et al. 2015 SENT / SENS phase-field fracture; pellet thermal-quench cases.</p></div>
+          <div class="card red reveal"><div class="ctag">Regression</div><h3>Gold guards</h3><p>Per-case <code>non-regression.py</code> vs version-controlled JSON — incl. PWR fuel-rod PCMI.</p></div>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">09 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 10 · ROADMAP & CONTRIBUTE ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">09</div>
+      <div class="htext reveal"><div class="kick">Roadmap &amp; contributing</div><h2>Where it is going</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g2" style="grid-template-columns:1.05fr 1fr;">
+        <div class="card reveal">
+          <div class="ctag">On the roadmap</div>
+          <ul>
+            <li>Frictional &amp; mortar contact (current is penalty, uniform-pressure).</li>
+            <li>Monolithic phase-field Newton for spontaneous crack nucleation.</li>
+            <li>Coupling with microstructure generators (Mérope).</li>
+            <li>Advanced 1-D cluster dynamics with nucleation.</li>
+            <li>Coupling with rate-theory codes.</li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card red reveal"><div class="ctag">How to contribute</div><h3>Pull requests welcome</h3><p>Open an issue first for major changes. Every case doubles as an example and a regression test.</p></div>
+          <div class="card k reveal"><div class="ctag">Extend without touching the core</div><ul>
+            <li>Add a YAML material card or a Python <code>k(T)</code> / stress callable.</li>
+            <li>Register new physics as a mixin with a distinctive method name.</li>
+            <li>Sphinx docs &amp; UML diagram build in CI.</li>
+          </ul></div>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr">10 / 11</span></footer>
+  </section>
+
+  <!-- ==================== SLIDE 11 · REFERENCES & CONTACTS ==================== -->
+  <section class="slide">
+    <header class="head">
+      <div class="idx reveal">10</div>
+      <div class="htext reveal"><div class="kick">References &amp; contacts</div><h2>Use it, cite it, join in</h2></div>
+    </header>
+    <div class="hrule reveal"></div>
+    <div class="body">
+      <div class="grid g2">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="card k reveal"><div class="ctag">Project</div><ul>
+            <li>Code — github.com/giozu/z3st</li>
+            <li>Docs — giozu.github.io/z3st</li>
+            <li>DOI — 10.5281/zenodo.17748028</li>
+            <li>License — Apache-2.0 · v0.2.0 (2026)</li>
+          </ul></div>
+          <div class="card reveal"><div class="ctag">Author</div><h3>Giovanni Zullo</h3><p>Politecnico di Milano · giovanni.zullo@polimi.it</p></div>
+        </div>
+        <div class="card red reveal" style="justify-content:center;">
+          <div class="ctag">Built on FEniCSx — please cite</div>
+          <h3 style="font-size:32px;">DOLFINx · Basix · UFL</h3>
+          <p style="margin-top:8px;">Z3ST stands on the FEniCSx problem-solving environment. The neural-network material-law path additionally builds on <code>dolfinx-external-operator</code> (Latyshev et al., 2025).</p>
+          <p style="margin-top:16px;font-family:var(--font-d);font-weight:800;font-size:24px;color:#fff;">Thank you — questions welcome.</p>
+        </div>
+      </div>
+    </div>
+    <footer class="foot"><span class="fl"><b>Z3ST</b> · thermo-mechanical FEM</span><span class="fr"><span class="accent">Z</span>3ST · 11 / 11</span></footer>
+  </section>
+
+</main>
+</div>
+
+<!-- Page dots -->
+<nav class="deck-controls" id="dots" aria-label="Slide progress"></nav>
+
+<!-- Inline editing chrome -->
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️</button>
+
+<script>
+/* ===========================================================================
+   SLIDE CONTROLLER — fixed 16:9 stage, keyboard / wheel / touch nav
+   =========================================================================== */
+class SlidePresentation{
+  constructor(){
+    this.slides=[...document.querySelectorAll('.slide')];
+    this.stage=document.getElementById('deckStage');
+    this.i=0;
+    this.buildDots();
+    this.scale();addEventListener('resize',()=>this.scale());
+    this.keys();this.wheel();this.touch();
+    this.show(0);
+  }
+  scale(){const f=Math.min(innerWidth/1920,innerHeight/1080);
+    const x=(innerWidth-1920*f)/2,y=(innerHeight-1080*f)/2;
+    this.stage.style.transform=`translate(${x}px,${y}px) scale(${f})`;}
+  buildDots(){const n=document.getElementById('dots');
+    this.slides.forEach((_,k)=>{const d=document.createElement('span');d.className='dot';
+      d.addEventListener('click',()=>this.show(k));n.appendChild(d);});}
+  show(k){this.i=Math.max(0,Math.min(k,this.slides.length-1));
+    this.slides.forEach((s,j)=>{s.classList.toggle('active',j===this.i);s.classList.toggle('visible',j===this.i);});
+    [...document.getElementById('dots').children].forEach((d,j)=>d.classList.toggle('on',j===this.i));}
+  next(){this.show(this.i+1);} prev(){this.show(this.i-1);}
+  keys(){addEventListener('keydown',e=>{
+    if(e.target.getAttribute&&e.target.getAttribute('contenteditable')==='true')return;
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){e.preventDefault();this.next();}
+    else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){e.preventDefault();this.prev();}
+    else if(e.key==='Home')this.show(0); else if(e.key==='End')this.show(this.slides.length-1);});}
+  wheel(){let lock=false;addEventListener('wheel',e=>{if(lock)return;
+    if(Math.abs(e.deltaY)<24)return;lock=true;e.deltaY>0?this.next():this.prev();
+    setTimeout(()=>lock=false,650);},{passive:true});}
+  touch(){let x0=null,y0=null;
+    addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+    addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+      if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50)dx<0?this.next():this.prev();x0=y0=null;},{passive:true});}
+}
+const deck=new SlidePresentation();
+
+/* ===========================================================================
+   INLINE EDITING — hover top-left hotzone or press E; Ctrl+S saves a copy
+   =========================================================================== */
+const editor={
+  isActive:false,
+  toggleEditMode(){this.isActive=!this.isActive;
+    const t=document.getElementById('editToggle');t.classList.toggle('active',this.isActive);t.classList.toggle('show',this.isActive);
+    document.querySelectorAll('.slide h1,.slide h2,.slide h3,.slide p,.slide li,.slide .ts-sub,.slide td,.slide .ctag,.slide .kick')
+      .forEach(el=>el.setAttribute('contenteditable',this.isActive));}
+};
+const toggle=document.getElementById('editToggle'),hot=document.querySelector('.edit-hotzone');
+let hide=null;
+toggle.addEventListener('click',()=>editor.toggleEditMode());
+hot.addEventListener('click',()=>editor.toggleEditMode());
+hot.addEventListener('mouseenter',()=>{clearTimeout(hide);toggle.classList.add('show');});
+hot.addEventListener('mouseleave',()=>{hide=setTimeout(()=>{if(!editor.isActive)toggle.classList.remove('show');},400);});
+toggle.addEventListener('mouseenter',()=>clearTimeout(hide));
+toggle.addEventListener('mouseleave',()=>{hide=setTimeout(()=>{if(!editor.isActive)toggle.classList.remove('show');},400);});
+addEventListener('keydown',e=>{
+  if((e.key==='e'||e.key==='E')&&!(e.target.getAttribute&&e.target.getAttribute('contenteditable')==='true'))editor.toggleEditMode();
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();
+    const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='z3st-presentation.html';a.click();}
+});
+</script>
+</body>
+</html>

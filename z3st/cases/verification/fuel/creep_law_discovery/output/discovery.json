@@ -14,20 +14,20 @@
     },
     "c3_true_1_per_s": 1.2601872955975901e-11,
     "full_fit_coefficients": {
-        "S": 5.284815185771747e-18,
-        "S^2": 1.912538248770637e-17,
+        "S": 5.284815185771784e-18,
+        "S^2": 1.9125382487705962e-17,
         "S^3": 1.2635795755193086e-11,
-        "S^5": 1.7872810663270513e-13,
-        "sinh S": 5.284362584780721e-18
+        "S^5": 1.787281066327045e-13,
+        "sinh S": 5.284362584780683e-18
     },
     "full_fit_strain_shares": {
-        "S": 4.6877178151743293e-07,
-        "S^2": 1.4374793979277661e-06,
-        "S^3": 0.9762394094891891,
-        "S^5": 0.023758141261934342,
-        "sinh S": 5.429976970926803e-07
+        "S": 4.687717815174362e-07,
+        "S^2": 1.4374793979277354e-06,
+        "S^3": 0.9762394094891892,
+        "S^5": 0.023758141261934262,
+        "sinh S": 5.429976970926765e-07
     },
-    "loss_full": 0.008028694609584918,
+    "loss_full": 0.008028694609584915,
     "loss_final": 0.008195958942466185,
     "selection": "one-standard-error rule on the backward-elimination path",
     "elimination_path": [
@@ -39,7 +39,7 @@
                 "S^5",
                 "sinh S"
             ],
-            "loss": 0.008028694609584918
+            "loss": 0.008028694609584915
         },
         {
             "active": [
@@ -73,5 +73,92 @@
         }
     ],
     "noise": 0.02,
-    "seed": 7
+    "seed": 7,
+    "robustness": {
+        "n_seeds": 10,
+        "n_cubic_only": 10,
+        "max_c3_rel_error": 0.01722981875201368,
+        "per_seed": [
+            {
+                "seed": 0,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.0035318588574976273
+            },
+            {
+                "seed": 1,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.005825487600880308
+            },
+            {
+                "seed": 2,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.0010868866586937198
+            },
+            {
+                "seed": 3,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.002469162578253803
+            },
+            {
+                "seed": 4,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.008329346357413447
+            },
+            {
+                "seed": 5,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.01722981875201368
+            },
+            {
+                "seed": 6,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.004191622043024257
+            },
+            {
+                "seed": 7,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.01631424901635614
+            },
+            {
+                "seed": 8,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.009970800468134478
+            },
+            {
+                "seed": 9,
+                "selected": [
+                    "S^3"
+                ],
+                "cubic_only": true,
+                "c3_rel_error": 0.006273696492217873
+            }
+        ]
+    }
 }

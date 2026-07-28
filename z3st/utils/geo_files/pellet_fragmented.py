@@ -16,6 +16,10 @@ Workflow:
             └── ...
 
 To make a SINGLE case, set each list in SWEEP CONFIGURATION to one value.
+Set H = 0 in DEFAULTS to generate a 2D (planar) fragmented disk instead of
+the extruded 3D pellet.
+RCI / RCO in DEFAULTS add an intact cladding ring (annulus in 2D, tube in
+3D) around the fragmented fuel; set them to 0 to disable it.
 """
 
 import os
@@ -38,9 +42,9 @@ import gmsh
 # Number of cases = product of all list lengths.
 # Default below: 3 seeds × 2 N_main × 2 ring layouts = 12 cases.
 
-SEEDS         = [7, 13, 42]                # stochastic realizations
-N_MAIN        = [6, 8]                     # number of main radial cracks
-CIRC_RADII    = [[], [0.55]]               # [] = no rings ; [0.55] = one ring
+SEEDS         = [24, 42]                   # stochastic realizations
+N_MAIN        = [4, 6]                     # number of main radial cracks
+CIRC_RADII    = [[], [0.42]]               # [] = no rings ; [0.55] = one ring
 CURL_AMPS     = [0.22]                     # crack curvature
 BRANCH_PROBS  = [0.35]                     # branching probability
 HUB_OFFSETS   = [0.15]                     # hub displacement
@@ -49,9 +53,11 @@ ANGLE_JITTERS = [0.35]                     # entry-angle jitter
 # Parameters that stay fixed across the sweep
 DEFAULTS = {
     "R_out":              5.0,
-    "H":                 12.0,
+    "RCI":                5.1,     # cladding inner radius; set 0 for no cladding
+    "RCO":                5.7,     # cladding outer radius; set 0 for no cladding
+    "H":                  0.0,     # axial height; set 0 for a 2D planar mesh
     "M_ax":               4,
-    "crack_w":            0.3,
+    "crack_w":            0.1,
     "circ_radius_jitter": 0.05,
     "mesh_size":          0.4,
     "print_scale":        1.0,
@@ -128,6 +134,24 @@ def generate_crack_network(R, N_main, rng, hub_offset, curl_amp,
     return lines, hub
 
 
+# ---------- gmsh helpers ----------
+def fragment_coords(poly, mesh_size):
+    """Simplified exterior coords of a fragment, or None if degenerate."""
+    ps = poly.simplify(mesh_size * 0.15, preserve_topology=True)
+    if ps.geom_type != 'Polygon':
+        return None
+    coords = list(ps.exterior.coords)[:-1]
+    return coords if len(coords) >= 3 else None
+
+
+def add_polygon_surface(coords, z, mesh_size):
+    pt = [gmsh.model.occ.addPoint(x, y, z, mesh_size) for (x, y) in coords]
+    n = len(pt)
+    ln = [gmsh.model.occ.addLine(pt[i], pt[(i+1) % n]) for i in range(n)]
+    cl = gmsh.model.occ.addCurveLoop(ln)
+    return gmsh.model.occ.addPlaneSurface([cl])
+
+
 # ---------- single-case generator ----------
 def generate_pellet(params, output_dir):
     """Generate one pellet according to params; write artefacts to output_dir."""
@@ -136,10 +160,16 @@ def generate_pellet(params, output_dir):
     p = dict(params)
 
     R_out     = p["R_out"]     * p["print_scale"]
+    RCI       = p["RCI"]       * p["print_scale"]
+    RCO       = p["RCO"]       * p["print_scale"]
     H         = p["H"]         * p["print_scale"]
     crack_w   = p["crack_w"]   * p["print_scale"]
     mesh_size = p["mesh_size"] * p["print_scale"]
     M_ax      = p["M_ax"]
+
+    has_clad = RCO > RCI > 0
+    if has_clad and RCI < R_out:
+        raise ValueError(f"RCI ({RCI}) must be >= R_out ({R_out})")
 
     rng = np.random.default_rng(p["SEED"])
 
@@ -170,6 +200,12 @@ def generate_pellet(params, output_dir):
         ax.plot(x, y, 'k-', lw=0.4)
     th = np.linspace(0, 2*np.pi, 200)
     ax.plot(R_out*np.cos(th), R_out*np.sin(th), 'k-', lw=1.2)
+    if has_clad:
+        ax.fill(np.append(RCO*np.cos(th), RCI*np.cos(th[::-1])),
+                np.append(RCO*np.sin(th), RCI*np.sin(th[::-1])),
+                color='0.75', alpha=0.5, lw=0)
+        for R_c in (RCI, RCO):
+            ax.plot(R_c*np.cos(th), R_c*np.sin(th), '-', color='0.35', lw=1.0)
     ax.plot(hub[0], hub[1], 'rx', markersize=10)
     ax.set_aspect('equal'); ax.set_xticks([]); ax.set_yticks([])
     title = (f"N={p['N_main']}  rings={p['circ_radii']}\n"
@@ -178,65 +214,141 @@ def generate_pellet(params, output_dir):
     plt.savefig(output_dir / "top_view.png", dpi=110, bbox_inches='tight')
     plt.close()
 
-    layer_h = H / M_ax
-    layers = [(m*layer_h + (crack_w/2 if m > 0 else 0),
-               (m+1)*layer_h - (crack_w/2 if m < M_ax-1 else 0))
-              for m in range(M_ax)]
+    is_2d = H <= 0
 
     gmsh.initialize()
     gmsh.option.setNumber('General.Terminal', 0)
     gmsh.model.add(output_dir.name)
 
-    volume_tags = []
-    for poly in fragments_2d:
-        ps = poly.simplify(mesh_size * 0.15, preserve_topology=True)
-        if ps.geom_type != 'Polygon':
-            continue
-        coords = list(ps.exterior.coords)[:-1]
-        if len(coords) < 3:
-            continue
-        for (z_bot, z_top) in layers:
-            pt = [gmsh.model.occ.addPoint(x, y, z_bot, mesh_size) for (x, y) in coords]
-            n = len(pt)
-            ln = [gmsh.model.occ.addLine(pt[i], pt[(i+1) % n]) for i in range(n)]
-            cl = gmsh.model.occ.addCurveLoop(ln)
-            sf = gmsh.model.occ.addPlaneSurface([cl])
-            ext = gmsh.model.occ.extrude([(2, sf)], 0, 0, z_top - z_bot)
-            vol_tag = next(t for (d, t) in ext if d == 3)
-            volume_tags.append(vol_tag)
+    if is_2d:
+        entity_tags = []
+        for poly in fragments_2d:
+            coords = fragment_coords(poly, mesh_size)
+            if coords is None:
+                continue
+            entity_tags.append(add_polygon_surface(coords, 0.0, mesh_size))
 
-    gmsh.model.occ.synchronize()
+        clad_tag = None
+        if has_clad:
+            disk_o = gmsh.model.occ.addDisk(0, 0, 0, RCO, RCO)
+            disk_i = gmsh.model.occ.addDisk(0, 0, 0, RCI, RCI)
+            cut, _ = gmsh.model.occ.cut([(2, disk_o)], [(2, disk_i)])
+            clad_tag = cut[0][1]
 
-    eps = crack_w * 0.1
-    outer_s, top_s, bot_s, crack_ax_s, crack_rd_s = [], [], [], [], []
-    z_axial_planes = [(m+1)*layer_h for m in range(M_ax-1)]
-    for dim, tag in gmsh.model.getEntities(2):
-        cx, cy, cz = gmsh.model.occ.getCenterOfMass(dim, tag)
-        r = (cx*cx + cy*cy)**0.5
-        if abs(cz) < eps:           bot_s.append(tag)
-        elif abs(cz - H) < eps:     top_s.append(tag)
-        elif r > 0.85 * R_out:      outer_s.append(tag)
-        else:
-            is_ax = any(abs(cz - zp) < crack_w*1.2 for zp in z_axial_planes)
-            (crack_ax_s if is_ax else crack_rd_s).append(tag)
+        gmsh.model.occ.synchronize()
 
-    gmsh.model.addPhysicalGroup(3, volume_tags, 1)
-    gmsh.model.setPhysicalName(3, 1, "fuel")
-    for tags, name, tid in [(outer_s, "outer", 10), (top_s, "top", 20),
-                             (bot_s, "bottom", 30),
-                             (crack_rd_s + crack_ax_s, "cracks", 50),
-                             (crack_ax_s, "cracks_axial", 51),
-                             (crack_rd_s, "cracks_radial", 52)]:
-        if tags:
-            gmsh.model.addPhysicalGroup(2, tags, tid)
-            gmsh.model.setPhysicalName(2, tid, name)
+        clad_curves = ([abs(t) for (_, t) in
+                        gmsh.model.getBoundary([(2, clad_tag)], oriented=False)]
+                       if clad_tag is not None else [])
+
+        outer_c, crack_c = [], []
+        for dim, tag in gmsh.model.getEntities(1):
+            if tag in clad_curves:
+                continue
+            cx, cy, _ = gmsh.model.occ.getCenterOfMass(dim, tag)
+            r = (cx*cx + cy*cy)**0.5
+            (outer_c if r > 0.85 * R_out else crack_c).append(tag)
+
+        # full circles have their center of mass on the axis, so tell the
+        # two cladding curves apart by bounding-box extent instead
+        clad_in_c, clad_out_c = [], []
+        for tag in clad_curves:
+            x0, y0, _, x1, y1, _ = gmsh.model.getBoundingBox(1, tag)
+            r_max = max(abs(x0), abs(x1), abs(y0), abs(y1))
+            (clad_out_c if r_max > 0.5 * (RCI + RCO) else clad_in_c).append(tag)
+
+        gmsh.model.addPhysicalGroup(2, entity_tags, 1)
+        gmsh.model.setPhysicalName(2, 1, "fuel")
+        if clad_tag is not None:
+            gmsh.model.addPhysicalGroup(2, [clad_tag], 2)
+            gmsh.model.setPhysicalName(2, 2, "cladding")
+        for tags, name, tid in [(outer_c, "outer", 10), (crack_c, "cracks", 50),
+                                (clad_in_c, "clad_inner", 60),
+                                (clad_out_c, "clad_outer", 61)]:
+            if tags:
+                gmsh.model.addPhysicalGroup(1, tags, tid)
+                gmsh.model.setPhysicalName(1, tid, name)
+    else:
+        layer_h = H / M_ax
+        layers = [(m*layer_h + (crack_w/2 if m > 0 else 0),
+                   (m+1)*layer_h - (crack_w/2 if m < M_ax-1 else 0))
+                  for m in range(M_ax)]
+
+        entity_tags = []
+        for poly in fragments_2d:
+            coords = fragment_coords(poly, mesh_size)
+            if coords is None:
+                continue
+            for (z_bot, z_top) in layers:
+                sf = add_polygon_surface(coords, z_bot, mesh_size)
+                ext = gmsh.model.occ.extrude([(2, sf)], 0, 0, z_top - z_bot)
+                vol_tag = next(t for (d, t) in ext if d == 3)
+                entity_tags.append(vol_tag)
+
+        clad_tag = None
+        if has_clad:
+            cyl_o = gmsh.model.occ.addCylinder(0, 0, 0, 0, 0, H, RCO)
+            cyl_i = gmsh.model.occ.addCylinder(0, 0, 0, 0, 0, H, RCI)
+            cut, _ = gmsh.model.occ.cut([(3, cyl_o)], [(3, cyl_i)])
+            clad_tag = cut[0][1]
+
+        gmsh.model.occ.synchronize()
+
+        clad_surfs = ([abs(t) for (_, t) in
+                       gmsh.model.getBoundary([(3, clad_tag)], oriented=False)]
+                      if clad_tag is not None else [])
+
+        eps = crack_w * 0.1
+        outer_s, top_s, bot_s, crack_ax_s, crack_rd_s = [], [], [], [], []
+        z_axial_planes = [(m+1)*layer_h for m in range(M_ax-1)]
+        for dim, tag in gmsh.model.getEntities(2):
+            if tag in clad_surfs:
+                continue
+            cx, cy, cz = gmsh.model.occ.getCenterOfMass(dim, tag)
+            r = (cx*cx + cy*cy)**0.5
+            if abs(cz) < eps:           bot_s.append(tag)
+            elif abs(cz - H) < eps:     top_s.append(tag)
+            elif r > 0.85 * R_out:      outer_s.append(tag)
+            else:
+                is_ax = any(abs(cz - zp) < crack_w*1.2 for zp in z_axial_planes)
+                (crack_ax_s if is_ax else crack_rd_s).append(tag)
+
+        # closed cylindrical shells have their center of mass on the axis, so
+        # tell inner from outer lateral by bounding-box extent instead
+        clad_in_s, clad_out_s, clad_top_s, clad_bot_s = [], [], [], []
+        for tag in clad_surfs:
+            _, _, cz = gmsh.model.occ.getCenterOfMass(2, tag)
+            if abs(cz) < eps:           clad_bot_s.append(tag)
+            elif abs(cz - H) < eps:     clad_top_s.append(tag)
+            else:
+                x0, y0, _, x1, y1, _ = gmsh.model.getBoundingBox(2, tag)
+                r_max = max(abs(x0), abs(x1), abs(y0), abs(y1))
+                (clad_out_s if r_max > 0.5 * (RCI + RCO) else clad_in_s).append(tag)
+
+        gmsh.model.addPhysicalGroup(3, entity_tags, 1)
+        gmsh.model.setPhysicalName(3, 1, "fuel")
+        if clad_tag is not None:
+            gmsh.model.addPhysicalGroup(3, [clad_tag], 2)
+            gmsh.model.setPhysicalName(3, 2, "cladding")
+        for tags, name, tid in [(outer_s, "outer", 10), (top_s, "top", 20),
+                                 (bot_s, "bottom", 30),
+                                 (crack_rd_s + crack_ax_s, "cracks", 50),
+                                 (crack_ax_s, "cracks_axial", 51),
+                                 (crack_rd_s, "cracks_radial", 52),
+                                 (clad_in_s, "clad_inner", 60),
+                                 (clad_out_s, "clad_outer", 61),
+                                 (clad_top_s, "clad_top", 62),
+                                 (clad_bot_s, "clad_bottom", 63)]:
+            if tags:
+                gmsh.model.addPhysicalGroup(2, tags, tid)
+                gmsh.model.setPhysicalName(2, tid, name)
 
     gmsh.option.setNumber('Mesh.CharacteristicLengthMin', mesh_size * 0.3)
     gmsh.option.setNumber('Mesh.CharacteristicLengthMax', mesh_size)
     gmsh.option.setNumber('Mesh.Algorithm', 6)
     gmsh.option.setNumber('Mesh.Algorithm3D', 10)
     gmsh.option.setNumber('Mesh.MshFileVersion', 2.2)
-    gmsh.model.mesh.generate(3)
+    gmsh.model.mesh.generate(2 if is_2d else 3)
 
     gmsh.write(str(output_dir / "pellet.msh"))
     gmsh.write(str(output_dir / "pellet.step"))
@@ -245,7 +357,7 @@ def generate_pellet(params, output_dir):
     with open(output_dir / "params.json", "w") as f:
         json.dump(p, f, indent=2)
 
-    return {"n_fragments": len(fragments_2d), "n_volumes": len(volume_tags)}
+    return {"n_fragments": len(fragments_2d), "n_volumes": len(entity_tags)}
 
 
 # ---------- sweep runner ----------

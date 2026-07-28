@@ -13,8 +13,23 @@
             "abs_error": 2.055900934762759e-13,
             "rel_error": 0.01631424901635622,
             "status": "PASS"
+        },
+        "robustness_cubic_only_fraction": {
+            "numerical": 1.0,
+            "reference": 1.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "robustness_max_cubic_coeff_error": {
+            "numerical": 0.01722981875201368,
+            "reference": 0.0,
+            "abs_error": 0.01722981875201368,
+            "rel_error": 0.01722981875201368,
+            "status": "PASS"
         }
     },
     "tolerance": 0.1,
-    "summary": "PASS"
+    "summary": "PASS",
+    "regression": "PASS"
 }
