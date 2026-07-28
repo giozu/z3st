@@ -204,11 +204,13 @@ class CreepModel:
             tmp.interpolate(expr, cells0=cells)
             sig = tmp.x.array[cells]
 
-            # With creep_A0 == 0, A(T) = A0·exp(-Q/RT) folds to a meshless
-            # UFL constant and dolfinx cannot derive the Expression's MPI
-            # communicator, so short-circuit to zeros instead of interpolating.
-            if float(material["creep_A0"]) == 0.0:
-                Adt = np.zeros_like(sig)
+            # With creep_A0 == 0 or creep_Q == 0, A(T) = A0·exp(-Q/RT) folds to a
+            # meshless UFL constant and dolfinx cannot derive the Expression's MPI
+            # communicator, so short-circuit to zeros or the constant value instead of
+            # interpolating.
+            if float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0:
+                A_val = float(material["creep_A0"])
+                Adt = dt * np.full_like(sig, A_val)
             else:
                 Texpr = dolfinx.fem.Expression(
                     ufl.as_ufl(self._creep_A(material, T)),

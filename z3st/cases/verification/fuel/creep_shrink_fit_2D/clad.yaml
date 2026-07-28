@@ -1,0 +1,25 @@
+name: zircaloy-4
+
+E: 99.3e9     # (Pa)
+nu: 0.37      # (-)
+
+k: 17.0           # (W/m·K)
+alpha: 7.5e-6     # (1/K)
+cp: 350           # (J/kg·K)
+T_ref: 300        # (K)
+T_initial: 580.0  # (K)
+
+rho: 6500                   # (kg/m³)
+melting_temperature: 2123   # (K)
+
+creep: norton
+creep_A0: 2.82e-24   # (Pa^-n s^-1)
+creep_n: 3.0         # (-)
+creep_Q: 1.2e5       # (J/mol)
+
+# Irradiation creep is deliberately OFF in this case. Esposito eq. (21) is a
+# pure Norton derivation with no in-pile term, so the linear ε̇_irr = B·φ·σ
+# contribution would break the very comparison this case verifies. The PWR
+# values are kept here, commented, for anyone re-enabling it:
+#   creep_irr_B: 2.0e-36  # (Pa^-1 per n/m^2) irradiation-creep coefficient
+#   fast_flux: 7.0e17     # (n/(m^2.s), E > 1 MeV)
