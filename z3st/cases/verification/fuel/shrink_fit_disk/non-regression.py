@@ -190,7 +190,7 @@ errors = {
     "contact_pressure": {
         "numerical": p_z3st[mask].max(),
         "reference": p_lame[mask].max(),
-        "abs_error": float(rel.max()),
+        "abs_error": float(np.abs(p_z3st[mask] - p_lame[mask]).max()),   # MPa
         "rel_error": float(rel.max()),
     },
 }

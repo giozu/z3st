@@ -3,7 +3,7 @@
         "contact_pressure": {
             "numerical": 149.46655729575565,
             "reference": 151.11293886422897,
-            "abs_error": 0.011845652728154481,
+            "abs_error": 1.6463815684733163,
             "rel_error": 0.011845652728154481,
             "status": "PASS"
         }
