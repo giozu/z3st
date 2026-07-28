@@ -253,8 +253,30 @@ def plot_stress_profiles():
     print("[INFO] stress_profile_verification.png saved")
 
     if pellet.any() and cladm.any():
-        print(f"[INFO] interface sigma_rr: pellet={srr[pellet][-1]:8.2f} MPa, "
-              f"clad={srr[cladm][0]:8.2f} MPa, analytic -p={-p:8.2f} MPa")
+        # sigma_rr is a DG0 cell-centre field, so the nearest cell on each side
+        # sits half a cell away from the interface, not on it. On the pellet
+        # side that half-cell crosses the steep thermal self-stress gradient
+        # (sigma_rr = alpha*E*(Tbar(R)-Tbar(r)), ~1e2 MPa/mm here), so the raw
+        # cell value reads far more compressive than the interface traction and
+        # looks like a jump across a boundary where sigma_rr must be continuous.
+        # Extrapolate each side to its own interface radius before comparing.
+        def _edge(mask, r_face, take_last):
+            r_s, s_s = rb[mask], srr[mask]
+            if r_s.size < 2:
+                return (s_s[-1] if take_last else s_s[0]), 0.0
+            r2, s2 = (r_s[-2:], s_s[-2:]) if take_last else (r_s[:2], s_s[:2])
+            slope = (s2[1] - s2[0]) / (r2[1] - r2[0])
+            r0, s0 = (r2[1], s2[1]) if take_last else (r2[0], s2[0])
+            return s0 + slope * (r_face - r0), abs(r_face - r0)
+
+        srr_p, d_p = _edge(pellet, b, True)
+        srr_c, d_c = _edge(cladm, bci, False)
+        print(f"[INFO] interface sigma_rr (extrapolated to the contact radius): "
+              f"pellet={srr_p:8.2f} MPa, clad={srr_c:8.2f} MPa, "
+              f"analytic -p={-p:8.2f} MPa")
+        print(f"[INFO]   nearest cell centres: pellet={srr[pellet][-1]:8.2f} MPa "
+              f"at {d_p * 1e6:.1f} um inside, clad={srr[cladm][0]:8.2f} MPa "
+              f"at {d_c * 1e6:.1f} um outside")
 
 
 plot_stress_profiles()

@@ -47,8 +47,14 @@ mechanical:
   - type: Clamp_y
     region: bottom_2      # u_z = 0
 
-  - type: Clamp_x
-    region: outer_2
+  # outer_2 is left traction-free, which is Esposito's hub boundary condition
+  # (sigma_r(c) = 0). The previous Clamp_x (u_r = 0) held the outer radius
+  # fixed, so creep could only redistribute stress until the deviatoric part
+  # vanished and then stopped, freezing the contact pressure at a residual
+  # plateau instead of decaying as a power law.
+  #
+  # - type: Clamp_x
+  #   region: outer_2
 
 
 

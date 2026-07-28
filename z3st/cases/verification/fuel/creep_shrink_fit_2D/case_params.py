@@ -106,6 +106,18 @@ def check_consistency():
     if str(_clad.get("creep", "")).lower() != "norton":
         problems.append(f"clad creep law is '{_clad.get('creep')}', expected 'norton'")
 
+    # creep_Q = 0 means A(T) = A0 identically, so A0 must already carry the
+    # Arrhenius factor at the operating temperature. Handing it the raw
+    # Zircaloy prefactor (~1e-24) instead of the folded value (~1e-34) runs the
+    # cladding ~1e10 times too fast, and the error is invisible in the output.
+    if CREEP_Q == 0.0 and CREEP_A0 > 1.0e-30:
+        problems.append(
+            f"creep_Q = 0 (isothermal) with creep_A0 = {CREEP_A0:.3e} Pa^-n s^-1, "
+            "which looks like an un-folded Arrhenius prefactor. With Q = 0, A0 "
+            "must be A0.exp(-Q/(R.T_ref)) evaluated at the operating "
+            "temperature - see clad.yaml"
+        )
+
     return problems
 
 

@@ -43,7 +43,48 @@ disagrees with `models.contact.initial_gap`, and irradiation creep left
 switched on. `pressure_creep_analysis.py` calls it on every run and warns
 before plotting.
 
-## Status: NOT yet verified — do not bless a gold from this as-is
+## Result (2026-07-28): the case reproduces Esposito to within the paper's own Tresca bias
+
+| t [days] | Z3ST [MPa] | eq. (21) [MPa] | ratio |
+|---|---|---|---|
+| 0 | 24.70 | 24.13 | 1.024 |
+| 500 | 7.30 | 5.14 | 1.421 |
+| 1240 | 5.20 | 3.33 | 1.559 |
+| 2500 | 3.88 | 2.45 | 1.586 |
+
+The elastic starting point agrees to **2.4%**, which verifies the elastic
+factor `f`, the geometry and the material data. Both curves then relax as
+power laws and the ratio settles at ~1.58.
+
+That residual is **expected and quantified**. Z3ST's creep is J2 (von Mises);
+eq. (11) of the paper adopts Tresca for the hub, and the paper's own
+Discussion says the formulation is "marginally conservative (overestimate the
+Pk decrease) compared to fem results ... due to the adoption of Tresca's
+equivalent criterion ... which slightly overestimates the equivalent von Mises
+stress adopted by the FEM solver". Tresca exceeds von Mises by 2/√3 on the
+equivalent stress here, and the creep rate goes as σ_eq^n, so the predicted
+bias is (2/√3)^n = **1.540** at n = 3 against **1.586** observed — agreement
+within 3% on the bias itself.
+
+So the disagreement is not a defect: it is a known criterion difference,
+reproduced at the right magnitude. A gold blessed on this case should gate on
+that, not on a naive overlay.
+
+### What it took to get here
+
+Three configuration errors had to be removed, each producing a different and
+individually plausible wrong answer:
+
+| Configuration | Behaviour | Cause |
+|---|---|---|
+| fissile pellet, clamped clad OD | P_c **rises** to 160 MPa | burnup swelling grows Δ; eq. (21) assumes Δ fixed |
+| non-fissile, clamped clad OD | P_c **freezes** at 12.9 MPa | u_r = 0 at r = c lets creep only redistribute stress until the deviatoric part vanishes, then it stops |
+| non-fissile, free clad OD, `initial_gap: +10 µm` | **no contact at all** | the clamp was what closed the gap; nothing else does |
+| non-fissile, free clad OD, `initial_gap: -10 µm` | relaxes correctly | a negative gap is a true interference, contact active from t = 0 |
+
+The last row is the paper's shrink fit, and is what the case now carries.
+
+## Remaining open points
 
 There is no `non-regression_gold.json` in this directory on purpose.
 **The figure Romain reported on 2026-07-20 (excellent agreement with the
@@ -62,15 +103,50 @@ four causes have been fixed here; two remain open.
    `T_TOTAL` 1800 d vs 2500 d, `NB_STEPS` 45/50 vs 34 — and the reported
    figure is titled `k_pen=3,47e12`, matching none of them.
 
-3. **OPEN — `creep_Q`.** This snapshot runs with `creep_Q: 1.2e5` (Arrhenius
-   active, non-isothermal). Esposito's derivation is isothermal, which is why
-   the `creep_Q: 0` path was needed — see the companion fix in
-   `models/creep_model.py`. Decide explicitly which of the two the
-   verification claims, and state it. `pressure_creep_analysis.py` evaluates
-   φ with `exp(-Q/RT)` at a clad temperature read from the solution, so the
-   two choices are not equivalent.
+3. ~~**`creep_Q`.**~~ Resolved: the case is **isothermal**, `creep_Q: 0`.
+   Esposito's eq. (9) is `ε̇_eq = A·σ_eq^n` with `A` a constant `[h⁻¹]` (see
+   the paper's nomenclature) — there is no Arrhenius factor anywhere in the
+   derivation, and temperature enters only through the interference Δ via
+   `α·ΔT`. This is the path the `models/creep_model.py` fix unblocks.
 
-4. **OPEN — modelling choice to document.** `boundary_conditions.yaml`
+   The trap this opens: `creep_Q = 0` makes `A(T) = A0` identically, so `A0`
+   must be the Arrhenius factor *already folded in*. The Zircaloy card value
+   `2.82e-24 Pa⁻ⁿ s⁻¹` is the prefactor that belongs with `creep_Q = 1.2e5`;
+   used with `creep_Q = 0` it runs the cladding ~10¹⁰ times too fast, and
+   nothing in the output says so. `clad.yaml` therefore carries the re-based
+   value `A0 = 2.82e-24 · exp(-1.2e5/(R·600 K)) = 1.0083e-34 Pa⁻ⁿ s⁻¹`, which
+   is the same `A(T)` that `verification/fuel/creep` reports at 600 K.
+   `case_params.check_consistency()` now flags an un-folded prefactor.
+
+   Still to confirm from a run: 600 K is a round stand-in for the clad mean
+   temperature. A hand estimate at LHR = 20 kW/m (`h_conv = 3.5e4`,
+   `T_ext = 580 K`) puts the clad between ~597 K outer and ~628 K inner, so
+   ~610 K mean. Re-derive `A0` from the computed clad mean temperature before
+   blessing a gold; `A` enters φ linearly, so a 10 K error is a few percent
+   on the relaxation rate.
+
+4. **OPEN — the interference is not fixed: burnup swelling drives it up.**
+   This is the big one, confirmed by running the case (2026-07-28). The
+   simulated contact pressure does **not** relax onto Esposito's curve — it
+   dips to ~9 MPa around day 300 and then climbs monotonically to **160 MPa
+   at 2500 days**, while eq. (21) decays to ~3 MPa. Total divergence.
+
+   The cause is not the creep model. `fuel.yaml` has `fissile: true` and
+   `eigenstrain: materials.fuel_swelling.solid_gas_densification` with
+   `swelling_rate: 7.0e-4` per MWd/kgU, and the run reaches **70.8 MWd/kgU**
+   at 20 kW/m over 2500 days. The pellet keeps growing, so the interference
+   keeps growing, so `P_k` rises. Esposito eq. (21) is integrated under a
+   *fixed* interference Δ assembled once and left to relax — the two loadings
+   are not the same problem. This is exactly the mismatch flagged in the
+   supervisor's 2026-07-10 e-mail ("the interference is not fixed and your
+   P_k rises"), and the committed snapshot never resolved it.
+
+   To actually reproduce the paper the burnup-driven interference growth has
+   to be removed — `fissile: false`, or dropping the swelling eigenstrain, so
+   that Δ is set once and only creep changes it. That is a physics decision
+   about what the case is for, so it is left open rather than patched in.
+
+5. **OPEN — modelling choice to document.** `boundary_conditions.yaml`
    applies `Clamp_x` on `outer_2`, i.e. the cladding outer surface is
    radially restrained rather than loaded by coolant pressure. That is what
    makes the configuration behave like Esposito's rigid hub; it is a

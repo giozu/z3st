@@ -41,7 +41,8 @@ models:
     surface_a: lateral_1        # pellet outer
     surface_b: inner_2          # clad inner
     penalty_stiffness: 3.5e12   # (Pa/m)
-    initial_gap: 10.0e-6        # (m)
+    initial_gap: -10.0e-6       # (m) NEGATIVE = radial interference: shrink fit
+                                #      active from t = 0, per Esposito eq. (21)
 
 mechanical:
   solver: nonlinear

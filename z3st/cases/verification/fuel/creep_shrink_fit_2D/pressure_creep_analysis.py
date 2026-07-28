@@ -88,7 +88,10 @@ def load_history_interference():
     gap_um = data["gap_um"]
     pressure = data["contact_pressure_MPa"]
     interference_um = np.maximum(0.0, -gap_um)  # gap négatif -> interférence
-    return time_h[:NB_STEPS], time_days[:NB_STEPS], gap_um[:NB_STEPS], interference_um[:NB_STEPS], pressure[:NB_STEPS]
+    # No truncation to a nominal step count: with time_adaptivity enabled the
+    # number of steps actually written is a runtime outcome, not sum(n_steps).
+    # The history is aligned against the XDMF step count below instead.
+    return time_h, time_days, gap_um, interference_um, pressure
 
 
 t_array, time_days, gap_um, interference_um, pressure = load_history_interference()
@@ -268,7 +271,33 @@ def extract_clad_point_vonmises(xdmf_file,
 XDMF_FILE = os.path.join(OUT, "fields.xdmf")
 
 vm,Temp=extract_clad_point_vonmises(XDMF_FILE, R_CLAD_I, 0.005)
-""" Temp=np.array([500 for i in range(NB_STEPS)]) """
+
+# history.csv and the XDMF field series are written by different paths and can
+# end up one step apart (adaptive time stepping, a final write after the last
+# converged step). Align them on their common length instead of trusting either
+# count, otherwise the elementwise phi/Delta arithmetic below fails to
+# broadcast.
+_n = min(len(t_array), len(Delta), len(Temp), len(vm),
+         len(time_days), len(gap_um), len(interference_um), len(pressure))
+_skew = abs(len(t_array) - len(Temp))
+if _skew > 2:
+    # More than a step or two apart is not adaptive time stepping: the usual
+    # cause is that history.csv was appended to by a previous run because
+    # Allclean was skipped, in which case the leading rows silently belong to
+    # the wrong simulation. Truncating would "work" and produce a plausible
+    # figure built on stale data, so refuse instead.
+    raise ValueError(
+        f"history.csv has {len(t_array)} steps but the XDMF series has "
+        f"{len(Temp)}: too far apart to be time adaptivity. history.csv is "
+        f"most likely appended from an earlier run - run ./Allclean and "
+        f"re-run the case."
+    )
+if _skew:
+    print(f"[INFO] history has {len(t_array)} steps, XDMF has {len(Temp)}: "
+          f"aligning both to {_n}")
+t_array, Delta, Temp, vm = t_array[:_n], Delta[:_n], Temp[:_n], vm[:_n]
+time_days, gap_um = time_days[:_n], gap_um[:_n]
+interference_um, pressure = interference_um[:_n], pressure[:_n]
 
 Pk, f, k1, k2, phi = contact_pressure(
     t_array, Delta, a, b, c, E1, nu1, E2, nu2, A, n, Temp

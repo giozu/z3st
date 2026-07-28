@@ -1,5 +1,12 @@
 name: UO2-fuel
-fissile: true
+
+# NON-fissile on purpose. Esposito eq. (21) relaxes a shrink fit assembled
+# once at a FIXED interference Delta; with a fissile pellet the burnup-driven
+# swelling eigenstrain below keeps growing Delta (70.8 MWd/kgU at 20 kW/m over
+# 2500 days), so the contact pressure rises to ~160 MPa instead of relaxing
+# and the comparison is meaningless. Burnup stays at zero here, which switches
+# off both the swelling and densification terms.
+fissile: false
 
 radial_profile: materials.fuel_profiles.rim_peaking
 radial_peak_amplitude: 2.0

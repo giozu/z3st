@@ -7,33 +7,43 @@ physics is reimplemented in Python**.
 
 ## 1. Build SCIANTIX as a shared library
 
-The binding `ctypes`-loads a `.so`, but SCIANTIX currently builds a *static*
-lib / executable (`add_library(sciantix STATIC ...)`). Add a shared target that
-includes the coupling shim (`src/coupling/TUSrcCoupling.C`, which defines the
-`extern "C"` `callSciantix` / `getSciantixOptions`):
+This is the **only** supported recipe. Run it from the SCIANTIX repo root:
 
-```cmake
-# in SCIANTIX CMakeLists.txt, alongside the existing targets
-add_library(sciantix_shared SHARED ${SOURCES})
-set_target_properties(sciantix_shared PROPERTIES OUTPUT_NAME sciantix)
-```
-
-Build, then point the binding at it:
 ```bash
-cmake -B build -DCMAKE_POSITION_INDEPENDENT_CODE=ON && cmake --build build
-export SCIANTIX_LIB=$PWD/build/libsciantix.so
-```
-(`callSciantix` is already `extern "C"`, so the symbol is undecorated and
-`ctypes`-callable; `-fPIC` is the only build flag the shared lib needs.)
-
-**Build with `-DCOUPLING_TU`.** Build to a persistent path (not `/tmp`, which is
-wiped on reboot) and put the export in your shell profile (`~/.bashrc`) so the
-binding finds it across sessions:
-```bash
+cd <sciantix>
+mkdir -p build
 g++ -O2 -std=c++17 -DCOUPLING_TU -fPIC -shared $(find include -type d | sed 's/^/-I/') \
     $(find src -name '*.C') -o build/libsciantix_tu.so
 export SCIANTIX_LIB=$PWD/build/libsciantix_tu.so   # add this line to ~/.bashrc
 ```
+
+Three things about that command are load-bearing:
+
+**`Allmake.sh` / CMake cannot produce this artifact.** SCIANTIX's
+`CMakeLists.txt` builds an executable by default and, under `COUPLING_TU`, a
+*static* library — `add_library(sciantix STATIC ${SOURCES})` with
+`CMAKE_STATIC_LIBRARY_SUFFIX ".a"`. The binding `ctypes`-loads a `.so`, so a
+`.a` is useless to it. Do not run `./Allmake.sh` expecting to get a shared
+library out of it; use the `g++` line above.
+
+**`-DCOUPLING_TU` is required for correctness, not for linking.** The
+`extern "C"` entry points live in `src/coupling/TUSrcCoupling.C` and are
+exported unconditionally, so a library built *without* the macro loads fine
+and every call succeeds — it is simply running different physics. The macro
+makes `Simulation::execute()` skip `Burnup()` / `EffectiveBurnup()` /
+`Densification()` (Z3ST owns those) and makes `SetVariables.C` take burnup
+from `Sciantix_history[7]/[8]`, i.e. from Z3ST. Omit it and SCIANTIX computes
+its own burnup and silently ignores the value Z3ST passes in. Check a build
+you are unsure about with:
+```bash
+nm -D --defined-only build/libsciantix_tu.so | grep -E 'callSciantix|getSciantixOptions'
+```
+(that confirms the symbols, *not* the macro — for the macro, rebuild.)
+
+**Use a persistent path, not `/tmp`.** `/tmp` is wiped on reboot and the next
+run then fails with a bare `OSError: cannot open shared object file`. Put the
+`export` in `~/.bashrc` so the binding finds the library across sessions;
+`SCIANTIX_LIB` is read by `sciantix_binding.py` and nothing else resolves it.
 
 ## 2. Validate the binding (standalone)
 
@@ -131,16 +141,14 @@ no Z3ST consumer yet, but a model needing them would face the same gap.
 Binding written against SCIANTIX 2.2.1; array map verified against source
 2026-06-18 and **validated end-to-end the same day**.
 
-Build the shared lib (no SCIANTIX repo edit needed):
-```bash
-cd <sciantix>
-g++ -O2 -std=c++17 -fPIC -shared $(find include -type d | sed 's/^/-I/') \
-    $(find src -name '*.C') -o /tmp/libsciantix.so
-```
-Then validate against SCIANTIX's own Baker regression gold:
+Build the shared lib exactly as in §1 — same `-DCOUPLING_TU`, same persistent
+path. (Earlier revisions of this section showed the build without the macro and
+into `/tmp`; both were wrong. Without `-DCOUPLING_TU` the library still loads
+and still runs, so the mistake shows up only as wrong numbers.) Then validate
+against SCIANTIX's own Baker regression gold:
 ```bash
 cd <sciantix>/regression/baker/test_Baker1977__1273K
-SCIANTIX_LIB=/tmp/libsciantix.so \
+SCIANTIX_LIB=<sciantix>/build/libsciantix_tu.so \
   PYTHONPATH=<z3st>/z3st/coupling/sciantix python3 \
   <z3st>/z3st/coupling/sciantix/validate_baker.py
 ```
