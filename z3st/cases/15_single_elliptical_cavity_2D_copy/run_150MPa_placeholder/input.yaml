@@ -69,7 +69,7 @@ damage:
 # n_steps: 1
 
 # Fictive time for a static ramp
-n_steps: 401  #For 401 steps (0 to 1.2e-7 )
+n_steps: 401  #For 401 steps (0 to 1.5e8 Pa)
 time: [0.0, 1.0]
 lhr: [0.0, 0.0]
 
