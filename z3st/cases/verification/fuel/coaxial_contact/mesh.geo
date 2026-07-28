@@ -13,8 +13,8 @@ r_2_i = 0.00411;    // inner radius (m)
 r_2_o = 0.00475;    // outer radius (m)
 h     = 0.010;      // axial segment height (m)
 
-n_r1 = 20;           // radial divisions, region 1
-n_r2 = 20;           // radial divisions, region 2 
+n_r1 = 80;
+n_r2 = 80;
 n_z  = 11;          // axial divisions
 
 // --- cyl_1 : rectangle [0, r_1_o] x [0, h] ---

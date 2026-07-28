@@ -15,7 +15,14 @@ radial_peak_exponent: 8.0
 E: 200.0e9          # (Pa)
 nu: 0.345           # (-)
 
-cracking: isotropic
+# Cracking is OFF. Inherited from pwr_rod_2D, it was degrading the pellet to
+# E_iso/E = 0.112 and nu_iso = 0.0026 while pressure_creep_analysis.py fed the
+# analytical overlay the card's nominal E = 200 GPa, nu = 0.345. Worse, the
+# softening is driven by the nominal LHR in input.yaml, so it fired at
+# "20 kW/m" even with fissile: false, i.e. on power that is never deposited.
+# Esposito's shaft is an elastic solid, not a cracked medium.
+#
+# cracking: isotropic
 
 k: materials.fuel_thermal.k    # W/(m·K)
 cp: 280.0           # (J/(kg·K))
