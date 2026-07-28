@@ -30,7 +30,6 @@ ax = 11.2 * scale; // Semi-axis X
 
 
 
-
 ay = 5 * scale; // Semi-axis Y
 
 
@@ -69,7 +68,7 @@ Rectangle(1) = {0, 0, 0, Lx, Ly};
 // // Ancien rectangle centré (mis en commentaire)
  //Rectangle(1) = {-Lx/2, -Ly/2, 0, Lx, Ly};
 
-//--------- Elliptical case----------
+//--------- Elliptical shape ----------
 //Elliptical hole
 //Ellipse(10) = {0, 0, 0, ax, ay};
 

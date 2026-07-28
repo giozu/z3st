@@ -38,7 +38,7 @@ mechanical:
   linear_solver: direct_mumps 
   rtol: 1.0e-6
   # stag_tol: 1.0e-6
-  stag_tol: 1.0e-4
+  stag_tol: 1.0e-05
   convergence: rel_norm # rel_norm | norm
   debug: false
 
@@ -57,7 +57,7 @@ damage:
   solver: linear
   linear_solver: direct_mumps
   rtol: 1.0e-6
-  stag_tol: 1.0e-4
+  stag_tol: 1.0e-04
   convergence: rel_norm
   lc: 5.0e-7          # 0.5 µm like the article
   hybrid_constraint: true
@@ -69,7 +69,7 @@ damage:
 # n_steps: 1
 
 # Fictive time for a static ramp
-n_steps: 401  #For 401 steps (0 to 1.2e-7 )
+n_steps: 401  #For 401 steps (0 to 1.880e+08 Pa)
 time: [0.0, 1.0]
 lhr: [0.0, 0.0]
 

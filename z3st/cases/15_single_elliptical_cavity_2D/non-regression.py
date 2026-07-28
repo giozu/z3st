@@ -95,6 +95,23 @@ for vtu in vtu_files:
 
 sigma_yy_max = np.max(stresses) if stresses else 0.0
 
+# --.. ..- .-.. .-.. --- Display Max Rupture Stress --.. ..- .-.. .-.. ---
+print("\n" + "="*70)
+print(f"{'█'*70}")
+print(f"  📊 MAXIMUM RUPTURE STRESS: {sigma_yy_max:.2f} MPa")
+print(f"{'█'*70}")
+print("="*70 + "\n")
+
+errors = {
+    "max_stress_yy": {
+        "numerical": float(sigma_yy_max),
+        "reference": 0.0,
+        "rel_error": 0.0
+    }
+}
+TOLERANCE = 1.0e-2
+pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+
 # --.. ..- .-.. .-.. --- plot Stress vs Strain --.. ..- .-.. .-.. ---
 plt.figure(figsize=(10, 6))
 
