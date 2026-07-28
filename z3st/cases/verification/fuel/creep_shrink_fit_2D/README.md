@@ -89,8 +89,9 @@ The last row is the paper's shrink fit, and is what the case now carries.
 There is no `non-regression_gold.json` in this directory on purpose.
 **The figure Romain reported on 2026-07-20 (excellent agreement with the
 analytical law out to 2500 days) is not reproducible from any commit** — it
-was produced with hand-edited values that were never committed. Two of the
-four causes have been fixed here; two remain open.
+was produced with hand-edited values that were never committed. All four
+causes are fixed below; what is left is the `A0` re-basing temperature and
+the gold itself.
 
 1. ~~**Irradiation creep left active.**~~ Fixed: `creep_irr_B` and
    `fast_flux` are commented out in `clad.yaml`, and `check_consistency()`
@@ -125,36 +126,36 @@ four causes have been fixed here; two remain open.
    blessing a gold; `A` enters φ linearly, so a 10 K error is a few percent
    on the relaxation rate.
 
-4. **OPEN — the interference is not fixed: burnup swelling drives it up.**
-   This is the big one, confirmed by running the case (2026-07-28). The
-   simulated contact pressure does **not** relax onto Esposito's curve — it
-   dips to ~9 MPa around day 300 and then climbs monotonically to **160 MPa
-   at 2500 days**, while eq. (21) decays to ~3 MPa. Total divergence.
+4. ~~**The interference is not fixed: burnup swelling drives it up.**~~
+   Fixed: `fuel.yaml` carries `fissile: false`. With `fissile: true` the run
+   reached 70.8 MWd/kgU at 20 kW/m over 2500 days, the swelling eigenstrain
+   `materials.fuel_swelling.solid_gas_densification` kept growing the pellet,
+   and the contact pressure climbed to ~160 MPa instead of relaxing —
+   Esposito eq. (21) is integrated under a *fixed* interference Δ assembled
+   once and left to relax, so the two loadings were not the same problem.
+   This was the mismatch flagged in the supervisor's 2026-07-10 e-mail ("the
+   interference is not fixed and your P_k rises"). Burnup now stays at zero,
+   which switches off both the swelling and the densification terms, and Δ is
+   changed only by creep. The eigenstrain entry is left in the card, inert.
 
-   The cause is not the creep model. `fuel.yaml` has `fissile: true` and
-   `eigenstrain: materials.fuel_swelling.solid_gas_densification` with
-   `swelling_rate: 7.0e-4` per MWd/kgU, and the run reaches **70.8 MWd/kgU**
-   at 20 kW/m over 2500 days. The pellet keeps growing, so the interference
-   keeps growing, so `P_k` rises. Esposito eq. (21) is integrated under a
-   *fixed* interference Δ assembled once and left to relax — the two loadings
-   are not the same problem. This is exactly the mismatch flagged in the
-   supervisor's 2026-07-10 e-mail ("the interference is not fixed and your
-   P_k rises"), and the committed snapshot never resolved it.
+   Cracking was switched off in the same pass: inherited from `pwr_rod_2D`,
+   it degraded the pellet to `E_iso/E = 0.112` while the analytical overlay
+   was fed the card's nominal `E = 200 GPa`, and it fired on the nominal LHR
+   even with `fissile: false`, i.e. on power that is never deposited.
+   Esposito's shaft is an elastic solid.
 
-   To actually reproduce the paper the burnup-driven interference growth has
-   to be removed — `fissile: false`, or dropping the swelling eigenstrain, so
-   that Δ is set once and only creep changes it. That is a physics decision
-   about what the case is for, so it is left open rather than patched in.
+5. ~~**Clad outer surface radially restrained.**~~ Fixed: `outer_2` is
+   traction-free in `boundary_conditions.yaml`, which is Esposito's hub
+   boundary condition σ_r(c) = 0. The previous `Clamp_x` (u_r = 0) held the
+   outer radius fixed, so creep could only redistribute stress until the
+   deviatoric part vanished and then stopped, freezing the contact pressure
+   at a residual plateau instead of decaying as a power law. The commented
+   block in the BC file records this.
 
-5. **OPEN — modelling choice to document.** `boundary_conditions.yaml`
-   applies `Clamp_x` on `outer_2`, i.e. the cladding outer surface is
-   radially restrained rather than loaded by coolant pressure. That is what
-   makes the configuration behave like Esposito's rigid hub; it is a
-   deliberate idealisation, not a PWR boundary condition, and the report
-   should say so.
-
-Once 3 is settled and the case runs clean, `non-regression.py` should gate on
-the analytical Pk(t) (a real verification), not only on a gold snapshot.
+The one substantive item left is the `A0` re-basing temperature in point 3.
+Once that is settled, `non-regression.py` should gate on the analytical Pk(t)
+including the (2/√3)^n Tresca bias (a real verification), not only on a gold
+snapshot.
 
 ## What was deliberately NOT carried over
 
@@ -168,9 +169,9 @@ the analytical Pk(t) (a real verification), not only on a gold snapshot.
 - The `__main__.py` edit casting `time` / `lhr` to float arrays. Harmless but
   unnecessary; both are only forwarded to `generate_power_history`.
 - The `coaxial_contact` rework from `15b4b4e` (mesh, BCs, geometry,
-  `non-regression.py`, **and its gold**). That is a separate piece of work on
-  an existing verification case and needs its own review — it must not ride
-  in on this branch.
+  `non-regression.py`, **and its gold**) — that case has since been renamed
+  `shrink_fit`. It is a separate piece of work on an existing verification
+  case and needs its own review — it must not ride in on this branch.
 
 ## Run
 

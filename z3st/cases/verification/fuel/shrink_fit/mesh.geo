@@ -9,7 +9,7 @@
 SetFactory("OpenCASCADE");
 
 r_1_o = 0.0041;     // outer radius (m)
-r_2_i = 0.00411;    // inner radius (m)
+r_2_i = 0.00413;    // inner radius (m) -> gap = 30 um, matches initial_gap
 r_2_o = 0.00475;    // outer radius (m)
 h     = 0.010;      // axial segment height (m)
 

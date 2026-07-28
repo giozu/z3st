@@ -15,7 +15,7 @@ regression/coaxial_gap_3D
 regression/box_crack_2D
 verification/plasticity/j2_hardening_2D
 verification/plasticity/crystal_single_grain
-verification/fuel/coaxial_contact_disk
+verification/fuel/shrink_fit_disk
 verification/fuel/swelling
 verification/fuel/burnup
 verification/fuel/fuel_swelling

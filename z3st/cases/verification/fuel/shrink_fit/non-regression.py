@@ -2,34 +2,39 @@
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Verification of the penalty contact pressure against the analytical Lame
-interference-fit pressure. The pellet is NOT heated uniformly: volumetric
-heat generation gives it a radial gradient (centerline hottest, surface
-coolest). For a free axisymmetric solid disk/cylinder, the exact result for
-the outer-surface radial displacement is
+interference-fit pressure.
 
-    u(R) = alpha * R * Tbar(R),   Tbar(R) = (2/R^2) int_0^R T(r) r dr
+The pellet carries no volumetric heat generation (lhr = 0): it is driven by a
+Dirichlet ramp on its outer surface, 300 K to 1500 K over the 13 steps, and
+its temperature field is therefore uniform. That is deliberate. A uniform
+field expands the pellet stress-free, so the outer-surface displacement is
+exactly
 
-i.e. it depends only on the area-averaged cross-section temperature, not on
-the profile shape or Poisson's ratio. For the standard parabolic fuel-pellet
-profile (uniform heat generation, insulated ends) this area average reduces
-to the arithmetic mean of the centerline and surface temperatures:
+    u(b) = alpha_f * (T - T_ref) * b
 
-    Tbar(R) = (T_c + T_s) / 2
+with no profile-shape correction and no self-equilibrated thermal stress, and
+the interference is
 
-so the interference is
+    delta = alpha_f * (T - T_ref) * b - g0
 
-    delta = alpha_f ((T_c + T_s)/2 - T_ref) * b - g0
-
-which then gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
+which gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
 
     p = delta / { b [ (1/E_c)((c^2+b^2)/(c^2-b^2) + nu_c) + (1/E_f)(1 - nu_f) ] }
 
-plane-stress form, consistent with the axially-free pellet. Note this only
-gives the correct outer-boundary displacement (and hence delta/p); the
-pellet's own stress state is no longer uniform hydrostatic -p once in
-contact, since the radial gradient also produces self-equilibrated thermal
-stresses (sigma_rr = alpha*E*(Tbar(R)-Tbar(r)), not accounted for below in
-plot_stress_profiles()).
+plane-stress form, consistent with the axially-free pellet. The reference is
+exact rather than approximate, which is the point of driving the case this
+way: under volumetric heating the pellet develops a radial gradient, and the
+free-expansion displacement then depends on the area-averaged temperature
+
+    u(b) = alpha_f * b * Tbar(b),   Tbar(b) = (2/b^2) int_0^b T(r) r dr
+
+(the arithmetic mean (T_c + T_s)/2 for the parabolic profile), while the
+gradient also produces self-equilibrated thermal stresses that the closed
+form above does not carry.
+
+The temperature below is still read as the area-averaged (T_c + T_s)/2, which
+equals T under the uniform field used here and keeps the reference correct if
+volumetric heating is ever switched back on.
 
 """
 

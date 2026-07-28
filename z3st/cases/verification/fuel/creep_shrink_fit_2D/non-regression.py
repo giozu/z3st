@@ -118,7 +118,7 @@ regression_check(errors, CASE_DIR)
 def plot_interference_pressure():
     """Calculate interference and plot contact pressure as function of interference.
     
-    Following the formula from coaxial_contact verification:
+    Following the formula from the shrink_fit verification:
     gap = g0 + surf(ur, r, bci) - surf(ur, r, b)
     where b is pellet outer radius, bci is clad inner radius
     """
