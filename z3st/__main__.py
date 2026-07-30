@@ -114,6 +114,42 @@ from z3st.utils.writer import OutputWriter
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
+# --. Environment banner --..
+# A gold reference is only reproducible on the versions that produced it, so
+# the run records them: comparing against a gold made on a different dolfinx
+# or numpy is not a like-for-like comparison. Rank 0 only, so the MPI log
+# holds one copy. Every lookup falls back to "n/a" rather than failing the run.
+def _print_environment():
+    import importlib
+
+    def _version(module):
+        try:
+            return str(getattr(importlib.import_module(module), "__version__"))
+        except Exception:
+            return "n/a"
+
+    try:
+        from petsc4py import PETSc
+
+        petsc = ".".join(str(v) for v in PETSc.Sys.getVersion())
+    except Exception:
+        petsc = "n/a"
+
+    print("[INFO] Environment")
+    print(f"  → python    : {sys.version.split()[0]}")
+    print(f"  → dolfinx   : {_version('dolfinx')}")
+    print(f"  → basix     : {_version('basix')}")
+    print(f"  → ufl       : {_version('ufl')}")
+    print(f"  → petsc     : {petsc}")
+    print(f"  → numpy     : {_version('numpy')}")
+    print(f"  → scipy     : {_version('scipy')}")
+    print(f"  → MPI ranks : {MPI.COMM_WORLD.size}")
+
+
+if MPI.COMM_WORLD.rank == 0:
+    _print_environment()
+
+
 # --. Hot-reload of input.yaml parameters --..
 # Some run-time parameters can be safely changed mid-simulation: the user
 # edits input.yaml, and the next time-step picks up the new value.

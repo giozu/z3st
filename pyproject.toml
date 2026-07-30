@@ -20,7 +20,7 @@ requires-python = ">=3.10"
 
 # Dependencies (pip-installable only)
 dependencies = [
-    "numpy",
+    "numpy>=2",   # np.trapezoid (numpy 2 API) is used across the verification cases
     "scipy",
     "sympy",
     "pandas",
