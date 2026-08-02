@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST: train k(T) = NN(T) --.. ..- .-.. .-.. ---
 """Offline training of the thermal-conductivity network.
 

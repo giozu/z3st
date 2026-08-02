@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST test script --.. ..- .-.. .-.. ---
 """
 Z3ST case: cluster_dynamics_test

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST parametric study --.. ..- .-.. .-.. ---
 """
 GB-fracture parametric study for two_elliptical_cavities_2D.

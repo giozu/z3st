@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """
 Post-processing for attenuation map (thermal shield)
 → Reads non-regression.json results, normalizes σθθ, and produces two plots:

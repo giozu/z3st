@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST automated script --.. ..- .-.. .-.. ---
 """
 Z3ST automated script to study the effect of the semi-dihedral angle on the stress concentration factor in a single elliptical cavity.

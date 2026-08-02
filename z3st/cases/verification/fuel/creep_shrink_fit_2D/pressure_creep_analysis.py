@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """
 Calcul de l'évolution de la pression de contact Pk(t) pour un assemblage
 fretté (arbre/moyeu) soumis au fluage, d'après Esposito, Bruno, Bertocco

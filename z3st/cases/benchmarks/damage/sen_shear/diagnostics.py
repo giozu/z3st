@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Streaming per-step force-displacement diagnostic for the SENS shear test.
 
 Loaded automatically by ``z3st/__main__.py`` if present in the case

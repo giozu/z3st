@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 import ufl
 
 # Grain-boundary-weakened fracture toughness (pJ/micron²). Shared by the UFL

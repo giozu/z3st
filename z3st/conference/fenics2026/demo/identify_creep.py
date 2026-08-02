@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST demo: creep-law identification --.. ..- .-.. .-.. ---
 """
 Gradient-based identification of Norton creep parameters from relaxation data.

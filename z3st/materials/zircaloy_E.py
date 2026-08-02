@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: temperature-dependent Young's modulus for Zircaloy-4 cladding
 # Author: Giovanni Zullo

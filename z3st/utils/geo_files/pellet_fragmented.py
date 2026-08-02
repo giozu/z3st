@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """
 Radial-cracked pellet — parametric sweep generator.
 

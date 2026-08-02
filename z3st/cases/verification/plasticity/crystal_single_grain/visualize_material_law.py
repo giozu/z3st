@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """
 Visualize the crystal plasticity material law and its derivative, motivating
 the use of automatic differentiation.

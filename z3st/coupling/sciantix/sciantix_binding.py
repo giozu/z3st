@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST <-> SCIANTIX coupling — Python binding (PROTOTYPE / DRAFT)
 # Author: Giovanni Zullo

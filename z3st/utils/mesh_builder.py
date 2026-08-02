@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 import dolfinx
 import gmsh
 import numpy as np

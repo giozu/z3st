@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST case: verification/fuel/creep_law_discovery --.. ..- .-.. .-.. ---
 """
 Sparse identification of the creep mechanism from finite-element data.
