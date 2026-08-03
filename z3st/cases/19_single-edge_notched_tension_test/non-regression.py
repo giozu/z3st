@@ -42,9 +42,28 @@ with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
     geom = yaml.safe_load(f)
 Lx, Ly = float(geom["Lx"]), float(geom["Ly"])
 
+# with open(MATERIAL_FILE) as f:
+#     mat = yaml.safe_load(f)
+# E, nu, Gc = float(mat["E"]), float(mat["nu"]), float(mat["Gc"])
+
 with open(MATERIAL_FILE) as f:
     mat = yaml.safe_load(f)
-E, nu, Gc = float(mat["E"]), float(mat["nu"]), float(mat["Gc"])
+E, nu = float(mat["E"]), float(mat["nu"])
+
+if "Gc" in mat:
+    Gc = float(mat["Gc"])
+elif "sigma_c" in mat:
+    sigma_c_mat = float(mat["sigma_c"])
+    if dmg_type == "AT2":
+        Gc = 256.0 / 27.0 * sigma_c_mat**2 * lc / E
+    elif dmg_type == "AT1":
+        Gc = 8.0 / 3.0 * sigma_c_mat**2 * lc / E
+    else:
+        raise ValueError(f"Unknown damage type: {dmg_type}")
+else:
+    raise KeyError(
+        f"Material file '{MATERIAL_FILE}' must define either 'Gc' or 'sigma_c'."
+    )
 
 # AT2/AT1 analytical sigma_c (matches spine.py reconciliation at material load).
 if dmg_type == "AT2":
@@ -65,20 +84,25 @@ print(f"[INFO] Phase-fld : {dmg_type}, lc = {lc*1e6:.2f} um -> sigma_c = {sigma_
 
 
 # ----- ParaView-style 2D field plots (last VTU only) ------------------------
+# def _build_triangulation(pv_mesh):
+#     pts = pv_mesh.points
+#     x, y = pts[:, 0], pts[:, 1]
+#     cells = pv_mesh.cells_dict
+#     if 5 in cells:
+#         tri = np.asarray(cells[5])
+#     elif 9 in cells:
+#         q = np.asarray(cells[9])
+#         tri = np.vstack([q[:, [0, 1, 2]], q[:, [0, 2, 3]]])
+#     else:
+#         tri = None
+#     return (mtri.Triangulation(x, y, tri) if tri is not None and len(tri) > 0
+#             else mtri.Triangulation(x, y)), x, y
+
 def _build_triangulation(pv_mesh):
     pts = pv_mesh.points
     x, y = pts[:, 0], pts[:, 1]
-    cells = pv_mesh.cells_dict
-    if 5 in cells:
-        tri = np.asarray(cells[5])
-    elif 9 in cells:
-        q = np.asarray(cells[9])
-        tri = np.vstack([q[:, [0, 1, 2]], q[:, [0, 2, 3]]])
-    else:
-        tri = None
-    return (mtri.Triangulation(x, y, tri) if tri is not None and len(tri) > 0
-            else mtri.Triangulation(x, y)), x, y
-
+    conn = pv_mesh.cell_connectivity.reshape(-1, 3)   # cellules déjà homogènes après linear_copy()
+    return mtri.Triangulation(x, y, conn), x, y
 
 def _draw_notch(ax):
     ax.plot([0.0, Dn], [Ly / 2.0, Ly / 2.0], color="cyan", linewidth=2.5,
@@ -120,6 +144,7 @@ def _get(pv_mesh, names):
 
 
 m = pv.read(LAST_VTU)
+m = m.linear_copy()   # convertit tout type de cellule d'ordre supérieur/générique (ex. VTK_LAGRANGE_TRIANGLE) vers VTK_TRIANGLE standard
 triang, _, _ = _build_triangulation(m)
 src = os.path.basename(LAST_VTU)
 

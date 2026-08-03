@@ -147,9 +147,15 @@ for idx in range(n_times):
             D_snap = mesh_snap.point_data[name]
             break
 
+    stt_snap = None
+    for name in ["Stress_uo2 (points)", "Stress (points)"]:
+        if name in mesh_snap.point_data:
+            _, stt_snap = cartesian_to_cylindrical_stress(mesh_snap.point_data[name], x_snap, y_snap)
+            break
+
     all_snapshots.append({
         "t": times_all[idx], "x": x_snap, "y": y_snap, "r": r_snap,
-        "T": T_snap, "D": D_snap, "idx": idx,
+        "T": T_snap, "D": D_snap, "stt": stt_snap, "idx": idx,
     })
     T_min, T_max = np.min(T_snap), np.max(T_snap)
     D_info = f" | D_max = {np.max(D_snap):.2e}" if D_snap is not None else ""
@@ -175,6 +181,54 @@ if last["D"] is not None:
     errors["D_max_final"] = {
         "numerical": D_max, "reference": 1.0, "rel_error": float(abs(D_max - 1.0)), "pass": True
     }
+
+# Numerical rupture stress: the peak hoop stress ever reached at the rim over the
+# full time history -- the stress-strain-curve peak, read before softening pulls
+# it back down. Thresholding on D >= 0.5 instead (an earlier version of this
+# check) actually read a post-softening value: with the current linear ~1ms
+# output stride, the whole contact wedge is already saturated near D=1 well
+# before the localization front is resolved, so D=0.5 gets crossed everywhere
+# at once, long after the true peak stress has already decayed.
+# The geometry imposes a Dirichlet D=1 pre-crack seed (crack_seed region at theta=15
+# deg, see geometry.yaml) so its neighborhood doesn't count -- only nodes that
+# started "fresh" (D < 0.1 in the first snapshot) are eligible.
+D_FRESH_THRESHOLD = 0.1
+sigma_c = mat.get("sigma_c")
+D_initial = next((s["D"] for s in all_snapshots if s["D"] is not None), None)
+fresh_mask = D_initial < D_FRESH_THRESHOLD if D_initial is not None else None
+
+onset = None
+for snap in all_snapshots:
+    if snap["stt"] is None or fresh_mask is None:
+        continue
+    near_surf = (snap["r"] > 0.90 * Ro) & (snap["r"] < 0.99 * Ro) & (snap["y"] >= 0)
+    mask = near_surf & fresh_mask
+    if not np.any(mask):
+        continue
+    j = int(np.argmax(np.where(mask, snap["stt"], -np.inf)))
+    if onset is None or snap["stt"][j] > onset["sigma_hoop"]:
+        onset = {
+            "idx": snap["idx"], "t": float(snap["t"]),
+            "x": float(snap["x"][j]), "y": float(snap["y"][j]),
+            "theta_deg": float(np.degrees(np.arctan2(snap["y"][j], snap["x"][j]))),
+            "D": float(snap["D"][j]) if snap["D"] is not None else float("nan"),
+            "sigma_hoop": float(snap["stt"][j]),
+        }
+
+if onset is not None:
+    sigma_rupture_MPa = onset["sigma_hoop"] / 1e6
+    print(f"\n[CHECK] Peak hoop stress at rim: idx={onset['idx']}, t={onset['t']:.3e}s, "
+          f"theta={onset['theta_deg']:.1f} deg, D={onset['D']:.3f}")
+    print(f"[CHECK] Numerical rupture stress (peak sigma_hoop): {sigma_rupture_MPa:.1f} MPa")
+    if sigma_c is not None:
+        sigma_c_MPa = float(sigma_c) / 1e6
+        err_rupture = abs(sigma_rupture_MPa - sigma_c_MPa) / sigma_c_MPa
+        print(f"[CHECK] Configured sigma_c: {sigma_c_MPa:.1f} MPa -> rel err = {err_rupture:.2e}")
+        errors["sigma_rupture_hoop"] = {
+            "numerical": sigma_rupture_MPa, "reference": sigma_c_MPa, "rel_error": float(err_rupture)
+        }
+else:
+    print("\n[CHECK] No fresh rim node found; cannot extract numerical rupture stress.")
 
 
 # --.. ..- .-.. .-.. --- subsample for plotting --.. ..- .-.. .-.. ---
@@ -335,20 +389,17 @@ else:
 # --.. ..- .-.. .-.. --- ParaView-like 2D field plots at final time --.. ..- .-.. .-.. ---
 # This is the McClenny Fig. 8 (top row) reproduction plus extra T and stress fields.
 def _build_triangulation(pv_mesh):
-    """Build a matplotlib Triangulation from a PyVista 2D mesh, handling tri/quad cells."""
+    """Build a matplotlib Triangulation from a PyVista 2D mesh, handling tri/quad cells.
+
+    pv_mesh.cells_dict chokes on VTK_LAGRANGE_TRIANGLE/QUAD cells (the solver writes
+    these even for linear geometry), so triangulate() first to normalize to plain
+    VTK_TRIANGLE cells -- it preserves points and point_data (only splits quads).
+    """
+    pv_mesh = pv_mesh.triangulate()
     pts = pv_mesh.points
     x_pts, y_pts = pts[:, 0], pts[:, 1]
-    cells_dict = pv_mesh.cells_dict
-    triangles = None
-    if 5 in cells_dict:
-        triangles = np.asarray(cells_dict[5])
-    elif 9 in cells_dict:
-        q = np.asarray(cells_dict[9])
-        triangles = np.vstack([q[:, [0, 1, 2]], q[:, [0, 2, 3]]])
-    if triangles is not None and len(triangles) > 0:
-        triang = mtri.Triangulation(x_pts, y_pts, triangles)
-    else:
-        triang = mtri.Triangulation(x_pts, y_pts)
+    triangles = np.asarray(pv_mesh.cells_dict[5])
+    triang = mtri.Triangulation(x_pts, y_pts, triangles)
     return triang, x_pts, y_pts
 
 

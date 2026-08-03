@@ -10,4 +10,5 @@ labels:
   ymax: 3
   xmin: 4
   crack: 5
-  steel: 6
+  # steel: 6 
+  uo2 : 6

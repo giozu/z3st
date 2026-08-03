@@ -1,33 +1,8 @@
-[INFO] Loading mesh from mesh.msh
 Info    : Reading 'mesh.msh'...
 Info    : 13 entities
 Info    : 19523 nodes
 Info    : 39044 elements
 Info    : Done reading 'mesh.msh'
-[INFO] Mesh successfully loaded from Gmsh file.
-[INFO] Mesh topology dimension d=2
-[INFO] 
-Available volume tags (dx):
-[INFO]   Tag ID: 1
-[INFO] 
-Unique tags found in facet data: [2 3 4 5 6]
-[INFO] Label map loaded from geometry:
-[INFO]   uo2          → 1
-[INFO]   ymin         → 2
-[INFO]   xmin         → 3
-[INFO]   xmax         → 4
-[INFO]   ymax         → 5
-[INFO]   cavity       → 6
-[INFO]   Lz = 0.000 m
-[INFO]   Lx = 0.000 m, Ly = 0.000 m
-[INFO]   area = 3.600e-09 m², perimeter = 2.400e-04 m
-[INFO] === Mesh summary ===
-[INFO]   Topology dim: 2
-[INFO]   Facet dim: 1
-[INFO]   Num cells: 37736
-[INFO]   Cell tags: {np.int32(1)}
-[INFO]   Facet tags: {np.int32(2), np.int32(3), np.int32(4), np.int32(5), np.int32(6)}
-[INFO]   Geometry type: rect
 
 
 ***
@@ -146,7 +121,7 @@ Initializing the damage field...
 Loading boundary conditions from 'boundary_conditions.yaml'
   **[INFO]** Clamp_y mechanical BC on 'uo2' → 0.0 (first step) at region 'ymin'
   **[INFO]** Clamp_x mechanical BC on 'uo2' → 0.0 (first step) at region 'xmin'
-  **[INFO]** Neumann mechanical BC on 'uo2' → cavity: 0.0 Pa (list loaded)
+  **[INFO]** Dirichlet_y mechanical BC on 'uo2' → 0.0 (first step) at region 'ymax'
 
 Setting damage boundary conditions...
 Computing symbolic result fields (strain, stress, ...)
@@ -188,9 +163,8 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.70
@@ -210,9 +184,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.49
@@ -232,9 +205,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.34
@@ -254,9 +226,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.24
@@ -276,9 +247,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.17
@@ -298,9 +268,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.12
@@ -320,9 +289,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.08
@@ -342,9 +310,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.06
@@ -364,9 +331,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.05
@@ -386,9 +352,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.05
@@ -408,9 +373,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.05
@@ -430,9 +394,8 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 0.0 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 0.0
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=0.05
@@ -484,18 +447,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 1.000e+00
   [adaptive] relax_u=0.05
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.524e-01
+  ||ΔD||/||D|| = 1.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.548e-09
+  |ΔD|_∞ = 8.074e-03
 
 Convergence check
 
@@ -506,18 +468,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.500e-01
+  ||Δu||/||u|| = 4.043e-01
   [adaptive] relax_u=0.06
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.643e+00
-  [adaptive] relax_D=0.70
-  |ΔD|_∞ = 9.898e-09
+  ||ΔD||/||D|| = 1.183e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.979e-06
 
 Convergence check
 
@@ -528,18 +489,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.927e-01
-  [adaptive] relax_u=0.05
+  ||Δu||/||u|| = 4.225e-01
+  [adaptive] relax_u=0.06
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.207e+00
-  [adaptive] relax_D=0.49
-  |ΔD|_∞ = 1.201e-08
+  ||ΔD||/||D|| = 2.053e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 3.449e-06
 
 Convergence check
 
@@ -550,18 +510,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.529e-01
-  [adaptive] relax_u=0.06
+  ||Δu||/||u|| = 4.392e-01
+  [adaptive] relax_u=0.07
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.330e+00
-  [adaptive] relax_D=0.34
-  |ΔD|_∞ = 1.247e-08
+  ||ΔD||/||D|| = 3.024e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 5.098e-06
 
 Convergence check
 
@@ -572,18 +531,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.912e-01
-  [adaptive] relax_u=0.06
+  ||Δu||/||u|| = 4.539e-01
+  [adaptive] relax_u=0.07
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.634e+00
-  [adaptive] relax_D=0.24
-  |ΔD|_∞ = 1.361e-08
+  ||ΔD||/||D|| = 4.083e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 6.907e-06
 
 Convergence check
 
@@ -594,18 +552,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.264e-01
-  [adaptive] relax_u=0.07
+  ||Δu||/||u|| = 4.661e-01
+  [adaptive] relax_u=0.08
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.833e+00
-  [adaptive] relax_D=0.17
-  |ΔD|_∞ = 1.435e-08
+  ||ΔD||/||D|| = 5.213e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 8.843e-06
 
 Convergence check
 
@@ -616,18 +573,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.574e-01
-  [adaptive] relax_u=0.05
+  ||Δu||/||u|| = 4.752e-01
+  [adaptive] relax_u=0.09
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.888e+00
-  [adaptive] relax_D=0.12
-  |ΔD|_∞ = 1.456e-08
+  ||ΔD||/||D|| = 6.387e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.086e-05
 
 Convergence check
 
@@ -638,18 +594,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.715e-01
-  [adaptive] relax_u=0.06
+  ||Δu||/||u|| = 4.806e-01
+  [adaptive] relax_u=0.10
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.293e+00
-  [adaptive] relax_D=0.13
-  |ΔD|_∞ = 1.233e-08
+  ||ΔD||/||D|| = 7.569e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.288e-05
 
 Convergence check
 
@@ -660,18 +615,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.017e-01
-  [adaptive] relax_u=0.06
+  ||Δu||/||u|| = 4.818e-01
+  [adaptive] relax_u=0.11
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.497e+00
-  [adaptive] relax_D=0.09
-  |ΔD|_∞ = 1.684e-08
+  ||ΔD||/||D|| = 8.715e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.484e-05
 
 Convergence check
 
@@ -682,18 +636,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.294e-01
-  [adaptive] relax_u=0.07
+  ||Δu||/||u|| = 4.784e-01
+  [adaptive] relax_u=0.12
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.776e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 1.414e-08
+  ||ΔD||/||D|| = 9.775e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.665e-05
 
 Convergence check
 
@@ -704,18 +657,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.538e-01
-  [adaptive] relax_u=0.07
+  ||Δu||/||u|| = 4.698e-01
+  [adaptive] relax_u=0.13
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.220e+00
-  [adaptive] relax_D=0.07
-  |ΔD|_∞ = 1.206e-08
+  ||ΔD||/||D|| = 1.069e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.821e-05
 
 Convergence check
 
@@ -726,18 +678,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.740e-01
-  [adaptive] relax_u=0.08
+  ||Δu||/||u|| = 4.559e-01
+  [adaptive] relax_u=0.14
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.317e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 1.617e-08
+  ||ΔD||/||D|| = 1.142e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.943e-05
 
 Convergence check
 
@@ -748,18 +699,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.891e-01
-  [adaptive] relax_u=0.06
+  ||Δu||/||u|| = 4.364e-01
+  [adaptive] relax_u=0.16
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.667e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 1.373e-08
+  ||ΔD||/||D|| = 1.189e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 2.023e-05
 
 Convergence check
 
@@ -770,18 +720,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.079e-01
-  [adaptive] relax_u=0.06
+  ||Δu||/||u|| = 4.116e-01
+  [adaptive] relax_u=0.17
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.425e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 1.657e-08
+  ||ΔD||/||D|| = 1.208e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 2.053e-05
 
 Convergence check
 
@@ -792,18 +741,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.272e-01
-  [adaptive] relax_u=0.07
+  ||Δu||/||u|| = 3.817e-01
+  [adaptive] relax_u=0.19
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.386e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 1.643e-08
+  ||ΔD||/||D|| = 1.195e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 2.030e-05
 
 Convergence check
 
@@ -814,18 +762,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.439e-01
-  [adaptive] relax_u=0.08
+  ||Δu||/||u|| = 3.474e-01
+  [adaptive] relax_u=0.21
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.798e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 1.797e-08
+  ||ΔD||/||D|| = 1.150e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.953e-05
 
 Convergence check
 
@@ -836,18 +783,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.575e-01
-  [adaptive] relax_u=0.08
+  ||Δu||/||u|| = 3.096e-01
+  [adaptive] relax_u=0.23
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.234e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 1.960e-08
+  ||ΔD||/||D|| = 1.076e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.825e-05
 
 Convergence check
 
@@ -858,18 +804,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.673e-01
-  [adaptive] relax_u=0.09
+  ||Δu||/||u|| = 2.694e-01
+  [adaptive] relax_u=0.25
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.690e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 2.131e-08
+  ||ΔD||/||D|| = 9.747e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.653e-05
 
 Convergence check
 
@@ -880,18 +825,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.725e-01
-  [adaptive] relax_u=0.10
+  ||Δu||/||u|| = 2.283e-01
+  [adaptive] relax_u=0.28
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.160e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 2.307e-08
+  ||ΔD||/||D|| = 8.540e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.447e-05
 
 Convergence check
 
@@ -902,18 +846,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.726e-01
-  [adaptive] relax_u=0.11
+  ||Δu||/||u|| = 1.876e-01
+  [adaptive] relax_u=0.31
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.639e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 2.486e-08
+  ||ΔD||/||D|| = 7.214e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.222e-05
 
 Convergence check
 
@@ -924,18 +867,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.669e-01
-  [adaptive] relax_u=0.12
+  ||Δu||/||u|| = 1.490e-01
+  [adaptive] relax_u=0.34
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.116e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 2.665e-08
+  ||ΔD||/||D|| = 5.854e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 9.914e-06
 
 Convergence check
 
@@ -946,18 +888,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.551e-01
-  [adaptive] relax_u=0.13
+  ||Δu||/||u|| = 1.138e-01
+  [adaptive] relax_u=0.37
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.581e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 2.839e-08
+  ||ΔD||/||D|| = 4.544e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 7.694e-06
 
 Convergence check
 
@@ -968,18 +909,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.368e-01
-  [adaptive] relax_u=0.15
+  ||Δu||/||u|| = 8.307e-02
+  [adaptive] relax_u=0.41
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.024e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.005e-08
+  ||ΔD||/||D|| = 3.358e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 5.684e-06
 
 Convergence check
 
@@ -990,18 +930,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.120e-01
-  [adaptive] relax_u=0.16
+  ||Δu||/||u|| = 5.756e-02
+  [adaptive] relax_u=0.45
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.433e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.158e-08
+  ||ΔD||/||D|| = 2.347e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 3.973e-06
 
 Convergence check
 
@@ -1012,18 +951,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.809e-01
-  [adaptive] relax_u=0.18
+  ||Δu||/||u|| = 3.755e-02
+  [adaptive] relax_u=0.49
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.794e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.293e-08
+  ||ΔD||/||D|| = 1.540e-03
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 2.606e-06
 
 Convergence check
 
@@ -1034,18 +972,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.439e-01
-  [adaptive] relax_u=0.19
+  ||Δu||/||u|| = 2.281e-02
+  [adaptive] relax_u=0.54
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.096e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.407e-08
+  ||ΔD||/||D|| = 9.388e-04
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.589e-06
 
 Convergence check
 
@@ -1056,18 +993,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.019e-01
-  [adaptive] relax_u=0.21
+  ||Δu||/||u|| = 1.273e-02
+  [adaptive] relax_u=0.60
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.329e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.494e-08
+  ||ΔD||/||D|| = 5.252e-04
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 8.889e-07
 
 Convergence check
 
@@ -1078,18 +1014,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.561e-01
-  [adaptive] relax_u=0.24
+  ||Δu||/||u|| = 6.419e-03
+  [adaptive] relax_u=0.66
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.485e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.552e-08
+  ||ΔD||/||D|| = 2.651e-04
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 4.486e-07
 
 Convergence check
 
@@ -1100,18 +1035,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.078e-01
-  [adaptive] relax_u=0.26
+  ||Δu||/||u|| = 2.853e-03
+  [adaptive] relax_u=0.72
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.558e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.580e-08
+  ||ΔD||/||D|| = 1.179e-04
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.995e-07
 
 Convergence check
 
@@ -1122,18 +1056,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.589e-01
-  [adaptive] relax_u=0.28
+  ||Δu||/||u|| = 1.081e-03
+  [adaptive] relax_u=0.79
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.548e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.576e-08
+  ||ΔD||/||D|| = 4.469e-05
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 7.563e-08
 
 Convergence check
 
@@ -1144,18 +1077,17 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.110e-01
-  [adaptive] relax_u=0.31
+  ||Δu||/||u|| = 3.318e-04
+  [adaptive] relax_u=0.87
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.456e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.542e-08
+  ||ΔD||/||D|| = 1.371e-05
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 2.321e-08
 
 Convergence check
 
@@ -1166,1038 +1098,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.660e-01
-  [adaptive] relax_u=0.34
+  ||Δu||/||u|| = 7.549e-05
+  [adaptive] relax_u=0.96
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.290e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.479e-08
-
-Convergence check
-
-
-#### Iteration 33/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.254e-01
-  [adaptive] relax_u=0.38
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.058e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 3.393e-08
-
-Convergence check
-
-
-#### Iteration 34/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 9.036e-02
-  [adaptive] relax_u=0.42
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.652e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.615e-08
-
-Convergence check
-
-
-#### Iteration 35/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 6.170e-02
-  [adaptive] relax_u=0.46
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.408e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 3.149e-08
-
-Convergence check
-
-
-#### Iteration 36/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 3.956e-02
-  [adaptive] relax_u=0.50
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.868e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 3.321e-08
-
-Convergence check
-
-
-#### Iteration 37/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.355e-02
-  [adaptive] relax_u=0.56
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.272e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.473e-08
-
-Convergence check
-
-
-#### Iteration 38/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.283e-02
-  [adaptive] relax_u=0.61
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.223e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 2.705e-08
-
-Convergence check
-
-
-#### Iteration 39/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 6.277e-03
-  [adaptive] relax_u=0.67
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.561e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 2.832e-08
-
-Convergence check
-
-
-#### Iteration 40/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.688e-03
-  [adaptive] relax_u=0.74
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.866e+00
-  [adaptive] relax_D=0.07
-  |ΔD|_∞ = 2.946e-08
-
-Convergence check
-
-
-#### Iteration 41/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 9.704e-04
-  [adaptive] relax_u=0.81
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.132e+00
-  [adaptive] relax_D=0.05
-  |ΔD|_∞ = 3.046e-08
-
-Convergence check
-
-
-#### Iteration 42/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.786e-04
-  [adaptive] relax_u=0.89
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.704e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 2.136e-08
-
-Convergence check
-
-
-#### Iteration 43/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 5.735e-05
-  [adaptive] relax_u=0.98
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.960e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 2.232e-08
-
-Convergence check
-
-
-#### Iteration 44/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 6.676e-06
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.196e+00
-  [adaptive] relax_D=0.07
-  |ΔD|_∞ = 2.320e-08
-
-Convergence check
-
-
-#### Iteration 45/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.114e-07
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.403e+00
-  [adaptive] relax_D=0.07
-  |ΔD|_∞ = 2.398e-08
-
-Convergence check
-
-
-#### Iteration 46/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 7.463e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.575e+00
-  [adaptive] relax_D=0.08
-  |ΔD|_∞ = 2.462e-08
-
-Convergence check
-
-
-#### Iteration 47/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.331e-15
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.703e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 2.510e-08
-
-Convergence check
-
-
-#### Iteration 48/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.331e-15
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.314e+00
-  [adaptive] relax_D=0.06
-  |ΔD|_∞ = 1.616e-08
-
-Convergence check
-
-
-#### Iteration 49/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.478e+00
-  [adaptive] relax_D=0.07
-  |ΔD|_∞ = 1.677e-08
-
-Convergence check
-
-
-#### Iteration 50/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.918e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.620e+00
-  [adaptive] relax_D=0.08
-  |ΔD|_∞ = 1.730e-08
-
-Convergence check
-
-
-#### Iteration 51/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 3.188e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.736e+00
-  [adaptive] relax_D=0.08
-  |ΔD|_∞ = 1.774e-08
-
-Convergence check
-
-
-#### Iteration 52/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.339e-15
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.818e+00
-  [adaptive] relax_D=0.09
-  |ΔD|_∞ = 1.805e-08
-
-Convergence check
-
-
-#### Iteration 53/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.334e-15
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.863e+00
-  [adaptive] relax_D=0.10
-  |ΔD|_∞ = 1.821e-08
-
-Convergence check
-
-
-#### Iteration 54/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.864e+00
-  [adaptive] relax_D=0.11
-  |ΔD|_∞ = 1.822e-08
-
-Convergence check
-
-
-#### Iteration 55/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 8.928e-17
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.816e+00
-  [adaptive] relax_D=0.12
-  |ΔD|_∞ = 1.804e-08
-
-Convergence check
-
-
-#### Iteration 56/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 8.928e-17
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.715e+00
-  [adaptive] relax_D=0.13
-  |ΔD|_∞ = 1.766e-08
-
-Convergence check
-
-
-#### Iteration 57/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.560e+00
-  [adaptive] relax_D=0.15
-  |ΔD|_∞ = 1.708e-08
-
-Convergence check
-
-
-#### Iteration 58/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.349e+00
-  [adaptive] relax_D=0.16
-  |ΔD|_∞ = 1.629e-08
-
-Convergence check
-
-
-#### Iteration 59/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 5.294e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.085e+00
-  [adaptive] relax_D=0.18
-  |ΔD|_∞ = 1.530e-08
-
-Convergence check
-
-
-#### Iteration 60/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 9.431e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.771e+00
-  [adaptive] relax_D=0.19
-  |ΔD|_∞ = 1.412e-08
-
-Convergence check
-
-
-#### Iteration 61/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 7.805e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.414e+00
-  [adaptive] relax_D=0.21
-  |ΔD|_∞ = 1.279e-08
-
-Convergence check
-
-
-#### Iteration 62/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.025e+00
-  [adaptive] relax_D=0.24
-  |ΔD|_∞ = 1.133e-08
-
-Convergence check
-
-
-#### Iteration 63/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.615e+00
-  [adaptive] relax_D=0.26
-  |ΔD|_∞ = 9.794e-09
-
-Convergence check
-
-
-#### Iteration 64/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.199e+00
-  [adaptive] relax_D=0.28
-  |ΔD|_∞ = 8.236e-09
-
-Convergence check
-
-
-#### Iteration 65/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 7.805e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.792e+00
-  [adaptive] relax_D=0.31
-  |ΔD|_∞ = 6.713e-09
-
-Convergence check
-
-
-#### Iteration 66/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 9.431e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.410e+00
-  [adaptive] relax_D=0.34
-  |ΔD|_∞ = 5.281e-09
-
-Convergence check
-
-
-#### Iteration 67/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 5.294e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.065e+00
-  [adaptive] relax_D=0.38
-  |ΔD|_∞ = 3.988e-09
-
-Convergence check
-
-
-#### Iteration 68/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.280e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.676e-01
-  [adaptive] relax_D=0.42
-  |ΔD|_∞ = 2.875e-09
-
-Convergence check
-
-
-#### Iteration 69/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.280e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.241e-01
-  [adaptive] relax_D=0.46
-  |ΔD|_∞ = 1.963e-09
-
-Convergence check
-
-
-#### Iteration 70/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.361e-01
-  [adaptive] relax_D=0.50
-  |ΔD|_∞ = 1.259e-09
-
-Convergence check
-
-
-#### Iteration 71/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.280e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.000e-01
-  [adaptive] relax_D=0.56
-  |ΔD|_∞ = 7.492e-10
-
-Convergence check
-
-
-#### Iteration 72/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 3.012e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.090e-01
-  [adaptive] relax_D=0.61
-  |ΔD|_∞ = 4.082e-10
-
-Convergence check
-
-
-#### Iteration 73/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 2.726e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.332e-02
-  [adaptive] relax_D=0.67
-  |ΔD|_∞ = 1.997e-10
-
-Convergence check
-
-
-#### Iteration 74/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.280e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.283e-02
-  [adaptive] relax_D=0.74
-  |ΔD|_∞ = 8.551e-11
-
-Convergence check
-
-
-#### Iteration 75/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 1.280e-16
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.243e-03
-  [adaptive] relax_D=0.81
-  |ΔD|_∞ = 3.087e-11
-
-Convergence check
-
-
-#### Iteration 76/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.367e-03
-  [adaptive] relax_D=0.89
-  |ΔD|_∞ = 8.864e-12
-
-Convergence check
-
-
-#### Iteration 77/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.871e-04
-  [adaptive] relax_D=0.98
-  |ΔD|_∞ = 1.824e-12
-
-Convergence check
-
-
-#### Iteration 78/200
-
-
-**[INFO]** Assembling mechanical problem...
-  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
-  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 609060.4026845639 Pa
-  Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
-  Linear solver
-  ||Δu||/||u|| = 0.000e+00
-  [adaptive] relax_u=1.00
-
-**[INFO]** Assembling damage (AT2) problem...
-Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.671e-05
+  ||ΔD||/||D|| = 3.120e-06
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.124e-13
+  |ΔD|_∞ = 5.280e-09
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 78 iterations.
+**[SUCCESS]** Staggered solver converged in 32 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.2564e-11 J
-  → Fracture energy : 2.0474e-17 J
-  → Total energy    : 8.2564e-11 J
+  → Elastic energy  : 1.5985e-08 J
+  → Fracture energy : 1.3392e-09 J
+  → Total energy    : 1.7325e-08 J
 
 
 ## Step 03/401: t = 5.00e-03 s | LHR = 0.00e+00 W/m
@@ -2232,18 +1151,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 1218120.8053691278 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.000e-01
-  [adaptive] relax_u=1.00
+  ||Δu||/||u|| = 4.896e-01
+  [adaptive] relax_u=0.96
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.505e-01
+  ||ΔD||/||D|| = 4.159e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.258e-06
+  |ΔD|_∞ = 8.455e-04
 
 Convergence check
 
@@ -2254,26 +1172,67 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 1218120.8053691278 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
+  Linear solver
+  ||Δu||/||u|| = 1.960e-02
+  [adaptive] relax_u=1.00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'uo2' material
+  ||ΔD||/||D|| = 2.248e-02
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 4.552e-05
+
+Convergence check
+
+
+#### Iteration 3/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-10
+  Building weak form, volume integrals (dx) for uo2, tag = 1
+  Linear solver
+  ||Δu||/||u|| = 8.228e-04
+  [adaptive] relax_u=1.00
+
+**[INFO]** Assembling damage (AT2) problem...
+Solving damage problem for 'uo2' material
+  ||ΔD||/||D|| = 9.532e-04
+  [adaptive] relax_D=1.00
+  |ΔD|_∞ = 1.930e-06
+
+Convergence check
+
+
+#### Iteration 4/200
+
+
+**[INFO]** Assembling mechanical problem...
+  **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-10
+  Building weak form, volume integrals (dx) for uo2, tag = 1
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.595e-17
+  ||ΔD||/||D|| = 4.511e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.388e-21
+  |ΔD|_∞ = 5.421e-20
 
 Convergence check
 
-**[SUCCESS]** Staggered solver converged in 2 iterations.
+**[SUCCESS]** Staggered solver converged in 4 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.3026e-10 J
-  → Fracture energy : 3.2846e-16 J
-  → Total energy    : 3.3026e-10 J
+  → Elastic energy  : 6.3936e-08 J
+  → Fracture energy : 1.3482e-09 J
+  → Total energy    : 6.5285e-08 J
 
 
 ## Step 04/401: t = 7.50e-03 s | LHR = 0.00e+00 W/m
@@ -2308,18 +1267,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 1827181.2080536918 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.333e-01
+  ||Δu||/||u|| = 3.334e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.579e-01
+  ||ΔD||/||D|| = 4.727e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.185e-06
+  |ΔD|_∞ = 1.490e-03
 
 Convergence check
 
@@ -2330,26 +1288,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 1827181.2080536918 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9e-10
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.494e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.228e-17
+  ||ΔD||/||D|| = 3.238e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.082e-21
+  |ΔD|_∞ = 5.421e-20
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.4308e-10 J
-  → Fracture energy : 1.6754e-15 J
-  → Total energy    : 7.4308e-10 J
+  → Elastic energy  : 1.4384e-07 J
+  → Fracture energy : 1.3721e-09 J
+  → Total energy    : 1.4521e-07 J
 
 
 ## Step 05/401: t = 1.00e-02 s | LHR = 0.00e+00 W/m
@@ -2384,18 +1341,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 2436241.6107382555 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.2e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.500e-01
+  ||Δu||/||u|| = 2.501e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.423e-01
+  ||ΔD||/||D|| = 4.143e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.025e-05
+  |ΔD|_∞ = 2.088e-03
 
 Convergence check
 
@@ -2406,26 +1362,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 2436241.6107382555 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.2e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.510e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.318e-14
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.218e-19
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3210e-09 J
-  → Fracture energy : 5.3619e-15 J
-  → Total energy    : 1.3210e-09 J
+  → Elastic energy  : 2.5566e-07 J
+  → Fracture energy : 1.4240e-09 J
+  → Total energy    : 2.5708e-07 J
 
 
 ## Step 06/401: t = 1.25e-02 s | LHR = 0.00e+00 W/m
@@ -2460,18 +1415,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 3045302.0134228193 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.5e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.000e-01
+  ||Δu||/||u|| = 2.001e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.666e-01
+  ||ΔD||/||D|| = 3.525e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.342e-05
+  |ΔD|_∞ = 2.692e-03
 
 Convergence check
 
@@ -2482,26 +1436,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 3045302.0134228193 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.5e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.487e-17
+  ||ΔD||/||D|| = 1.895e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.355e-20
+  |ΔD|_∞ = 1.301e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0641e-09 J
-  → Fracture energy : 1.3306e-14 J
-  → Total energy    : 2.0641e-09 J
+  → Elastic energy  : 3.9935e-07 J
+  → Fracture energy : 1.5226e-09 J
+  → Total energy    : 4.0088e-07 J
 
 
 ## Step 07/401: t = 1.50e-02 s | LHR = 0.00e+00 W/m
@@ -2536,18 +1489,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 3654362.4161073836 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.8e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.667e-01
+  ||Δu||/||u|| = 1.668e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.130e-01
+  ||ΔD||/||D|| = 3.032e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.662e-05
+  |ΔD|_∞ = 3.302e-03
 
 Convergence check
 
@@ -2558,26 +1510,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 3654362.4161073836 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.8e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.695e-22
+  ||ΔD||/||D|| = 1.041e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.204e-25
+  |ΔD|_∞ = 3.253e-19
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9724e-09 J
-  → Fracture energy : 2.8090e-14 J
-  → Total energy    : 2.9724e-09 J
+  → Elastic energy  : 5.7488e-07 J
+  → Fracture energy : 1.6927e-09 J
+  → Total energy    : 5.7657e-07 J
 
 
 ## Step 08/401: t = 1.75e-02 s | LHR = 0.00e+00 W/m
@@ -2612,18 +1563,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 4263422.818791947 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.0999999999999998e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.429e-01
+  ||Δu||/||u|| = 1.431e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.726e-01
+  ||ΔD||/||D|| = 2.650e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.980e-05
+  |ΔD|_∞ = 3.921e-03
 
 Convergence check
 
@@ -2634,26 +1584,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 4263422.818791947 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.0999999999999998e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.579e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.794e-16
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.776e-20
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.0457e-09 J
-  → Fracture energy : 5.2968e-14 J
-  → Total energy    : 4.0458e-09 J
+  → Elastic energy  : 7.8216e-07 J
+  → Fracture energy : 1.9680e-09 J
+  → Total energy    : 7.8413e-07 J
 
 
 ## Step 09/401: t = 2.00e-02 s | LHR = 0.00e+00 W/m
@@ -2688,18 +1637,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 4872483.221476511 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.4e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.250e-01
+  ||Δu||/||u|| = 1.253e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.409e-01
+  ||ΔD||/||D|| = 2.350e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.293e-05
+  |ΔD|_∞ = 4.551e-03
 
 Convergence check
 
@@ -2710,26 +1658,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 4872483.221476511 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.4e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.194e-18
+  ||ΔD||/||D|| = 3.855e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.711e-20
+  |ΔD|_∞ = 5.204e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.2843e-09 J
-  → Fracture energy : 9.1832e-14 J
-  → Total energy    : 5.2844e-09 J
+  → Elastic energy  : 1.0211e-06 J
+  → Fracture energy : 2.3839e-09 J
+  → Total energy    : 1.0235e-06 J
 
 
 ## Step 10/401: t = 2.25e-02 s | LHR = 0.00e+00 W/m
@@ -2764,18 +1711,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 5481543.624161075 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.7e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.111e-01
+  ||Δu||/||u|| = 1.114e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.154e-01
+  ||ΔD||/||D|| = 2.112e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.604e-05
+  |ΔD|_∞ = 5.193e-03
 
 Convergence check
 
@@ -2786,26 +1732,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 5481543.624161075 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.7e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.638e-17
+  ||ΔD||/||D|| = 7.258e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.421e-20
+  |ΔD|_∞ = 6.505e-19
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.6880e-09 J
-  → Fracture energy : 1.4918e-13 J
-  → Total energy    : 6.6881e-09 J
+  → Elastic energy  : 1.2917e-06 J
+  → Fracture energy : 2.9802e-09 J
+  → Total energy    : 1.2947e-06 J
 
 
 ## Step 11/401: t = 2.50e-02 s | LHR = 0.00e+00 W/m
@@ -2840,18 +1785,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 6090604.026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.000e-01
+  ||Δu||/||u|| = 1.003e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.945e-01
+  ||ΔD||/||D|| = 1.918e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.912e-05
+  |ΔD|_∞ = 5.851e-03
 
 Convergence check
 
@@ -2862,26 +1806,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 6090604.026845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.452e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.692e-16
+  ||ΔD||/||D|| = 1.185e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.337e-19
+  |ΔD|_∞ = 1.084e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.2569e-09 J
-  → Fracture energy : 2.3009e-13 J
-  → Total energy    : 8.2571e-09 J
+  → Elastic energy  : 1.5937e-06 J
+  → Fracture energy : 3.8032e-09 J
+  → Total energy    : 1.5975e-06 J
 
 
 ## Step 12/401: t = 2.75e-02 s | LHR = 0.00e+00 W/m
@@ -2916,18 +1859,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 6699664.429530202 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.2999999999999998e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.092e-02
+  ||Δu||/||u|| = 9.130e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.772e-01
+  ||ΔD||/||D|| = 1.758e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.219e-05
+  |ΔD|_∞ = 6.526e-03
 
 Convergence check
 
@@ -2938,26 +1880,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 6699664.429530202 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.2999999999999998e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.404e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.316e-21
+  ||ΔD||/||D|| = 7.196e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.323e-23
+  |ΔD|_∞ = 8.674e-19
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.9909e-09 J
-  → Fracture energy : 3.4023e-13 J
-  → Total energy    : 9.9913e-09 J
+  → Elastic energy  : 1.9271e-06 J
+  → Fracture energy : 4.9054e-09 J
+  → Total energy    : 1.9320e-06 J
 
 
 ## Step 13/401: t = 3.00e-02 s | LHR = 0.00e+00 W/m
@@ -2992,18 +1933,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 7308724.832214767 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.6e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.335e-02
+  ||Δu||/||u|| = 8.377e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.627e-01
+  ||ΔD||/||D|| = 1.624e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.525e-05
+  |ΔD|_∞ = 7.223e-03
 
 Convergence check
 
@@ -3014,26 +1954,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 7308724.832214767 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.6e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.880e-17
+  ||ΔD||/||D|| = 2.152e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.132e-20
+  |ΔD|_∞ = 2.602e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1890e-08 J
-  → Fracture energy : 4.8582e-13 J
-  → Total energy    : 1.1891e-08 J
+  → Elastic energy  : 2.2918e-06 J
+  → Fracture energy : 6.3445e-09 J
+  → Total energy    : 2.2981e-06 J
 
 
 ## Step 14/401: t = 3.25e-02 s | LHR = 0.00e+00 W/m
@@ -3068,18 +2007,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 7917785.234899331 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.694e-02
+  ||Δu||/||u|| = 7.741e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.503e-01
+  ||ΔD||/||D|| = 1.510e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.831e-05
+  |ΔD|_∞ = 7.943e-03
 
 Convergence check
 
@@ -3090,26 +2028,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 7917785.234899331 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.293e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.149e-14
+  ||ΔD||/||D|| = 1.647e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.014e-18
+  |ΔD|_∞ = 8.674e-19
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3955e-08 J
-  → Fracture energy : 6.7366e-13 J
-  → Total energy    : 1.3955e-08 J
+  → Elastic energy  : 2.6876e-06 J
+  → Fracture energy : 8.1843e-09 J
+  → Total energy    : 2.6958e-06 J
 
 
 ## Step 15/401: t = 3.50e-02 s | LHR = 0.00e+00 W/m
@@ -3144,18 +2081,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 8526845.637583895 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.1999999999999996e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.144e-02
+  ||Δu||/||u|| = 7.196e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.397e-01
+  ||ΔD||/||D|| = 1.412e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.137e-05
+  |ΔD|_∞ = 8.692e-03
 
 Convergence check
 
@@ -3166,26 +2102,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 8526845.637583895 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.1999999999999996e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 7.868e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 1.301e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6184e-08 J
-  → Fracture energy : 9.1115e-13 J
-  → Total energy    : 1.6185e-08 J
+  → Elastic energy  : 3.1143e-06 J
+  → Fracture energy : 1.0499e-08 J
+  → Total energy    : 3.1248e-06 J
 
 
 ## Step 16/401: t = 3.75e-02 s | LHR = 0.00e+00 W/m
@@ -3220,18 +2155,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 9135906.040268458 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.5e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.668e-02
+  ||Δu||/||u|| = 6.725e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.304e-01
+  ||ΔD||/||D|| = 1.328e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.443e-05
+  |ΔD|_∞ = 9.472e-03
 
 Convergence check
 
@@ -3242,26 +2176,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 9135906.040268458 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.5e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.472e-24
+  ||ΔD||/||D|| = 2.737e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 1.735e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8580e-08 J
-  → Fracture energy : 1.2063e-12 J
-  → Total energy    : 1.8581e-08 J
+  → Elastic energy  : 3.5719e-06 J
+  → Fracture energy : 1.3361e-08 J
+  → Total energy    : 3.5852e-06 J
 
 
 ## Step 17/401: t = 4.00e-02 s | LHR = 0.00e+00 W/m
@@ -3296,18 +2229,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 9744966.442953022 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.8e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.252e-02
+  ||Δu||/||u|| = 6.314e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.224e-01
+  ||ΔD||/||D|| = 1.254e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.749e-05
+  |ΔD|_∞ = 1.029e-02
 
 Convergence check
 
@@ -3318,26 +2250,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 9744966.442953022 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.8e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.577e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.006e-15
+  ||ΔD||/||D|| = 1.144e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.554e-18
+  |ΔD|_∞ = 2.168e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1140e-08 J
-  → Fracture energy : 1.5676e-12 J
-  → Total energy    : 2.1141e-08 J
+  → Elastic energy  : 4.0600e-06 J
+  → Fracture energy : 1.6853e-08 J
+  → Total energy    : 4.0769e-06 J
 
 
 ## Step 18/401: t = 4.25e-02 s | LHR = 0.00e+00 W/m
@@ -3372,18 +2303,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 10354026.845637586 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.1e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.884e-02
+  ||Δu||/||u|| = 5.952e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.153e-01
+  ||ΔD||/||D|| = 1.190e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.056e-05
+  |ΔD|_∞ = 1.115e-02
 
 Convergence check
 
@@ -3394,26 +2324,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 10354026.845637586 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.1e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.766e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.101e-16
+  ||ΔD||/||D|| = 4.382e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.589e-19
+  |ΔD|_∞ = 1.735e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3865e-08 J
-  → Fracture energy : 2.0042e-12 J
-  → Total energy    : 2.3867e-08 J
+  → Elastic energy  : 4.5786e-06 J
+  → Fracture energy : 2.1071e-08 J
+  → Total energy    : 4.5997e-06 J
 
 
 ## Step 19/401: t = 4.50e-02 s | LHR = 0.00e+00 W/m
@@ -3448,18 +2377,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 10963087.24832215 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.4e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.558e-02
+  ||Δu||/||u|| = 5.631e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.089e-01
+  ||ΔD||/||D|| = 1.133e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.363e-05
+  |ΔD|_∞ = 1.206e-02
 
 Convergence check
 
@@ -3470,26 +2398,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 10963087.24832215 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.4e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.147e-17
+  ||ΔD||/||D|| = 1.380e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.626e-19
+  |ΔD|_∞ = 2.602e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.6756e-08 J
-  → Fracture energy : 2.5259e-12 J
-  → Total energy    : 2.6759e-08 J
+  → Elastic energy  : 5.1274e-06 J
+  → Fracture energy : 2.6117e-08 J
+  → Total energy    : 5.1535e-06 J
 
 
 ## Step 20/401: t = 4.75e-02 s | LHR = 0.00e+00 W/m
@@ -3524,18 +2451,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 11572147.651006714 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.7e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.265e-02
+  ||Δu||/||u|| = 5.344e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.033e-01
+  ||ΔD||/||D|| = 1.083e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.670e-05
+  |ΔD|_∞ = 1.302e-02
 
 Convergence check
 
@@ -3546,26 +2472,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 11572147.651006714 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.7e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.861e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.002e-14
+  ||ΔD||/||D|| = 7.575e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.247e-17
+  |ΔD|_∞ = 2.602e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9813e-08 J
-  → Fracture energy : 3.1432e-12 J
-  → Total energy    : 2.9816e-08 J
+  → Elastic energy  : 5.7062e-06 J
+  → Fracture energy : 3.2105e-08 J
+  → Total energy    : 5.7383e-06 J
 
 
 ## Step 21/401: t = 5.00e-02 s | LHR = 0.00e+00 W/m
@@ -3600,18 +2525,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 12181208.053691277 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.002e-02
+  ||Δu||/||u|| = 5.088e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.817e-02
+  ||ΔD||/||D|| = 1.039e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.978e-05
+  |ΔD|_∞ = 1.405e-02
 
 Convergence check
 
@@ -3622,26 +2546,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 12181208.053691277 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.143e-23
+  ||ΔD||/||D|| = 6.371e-19
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.755e-26
+  |ΔD|_∞ = 4.337e-19
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.3035e-08 J
-  → Fracture energy : 3.8668e-12 J
-  → Total energy    : 3.3038e-08 J
+  → Elastic energy  : 6.3147e-06 J
+  → Fracture energy : 3.9156e-08 J
+  → Total energy    : 6.3538e-06 J
 
 
 ## Step 22/401: t = 5.25e-02 s | LHR = 0.00e+00 W/m
@@ -3676,18 +2599,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 12790268.456375841 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.3e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.764e-02
+  ||Δu||/||u|| = 4.856e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.356e-02
+  ||ΔD||/||D|| = 1.000e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.285e-05
+  |ΔD|_∞ = 1.516e-02
 
 Convergence check
 
@@ -3698,26 +2620,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 12790268.456375841 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.3e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.104e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.816e-15
+  ||ΔD||/||D|| = 7.440e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.830e-18
+  |ΔD|_∞ = 4.337e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.6422e-08 J
-  → Fracture energy : 4.7084e-12 J
-  → Total energy    : 3.6426e-08 J
+  → Elastic energy  : 6.9527e-06 J
+  → Fracture energy : 4.7400e-08 J
+  → Total energy    : 7.0001e-06 J
 
 
 ## Step 23/401: t = 5.50e-02 s | LHR = 0.00e+00 W/m
@@ -3752,18 +2673,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 13399328.859060405 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.5999999999999995e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.548e-02
+  ||Δu||/||u|| = 4.647e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.937e-02
+  ||ΔD||/||D|| = 9.657e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.594e-05
+  |ΔD|_∞ = 1.636e-02
 
 Convergence check
 
@@ -3774,26 +2694,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 13399328.859060405 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.5999999999999995e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.780e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.781e-14
+  ||ΔD||/||D|| = 8.825e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.407e-17
+  |ΔD|_∞ = 6.939e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.9974e-08 J
-  → Fracture energy : 5.6801e-12 J
-  → Total energy    : 3.9980e-08 J
+  → Elastic energy  : 7.6198e-06 J
+  → Fracture energy : 5.6967e-08 J
+  → Total energy    : 7.6768e-06 J
 
 
 ## Step 24/401: t = 5.75e-02 s | LHR = 0.00e+00 W/m
@@ -3828,18 +2747,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 14008389.261744969 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.350e-02
+  ||Δu||/||u|| = 4.458e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.554e-02
+  ||ΔD||/||D|| = 9.354e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.902e-05
+  |ΔD|_∞ = 1.766e-02
 
 Convergence check
 
@@ -3850,26 +2768,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 14008389.261744969 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.262e-17
+  ||ΔD||/||D|| = 7.604e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.253e-19
+  |ΔD|_∞ = 3.469e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.3692e-08 J
-  → Fracture energy : 6.7948e-12 J
-  → Total energy    : 4.3699e-08 J
+  → Elastic energy  : 8.3159e-06 J
+  → Fracture energy : 6.8001e-08 J
+  → Total energy    : 8.3839e-06 J
 
 
 ## Step 25/401: t = 6.00e-02 s | LHR = 0.00e+00 W/m
@@ -3904,18 +2821,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 14617449.664429534 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.2e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.169e-02
+  ||Δu||/||u|| = 4.284e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.203e-02
+  ||ΔD||/||D|| = 9.089e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.211e-05
+  |ΔD|_∞ = 1.909e-02
 
 Convergence check
 
@@ -3926,26 +2842,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 14617449.664429534 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.2e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.165e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.485e-15
+  ||ΔD||/||D|| = 9.902e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.724e-17
+  |ΔD|_∞ = 5.204e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.7576e-08 J
-  → Fracture energy : 8.0658e-12 J
-  → Total energy    : 4.7584e-08 J
+  → Elastic energy  : 9.0406e-06 J
+  → Fracture energy : 8.0636e-08 J
+  → Total energy    : 9.1213e-06 J
 
 
 ## Step 26/401: t = 6.25e-02 s | LHR = 0.00e+00 W/m
@@ -3980,18 +2895,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 15226510.067114098 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.5e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.003e-02
+  ||Δu||/||u|| = 4.127e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.881e-02
+  ||ΔD||/||D|| = 8.862e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.520e-05
+  |ΔD|_∞ = 2.067e-02
 
 Convergence check
 
@@ -4002,26 +2916,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 15226510.067114098 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.5e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.911e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.555e-15
+  ||ΔD||/||D|| = 8.921e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.637e-17
+  |ΔD|_∞ = 5.204e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.1625e-08 J
-  → Fracture energy : 9.5071e-12 J
-  → Total energy    : 5.1635e-08 J
+  → Elastic energy  : 9.7936e-06 J
+  → Fracture energy : 9.5043e-08 J
+  → Total energy    : 9.8887e-06 J
 
 
 ## Step 27/401: t = 6.50e-02 s | LHR = 0.00e+00 W/m
@@ -4056,18 +2969,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 15835570.469798662 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.8e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.849e-02
+  ||Δu||/||u|| = 3.982e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.583e-02
+  ||ΔD||/||D|| = 8.670e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.830e-05
+  |ΔD|_∞ = 2.242e-02
 
 Convergence check
 
@@ -4078,26 +2990,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 15835570.469798662 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.8e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.267e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.768e-15
+  ||ΔD||/||D|| = 2.766e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.128e-17
+  |ΔD|_∞ = 3.469e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.5840e-08 J
-  → Fracture energy : 1.1133e-11 J
-  → Total energy    : 5.5851e-08 J
+  → Elastic energy  : 1.0575e-05 J
+  → Fracture energy : 1.1138e-07 J
+  → Total energy    : 1.0686e-05 J
 
 
 ## Step 28/401: t = 6.75e-02 s | LHR = 0.00e+00 W/m
@@ -4132,18 +3043,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 16444630.872483226 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.1e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.707e-02
+  ||Δu||/||u|| = 3.850e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.307e-02
+  ||ΔD||/||D|| = 8.513e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.140e-05
+  |ΔD|_∞ = 2.441e-02
 
 Convergence check
 
@@ -4154,26 +3064,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 16444630.872483226 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.1e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.430e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.291e-14
+  ||ΔD||/||D|| = 2.382e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.489e-17
+  |ΔD|_∞ = 3.469e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.0220e-08 J
-  → Fracture energy : 1.2960e-11 J
-  → Total energy    : 6.0233e-08 J
+  → Elastic energy  : 1.1383e-05 J
+  → Fracture energy : 1.2981e-07 J
+  → Total energy    : 1.1513e-05 J
 
 
 ## Step 29/401: t = 7.00e-02 s | LHR = 0.00e+00 W/m
@@ -4208,18 +3117,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 17053691.27516779 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.399999999999999e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.575e-02
+  ||Δu||/||u|| = 3.730e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.050e-02
+  ||ΔD||/||D|| = 8.393e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.451e-05
+  |ΔD|_∞ = 2.667e-02
 
 Convergence check
 
@@ -4230,26 +3138,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 17053691.27516779 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.399999999999999e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.656e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.473e-15
+  ||ΔD||/||D|| = 1.313e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.255e-17
+  |ΔD|_∞ = 6.939e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.4767e-08 J
-  → Fracture energy : 1.5002e-11 J
-  → Total energy    : 6.4782e-08 J
+  → Elastic energy  : 1.2219e-05 J
+  → Fracture energy : 1.5054e-07 J
+  → Total energy    : 1.2369e-05 J
 
 
 ## Step 30/401: t = 7.25e-02 s | LHR = 0.00e+00 W/m
@@ -4284,18 +3191,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 17662751.67785235 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.7e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.452e-02
+  ||Δu||/||u|| = 3.621e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.811e-02
+  ||ΔD||/||D|| = 8.311e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.762e-05
+  |ΔD|_∞ = 2.927e-02
 
 Convergence check
 
@@ -4306,26 +3212,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 17662751.67785235 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.7e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.625e-25
+  ||ΔD||/||D|| = 2.440e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.585e-26
+  |ΔD|_∞ = 3.469e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.9478e-08 J
-  → Fracture energy : 1.7277e-11 J
-  → Total energy    : 6.9496e-08 J
+  → Elastic energy  : 1.3081e-05 J
+  → Fracture energy : 1.7378e-07 J
+  → Total energy    : 1.3255e-05 J
 
 
 ## Step 31/401: t = 7.50e-02 s | LHR = 0.00e+00 W/m
@@ -4360,18 +3265,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 18271812.080536917 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.337e-02
+  ||Δu||/||u|| = 3.522e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.589e-02
+  ||ΔD||/||D|| = 8.271e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.073e-05
+  |ΔD|_∞ = 3.230e-02
 
 Convergence check
 
@@ -4382,26 +3286,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 18271812.080536917 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.395e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.034e-15
+  ||ΔD||/||D|| = 5.345e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.236e-17
+  |ΔD|_∞ = 5.551e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.4356e-08 J
-  → Fracture energy : 1.9802e-11 J
-  → Total energy    : 7.4376e-08 J
+  → Elastic energy  : 1.3970e-05 J
+  → Fracture energy : 1.9979e-07 J
+  → Total energy    : 1.4170e-05 J
 
 
 ## Step 32/401: t = 7.75e-02 s | LHR = 0.00e+00 W/m
@@ -4436,18 +3339,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 18880872.48322148 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.3e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.229e-02
+  ||Δu||/||u|| = 3.434e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.380e-02
+  ||ΔD||/||D|| = 8.278e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.385e-05
+  |ΔD|_∞ = 3.589e-02
 
 Convergence check
 
@@ -4458,26 +3360,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 18880872.48322148 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.3e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.672e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.995e-16
+  ||ΔD||/||D|| = 6.219e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.204e-18
+  |ΔD|_∞ = 8.674e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.9400e-08 J
-  → Fracture energy : 2.2594e-11 J
-  → Total energy    : 7.9422e-08 J
+  → Elastic energy  : 1.4885e-05 J
+  → Fracture energy : 2.2885e-07 J
+  → Total energy    : 1.5114e-05 J
 
 
 ## Step 33/401: t = 8.00e-02 s | LHR = 0.00e+00 W/m
@@ -4512,18 +3413,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 19489932.885906044 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.6e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.129e-02
+  ||Δu||/||u|| = 3.357e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.184e-02
+  ||ΔD||/||D|| = 8.339e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.697e-05
+  |ΔD|_∞ = 4.020e-02
 
 Convergence check
 
@@ -4534,26 +3434,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 19489932.885906044 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.6e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.224e-17
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.505e-19
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.4609e-08 J
-  → Fracture energy : 2.5672e-11 J
-  → Total energy    : 8.4635e-08 J
+  → Elastic energy  : 1.5825e-05 J
+  → Fracture energy : 2.6132e-07 J
+  → Total energy    : 1.6086e-05 J
 
 
 ## Step 34/401: t = 8.25e-02 s | LHR = 0.00e+00 W/m
@@ -4588,18 +3487,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 20098993.28859061 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.034e-02
+  ||Δu||/||u|| = 3.292e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.001e-02
+  ||ΔD||/||D|| = 8.462e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.001e-04
+  |ΔD|_∞ = 4.541e-02
 
 Convergence check
 
@@ -4610,26 +3508,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 20098993.28859061 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.9e-09
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.660e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.295e-15
+  ||ΔD||/||D|| = 3.164e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.843e-17
+  |ΔD|_∞ = 6.939e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.9984e-08 J
-  → Fracture energy : 2.9055e-11 J
-  → Total energy    : 9.0013e-08 J
+  → Elastic energy  : 1.6789e-05 J
+  → Fracture energy : 2.9761e-07 J
+  → Total energy    : 1.7086e-05 J
 
 
 ## Step 35/401: t = 8.50e-02 s | LHR = 0.00e+00 W/m
@@ -4664,18 +3561,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 20708053.691275172 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.02e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.945e-02
+  ||Δu||/||u|| = 3.240e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.828e-02
+  ||ΔD||/||D|| = 8.663e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.032e-04
+  |ΔD|_∞ = 5.179e-02
 
 Convergence check
 
@@ -4686,26 +3582,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 20708053.691275172 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.02e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.377e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.331e-14
+  ||ΔD||/||D|| = 1.070e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.337e-17
+  |ΔD|_∞ = 1.041e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.5525e-08 J
-  → Fracture energy : 3.2762e-11 J
-  → Total energy    : 9.5558e-08 J
+  → Elastic energy  : 1.7776e-05 J
+  → Fracture energy : 3.3828e-07 J
+  → Total energy    : 1.8115e-05 J
 
 
 ## Step 36/401: t = 8.75e-02 s | LHR = 0.00e+00 W/m
@@ -4740,18 +3635,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 21317114.093959738 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.05e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.861e-02
+  ||Δu||/||u|| = 3.205e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.665e-02
+  ||ΔD||/||D|| = 8.964e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.064e-04
+  |ΔD|_∞ = 5.960e-02
 
 Convergence check
 
@@ -4762,26 +3656,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 21317114.093959738 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.05e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.208e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.571e-24
+  ||ΔD||/||D|| = 8.919e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 1.041e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0123e-07 J
-  → Fracture energy : 3.6814e-11 J
-  → Total energy    : 1.0127e-07 J
+  → Elastic energy  : 1.8786e-05 J
+  → Fracture energy : 3.8404e-07 J
+  → Total energy    : 1.9170e-05 J
 
 
 ## Step 37/401: t = 9.00e-02 s | LHR = 0.00e+00 W/m
@@ -4816,18 +3709,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 21926174.4966443 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.08e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.782e-02
+  ||Δu||/||u|| = 3.194e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.510e-02
+  ||ΔD||/||D|| = 9.378e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.095e-04
+  |ΔD|_∞ = 6.890e-02
 
 Convergence check
 
@@ -4838,26 +3730,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 21926174.4966443 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.08e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.692e-24
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0711e-07 J
-  → Fracture energy : 4.1232e-11 J
-  → Total energy    : 1.0715e-07 J
+  → Elastic energy  : 1.9817e-05 J
+  → Fracture energy : 4.3590e-07 J
+  → Total energy    : 2.0253e-05 J
 
 
 ## Step 38/401: t = 9.25e-02 s | LHR = 0.00e+00 W/m
@@ -4892,18 +3783,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 22535234.899328865 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.11e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.707e-02
+  ||Δu||/||u|| = 3.216e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.365e-02
+  ||ΔD||/||D|| = 9.904e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.127e-04
+  |ΔD|_∞ = 7.901e-02
 
 Convergence check
 
@@ -4914,26 +3804,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 22535234.899328865 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.11e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.369e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.445e-15
+  ||ΔD||/||D|| = 6.274e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.296e-17
+  |ΔD|_∞ = 1.388e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1315e-07 J
-  → Fracture energy : 4.6037e-11 J
-  → Total energy    : 1.1319e-07 J
+  → Elastic energy  : 2.0866e-05 J
+  → Fracture energy : 4.9522e-07 J
+  → Total energy    : 2.1361e-05 J
 
 
 ## Step 39/401: t = 9.50e-02 s | LHR = 0.00e+00 W/m
@@ -4968,18 +3857,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 23144295.302013427 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.14e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.636e-02
+  ||Δu||/||u|| = 3.290e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.227e-02
+  ||ΔD||/||D|| = 1.050e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.158e-04
+  |ΔD|_∞ = 8.810e-02
 
 Convergence check
 
@@ -4990,26 +3878,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 23144295.302013427 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.14e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.511e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.543e-15
+  ||ΔD||/||D|| = 1.603e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.255e-17
+  |ΔD|_∞ = 6.939e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1935e-07 J
-  → Fracture energy : 5.1251e-11 J
-  → Total energy    : 1.1940e-07 J
+  → Elastic energy  : 2.1930e-05 J
+  → Fracture energy : 5.6370e-07 J
+  → Total energy    : 2.2494e-05 J
 
 
 ## Step 40/401: t = 9.75e-02 s | LHR = 0.00e+00 W/m
@@ -5044,18 +3931,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 23753355.704697993 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.17e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.569e-02
+  ||Δu||/||u|| = 3.438e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.096e-02
+  ||ΔD||/||D|| = 1.105e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.190e-04
+  |ΔD|_∞ = 9.636e-02
 
 Convergence check
 
@@ -5066,26 +3952,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 23753355.704697993 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.17e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.436e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.523e-14
+  ||ΔD||/||D|| = 1.758e-20
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.041e-16
+  |ΔD|_∞ = 2.168e-19
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2572e-07 J
-  → Fracture energy : 5.6899e-11 J
-  → Total energy    : 1.2578e-07 J
+  → Elastic energy  : 2.3005e-05 J
+  → Fracture energy : 6.4300e-07 J
+  → Total energy    : 2.3648e-05 J
 
 
 ## Step 41/401: t = 1.00e-01 s | LHR = 0.00e+00 W/m
@@ -5120,18 +4005,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 24362416.107382555 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.2e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.505e-02
+  ||Δu||/||u|| = 3.675e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.971e-02
+  ||ΔD||/||D|| = 1.147e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.221e-04
+  |ΔD|_∞ = 1.057e-01
 
 Convergence check
 
@@ -5142,26 +4026,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 24362416.107382555 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.2e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.516e-18
+  ||ΔD||/||D|| = 1.232e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.337e-19
+  |ΔD|_∞ = 6.939e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3226e-07 J
-  → Fracture energy : 6.3002e-11 J
-  → Total energy    : 1.3232e-07 J
+  → Elastic energy  : 2.4087e-05 J
+  → Fracture energy : 7.3389e-07 J
+  → Total energy    : 2.4821e-05 J
 
 
 ## Step 42/401: t = 1.03e-01 s | LHR = 0.00e+00 W/m
@@ -5196,18 +4079,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 24971476.51006712 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.23e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.444e-02
+  ||Δu||/||u|| = 3.955e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.853e-02
+  ||ΔD||/||D|| = 1.176e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.253e-04
+  |ΔD|_∞ = 1.158e-01
 
 Convergence check
 
@@ -5218,26 +4100,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 24971476.51006712 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.23e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.916e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.247e-18
+  ||ΔD||/||D|| = 1.994e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.674e-19
+  |ΔD|_∞ = 6.939e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3897e-07 J
-  → Fracture energy : 6.9586e-11 J
-  → Total energy    : 1.3904e-07 J
+  → Elastic energy  : 2.5175e-05 J
+  → Fracture energy : 8.3609e-07 J
+  → Total energy    : 2.6011e-05 J
 
 
 ## Step 43/401: t = 1.05e-01 s | LHR = 0.00e+00 W/m
@@ -5272,18 +4153,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 25580536.912751682 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.26e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.386e-02
+  ||Δu||/||u|| = 4.163e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.740e-02
+  ||ΔD||/||D|| = 1.189e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.285e-04
+  |ΔD|_∞ = 1.246e-01
 
 Convergence check
 
@@ -5294,26 +4174,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 25580536.912751682 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.26e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.082e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.281e-15
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.684e-17
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4584e-07 J
-  → Fracture energy : 7.6676e-11 J
-  → Total energy    : 1.4591e-07 J
+  → Elastic energy  : 2.6268e-05 J
+  → Fracture energy : 9.4927e-07 J
+  → Total energy    : 2.7217e-05 J
 
 
 ## Step 44/401: t = 1.07e-01 s | LHR = 0.00e+00 W/m
@@ -5348,18 +4227,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 26189597.315436248 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.29e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.331e-02
+  ||Δu||/||u|| = 4.289e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.632e-02
+  ||ΔD||/||D|| = 1.187e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.317e-04
+  |ΔD|_∞ = 1.318e-01
 
 Convergence check
 
@@ -5370,26 +4248,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 26189597.315436248 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.29e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.070e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.276e-15
+  ||ΔD||/||D|| = 1.452e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.597e-17
+  |ΔD|_∞ = 6.939e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5287e-07 J
-  → Fracture energy : 8.4296e-11 J
-  → Total energy    : 1.5296e-07 J
+  → Elastic energy  : 2.7366e-05 J
+  → Fracture energy : 1.0738e-06 J
+  → Total energy    : 2.8440e-05 J
 
 
 ## Step 45/401: t = 1.10e-01 s | LHR = 0.00e+00 W/m
@@ -5424,18 +4301,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 26798657.71812081 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.3199999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.278e-02
+  ||Δu||/||u|| = 4.411e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.530e-02
+  ||ΔD||/||D|| = 1.182e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.349e-04
+  |ΔD|_∞ = 1.384e-01
 
 Convergence check
 
@@ -5446,26 +4322,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 26798657.71812081 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.3199999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.507e-23
+  ||ΔD||/||D|| = 6.577e-19
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.482e-24
+  |ΔD|_∞ = 6.939e-18
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6008e-07 J
-  → Fracture energy : 9.2474e-11 J
-  → Total energy    : 1.6017e-07 J
+  → Elastic energy  : 2.8466e-05 J
+  → Fracture energy : 1.2107e-06 J
+  → Total energy    : 2.9677e-05 J
 
 
 ## Step 46/401: t = 1.13e-01 s | LHR = 0.00e+00 W/m
@@ -5500,18 +4375,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 27407718.120805375 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.35e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.228e-02
+  ||Δu||/||u|| = 4.546e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.431e-02
+  ||ΔD||/||D|| = 1.175e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.381e-04
+  |ΔD|_∞ = 1.444e-01
 
 Convergence check
 
@@ -5522,26 +4396,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 27407718.120805375 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.35e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.464e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.898e-15
+  ||ΔD||/||D|| = 2.955e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.036e-17
+  |ΔD|_∞ = 1.388e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6745e-07 J
-  → Fracture energy : 1.0124e-10 J
-  → Total energy    : 1.6755e-07 J
+  → Elastic energy  : 2.9564e-05 J
+  → Fracture energy : 1.3611e-06 J
+  → Total energy    : 3.0926e-05 J
 
 
 ## Step 47/401: t = 1.15e-01 s | LHR = 0.00e+00 W/m
@@ -5576,18 +4449,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 28016778.523489937 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.38e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.180e-02
+  ||Δu||/||u|| = 4.692e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.338e-02
+  ||ΔD||/||D|| = 1.169e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.413e-04
+  |ΔD|_∞ = 1.505e-01
 
 Convergence check
 
@@ -5598,26 +4470,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 28016778.523489937 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.38e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.864e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.297e-16
+  ||ΔD||/||D|| = 2.931e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.337e-18
+  |ΔD|_∞ = 1.110e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7499e-07 J
-  → Fracture energy : 1.1061e-10 J
-  → Total energy    : 1.7510e-07 J
+  → Elastic energy  : 3.0658e-05 J
+  → Fracture energy : 1.5261e-06 J
+  → Total energy    : 3.2184e-05 J
 
 
 ## Step 48/401: t = 1.18e-01 s | LHR = 0.00e+00 W/m
@@ -5652,18 +4523,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 28625838.926174503 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.41e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.133e-02
+  ||Δu||/||u|| = 4.858e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.248e-02
+  ||ΔD||/||D|| = 1.163e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.445e-04
+  |ΔD|_∞ = 1.565e-01
 
 Convergence check
 
@@ -5674,26 +4544,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 28625838.926174503 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.41e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 2.020e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 1.388e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8269e-07 J
-  → Fracture energy : 1.2063e-10 J
-  → Total energy    : 1.8281e-07 J
+  → Elastic energy  : 3.1742e-05 J
+  → Fracture energy : 1.7072e-06 J
+  → Total energy    : 3.3449e-05 J
 
 
 ## Step 49/401: t = 1.20e-01 s | LHR = 0.00e+00 W/m
@@ -5728,18 +4597,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 29234899.32885907 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.44e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.089e-02
+  ||Δu||/||u|| = 5.039e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.162e-02
+  ||ΔD||/||D|| = 1.158e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.477e-04
+  |ΔD|_∞ = 1.623e-01
 
 Convergence check
 
@@ -5750,26 +4618,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 29234899.32885907 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.44e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.281e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.105e-14
+  ||ΔD||/||D|| = 2.782e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.561e-16
+  |ΔD|_∞ = 1.388e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9056e-07 J
-  → Fracture energy : 1.3131e-10 J
-  → Total energy    : 1.9069e-07 J
+  → Elastic energy  : 3.2812e-05 J
+  → Fracture energy : 1.9059e-06 J
+  → Total energy    : 3.4717e-05 J
 
 
 ## Step 50/401: t = 1.22e-01 s | LHR = 0.00e+00 W/m
@@ -5804,18 +4671,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 29843959.73154363 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.47e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.047e-02
+  ||Δu||/||u|| = 5.216e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.079e-02
+  ||ΔD||/||D|| = 1.154e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.510e-04
+  |ΔD|_∞ = 1.678e-01
 
 Convergence check
 
@@ -5826,26 +4692,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 29843959.73154363 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.47e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.218e-17
+  ||ΔD||/||D|| = 6.191e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.301e-18
+  |ΔD|_∞ = 3.469e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9860e-07 J
-  → Fracture energy : 1.4269e-10 J
-  → Total energy    : 1.9874e-07 J
+  → Elastic energy  : 3.3863e-05 J
+  → Fracture energy : 2.1236e-06 J
+  → Total energy    : 3.5986e-05 J
 
 
 ## Step 51/401: t = 1.25e-01 s | LHR = 0.00e+00 W/m
@@ -5880,18 +4745,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 30453020.134228196 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.5e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.006e-02
+  ||Δu||/||u|| = 5.387e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.000e-02
+  ||ΔD||/||D|| = 1.151e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.542e-04
+  |ΔD|_∞ = 1.731e-01
 
 Convergence check
 
@@ -5902,26 +4766,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 30453020.134228196 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.5e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.118e-17
+  ||ΔD||/||D|| = 4.417e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.168e-18
+  |ΔD|_∞ = 2.082e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0681e-07 J
-  → Fracture energy : 1.5481e-10 J
-  → Total energy    : 2.0696e-07 J
+  → Elastic energy  : 3.4890e-05 J
+  → Fracture energy : 2.3624e-06 J
+  → Total energy    : 3.7252e-05 J
 
 
 ## Step 52/401: t = 1.28e-01 s | LHR = 0.00e+00 W/m
@@ -5956,18 +4819,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 31062080.536912758 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.53e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.967e-02
+  ||Δu||/||u|| = 5.568e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.924e-02
+  ||ΔD||/||D|| = 1.148e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.574e-04
+  |ΔD|_∞ = 1.782e-01
 
 Convergence check
 
@@ -5978,26 +4840,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 31062080.536912758 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.53e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.728e-25
+  ||ΔD||/||D|| = 3.374e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 2.082e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1518e-07 J
-  → Fracture energy : 1.6768e-10 J
-  → Total energy    : 2.1535e-07 J
+  → Elastic energy  : 3.5886e-05 J
+  → Fracture energy : 2.6243e-06 J
+  → Total energy    : 3.8511e-05 J
 
 
 ## Step 53/401: t = 1.30e-01 s | LHR = 0.00e+00 W/m
@@ -6032,18 +4893,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 31671140.939597324 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.56e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.930e-02
+  ||Δu||/||u|| = 5.739e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.851e-02
+  ||ΔD||/||D|| = 1.142e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.607e-04
+  |ΔD|_∞ = 1.827e-01
 
 Convergence check
 
@@ -6054,26 +4914,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 31671140.939597324 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.56e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.482e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.939e-15
+  ||ΔD||/||D|| = 2.014e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.318e-16
+  |ΔD|_∞ = 2.082e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2372e-07 J
-  → Fracture energy : 1.8135e-10 J
-  → Total energy    : 2.2390e-07 J
+  → Elastic energy  : 3.6846e-05 J
+  → Fracture energy : 2.9115e-06 J
+  → Total energy    : 3.9758e-05 J
 
 
 ## Step 54/401: t = 1.33e-01 s | LHR = 0.00e+00 W/m
@@ -6108,18 +4967,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 32280201.342281885 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.59e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.893e-02
+  ||Δu||/||u|| = 5.907e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.780e-02
+  ||ΔD||/||D|| = 1.134e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.640e-04
+  |ΔD|_∞ = 1.867e-01
 
 Convergence check
 
@@ -6130,26 +4988,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 32280201.342281885 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.59e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.629e-17
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.602e-18
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3243e-07 J
-  → Fracture energy : 1.9585e-10 J
-  → Total energy    : 2.3262e-07 J
+  → Elastic energy  : 3.7763e-05 J
+  → Fracture energy : 3.2261e-06 J
+  → Total energy    : 4.0989e-05 J
 
 
 ## Step 55/401: t = 1.35e-01 s | LHR = 0.00e+00 W/m
@@ -6184,18 +5041,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 32889261.74496645 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.62e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.859e-02
+  ||Δu||/||u|| = 6.075e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.712e-02
+  ||ΔD||/||D|| = 1.124e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.672e-04
+  |ΔD|_∞ = 1.900e-01
 
 Convergence check
 
@@ -6206,26 +5062,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 32889261.74496645 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.62e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.125e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.144e-15
+  ||ΔD||/||D|| = 5.918e-19
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.893e-17
+  |ΔD|_∞ = 1.388e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.4130e-07 J
-  → Fracture energy : 2.1120e-10 J
-  → Total energy    : 2.4151e-07 J
+  → Elastic energy  : 3.8630e-05 J
+  → Fracture energy : 3.5706e-06 J
+  → Total energy    : 4.2201e-05 J
 
 
 ## Step 56/401: t = 1.38e-01 s | LHR = 0.00e+00 W/m
@@ -6260,18 +5115,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 33498322.147651013 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.65e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.825e-02
+  ||Δu||/||u|| = 6.221e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.647e-02
+  ||ΔD||/||D|| = 1.115e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.705e-04
+  |ΔD|_∞ = 1.930e-01
 
 Convergence check
 
@@ -6282,26 +5136,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 33498322.147651013 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.65e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.674e-18
+  ||ΔD||/||D|| = 5.783e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.337e-19
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5034e-07 J
-  → Fracture energy : 2.2745e-10 J
-  → Total energy    : 2.5057e-07 J
+  → Elastic energy  : 3.9440e-05 J
+  → Fracture energy : 3.9476e-06 J
+  → Total energy    : 4.3387e-05 J
 
 
 ## Step 57/401: t = 1.40e-01 s | LHR = 0.00e+00 W/m
@@ -6336,18 +5189,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 34107382.55033558 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.6799999999999998e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.793e-02
+  ||Δu||/||u|| = 6.346e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.592e-02
+  ||ΔD||/||D|| = 1.106e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.739e-04
+  |ΔD|_∞ = 1.955e-01
 
 Convergence check
 
@@ -6358,26 +5210,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 34107382.55033558 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.6799999999999998e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.224e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.080e-17
+  ||ΔD||/||D|| = 9.559e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.735e-18
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5955e-07 J
-  → Fracture energy : 2.4464e-10 J
-  → Total energy    : 2.5980e-07 J
+  → Elastic energy  : 4.0185e-05 J
+  → Fracture energy : 4.3596e-06 J
+  → Total energy    : 4.4544e-05 J
 
 
 ## Step 58/401: t = 1.43e-01 s | LHR = 0.00e+00 W/m
@@ -6412,18 +5263,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 34716442.95302014 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.71e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.762e-02
+  ||Δu||/||u|| = 6.469e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.523e-02
+  ||ΔD||/||D|| = 1.093e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.771e-04
+  |ΔD|_∞ = 1.976e-01
 
 Convergence check
 
@@ -6434,26 +5284,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 34716442.95302014 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.71e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.358e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.738e-17
+  ||ΔD||/||D|| = 4.752e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.735e-18
+  |ΔD|_∞ = 5.551e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.6893e-07 J
-  → Fracture energy : 2.6278e-10 J
-  → Total energy    : 2.6919e-07 J
+  → Elastic energy  : 4.0856e-05 J
+  → Fracture energy : 4.8095e-06 J
+  → Total energy    : 4.5666e-05 J
 
 
 ## Step 59/401: t = 1.45e-01 s | LHR = 0.00e+00 W/m
@@ -6488,18 +5337,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 35325503.3557047 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.74e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.731e-02
+  ||Δu||/||u|| = 6.602e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.465e-02
+  ||ΔD||/||D|| = 1.078e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.804e-04
+  |ΔD|_∞ = 1.995e-01
 
 Convergence check
 
@@ -6510,26 +5358,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 35325503.3557047 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.74e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.199e-18
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.674e-19
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.7848e-07 J
-  → Fracture energy : 2.8192e-10 J
-  → Total energy    : 2.7876e-07 J
+  → Elastic energy  : 4.1446e-05 J
+  → Fracture energy : 5.2993e-06 J
+  → Total energy    : 4.6746e-05 J
 
 
 ## Step 60/401: t = 1.47e-01 s | LHR = 0.00e+00 W/m
@@ -6564,18 +5411,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 35934563.75838927 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.77e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.702e-02
+  ||Δu||/||u|| = 6.721e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.408e-02
+  ||ΔD||/||D|| = 1.061e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.837e-04
+  |ΔD|_∞ = 2.007e-01
 
 Convergence check
 
@@ -6586,26 +5432,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 35934563.75838927 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.77e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.048e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.222e-17
+  ||ΔD||/||D|| = 0.000e+00
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.735e-18
+  |ΔD|_∞ = 0.000e+00
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.8819e-07 J
-  → Fracture energy : 3.0211e-10 J
-  → Total energy    : 2.8849e-07 J
+  → Elastic energy  : 4.1945e-05 J
+  → Fracture energy : 5.8328e-06 J
+  → Total energy    : 4.7778e-05 J
 
 
 ## Step 61/401: t = 1.50e-01 s | LHR = 0.00e+00 W/m
@@ -6640,18 +5485,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 36543624.16107383 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.8e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.674e-02
+  ||Δu||/||u|| = 6.809e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.353e-02
+  ||ΔD||/||D|| = 1.043e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.870e-04
+  |ΔD|_∞ = 2.013e-01
 
 Convergence check
 
@@ -6662,26 +5506,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 36543624.16107383 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.8e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.413e-17
+  ||ΔD||/||D|| = 1.509e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.602e-18
+  |ΔD|_∞ = 5.551e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9807e-07 J
-  → Fracture energy : 3.2337e-10 J
-  → Total energy    : 2.9839e-07 J
+  → Elastic energy  : 4.2349e-05 J
+  → Fracture energy : 6.4112e-06 J
+  → Total energy    : 4.8760e-05 J
 
 
 ## Step 62/401: t = 1.52e-01 s | LHR = 0.00e+00 W/m
@@ -6716,18 +5559,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 37152684.563758396 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.83e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.647e-02
+  ||Δu||/||u|| = 6.852e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.312e-02
+  ||ΔD||/||D|| = 1.026e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.907e-04
+  |ΔD|_∞ = 2.013e-01
 
 Convergence check
 
@@ -6738,26 +5580,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 37152684.563758396 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.83e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.083e-17
+  ||ΔD||/||D|| = 1.461e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.602e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.0812e-07 J
-  → Fracture energy : 3.4577e-10 J
-  → Total energy    : 3.0846e-07 J
+  → Elastic energy  : 4.2654e-05 J
+  → Fracture energy : 7.0343e-06 J
+  → Total energy    : 4.9689e-05 J
 
 
 ## Step 63/401: t = 1.55e-01 s | LHR = 0.00e+00 W/m
@@ -6792,18 +5633,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 37761744.96644296 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.86e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.621e-02
+  ||Δu||/||u|| = 6.867e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.249e-02
+  ||ΔD||/||D|| = 1.010e-01
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.937e-04
+  |ΔD|_∞ = 2.016e-01
 
 Convergence check
 
@@ -6814,26 +5654,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 37761744.96644296 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.86e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.300e-23
+  ||ΔD||/||D|| = 4.026e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.323e-23
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.1834e-07 J
-  → Fracture energy : 3.6930e-10 J
-  → Total energy    : 3.1871e-07 J
+  → Elastic energy  : 4.2852e-05 J
+  → Fracture energy : 7.7049e-06 J
+  → Total energy    : 5.0557e-05 J
 
 
 ## Step 64/401: t = 1.58e-01 s | LHR = 0.00e+00 W/m
@@ -6868,18 +5707,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 38370805.36912753 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.89e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.595e-02
+  ||Δu||/||u|| = 6.897e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.200e-02
+  ||ΔD||/||D|| = 9.927e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.971e-04
+  |ΔD|_∞ = 2.011e-01
 
 Convergence check
 
@@ -6890,26 +5728,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 38370805.36912753 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.89e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 4.668e-20
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 8.674e-19
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.2872e-07 J
-  → Fracture energy : 3.9403e-10 J
-  → Total energy    : 3.2912e-07 J
+  → Elastic energy  : 4.2935e-05 J
+  → Fracture energy : 8.4247e-06 J
+  → Total energy    : 5.1360e-05 J
 
 
 ## Step 65/401: t = 1.60e-01 s | LHR = 0.00e+00 W/m
@@ -6944,18 +5781,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 38979865.77181209 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.92e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.571e-02
+  ||Δu||/||u|| = 6.922e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.152e-02
+  ||ΔD||/||D|| = 9.760e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.005e-04
+  |ΔD|_∞ = 2.014e-01
 
 Convergence check
 
@@ -6966,26 +5802,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 38979865.77181209 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.92e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.471e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.133e-16
+  ||ΔD||/||D|| = 5.991e-19
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.214e-17
+  |ΔD|_∞ = 2.776e-17
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.3928e-07 J
-  → Fracture energy : 4.1999e-10 J
-  → Total energy    : 3.3970e-07 J
+  → Elastic energy  : 4.2898e-05 J
+  → Fracture energy : 9.1951e-06 J
+  → Total energy    : 5.2093e-05 J
 
 
 ## Step 66/401: t = 1.63e-01 s | LHR = 0.00e+00 W/m
@@ -7020,18 +5855,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 39588926.17449665 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.95e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.547e-02
+  ||Δu||/||u|| = 6.927e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.105e-02
+  ||ΔD||/||D|| = 9.576e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.038e-04
+  |ΔD|_∞ = 2.013e-01
 
 Convergence check
 
@@ -7042,26 +5876,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 39588926.17449665 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.95e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.358e-25
+  ||ΔD||/||D|| = 1.017e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.585e-26
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.5000e-07 J
-  → Fracture energy : 4.4723e-10 J
-  → Total energy    : 3.5045e-07 J
+  → Elastic energy  : 4.2727e-05 J
+  → Fracture energy : 1.0020e-05 J
+  → Total energy    : 5.2747e-05 J
 
 
 ## Step 67/401: t = 1.65e-01 s | LHR = 0.00e+00 W/m
@@ -7096,18 +5929,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 40197986.57718122 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.98e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.524e-02
+  ||Δu||/||u|| = 6.940e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.060e-02
+  ||ΔD||/||D|| = 9.363e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.072e-04
+  |ΔD|_∞ = 1.997e-01
 
 Convergence check
 
@@ -7118,26 +5950,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 40197986.57718122 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.98e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.605e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.756e-16
+  ||ΔD||/||D|| = 1.871e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.908e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.6089e-07 J
-  → Fracture energy : 4.7580e-10 J
-  → Total energy    : 3.6136e-07 J
+  → Elastic energy  : 4.2429e-05 J
+  → Fracture energy : 1.0895e-05 J
+  → Total energy    : 5.3324e-05 J
 
 
 ## Step 68/401: t = 1.68e-01 s | LHR = 0.00e+00 W/m
@@ -7172,18 +6003,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 40807046.97986578 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.01e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.501e-02
+  ||Δu||/||u|| = 6.903e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.017e-02
+  ||ΔD||/||D|| = 9.174e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.106e-04
+  |ΔD|_∞ = 1.990e-01
 
 Convergence check
 
@@ -7194,26 +6024,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 40807046.97986578 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.01e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.749e-25
+  ||ΔD||/||D|| = 1.637e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.755e-26
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.7195e-07 J
-  → Fracture energy : 5.0573e-10 J
-  → Total energy    : 3.7245e-07 J
+  → Elastic energy  : 4.2007e-05 J
+  → Fracture energy : 1.1819e-05 J
+  → Total energy    : 5.3826e-05 J
 
 
 ## Step 69/401: t = 1.70e-01 s | LHR = 0.00e+00 W/m
@@ -7248,18 +6077,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 41416107.382550344 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.04e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.479e-02
+  ||Δu||/||u|| = 6.832e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.974e-02
+  ||ΔD||/||D|| = 9.006e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.140e-04
+  |ΔD|_∞ = 1.995e-01
 
 Convergence check
 
@@ -7270,26 +6098,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 41416107.382550344 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.04e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.874e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.519e-15
+  ||ΔD||/||D|| = 9.755e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.546e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.8318e-07 J
-  → Fracture energy : 5.3708e-10 J
-  → Total energy    : 3.8371e-07 J
+  → Elastic energy  : 4.1456e-05 J
+  → Fracture energy : 1.2791e-05 J
+  → Total energy    : 5.4247e-05 J
 
 
 ## Step 70/401: t = 1.73e-01 s | LHR = 0.00e+00 W/m
@@ -7324,18 +6151,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 42025167.785234906 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.07e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.458e-02
+  ||Δu||/||u|| = 6.776e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.933e-02
+  ||ΔD||/||D|| = 8.845e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.175e-04
+  |ΔD|_∞ = 1.993e-01
 
 Convergence check
 
@@ -7346,26 +6172,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 42025167.785234906 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.07e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.837e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.442e-15
+  ||ΔD||/||D|| = 9.481e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.424e-17
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.9458e-07 J
-  → Fracture energy : 5.6988e-10 J
-  → Total energy    : 3.9515e-07 J
+  → Elastic energy  : 4.0759e-05 J
+  → Fracture energy : 1.3814e-05 J
+  → Total energy    : 5.4574e-05 J
 
 
 ## Step 71/401: t = 1.75e-01 s | LHR = 0.00e+00 W/m
@@ -7400,18 +6225,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 42634228.187919475 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.1e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.438e-02
+  ||Δu||/||u|| = 6.772e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.893e-02
+  ||ΔD||/||D|| = 8.696e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.209e-04
+  |ΔD|_∞ = 1.997e-01
 
 Convergence check
 
@@ -7422,26 +6246,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 42634228.187919475 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.1e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.924e-17
+  ||ΔD||/||D|| = 5.463e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.602e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.0614e-07 J
-  → Fracture energy : 6.0418e-10 J
-  → Total energy    : 4.0675e-07 J
+  → Elastic energy  : 3.9918e-05 J
+  → Fracture energy : 1.4886e-05 J
+  → Total energy    : 5.4804e-05 J
 
 
 ## Step 72/401: t = 1.77e-01 s | LHR = 0.00e+00 W/m
@@ -7476,18 +6299,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 43243288.59060404 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.13e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.418e-02
+  ||Δu||/||u|| = 6.767e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.854e-02
+  ||ΔD||/||D|| = 8.532e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.244e-04
+  |ΔD|_∞ = 1.994e-01
 
 Convergence check
 
@@ -7498,26 +6320,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 43243288.59060404 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.13e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.450e-17
+  ||ΔD||/||D|| = 6.152e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.1788e-07 J
-  → Fracture energy : 6.4004e-10 J
-  → Total energy    : 4.1852e-07 J
+  → Elastic energy  : 3.8921e-05 J
+  → Fracture energy : 1.6010e-05 J
+  → Total energy    : 5.4931e-05 J
 
 
 ## Step 73/401: t = 1.80e-01 s | LHR = 0.00e+00 W/m
@@ -7552,18 +6373,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 43852348.9932886 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.16e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.398e-02
+  ||Δu||/||u|| = 6.711e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.817e-02
+  ||ΔD||/||D|| = 8.362e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.278e-04
+  |ΔD|_∞ = 1.986e-01
 
 Convergence check
 
@@ -7574,26 +6394,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 43852348.9932886 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.16e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.343e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.911e-17
+  ||ΔD||/||D|| = 1.011e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.2978e-07 J
-  → Fracture energy : 6.7749e-10 J
-  → Total energy    : 4.3046e-07 J
+  → Elastic energy  : 3.7777e-05 J
+  → Fracture energy : 1.7185e-05 J
+  → Total energy    : 5.4961e-05 J
 
 
 ## Step 74/401: t = 1.82e-01 s | LHR = 0.00e+00 W/m
@@ -7628,18 +6447,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 44461409.39597316 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.19e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.379e-02
+  ||Δu||/||u|| = 6.634e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.780e-02
+  ||ΔD||/||D|| = 8.200e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.313e-04
+  |ΔD|_∞ = 1.981e-01
 
 Convergence check
 
@@ -7650,26 +6468,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 44461409.39597316 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.19e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.386e-17
+  ||ΔD||/||D|| = 3.238e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.4186e-07 J
-  → Fracture energy : 7.1659e-10 J
-  → Total energy    : 4.4257e-07 J
+  → Elastic energy  : 3.6494e-05 J
+  → Fracture energy : 1.8404e-05 J
+  → Total energy    : 5.4898e-05 J
 
 
 ## Step 75/401: t = 1.85e-01 s | LHR = 0.00e+00 W/m
@@ -7704,18 +6521,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 45070469.79865773 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.22e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.361e-02
+  ||Δu||/||u|| = 6.541e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.745e-02
+  ||ΔD||/||D|| = 8.035e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.348e-04
+  |ΔD|_∞ = 1.971e-01
 
 Convergence check
 
@@ -7726,26 +6542,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 45070469.79865773 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.22e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.832e-17
+  ||ΔD||/||D|| = 8.652e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.5410e-07 J
-  → Fracture energy : 7.5739e-10 J
-  → Total energy    : 4.5486e-07 J
+  → Elastic energy  : 3.5062e-05 J
+  → Fracture energy : 1.9670e-05 J
+  → Total energy    : 5.4732e-05 J
 
 
 ## Step 76/401: t = 1.88e-01 s | LHR = 0.00e+00 W/m
@@ -7780,18 +6595,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 45679530.20134229 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.25e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.343e-02
+  ||Δu||/||u|| = 6.491e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.710e-02
+  ||ΔD||/||D|| = 7.884e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.383e-04
+  |ΔD|_∞ = 1.959e-01
 
 Convergence check
 
@@ -7802,26 +6616,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 45679530.20134229 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.25e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.329e-17
+  ||ΔD||/||D|| = 6.381e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.6652e-07 J
-  → Fracture energy : 7.9994e-10 J
-  → Total energy    : 4.6732e-07 J
+  → Elastic energy  : 3.3495e-05 J
+  → Fracture energy : 2.0972e-05 J
+  → Total energy    : 5.4466e-05 J
 
 
 ## Step 77/401: t = 1.90e-01 s | LHR = 0.00e+00 W/m
@@ -7856,18 +6669,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 46288590.604026854 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.28e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.326e-02
+  ||Δu||/||u|| = 6.465e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.676e-02
+  ||ΔD||/||D|| = 7.777e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.418e-04
+  |ΔD|_∞ = 1.961e-01
 
 Convergence check
 
@@ -7878,26 +6690,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 46288590.604026854 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.28e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.538e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.630e-14
+  ||ΔD||/||D|| = 1.183e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.036e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.7910e-07 J
-  → Fracture energy : 8.4429e-10 J
-  → Total energy    : 4.7995e-07 J
+  → Elastic energy  : 3.1783e-05 J
+  → Fracture energy : 2.2311e-05 J
+  → Total energy    : 5.4094e-05 J
 
 
 ## Step 78/401: t = 1.93e-01 s | LHR = 0.00e+00 W/m
@@ -7932,18 +6743,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 46897651.006711416 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.31e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.309e-02
+  ||Δu||/||u|| = 6.368e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.643e-02
+  ||ΔD||/||D|| = 7.699e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.453e-04
+  |ΔD|_∞ = 1.965e-01
 
 Convergence check
 
@@ -7954,26 +6764,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 46897651.006711416 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.31e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.125e-25
+  ||ΔD||/||D|| = 6.378e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.9186e-07 J
-  → Fracture energy : 8.9050e-10 J
-  → Total energy    : 4.9275e-07 J
+  → Elastic energy  : 2.9889e-05 J
+  → Fracture energy : 2.3704e-05 J
+  → Total energy    : 5.3593e-05 J
 
 
 ## Step 79/401: t = 1.95e-01 s | LHR = 0.00e+00 W/m
@@ -8008,18 +6817,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 47506711.409395985 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.34e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.292e-02
+  ||Δu||/||u|| = 6.368e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.612e-02
+  ||ΔD||/||D|| = 7.623e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.489e-04
+  |ΔD|_∞ = 1.973e-01
 
 Convergence check
 
@@ -8030,26 +6838,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 47506711.409395985 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.34e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.318e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.517e-14
+  ||ΔD||/||D|| = 8.664e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.608e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.0478e-07 J
-  → Fracture energy : 9.3861e-10 J
-  → Total energy    : 5.0572e-07 J
+  → Elastic energy  : 2.7818e-05 J
+  → Fracture energy : 2.5133e-05 J
+  → Total energy    : 5.2951e-05 J
 
 
 ## Step 80/401: t = 1.98e-01 s | LHR = 0.00e+00 W/m
@@ -8084,18 +6891,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 48115771.81208055 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.37e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.276e-02
+  ||Δu||/||u|| = 6.427e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.580e-02
+  ||ΔD||/||D|| = 7.589e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.524e-04
+  |ΔD|_∞ = 2.001e-01
 
 Convergence check
 
@@ -8106,26 +6912,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 48115771.81208055 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.37e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.444e-17
+  ||ΔD||/||D|| = 5.737e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.204e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.1787e-07 J
-  → Fracture energy : 9.8868e-10 J
-  → Total energy    : 5.1886e-07 J
+  → Elastic energy  : 2.5546e-05 J
+  → Fracture energy : 2.6609e-05 J
+  → Total energy    : 5.2155e-05 J
 
 
 ## Step 81/401: t = 2.00e-01 s | LHR = 0.00e+00 W/m
@@ -8160,18 +6965,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 48724832.21476511 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.4e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.260e-02
+  ||Δu||/||u|| = 6.552e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.550e-02
+  ||ΔD||/||D|| = 7.570e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.560e-04
+  |ΔD|_∞ = 2.031e-01
 
 Convergence check
 
@@ -8182,26 +6986,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 48724832.21476511 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.4e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.657e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.496e-14
+  ||ΔD||/||D|| = 8.891e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.325e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.3114e-07 J
-  → Fracture energy : 1.0408e-09 J
-  → Total energy    : 5.3218e-07 J
+  → Elastic energy  : 2.3046e-05 J
+  → Fracture energy : 2.8130e-05 J
+  → Total energy    : 5.1176e-05 J
 
 
 ## Step 82/401: t = 2.03e-01 s | LHR = 0.00e+00 W/m
@@ -8236,18 +7039,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 49333892.61744968 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.43e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.245e-02
+  ||Δu||/||u|| = 6.716e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.521e-02
+  ||ΔD||/||D|| = 7.552e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.596e-04
+  |ΔD|_∞ = 2.084e-01
 
 Convergence check
 
@@ -8258,26 +7060,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 49333892.61744968 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.43e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.442e-17
+  ||ΔD||/||D|| = 1.354e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.4458e-07 J
-  → Fracture energy : 1.0949e-09 J
-  → Total energy    : 5.4567e-07 J
+  → Elastic energy  : 2.0281e-05 J
+  → Fracture energy : 2.9698e-05 J
+  → Total energy    : 4.9979e-05 J
 
 
 ## Step 83/401: t = 2.05e-01 s | LHR = 0.00e+00 W/m
@@ -8312,18 +7113,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 49942953.02013424 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.46e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.230e-02
+  ||Δu||/||u|| = 7.063e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.492e-02
+  ||ΔD||/||D|| = 7.504e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.632e-04
+  |ΔD|_∞ = 2.160e-01
 
 Convergence check
 
@@ -8334,26 +7134,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 49942953.02013424 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.46e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.419e-17
+  ||ΔD||/||D|| = 6.217e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.204e-18
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.5818e-07 J
-  → Fracture energy : 1.1513e-09 J
-  → Total energy    : 5.5933e-07 J
+  → Elastic energy  : 1.7190e-05 J
+  → Fracture energy : 3.1318e-05 J
+  → Total energy    : 4.8508e-05 J
 
 
 ## Step 84/401: t = 2.08e-01 s | LHR = 0.00e+00 W/m
@@ -8388,18 +7187,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 50552013.4228188 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.49e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.216e-02
+  ||Δu||/||u|| = 7.598e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.464e-02
+  ||ΔD||/||D|| = 7.387e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.668e-04
+  |ΔD|_∞ = 2.291e-01
 
 Convergence check
 
@@ -8410,26 +7208,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 50552013.4228188 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.49e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.143e-17
+  ||ΔD||/||D|| = 5.935e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.204e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.7196e-07 J
-  → Fracture energy : 1.2097e-09 J
-  → Total energy    : 5.7317e-07 J
+  → Elastic energy  : 1.3676e-05 J
+  → Fracture energy : 3.2999e-05 J
+  → Total energy    : 4.6676e-05 J
 
 
 ## Step 85/401: t = 2.10e-01 s | LHR = 0.00e+00 W/m
@@ -8464,18 +7261,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 51161073.825503364 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.52e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.202e-02
+  ||Δu||/||u|| = 8.634e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.436e-02
+  ||ΔD||/||D|| = 7.016e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.704e-04
+  |ΔD|_∞ = 2.495e-01
 
 Convergence check
 
@@ -8486,26 +7282,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 51161073.825503364 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.52e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.903e-25
+  ||ΔD||/||D|| = 5.672e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.551e-25
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.8591e-07 J
-  → Fracture energy : 1.2705e-09 J
-  → Total energy    : 5.8718e-07 J
+  → Elastic energy  : 9.5939e-06 J
+  → Fracture energy : 3.4737e-05 J
+  → Total energy    : 4.4330e-05 J
 
 
 ## Step 86/401: t = 2.12e-01 s | LHR = 0.00e+00 W/m
@@ -8540,18 +7335,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 51770134.22818793 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.55e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.188e-02
+  ||Δu||/||u|| = 1.045e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.410e-02
+  ||ΔD||/||D|| = 5.867e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.741e-04
+  |ΔD|_∞ = 2.882e-01
 
 Convergence check
 
@@ -8562,26 +7356,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 51770134.22818793 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.55e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.045e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.953e-15
+  ||ΔD||/||D|| = 8.925e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.674e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.0003e-07 J
-  → Fracture energy : 1.3336e-09 J
-  → Total energy    : 6.0136e-07 J
+  → Elastic energy  : 5.1580e-06 J
+  → Fracture energy : 3.6299e-05 J
+  → Total energy    : 4.1457e-05 J
 
 
 ## Step 87/401: t = 2.15e-01 s | LHR = 0.00e+00 W/m
@@ -8616,18 +7409,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 52379194.630872495 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.58e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.174e-02
+  ||Δu||/||u|| = 1.190e-01
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.388e-02
+  ||ΔD||/||D|| = 3.462e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.779e-04
+  |ΔD|_∞ = 2.186e-01
 
 Convergence check
 
@@ -8638,26 +7430,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 52379194.630872495 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.58e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.041e-17
+  ||ΔD||/||D|| = 8.505e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.1432e-07 J
-  → Fracture energy : 1.3990e-09 J
-  → Total energy    : 6.1572e-07 J
+  → Elastic energy  : 1.8056e-06 J
+  → Fracture energy : 3.7185e-05 J
+  → Total energy    : 3.8991e-05 J
 
 
 ## Step 88/401: t = 2.17e-01 s | LHR = 0.00e+00 W/m
@@ -8692,18 +7483,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 52988255.03355706 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.61e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.161e-02
+  ||Δu||/||u|| = 9.579e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.358e-02
+  ||ΔD||/||D|| = 1.034e-02
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.814e-04
+  |ΔD|_∞ = 1.076e-01
 
 Convergence check
 
@@ -8714,26 +7504,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 52988255.03355706 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.61e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.430e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.240e-15
+  ||ΔD||/||D|| = 9.373e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.633e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.2878e-07 J
-  → Fracture energy : 1.4669e-09 J
-  → Total energy    : 6.3025e-07 J
+  → Elastic energy  : 4.7091e-07 J
+  → Fracture energy : 3.7521e-05 J
+  → Total energy    : 3.7992e-05 J
 
 
 ## Step 89/401: t = 2.20e-01 s | LHR = 0.00e+00 W/m
@@ -8768,18 +7557,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 53597315.43624162 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.6399999999999998e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.148e-02
+  ||Δu||/||u|| = 6.005e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.333e-02
+  ||ΔD||/||D|| = 1.244e-03
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.851e-04
+  |ΔD|_∞ = 4.440e-02
 
 Convergence check
 
@@ -8790,26 +7578,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 53597315.43624162 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.6399999999999998e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 1.240e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.4341e-07 J
-  → Fracture energy : 1.5373e-09 J
-  → Total energy    : 6.4495e-07 J
+  → Elastic energy  : 2.1418e-07 J
+  → Fracture energy : 3.7611e-05 J
+  → Total energy    : 3.7825e-05 J
 
 
 ## Step 90/401: t = 2.23e-01 s | LHR = 0.00e+00 W/m
@@ -8844,18 +7631,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 54206375.83892619 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.67e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.135e-02
+  ||Δu||/||u|| = 4.082e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.309e-02
+  ||ΔD||/||D|| = 5.819e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.888e-04
+  |ΔD|_∞ = 2.826e-02
 
 Convergence check
 
@@ -8866,26 +7652,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 54206375.83892619 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.67e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.201e-17
+  ||ΔD||/||D|| = 7.137e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.5822e-07 J
-  → Fracture energy : 1.6103e-09 J
-  → Total energy    : 6.5983e-07 J
+  → Elastic energy  : 1.2048e-07 J
+  → Fracture energy : 3.7647e-05 J
+  → Total energy    : 3.7768e-05 J
 
 
 ## Step 91/401: t = 2.25e-01 s | LHR = 0.00e+00 W/m
@@ -8920,18 +7705,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 54815436.24161075 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.7e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.123e-02
+  ||Δu||/||u|| = 3.488e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.285e-02
+  ||ΔD||/||D|| = 3.729e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.926e-04
+  |ΔD|_∞ = 2.759e-02
 
 Convergence check
 
@@ -8942,26 +7726,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 54815436.24161075 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.7e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.785e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.541e-15
+  ||ΔD||/||D|| = 6.559e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.112e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.7320e-07 J
-  → Fracture energy : 1.6858e-09 J
-  → Total energy    : 6.7489e-07 J
+  → Elastic energy  : 6.4319e-08 J
+  → Fracture energy : 3.7668e-05 J
+  → Total energy    : 3.7732e-05 J
 
 
 ## Step 92/401: t = 2.28e-01 s | LHR = 0.00e+00 W/m
@@ -8996,18 +7779,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 55424496.64429531 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.73e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.111e-02
+  ||Δu||/||u|| = 2.550e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.262e-02
+  ||ΔD||/||D|| = 1.605e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.963e-04
+  |ΔD|_∞ = 1.385e-02
 
 Convergence check
 
@@ -9018,26 +7800,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 55424496.64429531 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.73e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.951e-18
+  ||ΔD||/||D|| = 4.190e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.8835e-07 J
-  → Fracture energy : 1.7641e-09 J
-  → Total energy    : 6.9011e-07 J
+  → Elastic energy  : 4.9937e-08 J
+  → Fracture energy : 3.7674e-05 J
+  → Total energy    : 3.7724e-05 J
 
 
 ## Step 93/401: t = 2.30e-01 s | LHR = 0.00e+00 W/m
@@ -9072,18 +7853,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 56033557.046979874 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.76e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.099e-02
+  ||Δu||/||u|| = 1.223e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.240e-02
+  ||ΔD||/||D|| = 1.074e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.001e-04
+  |ΔD|_∞ = 9.072e-03
 
 Convergence check
 
@@ -9094,26 +7874,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 56033557.046979874 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.76e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.824e-22
+  ||ΔD||/||D|| = 8.275e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.059e-22
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.0367e-07 J
-  → Fracture energy : 1.8452e-09 J
-  → Total energy    : 7.0552e-07 J
+  → Elastic energy  : 4.5633e-08 J
+  → Fracture energy : 3.7677e-05 J
+  → Total energy    : 3.7723e-05 J
 
 
 ## Step 94/401: t = 2.33e-01 s | LHR = 0.00e+00 W/m
@@ -9148,18 +7927,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 56642617.449664444 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.79e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.088e-02
+  ||Δu||/||u|| = 1.113e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.217e-02
+  ||ΔD||/||D|| = 7.260e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.039e-04
+  |ΔD|_∞ = 4.461e-03
 
 Convergence check
 
@@ -9170,26 +7948,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 56642617.449664444 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.79e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.543e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.167e-14
+  ||ΔD||/||D|| = 4.084e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.534e-16
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.1917e-07 J
-  → Fracture energy : 1.9291e-09 J
-  → Total energy    : 7.2110e-07 J
+  → Elastic energy  : 4.3489e-08 J
+  → Fracture energy : 3.7679e-05 J
+  → Total energy    : 3.7722e-05 J
 
 
 ## Step 95/401: t = 2.35e-01 s | LHR = 0.00e+00 W/m
@@ -9224,18 +8001,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 57251677.852349006 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.82e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.076e-02
+  ||Δu||/||u|| = 1.065e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.196e-02
+  ||ΔD||/||D|| = 4.976e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.077e-04
+  |ΔD|_∞ = 1.453e-03
 
 Convergence check
 
@@ -9246,26 +8022,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 57251677.852349006 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.82e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.164e-26
+  ||ΔD||/||D|| = 1.048e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.3484e-07 J
-  → Fracture energy : 2.0159e-09 J
-  → Total energy    : 7.3685e-07 J
+  → Elastic energy  : 4.3230e-08 J
+  → Fracture energy : 3.7680e-05 J
+  → Total energy    : 3.7723e-05 J
 
 
 ## Step 96/401: t = 2.38e-01 s | LHR = 0.00e+00 W/m
@@ -9300,18 +8075,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 57860738.25503357 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.85e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.065e-02
+  ||Δu||/||u|| = 1.018e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.179e-02
+  ||ΔD||/||D|| = 4.444e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.116e-04
+  |ΔD|_∞ = 1.073e-03
 
 Convergence check
 
@@ -9322,26 +8096,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 57860738.25503357 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.85e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.260e-26
+  ||ΔD||/||D|| = 7.136e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.585e-26
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.5068e-07 J
-  → Fracture energy : 2.1058e-09 J
-  → Total energy    : 7.5278e-07 J
+  → Elastic energy  : 4.3644e-08 J
+  → Fracture energy : 3.7680e-05 J
+  → Total energy    : 3.7724e-05 J
 
 
 ## Step 97/401: t = 2.40e-01 s | LHR = 0.00e+00 W/m
@@ -9376,18 +8149,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 58469798.65771814 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.88e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.055e-02
+  ||Δu||/||u|| = 1.004e-02
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.154e-02
+  ||ΔD||/||D|| = 4.389e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.153e-04
+  |ΔD|_∞ = 1.357e-03
 
 Convergence check
 
@@ -9398,26 +8170,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 58469798.65771814 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.88e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.725e-25
+  ||ΔD||/||D|| = 8.839e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.755e-26
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.6669e-07 J
-  → Fracture energy : 2.1986e-09 J
-  → Total energy    : 7.6889e-07 J
+  → Elastic energy  : 4.4211e-08 J
+  → Fracture energy : 3.7681e-05 J
+  → Total energy    : 3.7725e-05 J
 
 
 ## Step 98/401: t = 2.42e-01 s | LHR = 0.00e+00 W/m
@@ -9452,18 +8223,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 59078859.0604027 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.91e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.044e-02
+  ||Δu||/||u|| = 9.947e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.134e-02
+  ||ΔD||/||D|| = 4.463e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.192e-04
+  |ΔD|_∞ = 1.822e-03
 
 Convergence check
 
@@ -9474,26 +8244,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 59078859.0604027 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.91e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.613e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.236e-15
+  ||ΔD||/||D|| = 1.236e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.978e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.8288e-07 J
-  → Fracture energy : 2.2946e-09 J
-  → Total energy    : 7.8517e-07 J
+  → Elastic energy  : 4.4810e-08 J
+  → Fracture energy : 3.7681e-05 J
+  → Total energy    : 3.7726e-05 J
 
 
 ## Step 99/401: t = 2.45e-01 s | LHR = 0.00e+00 W/m
@@ -9528,18 +8297,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 59687919.46308726 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.94e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.034e-02
+  ||Δu||/||u|| = 9.869e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.114e-02
+  ||ΔD||/||D|| = 4.489e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.231e-04
+  |ΔD|_∞ = 2.058e-03
 
 Convergence check
 
@@ -9550,26 +8318,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 59687919.46308726 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.94e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.939e-18
+  ||ΔD||/||D|| = 9.322e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.9924e-07 J
-  → Fracture energy : 2.3939e-09 J
-  → Total energy    : 8.0163e-07 J
+  → Elastic energy  : 4.5414e-08 J
+  → Fracture energy : 3.7681e-05 J
+  → Total energy    : 3.7727e-05 J
 
 
 ## Step 100/401: t = 2.47e-01 s | LHR = 0.00e+00 W/m
@@ -9604,18 +8371,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 60296979.86577182 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.97e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.024e-02
+  ||Δu||/||u|| = 9.822e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.100e-02
+  ||ΔD||/||D|| = 4.234e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.271e-04
+  |ΔD|_∞ = 1.238e-03
 
 Convergence check
 
@@ -9626,26 +8392,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 60296979.86577182 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 2.97e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.926e-17
+  ||ΔD||/||D|| = 7.950e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.204e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.1577e-07 J
-  → Fracture energy : 2.4964e-09 J
-  → Total energy    : 8.1827e-07 J
+  → Elastic energy  : 4.6027e-08 J
+  → Fracture energy : 3.7682e-05 J
+  → Total energy    : 3.7728e-05 J
 
 
 ## Step 101/401: t = 2.50e-01 s | LHR = 0.00e+00 W/m
@@ -9680,18 +8445,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 60906040.26845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.014e-02
+  ||Δu||/||u|| = 9.672e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.076e-02
+  ||ΔD||/||D|| = 4.165e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.309e-04
+  |ΔD|_∞ = 1.060e-03
 
 Convergence check
 
@@ -9702,26 +8466,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 60906040.26845639 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.406e-20
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.780e-18
+  ||ΔD||/||D|| = 9.369e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.735e-18
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.3248e-07 J
-  → Fracture energy : 2.6023e-09 J
-  → Total energy    : 8.3509e-07 J
+  → Elastic energy  : 4.6661e-08 J
+  → Fracture energy : 3.7682e-05 J
+  → Total energy    : 3.7729e-05 J
 
 
 ## Step 102/401: t = 2.53e-01 s | LHR = 0.00e+00 W/m
@@ -9756,18 +8519,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 61515100.671140954 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.03e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.004e-02
+  ||Δu||/||u|| = 9.566e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.057e-02
+  ||ΔD||/||D|| = 4.182e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.348e-04
+  |ΔD|_∞ = 1.466e-03
 
 Convergence check
 
@@ -9778,26 +8540,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 61515100.671140954 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.03e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.647e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.185e-15
+  ||ΔD||/||D|| = 7.782e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.249e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.4937e-07 J
-  → Fracture energy : 2.7116e-09 J
-  → Total energy    : 8.5208e-07 J
+  → Elastic energy  : 4.7304e-08 J
+  → Fracture energy : 3.7683e-05 J
+  → Total energy    : 3.7730e-05 J
 
 
 ## Step 103/401: t = 2.55e-01 s | LHR = 0.00e+00 W/m
@@ -9832,18 +8593,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 62124161.073825516 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.06e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.943e-03
+  ||Δu||/||u|| = 9.469e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.045e-02
+  ||ΔD||/||D|| = 4.265e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.390e-04
+  |ΔD|_∞ = 2.018e-03
 
 Convergence check
 
@@ -9854,26 +8614,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 62124161.073825516 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.06e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.487e-25
+  ||ΔD||/||D|| = 9.408e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.6642e-07 J
-  → Fracture energy : 2.8246e-09 J
-  → Total energy    : 8.6925e-07 J
+  → Elastic energy  : 4.7952e-08 J
+  → Fracture energy : 3.7683e-05 J
+  → Total energy    : 3.7731e-05 J
 
 
 ## Step 104/401: t = 2.58e-01 s | LHR = 0.00e+00 W/m
@@ -9908,18 +8667,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 62733221.47651008 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.09e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.850e-03
+  ||Δu||/||u|| = 9.406e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.021e-02
+  ||ΔD||/||D|| = 4.167e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.428e-04
+  |ΔD|_∞ = 1.834e-03
 
 Convergence check
 
@@ -9930,26 +8688,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 62733221.47651008 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.09e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.025e-17
+  ||ΔD||/||D|| = 9.227e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.041e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.8365e-07 J
-  → Fracture energy : 2.9410e-09 J
-  → Total energy    : 8.8660e-07 J
+  → Elastic energy  : 4.8600e-08 J
+  → Fracture energy : 3.7683e-05 J
+  → Total energy    : 3.7732e-05 J
 
 
 ## Step 105/401: t = 2.60e-01 s | LHR = 0.00e+00 W/m
@@ -9984,18 +8741,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 63342281.87919465 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.12e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.758e-03
+  ||Δu||/||u|| = 9.353e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.004e-02
+  ||ΔD||/||D|| = 3.886e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.468e-04
+  |ΔD|_∞ = 1.054e-03
 
 Convergence check
 
@@ -10006,26 +8762,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 63342281.87919465 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.12e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.658e-17
+  ||ΔD||/||D|| = 9.083e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.0106e-07 J
-  → Fracture energy : 3.0612e-09 J
-  → Total energy    : 9.0412e-07 J
+  → Elastic energy  : 4.9267e-08 J
+  → Fracture energy : 3.7684e-05 J
+  → Total energy    : 3.7733e-05 J
 
 
 ## Step 106/401: t = 2.63e-01 s | LHR = 0.00e+00 W/m
@@ -10060,18 +8815,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 63951342.28187921 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.15e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.668e-03
+  ||Δu||/||u|| = 9.183e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.987e-02
+  ||ΔD||/||D|| = 3.858e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.508e-04
+  |ΔD|_∞ = 1.159e-03
 
 Convergence check
 
@@ -10082,26 +8836,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 63951342.28187921 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.15e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.840e-17
+  ||ΔD||/||D|| = 7.135e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.1864e-07 J
-  → Fracture energy : 3.1852e-09 J
-  → Total energy    : 9.2183e-07 J
+  → Elastic energy  : 4.9956e-08 J
+  → Fracture energy : 3.7684e-05 J
+  → Total energy    : 3.7734e-05 J
 
 
 ## Step 107/401: t = 2.65e-01 s | LHR = 0.00e+00 W/m
@@ -10136,18 +8889,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 64560402.68456377 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.18e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.580e-03
+  ||Δu||/||u|| = 9.099e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.970e-02
+  ||ΔD||/||D|| = 3.838e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.549e-04
+  |ΔD|_∞ = 1.023e-03
 
 Convergence check
 
@@ -10158,26 +8910,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 64560402.68456377 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.18e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.127e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.596e-14
+  ||ΔD||/||D|| = 8.059e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.251e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.3640e-07 J
-  → Fracture energy : 3.3130e-09 J
-  → Total energy    : 9.3971e-07 J
+  → Elastic energy  : 5.0653e-08 J
+  → Fracture energy : 3.7684e-05 J
+  → Total energy    : 3.7735e-05 J
 
 
 ## Step 108/401: t = 2.68e-01 s | LHR = 0.00e+00 W/m
@@ -10212,18 +8963,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 65169463.08724833 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.21e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.494e-03
+  ||Δu||/||u|| = 9.006e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.954e-02
+  ||ΔD||/||D|| = 3.877e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.590e-04
+  |ΔD|_∞ = 1.189e-03
 
 Convergence check
 
@@ -10234,26 +8984,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 65169463.08724833 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.21e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.541e-17
+  ||ΔD||/||D|| = 4.684e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.674e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.5433e-07 J
-  → Fracture energy : 3.4448e-09 J
-  → Total energy    : 9.5777e-07 J
+  → Elastic energy  : 5.1358e-08 J
+  → Fracture energy : 3.7685e-05 J
+  → Total energy    : 3.7736e-05 J
 
 
 ## Step 109/401: t = 2.70e-01 s | LHR = 0.00e+00 W/m
@@ -10288,18 +9037,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 65778523.4899329 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.24e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.409e-03
+  ||Δu||/||u|| = 8.926e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.938e-02
+  ||ΔD||/||D|| = 3.931e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.631e-04
+  |ΔD|_∞ = 9.601e-04
 
 Convergence check
 
@@ -10310,26 +9058,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 65778523.4899329 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.24e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.763e-17
+  ||ΔD||/||D|| = 1.009e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.7244e-07 J
-  → Fracture energy : 3.5806e-09 J
-  → Total energy    : 9.7602e-07 J
+  → Elastic energy  : 5.2066e-08 J
+  → Fracture energy : 3.7685e-05 J
+  → Total energy    : 3.7737e-05 J
 
 
 ## Step 110/401: t = 2.73e-01 s | LHR = 0.00e+00 W/m
@@ -10364,18 +9111,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 66387583.892617464 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.27e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.325e-03
+  ||Δu||/||u|| = 8.847e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.922e-02
+  ||ΔD||/||D|| = 3.951e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.672e-04
+  |ΔD|_∞ = 9.010e-04
 
 Convergence check
 
@@ -10386,26 +9132,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 66387583.892617464 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.27e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.925e-25
+  ||ΔD||/||D|| = 4.777e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.9072e-07 J
-  → Fracture energy : 3.7206e-09 J
-  → Total energy    : 9.9444e-07 J
+  → Elastic energy  : 5.2779e-08 J
+  → Fracture energy : 3.7685e-05 J
+  → Total energy    : 3.7738e-05 J
 
 
 ## Step 111/401: t = 2.75e-01 s | LHR = 0.00e+00 W/m
@@ -10440,18 +9185,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 66996644.295302026 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.244e-03
+  ||Δu||/||u|| = 8.763e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.907e-02
+  ||ΔD||/||D|| = 3.946e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.714e-04
+  |ΔD|_∞ = 8.593e-04
 
 Convergence check
 
@@ -10462,26 +9206,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 66996644.295302026 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.071e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.703e-15
+  ||ΔD||/||D|| = 1.060e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.296e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0092e-06 J
-  → Fracture energy : 3.8648e-09 J
-  → Total energy    : 1.0130e-06 J
+  → Elastic energy  : 5.3500e-08 J
+  → Fracture energy : 3.7686e-05 J
+  → Total energy    : 3.7739e-05 J
 
 
 ## Step 112/401: t = 2.78e-01 s | LHR = 0.00e+00 W/m
@@ -10516,18 +9259,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 67605704.69798659 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.33e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.164e-03
+  ||Δu||/||u|| = 8.681e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.892e-02
+  ||ΔD||/||D|| = 3.939e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.755e-04
+  |ΔD|_∞ = 1.065e-03
 
 Convergence check
 
@@ -10538,26 +9280,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 67605704.69798659 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.33e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.728e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.431e-14
+  ||ΔD||/||D|| = 6.284e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.100e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0278e-06 J
-  → Fracture energy : 4.0133e-09 J
-  → Total energy    : 1.0318e-06 J
+  → Elastic energy  : 5.4229e-08 J
+  → Fracture energy : 3.7686e-05 J
+  → Total energy    : 3.7740e-05 J
 
 
 ## Step 113/401: t = 2.80e-01 s | LHR = 0.00e+00 W/m
@@ -10592,18 +9333,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 68214765.10067116 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.3599999999999996e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.085e-03
+  ||Δu||/||u|| = 8.599e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.877e-02
+  ||ΔD||/||D|| = 3.965e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.797e-04
+  |ΔD|_∞ = 1.160e-03
 
 Convergence check
 
@@ -10614,26 +9354,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 68214765.10067116 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.3599999999999996e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 8.379e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0466e-06 J
-  → Fracture energy : 4.1663e-09 J
-  → Total energy    : 1.0508e-06 J
+  → Elastic energy  : 5.4965e-08 J
+  → Fracture energy : 3.7686e-05 J
+  → Total energy    : 3.7741e-05 J
 
 
 ## Step 114/401: t = 2.83e-01 s | LHR = 0.00e+00 W/m
@@ -10668,18 +9407,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 68823825.50335573 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.39e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.008e-03
+  ||Δu||/||u|| = 8.527e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.862e-02
+  ||ΔD||/||D|| = 3.922e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.840e-04
+  |ΔD|_∞ = 7.932e-04
 
 Convergence check
 
@@ -10690,26 +9428,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 68823825.50335573 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.39e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.868e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.474e-16
+  ||ΔD||/||D|| = 7.668e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.082e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0656e-06 J
-  → Fracture energy : 4.3238e-09 J
-  → Total energy    : 1.0699e-06 J
+  → Elastic energy  : 5.5707e-08 J
+  → Fracture energy : 3.7687e-05 J
+  → Total energy    : 3.7742e-05 J
 
 
 ## Step 115/401: t = 2.85e-01 s | LHR = 0.00e+00 W/m
@@ -10744,18 +9481,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 69432885.90604028 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.42e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.932e-03
+  ||Δu||/||u|| = 8.442e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.911e-02
+  ||ΔD||/||D|| = 3.886e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.607e-04
+  |ΔD|_∞ = 9.380e-04
 
 Convergence check
 
@@ -10766,26 +9502,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 69432885.90604028 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.42e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.227e-17
+  ||ΔD||/||D|| = 7.072e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.041e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0848e-06 J
-  → Fracture energy : 4.4892e-09 J
-  → Total energy    : 1.0893e-06 J
+  → Elastic energy  : 5.6460e-08 J
+  → Fracture energy : 3.7687e-05 J
+  → Total energy    : 3.7743e-05 J
 
 
 ## Step 116/401: t = 2.88e-01 s | LHR = 0.00e+00 W/m
@@ -10820,18 +9555,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 70041946.30872485 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.45e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.866e-03
+  ||Δu||/||u|| = 8.359e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.838e-02
+  ||ΔD||/||D|| = 3.920e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.949e-04
+  |ΔD|_∞ = 1.123e-03
 
 Convergence check
 
@@ -10842,26 +9576,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 70041946.30872485 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.45e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.283e-18
+  ||ΔD||/||D|| = 5.850e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1041e-06 J
-  → Fracture energy : 4.6564e-09 J
-  → Total energy    : 1.1088e-06 J
+  → Elastic energy  : 5.7219e-08 J
+  → Fracture energy : 3.7687e-05 J
+  → Total energy    : 3.7744e-05 J
 
 
 ## Step 117/401: t = 2.90e-01 s | LHR = 0.00e+00 W/m
@@ -10896,18 +9629,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 70651006.7114094 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.48e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.785e-03
+  ||Δu||/||u|| = 8.293e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.821e-02
+  ||ΔD||/||D|| = 3.933e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.973e-04
+  |ΔD|_∞ = 9.775e-04
 
 Convergence check
 
@@ -10918,26 +9650,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 70651006.7114094 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.48e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.150e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.163e-14
+  ||ΔD||/||D|| = 9.320e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.927e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1237e-06 J
-  → Fracture energy : 4.8283e-09 J
-  → Total energy    : 1.1285e-06 J
+  → Elastic energy  : 5.7982e-08 J
+  → Fracture energy : 3.7687e-05 J
+  → Total energy    : 3.7745e-05 J
 
 
 ## Step 118/401: t = 2.92e-01 s | LHR = 0.00e+00 W/m
@@ -10972,18 +9703,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 71260067.11409397 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.5099999999999997e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.713e-03
+  ||Δu||/||u|| = 8.220e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.807e-02
+  ||ΔD||/||D|| = 3.951e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.014e-04
+  |ΔD|_∞ = 8.331e-04
 
 Convergence check
 
@@ -10994,26 +9724,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 71260067.11409397 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.5099999999999997e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 1.005e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1434e-06 J
-  → Fracture energy : 5.0050e-09 J
-  → Total energy    : 1.1484e-06 J
+  → Elastic energy  : 5.8751e-08 J
+  → Fracture energy : 3.7688e-05 J
+  → Total energy    : 3.7747e-05 J
 
 
 ## Step 119/401: t = 2.95e-01 s | LHR = 0.00e+00 W/m
@@ -11048,18 +9777,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 71869127.51677854 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.54e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.642e-03
+  ||Δu||/||u|| = 8.141e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.794e-02
+  ||ΔD||/||D|| = 4.102e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.058e-04
+  |ΔD|_∞ = 9.829e-04
 
 Convergence check
 
@@ -11070,26 +9798,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 71869127.51677854 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.54e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 5.850e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1632e-06 J
-  → Fracture energy : 5.1868e-09 J
-  → Total energy    : 1.1684e-06 J
+  → Elastic energy  : 5.9524e-08 J
+  → Fracture energy : 3.7688e-05 J
+  → Total energy    : 3.7748e-05 J
 
 
 ## Step 120/401: t = 2.97e-01 s | LHR = 0.00e+00 W/m
@@ -11124,18 +9851,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 72478187.9194631 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.57e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.572e-03
+  ||Δu||/||u|| = 8.076e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.781e-02
+  ||ΔD||/||D|| = 4.332e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.102e-04
+  |ΔD|_∞ = 1.305e-03
 
 Convergence check
 
@@ -11146,26 +9872,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 72478187.9194631 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.57e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.326e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.230e-16
+  ||ΔD||/||D|| = 5.998e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.368e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.1833e-06 J
-  → Fracture energy : 5.3738e-09 J
-  → Total energy    : 1.1887e-06 J
+  → Elastic energy  : 6.0293e-08 J
+  → Fracture energy : 3.7688e-05 J
+  → Total energy    : 3.7749e-05 J
 
 
 ## Step 121/401: t = 3.00e-01 s | LHR = 0.00e+00 W/m
@@ -11200,18 +9925,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 73087248.32214767 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.504e-03
+  ||Δu||/||u|| = 8.016e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.774e-02
+  ||ΔD||/||D|| = 4.663e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.150e-04
+  |ΔD|_∞ = 1.755e-03
 
 Convergence check
 
@@ -11222,26 +9946,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 73087248.32214767 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 6.490e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2035e-06 J
-  → Fracture energy : 5.5662e-09 J
-  → Total energy    : 1.2091e-06 J
+  → Elastic energy  : 6.1054e-08 J
+  → Fracture energy : 3.7689e-05 J
+  → Total energy    : 3.7750e-05 J
 
 
 ## Step 122/401: t = 3.02e-01 s | LHR = 0.00e+00 W/m
@@ -11276,18 +9999,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 73696308.72483224 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.63e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.438e-03
+  ||Δu||/||u|| = 7.991e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.762e-02
+  ||ΔD||/||D|| = 4.839e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.194e-04
+  |ΔD|_∞ = 1.812e-03
 
 Convergence check
 
@@ -11298,26 +10020,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 73696308.72483224 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.63e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.153e-17
+  ||ΔD||/||D|| = 7.837e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.041e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2239e-06 J
-  → Fracture energy : 5.7641e-09 J
-  → Total energy    : 1.2297e-06 J
+  → Elastic energy  : 6.1798e-08 J
+  → Fracture energy : 3.7689e-05 J
+  → Total energy    : 3.7751e-05 J
 
 
 ## Step 123/401: t = 3.05e-01 s | LHR = 0.00e+00 W/m
@@ -11352,18 +10073,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 74305369.12751679 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.66e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.372e-03
+  ||Δu||/||u|| = 8.028e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.750e-02
+  ||ΔD||/||D|| = 4.477e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.240e-04
+  |ΔD|_∞ = 1.378e-03
 
 Convergence check
 
@@ -11374,26 +10094,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 74305369.12751679 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.66e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.732e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.498e-15
+  ||ΔD||/||D|| = 8.272e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.690e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2445e-06 J
-  → Fracture energy : 5.9674e-09 J
-  → Total energy    : 1.2505e-06 J
+  → Elastic energy  : 6.2545e-08 J
+  → Fracture energy : 3.7689e-05 J
+  → Total energy    : 3.7752e-05 J
 
 
 ## Step 124/401: t = 3.07e-01 s | LHR = 0.00e+00 W/m
@@ -11428,18 +10147,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 74914429.53020136 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.69e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.307e-03
+  ||Δu||/||u|| = 7.871e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.738e-02
+  ||ΔD||/||D|| = 4.208e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.285e-04
+  |ΔD|_∞ = 1.071e-03
 
 Convergence check
 
@@ -11450,26 +10168,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 74914429.53020136 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.69e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.269e-17
+  ||ΔD||/||D|| = 1.257e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 7.772e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2653e-06 J
-  → Fracture energy : 6.1764e-09 J
-  → Total energy    : 1.2715e-06 J
+  → Elastic energy  : 6.3326e-08 J
+  → Fracture energy : 3.7690e-05 J
+  → Total energy    : 3.7753e-05 J
 
 
 ## Step 125/401: t = 3.10e-01 s | LHR = 0.00e+00 W/m
@@ -11504,18 +10221,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 75523489.93288592 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.72e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.244e-03
+  ||Δu||/||u|| = 7.760e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.720e-02
+  ||ΔD||/||D|| = 4.202e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.327e-04
+  |ΔD|_∞ = 1.150e-03
 
 Convergence check
 
@@ -11526,26 +10242,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 75523489.93288592 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.72e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.827e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.432e-15
+  ||ΔD||/||D|| = 7.892e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.012e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2863e-06 J
-  → Fracture energy : 6.3909e-09 J
-  → Total energy    : 1.2926e-06 J
+  → Elastic energy  : 6.4125e-08 J
+  → Fracture energy : 3.7690e-05 J
+  → Total energy    : 3.7754e-05 J
 
 
 ## Step 126/401: t = 3.12e-01 s | LHR = 0.00e+00 W/m
@@ -11580,18 +10295,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 76132550.33557048 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.75e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.180e-03
+  ||Δu||/||u|| = 7.691e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.715e-02
+  ||ΔD||/||D|| = 4.306e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.378e-04
+  |ΔD|_∞ = 1.334e-03
 
 Convergence check
 
@@ -11602,26 +10316,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 76132550.33557048 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.75e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.900e-17
+  ||ΔD||/||D|| = 3.628e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.041e-17
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3074e-06 J
-  → Fracture energy : 6.6115e-09 J
-  → Total energy    : 1.3140e-06 J
+  → Elastic energy  : 6.4928e-08 J
+  → Fracture energy : 3.7690e-05 J
+  → Total energy    : 3.7755e-05 J
 
 
 ## Step 127/401: t = 3.15e-01 s | LHR = 0.00e+00 W/m
@@ -11656,18 +10369,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 76741610.73825505 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.78e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.120e-03
+  ||Δu||/||u|| = 7.638e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.704e-02
+  ||ΔD||/||D|| = 4.434e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.423e-04
+  |ΔD|_∞ = 1.575e-03
 
 Convergence check
 
@@ -11678,26 +10390,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 76741610.73825505 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.78e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.529e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.391e-15
+  ||ΔD||/||D|| = 9.177e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.769e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3287e-06 J
-  → Fracture energy : 6.8381e-09 J
-  → Total energy    : 1.3355e-06 J
+  → Elastic energy  : 6.5733e-08 J
+  → Fracture energy : 3.7691e-05 J
+  → Total energy    : 3.7756e-05 J
 
 
 ## Step 128/401: t = 3.18e-01 s | LHR = 0.00e+00 W/m
@@ -11732,18 +10443,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 77350671.14093961 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.81e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.059e-03
+  ||Δu||/||u|| = 7.572e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.692e-02
+  ||ΔD||/||D|| = 4.694e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.470e-04
+  |ΔD|_∞ = 1.826e-03
 
 Convergence check
 
@@ -11754,26 +10464,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 77350671.14093961 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.81e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.615e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.345e-14
+  ||ΔD||/||D|| = 8.057e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.027e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3502e-06 J
-  → Fracture energy : 7.0708e-09 J
-  → Total energy    : 1.3573e-06 J
+  → Elastic energy  : 6.6533e-08 J
+  → Fracture energy : 3.7691e-05 J
+  → Total energy    : 3.7758e-05 J
 
 
 ## Step 129/401: t = 3.20e-01 s | LHR = 0.00e+00 W/m
@@ -11808,18 +10517,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 77959731.54362418 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.84e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.000e-03
+  ||Δu||/||u|| = 7.557e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.675e-02
+  ||ΔD||/||D|| = 4.823e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.513e-04
+  |ΔD|_∞ = 1.607e-03
 
 Convergence check
 
@@ -11830,26 +10538,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 77959731.54362418 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.84e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.076e-17
+  ||ΔD||/||D|| = 4.776e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.041e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3719e-06 J
-  → Fracture energy : 7.3095e-09 J
-  → Total energy    : 1.3792e-06 J
+  → Elastic energy  : 6.7319e-08 J
+  → Fracture energy : 3.7691e-05 J
+  → Total energy    : 3.7759e-05 J
 
 
 ## Step 130/401: t = 3.23e-01 s | LHR = 0.00e+00 W/m
@@ -11884,18 +10591,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 78568791.94630875 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.87e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.940e-03
+  ||Δu||/||u|| = 7.544e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.677e-02
+  ||ΔD||/||D|| = 4.655e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.567e-04
+  |ΔD|_∞ = 1.314e-03
 
 Convergence check
 
@@ -11906,26 +10612,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 78568791.94630875 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.87e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.619e-17
+  ||ΔD||/||D|| = 8.165e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.3937e-06 J
-  → Fracture energy : 7.5551e-09 J
-  → Total energy    : 1.4013e-06 J
+  → Elastic energy  : 6.8109e-08 J
+  → Fracture energy : 3.7692e-05 J
+  → Total energy    : 3.7760e-05 J
 
 
 ## Step 131/401: t = 3.25e-01 s | LHR = 0.00e+00 W/m
@@ -11960,18 +10665,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 79177852.3489933 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.884e-03
+  ||Δu||/||u|| = 7.436e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.654e-02
+  ||ΔD||/||D|| = 4.470e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.608e-04
+  |ΔD|_∞ = 1.410e-03
 
 Convergence check
 
@@ -11982,26 +10686,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 79177852.3489933 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 1.139e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4158e-06 J
-  → Fracture energy : 7.8067e-09 J
-  → Total energy    : 1.4236e-06 J
+  → Elastic energy  : 6.8920e-08 J
+  → Fracture energy : 3.7692e-05 J
+  → Total energy    : 3.7761e-05 J
 
 
 ## Step 132/401: t = 3.28e-01 s | LHR = 0.00e+00 W/m
@@ -12036,18 +10739,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 79786912.75167787 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.93e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.826e-03
+  ||Δu||/||u|| = 7.370e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.643e-02
+  ||ΔD||/||D|| = 4.187e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.655e-04
+  |ΔD|_∞ = 1.036e-03
 
 Convergence check
 
@@ -12058,26 +10760,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 79786912.75167787 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.93e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 7.374e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4380e-06 J
-  → Fracture energy : 8.0648e-09 J
-  → Total energy    : 1.4460e-06 J
+  → Elastic energy  : 6.9748e-08 J
+  → Fracture energy : 3.7692e-05 J
+  → Total energy    : 3.7762e-05 J
 
 
 ## Step 133/401: t = 3.30e-01 s | LHR = 0.00e+00 W/m
@@ -12112,18 +10813,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 80395973.15436244 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.96e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.770e-03
+  ||Δu||/||u|| = 7.277e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.633e-02
+  ||ΔD||/||D|| = 4.043e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.704e-04
+  |ΔD|_∞ = 1.048e-03
 
 Convergence check
 
@@ -12134,26 +10834,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 80395973.15436244 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.96e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.275e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.579e-15
+  ||ΔD||/||D|| = 7.609e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.835e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4604e-06 J
-  → Fracture energy : 8.3298e-09 J
-  → Total energy    : 1.4687e-06 J
+  → Elastic energy  : 7.0599e-08 J
+  → Fracture energy : 3.7693e-05 J
+  → Total energy    : 3.7763e-05 J
 
 
 ## Step 134/401: t = 3.33e-01 s | LHR = 0.00e+00 W/m
@@ -12188,18 +10887,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 81005033.557047 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.99e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.715e-03
+  ||Δu||/||u|| = 7.204e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.623e-02
+  ||ΔD||/||D|| = 4.071e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.752e-04
+  |ΔD|_∞ = 9.932e-04
 
 Convergence check
 
@@ -12210,26 +10908,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 81005033.557047 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 3.99e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.686e-23
+  ||ΔD||/||D|| = 4.866e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.647e-23
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4830e-06 J
-  → Fracture energy : 8.6016e-09 J
-  → Total energy    : 1.4916e-06 J
+  → Elastic energy  : 7.1461e-08 J
+  → Fracture energy : 3.7693e-05 J
+  → Total energy    : 3.7764e-05 J
 
 
 ## Step 135/401: t = 3.35e-01 s | LHR = 0.00e+00 W/m
@@ -12264,18 +10961,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 81614093.95973156 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.02e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.661e-03
+  ||Δu||/||u|| = 7.152e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.613e-02
+  ||ΔD||/||D|| = 4.157e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.801e-04
+  |ΔD|_∞ = 9.672e-04
 
 Convergence check
 
@@ -12286,26 +10982,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 81614093.95973156 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.02e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.436e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.390e-14
+  ||ΔD||/||D|| = 8.634e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.945e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5057e-06 J
-  → Fracture energy : 8.8804e-09 J
-  → Total energy    : 1.5146e-06 J
+  → Elastic energy  : 7.2324e-08 J
+  → Fracture energy : 3.7693e-05 J
+  → Total energy    : 3.7766e-05 J
 
 
 ## Step 136/401: t = 3.38e-01 s | LHR = 0.00e+00 W/m
@@ -12340,18 +11035,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 82223154.36241612 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.05e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.608e-03
+  ||Δu||/||u|| = 7.101e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.604e-02
+  ||ΔD||/||D|| = 4.250e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.851e-04
+  |ΔD|_∞ = 9.411e-04
 
 Convergence check
 
@@ -12362,26 +11056,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 82223154.36241612 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.05e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.632e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.341e-15
+  ||ΔD||/||D|| = 8.637e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.239e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5287e-06 J
-  → Fracture energy : 9.1665e-09 J
-  → Total energy    : 1.5378e-06 J
+  → Elastic energy  : 7.3189e-08 J
+  → Fracture energy : 3.7694e-05 J
+  → Total energy    : 3.7767e-05 J
 
 
 ## Step 137/401: t = 3.40e-01 s | LHR = 0.00e+00 W/m
@@ -12416,18 +11109,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 82832214.76510069 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.08e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.555e-03
+  ||Δu||/||u|| = 7.052e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.594e-02
+  ||ΔD||/||D|| = 4.358e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.901e-04
+  |ΔD|_∞ = 1.275e-03
 
 Convergence check
 
@@ -12438,26 +11130,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 82832214.76510069 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.08e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.025e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.686e-16
+  ||ΔD||/||D|| = 1.463e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.021e-17
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5518e-06 J
-  → Fracture energy : 9.4599e-09 J
-  → Total energy    : 1.5613e-06 J
+  → Elastic energy  : 7.4056e-08 J
+  → Fracture energy : 3.7694e-05 J
+  → Total energy    : 3.7768e-05 J
 
 
 ## Step 138/401: t = 3.43e-01 s | LHR = 0.00e+00 W/m
@@ -12492,18 +11183,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 83441275.16778526 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.11e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.504e-03
+  ||Δu||/||u|| = 7.003e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.585e-02
+  ||ΔD||/||D|| = 4.557e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.951e-04
+  |ΔD|_∞ = 1.701e-03
 
 Convergence check
 
@@ -12514,26 +11204,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 83441275.16778526 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.11e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.380e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.496e-14
+  ||ΔD||/||D|| = 5.043e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.121e-15
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5751e-06 J
-  → Fracture energy : 9.7607e-09 J
-  → Total energy    : 1.5849e-06 J
+  → Elastic energy  : 7.4920e-08 J
+  → Fracture energy : 3.7694e-05 J
+  → Total energy    : 3.7769e-05 J
 
 
 ## Step 139/401: t = 3.45e-01 s | LHR = 0.00e+00 W/m
@@ -12568,18 +11257,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 84050335.57046981 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.14e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.453e-03
+  ||Δu||/||u|| = 6.987e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.576e-02
+  ||ΔD||/||D|| = 4.601e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.002e-04
+  |ΔD|_∞ = 1.501e-03
 
 Convergence check
 
@@ -12590,26 +11278,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 84050335.57046981 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.14e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.955e-18
+  ||ΔD||/||D|| = 6.069e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5986e-06 J
-  → Fracture energy : 1.0069e-08 J
-  → Total energy    : 1.6087e-06 J
+  → Elastic energy  : 7.5780e-08 J
+  → Fracture energy : 3.7695e-05 J
+  → Total energy    : 3.7770e-05 J
 
 
 ## Step 140/401: t = 3.48e-01 s | LHR = 0.00e+00 W/m
@@ -12644,18 +11331,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 84659395.97315438 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.17e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.403e-03
+  ||Δu||/||u|| = 6.960e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.567e-02
+  ||ΔD||/||D|| = 4.524e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.053e-04
+  |ΔD|_∞ = 1.767e-03
 
 Convergence check
 
@@ -12666,26 +11352,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 84659395.97315438 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.17e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.973e-25
+  ||ΔD||/||D|| = 7.492e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.755e-26
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6223e-06 J
-  → Fracture energy : 1.0385e-08 J
-  → Total energy    : 1.6327e-06 J
+  → Elastic energy  : 7.6650e-08 J
+  → Fracture energy : 3.7695e-05 J
+  → Total energy    : 3.7772e-05 J
 
 
 ## Step 141/401: t = 3.50e-01 s | LHR = 0.00e+00 W/m
@@ -12720,18 +11405,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 85268456.37583895 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.2e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.354e-03
+  ||Δu||/||u|| = 6.862e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.558e-02
+  ||ΔD||/||D|| = 4.604e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.104e-04
+  |ΔD|_∞ = 1.688e-03
 
 Convergence check
 
@@ -12742,26 +11426,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 85268456.37583895 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.2e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.786e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.853e-14
+  ||ΔD||/||D|| = 8.634e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.318e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6462e-06 J
-  → Fracture energy : 1.0710e-08 J
-  → Total energy    : 1.6569e-06 J
+  → Elastic energy  : 7.7527e-08 J
+  → Fracture energy : 3.7695e-05 J
+  → Total energy    : 3.7773e-05 J
 
 
 ## Step 142/401: t = 3.52e-01 s | LHR = 0.00e+00 W/m
@@ -12796,18 +11479,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 85877516.7785235 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.23e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.305e-03
+  ||Δu||/||u|| = 6.830e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.550e-02
+  ||ΔD||/||D|| = 4.671e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.156e-04
+  |ΔD|_∞ = 1.696e-03
 
 Convergence check
 
@@ -12818,26 +11500,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 85877516.7785235 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.23e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.159e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.037e-16
+  ||ΔD||/||D|| = 8.110e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.857e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6702e-06 J
-  → Fracture energy : 1.1042e-08 J
-  → Total energy    : 1.6813e-06 J
+  → Elastic energy  : 7.8400e-08 J
+  → Fracture energy : 3.7696e-05 J
+  → Total energy    : 3.7774e-05 J
 
 
 ## Step 143/401: t = 3.55e-01 s | LHR = 0.00e+00 W/m
@@ -12872,18 +11553,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 86486577.18120807 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.26e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.257e-03
+  ||Δu||/||u|| = 6.776e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.541e-02
+  ||ΔD||/||D|| = 4.878e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.209e-04
+  |ΔD|_∞ = 1.708e-03
 
 Convergence check
 
@@ -12894,26 +11574,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 86486577.18120807 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.26e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.751e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.587e-17
+  ||ΔD||/||D|| = 8.480e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.082e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.6945e-06 J
-  → Fracture energy : 1.1383e-08 J
-  → Total energy    : 1.7058e-06 J
+  → Elastic energy  : 7.9267e-08 J
+  → Fracture energy : 3.7696e-05 J
+  → Total energy    : 3.7775e-05 J
 
 
 ## Step 144/401: t = 3.57e-01 s | LHR = 0.00e+00 W/m
@@ -12948,18 +11627,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 87095637.58389263 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.29e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.210e-03
+  ||Δu||/||u|| = 6.785e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.533e-02
+  ||ΔD||/||D|| = 4.900e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.261e-04
+  |ΔD|_∞ = 1.510e-03
 
 Convergence check
 
@@ -12970,26 +11648,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 87095637.58389263 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.29e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.431e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.283e-15
+  ||ΔD||/||D|| = 1.104e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.437e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7189e-06 J
-  → Fracture energy : 1.1732e-08 J
-  → Total energy    : 1.7306e-06 J
+  → Elastic energy  : 8.0126e-08 J
+  → Fracture energy : 3.7696e-05 J
+  → Total energy    : 3.7776e-05 J
 
 
 ## Step 145/401: t = 3.60e-01 s | LHR = 0.00e+00 W/m
@@ -13024,18 +11701,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 87704697.9865772 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.32e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.164e-03
+  ||Δu||/||u|| = 6.728e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.525e-02
+  ||ΔD||/||D|| = 4.911e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.315e-04
+  |ΔD|_∞ = 1.924e-03
 
 Convergence check
 
@@ -13046,26 +11722,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 87704697.9865772 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.32e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.220e-17
+  ||ΔD||/||D|| = 1.158e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7435e-06 J
-  → Fracture energy : 1.2089e-08 J
-  → Total energy    : 1.7556e-06 J
+  → Elastic energy  : 8.0997e-08 J
+  → Fracture energy : 3.7697e-05 J
+  → Total energy    : 3.7778e-05 J
 
 
 ## Step 146/401: t = 3.62e-01 s | LHR = 0.00e+00 W/m
@@ -13100,18 +11775,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 88313758.38926177 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.35e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.118e-03
+  ||Δu||/||u|| = 6.657e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.517e-02
+  ||ΔD||/||D|| = 4.952e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.369e-04
+  |ΔD|_∞ = 1.993e-03
 
 Convergence check
 
@@ -13122,26 +11796,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 88313758.38926177 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.35e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.237e-26
+  ||ΔD||/||D|| = 8.819e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7683e-06 J
-  → Fracture energy : 1.2456e-08 J
-  → Total energy    : 1.7807e-06 J
+  → Elastic energy  : 8.1869e-08 J
+  → Fracture energy : 3.7697e-05 J
+  → Total energy    : 3.7779e-05 J
 
 
 ## Step 147/401: t = 3.65e-01 s | LHR = 0.00e+00 W/m
@@ -13176,18 +11849,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 88922818.79194632 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.38e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.073e-03
+  ||Δu||/||u|| = 6.679e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.514e-02
+  ||ΔD||/||D|| = 4.787e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.425e-04
+  |ΔD|_∞ = 1.584e-03
 
 Convergence check
 
@@ -13198,26 +11870,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 88922818.79194632 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.38e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.891e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.264e-17
+  ||ΔD||/||D|| = 8.531e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.082e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7933e-06 J
-  → Fracture energy : 1.2831e-08 J
-  → Total energy    : 1.8061e-06 J
+  → Elastic energy  : 8.2750e-08 J
+  → Fracture energy : 3.7697e-05 J
+  → Total energy    : 3.7780e-05 J
 
 
 ## Step 148/401: t = 3.67e-01 s | LHR = 0.00e+00 W/m
@@ -13252,18 +11923,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 89531879.19463089 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.41e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.031e-03
+  ||Δu||/||u|| = 6.548e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.506e-02
+  ||ΔD||/||D|| = 5.017e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.480e-04
+  |ΔD|_∞ = 1.885e-03
 
 Convergence check
 
@@ -13274,26 +11944,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 89531879.19463089 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.41e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 7.373e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8184e-06 J
-  → Fracture energy : 1.3216e-08 J
-  → Total energy    : 1.8317e-06 J
+  → Elastic energy  : 8.3645e-08 J
+  → Fracture energy : 3.7698e-05 J
+  → Total energy    : 3.7781e-05 J
 
 
 ## Step 149/401: t = 3.70e-01 s | LHR = 0.00e+00 W/m
@@ -13328,18 +11997,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 90140939.59731546 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.44e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.987e-03
+  ||Δu||/||u|| = 6.557e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.516e-02
+  ||ΔD||/||D|| = 5.188e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.565e-04
+  |ΔD|_∞ = 2.627e-03
 
 Convergence check
 
@@ -13350,26 +12018,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 90140939.59731546 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.44e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.523e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.445e-16
+  ||ΔD||/||D|| = 8.507e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.457e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8438e-06 J
-  → Fracture energy : 1.3612e-08 J
-  → Total energy    : 1.8574e-06 J
+  → Elastic energy  : 8.4524e-08 J
+  → Fracture energy : 3.7698e-05 J
+  → Total energy    : 3.7782e-05 J
 
 
 ## Step 150/401: t = 3.72e-01 s | LHR = 0.00e+00 W/m
@@ -13404,18 +12071,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 90750000.00000001 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.4699999999999997e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.946e-03
+  ||Δu||/||u|| = 6.578e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.488e-02
+  ||ΔD||/||D|| = 4.789e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.596e-04
+  |ΔD|_∞ = 2.334e-03
 
 Convergence check
 
@@ -13426,26 +12092,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 90750000.00000001 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.4699999999999997e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.876e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.427e-15
+  ||ΔD||/||D|| = 6.621e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.996e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8694e-06 J
-  → Fracture energy : 1.4016e-08 J
-  → Total energy    : 1.8834e-06 J
+  → Elastic energy  : 8.5394e-08 J
+  → Fracture energy : 3.7698e-05 J
+  → Total energy    : 3.7784e-05 J
 
 
 ## Step 151/401: t = 3.75e-01 s | LHR = 0.00e+00 W/m
@@ -13480,18 +12145,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 91359060.40268458 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.5e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.900e-03
+  ||Δu||/||u|| = 6.564e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.479e-02
+  ||ΔD||/||D|| = 4.222e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.647e-04
+  |ΔD|_∞ = 9.573e-04
 
 Convergence check
 
@@ -13502,26 +12166,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 91359060.40268458 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.5e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.614e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.013e-16
+  ||ΔD||/||D|| = 8.003e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8951e-06 J
-  → Fracture energy : 1.4429e-08 J
-  → Total energy    : 1.9095e-06 J
+  → Elastic energy  : 8.6306e-08 J
+  → Fracture energy : 3.7699e-05 J
+  → Total energy    : 3.7785e-05 J
 
 
 ## Step 152/401: t = 3.78e-01 s | LHR = 0.00e+00 W/m
@@ -13556,18 +12219,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 91968120.80536915 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.53e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.858e-03
+  ||Δu||/||u|| = 6.340e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.472e-02
+  ||ΔD||/||D|| = 4.265e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.703e-04
+  |ΔD|_∞ = 9.505e-04
 
 Convergence check
 
@@ -13578,26 +12240,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 91968120.80536915 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.53e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.623e-18
+  ||ΔD||/||D|| = 9.731e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9210e-06 J
-  → Fracture energy : 1.4852e-08 J
-  → Total energy    : 1.9359e-06 J
+  → Elastic energy  : 8.7254e-08 J
+  → Fracture energy : 3.7699e-05 J
+  → Total energy    : 3.7786e-05 J
 
 
 ## Step 153/401: t = 3.80e-01 s | LHR = 0.00e+00 W/m
@@ -13632,18 +12293,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 92577181.20805371 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.56e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.817e-03
+  ||Δu||/||u|| = 6.297e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.499e-02
+  ||ΔD||/||D|| = 4.401e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.637e-04
+  |ΔD|_∞ = 9.878e-04
 
 Convergence check
 
@@ -13654,26 +12314,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 92577181.20805371 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.56e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 6.487e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9471e-06 J
-  → Fracture energy : 1.5289e-08 J
-  → Total energy    : 1.9624e-06 J
+  → Elastic energy  : 8.8202e-08 J
+  → Fracture energy : 3.7699e-05 J
+  → Total energy    : 3.7787e-05 J
 
 
 ## Step 154/401: t = 3.83e-01 s | LHR = 0.00e+00 W/m
@@ -13708,18 +12367,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 93186241.61073828 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.59e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.783e-03
+  ||Δu||/||u|| = 6.258e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.461e-02
+  ||ΔD||/||D|| = 4.581e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.835e-04
+  |ΔD|_∞ = 1.213e-03
 
 Convergence check
 
@@ -13730,26 +12388,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 93186241.61073828 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.59e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.323e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.133e-14
+  ||ΔD||/||D|| = 5.996e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.221e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.9735e-06 J
-  → Fracture energy : 1.5733e-08 J
-  → Total energy    : 1.9892e-06 J
+  → Elastic energy  : 8.9146e-08 J
+  → Fracture energy : 3.7700e-05 J
+  → Total energy    : 3.7789e-05 J
 
 
 ## Step 155/401: t = 3.85e-01 s | LHR = 0.00e+00 W/m
@@ -13784,18 +12441,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 93795302.01342283 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.62e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.737e-03
+  ||Δu||/||u|| = 6.224e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.451e-02
+  ||ΔD||/||D|| = 4.872e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.880e-04
+  |ΔD|_∞ = 1.733e-03
 
 Convergence check
 
@@ -13806,26 +12462,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 93795302.01342283 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.62e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.905e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.785e-17
+  ||ΔD||/||D|| = 9.029e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.082e-17
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0000e-06 J
-  → Fracture energy : 1.6187e-08 J
-  → Total energy    : 2.0162e-06 J
+  → Elastic energy  : 9.0082e-08 J
+  → Fracture energy : 3.7700e-05 J
+  → Total energy    : 3.7790e-05 J
 
 
 ## Step 156/401: t = 3.88e-01 s | LHR = 0.00e+00 W/m
@@ -13860,18 +12515,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 94404362.4161074 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.65e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.697e-03
+  ||Δu||/||u|| = 6.194e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.450e-02
+  ||ΔD||/||D|| = 5.402e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.943e-04
+  |ΔD|_∞ = 1.869e-03
 
 Convergence check
 
@@ -13882,26 +12536,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 94404362.4161074 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.65e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.308e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.797e-15
+  ||ΔD||/||D|| = 9.029e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.621e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0267e-06 J
-  → Fracture energy : 1.6652e-08 J
-  → Total energy    : 2.0433e-06 J
+  → Elastic energy  : 9.1002e-08 J
+  → Fracture energy : 3.7700e-05 J
+  → Total energy    : 3.7791e-05 J
 
 
 ## Step 157/401: t = 3.90e-01 s | LHR = 0.00e+00 W/m
@@ -13936,18 +12589,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 95013422.81879197 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.68e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.659e-03
+  ||Δu||/||u|| = 6.196e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.438e-02
+  ||ΔD||/||D|| = 6.341e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.998e-04
+  |ΔD|_∞ = 2.118e-03
 
 Convergence check
 
@@ -13958,26 +12610,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 95013422.81879197 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.68e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.347e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.468e-14
+  ||ΔD||/||D|| = 9.418e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.769e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0535e-06 J
-  → Fracture energy : 1.7127e-08 J
-  → Total energy    : 2.0707e-06 J
+  → Elastic energy  : 9.1886e-08 J
+  → Fracture energy : 3.7701e-05 J
+  → Total energy    : 3.7793e-05 J
 
 
 ## Step 158/401: t = 3.93e-01 s | LHR = 0.00e+00 W/m
@@ -14012,18 +12663,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 95622483.22147653 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.71e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.620e-03
+  ||Δu||/||u|| = 6.198e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.431e-02
+  ||ΔD||/||D|| = 7.534e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.057e-04
+  |ΔD|_∞ = 2.897e-03
 
 Convergence check
 
@@ -14034,26 +12684,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 95622483.22147653 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.71e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.035e-17
+  ||ΔD||/||D|| = 1.096e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0806e-06 J
-  → Fracture energy : 1.7614e-08 J
-  → Total energy    : 2.0982e-06 J
+  → Elastic energy  : 9.2684e-08 J
+  → Fracture energy : 3.7701e-05 J
+  → Total energy    : 3.7794e-05 J
 
 
 ## Step 159/401: t = 3.95e-01 s | LHR = 0.00e+00 W/m
@@ -14088,18 +12737,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 96231543.6241611 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.74e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.582e-03
+  ||Δu||/||u|| = 6.616e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.425e-02
+  ||ΔD||/||D|| = 7.248e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.118e-04
+  |ΔD|_∞ = 3.675e-03
 
 Convergence check
 
@@ -14110,26 +12758,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 96231543.6241611 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.74e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.143e-17
+  ||ΔD||/||D|| = 6.620e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.776e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1079e-06 J
-  → Fracture energy : 1.8112e-08 J
-  → Total energy    : 2.1260e-06 J
+  → Elastic energy  : 9.3331e-08 J
+  → Fracture energy : 3.7702e-05 J
+  → Total energy    : 3.7795e-05 J
 
 
 ## Step 160/401: t = 3.98e-01 s | LHR = 0.00e+00 W/m
@@ -14164,18 +12811,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 96840604.02684566 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.77e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.545e-03
+  ||Δu||/||u|| = 6.704e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.419e-02
+  ||ΔD||/||D|| = 6.574e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.179e-04
+  |ΔD|_∞ = 3.827e-03
 
 Convergence check
 
@@ -14186,26 +12832,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 96840604.02684566 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.77e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.884e-18
+  ||ΔD||/||D|| = 1.072e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1353e-06 J
-  → Fracture energy : 1.8622e-08 J
-  → Total energy    : 2.1540e-06 J
+  → Elastic energy  : 9.4040e-08 J
+  → Fracture energy : 3.7702e-05 J
+  → Total energy    : 3.7796e-05 J
 
 
 ## Step 161/401: t = 4.00e-01 s | LHR = 0.00e+00 W/m
@@ -14240,18 +12885,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 97449664.42953022 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.8e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.508e-03
+  ||Δu||/||u|| = 6.687e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.412e-02
+  ||ΔD||/||D|| = 5.779e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.242e-04
+  |ΔD|_∞ = 2.139e-03
 
 Convergence check
 
@@ -14262,26 +12906,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 97449664.42953022 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.8e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.785e-25
+  ||ΔD||/||D|| = 1.021e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.654e-24
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1630e-06 J
-  → Fracture energy : 1.9143e-08 J
-  → Total energy    : 2.1821e-06 J
+  → Elastic energy  : 9.4811e-08 J
+  → Fracture energy : 3.7702e-05 J
+  → Total energy    : 3.7797e-05 J
 
 
 ## Step 162/401: t = 4.03e-01 s | LHR = 0.00e+00 W/m
@@ -14316,18 +12959,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 98058724.83221479 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.83e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.472e-03
+  ||Δu||/||u|| = 6.160e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.407e-02
+  ||ΔD||/||D|| = 6.336e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.304e-04
+  |ΔD|_∞ = 3.124e-03
 
 Convergence check
 
@@ -14338,26 +12980,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 98058724.83221479 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.83e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.853e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.082e-14
+  ||ΔD||/||D|| = 1.096e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.776e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1908e-06 J
-  → Fracture energy : 1.9676e-08 J
-  → Total energy    : 2.2105e-06 J
+  → Elastic energy  : 9.5671e-08 J
+  → Fracture energy : 3.7703e-05 J
+  → Total energy    : 3.7798e-05 J
 
 
 ## Step 163/401: t = 4.05e-01 s | LHR = 0.00e+00 W/m
@@ -14392,18 +13033,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 98667785.23489936 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.86e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.436e-03
+  ||Δu||/||u|| = 6.280e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.465e-02
+  ||ΔD||/||D|| = 6.946e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.820e-03
+  |ΔD|_∞ = 3.802e-03
 
 Convergence check
 
@@ -14414,26 +13054,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 98667785.23489936 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.86e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.486e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.252e-14
+  ||ΔD||/||D|| = 1.379e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.735e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2188e-06 J
-  → Fracture energy : 2.0242e-08 J
-  → Total energy    : 2.2390e-06 J
+  → Elastic energy  : 9.6474e-08 J
+  → Fracture energy : 3.7703e-05 J
+  → Total energy    : 3.7800e-05 J
 
 
 ## Step 164/401: t = 4.08e-01 s | LHR = 0.00e+00 W/m
@@ -14468,18 +13107,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 99276845.63758391 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.89e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.430e-03
+  ||Δu||/||u|| = 6.555e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.418e-02
+  ||ΔD||/||D|| = 6.964e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.580e-04
+  |ΔD|_∞ = 3.810e-03
 
 Convergence check
 
@@ -14490,26 +13128,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 99276845.63758391 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.89e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.026e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.566e-15
+  ||ΔD||/||D|| = 1.154e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.400e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2472e-06 J
-  → Fracture energy : 2.0806e-08 J
-  → Total energy    : 2.2680e-06 J
+  → Elastic energy  : 9.7217e-08 J
+  → Fracture energy : 3.7704e-05 J
+  → Total energy    : 3.7801e-05 J
 
 
 ## Step 165/401: t = 4.10e-01 s | LHR = 0.00e+00 W/m
@@ -14544,18 +13181,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 99885906.04026848 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.92e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.372e-03
+  ||Δu||/||u|| = 6.279e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.405e-02
+  ||ΔD||/||D|| = 7.031e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.539e-04
+  |ΔD|_∞ = 4.520e-03
 
 Convergence check
 
@@ -14566,26 +13202,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 99885906.04026848 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.92e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.688e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.915e-16
+  ||ΔD||/||D|| = 9.408e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.180e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.2756e-06 J
-  → Fracture energy : 2.1380e-08 J
-  → Total energy    : 2.2970e-06 J
+  → Elastic energy  : 9.7995e-08 J
+  → Fracture energy : 3.7704e-05 J
+  → Total energy    : 3.7802e-05 J
 
 
 ## Step 166/401: t = 4.13e-01 s | LHR = 0.00e+00 W/m
@@ -14620,18 +13255,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 100494966.44295304 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.95e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.336e-03
+  ||Δu||/||u|| = 6.423e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.385e-02
+  ||ΔD||/||D|| = 6.214e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.576e-04
+  |ΔD|_∞ = 3.340e-03
 
 Convergence check
 
@@ -14642,26 +13276,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 100494966.44295304 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.95e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.546e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.398e-14
+  ||ΔD||/||D|| = 8.580e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.124e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3043e-06 J
-  → Fracture energy : 2.1965e-08 J
-  → Total energy    : 2.3262e-06 J
+  → Elastic energy  : 9.8725e-08 J
+  → Fracture energy : 3.7704e-05 J
+  → Total energy    : 3.7803e-05 J
 
 
 ## Step 167/401: t = 4.15e-01 s | LHR = 0.00e+00 W/m
@@ -14696,18 +13329,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 101104026.8456376 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.98e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.299e-03
+  ||Δu||/||u|| = 6.241e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.379e-02
+  ||ΔD||/||D|| = 6.056e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.637e-04
+  |ΔD|_∞ = 4.425e-03
 
 Convergence check
 
@@ -14718,26 +13350,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 101104026.8456376 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 4.98e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.612e-18
+  ||ΔD||/||D|| = 1.055e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3331e-06 J
-  → Fracture energy : 2.2563e-08 J
-  → Total energy    : 2.3557e-06 J
+  → Elastic energy  : 9.9597e-08 J
+  → Fracture energy : 3.7705e-05 J
+  → Total energy    : 3.7804e-05 J
 
 
 ## Step 168/401: t = 4.17e-01 s | LHR = 0.00e+00 W/m
@@ -14772,18 +13403,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 101713087.24832217 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.01e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.265e-03
+  ||Δu||/||u|| = 6.088e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.386e-02
+  ||ΔD||/||D|| = 4.930e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.714e-04
+  |ΔD|_∞ = 2.089e-03
 
 Convergence check
 
@@ -14794,26 +13424,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 101713087.24832217 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.01e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.278e-17
+  ||ΔD||/||D|| = 8.477e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3621e-06 J
-  → Fracture energy : 2.3176e-08 J
-  → Total energy    : 2.3853e-06 J
+  → Elastic energy  : 1.0046e-07 J
+  → Fracture energy : 3.7705e-05 J
+  → Total energy    : 3.7805e-05 J
 
 
 ## Step 169/401: t = 4.20e-01 s | LHR = 0.00e+00 W/m
@@ -14848,18 +13477,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 102322147.65100673 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.04e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.235e-03
+  ||Δu||/||u|| = 5.838e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.376e-02
+  ||ΔD||/||D|| = 4.695e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.780e-04
+  |ΔD|_∞ = 2.012e-03
 
 Convergence check
 
@@ -14870,26 +13498,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 102322147.65100673 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.04e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.935e-17
+  ||ΔD||/||D|| = 1.080e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.082e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3914e-06 J
-  → Fracture energy : 2.3803e-08 J
-  → Total energy    : 2.4152e-06 J
+  → Elastic energy  : 1.0142e-07 J
+  → Fracture energy : 3.7705e-05 J
+  → Total energy    : 3.7807e-05 J
 
 
 ## Step 170/401: t = 4.22e-01 s | LHR = 0.00e+00 W/m
@@ -14924,18 +13551,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 102931208.0536913 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.07e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.202e-03
+  ||Δu||/||u|| = 5.727e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.377e-02
+  ||ΔD||/||D|| = 4.606e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.853e-04
+  |ΔD|_∞ = 1.596e-03
 
 Convergence check
 
@@ -14946,26 +13572,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 102931208.0536913 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.07e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.414e-17
+  ||ΔD||/||D|| = 8.373e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.4208e-06 J
-  → Fracture energy : 2.4445e-08 J
-  → Total energy    : 2.4452e-06 J
+  → Elastic energy  : 1.0242e-07 J
+  → Fracture energy : 3.7706e-05 J
+  → Total energy    : 3.7808e-05 J
 
 
 ## Step 171/401: t = 4.25e-01 s | LHR = 0.00e+00 W/m
@@ -15000,18 +13625,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 103540268.45637587 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.1e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.171e-03
+  ||Δu||/||u|| = 5.650e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.359e-02
+  ||ΔD||/||D|| = 4.713e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.914e-04
+  |ΔD|_∞ = 2.114e-03
 
 Convergence check
 
@@ -15022,26 +13646,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 103540268.45637587 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.1e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.451e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.306e-15
+  ||ΔD||/||D|| = 6.485e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.163e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.4504e-06 J
-  → Fracture energy : 2.5099e-08 J
-  → Total energy    : 2.4755e-06 J
+  → Elastic energy  : 1.0342e-07 J
+  → Fracture energy : 3.7706e-05 J
+  → Total energy    : 3.7809e-05 J
 
 
 ## Step 172/401: t = 4.27e-01 s | LHR = 0.00e+00 W/m
@@ -15076,18 +13699,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 104149328.85906042 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.13e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.137e-03
+  ||Δu||/||u|| = 5.654e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.353e-02
+  ||ΔD||/||D|| = 4.665e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.981e-04
+  |ΔD|_∞ = 1.628e-03
 
 Convergence check
 
@@ -15098,26 +13720,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 104149328.85906042 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.13e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.495e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.109e-14
+  ||ΔD||/||D|| = 9.361e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.263e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.4802e-06 J
-  → Fracture energy : 2.5768e-08 J
-  → Total energy    : 2.5060e-06 J
+  → Elastic energy  : 1.0442e-07 J
+  → Fracture energy : 3.7706e-05 J
+  → Total energy    : 3.7811e-05 J
 
 
 ## Step 173/401: t = 4.30e-01 s | LHR = 0.00e+00 W/m
@@ -15152,18 +13773,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 104758389.26174499 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.16e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.105e-03
+  ||Δu||/||u|| = 5.625e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.348e-02
+  ||ΔD||/||D|| = 4.544e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.052e-04
+  |ΔD|_∞ = 1.396e-03
 
 Convergence check
 
@@ -15174,26 +13794,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 104758389.26174499 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.16e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.971e-26
+  ||ΔD||/||D|| = 8.320e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5103e-06 J
-  → Fracture energy : 2.6452e-08 J
-  → Total energy    : 2.5367e-06 J
+  → Elastic energy  : 1.0543e-07 J
+  → Fracture energy : 3.7706e-05 J
+  → Total energy    : 3.7812e-05 J
 
 
 ## Step 174/401: t = 4.32e-01 s | LHR = 0.00e+00 W/m
@@ -15228,18 +13847,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 105367449.66442955 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.19e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.075e-03
+  ||Δu||/||u|| = 5.559e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.344e-02
+  ||ΔD||/||D|| = 4.474e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.124e-04
+  |ΔD|_∞ = 1.082e-03
 
 Convergence check
 
@@ -15250,26 +13868,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 105367449.66442955 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.19e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.291e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.046e-15
+  ||ΔD||/||D|| = 1.259e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.923e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5405e-06 J
-  → Fracture energy : 2.7151e-08 J
-  → Total energy    : 2.5676e-06 J
+  → Elastic energy  : 1.0645e-07 J
+  → Fracture energy : 3.7707e-05 J
+  → Total energy    : 3.7813e-05 J
 
 
 ## Step 175/401: t = 4.35e-01 s | LHR = 0.00e+00 W/m
@@ -15304,18 +13921,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 105976510.06711411 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.22e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.044e-03
+  ||Δu||/||u|| = 5.518e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.339e-02
+  ||ΔD||/||D|| = 4.474e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.197e-04
+  |ΔD|_∞ = 1.280e-03
 
 Convergence check
 
@@ -15326,26 +13942,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 105976510.06711411 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.22e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.749e-26
+  ||ΔD||/||D|| = 1.063e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.755e-26
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5709e-06 J
-  → Fracture energy : 2.7865e-08 J
-  → Total energy    : 2.5988e-06 J
+  → Elastic energy  : 1.0749e-07 J
+  → Fracture energy : 3.7707e-05 J
+  → Total energy    : 3.7815e-05 J
 
 
 ## Step 176/401: t = 4.38e-01 s | LHR = 0.00e+00 W/m
@@ -15380,18 +13995,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 106585570.46979868 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.25e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.015e-03
+  ||Δu||/||u|| = 5.487e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.335e-02
+  ||ΔD||/||D|| = 4.560e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.271e-04
+  |ΔD|_∞ = 1.175e-03
 
 Convergence check
 
@@ -15402,26 +14016,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 106585570.46979868 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.25e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.477e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.327e-18
+  ||ΔD||/||D|| = 1.004e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.082e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.6015e-06 J
-  → Fracture energy : 2.8596e-08 J
-  → Total energy    : 2.6301e-06 J
+  → Elastic energy  : 1.0853e-07 J
+  → Fracture energy : 3.7707e-05 J
+  → Total energy    : 3.7816e-05 J
 
 
 ## Step 177/401: t = 4.40e-01 s | LHR = 0.00e+00 W/m
@@ -15456,18 +14069,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 107194630.87248324 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.2799999999999996e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.985e-03
+  ||Δu||/||u|| = 5.462e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.330e-02
+  ||ΔD||/||D|| = 4.621e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.346e-04
+  |ΔD|_∞ = 1.157e-03
 
 Convergence check
 
@@ -15478,26 +14090,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 107194630.87248324 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.2799999999999996e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.104e-25
+  ||ΔD||/||D|| = 6.066e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.6323e-06 J
-  → Fracture energy : 2.9343e-08 J
-  → Total energy    : 2.6617e-06 J
+  → Elastic energy  : 1.0957e-07 J
+  → Fracture energy : 3.7708e-05 J
+  → Total energy    : 3.7817e-05 J
 
 
 ## Step 178/401: t = 4.43e-01 s | LHR = 0.00e+00 W/m
@@ -15532,18 +14143,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 107803691.27516781 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.31e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.956e-03
+  ||Δu||/||u|| = 5.430e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.326e-02
+  ||ΔD||/||D|| = 4.682e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.421e-04
+  |ΔD|_∞ = 1.297e-03
 
 Convergence check
 
@@ -15554,26 +14164,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 107803691.27516781 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.31e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 8.777e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.6634e-06 J
-  → Fracture energy : 3.0106e-08 J
-  → Total energy    : 2.6935e-06 J
+  → Elastic energy  : 1.1062e-07 J
+  → Fracture energy : 3.7708e-05 J
+  → Total energy    : 3.7819e-05 J
 
 
 ## Step 179/401: t = 4.45e-01 s | LHR = 0.00e+00 W/m
@@ -15608,18 +14217,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 108412751.67785238 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.34e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.927e-03
+  ||Δu||/||u|| = 5.409e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.322e-02
+  ||ΔD||/||D|| = 4.656e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.498e-04
+  |ΔD|_∞ = 1.500e-03
 
 Convergence check
 
@@ -15630,26 +14238,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 108412751.67785238 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.34e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.438e-17
+  ||ΔD||/||D|| = 8.629e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.6946e-06 J
-  → Fracture energy : 3.0886e-08 J
-  → Total energy    : 2.7255e-06 J
+  → Elastic energy  : 1.1166e-07 J
+  → Fracture energy : 3.7708e-05 J
+  → Total energy    : 3.7820e-05 J
 
 
 ## Step 180/401: t = 4.48e-01 s | LHR = 0.00e+00 W/m
@@ -15684,18 +14291,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 109021812.08053693 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.37e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.899e-03
+  ||Δu||/||u|| = 5.383e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.318e-02
+  ||ΔD||/||D|| = 4.549e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.576e-04
+  |ΔD|_∞ = 1.579e-03
 
 Convergence check
 
@@ -15706,26 +14312,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 109021812.08053693 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.37e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.793e-18
+  ||ΔD||/||D|| = 1.154e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-18
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.7260e-06 J
-  → Fracture energy : 3.1684e-08 J
-  → Total energy    : 2.7577e-06 J
+  → Elastic energy  : 1.1272e-07 J
+  → Fracture energy : 3.7709e-05 J
+  → Total energy    : 3.7821e-05 J
 
 
 ## Step 181/401: t = 4.50e-01 s | LHR = 0.00e+00 W/m
@@ -15760,18 +14365,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 109630872.4832215 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.4e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.871e-03
+  ||Δu||/||u|| = 5.358e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.314e-02
+  ||ΔD||/||D|| = 4.383e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.655e-04
+  |ΔD|_∞ = 9.502e-04
 
 Convergence check
 
@@ -15782,26 +14386,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 109630872.4832215 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.4e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.798e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.752e-14
+  ||ΔD||/||D|| = 1.718e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.165e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.7577e-06 J
-  → Fracture energy : 3.2499e-08 J
-  → Total energy    : 2.7902e-06 J
+  → Elastic energy  : 1.1379e-07 J
+  → Fracture energy : 3.7709e-05 J
+  → Total energy    : 3.7823e-05 J
 
 
 ## Step 182/401: t = 4.53e-01 s | LHR = 0.00e+00 W/m
@@ -15836,18 +14439,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 110239932.88590607 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.4299999999999997e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.844e-03
+  ||Δu||/||u|| = 5.292e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.310e-02
+  ||ΔD||/||D|| = 4.420e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.735e-04
+  |ΔD|_∞ = 9.855e-04
 
 Convergence check
 
@@ -15858,26 +14460,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 110239932.88590607 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.4299999999999997e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.292e-17
+  ||ΔD||/||D|| = 6.137e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.776e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.7895e-06 J
-  → Fracture energy : 3.3332e-08 J
-  → Total energy    : 2.8229e-06 J
+  → Elastic energy  : 1.1487e-07 J
+  → Fracture energy : 3.7709e-05 J
+  → Total energy    : 3.7824e-05 J
 
 
 ## Step 183/401: t = 4.55e-01 s | LHR = 0.00e+00 W/m
@@ -15912,18 +14513,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 110848993.28859062 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.46e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.817e-03
+  ||Δu||/||u|| = 5.264e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.306e-02
+  ||ΔD||/||D|| = 4.520e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.815e-04
+  |ΔD|_∞ = 1.062e-03
 
 Convergence check
 
@@ -15934,26 +14534,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 110848993.28859062 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.46e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.345e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.886e-15
+  ||ΔD||/||D|| = 5.377e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.841e-16
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.8216e-06 J
-  → Fracture energy : 3.4183e-08 J
-  → Total energy    : 2.8558e-06 J
+  → Elastic energy  : 1.1595e-07 J
+  → Fracture energy : 3.7709e-05 J
+  → Total energy    : 3.7825e-05 J
 
 
 ## Step 184/401: t = 4.58e-01 s | LHR = 0.00e+00 W/m
@@ -15988,18 +14587,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 111458053.6912752 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.49e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.790e-03
+  ||Δu||/||u|| = 5.241e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.303e-02
+  ||ΔD||/||D|| = 4.678e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.898e-04
+  |ΔD|_∞ = 1.363e-03
 
 Convergence check
 
@@ -16010,26 +14608,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 111458053.6912752 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.49e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.220e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.325e-15
+  ||ΔD||/||D|| = 6.814e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.453e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.8538e-06 J
-  → Fracture energy : 3.5053e-08 J
-  → Total energy    : 2.8889e-06 J
+  → Elastic energy  : 1.1703e-07 J
+  → Fracture energy : 3.7710e-05 J
+  → Total energy    : 3.7827e-05 J
 
 
 ## Step 185/401: t = 4.60e-01 s | LHR = 0.00e+00 W/m
@@ -16064,18 +14661,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 112067114.09395975 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.52e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.764e-03
+  ||Δu||/||u|| = 5.220e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.299e-02
+  ||ΔD||/||D|| = 5.055e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.981e-04
+  |ΔD|_∞ = 2.296e-03
 
 Convergence check
 
@@ -16086,26 +14682,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 112067114.09395975 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.52e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.119e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.744e-15
+  ||ΔD||/||D|| = 9.993e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.355e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.8863e-06 J
-  → Fracture energy : 3.5942e-08 J
-  → Total energy    : 2.9223e-06 J
+  → Elastic energy  : 1.1810e-07 J
+  → Fracture energy : 3.7710e-05 J
+  → Total energy    : 3.7828e-05 J
 
 
 ## Step 186/401: t = 4.63e-01 s | LHR = 0.00e+00 W/m
@@ -16140,18 +14735,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 112676174.49664432 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.55e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.738e-03
+  ||Δu||/||u|| = 5.195e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.296e-02
+  ||ΔD||/||D|| = 5.882e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.065e-04
+  |ΔD|_∞ = 3.554e-03
 
 Convergence check
 
@@ -16162,26 +14756,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 112676174.49664432 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.55e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.994e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.066e-17
+  ||ΔD||/||D|| = 8.679e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.082e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9190e-06 J
-  → Fracture energy : 3.6851e-08 J
-  → Total energy    : 2.9558e-06 J
+  → Elastic energy  : 1.1914e-07 J
+  → Fracture energy : 3.7710e-05 J
+  → Total energy    : 3.7829e-05 J
 
 
 ## Step 187/401: t = 4.65e-01 s | LHR = 0.00e+00 W/m
@@ -16216,18 +14809,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 113285234.89932889 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.58e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.712e-03
+  ||Δu||/||u|| = 5.343e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.292e-02
+  ||ΔD||/||D|| = 5.682e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.151e-04
+  |ΔD|_∞ = 2.831e-03
 
 Convergence check
 
@@ -16238,26 +14830,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 113285234.89932889 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.58e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.515e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.256e-16
+  ||ΔD||/||D|| = 1.012e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9519e-06 J
-  → Fracture energy : 3.7779e-08 J
-  → Total energy    : 2.9897e-06 J
+  → Elastic energy  : 1.2007e-07 J
+  → Fracture energy : 3.7711e-05 J
+  → Total energy    : 3.7831e-05 J
 
 
 ## Step 188/401: t = 4.68e-01 s | LHR = 0.00e+00 W/m
@@ -16292,18 +14883,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 113894295.30201344 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.61e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.687e-03
+  ||Δu||/||u|| = 5.586e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.289e-02
+  ||ΔD||/||D|| = 4.956e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.237e-04
+  |ΔD|_∞ = 2.008e-03
 
 Convergence check
 
@@ -16314,26 +14904,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 113894295.30201344 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.61e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.984e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.213e-15
+  ||ΔD||/||D|| = 7.661e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.274e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9850e-06 J
-  → Fracture energy : 3.8728e-08 J
-  → Total energy    : 3.0237e-06 J
+  → Elastic energy  : 1.2106e-07 J
+  → Fracture energy : 3.7711e-05 J
+  → Total energy    : 3.7832e-05 J
 
 
 ## Step 189/401: t = 4.70e-01 s | LHR = 0.00e+00 W/m
@@ -16368,18 +14957,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 114503355.70469801 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.64e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.662e-03
+  ||Δu||/||u|| = 5.102e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.286e-02
+  ||ΔD||/||D|| = 5.183e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.325e-04
+  |ΔD|_∞ = 2.427e-03
 
 Convergence check
 
@@ -16390,26 +14978,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 114503355.70469801 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.64e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.939e-17
+  ||ΔD||/||D|| = 6.137e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.0183e-06 J
-  → Fracture energy : 3.9697e-08 J
-  → Total energy    : 3.0580e-06 J
+  → Elastic energy  : 1.2215e-07 J
+  → Fracture energy : 3.7711e-05 J
+  → Total energy    : 3.7833e-05 J
 
 
 ## Step 190/401: t = 4.73e-01 s | LHR = 0.00e+00 W/m
@@ -16444,18 +15031,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 115112416.10738258 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.67e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.637e-03
+  ||Δu||/||u|| = 5.069e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.283e-02
+  ||ΔD||/||D|| = 5.973e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.415e-04
+  |ΔD|_∞ = 3.469e-03
 
 Convergence check
 
@@ -16466,26 +15052,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 115112416.10738258 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.67e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.717e-20
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.843e-18
+  ||ΔD||/||D|| = 1.515e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.0518e-06 J
-  → Fracture energy : 4.0688e-08 J
-  → Total energy    : 3.0925e-06 J
+  → Elastic energy  : 1.2322e-07 J
+  → Fracture energy : 3.7712e-05 J
+  → Total energy    : 3.7835e-05 J
 
 
 ## Step 191/401: t = 4.75e-01 s | LHR = 0.00e+00 W/m
@@ -16520,18 +15105,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 115721476.51006714 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.7e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.613e-03
+  ||Δu||/||u|| = 5.097e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.280e-02
+  ||ΔD||/||D|| = 6.745e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.505e-04
+  |ΔD|_∞ = 4.234e-03
 
 Convergence check
 
@@ -16542,26 +15126,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 115721476.51006714 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.7e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.697e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.381e-15
+  ||ΔD||/||D|| = 8.475e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.135e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.0856e-06 J
-  → Fracture energy : 4.1700e-08 J
-  → Total energy    : 3.1273e-06 J
+  → Elastic energy  : 1.2420e-07 J
+  → Fracture energy : 3.7712e-05 J
+  → Total energy    : 3.7836e-05 J
 
 
 ## Step 192/401: t = 4.78e-01 s | LHR = 0.00e+00 W/m
@@ -16596,18 +15179,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 116330536.9127517 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.73e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.589e-03
+  ||Δu||/||u|| = 5.614e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.277e-02
+  ||ΔD||/||D|| = 6.026e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.597e-04
+  |ΔD|_∞ = 2.071e-03
 
 Convergence check
 
@@ -16618,26 +15200,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 116330536.9127517 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.73e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.041e-26
+  ||ΔD||/||D|| = 1.012e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.1195e-06 J
-  → Fracture energy : 4.2734e-08 J
-  → Total energy    : 3.1622e-06 J
+  → Elastic energy  : 1.2505e-07 J
+  → Fracture energy : 3.7712e-05 J
+  → Total energy    : 3.7838e-05 J
 
 
 ## Step 193/401: t = 4.80e-01 s | LHR = 0.00e+00 W/m
@@ -16672,18 +15253,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 116939597.31543627 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.76e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.566e-03
+  ||Δu||/||u|| = 5.224e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.326e-02
+  ||ΔD||/||D|| = 5.528e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.640e-03
+  |ΔD|_∞ = 1.996e-03
 
 Convergence check
 
@@ -16694,26 +15274,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 116939597.31543627 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.76e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.930e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.066e-14
+  ||ΔD||/||D|| = 1.050e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.512e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.1536e-06 J
-  → Fracture energy : 4.3810e-08 J
-  → Total energy    : 3.1974e-06 J
+  → Elastic energy  : 1.2607e-07 J
+  → Fracture energy : 3.7713e-05 J
+  → Total energy    : 3.7839e-05 J
 
 
 ## Step 194/401: t = 4.82e-01 s | LHR = 0.00e+00 W/m
@@ -16748,18 +15327,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 117548657.71812083 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.79e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.561e-03
+  ||Δu||/||u|| = 5.101e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.281e-02
+  ||ΔD||/||D|| = 5.064e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.871e-04
+  |ΔD|_∞ = 1.981e-03
 
 Convergence check
 
@@ -16770,26 +15348,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 117548657.71812083 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.79e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.556e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.875e-14
+  ||ΔD||/||D|| = 1.364e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.165e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.1881e-06 J
-  → Fracture energy : 4.4895e-08 J
-  → Total energy    : 3.2330e-06 J
+  → Elastic energy  : 1.2715e-07 J
+  → Fracture energy : 3.7713e-05 J
+  → Total energy    : 3.7840e-05 J
 
 
 ## Step 195/401: t = 4.85e-01 s | LHR = 0.00e+00 W/m
@@ -16824,18 +15401,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 118157718.1208054 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.82e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.523e-03
+  ||Δu||/||u|| = 4.979e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.287e-02
+  ||ΔD||/||D|| = 4.920e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.068e-04
+  |ΔD|_∞ = 1.439e-03
 
 Convergence check
 
@@ -16846,26 +15422,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 118157718.1208054 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.82e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.538e-17
+  ||ΔD||/||D|| = 1.834e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.163e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.2227e-06 J
-  → Fracture energy : 4.6005e-08 J
-  → Total energy    : 3.2687e-06 J
+  → Elastic energy  : 1.2825e-07 J
+  → Fracture energy : 3.7713e-05 J
+  → Total energy    : 3.7842e-05 J
 
 
 ## Step 196/401: t = 4.87e-01 s | LHR = 0.00e+00 W/m
@@ -16900,18 +15475,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 118766778.52348995 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.85e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.503e-03
+  ||Δu||/||u|| = 4.936e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.270e-02
+  ||ΔD||/||D|| = 4.976e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.003e-04
+  |ΔD|_∞ = 1.530e-03
 
 Convergence check
 
@@ -16922,26 +15496,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 118766778.52348995 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.85e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.314e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.247e-14
+  ||ΔD||/||D|| = 6.940e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.817e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.2576e-06 J
-  → Fracture energy : 4.7135e-08 J
-  → Total energy    : 3.3047e-06 J
+  → Elastic energy  : 1.2937e-07 J
+  → Fracture energy : 3.7714e-05 J
+  → Total energy    : 3.7843e-05 J
 
 
 ## Step 197/401: t = 4.90e-01 s | LHR = 0.00e+00 W/m
@@ -16976,18 +15549,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 119375838.92617452 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.88e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.476e-03
+  ||Δu||/||u|| = 4.886e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.265e-02
+  ||ΔD||/||D|| = 5.328e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.089e-04
+  |ΔD|_∞ = 2.238e-03
 
 Convergence check
 
@@ -16998,26 +15570,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 119375838.92617452 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.88e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.932e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.934e-15
+  ||ΔD||/||D|| = 9.497e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.412e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.2926e-06 J
-  → Fracture energy : 4.8288e-08 J
-  → Total energy    : 3.3409e-06 J
+  → Elastic energy  : 1.3049e-07 J
+  → Fracture energy : 3.7714e-05 J
+  → Total energy    : 3.7845e-05 J
 
 
 ## Step 198/401: t = 4.92e-01 s | LHR = 0.00e+00 W/m
@@ -17052,18 +15623,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 119984899.32885909 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.91e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.454e-03
+  ||Δu||/||u|| = 4.874e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.309e-02
+  ||ΔD||/||D|| = 6.021e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.814e-03
+  |ΔD|_∞ = 3.442e-03
 
 Convergence check
 
@@ -17074,26 +15644,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 119984899.32885909 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.91e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.911e-17
+  ||ΔD||/||D|| = 1.771e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.163e-17
+  |ΔD|_∞ = 1.332e-15
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.3278e-06 J
-  → Fracture energy : 4.9492e-08 J
-  → Total energy    : 3.3773e-06 J
+  → Elastic energy  : 1.3158e-07 J
+  → Fracture energy : 3.7714e-05 J
+  → Total energy    : 3.7846e-05 J
 
 
 ## Step 199/401: t = 4.95e-01 s | LHR = 0.00e+00 W/m
@@ -17128,18 +15697,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 120593959.73154365 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.94e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.454e-03
+  ||Δu||/||u|| = 4.933e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.270e-02
+  ||ΔD||/||D|| = 6.329e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.438e-04
+  |ΔD|_∞ = 3.781e-03
 
 Convergence check
 
@@ -17150,26 +15718,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 120593959.73154365 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.94e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.176e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.159e-15
+  ||ΔD||/||D|| = 6.483e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.298e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.3635e-06 J
-  → Fracture energy : 5.0703e-08 J
-  → Total energy    : 3.4142e-06 J
+  → Elastic energy  : 1.3259e-07 J
+  → Fracture energy : 3.7715e-05 J
+  → Total energy    : 3.7847e-05 J
 
 
 ## Step 200/401: t = 4.97e-01 s | LHR = 0.00e+00 W/m
@@ -17204,18 +15771,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 121203020.13422821 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.97e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.414e-03
+  ||Δu||/||u|| = 5.433e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.260e-02
+  ||ΔD||/||D|| = 5.222e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.432e-04
+  |ΔD|_∞ = 1.606e-03
 
 Convergence check
 
@@ -17226,26 +15792,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 121203020.13422821 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 5.97e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.962e-20
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.260e-17
+  ||ΔD||/||D|| = 7.995e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.163e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.3992e-06 J
-  → Fracture energy : 5.1935e-08 J
-  → Total energy    : 3.4511e-06 J
+  → Elastic energy  : 1.3355e-07 J
+  → Fracture energy : 3.7715e-05 J
+  → Total energy    : 3.7849e-05 J
 
 
 ## Step 201/401: t = 5.00e-01 s | LHR = 0.00e+00 W/m
@@ -17280,18 +15845,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 121812080.53691278 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.391e-03
+  ||Δu||/||u|| = 4.868e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.257e-02
+  ||ΔD||/||D|| = 5.321e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.513e-04
+  |ΔD|_∞ = 2.307e-03
 
 Convergence check
 
@@ -17302,26 +15866,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 121812080.53691278 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.393e-26
+  ||ΔD||/||D|| = 6.876e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.4351e-06 J
-  → Fracture energy : 5.3192e-08 J
-  → Total energy    : 3.4883e-06 J
+  → Elastic energy  : 1.3467e-07 J
+  → Fracture energy : 3.7715e-05 J
+  → Total energy    : 3.7850e-05 J
 
 
 ## Step 202/401: t = 5.03e-01 s | LHR = 0.00e+00 W/m
@@ -17356,18 +15919,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 122421140.93959734 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.03e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.370e-03
+  ||Δu||/||u|| = 4.849e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.259e-02
+  ||ΔD||/||D|| = 5.311e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.619e-04
+  |ΔD|_∞ = 2.176e-03
 
 Convergence check
 
@@ -17378,26 +15940,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 122421140.93959734 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.03e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.519e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.646e-14
+  ||ΔD||/||D|| = 7.544e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.193e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.4713e-06 J
-  → Fracture energy : 5.4479e-08 J
-  → Total energy    : 3.5258e-06 J
+  → Elastic energy  : 1.3576e-07 J
+  → Fracture energy : 3.7716e-05 J
+  → Total energy    : 3.7852e-05 J
 
 
 ## Step 203/401: t = 5.05e-01 s | LHR = 0.00e+00 W/m
@@ -17432,18 +15993,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 123030201.34228191 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.06e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.351e-03
+  ||Δu||/||u|| = 4.927e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.253e-02
+  ||ΔD||/||D|| = 4.681e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.724e-04
+  |ΔD|_∞ = 1.044e-03
 
 Convergence check
 
@@ -17454,26 +16014,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 123030201.34228191 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.06e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.053e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.958e-15
+  ||ΔD||/||D|| = 5.210e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.804e-15
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.5077e-06 J
-  → Fracture energy : 5.5792e-08 J
-  → Total energy    : 3.5635e-06 J
+  → Elastic energy  : 1.3688e-07 J
+  → Fracture energy : 3.7716e-05 J
+  → Total energy    : 3.7853e-05 J
 
 
 ## Step 204/401: t = 5.08e-01 s | LHR = 0.00e+00 W/m
@@ -17508,18 +16067,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 123639261.74496646 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.09e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.330e-03
+  ||Δu||/||u|| = 4.741e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.251e-02
+  ||ΔD||/||D|| = 4.479e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.835e-04
+  |ΔD|_∞ = 1.105e-03
 
 Convergence check
 
@@ -17530,26 +16088,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 123639261.74496646 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.09e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.983e-17
+  ||ΔD||/||D|| = 8.827e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.163e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.5443e-06 J
-  → Fracture energy : 5.7134e-08 J
-  → Total energy    : 3.6014e-06 J
+  → Elastic energy  : 1.3805e-07 J
+  → Fracture energy : 3.7716e-05 J
+  → Total energy    : 3.7854e-05 J
 
 
 ## Step 205/401: t = 5.10e-01 s | LHR = 0.00e+00 W/m
@@ -17584,18 +16141,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 124248322.14765103 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.12e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.310e-03
+  ||Δu||/||u|| = 4.698e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.254e-02
+  ||ΔD||/||D|| = 4.522e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.952e-04
+  |ΔD|_∞ = 9.095e-04
 
 Convergence check
 
@@ -17606,26 +16162,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 124248322.14765103 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.12e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.116e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.429e-17
+  ||ΔD||/||D|| = 8.211e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.776e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.5811e-06 J
-  → Fracture energy : 5.8507e-08 J
-  → Total energy    : 3.6396e-06 J
+  → Elastic energy  : 1.3922e-07 J
+  → Fracture energy : 3.7717e-05 J
+  → Total energy    : 3.7856e-05 J
 
 
 ## Step 206/401: t = 5.12e-01 s | LHR = 0.00e+00 W/m
@@ -17660,18 +16215,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 124857382.5503356 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.15e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.292e-03
+  ||Δu||/||u|| = 4.671e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.264e-02
+  ||ΔD||/||D|| = 4.813e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.009e-03
+  |ΔD|_∞ = 1.266e-03
 
 Convergence check
 
@@ -17682,26 +16236,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 124857382.5503356 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.15e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.002e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.440e-15
+  ||ΔD||/||D|| = 9.679e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.412e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.6182e-06 J
-  → Fracture energy : 5.9914e-08 J
-  → Total energy    : 3.6781e-06 J
+  → Elastic energy  : 1.4040e-07 J
+  → Fracture energy : 3.7717e-05 J
+  → Total energy    : 3.7857e-05 J
 
 
 ## Step 207/401: t = 5.15e-01 s | LHR = 0.00e+00 W/m
@@ -17736,18 +16289,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 125466442.95302016 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.18e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.278e-03
+  ||Δu||/||u|| = 4.652e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.249e-02
+  ||ΔD||/||D|| = 5.376e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.019e-03
+  |ΔD|_∞ = 1.718e-03
 
 Convergence check
 
@@ -17758,26 +16310,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 125466442.95302016 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.18e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.165e-17
+  ||ΔD||/||D|| = 8.210e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.776e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.6555e-06 J
-  → Fracture energy : 6.1348e-08 J
-  → Total energy    : 3.7168e-06 J
+  → Elastic energy  : 1.4155e-07 J
+  → Fracture energy : 3.7717e-05 J
+  → Total energy    : 3.7859e-05 J
 
 
 ## Step 208/401: t = 5.17e-01 s | LHR = 0.00e+00 W/m
@@ -17812,18 +16363,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 126075503.35570472 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.21e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.253e-03
+  ||Δu||/||u|| = 4.675e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.251e-02
+  ||ΔD||/||D|| = 5.948e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.031e-03
+  |ΔD|_∞ = 2.151e-03
 
 Convergence check
 
@@ -17834,26 +16384,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 126075503.35570472 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.21e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 9.813e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.6930e-06 J
-  → Fracture energy : 6.2813e-08 J
-  → Total energy    : 3.7558e-06 J
+  → Elastic energy  : 1.4266e-07 J
+  → Fracture energy : 3.7718e-05 J
+  → Total energy    : 3.7860e-05 J
 
 
 ## Step 209/401: t = 5.20e-01 s | LHR = 0.00e+00 W/m
@@ -17888,18 +16437,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 126684563.7583893 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.24e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.238e-03
+  ||Δu||/||u|| = 4.749e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.245e-02
+  ||ΔD||/||D|| = 6.110e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.043e-03
+  |ΔD|_∞ = 1.884e-03
 
 Convergence check
 
@@ -17910,26 +16458,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 126684563.7583893 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.24e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.071e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.556e-15
+  ||ΔD||/||D|| = 1.279e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.499e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.7308e-06 J
-  → Fracture energy : 6.4309e-08 J
-  → Total energy    : 3.7951e-06 J
+  → Elastic energy  : 1.4374e-07 J
+  → Fracture energy : 3.7718e-05 J
+  → Total energy    : 3.7862e-05 J
 
 
 ## Step 210/401: t = 5.22e-01 s | LHR = 0.00e+00 W/m
@@ -17964,18 +16511,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 127293624.16107385 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.27e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.216e-03
+  ||Δu||/||u|| = 4.780e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.249e-02
+  ||ΔD||/||D|| = 6.016e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.056e-03
+  |ΔD|_∞ = 2.017e-03
 
 Convergence check
 
@@ -17986,26 +16532,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 127293624.16107385 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.27e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.672e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.647e-15
+  ||ΔD||/||D|| = 6.747e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.7688e-06 J
-  → Fracture energy : 6.5840e-08 J
-  → Total energy    : 3.8346e-06 J
+  → Elastic energy  : 1.4482e-07 J
+  → Fracture energy : 3.7719e-05 J
+  → Total energy    : 3.7863e-05 J
 
 
 ## Step 211/401: t = 5.25e-01 s | LHR = 0.00e+00 W/m
@@ -18040,18 +16585,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 127902684.56375842 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.201e-03
+  ||Δu||/||u|| = 4.835e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.253e-02
+  ||ΔD||/||D|| = 6.086e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.069e-03
+  |ΔD|_∞ = 1.989e-03
 
 Convergence check
 
@@ -18062,26 +16606,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 127902684.56375842 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.648e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.307e-14
+  ||ΔD||/||D|| = 1.195e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.429e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.8070e-06 J
-  → Fracture energy : 6.7407e-08 J
-  → Total energy    : 3.8744e-06 J
+  → Elastic energy  : 1.4591e-07 J
+  → Fracture energy : 3.7719e-05 J
+  → Total energy    : 3.7865e-05 J
 
 
 ## Step 212/401: t = 5.27e-01 s | LHR = 0.00e+00 W/m
@@ -18116,18 +16659,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 128511744.96644299 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.33e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.186e-03
+  ||Δu||/||u|| = 4.838e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.248e-02
+  ||ΔD||/||D|| = 6.678e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.082e-03
+  |ΔD|_∞ = 2.609e-03
 
 Convergence check
 
@@ -18138,26 +16680,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 128511744.96644299 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.33e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.870e-18
+  ||ΔD||/||D|| = 7.601e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.8455e-06 J
-  → Fracture energy : 6.9007e-08 J
-  → Total energy    : 3.9145e-06 J
+  → Elastic energy  : 1.4697e-07 J
+  → Fracture energy : 3.7719e-05 J
+  → Total energy    : 3.7866e-05 J
 
 
 ## Step 213/401: t = 5.30e-01 s | LHR = 0.00e+00 W/m
@@ -18192,18 +16733,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 129120805.36912754 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.36e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.166e-03
+  ||Δu||/||u|| = 5.151e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.242e-02
+  ||ΔD||/||D|| = 6.510e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.095e-03
+  |ΔD|_∞ = 2.568e-03
 
 Convergence check
 
@@ -18214,26 +16754,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 129120805.36912754 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.36e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.517e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.418e-15
+  ||ΔD||/||D|| = 6.414e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.523e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.8842e-06 J
-  → Fracture energy : 7.0640e-08 J
-  → Total energy    : 3.9549e-06 J
+  → Elastic energy  : 1.4797e-07 J
+  → Fracture energy : 3.7720e-05 J
+  → Total energy    : 3.7868e-05 J
 
 
 ## Step 214/401: t = 5.32e-01 s | LHR = 0.00e+00 W/m
@@ -18268,18 +16807,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 129729865.77181211 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.39e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.147e-03
+  ||Δu||/||u|| = 4.955e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.241e-02
+  ||ΔD||/||D|| = 5.731e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.108e-03
+  |ΔD|_∞ = 2.129e-03
 
 Convergence check
 
@@ -18290,26 +16828,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 129729865.77181211 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.39e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.956e-18
+  ||ΔD||/||D|| = 6.482e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.776e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.9232e-06 J
-  → Fracture energy : 7.2308e-08 J
-  → Total energy    : 3.9955e-06 J
+  → Elastic energy  : 1.4904e-07 J
+  → Fracture energy : 3.7720e-05 J
+  → Total energy    : 3.7869e-05 J
 
 
 ## Step 215/401: t = 5.35e-01 s | LHR = 0.00e+00 W/m
@@ -18344,18 +16881,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 130338926.17449667 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.42e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.130e-03
+  ||Δu||/||u|| = 4.691e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.245e-02
+  ||ΔD||/||D|| = 5.066e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.122e-03
+  |ΔD|_∞ = 1.270e-03
 
 Convergence check
 
@@ -18366,26 +16902,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 130338926.17449667 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.42e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.328e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.515e-15
+  ||ΔD||/||D|| = 1.612e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.078e-16
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.9623e-06 J
-  → Fracture energy : 7.4016e-08 J
-  → Total energy    : 4.0364e-06 J
+  → Elastic energy  : 1.5019e-07 J
+  → Fracture energy : 3.7720e-05 J
+  → Total energy    : 3.7871e-05 J
 
 
 ## Step 216/401: t = 5.37e-01 s | LHR = 0.00e+00 W/m
@@ -18420,18 +16955,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 130947986.57718123 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.45e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.116e-03
+  ||Δu||/||u|| = 4.498e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.241e-02
+  ||ΔD||/||D|| = 4.945e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.136e-03
+  |ΔD|_∞ = 1.408e-03
 
 Convergence check
 
@@ -18442,26 +16976,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 130947986.57718123 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.45e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.976e-24
+  ||ΔD||/||D|| = 8.949e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.926e-24
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.0018e-06 J
-  → Fracture energy : 7.5760e-08 J
-  → Total energy    : 4.0776e-06 J
+  → Elastic energy  : 1.5140e-07 J
+  → Fracture energy : 3.7721e-05 J
+  → Total energy    : 3.7872e-05 J
 
 
 ## Step 217/401: t = 5.40e-01 s | LHR = 0.00e+00 W/m
@@ -18496,18 +17029,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 131557046.9798658 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.48e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.098e-03
+  ||Δu||/||u|| = 4.453e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.245e-02
+  ||ΔD||/||D|| = 5.066e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.150e-03
+  |ΔD|_∞ = 1.941e-03
 
 Convergence check
 
@@ -18518,26 +17050,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 131557046.9798658 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.48e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.456e-18
+  ||ΔD||/||D|| = 1.897e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.0415e-06 J
-  → Fracture energy : 7.7544e-08 J
-  → Total energy    : 4.1190e-06 J
+  → Elastic energy  : 1.5260e-07 J
+  → Fracture energy : 3.7721e-05 J
+  → Total energy    : 3.7874e-05 J
 
 
 ## Step 218/401: t = 5.42e-01 s | LHR = 0.00e+00 W/m
@@ -18572,18 +17103,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 132166107.38255036 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.51e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.085e-03
+  ||Δu||/||u|| = 4.434e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.251e-02
+  ||ΔD||/||D|| = 5.430e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.166e-03
+  |ΔD|_∞ = 2.859e-03
 
 Convergence check
 
@@ -18594,26 +17124,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 132166107.38255036 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.51e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.004e-26
+  ||ΔD||/||D|| = 9.355e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.585e-26
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.0814e-06 J
-  → Fracture energy : 7.9372e-08 J
-  → Total energy    : 4.1607e-06 J
+  → Elastic energy  : 1.5380e-07 J
+  → Fracture energy : 3.7721e-05 J
+  → Total energy    : 3.7875e-05 J
 
 
 ## Step 219/401: t = 5.45e-01 s | LHR = 0.00e+00 W/m
@@ -18648,18 +17177,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 132775167.78523493 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.54e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.073e-03
+  ||Δu||/||u|| = 4.461e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.242e-02
+  ||ΔD||/||D|| = 5.516e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.180e-03
+  |ΔD|_∞ = 3.117e-03
 
 Convergence check
 
@@ -18670,26 +17198,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 132775167.78523493 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.54e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.160e-17
+  ||ΔD||/||D|| = 1.050e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.163e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.1216e-06 J
-  → Fracture energy : 8.1237e-08 J
-  → Total energy    : 4.2028e-06 J
+  → Elastic energy  : 1.5496e-07 J
+  → Fracture energy : 3.7722e-05 J
+  → Total energy    : 3.7877e-05 J
 
 
 ## Step 220/401: t = 5.47e-01 s | LHR = 0.00e+00 W/m
@@ -18724,18 +17251,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 133384228.1879195 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.57e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.053e-03
+  ||Δu||/||u|| = 4.701e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.246e-02
+  ||ΔD||/||D|| = 4.636e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.196e-03
+  |ΔD|_∞ = 1.133e-03
 
 Convergence check
 
@@ -18746,26 +17272,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 133384228.1879195 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.57e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.366e-17
+  ||ΔD||/||D|| = 2.015e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.1620e-06 J
-  → Fracture energy : 8.3145e-08 J
-  → Total energy    : 4.2451e-06 J
+  → Elastic energy  : 1.5612e-07 J
+  → Fracture energy : 3.7722e-05 J
+  → Total energy    : 3.7878e-05 J
 
 
 ## Step 221/401: t = 5.50e-01 s | LHR = 0.00e+00 W/m
@@ -18800,18 +17325,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 133993288.59060405 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.040e-03
+  ||Δu||/||u|| = 4.382e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.250e-02
+  ||ΔD||/||D|| = 4.605e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.212e-03
+  |ΔD|_∞ = 1.094e-03
 
 Convergence check
 
@@ -18822,26 +17346,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 133993288.59060405 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.930e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.879e-15
+  ||ΔD||/||D|| = 9.677e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.188e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.2027e-06 J
-  → Fracture energy : 8.5099e-08 J
-  → Total energy    : 4.2878e-06 J
+  → Elastic energy  : 1.5736e-07 J
+  → Fracture energy : 3.7722e-05 J
+  → Total energy    : 3.7880e-05 J
 
 
 ## Step 222/401: t = 5.52e-01 s | LHR = 0.00e+00 W/m
@@ -18876,18 +17399,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 134602348.9932886 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.63e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.028e-03
+  ||Δu||/||u|| = 4.354e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.248e-02
+  ||ΔD||/||D|| = 4.932e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.228e-03
+  |ΔD|_∞ = 1.323e-03
 
 Convergence check
 
@@ -18898,26 +17420,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 134602348.9932886 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.63e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.108e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.744e-15
+  ||ΔD||/||D|| = 1.445e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.2436e-06 J
-  → Fracture energy : 8.7097e-08 J
-  → Total energy    : 4.3307e-06 J
+  → Elastic energy  : 1.5860e-07 J
+  → Fracture energy : 3.7723e-05 J
+  → Total energy    : 3.7881e-05 J
 
 
 ## Step 223/401: t = 5.55e-01 s | LHR = 0.00e+00 W/m
@@ -18952,18 +17473,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 135211409.39597318 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.66e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.012e-03
+  ||Δu||/||u|| = 4.368e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.254e-02
+  ||ΔD||/||D|| = 5.147e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.245e-03
+  |ΔD|_∞ = 1.566e-03
 
 Convergence check
 
@@ -18974,26 +17494,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 135211409.39597318 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.66e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.748e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.661e-15
+  ||ΔD||/||D|| = 1.362e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.749e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.2848e-06 J
-  → Fracture energy : 8.9141e-08 J
-  → Total energy    : 4.3739e-06 J
+  → Elastic energy  : 1.5983e-07 J
+  → Fracture energy : 3.7723e-05 J
+  → Total energy    : 3.7883e-05 J
 
 
 ## Step 224/401: t = 5.57e-01 s | LHR = 0.00e+00 W/m
@@ -19028,18 +17547,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 135820469.79865775 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.69e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.002e-03
+  ||Δu||/||u|| = 4.373e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.250e-02
+  ||ΔD||/||D|| = 5.066e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.261e-03
+  |ΔD|_∞ = 1.513e-03
 
 Convergence check
 
@@ -19050,26 +17568,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 135820469.79865775 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.69e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.262e-17
+  ||ΔD||/||D|| = 1.413e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.3263e-06 J
-  → Fracture energy : 9.1230e-08 J
-  → Total energy    : 4.4175e-06 J
+  → Elastic energy  : 1.6105e-07 J
+  → Fracture energy : 3.7723e-05 J
+  → Total energy    : 3.7884e-05 J
 
 
 ## Step 225/401: t = 5.60e-01 s | LHR = 0.00e+00 W/m
@@ -19104,18 +17621,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 136429530.2013423 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.719999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.986e-03
+  ||Δu||/||u|| = 4.354e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.250e-02
+  ||ΔD||/||D|| = 4.886e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.279e-03
+  |ΔD|_∞ = 1.234e-03
 
 Convergence check
 
@@ -19126,26 +17642,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 136429530.2013423 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.719999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.873e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.594e-14
+  ||ΔD||/||D|| = 1.310e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.345e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.3680e-06 J
-  → Fracture energy : 9.3367e-08 J
-  → Total energy    : 4.4614e-06 J
+  → Elastic energy  : 1.6229e-07 J
+  → Fracture energy : 3.7723e-05 J
+  → Total energy    : 3.7886e-05 J
 
 
 ## Step 226/401: t = 5.62e-01 s | LHR = 0.00e+00 W/m
@@ -19180,18 +17695,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 137038590.60402688 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.75e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.972e-03
+  ||Δu||/||u|| = 4.298e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.246e-02
+  ||ΔD||/||D|| = 5.202e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.296e-03
+  |ΔD|_∞ = 1.930e-03
 
 Convergence check
 
@@ -19202,26 +17716,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 137038590.60402688 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.75e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.854e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.039e-14
+  ||ΔD||/||D|| = 1.571e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.053e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.4100e-06 J
-  → Fracture energy : 9.5550e-08 J
-  → Total energy    : 4.5055e-06 J
+  → Elastic energy  : 1.6354e-07 J
+  → Fracture energy : 3.7724e-05 J
+  → Total energy    : 3.7887e-05 J
 
 
 ## Step 227/401: t = 5.65e-01 s | LHR = 0.00e+00 W/m
@@ -19256,18 +17769,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 137647651.00671145 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.78e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.956e-03
+  ||Δu||/||u|| = 4.285e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.251e-02
+  ||ΔD||/||D|| = 6.001e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.314e-03
+  |ΔD|_∞ = 2.560e-03
 
 Convergence check
 
@@ -19278,26 +17790,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 137647651.00671145 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.78e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.655e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.485e-15
+  ||ΔD||/||D|| = 7.366e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.494e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.4522e-06 J
-  → Fracture energy : 9.7785e-08 J
-  → Total energy    : 4.5500e-06 J
+  → Elastic energy  : 1.6475e-07 J
+  → Fracture energy : 3.7724e-05 J
+  → Total energy    : 3.7889e-05 J
 
 
 ## Step 228/401: t = 5.68e-01 s | LHR = 0.00e+00 W/m
@@ -19332,18 +17843,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 138256711.409396 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.81e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.946e-03
+  ||Δu||/||u|| = 4.454e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.254e-02
+  ||ΔD||/||D|| = 5.765e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.333e-03
+  |ΔD|_∞ = 2.420e-03
 
 Convergence check
 
@@ -19354,26 +17864,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 138256711.409396 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.81e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.414e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.542e-16
+  ||ΔD||/||D|| = 5.990e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.714e-17
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.4947e-06 J
-  → Fracture energy : 1.0007e-07 J
-  → Total energy    : 4.5948e-06 J
+  → Elastic energy  : 1.6589e-07 J
+  → Fracture energy : 3.7724e-05 J
+  → Total energy    : 3.7890e-05 J
 
 
 ## Step 229/401: t = 5.70e-01 s | LHR = 0.00e+00 W/m
@@ -19408,18 +17917,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 138865771.81208056 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.84e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.934e-03
+  ||Δu||/||u|| = 4.533e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.298e-02
+  ||ΔD||/||D|| = 4.776e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.494e-03
+  |ΔD|_∞ = 1.591e-03
 
 Convergence check
 
@@ -19430,26 +17938,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 138865771.81208056 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.84e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.219e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.449e-15
+  ||ΔD||/||D|| = 1.060e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.188e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.5372e-06 J
-  → Fracture energy : 1.0251e-07 J
-  → Total energy    : 4.6397e-06 J
+  → Elastic energy  : 1.6709e-07 J
+  → Fracture energy : 3.7725e-05 J
+  → Total energy    : 3.7892e-05 J
 
 
 ## Step 230/401: t = 5.73e-01 s | LHR = 0.00e+00 W/m
@@ -19484,18 +17991,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 139474832.21476513 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.87e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.969e-03
+  ||Δu||/||u|| = 4.243e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.277e-02
+  ||ΔD||/||D|| = 4.684e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.426e-03
+  |ΔD|_∞ = 1.094e-03
 
 Convergence check
 
@@ -19506,26 +18012,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 139474832.21476513 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.87e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.270e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.529e-15
+  ||ΔD||/||D|| = 1.220e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.772e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.5807e-06 J
-  → Fracture energy : 1.0494e-07 J
-  → Total energy    : 4.6857e-06 J
+  → Elastic energy  : 1.6838e-07 J
+  → Fracture energy : 3.7725e-05 J
+  → Total energy    : 3.7893e-05 J
 
 
 ## Step 231/401: t = 5.75e-01 s | LHR = 0.00e+00 W/m
@@ -19560,18 +18065,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 140083892.6174497 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.923e-03
+  ||Δu||/||u|| = 4.199e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.262e-02
+  ||ΔD||/||D|| = 4.989e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.413e-03
+  |ΔD|_∞ = 1.701e-03
 
 Convergence check
 
@@ -19582,26 +18086,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 140083892.6174497 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.926e-17
+  ||ΔD||/||D|| = 7.599e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.6242e-06 J
-  → Fracture energy : 1.0741e-07 J
-  → Total energy    : 4.7316e-06 J
+  → Elastic energy  : 1.6966e-07 J
+  → Fracture energy : 3.7725e-05 J
+  → Total energy    : 3.7895e-05 J
 
 
 ## Step 232/401: t = 5.78e-01 s | LHR = 0.00e+00 W/m
@@ -19636,18 +18139,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 140692953.02013427 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.93e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.901e-03
+  ||Δu||/||u|| = 4.198e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.268e-02
+  ||ΔD||/||D|| = 5.428e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.422e-03
+  |ΔD|_∞ = 2.678e-03
 
 Convergence check
 
@@ -19658,26 +18160,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 140692953.02013427 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.93e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.400e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 1.216e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.6677e-06 J
-  → Fracture energy : 1.0993e-07 J
-  → Total energy    : 4.7777e-06 J
+  → Elastic energy  : 1.7093e-07 J
+  → Fracture energy : 3.7726e-05 J
+  → Total energy    : 3.7897e-05 J
 
 
 ## Step 233/401: t = 5.80e-01 s | LHR = 0.00e+00 W/m
@@ -19712,18 +18213,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 141302013.4228188 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.96e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.894e-03
+  ||Δu||/||u|| = 4.235e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.265e-02
+  ||ΔD||/||D|| = 5.426e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.439e-03
+  |ΔD|_∞ = 2.661e-03
 
 Convergence check
 
@@ -19734,26 +18234,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 141302013.4228188 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.96e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.120e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.508e-15
+  ||ΔD||/||D|| = 8.573e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.829e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.7117e-06 J
-  → Fracture energy : 1.1250e-07 J
-  → Total energy    : 4.8242e-06 J
+  → Elastic energy  : 1.7215e-07 J
+  → Fracture energy : 3.7726e-05 J
+  → Total energy    : 3.7898e-05 J
 
 
 ## Step 234/401: t = 5.83e-01 s | LHR = 0.00e+00 W/m
@@ -19788,18 +18287,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 141911073.82550338 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.99e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.881e-03
+  ||Δu||/||u|| = 4.393e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.267e-02
+  ||ΔD||/||D|| = 4.931e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.459e-03
+  |ΔD|_∞ = 1.701e-03
 
 Convergence check
 
@@ -19810,26 +18308,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 141911073.82550338 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 6.99e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.520e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.865e-16
+  ||ΔD||/||D|| = 1.560e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.7558e-06 J
-  → Fracture energy : 1.1514e-07 J
-  → Total energy    : 4.8710e-06 J
+  → Elastic energy  : 1.7339e-07 J
+  → Fracture energy : 3.7726e-05 J
+  → Total energy    : 3.7900e-05 J
 
 
 ## Step 235/401: t = 5.85e-01 s | LHR = 0.00e+00 W/m
@@ -19864,18 +18361,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 142520134.22818795 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.019999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.870e-03
+  ||Δu||/||u|| = 4.150e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.270e-02
+  ||ΔD||/||D|| = 5.044e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.481e-03
+  |ΔD|_∞ = 1.961e-03
 
 Convergence check
 
@@ -19886,26 +18382,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 142520134.22818795 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.019999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.393e-17
+  ||ΔD||/||D|| = 7.770e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.8003e-06 J
-  → Fracture energy : 1.1785e-07 J
-  → Total energy    : 4.9181e-06 J
+  → Elastic energy  : 1.7468e-07 J
+  → Fracture energy : 3.7727e-05 J
+  → Total energy    : 3.7901e-05 J
 
 
 ## Step 236/401: t = 5.88e-01 s | LHR = 0.00e+00 W/m
@@ -19940,18 +18435,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 143129194.63087252 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.05e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.862e-03
+  ||Δu||/||u|| = 4.179e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.278e-02
+  ||ΔD||/||D|| = 5.038e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.504e-03
+  |ΔD|_∞ = 1.748e-03
 
 Convergence check
 
@@ -19962,26 +18456,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 143129194.63087252 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.05e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 1.179e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.8450e-06 J
-  → Fracture energy : 1.2062e-07 J
-  → Total energy    : 4.9656e-06 J
+  → Elastic energy  : 1.7596e-07 J
+  → Fracture energy : 3.7727e-05 J
+  → Total energy    : 3.7903e-05 J
 
 
 ## Step 237/401: t = 5.90e-01 s | LHR = 0.00e+00 W/m
@@ -20016,18 +18509,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 143738255.0335571 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.08e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.855e-03
+  ||Δu||/||u|| = 4.122e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.284e-02
+  ||ΔD||/||D|| = 5.362e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.529e-03
+  |ΔD|_∞ = 2.546e-03
 
 Convergence check
 
@@ -20038,26 +18530,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 143738255.0335571 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.08e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.147e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.745e-14
+  ||ΔD||/||D|| = 2.034e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.469e-15
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.8900e-06 J
-  → Fracture energy : 1.2346e-07 J
-  → Total energy    : 5.0135e-06 J
+  → Elastic energy  : 1.7725e-07 J
+  → Fracture energy : 3.7727e-05 J
+  → Total energy    : 3.7904e-05 J
 
 
 ## Step 238/401: t = 5.93e-01 s | LHR = 0.00e+00 W/m
@@ -20092,18 +18583,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 144347315.43624163 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.11e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.848e-03
+  ||Δu||/||u|| = 4.169e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.277e-02
+  ||ΔD||/||D|| = 5.446e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-03
+  |ΔD|_∞ = 2.177e-03
 
 Convergence check
 
@@ -20114,26 +18604,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 144347315.43624163 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.11e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.470e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.751e-14
+  ||ΔD||/||D|| = 1.042e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.608e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.9355e-06 J
-  → Fracture energy : 1.2637e-07 J
-  → Total energy    : 5.0618e-06 J
+  → Elastic energy  : 1.7850e-07 J
+  → Fracture energy : 3.7728e-05 J
+  → Total energy    : 3.7906e-05 J
 
 
 ## Step 239/401: t = 5.95e-01 s | LHR = 0.00e+00 W/m
@@ -20168,18 +18657,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 144956375.8389262 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.14e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.832e-03
+  ||Δu||/||u|| = 4.229e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.288e-02
+  ||ΔD||/||D|| = 5.200e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.580e-03
+  |ΔD|_∞ = 2.375e-03
 
 Convergence check
 
@@ -20190,26 +18678,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 144956375.8389262 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.14e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.690e-17
+  ||ΔD||/||D|| = 1.342e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.9810e-06 J
-  → Fracture energy : 1.2935e-07 J
-  → Total energy    : 5.1104e-06 J
+  → Elastic energy  : 1.7977e-07 J
+  → Fracture energy : 3.7728e-05 J
+  → Total energy    : 3.7908e-05 J
 
 
 ## Step 240/401: t = 5.98e-01 s | LHR = 0.00e+00 W/m
@@ -20244,18 +18731,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 145565436.24161077 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.17e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.829e-03
+  ||Δu||/||u|| = 4.202e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.288e-02
+  ||ΔD||/||D|| = 4.702e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.606e-03
+  |ΔD|_∞ = 1.502e-03
 
 Convergence check
 
@@ -20266,26 +18752,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 145565436.24161077 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.17e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.666e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.262e-17
+  ||ΔD||/||D|| = 7.713e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.939e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.0270e-06 J
-  → Fracture energy : 1.3240e-07 J
-  → Total energy    : 5.1594e-06 J
+  → Elastic energy  : 1.8106e-07 J
+  → Fracture energy : 3.7728e-05 J
+  → Total energy    : 3.7909e-05 J
 
 
 ## Step 241/401: t = 6.00e-01 s | LHR = 0.00e+00 W/m
@@ -20320,18 +18805,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 146174496.64429533 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.2e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.819e-03
+  ||Δu||/||u|| = 4.066e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.288e-02
+  ||ΔD||/||D|| = 4.562e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.633e-03
+  |ΔD|_∞ = 1.646e-03
 
 Convergence check
 
@@ -20342,26 +18826,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 146174496.64429533 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.2e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.549e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.732e-15
+  ||ΔD||/||D|| = 1.168e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.582e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.0732e-06 J
-  → Fracture energy : 1.3553e-07 J
-  → Total energy    : 5.2088e-06 J
+  → Elastic energy  : 1.8240e-07 J
+  → Fracture energy : 3.7728e-05 J
+  → Total energy    : 3.7911e-05 J
 
 
 ## Step 242/401: t = 6.03e-01 s | LHR = 0.00e+00 W/m
@@ -20396,18 +18879,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 146783557.0469799 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.23e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.808e-03
+  ||Δu||/||u|| = 4.042e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.297e-02
+  ||ΔD||/||D|| = 4.490e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.661e-03
+  |ΔD|_∞ = 1.291e-03
 
 Convergence check
 
@@ -20418,26 +18900,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 146783557.0469799 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.23e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.161e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.276e-15
+  ||ΔD||/||D|| = 6.679e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.523e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.1197e-06 J
-  → Fracture energy : 1.3874e-07 J
-  → Total energy    : 5.2585e-06 J
+  → Elastic energy  : 1.8375e-07 J
+  → Fracture energy : 3.7729e-05 J
+  → Total energy    : 3.7912e-05 J
 
 
 ## Step 243/401: t = 6.05e-01 s | LHR = 0.00e+00 W/m
@@ -20472,18 +18953,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 147392617.44966447 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.26e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.805e-03
+  ||Δu||/||u|| = 4.014e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.297e-02
+  ||ΔD||/||D|| = 4.457e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.690e-03
+  |ΔD|_∞ = 9.831e-04
 
 Convergence check
 
@@ -20494,26 +18974,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 147392617.44966447 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.26e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.744e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.980e-15
+  ||ΔD||/||D|| = 1.025e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.772e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.1666e-06 J
-  → Fracture energy : 1.4203e-07 J
-  → Total energy    : 5.3086e-06 J
+  → Elastic energy  : 1.8511e-07 J
+  → Fracture energy : 3.7729e-05 J
+  → Total energy    : 3.7914e-05 J
 
 
 ## Step 244/401: t = 6.08e-01 s | LHR = 0.00e+00 W/m
@@ -20548,18 +19027,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 148001677.852349 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.29e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.795e-03
+  ||Δu||/||u|| = 3.974e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.332e-02
+  ||ΔD||/||D|| = 4.670e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.048e-03
+  |ΔD|_∞ = 1.298e-03
 
 Convergence check
 
@@ -20570,26 +19048,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 148001677.852349 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.29e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.264e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.688e-15
+  ||ΔD||/||D|| = 2.095e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.275e-15
+  |ΔD|_∞ = 8.882e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.2136e-06 J
-  → Fracture energy : 1.4543e-07 J
-  → Total energy    : 5.3590e-06 J
+  → Elastic energy  : 1.8647e-07 J
+  → Fracture energy : 3.7729e-05 J
+  → Total energy    : 3.7916e-05 J
 
 
 ## Step 245/401: t = 6.10e-01 s | LHR = 0.00e+00 W/m
@@ -20624,18 +19101,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 148610738.25503358 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.32e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.813e-03
+  ||Δu||/||u|| = 3.962e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.319e-02
+  ||ΔD||/||D|| = 5.027e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.753e-03
+  |ΔD|_∞ = 1.817e-03
 
 Convergence check
 
@@ -20646,26 +19122,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 148610738.25503358 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.32e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.084e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.115e-15
+  ||ΔD||/||D|| = 7.364e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.860e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.2613e-06 J
-  → Fracture energy : 1.4891e-07 J
-  → Total energy    : 5.4102e-06 J
+  → Elastic energy  : 1.8782e-07 J
+  → Fracture energy : 3.7729e-05 J
+  → Total energy    : 3.7917e-05 J
 
 
 ## Step 246/401: t = 6.13e-01 s | LHR = 0.00e+00 W/m
@@ -20700,18 +19175,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 149219798.65771815 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.35e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.791e-03
+  ||Δu||/||u|| = 3.985e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.333e-02
+  ||ΔD||/||D|| = 5.145e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.834e-03
+  |ΔD|_∞ = 1.729e-03
 
 Convergence check
 
@@ -20722,26 +19196,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 149219798.65771815 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.35e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.415e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.128e-14
+  ||ΔD||/||D|| = 1.226e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.470e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.3091e-06 J
-  → Fracture energy : 1.5250e-07 J
-  → Total energy    : 5.4616e-06 J
+  → Elastic energy  : 1.8915e-07 J
+  → Fracture energy : 3.7730e-05 J
+  → Total energy    : 3.7919e-05 J
 
 
 ## Step 247/401: t = 6.15e-01 s | LHR = 0.00e+00 W/m
@@ -20776,18 +19249,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 149828859.06040272 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.38e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.794e-03
+  ||Δu||/||u|| = 4.008e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.326e-02
+  ||ΔD||/||D|| = 5.017e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.821e-03
+  |ΔD|_∞ = 1.945e-03
 
 Convergence check
 
@@ -20798,26 +19270,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 149828859.06040272 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.38e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.874e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.480e-17
+  ||ΔD||/||D|| = 1.272e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.110e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.3574e-06 J
-  → Fracture energy : 1.5616e-07 J
-  → Total energy    : 5.5136e-06 J
+  → Elastic energy  : 1.9049e-07 J
+  → Fracture energy : 3.7730e-05 J
+  → Total energy    : 3.7921e-05 J
 
 
 ## Step 248/401: t = 6.18e-01 s | LHR = 0.00e+00 W/m
@@ -20852,18 +19323,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 150437919.4630873 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.41e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.778e-03
+  ||Δu||/||u|| = 3.941e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.329e-02
+  ||ΔD||/||D|| = 5.350e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.855e-03
+  |ΔD|_∞ = 2.912e-03
 
 Convergence check
 
@@ -20874,26 +19344,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 150437919.4630873 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.41e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.446e-26
+  ||ΔD||/||D|| = 8.045e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.755e-26
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.4059e-06 J
-  → Fracture energy : 1.5991e-07 J
-  → Total energy    : 5.5658e-06 J
+  → Elastic energy  : 1.9183e-07 J
+  → Fracture energy : 3.7730e-05 J
+  → Total energy    : 3.7922e-05 J
 
 
 ## Step 249/401: t = 6.20e-01 s | LHR = 0.00e+00 W/m
@@ -20928,18 +19397,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 151046979.86577183 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.44e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.771e-03
+  ||Δu||/||u|| = 4.014e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.338e-02
+  ||ΔD||/||D|| = 5.334e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.891e-03
+  |ΔD|_∞ = 2.465e-03
 
 Convergence check
 
@@ -20950,26 +19418,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 151046979.86577183 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.44e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.564e-18
+  ||ΔD||/||D|| = 1.122e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.4547e-06 J
-  → Fracture energy : 1.6377e-07 J
-  → Total energy    : 5.6184e-06 J
+  → Elastic energy  : 1.9313e-07 J
+  → Fracture energy : 3.7731e-05 J
+  → Total energy    : 3.7924e-05 J
 
 
 ## Step 250/401: t = 6.23e-01 s | LHR = 0.00e+00 W/m
@@ -21004,18 +19471,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 151656040.2684564 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.47e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.771e-03
+  ||Δu||/||u|| = 4.138e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.352e-02
+  ||ΔD||/||D|| = 4.961e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.929e-03
+  |ΔD|_∞ = 1.845e-03
 
 Convergence check
 
@@ -21026,26 +19492,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 151656040.2684564 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.47e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.338e-17
+  ||ΔD||/||D|| = 6.679e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.5038e-06 J
-  → Fracture energy : 1.6774e-07 J
-  → Total energy    : 5.6715e-06 J
+  → Elastic energy  : 1.9446e-07 J
+  → Fracture energy : 3.7731e-05 J
+  → Total energy    : 3.7925e-05 J
 
 
 ## Step 251/401: t = 6.25e-01 s | LHR = 0.00e+00 W/m
@@ -21080,18 +19545,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 152265100.67114097 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.5e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.774e-03
+  ||Δu||/||u|| = 3.943e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.361e-02
+  ||ΔD||/||D|| = 4.928e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.969e-03
+  |ΔD|_∞ = 1.503e-03
 
 Convergence check
 
@@ -21102,26 +19566,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 152265100.67114097 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.5e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.219e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.938e-26
+  ||ΔD||/||D|| = 9.258e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.5534e-06 J
-  → Fracture energy : 1.7183e-07 J
-  → Total energy    : 5.7252e-06 J
+  → Elastic energy  : 1.9583e-07 J
+  → Fracture energy : 3.7731e-05 J
+  → Total energy    : 3.7927e-05 J
 
 
 ## Step 252/401: t = 6.28e-01 s | LHR = 0.00e+00 W/m
@@ -21156,18 +19619,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 152874161.07382554 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.53e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.772e-03
+  ||Δu||/||u|| = 3.896e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.365e-02
+  ||ΔD||/||D|| = 5.209e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.010e-03
+  |ΔD|_∞ = 2.293e-03
 
 Convergence check
 
@@ -21178,26 +19640,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 152874161.07382554 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.53e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.017e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.614e-14
+  ||ΔD||/||D|| = 8.259e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.553e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.6033e-06 J
-  → Fracture energy : 1.7603e-07 J
-  → Total energy    : 5.7793e-06 J
+  → Elastic energy  : 1.9721e-07 J
+  → Fracture energy : 3.7731e-05 J
+  → Total energy    : 3.7929e-05 J
 
 
 ## Step 253/401: t = 6.30e-01 s | LHR = 0.00e+00 W/m
@@ -21232,18 +19693,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 153483221.4765101 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.56e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.767e-03
+  ||Δu||/||u|| = 3.850e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.428e-02
+  ||ΔD||/||D|| = 6.019e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.902e-03
+  |ΔD|_∞ = 3.151e-03
 
 Convergence check
 
@@ -21254,26 +19714,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 153483221.4765101 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.56e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.082e-17
+  ||ΔD||/||D|| = 1.187e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.6532e-06 J
-  → Fracture energy : 1.8044e-07 J
-  → Total energy    : 5.8336e-06 J
+  → Elastic energy  : 1.9855e-07 J
+  → Fracture energy : 3.7732e-05 J
+  → Total energy    : 3.7930e-05 J
 
 
 ## Step 254/401: t = 6.33e-01 s | LHR = 0.00e+00 W/m
@@ -21308,18 +19767,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 154092281.87919468 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.59e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.822e-03
+  ||Δu||/||u|| = 4.019e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.402e-02
+  ||ΔD||/||D|| = 6.198e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.110e-03
+  |ΔD|_∞ = 2.393e-03
 
 Convergence check
 
@@ -21330,26 +19788,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 154092281.87919468 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.59e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.134e-18
+  ||ΔD||/||D|| = 1.161e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.776e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.7045e-06 J
-  → Fracture energy : 1.8493e-07 J
-  → Total energy    : 5.8894e-06 J
+  → Elastic energy  : 1.9980e-07 J
+  → Fracture energy : 3.7732e-05 J
+  → Total energy    : 3.7932e-05 J
 
 
 ## Step 255/401: t = 6.35e-01 s | LHR = 0.00e+00 W/m
@@ -21384,18 +19841,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 154701342.28187922 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.62e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.782e-03
+  ||Δu||/||u|| = 3.939e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.404e-02
+  ||ΔD||/||D|| = 6.917e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.155e-03
+  |ΔD|_∞ = 3.561e-03
 
 Convergence check
 
@@ -21406,26 +19862,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 154701342.28187922 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.62e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.194e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.543e-15
+  ||ΔD||/||D|| = 9.210e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.582e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.7556e-06 J
-  → Fracture energy : 1.8953e-07 J
-  → Total energy    : 5.9451e-06 J
+  → Elastic energy  : 2.0108e-07 J
+  → Fracture energy : 3.7733e-05 J
+  → Total energy    : 3.7934e-05 J
 
 
 ## Step 256/401: t = 6.38e-01 s | LHR = 0.00e+00 W/m
@@ -21460,18 +19915,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 155310402.6845638 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.65e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.778e-03
+  ||Δu||/||u|| = 4.079e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.408e-02
+  ||ΔD||/||D|| = 6.515e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.202e-03
+  |ΔD|_∞ = 2.614e-03
 
 Convergence check
 
@@ -21482,26 +19936,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 155310402.6845638 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.65e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.663e-17
+  ||ΔD||/||D|| = 9.018e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.8071e-06 J
-  → Fracture energy : 1.9425e-07 J
-  → Total energy    : 6.0014e-06 J
+  → Elastic energy  : 2.0223e-07 J
+  → Fracture energy : 3.7733e-05 J
+  → Total energy    : 3.7935e-05 J
 
 
 ## Step 257/401: t = 6.40e-01 s | LHR = 0.00e+00 W/m
@@ -21536,18 +19989,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 155919463.08724836 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.68e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.773e-03
+  ||Δu||/||u|| = 4.337e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.417e-02
+  ||ΔD||/||D|| = 5.223e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.252e-03
+  |ΔD|_∞ = 1.227e-03
 
 Convergence check
 
@@ -21558,26 +20010,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 155919463.08724836 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.68e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.183e-17
+  ||ΔD||/||D|| = 7.304e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.8590e-06 J
-  → Fracture energy : 1.9912e-07 J
-  → Total energy    : 6.0581e-06 J
+  → Elastic energy  : 2.0348e-07 J
+  → Fracture energy : 3.7733e-05 J
+  → Total energy    : 3.7937e-05 J
 
 
 ## Step 258/401: t = 6.42e-01 s | LHR = 0.00e+00 W/m
@@ -21612,18 +20063,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 156528523.48993292 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.71e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.774e-03
+  ||Δu||/||u|| = 3.792e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.432e-02
+  ||ΔD||/||D|| = 4.988e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.306e-03
+  |ΔD|_∞ = 1.206e-03
 
 Convergence check
 
@@ -21634,26 +20084,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 156528523.48993292 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.71e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.063e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.570e-15
+  ||ΔD||/||D|| = 1.396e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.331e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.9112e-06 J
-  → Fracture energy : 2.0414e-07 J
-  → Total energy    : 6.1153e-06 J
+  → Elastic energy  : 2.0488e-07 J
+  → Fracture energy : 3.7734e-05 J
+  → Total energy    : 3.7938e-05 J
 
 
 ## Step 259/401: t = 6.45e-01 s | LHR = 0.00e+00 W/m
@@ -21688,18 +20137,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 157137583.8926175 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.74e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.782e-03
+  ||Δu||/||u|| = 3.749e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.442e-02
+  ||ΔD||/||D|| = 5.339e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.363e-03
+  |ΔD|_∞ = 1.770e-03
 
 Convergence check
 
@@ -21710,26 +20158,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 157137583.8926175 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.74e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.708e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.964e-17
+  ||ΔD||/||D|| = 9.398e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.9638e-06 J
-  → Fracture energy : 2.0931e-07 J
-  → Total energy    : 6.1732e-06 J
+  → Elastic energy  : 2.0628e-07 J
+  → Fracture energy : 3.7734e-05 J
+  → Total energy    : 3.7940e-05 J
 
 
 ## Step 260/401: t = 6.47e-01 s | LHR = 0.00e+00 W/m
@@ -21764,18 +20211,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 157746644.29530203 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.77e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.783e-03
+  ||Δu||/||u|| = 3.770e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.456e-02
+  ||ΔD||/||D|| = 5.705e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.424e-03
+  |ΔD|_∞ = 1.947e-03
 
 Convergence check
 
@@ -21786,26 +20232,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 157746644.29530203 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.77e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.364e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.663e-14
+  ||ΔD||/||D|| = 8.468e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.413e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.0169e-06 J
-  → Fracture energy : 2.1465e-07 J
-  → Total energy    : 6.2315e-06 J
+  → Elastic energy  : 2.0764e-07 J
+  → Fracture energy : 3.7734e-05 J
+  → Total energy    : 3.7942e-05 J
 
 
 ## Step 261/401: t = 6.50e-01 s | LHR = 0.00e+00 W/m
@@ -21840,18 +20285,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 158355704.6979866 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.8e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.788e-03
+  ||Δu||/||u|| = 3.844e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.471e-02
+  ||ΔD||/||D|| = 5.666e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.488e-03
+  |ΔD|_∞ = 1.908e-03
 
 Convergence check
 
@@ -21862,26 +20306,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 158355704.6979866 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.8e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.022e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.448e-16
+  ||ΔD||/||D|| = 8.772e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.388e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.0704e-06 J
-  → Fracture energy : 2.2017e-07 J
-  → Total energy    : 6.2906e-06 J
+  → Elastic energy  : 2.0900e-07 J
+  → Fracture energy : 3.7735e-05 J
+  → Total energy    : 3.7944e-05 J
 
 
 ## Step 262/401: t = 6.52e-01 s | LHR = 0.00e+00 W/m
@@ -21916,18 +20359,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 158964765.10067117 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.829999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.793e-03
+  ||Δu||/||u|| = 3.746e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.483e-02
+  ||ΔD||/||D|| = 6.236e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.557e-03
+  |ΔD|_∞ = 3.029e-03
 
 Convergence check
 
@@ -21938,26 +20380,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 158964765.10067117 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.829999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.181e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.632e-15
+  ||ΔD||/||D|| = 1.473e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.359e-15
+  |ΔD|_∞ = 1.332e-15
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.1244e-06 J
-  → Fracture energy : 2.2586e-07 J
-  → Total energy    : 6.3502e-06 J
+  → Elastic energy  : 2.1036e-07 J
+  → Fracture energy : 3.7735e-05 J
+  → Total energy    : 3.7945e-05 J
 
 
 ## Step 263/401: t = 6.55e-01 s | LHR = 0.00e+00 W/m
@@ -21992,18 +20433,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 159573825.50335574 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.86e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.796e-03
+  ||Δu||/||u|| = 3.781e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.510e-02
+  ||ΔD||/||D|| = 6.736e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.630e-03
+  |ΔD|_∞ = 3.122e-03
 
 Convergence check
 
@@ -22014,26 +20454,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 159573825.50335574 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.86e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.347e-17
+  ||ΔD||/||D|| = 9.304e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.1786e-06 J
-  → Fracture energy : 2.3177e-07 J
-  → Total energy    : 6.4104e-06 J
+  → Elastic energy  : 2.1164e-07 J
+  → Fracture energy : 3.7735e-05 J
+  → Total energy    : 3.7947e-05 J
 
 
 ## Step 264/401: t = 6.57e-01 s | LHR = 0.00e+00 W/m
@@ -22068,18 +20507,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 160182885.9060403 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.89e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.817e-03
+  ||Δu||/||u|| = 4.148e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.524e-02
+  ||ΔD||/||D|| = 6.167e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.707e-03
+  |ΔD|_∞ = 2.132e-03
 
 Convergence check
 
@@ -22090,26 +20528,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 160182885.9060403 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.89e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.913e-18
+  ||ΔD||/||D|| = 1.141e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.776e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.2335e-06 J
-  → Fracture energy : 2.3787e-07 J
-  → Total energy    : 6.4714e-06 J
+  → Elastic energy  : 2.1288e-07 J
+  → Fracture energy : 3.7736e-05 J
+  → Total energy    : 3.7949e-05 J
 
 
 ## Step 265/401: t = 6.60e-01 s | LHR = 0.00e+00 W/m
@@ -22144,18 +20581,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 160791946.30872488 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.92e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.823e-03
+  ||Δu||/||u|| = 3.819e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.574e-02
+  ||ΔD||/||D|| = 5.919e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.629e-03
+  |ΔD|_∞ = 2.437e-03
 
 Convergence check
 
@@ -22166,26 +20602,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 160791946.30872488 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.92e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.364e-18
+  ||ΔD||/||D|| = 1.384e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.163e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.2885e-06 J
-  → Fracture energy : 2.4430e-07 J
-  → Total energy    : 6.5328e-06 J
+  → Elastic energy  : 2.1423e-07 J
+  → Fracture energy : 3.7736e-05 J
+  → Total energy    : 3.7950e-05 J
 
 
 ## Step 266/401: t = 6.62e-01 s | LHR = 0.00e+00 W/m
@@ -22220,18 +20655,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 161401006.71140942 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.95e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.884e-03
+  ||Δu||/||u|| = 3.796e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.575e-02
+  ||ΔD||/||D|| = 5.909e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.883e-03
+  |ΔD|_∞ = 2.047e-03
 
 Convergence check
 
@@ -22242,26 +20676,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 161401006.71140942 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.95e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.693e-17
+  ||ΔD||/||D|| = 9.114e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-17
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.3451e-06 J
-  → Fracture energy : 2.5091e-07 J
-  → Total energy    : 6.5960e-06 J
+  → Elastic energy  : 2.1559e-07 J
+  → Fracture energy : 3.7736e-05 J
+  → Total energy    : 3.7952e-05 J
 
 
 ## Step 267/401: t = 6.65e-01 s | LHR = 0.00e+00 W/m
@@ -22296,18 +20729,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 162010067.114094 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.98e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.859e-03
+  ||Δu||/||u|| = 3.683e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.596e-02
+  ||ΔD||/||D|| = 6.479e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.979e-03
+  |ΔD|_∞ = 2.881e-03
 
 Convergence check
 
@@ -22318,26 +20750,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 162010067.114094 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 7.98e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 7.362e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.4015e-06 J
-  → Fracture energy : 2.5775e-07 J
-  → Total energy    : 6.6593e-06 J
+  → Elastic energy  : 2.1694e-07 J
+  → Fracture energy : 3.7737e-05 J
+  → Total energy    : 3.7954e-05 J
 
 
 ## Step 268/401: t = 6.67e-01 s | LHR = 0.00e+00 W/m
@@ -22372,18 +20803,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 162619127.51677856 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.01e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.875e-03
+  ||Δu||/||u|| = 3.885e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.627e-02
+  ||ΔD||/||D|| = 6.078e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.081e-03
+  |ΔD|_∞ = 2.020e-03
 
 Convergence check
 
@@ -22394,26 +20824,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 162619127.51677856 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.01e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.444e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.694e-14
+  ||ΔD||/||D|| = 1.066e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.662e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.4584e-06 J
-  → Fracture energy : 2.6487e-07 J
-  → Total energy    : 6.7233e-06 J
+  → Elastic energy  : 2.1822e-07 J
+  → Fracture energy : 3.7737e-05 J
+  → Total energy    : 3.7955e-05 J
 
 
 ## Step 269/401: t = 6.70e-01 s | LHR = 0.00e+00 W/m
@@ -22448,18 +20877,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 163228187.91946313 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.04e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.903e-03
+  ||Δu||/||u|| = 3.816e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.644e-02
+  ||ΔD||/||D|| = 5.764e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.190e-03
+  |ΔD|_∞ = 1.413e-03
 
 Convergence check
 
@@ -22470,26 +20898,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 163228187.91946313 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.04e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.263e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.411e-15
+  ||ΔD||/||D|| = 9.256e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.609e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.5162e-06 J
-  → Fracture energy : 2.7227e-07 J
-  → Total energy    : 6.7885e-06 J
+  → Elastic energy  : 2.1959e-07 J
+  → Fracture energy : 3.7737e-05 J
+  → Total energy    : 3.7957e-05 J
 
 
 ## Step 270/401: t = 6.72e-01 s | LHR = 0.00e+00 W/m
@@ -22524,18 +20951,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 163837248.3221477 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.07e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.910e-03
+  ||Δu||/||u|| = 3.673e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.671e-02
+  ||ΔD||/||D|| = 5.947e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.309e-03
+  |ΔD|_∞ = 1.429e-03
 
 Convergence check
 
@@ -22546,26 +20972,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 163837248.3221477 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.07e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.886e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.652e-15
+  ||ΔD||/||D|| = 8.620e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.277e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.5743e-06 J
-  → Fracture energy : 2.7996e-07 J
-  → Total energy    : 6.8543e-06 J
+  → Elastic energy  : 2.2097e-07 J
+  → Fracture energy : 3.7738e-05 J
+  → Total energy    : 3.7959e-05 J
 
 
 ## Step 271/401: t = 6.75e-01 s | LHR = 0.00e+00 W/m
@@ -22600,18 +21025,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 164446308.72483224 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.1e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.929e-03
+  ||Δu||/||u|| = 3.728e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.708e-02
+  ||ΔD||/||D|| = 5.964e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.438e-03
+  |ΔD|_∞ = 1.749e-03
 
 Convergence check
 
@@ -22622,26 +21046,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 164446308.72483224 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.1e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.853e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.812e-15
+  ||ΔD||/||D|| = 7.059e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.525e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.6330e-06 J
-  → Fracture energy : 2.8800e-07 J
-  → Total energy    : 6.9210e-06 J
+  → Elastic energy  : 2.2236e-07 J
+  → Fracture energy : 3.7738e-05 J
+  → Total energy    : 3.7960e-05 J
 
 
 ## Step 272/401: t = 6.77e-01 s | LHR = 0.00e+00 W/m
@@ -22676,18 +21099,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 165055369.1275168 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.13e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.964e-03
+  ||Δu||/||u|| = 3.762e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.745e-02
+  ||ΔD||/||D|| = 5.638e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.579e-03
+  |ΔD|_∞ = 1.519e-03
 
 Convergence check
 
@@ -22698,26 +21120,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 165055369.1275168 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.13e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.196e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.018e-15
+  ||ΔD||/||D|| = 1.451e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.637e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.6923e-06 J
-  → Fracture energy : 2.9641e-07 J
-  → Total energy    : 6.9887e-06 J
+  → Elastic energy  : 2.2375e-07 J
+  → Fracture energy : 3.7738e-05 J
+  → Total energy    : 3.7962e-05 J
 
 
 ## Step 273/401: t = 6.80e-01 s | LHR = 0.00e+00 W/m
@@ -22752,18 +21173,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 165664429.53020138 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.16e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.998e-03
+  ||Δu||/||u|| = 3.719e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.783e-02
+  ||ΔD||/||D|| = 5.302e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.733e-03
+  |ΔD|_∞ = 1.953e-03
 
 Convergence check
 
@@ -22774,26 +21194,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 165664429.53020138 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.16e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.842e-17
+  ||ΔD||/||D|| = 1.223e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.7525e-06 J
-  → Fracture energy : 3.0521e-07 J
-  → Total energy    : 7.0577e-06 J
+  → Elastic energy  : 2.2517e-07 J
+  → Fracture energy : 3.7739e-05 J
+  → Total energy    : 3.7964e-05 J
 
 
 ## Step 274/401: t = 6.82e-01 s | LHR = 0.00e+00 W/m
@@ -22828,18 +21247,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 166273489.93288594 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.19e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.032e-03
+  ||Δu||/||u|| = 3.627e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.841e-02
+  ||ΔD||/||D|| = 5.204e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.914e-03
+  |ΔD|_∞ = 1.561e-03
 
 Convergence check
 
@@ -22850,26 +21268,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 166273489.93288594 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.19e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.050e-26
+  ||ΔD||/||D|| = 1.332e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.8130e-06 J
-  → Fracture energy : 3.1452e-07 J
-  → Total energy    : 7.1275e-06 J
+  → Elastic energy  : 2.2662e-07 J
+  → Fracture energy : 3.7739e-05 J
+  → Total energy    : 3.7966e-05 J
 
 
 ## Step 275/401: t = 6.85e-01 s | LHR = 0.00e+00 W/m
@@ -22904,18 +21321,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 166882550.3355705 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.22e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.106e-03
+  ||Δu||/||u|| = 3.613e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.875e-02
+  ||ΔD||/||D|| = 5.124e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.092e-03
+  |ΔD|_∞ = 1.367e-03
 
 Convergence check
 
@@ -22926,26 +21342,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 166882550.3355705 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.22e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.877e-17
+  ||ΔD||/||D|| = 1.020e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.8752e-06 J
-  → Fracture energy : 3.2426e-07 J
-  → Total energy    : 7.1994e-06 J
+  → Elastic energy  : 2.2807e-07 J
+  → Fracture energy : 3.7739e-05 J
+  → Total energy    : 3.7967e-05 J
 
 
 ## Step 276/401: t = 6.88e-01 s | LHR = 0.00e+00 W/m
@@ -22980,18 +21395,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 167491610.73825508 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.25e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.115e-03
+  ||Δu||/||u|| = 3.599e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.934e-02
+  ||ΔD||/||D|| = 5.326e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.303e-03
+  |ΔD|_∞ = 1.786e-03
 
 Convergence check
 
@@ -23002,26 +21416,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 167491610.73825508 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.25e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.943e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.422e-15
+  ||ΔD||/||D|| = 1.272e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.054e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.9375e-06 J
-  → Fracture energy : 3.3453e-07 J
-  → Total energy    : 7.2720e-06 J
+  → Elastic energy  : 2.2952e-07 J
+  → Fracture energy : 3.7740e-05 J
+  → Total energy    : 3.7969e-05 J
 
 
 ## Step 277/401: t = 6.90e-01 s | LHR = 0.00e+00 W/m
@@ -23056,18 +21469,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 168100671.14093962 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.28e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.180e-03
+  ||Δu||/||u|| = 3.585e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.986e-02
+  ||ΔD||/||D|| = 5.893e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.538e-03
+  |ΔD|_∞ = 2.864e-03
 
 Convergence check
 
@@ -23078,26 +21490,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 168100671.14093962 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.28e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 0.000e+00
+  ||ΔD||/||D|| = 1.581e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 0.000e+00
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.0010e-06 J
-  → Fracture energy : 3.4537e-07 J
-  → Total energy    : 7.3463e-06 J
+  → Elastic energy  : 2.3096e-07 J
+  → Fracture energy : 3.7740e-05 J
+  → Total energy    : 3.7971e-05 J
 
 
 ## Step 278/401: t = 6.93e-01 s | LHR = 0.00e+00 W/m
@@ -23132,18 +21543,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 168709731.5436242 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.31e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.225e-03
+  ||Δu||/||u|| = 3.608e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.042e-02
+  ||ΔD||/||D|| = 6.263e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.803e-03
+  |ΔD|_∞ = 3.277e-03
 
 Convergence check
 
@@ -23154,26 +21564,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 168709731.5436242 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.31e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.830e-17
+  ||ΔD||/||D|| = 4.181e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.0653e-06 J
-  → Fracture energy : 3.5683e-07 J
-  → Total energy    : 7.4222e-06 J
+  → Elastic energy  : 2.3234e-07 J
+  → Fracture energy : 3.7740e-05 J
+  → Total energy    : 3.7973e-05 J
 
 
 ## Step 279/401: t = 6.95e-01 s | LHR = 0.00e+00 W/m
@@ -23208,18 +21617,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 169318791.94630876 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.34e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.275e-03
+  ||Δu||/||u|| = 3.870e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.154e-02
+  ||ΔD||/||D|| = 6.045e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.578e-03
+  |ΔD|_∞ = 2.611e-03
 
 Convergence check
 
@@ -23230,26 +21638,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 169318791.94630876 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.34e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.792e-21
+  ||ΔD||/||D|| = 9.112e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.355e-20
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.1298e-06 J
-  → Fracture energy : 3.6916e-07 J
-  → Total energy    : 7.4990e-06 J
+  → Elastic energy  : 2.3367e-07 J
+  → Fracture energy : 3.7741e-05 J
+  → Total energy    : 3.7974e-05 J
 
 
 ## Step 280/401: t = 6.98e-01 s | LHR = 0.00e+00 W/m
@@ -23284,18 +21691,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 169927852.34899333 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.37e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.417e-03
+  ||Δu||/||u|| = 3.638e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.215e-02
+  ||ΔD||/||D|| = 6.342e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.446e-03
+  |ΔD|_∞ = 3.534e-03
 
 Convergence check
 
@@ -23306,26 +21712,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 169927852.34899333 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.37e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.410e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.259e-17
+  ||ΔD||/||D|| = 8.568e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.1970e-06 J
-  → Fracture energy : 3.8227e-07 J
-  → Total energy    : 7.5792e-06 J
+  → Elastic energy  : 2.3504e-07 J
+  → Fracture energy : 3.7741e-05 J
+  → Total energy    : 3.7976e-05 J
 
 
 ## Step 281/401: t = 7.00e-01 s | LHR = 0.00e+00 W/m
@@ -23360,18 +21765,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 170536912.7516779 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.4e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.465e-03
+  ||Δu||/||u|| = 3.861e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.297e-02
+  ||ΔD||/||D|| = 5.478e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.845e-03
+  |ΔD|_∞ = 2.018e-03
 
 Convergence check
 
@@ -23382,26 +21786,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 170536912.7516779 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.4e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.378e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.342e-15
+  ||ΔD||/||D|| = 8.967e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.581e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.2648e-06 J
-  → Fracture energy : 3.9627e-07 J
-  → Total energy    : 7.6611e-06 J
+  → Elastic energy  : 2.3636e-07 J
+  → Fracture energy : 3.7741e-05 J
+  → Total energy    : 3.7978e-05 J
 
 
 ## Step 282/401: t = 7.03e-01 s | LHR = 0.00e+00 W/m
@@ -23436,18 +21839,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 171145973.15436244 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.43e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.542e-03
+  ||Δu||/||u|| = 3.702e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.409e-02
+  ||ΔD||/||D|| = 4.920e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.312e-03
+  |ΔD|_∞ = 2.025e-03
 
 Convergence check
 
@@ -23458,26 +21860,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 171145973.15436244 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.43e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.136e-17
+  ||ΔD||/||D|| = 1.448e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.3335e-06 J
-  → Fracture energy : 4.1137e-07 J
-  → Total energy    : 7.7448e-06 J
+  → Elastic energy  : 2.3782e-07 J
+  → Fracture energy : 3.7742e-05 J
+  → Total energy    : 3.7979e-05 J
 
 
 ## Step 283/401: t = 7.05e-01 s | LHR = 0.00e+00 W/m
@@ -23512,18 +21913,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 171755033.557047 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.46e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.671e-03
+  ||Δu||/||u|| = 3.530e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.533e-02
+  ||ΔD||/||D|| = 4.853e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.862e-03
+  |ΔD|_∞ = 1.730e-03
 
 Convergence check
 
@@ -23534,26 +21934,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 171755033.557047 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.46e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.139e-26
+  ||ΔD||/||D|| = 8.619e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.755e-26
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.4039e-06 J
-  → Fracture energy : 4.2774e-07 J
-  → Total energy    : 7.8316e-06 J
+  → Elastic energy  : 2.3931e-07 J
+  → Fracture energy : 3.7742e-05 J
+  → Total energy    : 3.7981e-05 J
 
 
 ## Step 284/401: t = 7.08e-01 s | LHR = 0.00e+00 W/m
@@ -23588,18 +21987,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 172364093.95973158 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.49e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.804e-03
+  ||Δu||/||u|| = 3.566e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.677e-02
+  ||ΔD||/||D|| = 4.667e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.522e-03
+  |ΔD|_∞ = 1.204e-03
 
 Convergence check
 
@@ -23610,26 +22008,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 172364093.95973158 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.49e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.460e-17
+  ||ΔD||/||D|| = 8.619e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-17
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.4759e-06 J
-  → Fracture energy : 4.4562e-07 J
-  → Total energy    : 7.9215e-06 J
+  → Elastic energy  : 2.4082e-07 J
+  → Fracture energy : 3.7742e-05 J
+  → Total energy    : 3.7983e-05 J
 
 
 ## Step 285/401: t = 7.10e-01 s | LHR = 0.00e+00 W/m
@@ -23664,18 +22061,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 172973154.36241615 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.52e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.960e-03
+  ||Δu||/||u|| = 3.521e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.856e-02
+  ||ΔD||/||D|| = 4.730e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.327e-03
+  |ΔD|_∞ = 1.458e-03
 
 Convergence check
 
@@ -23686,26 +22082,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 172973154.36241615 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.52e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.185e-22
+  ||ΔD||/||D|| = 8.517e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.694e-21
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.5494e-06 J
-  → Fracture energy : 4.6533e-07 J
-  → Total energy    : 8.0148e-06 J
+  → Elastic energy  : 2.4234e-07 J
+  → Fracture energy : 3.7742e-05 J
+  → Total energy    : 3.7985e-05 J
 
 
 ## Step 286/401: t = 7.13e-01 s | LHR = 0.00e+00 W/m
@@ -23740,18 +22135,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 173582214.76510072 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.55e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.169e-03
+  ||Δu||/||u|| = 3.470e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.085e-02
+  ||ΔD||/||D|| = 5.031e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.327e-03
+  |ΔD|_∞ = 1.379e-03
 
 Convergence check
 
@@ -23762,26 +22156,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 173582214.76510072 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.55e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.695e-17
+  ||ΔD||/||D|| = 1.024e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.6246e-06 J
-  → Fracture energy : 4.8746e-07 J
-  → Total energy    : 8.1120e-06 J
+  → Elastic energy  : 2.4385e-07 J
+  → Fracture energy : 3.7743e-05 J
+  → Total energy    : 3.7987e-05 J
 
 
 ## Step 287/401: t = 7.15e-01 s | LHR = 0.00e+00 W/m
@@ -23816,18 +22209,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 174191275.16778526 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.58e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.491e-03
+  ||Δu||/||u|| = 3.460e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.355e-02
+  ||ΔD||/||D|| = 5.931e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.059e-02
+  |ΔD|_∞ = 2.120e-03
 
 Convergence check
 
@@ -23838,26 +22230,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 174191275.16778526 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.58e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.483e-17
+  ||ΔD||/||D|| = 1.033e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.7036e-06 J
-  → Fracture energy : 5.1252e-07 J
-  → Total energy    : 8.2161e-06 J
+  → Elastic energy  : 2.4535e-07 J
+  → Fracture energy : 3.7743e-05 J
+  → Total energy    : 3.7988e-05 J
 
 
 ## Step 288/401: t = 7.18e-01 s | LHR = 0.00e+00 W/m
@@ -23892,18 +22283,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 174800335.57046983 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.61e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.807e-03
+  ||Δu||/||u|| = 3.507e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.678e-02
+  ||ΔD||/||D|| = 7.536e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.224e-02
+  |ΔD|_∞ = 3.196e-03
 
 Convergence check
 
@@ -23914,26 +22304,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 174800335.57046983 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.61e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.732e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.944e-16
+  ||ΔD||/||D|| = 8.769e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.772e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.7858e-06 J
-  → Fracture energy : 5.4118e-07 J
-  → Total energy    : 8.3270e-06 J
+  → Elastic energy  : 2.4677e-07 J
+  → Fracture energy : 3.7743e-05 J
+  → Total energy    : 3.7990e-05 J
 
 
 ## Step 289/401: t = 7.20e-01 s | LHR = 0.00e+00 W/m
@@ -23968,18 +22357,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 175409395.9731544 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.64e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.187e-03
+  ||Δu||/||u|| = 3.799e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.107e-02
+  ||ΔD||/||D|| = 8.247e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.446e-02
+  |ΔD|_∞ = 3.604e-03
 
 Convergence check
 
@@ -23990,26 +22378,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 175409395.9731544 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.64e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.880e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.405e-17
+  ||ΔD||/||D|| = 9.207e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.110e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.8706e-06 J
-  → Fracture energy : 5.7477e-07 J
-  → Total energy    : 8.4454e-06 J
+  → Elastic energy  : 2.4802e-07 J
+  → Fracture energy : 3.7744e-05 J
+  → Total energy    : 3.7992e-05 J
 
 
 ## Step 290/401: t = 7.23e-01 s | LHR = 0.00e+00 W/m
@@ -24044,18 +22431,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 176018456.37583897 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.67e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.761e-03
+  ||Δu||/||u|| = 4.534e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.706e-02
+  ||ΔD||/||D|| = 6.891e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.756e-02
+  |ΔD|_∞ = 4.174e-03
 
 Convergence check
 
@@ -24066,26 +22452,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 176018456.37583897 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.67e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.312e-17
+  ||ΔD||/||D|| = 1.653e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.9569e-06 J
-  → Fracture energy : 6.1631e-07 J
-  → Total energy    : 8.5732e-06 J
+  → Elastic energy  : 2.4913e-07 J
+  → Fracture energy : 3.7744e-05 J
+  → Total energy    : 3.7993e-05 J
 
 
 ## Step 291/401: t = 7.25e-01 s | LHR = 0.00e+00 W/m
@@ -24120,18 +22505,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 176627516.77852353 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.7e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.855e-03
+  ||Δu||/||u|| = 4.008e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.469e-02
+  ||ΔD||/||D|| = 5.194e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.207e-02
+  |ΔD|_∞ = 2.286e-03
 
 Convergence check
 
@@ -24142,26 +22526,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 176627516.77852353 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.7e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.485e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.419e-15
+  ||ΔD||/||D|| = 1.151e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.887e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.0563e-06 J
-  → Fracture energy : 6.6759e-07 J
-  → Total energy    : 8.7239e-06 J
+  → Elastic energy  : 2.5048e-07 J
+  → Fracture energy : 3.7744e-05 J
+  → Total energy    : 3.7995e-05 J
 
 
 ## Step 292/401: t = 7.28e-01 s | LHR = 0.00e+00 W/m
@@ -24196,18 +22579,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 177236577.1812081 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.73e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.863e-03
+  ||Δu||/||u|| = 3.455e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.557e-02
+  ||ΔD||/||D|| = 5.123e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.905e-02
+  |ΔD|_∞ = 3.073e-03
 
 Convergence check
 
@@ -24218,26 +22600,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 177236577.1812081 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.73e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.710e-17
+  ||ΔD||/||D|| = 7.821e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.1585e-06 J
-  → Fracture energy : 7.3468e-07 J
-  → Total energy    : 8.8932e-06 J
+  → Elastic energy  : 2.5204e-07 J
+  → Fracture energy : 3.7745e-05 J
+  → Total energy    : 3.7997e-05 J
 
 
 ## Step 293/401: t = 7.30e-01 s | LHR = 0.00e+00 W/m
@@ -24272,18 +22653,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 177845637.58389264 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.76e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.174e-02
+  ||Δu||/||u|| = 3.366e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.154e-02
+  ||ΔD||/||D|| = 5.756e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.060e-02
+  |ΔD|_∞ = 4.021e-03
 
 Convergence check
 
@@ -24294,26 +22674,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 177845637.58389264 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.76e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.555e-17
+  ||ΔD||/||D|| = 1.254e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.2710e-06 J
-  → Fracture energy : 8.2803e-07 J
-  → Total energy    : 9.0990e-06 J
+  → Elastic energy  : 2.5359e-07 J
+  → Fracture energy : 3.7745e-05 J
+  → Total energy    : 3.7998e-05 J
 
 
 ## Step 294/401: t = 7.33e-01 s | LHR = 0.00e+00 W/m
@@ -24348,18 +22727,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 178454697.9865772 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.79e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.478e-02
+  ||Δu||/||u|| = 3.461e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.061e-01
+  ||ΔD||/||D|| = 5.509e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.147e-02
+  |ΔD|_∞ = 3.216e-03
 
 Convergence check
 
@@ -24370,16 +22748,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 178454697.9865772 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.79e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.969e-17
+  ||ΔD||/||D|| = 9.254e-18
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 3.331e-16
 
@@ -24387,9 +22764,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.3911e-06 J
-  → Fracture energy : 9.7029e-07 J
-  → Total energy    : 9.3614e-06 J
+  → Elastic energy  : 2.5505e-07 J
+  → Fracture energy : 3.7745e-05 J
+  → Total energy    : 3.8000e-05 J
 
 
 ## Step 295/401: t = 7.35e-01 s | LHR = 0.00e+00 W/m
@@ -24424,18 +22801,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 179063758.38926178 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.82e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.072e-02
+  ||Δu||/||u|| = 3.716e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.454e-01
+  ||ΔD||/||D|| = 4.883e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.027e-01
+  |ΔD|_∞ = 1.577e-03
 
 Convergence check
 
@@ -24446,26 +22822,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 179063758.38926178 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.82e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.151e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.402e-27
+  ||ΔD||/||D|| = 1.106e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.170e-26
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.5091e-06 J
-  → Fracture energy : 1.2174e-06 J
-  → Total energy    : 9.7265e-06 J
+  → Elastic energy  : 2.5653e-07 J
+  → Fracture energy : 3.7745e-05 J
+  → Total energy    : 3.8002e-05 J
 
 
 ## Step 296/401: t = 7.38e-01 s | LHR = 0.00e+00 W/m
@@ -24500,18 +22875,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 179672818.79194635 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.85e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.510e-02
+  ||Δu||/||u|| = 3.396e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.036e-01
+  ||ΔD||/||D|| = 4.856e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.823e-01
+  |ΔD|_∞ = 1.925e-03
 
 Convergence check
 
@@ -24522,26 +22896,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 179672818.79194635 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.85e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.496e-17
+  ||ΔD||/||D|| = 7.765e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.5742e-06 J
-  → Fracture energy : 1.7210e-06 J
-  → Total energy    : 1.0295e-05 J
+  → Elastic energy  : 2.5810e-07 J
+  → Fracture energy : 3.7746e-05 J
+  → Total energy    : 3.8004e-05 J
 
 
 ## Step 297/401: t = 7.40e-01 s | LHR = 0.00e+00 W/m
@@ -24576,18 +22949,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 180281879.19463092 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.88e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.965e-02
+  ||Δu||/||u|| = 3.446e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.419e-01
+  ||ΔD||/||D|| = 4.750e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.305e-01
+  |ΔD|_∞ = 1.943e-03
 
 Convergence check
 
@@ -24598,26 +22970,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 180281879.19463092 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.88e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.829e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.918e-16
+  ||ΔD||/||D|| = 1.208e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.4483e-06 J
-  → Fracture energy : 2.7601e-06 J
-  → Total energy    : 1.1208e-05 J
+  → Elastic energy  : 2.5967e-07 J
+  → Fracture energy : 3.7746e-05 J
+  → Total energy    : 3.8006e-05 J
 
 
 ## Step 298/401: t = 7.43e-01 s | LHR = 0.00e+00 W/m
@@ -24652,18 +23023,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 180890939.59731546 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.91e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.765e-01
+  ||Δu||/||u|| = 3.386e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.627e-01
+  ||ΔD||/||D|| = 4.704e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.242e-01
+  |ΔD|_∞ = 1.926e-03
 
 Convergence check
 
@@ -24674,16 +23044,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 180890939.59731546 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.91e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.389e-17
+  ||ΔD||/||D|| = 1.237e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -24691,9 +23060,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.2420e-06 J
-  → Fracture energy : 4.0864e-06 J
-  → Total energy    : 1.2328e-05 J
+  → Elastic energy  : 2.6126e-07 J
+  → Fracture energy : 3.7746e-05 J
+  → Total energy    : 3.8007e-05 J
 
 
 ## Step 299/401: t = 7.45e-01 s | LHR = 0.00e+00 W/m
@@ -24728,18 +23097,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 181500000.00000003 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.939999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.995e-01
+  ||Δu||/||u|| = 3.297e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.383e-02
+  ||ΔD||/||D|| = 5.348e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.299e-01
+  |ΔD|_∞ = 2.880e-03
 
 Convergence check
 
@@ -24750,26 +23118,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 181500000.00000003 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.939999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.230e-20
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.781e-16
+  ||ΔD||/||D|| = 8.095e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.776e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.0709e-02 J
-  → Fracture energy : 5.2884e-06 J
-  → Total energy    : 5.0714e-02 J
+  → Elastic energy  : 2.6286e-07 J
+  → Fracture energy : 3.7746e-05 J
+  → Total energy    : 3.8009e-05 J
 
 
 ## Step 300/401: t = 7.48e-01 s | LHR = 0.00e+00 W/m
@@ -24804,18 +23171,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 182109060.4026846 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.97e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.418e-01
+  ||Δu||/||u|| = 3.325e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.862e-02
+  ||ΔD||/||D|| = 6.171e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.659e-01
+  |ΔD|_∞ = 3.794e-03
 
 Convergence check
 
@@ -24826,26 +23192,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 182109060.4026846 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 8.97e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.195e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.057e-17
+  ||ΔD||/||D|| = 1.342e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.882e-16
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5238e-01 J
-  → Fracture energy : 6.4977e-06 J
-  → Total energy    : 2.5238e-01 J
+  → Elastic energy  : 2.6439e-07 J
+  → Fracture energy : 3.7747e-05 J
+  → Total energy    : 3.8011e-05 J
 
 
 ## Step 301/401: t = 7.50e-01 s | LHR = 0.00e+00 W/m
@@ -24880,18 +23245,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 182718120.80536917 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.297e-01
+  ||Δu||/||u|| = 3.634e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.537e-02
+  ||ΔD||/||D|| = 5.501e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.310e-01
+  |ΔD|_∞ = 1.999e-03
 
 Convergence check
 
@@ -24902,26 +23266,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 182718120.80536917 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.206e-20
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.381e-17
+  ||ΔD||/||D|| = 3.854e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.772e-16
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.8320e-01 J
-  → Fracture energy : 7.7818e-06 J
-  → Total energy    : 3.8321e-01 J
+  → Elastic energy  : 2.6583e-07 J
+  → Fracture energy : 3.7747e-05 J
+  → Total energy    : 3.8013e-05 J
 
 
 ## Step 302/401: t = 7.53e-01 s | LHR = 0.00e+00 W/m
@@ -24956,18 +23319,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 183327181.20805374 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.03e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.964e-01
+  ||Δu||/||u|| = 3.535e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.080e-02
+  ||ΔD||/||D|| = 4.948e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.960e-01
+  |ΔD|_∞ = 2.006e-03
 
 Convergence check
 
@@ -24978,26 +23340,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 183327181.20805374 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.03e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.947e-17
+  ||ΔD||/||D|| = 1.118e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.0557e-01 J
-  → Fracture energy : 9.2132e-06 J
-  → Total energy    : 5.0558e-01 J
+  → Elastic energy  : 2.6738e-07 J
+  → Fracture energy : 3.7747e-05 J
+  → Total energy    : 3.8015e-05 J
 
 
 ## Step 303/401: t = 7.55e-01 s | LHR = 0.00e+00 W/m
@@ -25032,18 +23393,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 183936241.6107383 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.06e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.208e-01
+  ||Δu||/||u|| = 3.404e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.481e-02
+  ||ΔD||/||D|| = 4.873e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.456e-01
+  |ΔD|_∞ = 1.709e-03
 
 Convergence check
 
@@ -25054,26 +23414,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 183936241.6107383 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.06e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.294e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.443e-16
+  ||ΔD||/||D|| = 1.167e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.776e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.3121e-01 J
-  → Fracture energy : 1.0730e-05 J
-  → Total energy    : 6.3122e-01 J
+  → Elastic energy  : 2.6897e-07 J
+  → Fracture energy : 3.7747e-05 J
+  → Total energy    : 3.8016e-05 J
 
 
 ## Step 304/401: t = 7.58e-01 s | LHR = 0.00e+00 W/m
@@ -25108,18 +23467,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 184545302.01342285 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.09e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.183e-01
+  ||Δu||/||u|| = 3.292e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.071e-01
+  ||ΔD||/||D|| = 5.118e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.851e-01
+  |ΔD|_∞ = 1.957e-03
 
 Convergence check
 
@@ -25130,26 +23488,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 184545302.01342285 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.09e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.345e-17
+  ||ΔD||/||D|| = 1.288e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.8475e-01 J
-  → Fracture energy : 1.2388e-05 J
-  → Total energy    : 7.8476e-01 J
+  → Elastic energy  : 2.7056e-07 J
+  → Fracture energy : 3.7748e-05 J
+  → Total energy    : 3.8018e-05 J
 
 
 ## Step 305/401: t = 7.60e-01 s | LHR = 0.00e+00 W/m
@@ -25184,18 +23541,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 185154362.41610742 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.12e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.689e-01
+  ||Δu||/||u|| = 3.337e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.200e-01
+  ||ΔD||/||D|| = 4.839e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.051e-01
+  |ΔD|_∞ = 1.501e-03
 
 Convergence check
 
@@ -25206,26 +23562,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 185154362.41610742 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.12e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.797e-22
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.080e-17
+  ||ΔD||/||D|| = 6.200e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.332e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 9.1023e-01 J
-  → Fracture energy : 1.4156e-05 J
-  → Total energy    : 9.1025e-01 J
+  → Elastic energy  : 2.7215e-07 J
+  → Fracture energy : 3.7748e-05 J
+  → Total energy    : 3.8020e-05 J
 
 
 ## Step 306/401: t = 7.63e-01 s | LHR = 0.00e+00 W/m
@@ -25260,18 +23615,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 185763422.818792 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.15e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.386e-01
+  ||Δu||/||u|| = 3.254e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.094e-01
+  ||ΔD||/||D|| = 4.951e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.732e-01
+  |ΔD|_∞ = 1.789e-03
 
 Convergence check
 
@@ -25282,26 +23636,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 185763422.818792 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.15e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.394e-18
+  ||ΔD||/||D|| = 7.360e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.220e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.0479e+00 J
-  → Fracture energy : 1.5911e-05 J
-  → Total energy    : 1.0479e+00 J
+  → Elastic energy  : 2.7377e-07 J
+  → Fracture energy : 3.7748e-05 J
+  → Total energy    : 3.8022e-05 J
 
 
 ## Step 307/401: t = 7.65e-01 s | LHR = 0.00e+00 W/m
@@ -25336,18 +23689,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 186372483.22147655 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.18e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.600e-01
+  ||Δu||/||u|| = 3.263e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.040e-02
+  ||ΔD||/||D|| = 5.202e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.927e-01
+  |ΔD|_∞ = 2.289e-03
 
 Convergence check
 
@@ -25358,26 +23710,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 186372483.22147655 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.18e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.209e-17
+  ||ΔD||/||D|| = 6.675e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.661e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.2302e+00 J
-  → Fracture energy : 1.7792e-05 J
-  → Total energy    : 1.2302e+00 J
+  → Elastic energy  : 2.7537e-07 J
+  → Fracture energy : 3.7748e-05 J
+  → Total energy    : 3.8024e-05 J
 
 
 ## Step 308/401: t = 7.68e-01 s | LHR = 0.00e+00 W/m
@@ -25412,18 +23763,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 186981543.62416112 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.21e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.602e-01
+  ||Δu||/||u|| = 3.324e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.299e-02
+  ||ΔD||/||D|| = 4.848e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.821e-01
+  |ΔD|_∞ = 1.458e-03
 
 Convergence check
 
@@ -25434,26 +23784,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 186981543.62416112 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.21e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.303e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.862e-16
+  ||ΔD||/||D|| = 1.229e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.221e-15
+  |ΔD|_∞ = 8.882e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.4321e+00 J
-  → Fracture energy : 2.0042e-05 J
-  → Total energy    : 1.4321e+00 J
+  → Elastic energy  : 2.7696e-07 J
+  → Fracture energy : 3.7749e-05 J
+  → Total energy    : 3.8026e-05 J
 
 
 ## Step 309/401: t = 7.70e-01 s | LHR = 0.00e+00 W/m
@@ -25488,18 +23837,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 187590604.02684566 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.24e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.706e-02
+  ||Δu||/||u|| = 3.268e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.942e-02
+  ||ΔD||/||D|| = 4.350e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.876e-01
+  |ΔD|_∞ = 1.536e-03
 
 Convergence check
 
@@ -25510,26 +23858,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 187590604.02684566 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.24e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.996e-17
+  ||ΔD||/||D|| = 1.236e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.5415e+00 J
-  → Fracture energy : 2.1791e-05 J
-  → Total energy    : 1.5415e+00 J
+  → Elastic energy  : 2.7860e-07 J
+  → Fracture energy : 3.7749e-05 J
+  → Total energy    : 3.8028e-05 J
 
 
 ## Step 310/401: t = 7.72e-01 s | LHR = 0.00e+00 W/m
@@ -25564,18 +23911,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 188199664.42953023 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.27e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.619e-01
+  ||Δu||/||u|| = 3.202e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.906e-02
+  ||ΔD||/||D|| = 4.119e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.080e-01
+  |ΔD|_∞ = 1.486e-03
 
 Convergence check
 
@@ -25586,26 +23932,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 188199664.42953023 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.27e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.102e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.590e-16
+  ||ΔD||/||D|| = 1.074e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.332e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.7916e+00 J
-  → Fracture energy : 2.3934e-05 J
-  → Total energy    : 1.7916e+00 J
+  → Elastic energy  : 2.8026e-07 J
+  → Fracture energy : 3.7749e-05 J
+  → Total energy    : 3.8029e-05 J
 
 
 ## Step 311/401: t = 7.75e-01 s | LHR = 0.00e+00 W/m
@@ -25640,18 +23985,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 188808724.8322148 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.033e-02
+  ||Δu||/||u|| = 3.216e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.861e-02
+  ||ΔD||/||D|| = 3.816e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.001e-01
+  |ΔD|_∞ = 1.143e-03
 
 Convergence check
 
@@ -25662,26 +24006,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 188808724.8322148 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.3e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.447e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.562e-16
+  ||ΔD||/||D|| = 1.125e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 1.8976e+00 J
-  → Fracture energy : 2.5877e-05 J
-  → Total energy    : 1.8977e+00 J
+  → Elastic energy  : 2.8193e-07 J
+  → Fracture energy : 3.7749e-05 J
+  → Total energy    : 3.8031e-05 J
 
 
 ## Step 312/401: t = 7.77e-01 s | LHR = 0.00e+00 W/m
@@ -25716,18 +24059,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 189417785.23489937 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.33e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.963e-02
+  ||Δu||/||u|| = 3.158e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.874e-02
+  ||ΔD||/||D|| = 3.736e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.472e-01
+  |ΔD|_∞ = 1.077e-03
 
 Convergence check
 
@@ -25738,26 +24080,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 189417785.23489937 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.33e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.338e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.600e-16
+  ||ΔD||/||D|| = 1.600e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-15
+  |ΔD|_∞ = 7.772e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.0811e+00 J
-  → Fracture energy : 2.8717e-05 J
-  → Total energy    : 2.0811e+00 J
+  → Elastic energy  : 2.8363e-07 J
+  → Fracture energy : 3.7750e-05 J
+  → Total energy    : 3.8033e-05 J
 
 
 ## Step 313/401: t = 7.80e-01 s | LHR = 0.00e+00 W/m
@@ -25792,18 +24133,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 190026845.63758394 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.36e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.676e-02
+  ||Δu||/||u|| = 3.140e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.690e-02
+  ||ΔD||/||D|| = 3.865e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.971e-01
+  |ΔD|_∞ = 1.150e-03
 
 Convergence check
 
@@ -25814,26 +24154,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 190026845.63758394 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.36e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.135e-17
+  ||ΔD||/||D|| = 7.875e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.1681e+00 J
-  → Fracture energy : 3.0969e-05 J
-  → Total energy    : 2.1681e+00 J
+  → Elastic energy  : 2.8533e-07 J
+  → Fracture energy : 3.7750e-05 J
+  → Total energy    : 3.8035e-05 J
 
 
 ## Step 314/401: t = 7.82e-01 s | LHR = 0.00e+00 W/m
@@ -25868,18 +24207,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 190635906.0402685 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.39e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.850e-02
+  ||Δu||/||u|| = 3.127e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.880e-02
+  ||ΔD||/||D|| = 4.207e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.457e-01
+  |ΔD|_∞ = 1.323e-03
 
 Convergence check
 
@@ -25890,26 +24228,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 190635906.0402685 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.39e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.237e-17
+  ||ΔD||/||D|| = 1.215e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.3668e+00 J
-  → Fracture energy : 3.3276e-05 J
-  → Total energy    : 2.3668e+00 J
+  → Elastic energy  : 2.8703e-07 J
+  → Fracture energy : 3.7750e-05 J
+  → Total energy    : 3.8037e-05 J
 
 
 ## Step 315/401: t = 7.85e-01 s | LHR = 0.00e+00 W/m
@@ -25944,18 +24281,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 191244966.44295305 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.42e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.023e-01
+  ||Δu||/||u|| = 3.128e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.819e-02
+  ||ΔD||/||D|| = 4.795e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.303e-01
+  |ΔD|_∞ = 1.748e-03
 
 Convergence check
 
@@ -25966,26 +24302,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 191244966.44295305 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.42e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.314e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.827e-17
+  ||ΔD||/||D|| = 1.168e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.332e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.5874e+00 J
-  → Fracture energy : 3.6410e-05 J
-  → Total energy    : 2.5875e+00 J
+  → Elastic energy  : 2.8872e-07 J
+  → Fracture energy : 3.7750e-05 J
+  → Total energy    : 3.8039e-05 J
 
 
 ## Step 316/401: t = 7.87e-01 s | LHR = 0.00e+00 W/m
@@ -26020,18 +24355,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 191854026.84563762 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.45e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.092e-02
+  ||Δu||/||u|| = 3.143e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.614e-02
+  ||ΔD||/||D|| = 5.531e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.270e-01
+  |ΔD|_∞ = 2.181e-03
 
 Convergence check
 
@@ -26042,26 +24376,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 191854026.84563762 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.45e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.067e-17
+  ||ΔD||/||D|| = 6.609e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.220e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.6960e+00 J
-  → Fracture energy : 3.8469e-05 J
-  → Total energy    : 2.6960e+00 J
+  → Elastic energy  : 2.9036e-07 J
+  → Fracture energy : 3.7751e-05 J
+  → Total energy    : 3.8041e-05 J
 
 
 ## Step 317/401: t = 7.90e-01 s | LHR = 0.00e+00 W/m
@@ -26096,18 +24429,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 192463087.2483222 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.48e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.680e-02
+  ||Δu||/||u|| = 3.196e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.335e-02
+  ||ΔD||/||D|| = 6.080e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.130e-01
+  |ΔD|_∞ = 2.761e-03
 
 Convergence check
 
@@ -26118,26 +24450,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 192463087.2483222 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.48e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.349e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.012e-16
+  ||ΔD||/||D|| = 1.437e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 2.9534e+00 J
-  → Fracture energy : 4.0744e-05 J
-  → Total energy    : 2.9534e+00 J
+  → Elastic energy  : 2.9197e-07 J
+  → Fracture energy : 3.7751e-05 J
+  → Total energy    : 3.8043e-05 J
 
 
 ## Step 318/401: t = 7.92e-01 s | LHR = 0.00e+00 W/m
@@ -26172,18 +24503,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 193072147.65100676 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.51e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.012e-02
+  ||Δu||/||u|| = 3.249e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.698e-02
+  ||ΔD||/||D|| = 6.035e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.382e-01
+  |ΔD|_∞ = 2.773e-03
 
 Convergence check
 
@@ -26194,26 +24524,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 193072147.65100676 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.51e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.194e-17
+  ||ΔD||/||D|| = 7.477e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.0768e+00 J
-  → Fracture energy : 4.4771e-05 J
-  → Total energy    : 3.0769e+00 J
+  → Elastic energy  : 2.9353e-07 J
+  → Fracture energy : 3.7751e-05 J
+  → Total energy    : 3.8045e-05 J
 
 
 ## Step 319/401: t = 7.95e-01 s | LHR = 0.00e+00 W/m
@@ -26248,18 +24577,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 193681208.05369133 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.54e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 7.731e-03
+  ||Δu||/||u|| = 3.394e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.525e-02
+  ||ΔD||/||D|| = 5.605e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.339e-01
+  |ΔD|_∞ = 1.888e-03
 
 Convergence check
 
@@ -26270,26 +24598,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 193681208.05369133 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.54e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.473e-17
+  ||ΔD||/||D|| = 7.707e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.1134e+00 J
-  → Fracture energy : 4.7794e-05 J
-  → Total energy    : 3.1134e+00 J
+  → Elastic energy  : 2.9511e-07 J
+  → Fracture energy : 3.7751e-05 J
+  → Total energy    : 3.8047e-05 J
 
 
 ## Step 320/401: t = 7.97e-01 s | LHR = 0.00e+00 W/m
@@ -26324,18 +24651,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 194290268.45637587 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.57e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.313e-02
+  ||Δu||/||u|| = 3.145e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.599e-02
+  ||ΔD||/||D|| = 6.223e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.590e-01
+  |ΔD|_∞ = 2.741e-03
 
 Convergence check
 
@@ -26346,26 +24672,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 194290268.45637587 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.57e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.988e-17
+  ||ΔD||/||D|| = 5.203e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.661e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.3381e+00 J
-  → Fracture energy : 5.0472e-05 J
-  → Total energy    : 3.3382e+00 J
+  → Elastic energy  : 2.9673e-07 J
+  → Fracture energy : 3.7752e-05 J
+  → Total energy    : 3.8048e-05 J
 
 
 ## Step 321/401: t = 8.00e-01 s | LHR = 0.00e+00 W/m
@@ -26400,18 +24725,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 194899328.85906044 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.270e-02
+  ||Δu||/||u|| = 3.195e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.284e-02
+  ||ΔD||/||D|| = 6.678e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.631e-01
+  |ΔD|_∞ = 2.842e-03
 
 Convergence check
 
@@ -26422,16 +24746,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 194899328.85906044 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.6e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.676e-17
+  ||ΔD||/||D|| = 1.457e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 5.551e-16
 
@@ -26439,9 +24762,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.5217e+00 J
-  → Fracture energy : 5.3957e-05 J
-  → Total energy    : 3.5217e+00 J
+  → Elastic energy  : 2.9828e-07 J
+  → Fracture energy : 3.7752e-05 J
+  → Total energy    : 3.8050e-05 J
 
 
 ## Step 322/401: t = 8.02e-01 s | LHR = 0.00e+00 W/m
@@ -26476,18 +24799,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 195508389.261745 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.63e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.923e-03
+  ||Δu||/||u|| = 3.382e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.357e-02
+  ||ΔD||/||D|| = 5.832e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.096e-01
+  |ΔD|_∞ = 1.866e-03
 
 Convergence check
 
@@ -26498,26 +24820,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 195508389.261745 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.63e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.055e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.147e-16
+  ||ΔD||/||D|| = 1.204e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.776e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.5512e+00 J
-  → Fracture energy : 5.6135e-05 J
-  → Total energy    : 3.5513e+00 J
+  → Elastic energy  : 2.9981e-07 J
+  → Fracture energy : 3.7752e-05 J
+  → Total energy    : 3.8052e-05 J
 
 
 ## Step 323/401: t = 8.05e-01 s | LHR = 0.00e+00 W/m
@@ -26552,18 +24873,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 196117449.66442958 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.66e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.117e-01
+  ||Δu||/||u|| = 3.294e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.140e-02
+  ||ΔD||/||D|| = 4.612e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.270e-01
+  |ΔD|_∞ = 1.592e-03
 
 Convergence check
 
@@ -26574,16 +24894,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 196117449.66442958 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.66e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.150e-17
+  ||ΔD||/||D|| = 6.739e-18
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -26591,9 +24910,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 3.9196e+00 J
-  → Fracture energy : 5.8372e-05 J
-  → Total energy    : 3.9196e+00 J
+  → Elastic energy  : 3.0145e-07 J
+  → Fracture energy : 3.7753e-05 J
+  → Total energy    : 3.8054e-05 J
 
 
 ## Step 324/401: t = 8.07e-01 s | LHR = 0.00e+00 W/m
@@ -26628,18 +24947,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 196726510.06711414 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.69e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.667e-02
+  ||Δu||/||u|| = 3.105e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.248e-02
+  ||ΔD||/||D|| = 4.107e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.052e-01
+  |ΔD|_∞ = 1.199e-03
 
 Convergence check
 
@@ -26650,26 +24968,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 196726510.06711414 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.69e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.668e-23
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.380e-17
+  ||ΔD||/||D|| = 8.201e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.661e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.0096e+00 J
-  → Fracture energy : 5.9025e-05 J
-  → Total energy    : 4.0097e+00 J
+  → Elastic energy  : 3.0318e-07 J
+  → Fracture energy : 3.7753e-05 J
+  → Total energy    : 3.8056e-05 J
 
 
 ## Step 325/401: t = 8.10e-01 s | LHR = 0.00e+00 W/m
@@ -26704,18 +25021,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 197335570.4697987 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.72e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.131e-02
+  ||Δu||/||u|| = 3.048e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.203e-02
+  ||ΔD||/||D|| = 4.152e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.478e-01
+  |ΔD|_∞ = 1.417e-03
 
 Convergence check
 
@@ -26726,26 +25042,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 197335570.4697987 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.72e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.902e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.876e-16
+  ||ΔD||/||D|| = 6.269e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.1769e+00 J
-  → Fracture energy : 5.9737e-05 J
-  → Total energy    : 4.1769e+00 J
+  → Elastic energy  : 3.0493e-07 J
+  → Fracture energy : 3.7753e-05 J
+  → Total energy    : 3.8058e-05 J
 
 
 ## Step 326/401: t = 8.12e-01 s | LHR = 0.00e+00 W/m
@@ -26780,18 +25095,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 197944630.87248325 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.749999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.743e-03
+  ||Δu||/||u|| = 3.034e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.621e-03
+  ||ΔD||/||D|| = 4.387e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.470e-01
+  |ΔD|_∞ = 1.532e-03
 
 Convergence check
 
@@ -26802,26 +25116,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 197944630.87248325 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.749999999999999e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.994e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.223e-17
+  ||ΔD||/||D|| = 1.098e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.2106e+00 J
-  → Fracture energy : 6.0910e-05 J
-  → Total energy    : 4.2107e+00 J
+  → Elastic energy  : 3.0667e-07 J
+  → Fracture energy : 3.7753e-05 J
+  → Total energy    : 3.8060e-05 J
 
 
 ## Step 327/401: t = 8.15e-01 s | LHR = 0.00e+00 W/m
@@ -26856,18 +25169,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 198553691.27516782 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.78e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.690e-03
+  ||Δu||/||u|| = 3.033e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.121e-02
+  ||ΔD||/||D|| = 4.838e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.662e-01
+  |ΔD|_∞ = 1.903e-03
 
 Convergence check
 
@@ -26878,26 +25190,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 198553691.27516782 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.78e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.676e-17
+  ||ΔD||/||D|| = 3.237e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.772e-16
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.2384e+00 J
-  → Fracture energy : 6.3257e-05 J
-  → Total energy    : 4.2385e+00 J
+  → Elastic energy  : 3.0839e-07 J
+  → Fracture energy : 3.7754e-05 J
+  → Total energy    : 3.8062e-05 J
 
 
 ## Step 328/401: t = 8.18e-01 s | LHR = 0.00e+00 W/m
@@ -26932,18 +25243,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 199162751.6778524 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.81e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.410e-03
+  ||Δu||/||u|| = 3.027e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.219e-02
+  ||ΔD||/||D|| = 5.820e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.092e-01
+  |ΔD|_∞ = 3.036e-03
 
 Convergence check
 
@@ -26954,26 +25264,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 199162751.6778524 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.81e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.795e-17
+  ||ΔD||/||D|| = 7.534e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.2672e+00 J
-  → Fracture energy : 6.6431e-05 J
-  → Total energy    : 4.2673e+00 J
+  → Elastic energy  : 3.1008e-07 J
+  → Fracture energy : 3.7754e-05 J
+  → Total energy    : 3.8064e-05 J
 
 
 ## Step 329/401: t = 8.20e-01 s | LHR = 0.00e+00 W/m
@@ -27008,18 +25317,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 199771812.08053696 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.84e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.767e-02
+  ||Δu||/||u|| = 3.086e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.110e-02
+  ||ΔD||/||D|| = 6.651e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.533e-01
+  |ΔD|_∞ = 3.087e-03
 
 Convergence check
 
@@ -27030,26 +25338,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 199771812.08053696 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.84e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.115e-18
+  ||ΔD||/||D|| = 1.032e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.3271e+00 J
-  → Fracture energy : 6.8783e-05 J
-  → Total energy    : 4.3272e+00 J
+  → Elastic energy  : 3.1168e-07 J
+  → Fracture energy : 3.7754e-05 J
+  → Total energy    : 3.8066e-05 J
 
 
 ## Step 330/401: t = 8.23e-01 s | LHR = 0.00e+00 W/m
@@ -27084,18 +25391,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 200380872.48322153 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.87e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.293e-02
+  ||Δu||/||u|| = 3.407e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.286e-02
+  ||ΔD||/||D|| = 6.793e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.996e-01
+  |ΔD|_∞ = 3.929e-03
 
 Convergence check
 
@@ -27106,26 +25412,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 200380872.48322153 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.87e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.085e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.788e-16
+  ||ΔD||/||D|| = 1.011e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.4381e+00 J
-  → Fracture energy : 6.9731e-05 J
-  → Total energy    : 4.4382e+00 J
+  → Elastic energy  : 3.1320e-07 J
+  → Fracture energy : 3.7755e-05 J
+  → Total energy    : 3.8068e-05 J
 
 
 ## Step 331/401: t = 8.25e-01 s | LHR = 0.00e+00 W/m
@@ -27160,18 +25465,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 200989932.88590607 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.697e-02
+  ||Δu||/||u|| = 3.362e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.230e-02
+  ||ΔD||/||D|| = 5.676e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.572e-01
+  |ΔD|_∞ = 2.263e-03
 
 Convergence check
 
@@ -27182,16 +25486,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 200989932.88590607 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.9e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.255e-17
+  ||ΔD||/||D|| = 6.128e-18
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -27199,9 +25502,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.6447e+00 J
-  → Fracture energy : 7.1753e-05 J
-  → Total energy    : 4.6448e+00 J
+  → Elastic energy  : 3.1467e-07 J
+  → Fracture energy : 3.7755e-05 J
+  → Total energy    : 3.8070e-05 J
 
 
 ## Step 332/401: t = 8.28e-01 s | LHR = 0.00e+00 W/m
@@ -27236,18 +25539,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 201598993.28859064 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.93e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.082e-03
+  ||Δu||/||u|| = 3.302e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.408e-03
+  ||ΔD||/||D|| = 4.671e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.375e-01
+  |ΔD|_∞ = 1.424e-03
 
 Convergence check
 
@@ -27258,26 +25560,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 201598993.28859064 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.93e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.746e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.375e-16
+  ||ΔD||/||D|| = 1.015e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 8.882e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.6730e+00 J
-  → Fracture energy : 7.3783e-05 J
-  → Total energy    : 4.6731e+00 J
+  → Elastic energy  : 3.1634e-07 J
+  → Fracture energy : 3.7755e-05 J
+  → Total energy    : 3.8071e-05 J
 
 
 ## Step 333/401: t = 8.30e-01 s | LHR = 0.00e+00 W/m
@@ -27312,18 +25613,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 202208053.6912752 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.96e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.435e-02
+  ||Δu||/||u|| = 2.998e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.007e-02
+  ||ΔD||/||D|| = 4.679e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.172e-01
+  |ΔD|_∞ = 1.573e-03
 
 Convergence check
 
@@ -27334,26 +25634,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 202208053.6912752 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.96e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.203e-17
+  ||ΔD||/||D|| = 9.012e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.7877e+00 J
-  → Fracture energy : 7.6753e-05 J
-  → Total energy    : 4.7878e+00 J
+  → Elastic energy  : 3.1808e-07 J
+  → Fracture energy : 3.7755e-05 J
+  → Total energy    : 3.8073e-05 J
 
 
 ## Step 334/401: t = 8.33e-01 s | LHR = 0.00e+00 W/m
@@ -27388,18 +25687,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 202817114.09395978 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.99e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.537e-02
+  ||Δu||/||u|| = 3.012e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.016e-02
+  ||ΔD||/||D|| = 4.778e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.914e-01
+  |ΔD|_∞ = 1.525e-03
 
 Convergence check
 
@@ -27410,26 +25708,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 202817114.09395978 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 9.99e-08
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.177e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.056e-16
+  ||ΔD||/||D|| = 1.550e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.221e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.8600e+00 J
-  → Fracture energy : 8.0625e-05 J
-  → Total energy    : 4.8601e+00 J
+  → Elastic energy  : 3.1983e-07 J
+  → Fracture energy : 3.7756e-05 J
+  → Total energy    : 3.8075e-05 J
 
 
 ## Step 335/401: t = 8.35e-01 s | LHR = 0.00e+00 W/m
@@ -27464,18 +25761,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 203426174.49664435 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.002e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.776e-03
+  ||Δu||/||u|| = 3.001e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.587e-03
+  ||ΔD||/||D|| = 5.223e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.324e-01
+  |ΔD|_∞ = 2.486e-03
 
 Convergence check
 
@@ -27486,26 +25782,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 203426174.49664435 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.002e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.737e-17
+  ||ΔD||/||D|| = 6.474e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 4.8897e+00 J
-  → Fracture energy : 8.1897e-05 J
-  → Total energy    : 4.8897e+00 J
+  → Elastic energy  : 3.2156e-07 J
+  → Fracture energy : 3.7756e-05 J
+  → Total energy    : 3.8077e-05 J
 
 
 ## Step 336/401: t = 8.38e-01 s | LHR = 0.00e+00 W/m
@@ -27540,18 +25835,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 204035234.8993289 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.0049999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.169e-02
+  ||Δu||/||u|| = 2.985e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.641e-03
+  ||ΔD||/||D|| = 5.941e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.027e-01
+  |ΔD|_∞ = 3.152e-03
 
 Convergence check
 
@@ -27562,16 +25856,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 204035234.8993289 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.0049999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.533e-17
+  ||ΔD||/||D|| = 8.092e-18
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -27579,9 +25872,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.2803e+00 J
-  → Fracture energy : 8.3455e-05 J
-  → Total energy    : 5.2804e+00 J
+  → Elastic energy  : 3.2326e-07 J
+  → Fracture energy : 3.7756e-05 J
+  → Total energy    : 3.8079e-05 J
 
 
 ## Step 337/401: t = 8.40e-01 s | LHR = 0.00e+00 W/m
@@ -27616,18 +25909,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 204644295.30201346 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.008e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.004e-03
+  ||Δu||/||u|| = 3.223e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.596e-03
+  ||ΔD||/||D|| = 5.592e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.074e-01
+  |ΔD|_∞ = 2.493e-03
 
 Convergence check
 
@@ -27638,26 +25930,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 204644295.30201346 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.008e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.345e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.363e-16
+  ||ΔD||/||D|| = 7.984e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.332e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.3122e+00 J
-  → Fracture energy : 8.5899e-05 J
-  → Total energy    : 5.3123e+00 J
+  → Elastic energy  : 3.2488e-07 J
+  → Fracture energy : 3.7756e-05 J
+  → Total energy    : 3.8081e-05 J
 
 
 ## Step 338/401: t = 8.43e-01 s | LHR = 0.00e+00 W/m
@@ -27692,18 +25983,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 205253355.70469803 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.011e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.111e-03
+  ||Δu||/||u|| = 3.081e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.600e-03
+  ||ΔD||/||D|| = 5.881e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.053e-01
+  |ΔD|_∞ = 3.613e-03
 
 Convergence check
 
@@ -27714,26 +26004,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 205253355.70469803 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.011e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.104e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.525e-16
+  ||ΔD||/||D|| = 9.529e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.3439e+00 J
-  → Fracture energy : 8.8105e-05 J
-  → Total energy    : 5.3440e+00 J
+  → Elastic energy  : 3.2657e-07 J
+  → Fracture energy : 3.7757e-05 J
+  → Total energy    : 3.8083e-05 J
 
 
 ## Step 339/401: t = 8.45e-01 s | LHR = 0.00e+00 W/m
@@ -27768,18 +26057,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 205862416.1073826 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.014e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.579e-02
+  ||Δu||/||u|| = 3.178e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.577e-03
+  ||ΔD||/||D|| = 5.665e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.585e-01
+  |ΔD|_∞ = 2.354e-03
 
 Convergence check
 
@@ -27790,26 +26078,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 205862416.1073826 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.014e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.171e-17
+  ||ΔD||/||D|| = 1.006e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 7.772e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.4670e+00 J
-  → Fracture energy : 9.0718e-05 J
-  → Total energy    : 5.4670e+00 J
+  → Elastic energy  : 3.2819e-07 J
+  → Fracture energy : 3.7757e-05 J
+  → Total energy    : 3.8085e-05 J
 
 
 ## Step 340/401: t = 8.48e-01 s | LHR = 0.00e+00 W/m
@@ -27844,18 +26131,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 206471476.51006716 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.017e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 5.859e-03
+  ||Δu||/||u|| = 3.187e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.854e-03
+  ||ΔD||/||D|| = 5.802e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.494e-01
+  |ΔD|_∞ = 1.953e-03
 
 Convergence check
 
@@ -27866,26 +26152,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 206471476.51006716 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.017e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.130e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.424e-16
+  ||ΔD||/||D|| = 7.238e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.5049e+00 J
-  → Fracture energy : 9.2664e-05 J
-  → Total energy    : 5.5050e+00 J
+  → Elastic energy  : 3.2987e-07 J
+  → Fracture energy : 3.7757e-05 J
+  → Total energy    : 3.8087e-05 J
 
 
 ## Step 341/401: t = 8.50e-01 s | LHR = 0.00e+00 W/m
@@ -27920,18 +26205,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 207080536.91275173 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.02e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.613e-02
+  ||Δu||/||u|| = 3.065e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.154e-03
+  ||ΔD||/||D|| = 6.488e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.441e-01
+  |ΔD|_∞ = 2.072e-03
 
 Convergence check
 
@@ -27942,26 +26226,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 207080536.91275173 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.02e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.162e-17
+  ||ΔD||/||D|| = 1.463e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 7.772e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.6137e+00 J
-  → Fracture energy : 9.3367e-05 J
-  → Total energy    : 5.6138e+00 J
+  → Elastic energy  : 3.3156e-07 J
+  → Fracture energy : 3.7758e-05 J
+  → Total energy    : 3.8089e-05 J
 
 
 ## Step 342/401: t = 8.53e-01 s | LHR = 0.00e+00 W/m
@@ -27996,18 +26279,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 207689597.31543627 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.023e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.284e-02
+  ||Δu||/||u|| = 3.043e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.068e-03
+  ||ΔD||/||D|| = 7.346e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.683e-01
+  |ΔD|_∞ = 2.919e-03
 
 Convergence check
 
@@ -28018,26 +26300,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 207689597.31543627 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.023e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.037e-17
+  ||ΔD||/||D|| = 6.056e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.7799e+00 J
-  → Fracture energy : 9.4628e-05 J
-  → Total energy    : 5.7800e+00 J
+  → Elastic energy  : 3.3320e-07 J
+  → Fracture energy : 3.7758e-05 J
+  → Total energy    : 3.8091e-05 J
 
 
 ## Step 343/401: t = 8.55e-01 s | LHR = 0.00e+00 W/m
@@ -28072,18 +26353,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 208298657.71812084 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.026e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.949e-03
+  ||Δu||/||u|| = 3.104e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.989e-03
+  ||ΔD||/||D|| = 7.652e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.997e-01
+  |ΔD|_∞ = 3.009e-03
 
 Convergence check
 
@@ -28094,26 +26374,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 208298657.71812084 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.026e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.418e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.310e-16
+  ||ΔD||/||D|| = 1.338e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.8138e+00 J
-  → Fracture energy : 9.5449e-05 J
-  → Total energy    : 5.8139e+00 J
+  → Elastic energy  : 3.3476e-07 J
+  → Fracture energy : 3.7758e-05 J
+  → Total energy    : 3.8093e-05 J
 
 
 ## Step 344/401: t = 8.58e-01 s | LHR = 0.00e+00 W/m
@@ -28148,18 +26427,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 208907718.1208054 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.029e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.833e-02
+  ||Δu||/||u|| = 3.258e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.232e-03
+  ||ΔD||/||D|| = 6.827e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.865e-01
+  |ΔD|_∞ = 2.159e-03
 
 Convergence check
 
@@ -28170,26 +26448,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 208907718.1208054 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.029e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.705e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.584e-17
+  ||ΔD||/||D|| = 7.761e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.882e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.9146e+00 J
-  → Fracture energy : 9.6665e-05 J
-  → Total energy    : 5.9147e+00 J
+  → Elastic energy  : 3.3631e-07 J
+  → Fracture energy : 3.7759e-05 J
+  → Total energy    : 3.8095e-05 J
 
 
 ## Step 345/401: t = 8.60e-01 s | LHR = 0.00e+00 W/m
@@ -28224,18 +26501,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 209516778.52348998 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.032e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.058e-03
+  ||Δu||/||u|| = 3.160e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.798e-03
+  ||ΔD||/||D|| = 6.107e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.313e-01
+  |ΔD|_∞ = 1.761e-03
 
 Convergence check
 
@@ -28246,16 +26522,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 209516778.52348998 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.032e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.150e-17
+  ||ΔD||/||D|| = 1.121e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -28263,9 +26538,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.9511e+00 J
-  → Fracture energy : 9.8504e-05 J
-  → Total energy    : 5.9512e+00 J
+  → Elastic energy  : 3.3798e-07 J
+  → Fracture energy : 3.7759e-05 J
+  → Total energy    : 3.8097e-05 J
 
 
 ## Step 346/401: t = 8.63e-01 s | LHR = 0.00e+00 W/m
@@ -28300,18 +26575,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 210125838.92617455 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.035e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.965e-03
+  ||Δu||/||u|| = 2.999e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.993e-04
+  ||ΔD||/||D|| = 5.742e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.723e-02
+  |ΔD|_∞ = 1.945e-03
 
 Convergence check
 
@@ -28322,26 +26596,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 210125838.92617455 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.035e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.774e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.877e-17
+  ||ΔD||/||D|| = 1.174e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.992e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 5.9857e+00 J
-  → Fracture energy : 9.8899e-05 J
-  → Total energy    : 5.9858e+00 J
+  → Elastic energy  : 3.3972e-07 J
+  → Fracture energy : 3.7759e-05 J
+  → Total energy    : 3.8099e-05 J
 
 
 ## Step 347/401: t = 8.65e-01 s | LHR = 0.00e+00 W/m
@@ -28376,18 +26649,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 210734899.3288591 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.038e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.335e-02
+  ||Δu||/||u|| = 2.965e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.533e-04
+  ||ΔD||/||D|| = 5.575e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.303e-02
+  |ΔD|_∞ = 1.407e-03
 
 Convergence check
 
@@ -28398,26 +26670,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 210734899.3288591 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.038e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.581e-17
+  ||ΔD||/||D|| = 9.155e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.661e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.1240e+00 J
-  → Fracture energy : 9.9058e-05 J
-  → Total energy    : 6.1241e+00 J
+  → Elastic energy  : 3.4147e-07 J
+  → Fracture energy : 3.7760e-05 J
+  → Total energy    : 3.8101e-05 J
 
 
 ## Step 348/401: t = 8.68e-01 s | LHR = 0.00e+00 W/m
@@ -28452,18 +26723,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 211343959.73154366 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.041e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.883e-03
+  ||Δu||/||u|| = 2.895e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.021e-03
+  ||ΔD||/||D|| = 6.123e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.037e-02
+  |ΔD|_∞ = 2.007e-03
 
 Convergence check
 
@@ -28474,16 +26744,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 211343959.73154366 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.041e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.756e-19
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.953e-17
+  ||ΔD||/||D|| = 1.284e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 5.551e-16
 
@@ -28491,9 +26760,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.1595e+00 J
-  → Fracture energy : 9.9241e-05 J
-  → Total energy    : 6.1596e+00 J
+  → Elastic energy  : 3.4323e-07 J
+  → Fracture energy : 3.7760e-05 J
+  → Total energy    : 3.8103e-05 J
 
 
 ## Step 349/401: t = 8.70e-01 s | LHR = 0.00e+00 W/m
@@ -28528,18 +26797,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 211953020.13422823 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.044e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.874e-03
+  ||Δu||/||u|| = 2.925e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.292e-03
+  ||ΔD||/||D|| = 7.168e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.972e-02
+  |ΔD|_∞ = 3.349e-03
 
 Convergence check
 
@@ -28550,26 +26818,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 211953020.13422823 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.044e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.552e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.228e-17
+  ||ΔD||/||D|| = 1.028e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.110e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.1950e+00 J
-  → Fracture energy : 9.9497e-05 J
-  → Total energy    : 6.1951e+00 J
+  → Elastic energy  : 3.4494e-07 J
+  → Fracture energy : 3.7760e-05 J
+  → Total energy    : 3.8105e-05 J
 
 
 ## Step 350/401: t = 8.73e-01 s | LHR = 0.00e+00 W/m
@@ -28604,18 +26871,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 212562080.5369128 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.047e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.865e-03
+  ||Δu||/||u|| = 3.001e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.851e-03
+  ||ΔD||/||D|| = 7.690e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.288e-01
+  |ΔD|_∞ = 4.180e-03
 
 Convergence check
 
@@ -28626,26 +26892,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 212562080.5369128 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.047e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.174e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.779e-17
+  ||ΔD||/||D|| = 1.049e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.992e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.2307e+00 J
-  → Fracture energy : 9.9921e-05 J
-  → Total energy    : 6.2308e+00 J
+  → Elastic energy  : 3.4650e-07 J
+  → Fracture energy : 3.7761e-05 J
+  → Total energy    : 3.8107e-05 J
 
 
 ## Step 351/401: t = 8.75e-01 s | LHR = 0.00e+00 W/m
@@ -28680,18 +26945,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 213171140.93959737 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.05e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.857e-03
+  ||Δu||/||u|| = 3.624e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.912e-03
+  ||ΔD||/||D|| = 6.152e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.021e-01
+  |ΔD|_∞ = 1.754e-03
 
 Convergence check
 
@@ -28702,16 +26966,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 213171140.93959737 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.05e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.546e-17
+  ||ΔD||/||D|| = 9.390e-18
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -28719,9 +26982,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.2665e+00 J
-  → Fracture energy : 1.0075e-04 J
-  → Total energy    : 6.2666e+00 J
+  → Elastic energy  : 3.4794e-07 J
+  → Fracture energy : 3.7761e-05 J
+  → Total energy    : 3.8109e-05 J
 
 
 ## Step 352/401: t = 8.78e-01 s | LHR = 0.00e+00 W/m
@@ -28756,18 +27019,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 213780201.34228194 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.053e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.849e-03
+  ||Δu||/||u|| = 3.019e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.110e-03
+  ||ΔD||/||D|| = 6.054e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.688e-01
+  |ΔD|_∞ = 1.795e-03
 
 Convergence check
 
@@ -28778,26 +27040,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 213780201.34228194 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.053e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.719e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.115e-16
+  ||ΔD||/||D|| = 6.672e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.3023e+00 J
-  → Fracture energy : 1.0228e-04 J
-  → Total energy    : 6.3024e+00 J
+  → Elastic energy  : 3.4967e-07 J
+  → Fracture energy : 3.7761e-05 J
+  → Total energy    : 3.8111e-05 J
 
 
 ## Step 353/401: t = 8.80e-01 s | LHR = 0.00e+00 W/m
@@ -28832,18 +27093,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 214389261.74496648 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.0559999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.848e-03
+  ||Δu||/||u|| = 2.849e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.508e-03
+  ||ΔD||/||D|| = 6.871e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.987e-01
+  |ΔD|_∞ = 2.788e-03
 
 Convergence check
 
@@ -28854,26 +27114,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 214389261.74496648 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.0559999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.379e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.733e-17
+  ||ΔD||/||D|| = 1.264e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.661e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.3383e+00 J
-  → Fracture energy : 1.0368e-04 J
-  → Total energy    : 6.3384e+00 J
+  → Elastic energy  : 3.5140e-07 J
+  → Fracture energy : 3.7762e-05 J
+  → Total energy    : 3.8113e-05 J
 
 
 ## Step 354/401: t = 8.83e-01 s | LHR = 0.00e+00 W/m
@@ -28908,18 +27167,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 214998322.14765105 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.059e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 9.701e-03
+  ||Δu||/||u|| = 2.967e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.323e-03
+  ||ΔD||/||D|| = 7.350e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.401e-01
+  |ΔD|_∞ = 3.078e-03
 
 Convergence check
 
@@ -28930,26 +27188,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 214998322.14765105 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.059e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.435e-17
+  ||ΔD||/||D|| = 6.126e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.4115e+00 J
-  → Fracture energy : 1.0565e-04 J
-  → Total energy    : 6.4116e+00 J
+  → Elastic energy  : 3.5305e-07 J
+  → Fracture energy : 3.7762e-05 J
+  → Total energy    : 3.8115e-05 J
 
 
 ## Step 355/401: t = 8.85e-01 s | LHR = 0.00e+00 W/m
@@ -28984,18 +27241,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 215607382.55033562 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.062e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.033e-03
+  ||Δu||/||u|| = 3.226e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.831e-03
+  ||ΔD||/||D|| = 6.828e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.274e-01
+  |ΔD|_∞ = 2.100e-03
 
 Convergence check
 
@@ -29006,26 +27262,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 215607382.55033562 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.062e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.531e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.723e-16
+  ||ΔD||/||D|| = 1.569e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.4499e+00 J
-  → Fracture energy : 1.0638e-04 J
-  → Total energy    : 6.4500e+00 J
+  → Elastic energy  : 3.5466e-07 J
+  → Fracture energy : 3.7763e-05 J
+  → Total energy    : 3.8117e-05 J
 
 
 ## Step 356/401: t = 8.88e-01 s | LHR = 0.00e+00 W/m
@@ -29060,18 +27315,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 216216442.9530202 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.065e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.943e-02
+  ||Δu||/||u|| = 3.116e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.120e-04
+  ||ΔD||/||D|| = 6.332e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.739e-02
+  |ΔD|_∞ = 1.578e-03
 
 Convergence check
 
@@ -29082,26 +27336,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 216216442.9530202 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.065e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.858e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.472e-16
+  ||ΔD||/||D|| = 8.198e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.6547e+00 J
-  → Fracture energy : 1.0641e-04 J
-  → Total energy    : 6.6548e+00 J
+  → Elastic energy  : 3.5636e-07 J
+  → Fracture energy : 3.7763e-05 J
+  → Total energy    : 3.8119e-05 J
 
 
 ## Step 357/401: t = 8.90e-01 s | LHR = 0.00e+00 W/m
@@ -29136,18 +27389,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 216825503.35570475 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.068e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.985e-03
+  ||Δu||/||u|| = 2.883e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.700e-04
+  ||ΔD||/||D|| = 6.853e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.972e-03
+  |ΔD|_∞ = 2.576e-03
 
 Convergence check
 
@@ -29158,26 +27410,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 216825503.35570475 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.068e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.127e-17
+  ||ΔD||/||D|| = 1.207e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.6947e+00 J
-  → Fracture energy : 1.0642e-04 J
-  → Total energy    : 6.6948e+00 J
+  → Elastic energy  : 3.5811e-07 J
+  → Fracture energy : 3.7763e-05 J
+  → Total energy    : 3.8121e-05 J
 
 
 ## Step 358/401: t = 8.93e-01 s | LHR = 0.00e+00 W/m
@@ -29212,18 +27463,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 217434563.7583893 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.071e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.801e-03
+  ||Δu||/||u|| = 2.836e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.129e-04
+  ||ΔD||/||D|| = 8.233e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.399e-03
+  |ΔD|_∞ = 3.232e-03
 
 Convergence check
 
@@ -29234,26 +27484,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 217434563.7583893 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.071e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.132e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.714e-16
+  ||ΔD||/||D|| = 4.764e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.7323e+00 J
-  → Fracture energy : 1.0643e-04 J
-  → Total energy    : 6.7324e+00 J
+  → Elastic energy  : 3.5979e-07 J
+  → Fracture energy : 3.7764e-05 J
+  → Total energy    : 3.8124e-05 J
 
 
 ## Step 359/401: t = 8.95e-01 s | LHR = 0.00e+00 W/m
@@ -29288,18 +27537,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 218043624.16107386 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.074e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.793e-03
+  ||Δu||/||u|| = 3.093e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.474e-05
+  ||ΔD||/||D|| = 1.013e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.665e-03
+  |ΔD|_∞ = 4.425e-03
 
 Convergence check
 
@@ -29310,26 +27558,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 218043624.16107386 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.074e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.109e-17
+  ||ΔD||/||D|| = 1.262e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.7701e+00 J
-  → Fracture energy : 1.0644e-04 J
-  → Total energy    : 6.7702e+00 J
+  → Elastic energy  : 3.6132e-07 J
+  → Fracture energy : 3.7764e-05 J
+  → Total energy    : 3.8126e-05 J
 
 
 ## Step 360/401: t = 8.97e-01 s | LHR = 0.00e+00 W/m
@@ -29364,18 +27611,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 218652684.56375843 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.077e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.786e-03
+  ||Δu||/||u|| = 2.982e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.035e-05
+  ||ΔD||/||D|| = 1.241e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.813e-03
+  |ΔD|_∞ = 6.330e-03
 
 Convergence check
 
@@ -29386,26 +27632,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 218652684.56375843 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.077e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.195e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.202e-16
+  ||ΔD||/||D|| = 7.704e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.8080e+00 J
-  → Fracture energy : 1.0644e-04 J
-  → Total energy    : 6.8081e+00 J
+  → Elastic energy  : 3.6260e-07 J
+  → Fracture energy : 3.7765e-05 J
+  → Total energy    : 3.8127e-05 J
 
 
 ## Step 361/401: t = 9.00e-01 s | LHR = 0.00e+00 W/m
@@ -29440,18 +27685,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 219261744.966443 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.08e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.778e-03
+  ||Δu||/||u|| = 4.823e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.292e-05
+  ||ΔD||/||D|| = 1.172e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.398e-03
+  |ΔD|_∞ = 6.733e-03
 
 Convergence check
 
@@ -29462,26 +27706,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 219261744.966443 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.08e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.536e-17
+  ||ΔD||/||D|| = 6.208e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.882e-16
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.8459e+00 J
-  → Fracture energy : 1.0645e-04 J
-  → Total energy    : 6.8460e+00 J
+  → Elastic energy  : 3.6258e-07 J
+  → Fracture energy : 3.7765e-05 J
+  → Total energy    : 3.8128e-05 J
 
 
 ## Step 362/401: t = 9.02e-01 s | LHR = 0.00e+00 W/m
@@ -29516,18 +27759,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 219870805.36912757 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.083e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.770e-03
+  ||Δu||/||u|| = 4.175e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.918e-05
+  ||ΔD||/||D|| = 1.183e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.201e-03
+  |ΔD|_∞ = 6.991e-03
 
 Convergence check
 
@@ -29538,26 +27780,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 219870805.36912757 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.083e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.295e-17
+  ||ΔD||/||D|| = 1.101e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.8840e+00 J
-  → Fracture energy : 1.0645e-04 J
-  → Total energy    : 6.8841e+00 J
+  → Elastic energy  : 3.6330e-07 J
+  → Fracture energy : 3.7766e-05 J
+  → Total energy    : 3.8129e-05 J
 
 
 ## Step 363/401: t = 9.05e-01 s | LHR = 0.00e+00 W/m
@@ -29592,18 +27833,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 220479865.77181214 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.0859999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.762e-03
+  ||Δu||/||u|| = 4.571e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.745e-05
+  ||ΔD||/||D|| = 1.110e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.113e-03
+  |ΔD|_∞ = 6.132e-03
 
 Convergence check
 
@@ -29614,26 +27854,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 220479865.77181214 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.0859999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.510e-18
+  ||ΔD||/||D|| = 1.032e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.220e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.9222e+00 J
-  → Fracture energy : 1.0646e-04 J
-  → Total energy    : 6.9223e+00 J
+  → Elastic energy  : 3.6386e-07 J
+  → Fracture energy : 3.7766e-05 J
+  → Total energy    : 3.8130e-05 J
 
 
 ## Step 364/401: t = 9.07e-01 s | LHR = 0.00e+00 W/m
@@ -29668,18 +27907,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 221088926.17449668 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.089e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.755e-03
+  ||Δu||/||u|| = 4.403e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.687e-05
+  ||ΔD||/||D|| = 1.179e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.080e-03
+  |ΔD|_∞ = 7.238e-03
 
 Convergence check
 
@@ -29690,26 +27928,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 221088926.17449668 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.089e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.521e-17
+  ||ΔD||/||D|| = 9.481e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.9605e+00 J
-  → Fracture energy : 1.0646e-04 J
-  → Total energy    : 6.9606e+00 J
+  → Elastic energy  : 3.6462e-07 J
+  → Fracture energy : 3.7767e-05 J
+  → Total energy    : 3.8131e-05 J
 
 
 ## Step 365/401: t = 9.10e-01 s | LHR = 0.00e+00 W/m
@@ -29744,18 +27981,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 221697986.57718125 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.092e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.747e-03
+  ||Δu||/||u|| = 3.308e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.698e-05
+  ||ΔD||/||D|| = 1.151e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.075e-03
+  |ΔD|_∞ = 6.841e-03
 
 Convergence check
 
@@ -29766,26 +28002,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 221697986.57718125 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.092e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.973e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.040e-17
+  ||ΔD||/||D|| = 1.328e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.882e-16
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 6.9989e+00 J
-  → Fracture energy : 1.0647e-04 J
-  → Total energy    : 6.9990e+00 J
+  → Elastic energy  : 3.6540e-07 J
+  → Fracture energy : 3.7767e-05 J
+  → Total energy    : 3.8133e-05 J
 
 
 ## Step 366/401: t = 9.12e-01 s | LHR = 0.00e+00 W/m
@@ -29820,18 +28055,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 222307046.97986582 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.095e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.740e-03
+  ||Δu||/||u|| = 4.647e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.752e-05
+  ||ΔD||/||D|| = 9.156e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.085e-03
+  |ΔD|_∞ = 5.504e-03
 
 Convergence check
 
@@ -29842,26 +28076,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 222307046.97986582 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.095e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.029e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.750e-16
+  ||ΔD||/||D|| = 1.133e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.0374e+00 J
-  → Fracture energy : 1.0647e-04 J
-  → Total energy    : 7.0375e+00 J
+  → Elastic energy  : 3.6596e-07 J
+  → Fracture energy : 3.7768e-05 J
+  → Total energy    : 3.8134e-05 J
 
 
 ## Step 367/401: t = 9.15e-01 s | LHR = 0.00e+00 W/m
@@ -29896,18 +28129,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 222916107.3825504 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.098e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.732e-03
+  ||Δu||/||u|| = 4.365e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.838e-05
+  ||ΔD||/||D|| = 7.628e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.103e-03
+  |ΔD|_∞ = 4.209e-03
 
 Convergence check
 
@@ -29918,26 +28150,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 222916107.3825504 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.098e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.261e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.744e-17
+  ||ΔD||/||D|| = 6.736e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.332e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.0760e+00 J
-  → Fracture energy : 1.0648e-04 J
-  → Total energy    : 7.0761e+00 J
+  → Elastic energy  : 3.6697e-07 J
+  → Fracture energy : 3.7768e-05 J
+  → Total energy    : 3.8135e-05 J
 
 
 ## Step 368/401: t = 9.17e-01 s | LHR = 0.00e+00 W/m
@@ -29972,18 +28203,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 223525167.78523496 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.101e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.725e-03
+  ||Δu||/||u|| = 2.844e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.949e-05
+  ||ΔD||/||D|| = 8.596e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.125e-03
+  |ΔD|_∞ = 6.008e-03
 
 Convergence check
 
@@ -29994,26 +28224,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 223525167.78523496 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.101e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.998e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.724e-17
+  ||ΔD||/||D|| = 8.815e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.1148e+00 J
-  → Fracture energy : 1.0648e-04 J
-  → Total energy    : 7.1149e+00 J
+  → Elastic energy  : 3.6862e-07 J
+  → Fracture energy : 3.7768e-05 J
+  → Total energy    : 3.8137e-05 J
 
 
 ## Step 369/401: t = 9.20e-01 s | LHR = 0.00e+00 W/m
@@ -30048,18 +28277,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 224134228.1879195 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.104e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.717e-03
+  ||Δu||/||u|| = 3.003e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.084e-05
+  ||ΔD||/||D|| = 7.972e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.148e-03
+  |ΔD|_∞ = 5.311e-03
 
 Convergence check
 
@@ -30070,26 +28298,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 224134228.1879195 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.104e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.535e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.506e-17
+  ||ΔD||/||D|| = 7.114e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.221e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.1536e+00 J
-  → Fracture energy : 1.0649e-04 J
-  → Total energy    : 7.1537e+00 J
+  → Elastic energy  : 3.6999e-07 J
+  → Fracture energy : 3.7769e-05 J
+  → Total energy    : 3.8139e-05 J
 
 
 ## Step 370/401: t = 9.22e-01 s | LHR = 0.00e+00 W/m
@@ -30124,18 +28351,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 224743288.59060407 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.107e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.710e-03
+  ||Δu||/||u|| = 4.178e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.243e-05
+  ||ΔD||/||D|| = 6.532e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.174e-03
+  |ΔD|_∞ = 3.758e-03
 
 Convergence check
 
@@ -30146,26 +28372,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 224743288.59060407 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.107e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.275e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.235e-16
+  ||ΔD||/||D|| = 5.604e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.776e-15
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.1925e+00 J
-  → Fracture energy : 1.0650e-04 J
-  → Total energy    : 7.1926e+00 J
+  → Elastic energy  : 3.7117e-07 J
+  → Fracture energy : 3.7769e-05 J
+  → Total energy    : 3.8140e-05 J
 
 
 ## Step 371/401: t = 9.25e-01 s | LHR = 0.00e+00 W/m
@@ -30200,18 +28425,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 225352348.99328864 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.11e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.703e-03
+  ||Δu||/||u|| = 2.833e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.430e-05
+  ||ΔD||/||D|| = 6.350e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.200e-03
+  |ΔD|_∞ = 3.396e-03
 
 Convergence check
 
@@ -30222,26 +28446,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 225352348.99328864 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.11e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.108e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.400e-17
+  ||ΔD||/||D|| = 1.189e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.221e-15
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.2316e+00 J
-  → Fracture energy : 1.0650e-04 J
-  → Total energy    : 7.2317e+00 J
+  → Elastic energy  : 3.7281e-07 J
+  → Fracture energy : 3.7769e-05 J
+  → Total energy    : 3.8142e-05 J
 
 
 ## Step 372/401: t = 9.27e-01 s | LHR = 0.00e+00 W/m
@@ -30276,18 +28499,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 225961409.3959732 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.113e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.695e-03
+  ||Δu||/||u|| = 3.341e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.649e-05
+  ||ΔD||/||D|| = 5.478e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.226e-03
+  |ΔD|_∞ = 1.578e-03
 
 Convergence check
 
@@ -30298,16 +28520,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 225961409.3959732 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.113e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.538e-17
+  ||ΔD||/||D|| = 8.119e-18
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 3.331e-16
 
@@ -30315,9 +28536,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.2707e+00 J
-  → Fracture energy : 1.0651e-04 J
-  → Total energy    : 7.2708e+00 J
+  → Elastic energy  : 3.7443e-07 J
+  → Fracture energy : 3.7770e-05 J
+  → Total energy    : 3.8144e-05 J
 
 
 ## Step 373/401: t = 9.30e-01 s | LHR = 0.00e+00 W/m
@@ -30352,18 +28573,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 226570469.79865777 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.116e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.688e-03
+  ||Δu||/||u|| = 2.848e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.908e-05
+  ||ΔD||/||D|| = 5.699e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.388e-03
+  |ΔD|_∞ = 2.118e-03
 
 Convergence check
 
@@ -30374,26 +28594,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 226570469.79865777 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.116e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.048e-17
+  ||ΔD||/||D|| = 4.381e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.661e-16
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.3099e+00 J
-  → Fracture energy : 1.0651e-04 J
-  → Total energy    : 7.3100e+00 J
+  → Elastic energy  : 3.7622e-07 J
+  → Fracture energy : 3.7770e-05 J
+  → Total energy    : 3.8146e-05 J
 
 
 ## Step 374/401: t = 9.32e-01 s | LHR = 0.00e+00 W/m
@@ -30428,18 +28647,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 227179530.20134234 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.119e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.681e-03
+  ||Δu||/||u|| = 2.941e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.218e-05
+  ||ΔD||/||D|| = 6.008e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.656e-03
+  |ΔD|_∞ = 3.230e-03
 
 Convergence check
 
@@ -30450,26 +28668,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 227179530.20134234 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.119e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.907e-17
+  ||ΔD||/||D|| = 9.008e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.3493e+00 J
-  → Fracture energy : 1.0652e-04 J
-  → Total energy    : 7.3494e+00 J
+  → Elastic energy  : 3.7799e-07 J
+  → Fracture energy : 3.7770e-05 J
+  → Total energy    : 3.8148e-05 J
 
 
 ## Step 375/401: t = 9.35e-01 s | LHR = 0.00e+00 W/m
@@ -30504,18 +28721,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 227788590.60402688 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.122e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.674e-03
+  ||Δu||/||u|| = 3.034e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.592e-05
+  ||ΔD||/||D|| = 7.418e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.976e-03
+  |ΔD|_∞ = 5.422e-03
 
 Convergence check
 
@@ -30526,26 +28742,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 227788590.60402688 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.122e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.394e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.712e-16
+  ||ΔD||/||D|| = 9.387e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.887e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.3888e+00 J
-  → Fracture energy : 1.0652e-04 J
-  → Total energy    : 7.3889e+00 J
+  → Elastic energy  : 3.7974e-07 J
+  → Fracture energy : 3.7771e-05 J
+  → Total energy    : 3.8150e-05 J
 
 
 ## Step 376/401: t = 9.38e-01 s | LHR = 0.00e+00 W/m
@@ -30580,18 +28795,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 228397651.00671145 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.125e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.667e-03
+  ||Δu||/||u|| = 2.717e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 8.135e-05
+  ||ΔD||/||D|| = 8.795e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.362e-03
+  |ΔD|_∞ = 6.490e-03
 
 Convergence check
 
@@ -30602,16 +28816,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 228397651.00671145 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.125e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.198e-17
+  ||ΔD||/||D|| = 1.200e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -30619,9 +28832,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.4283e+00 J
-  → Fracture energy : 1.0653e-04 J
-  → Total energy    : 7.4284e+00 J
+  → Elastic energy  : 3.8128e-07 J
+  → Fracture energy : 3.7771e-05 J
+  → Total energy    : 3.8152e-05 J
 
 
 ## Step 377/401: t = 9.40e-01 s | LHR = 0.00e+00 W/m
@@ -30656,18 +28869,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 229006711.40939602 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.128e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.660e-03
+  ||Δu||/||u|| = 4.129e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 9.789e-05
+  ||ΔD||/||D|| = 6.893e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.834e-03
+  |ΔD|_∞ = 3.864e-03
 
 Convergence check
 
@@ -30678,26 +28890,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 229006711.40939602 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.128e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.946e-17
+  ||ΔD||/||D|| = 5.909e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.441e-16
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.4680e+00 J
-  → Fracture energy : 1.0654e-04 J
-  → Total energy    : 7.4681e+00 J
+  → Elastic energy  : 3.8213e-07 J
+  → Fracture energy : 3.7771e-05 J
+  → Total energy    : 3.8154e-05 J
 
 
 ## Step 378/401: t = 9.43e-01 s | LHR = 0.00e+00 W/m
@@ -30732,18 +28943,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 229615771.8120806 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.131e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.653e-03
+  ||Δu||/||u|| = 2.844e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.209e-04
+  ||ΔD||/||D|| = 7.712e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.424e-03
+  |ΔD|_∞ = 5.160e-03
 
 Convergence check
 
@@ -30754,26 +28964,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 229615771.8120806 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.131e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.914e-17
+  ||ΔD||/||D|| = 8.035e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.772e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.5078e+00 J
-  → Fracture energy : 1.0656e-04 J
-  → Total energy    : 7.5079e+00 J
+  → Elastic energy  : 3.8385e-07 J
+  → Fracture energy : 3.7772e-05 J
+  → Total energy    : 3.8156e-05 J
 
 
 ## Step 379/401: t = 9.45e-01 s | LHR = 0.00e+00 W/m
@@ -30808,18 +29017,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 230224832.21476516 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.134e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.646e-03
+  ||Δu||/||u|| = 2.715e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.468e-04
+  ||ΔD||/||D|| = 9.637e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.175e-03
+  |ΔD|_∞ = 6.980e-03
 
 Convergence check
 
@@ -30830,26 +29038,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 230224832.21476516 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.134e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.701e-17
+  ||ΔD||/||D|| = 9.059e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.5476e+00 J
-  → Fracture energy : 1.0658e-04 J
-  → Total energy    : 7.5478e+00 J
+  → Elastic energy  : 3.8550e-07 J
+  → Fracture energy : 3.7772e-05 J
+  → Total energy    : 3.8158e-05 J
 
 
 ## Step 380/401: t = 9.48e-01 s | LHR = 0.00e+00 W/m
@@ -30884,18 +29091,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 230833892.6174497 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.137e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.639e-03
+  ||Δu||/||u|| = 3.061e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.764e-04
+  ||ΔD||/||D|| = 9.687e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.187e-03
+  |ΔD|_∞ = 5.952e-03
 
 Convergence check
 
@@ -30906,26 +29112,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 230833892.6174497 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.137e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 3.793e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.547e-16
+  ||ΔD||/||D|| = 4.942e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.5876e+00 J
-  → Fracture energy : 1.0660e-04 J
-  → Total energy    : 7.5877e+00 J
+  → Elastic energy  : 3.8664e-07 J
+  → Fracture energy : 3.7773e-05 J
+  → Total energy    : 3.8159e-05 J
 
 
 ## Step 381/401: t = 9.50e-01 s | LHR = 0.00e+00 W/m
@@ -30960,18 +29165,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 231442953.02013427 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.14e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.632e-03
+  ||Δu||/||u|| = 3.937e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.115e-04
+  ||ΔD||/||D|| = 1.031e-04
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.605e-03
+  |ΔD|_∞ = 8.231e-03
 
 Convergence check
 
@@ -30982,26 +29186,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 231442953.02013427 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.14e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.967e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.089e-16
+  ||ΔD||/||D|| = 5.907e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.443e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.6277e+00 J
-  → Fracture energy : 1.0663e-04 J
-  → Total energy    : 7.6278e+00 J
+  → Elastic energy  : 3.8768e-07 J
+  → Fracture energy : 3.7773e-05 J
+  → Total energy    : 3.8161e-05 J
 
 
 ## Step 382/401: t = 9.53e-01 s | LHR = 0.00e+00 W/m
@@ -31036,18 +29239,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 232052013.42281884 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.143e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.625e-03
+  ||Δu||/||u|| = 3.732e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.552e-04
+  ||ΔD||/||D|| = 9.663e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.033e-02
+  |ΔD|_∞ = 7.428e-03
 
 Convergence check
 
@@ -31058,26 +29260,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 232052013.42281884 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.143e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 6.947e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.953e-17
+  ||ΔD||/||D|| = 1.462e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.882e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.6679e+00 J
-  → Fracture energy : 1.0666e-04 J
-  → Total energy    : 7.6680e+00 J
+  → Elastic energy  : 3.8836e-07 J
+  → Fracture energy : 3.7773e-05 J
+  → Total energy    : 3.8162e-05 J
 
 
 ## Step 383/401: t = 9.55e-01 s | LHR = 0.00e+00 W/m
@@ -31112,18 +29313,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 232661073.8255034 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.146e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.618e-03
+  ||Δu||/||u|| = 3.410e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.129e-04
+  ||ΔD||/||D|| = 7.875e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.302e-02
+  |ΔD|_∞ = 5.205e-03
 
 Convergence check
 
@@ -31134,26 +29334,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 232661073.8255034 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.146e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.847e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.686e-16
+  ||ΔD||/||D|| = 8.509e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.7082e+00 J
-  → Fracture energy : 1.0671e-04 J
-  → Total energy    : 7.7083e+00 J
+  → Elastic energy  : 3.8930e-07 J
+  → Fracture energy : 3.7774e-05 J
+  → Total energy    : 3.8163e-05 J
 
 
 ## Step 384/401: t = 9.58e-01 s | LHR = 0.00e+00 W/m
@@ -31188,18 +29387,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 233270134.22818798 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.149e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.611e-03
+  ||Δu||/||u|| = 4.048e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.948e-04
+  ||ΔD||/||D|| = 6.545e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.717e-02
+  |ΔD|_∞ = 2.391e-03
 
 Convergence check
 
@@ -31210,26 +29408,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 233270134.22818798 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.149e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.490e-17
+  ||ΔD||/||D|| = 1.148e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 5.551e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.7486e+00 J
-  → Fracture energy : 1.0677e-04 J
-  → Total energy    : 7.7487e+00 J
+  → Elastic energy  : 3.9041e-07 J
+  → Fracture energy : 3.7774e-05 J
+  → Total energy    : 3.8165e-05 J
 
 
 ## Step 385/401: t = 9.60e-01 s | LHR = 0.00e+00 W/m
@@ -31264,18 +29461,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 233879194.63087255 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.152e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.604e-03
+  ||Δu||/||u|| = 2.693e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.195e-04
+  ||ΔD||/||D|| = 7.480e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.401e-02
+  |ΔD|_∞ = 3.905e-03
 
 Convergence check
 
@@ -31286,26 +29482,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 233879194.63087255 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.152e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.835e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.335e-16
+  ||ΔD||/||D|| = 5.604e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.332e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.7892e+00 J
-  → Fracture energy : 1.0685e-04 J
-  → Total energy    : 7.7893e+00 J
+  → Elastic energy  : 3.9212e-07 J
+  → Fracture energy : 3.7775e-05 J
+  → Total energy    : 3.8167e-05 J
 
 
 ## Step 386/401: t = 9.63e-01 s | LHR = 0.00e+00 W/m
@@ -31340,18 +29535,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 234488255.0335571 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.155e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.597e-03
+  ||Δu||/||u|| = 2.850e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.252e-04
+  ||ΔD||/||D|| = 7.575e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.623e-02
+  |ΔD|_∞ = 3.818e-03
 
 Convergence check
 
@@ -31362,26 +29556,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 234488255.0335571 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.155e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.591e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.635e-16
+  ||ΔD||/||D|| = 7.051e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.8298e+00 J
-  → Fracture energy : 1.0696e-04 J
-  → Total energy    : 7.8299e+00 J
+  → Elastic energy  : 3.9367e-07 J
+  → Fracture energy : 3.7775e-05 J
+  → Total energy    : 3.8169e-05 J
 
 
 ## Step 387/401: t = 9.65e-01 s | LHR = 0.00e+00 W/m
@@ -31416,18 +29609,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 235097315.43624166 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.158e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.591e-03
+  ||Δu||/||u|| = 3.370e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.669e-03
+  ||ΔD||/||D|| = 6.865e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.051e-01
+  |ΔD|_∞ = 4.074e-03
 
 Convergence check
 
@@ -31438,16 +29630,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 235097315.43624166 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.158e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.461e-17
+  ||ΔD||/||D|| = 8.961e-18
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 4.441e-16
 
@@ -31455,9 +29646,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.8705e+00 J
-  → Fracture energy : 1.0715e-04 J
-  → Total energy    : 7.8706e+00 J
+  → Elastic energy  : 3.9516e-07 J
+  → Fracture energy : 3.7775e-05 J
+  → Total energy    : 3.8170e-05 J
 
 
 ## Step 388/401: t = 9.68e-01 s | LHR = 0.00e+00 W/m
@@ -31492,18 +29683,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 235706375.83892623 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.161e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.584e-03
+  ||Δu||/||u|| = 2.769e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.828e-03
+  ||ΔD||/||D|| = 7.014e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.826e-01
+  |ΔD|_∞ = 3.618e-03
 
 Convergence check
 
@@ -31514,26 +29704,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 235706375.83892623 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.161e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.571e-18
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.825e-17
+  ||ΔD||/||D|| = 7.504e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.110e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.9113e+00 J
-  → Fracture energy : 1.0746e-04 J
-  → Total energy    : 7.9114e+00 J
+  → Elastic energy  : 3.9676e-07 J
+  → Fracture energy : 3.7776e-05 J
+  → Total energy    : 3.8172e-05 J
 
 
 ## Step 389/401: t = 9.70e-01 s | LHR = 0.00e+00 W/m
@@ -31568,18 +29757,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 236315436.2416108 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.164e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.577e-03
+  ||Δu||/||u|| = 3.338e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.836e-03
+  ||ΔD||/||D|| = 6.339e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.638e-01
+  |ΔD|_∞ = 2.833e-03
 
 Convergence check
 
@@ -31590,26 +29778,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 236315436.2416108 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.164e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.462e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 7.774e-17
+  ||ΔD||/||D|| = 5.115e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.221e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.9523e+00 J
-  → Fracture energy : 1.0795e-04 J
-  → Total energy    : 7.9524e+00 J
+  → Elastic energy  : 3.9827e-07 J
+  → Fracture energy : 3.7776e-05 J
+  → Total energy    : 3.8174e-05 J
 
 
 ## Step 390/401: t = 9.73e-01 s | LHR = 0.00e+00 W/m
@@ -31644,18 +29831,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 236924496.64429536 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.1669999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.576e-03
+  ||Δu||/||u|| = 3.012e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.614e-03
+  ||ΔD||/||D|| = 5.991e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.402e-01
+  |ΔD|_∞ = 2.110e-03
 
 Convergence check
 
@@ -31666,16 +29852,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 236924496.64429536 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.1669999999999999e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.407e-17
+  ||ΔD||/||D|| = 1.117e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 5.551e-16
 
@@ -31683,9 +29868,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 7.9933e+00 J
-  → Fracture energy : 1.0870e-04 J
-  → Total energy    : 7.9934e+00 J
+  → Elastic energy  : 3.9999e-07 J
+  → Fracture energy : 3.7776e-05 J
+  → Total energy    : 3.8176e-05 J
 
 
 ## Step 391/401: t = 9.75e-01 s | LHR = 0.00e+00 W/m
@@ -31720,18 +29905,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 237533557.0469799 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.17e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.756e-03
+  ||Δu||/||u|| = 2.850e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.550e-03
+  ||ΔD||/||D|| = 6.100e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.489e-01
+  |ΔD|_∞ = 2.809e-03
 
 Convergence check
 
@@ -31742,26 +29926,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 237533557.0469799 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.17e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.459e-17
+  ||ΔD||/||D|| = 1.048e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 8.882e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.0374e+00 J
-  → Fracture energy : 1.1034e-04 J
-  → Total energy    : 8.0375e+00 J
+  → Elastic energy  : 4.0176e-07 J
+  → Fracture energy : 3.7777e-05 J
+  → Total energy    : 3.8178e-05 J
 
 
 ## Step 392/401: t = 9.78e-01 s | LHR = 0.00e+00 W/m
@@ -31796,18 +29979,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 238142617.44966447 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.173e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.559e-03
+  ||Δu||/||u|| = 2.670e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.033e-03
+  ||ΔD||/||D|| = 7.126e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.586e-01
+  |ΔD|_∞ = 3.991e-03
 
 Convergence check
 
@@ -31818,26 +30000,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 238142617.44966447 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.173e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.468e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.343e-16
+  ||ΔD||/||D|| = 8.810e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.554e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.0787e+00 J
-  → Fracture energy : 1.1270e-04 J
-  → Total energy    : 8.0788e+00 J
+  → Elastic energy  : 4.0353e-07 J
+  → Fracture energy : 3.7777e-05 J
+  → Total energy    : 3.8180e-05 J
 
 
 ## Step 393/401: t = 9.80e-01 s | LHR = 0.00e+00 W/m
@@ -31872,18 +30053,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 238751677.85234904 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.176e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.658e-03
+  ||Δu||/||u|| = 2.915e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.249e-03
+  ||ΔD||/||D|| = 6.756e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.157e-01
+  |ΔD|_∞ = 3.137e-03
 
 Convergence check
 
@@ -31894,26 +30074,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 238751677.85234904 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.176e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 4.857e-17
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.164e-16
+  ||ΔD||/||D|| = 8.329e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.332e-15
+  |ΔD|_∞ = 3.331e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.1200e+00 J
-  → Fracture energy : 1.1370e-04 J
-  → Total energy    : 8.1202e+00 J
+  → Elastic energy  : 4.0511e-07 J
+  → Fracture energy : 3.7777e-05 J
+  → Total energy    : 3.8182e-05 J
 
 
 ## Step 394/401: t = 9.83e-01 s | LHR = 0.00e+00 W/m
@@ -31948,18 +30127,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 239360738.2550336 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.179e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.395e-02
+  ||Δu||/||u|| = 2.977e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 6.672e-03
+  ||ΔD||/||D|| = 6.049e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 4.084e-01
+  |ΔD|_∞ = 2.477e-03
 
 Convergence check
 
@@ -31970,16 +30148,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 239360738.2550336 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.179e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.311e-22
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.512e-17
+  ||ΔD||/||D|| = 1.395e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 5.551e-16
 
@@ -31987,9 +30164,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.2985e+00 J
-  → Fracture energy : 1.1574e-04 J
-  → Total energy    : 8.2986e+00 J
+  → Elastic energy  : 4.0683e-07 J
+  → Fracture energy : 3.7778e-05 J
+  → Total energy    : 3.8184e-05 J
 
 
 ## Step 395/401: t = 9.85e-01 s | LHR = 0.00e+00 W/m
@@ -32024,18 +30201,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 239969798.65771818 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.182e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.542e-03
+  ||Δu||/||u|| = 2.659e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.912e-03
+  ||ΔD||/||D|| = 6.017e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.218e-01
+  |ΔD|_∞ = 1.993e-03
 
 Convergence check
 
@@ -32046,26 +30222,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 239969798.65771818 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.182e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.011e-17
+  ||ΔD||/||D|| = 9.927e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 7.772e-16
+  |ΔD|_∞ = 5.551e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.3408e+00 J
-  → Fracture energy : 1.1780e-04 J
-  → Total energy    : 8.3409e+00 J
+  → Elastic energy  : 4.0865e-07 J
+  → Fracture energy : 3.7778e-05 J
+  → Total energy    : 3.8186e-05 J
 
 
 ## Step 396/401: t = 9.88e-01 s | LHR = 0.00e+00 W/m
@@ -32100,18 +30275,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 240578859.06040272 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.185e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 8.861e-03
+  ||Δu||/||u|| = 2.691e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 5.985e-03
+  ||ΔD||/||D|| = 6.095e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.567e-01
+  |ΔD|_∞ = 2.183e-03
 
 Convergence check
 
@@ -32122,26 +30296,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 240578859.06040272 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.185e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.534e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.842e-16
+  ||ΔD||/||D|| = 8.456e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.887e-15
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.3990e+00 J
-  → Fracture energy : 1.1940e-04 J
-  → Total energy    : 8.3991e+00 J
+  → Elastic energy  : 4.1048e-07 J
+  → Fracture energy : 3.7778e-05 J
+  → Total energy    : 3.8189e-05 J
 
 
 ## Step 397/401: t = 9.90e-01 s | LHR = 0.00e+00 W/m
@@ -32176,18 +30349,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 241187919.4630873 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.188e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.374e-02
+  ||Δu||/||u|| = 2.679e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.431e-03
+  ||ΔD||/||D|| = 6.825e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.040e-01
+  |ΔD|_∞ = 2.779e-03
 
 Convergence check
 
@@ -32198,16 +30370,15 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 241187919.4630873 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.188e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.231e-17
+  ||ΔD||/||D|| = 1.260e-17
   [adaptive] relax_D=1.00
   |ΔD|_∞ = 5.551e-16
 
@@ -32215,9 +30386,9 @@ Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.5466e+00 J
-  → Fracture energy : 1.2098e-04 J
-  → Total energy    : 8.5467e+00 J
+  → Elastic energy  : 4.1230e-07 J
+  → Fracture energy : 3.7778e-05 J
+  → Total energy    : 3.8191e-05 J
 
 
 ## Step 398/401: t = 9.93e-01 s | LHR = 0.00e+00 W/m
@@ -32252,18 +30423,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 241796979.86577186 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.191e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.139e-02
+  ||Δu||/||u|| = 2.762e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.651e-03
+  ||ΔD||/||D|| = 7.514e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 9.737e-02
+  |ΔD|_∞ = 3.097e-03
 
 Convergence check
 
@@ -32274,26 +30444,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 241796979.86577186 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.191e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.838e-17
+  ||ΔD||/||D|| = 1.136e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 6.661e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.6489e+00 J
-  → Fracture energy : 1.2162e-04 J
-  → Total energy    : 8.6490e+00 J
+  → Elastic energy  : 4.1404e-07 J
+  → Fracture energy : 3.7779e-05 J
+  → Total energy    : 3.8193e-05 J
 
 
 ## Step 399/401: t = 9.95e-01 s | LHR = 0.00e+00 W/m
@@ -32328,18 +30497,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 242406040.26845643 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.194e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.153e-02
+  ||Δu||/||u|| = 3.077e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.544e-03
+  ||ΔD||/||D|| = 8.049e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.373e-01
+  |ΔD|_∞ = 4.147e-03
 
 Convergence check
 
@@ -32350,26 +30518,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 242406040.26845643 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.194e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 1.426e-16
+  ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 2.867e-16
+  ||ΔD||/||D|| = 6.537e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.665e-15
+  |ΔD|_∞ = 2.220e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.7636e+00 J
-  → Fracture energy : 1.2183e-04 J
-  → Total energy    : 8.7638e+00 J
+  → Elastic energy  : 4.1569e-07 J
+  → Fracture energy : 3.7779e-05 J
+  → Total energy    : 3.8195e-05 J
 
 
 ## Step 400/401: t = 9.98e-01 s | LHR = 0.00e+00 W/m
@@ -32404,18 +30571,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 243015100.671141 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.197e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.579e-03
+  ||Δu||/||u|| = 3.008e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 3.182e-03
+  ||ΔD||/||D|| = 7.036e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 1.589e-01
+  |ΔD|_∞ = 3.654e-03
 
 Convergence check
 
@@ -32426,26 +30592,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 243015100.671141 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.197e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.069e-17
+  ||ΔD||/||D|| = 9.251e-18
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 3.331e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.8094e+00 J
-  → Fracture energy : 1.2216e-04 J
-  → Total energy    : 8.8095e+00 J
+  → Elastic energy  : 4.1731e-07 J
+  → Fracture energy : 3.7779e-05 J
+  → Total energy    : 3.8197e-05 J
 
 
 ## Step 401/401: t = 1.00e+00 s | LHR = 0.00e+00 W/m
@@ -32480,18 +30645,17 @@ Coupling = staggered
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 243624161.07382554 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.2e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
-  ||Δu||/||u|| = 2.500e-03
+  ||Δu||/||u|| = 3.015e-03
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 4.987e-03
+  ||ΔD||/||D|| = 5.239e-05
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 2.423e-01
+  |ΔD|_∞ = 2.398e-03
 
 Convergence check
 
@@ -32502,26 +30666,25 @@ Convergence check
 **[INFO]** Assembling mechanical problem...
   **[INFO]** Updating Displacement Dirichlet on region 2 → 0.0
   **[INFO]** Updating Displacement Dirichlet on region 3 → 0.0
-  **[INFO]** Updating traction on region 6 → 243624161.07382554 Pa
+  **[INFO]** Updating Displacement Dirichlet on region 5 → 1.2e-07
   Building weak form, volume integrals (dx) for uo2, tag = 1
-  Applying mechanical traction on subdomain id = 6
   Linear solver
   ||Δu||/||u|| = 0.000e+00
   [adaptive] relax_u=1.00
 
 **[INFO]** Assembling damage (AT2) problem...
 Solving damage problem for 'uo2' material
-  ||ΔD||/||D|| = 1.858e-17
+  ||ΔD||/||D|| = 1.166e-17
   [adaptive] relax_D=1.00
-  |ΔD|_∞ = 6.661e-16
+  |ΔD|_∞ = 4.441e-16
 
 Convergence check
 
 **[SUCCESS]** Staggered solver converged in 2 iterations.
 Computing symbolic result fields (strain, stress, ...)
-  → Elastic energy  : 8.8536e+00 J
-  → Fracture energy : 1.2282e-04 J
-  → Total energy    : 8.8537e+00 J
+  → Elastic energy  : 4.1907e-07 J
+  → Fracture energy : 3.7780e-05 J
+  → Total energy    : 3.8199e-05 J
 
-Simulation completed in 1072.78 s
+Simulation completed in 736.08 s
 Total time steps solved: 401
