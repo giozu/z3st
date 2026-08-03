@@ -64,3 +64,6 @@ z3st/cases/**/log_study*.txt
 z3st/cases/**/*.vtk
 z3st/cases/**/generate.yaml
 z3st/cases/**/output/stress_strain.txt
+
+# isolated parametric-sweep variants (z3st/utils/case_sweep.py)
+z3st/cases/**/.sweep/

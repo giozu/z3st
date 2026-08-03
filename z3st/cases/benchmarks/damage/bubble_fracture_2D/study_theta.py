@@ -1,167 +1,156 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST automated script --.. ..- .-.. .-.. ---
 """
-Z3ST automated script to study the effect of the semi-dihedral angle on the stress concentration factor in a single elliptical cavity.
+Effect of the semi-dihedral angle theta on the stress concentration at the
+tip of a single elliptical/lenticular cavity.
 
+Each theta is meshed and solved in an ISOLATED COPY of this case under
+../.sweep/ (see z3st/utils/case_sweep.py). This case's own mesh.geo and
+geometry.yaml are read but never written -- an interrupted sweep can no
+longer leave the case configured for a half-finished sample, and a writer
+that emits "ay = <number>" can no longer clobber the line that computes ay
+from theta.
 """
 
 import os
 import re
-import yaml
+import sys
+
 import numpy as np
+import yaml
 import matplotlib.pyplot as plt
-import subprocess
-import json
+
+from z3st.utils.case_sweep import make_variant, run_variant
 
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MESH_GEO = os.path.join(CASE_DIR, "mesh.geo")
-GEOMETRY_YAML = os.path.join(CASE_DIR, "geometry.yaml")
-NON_REGRESSION_PY = os.path.join(CASE_DIR, "non-regression.py")
-OUTPUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+THETAS = [15, 20, 25, 30, 40, 50, 60]
 
-def update_mesh_geo(theta_deg):
-    """
-    Updates the theta value in mesh.geo.
-    """
-    with open(MESH_GEO, 'r') as f:
-        content = f.read()
-    
-    # Regex to replace "theta = X * Pi / 180;"
-    # We want to replace the number 30 with the new angle
-    pattern = r"theta = .* \* Pi / 180;"
-    replacement = f"theta = {theta_deg} * Pi / 180;"
-    
-    new_content = re.sub(pattern, replacement, content)
-    
-    with open(MESH_GEO, 'w') as f:
-        f.write(new_content)
-    print(f"[INFO] Updated mesh.geo with theta = {theta_deg}")
 
-def update_geometry_yaml(theta_deg):
-    """
-    Updates the ay value in geometry.yaml based on theta and ax.
-    """
-    with open(GEOMETRY_YAML, 'r') as f:
-        geom = yaml.safe_load(f)
-    
-    ax = float(geom['ax'])
-    theta_rad = theta_deg * np.pi / 180
-    
-    # ay = ax * (1 - cos(theta)) / sin(theta) = ax * tan(theta/2)
-    ay = ax * np.tan(theta_rad / 2)
-    
-    rho = (ay**2) / ax
-    print(f"      Tip/curvature radius: {rho:.6f} micron")
+def set_theta_in_geo(text, theta_deg):
+    """Set the swept angle on the ACTIVE (uncommented) parameter line only.
 
-    geom['ay'] = float(ay)
-    
-    with open(GEOMETRY_YAML, 'w') as f:
-        yaml.dump(geom, f, sort_keys=False, default_flow_style=False)
-    
-    print(f"[INFO] Updated geometry.yaml with ay = {ay}")
+    Two mesh.geo flavours exist among these cases:
 
-def run_simulation():
+    * angle-parameterised (``theta_deg = 48.1;``) -- rewrite that one line and
+      leave every expression derived from it, including the ``ay = Rp * Tan(...)``
+      lines inside the If/Else, completely untouched;
+    * literal semi-axis (``ay = 5 * scale;``) with the angle form commented out
+      -- compute ay from theta and ax and rewrite that line.
+
+    Commented lines are never matched, so the historical `// theta = 60 * Pi / 180;`
+    reference stays a reference.
     """
-    Runs the simulation: gmsh, z3st, non-regression.
-    Returns the numerical max stress.
-    """
-    # 0. Setup Env
+    lines = text.split("\n")
+
+    def active(i):
+        return not lines[i].lstrip().startswith("//")
+
+    # flavour 1: an active theta / theta_deg assignment
+    for i, ln in enumerate(lines):
+        m = re.match(r"(\s*)theta(_deg)?\s*=\s*([^;]+);(.*)$", ln)
+        if m and active(i):
+            indent, deg_suffix, _, tail = m.groups()
+            value = (f"{theta_deg}" if deg_suffix
+                     else f"{theta_deg} * Pi / 180")
+            lines[i] = f"{indent}theta{deg_suffix or ''} = {value};{tail}"
+            return "\n".join(lines)
+
+    # flavour 2: no active theta -- drive the literal semi-axis instead
+    ax_scaled = None
+    for i, ln in enumerate(lines):
+        m = re.match(r"\s*ax\s*=\s*([0-9.eE+-]+)\s*\*\s*scale\s*;", ln)
+        if m and active(i):
+            ax_scaled = float(m.group(1))
+            break
+    if ax_scaled is None:
+        raise ValueError("mesh.geo has neither an active theta nor an active 'ax = N * scale;'")
+
+    ay_scaled = ax_scaled * np.tan(np.radians(theta_deg) / 2)
+    for i, ln in enumerate(lines):
+        m = re.match(r"(\s*)ay\s*=\s*[0-9.eE+-]+\s*\*\s*scale\s*;(.*)$", ln)
+        if m and active(i):
+            indent, tail = m.groups()
+            lines[i] = f"{indent}ay = {ay_scaled} * scale;{tail}"
+            return "\n".join(lines)
+
+    raise ValueError("mesh.geo has no active 'ay = N * scale;' to drive")
+
+
+def set_ay_in_geometry(text, theta_deg):
+    """ay = ax * tan(theta/2); ax is read from the case, not assumed."""
+    geom = yaml.safe_load(text)
+    node = geom["cavity"] if "cavity" in geom else geom
+    ax = float(node["ax"])
+    node["ay"] = float(ax * np.tan(np.radians(theta_deg) / 2))
+    return yaml.dump(geom, sort_keys=False, default_flow_style=False)
+
+
+def harvest(variant):
+    """Read max_stress_yy from the variant's own non-regression output."""
+    import subprocess
     env = os.environ.copy()
-    z3st_root = os.path.abspath(os.path.join(CASE_DIR, "../../../../.."))
-    env["PYTHONPATH"] = z3st_root + ":" + env.get("PYTHONPATH", "")
-    print(f"[INFO] Using PYTHONPATH: {env['PYTHONPATH']}")
+    repo_root = os.path.abspath(os.path.join(CASE_DIR, "../../../../.."))
+    env["PYTHONPATH"] = repo_root + os.pathsep + env.get("PYTHONPATH", "")
+    subprocess.run(["python3", "non-regression.py"], cwd=variant, check=True, env=env)
+    with open(os.path.join(variant, "output", "non-regression.json")) as fh:
+        import json
+        return json.load(fh)["results"]["max_stress_yy"]["numerical"]
 
-    # 1. Mesh
-    print("[INFO] Running gmsh...")
-    subprocess.run(["gmsh", "mesh.geo", "-2"], cwd=CASE_DIR, check=True, stdout=subprocess.DEVNULL)
-    
-    # 2. z3st
-    print("[INFO] Running z3st...")
-
-    with open(os.path.join(CASE_DIR, "log.z3st"), "w") as log_file:
-         subprocess.run(["python3", "-m", "z3st"], cwd=CASE_DIR, check=True, stdout=log_file, stderr=log_file, env=env)
-    
-    # 3. Extract from non-regression.py
-    print("[INFO] Extracting results...")
-    subprocess.run(["python3", "non-regression.py"], cwd=CASE_DIR, check=True, env=env)
-    with open(OUTPUT_JSON, 'r') as f:
-        data = json.load(f)
-
-    return data["results"]["max_stress_yy"]
 
 def main():
-
-    thetas = [15, 20, 25, 30, 40, 50, 60]
     results = []
-    
-    print("--------------------------------------------------")
-    print("Starting Theta Sweep")
-    print("--------------------------------------------------")
-    
-    for theta in thetas:
-        print(f"\n---> Processing Theta = {theta} degrees")
-        
-        # Update inputs
-        update_mesh_geo(theta)
-        update_geometry_yaml(theta)
-        
-        # Run simulation
+    print("Theta sweep -- each sample runs in its own .sweep/ variant\n")
+
+    for theta in THETAS:
+        print(f"---> theta = {theta} deg")
+        variant = make_variant(
+            CASE_DIR, f"theta_{theta}",
+            edits={
+                "mesh.geo": lambda s, t=theta: set_theta_in_geo(s, t),
+                "geometry.yaml": lambda s, t=theta: set_ay_in_geometry(s, t),
+            },
+        )
         try:
-            res = run_simulation()
-            
-            # Store results
-            numerical = res["numerical"]
-            # Analytical solution for remote traction P=1 (Inglis)
-            # Sigma_tip = P * (2 * a/b + 1)
-            # a/b = ax/ay = 1 / tan(theta/2)
-            
-            # Analytical solution for internal pressure P=1 (Muskhelishvili)
-            # Sigma_tip = P * (2 * a/b - 1)
-            # a/b = ax/ay = 1 / tan(theta/2)
-            reference = 2 / np.tan(np.radians(theta/2)) - 1 
-            error = (numerical - reference) / reference
-            
-            results.append({
-                "theta": theta,
-                "numerical": numerical,
-                "reference": reference,
-                "error": error
-            })
-            
-            print(f"     Result: Num={numerical:.4f}, Ref={reference:.4f}, Err={error:.2%}")
-            
-        except subprocess.CalledProcessError as e:
-            print(f"[ERROR] Simulation failed for theta={theta}")
-            print(e)
+            run_variant(variant, dim=2)
+            numerical = harvest(variant)
+        except Exception as exc:
+            print(f"[ERROR] theta={theta} failed: {exc}")
             continue
 
-    # Plotting
-    print("\n--------------------------------------------------")
-    print("Plotting Summary")
-    print("--------------------------------------------------")
-    
-    t_vals = [r["theta"] for r in results]
-    num_vals = [r["numerical"] for r in results]
-    ref_vals = [r["reference"] for r in results]
-    
+        # Muskhelishvili, internal pressure P=1: sigma_tip = P * (2*a/b - 1),
+        # with a/b = 1 / tan(theta/2).
+        reference = 2 / np.tan(np.radians(theta / 2)) - 1
+        error = (numerical - reference) / reference
+        results.append({"theta": theta, "numerical": numerical,
+                        "reference": reference, "error": error})
+        print(f"     num={numerical:.4f}  ref={reference:.4f}  err={error:.2%}")
+
+    if not results:
+        print("[ERROR] no sample completed")
+        sys.exit(1)
+
+    out_dir = os.path.join(CASE_DIR, "output")
+    os.makedirs(out_dir, exist_ok=True)
+
     plt.figure(figsize=(8, 6))
-    plt.plot(t_vals, num_vals, 'bo-', label="Numerical (z3st)")
-    plt.plot(t_vals, ref_vals, 'r--', label="Analytical")
+    plt.plot([r["theta"] for r in results], [r["numerical"] for r in results],
+             "bo-", label="Numerical (z3st)")
+    plt.plot([r["theta"] for r in results], [r["reference"] for r in results],
+             "r--", label="Analytical")
     plt.xlabel(r"Angle $\theta$ (degrees)")
     plt.ylabel(r"Max $\sigma_{yy}$ (MPa)")
     plt.legend()
     plt.grid(True)
-    
-    plot_path = os.path.join(CASE_DIR, "output", "stress_vs_theta.png")
+    plot_path = os.path.join(out_dir, "stress_vs_theta.png")
     plt.savefig(plot_path, dpi=300)
-    print(f"[INFO] Plot saved to {plot_path}")
+    print(f"\n[INFO] plot saved to {plot_path}")
 
-    # Print Table
-    print("\nSummary Table:")
-    print(f"{'Theta':<10} | {'Numerical':<10} | {'Analytical':<10} | {'Error (%)':<10}")
+    print(f"\n{'Theta':<8} | {'Numerical':<11} | {'Analytical':<11} | {'Error (%)':<9}")
     print("-" * 50)
     for r in results:
-        print(f"{r['theta']:<10} | {r['numerical']:<10.4f} | {r['reference']:<10.4f} | {r['error']*100:<10.2f}")
+        print(f"{r['theta']:<8} | {r['numerical']:<11.4f} | "
+              f"{r['reference']:<11.4f} | {r['error']*100:<9.2f}")
+
 
 if __name__ == "__main__":
     main()

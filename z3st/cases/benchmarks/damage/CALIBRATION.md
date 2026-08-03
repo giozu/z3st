@@ -80,9 +80,9 @@ Each case's own `(model, ℓ)` with E = 385 GPa:
 | `elliptical_cavity_pressurized_2D` | AT2 | 0.5 µm | 0.123 | **0.277** | 0.493 J/m² |
 | `two_elliptical_cavities_2D` | AT2 | 0.5 µm | 0.123 | **0.277** | 0.493 J/m² |
 | `bubble_fracture_2D` | AT1 | 2.0 µm | 0.139 | **0.312** | 0.554 J/m² |
-| `spherical_cavity_pressurized` | AT1 | 0.5 µm | 0.035 | **0.078** | 0.139 J/m² |
+| `spherical_void_tension_3D` | AT1 | 0.5 µm | 0.035 | **0.078** | 0.139 J/m² |
 
-## Mesh floor — one case currently violates it
+## Mesh floor — two cases currently violate it
 
 `ℓ ≥ 4h` at the cavity boundary, so the damage band is resolved:
 
@@ -91,9 +91,11 @@ Each case's own `(model, ℓ)` with E = 385 GPa:
 | `elliptical_cavity_2D` / `_pressurized` | 0.05 µm | 0.20 µm | 0.5 µm | OK |
 | `two_elliptical_cavities_2D` | 0.15 µm | 0.60 µm | 0.5 µm | **VIOLATED** |
 | `bubble_fracture_2D` | 0.5 µm | 2.0 µm | 2.0 µm | OK (at the limit) |
+| `spherical_void_tension_3D` | 0.25 µm | 1.0 µm | 0.5 µm | **VIOLATED** |
 
 `two_elliptical_cavities_2D` needs either `h_cavity ≤ 0.125 µm` or `lc ≥ 0.6 µm`
 before its result (peak σ_yy = 116.5 MPa at ε = 7.17e-4) can be blessed.
+`spherical_void_tension_3D` needs either `h_sph ≤ 0.125 µm` or `lc ≥ 1.0 µm`.
 
 ## Consistency check against measured results
 
@@ -104,6 +106,38 @@ or adjacent to the [100, 200] MPa envelope, which is the expected behaviour —
 macroscopic rupture stress is reduced below σ_c by the stress concentration, and
 the pressurised number is a *pressure*, not a stress, so it is not required to
 match σ_c at all (see `elliptical_cavity_pressurized_2D/compare_tip_stress.py`).
+
+## Case status
+
+| Case | Verdict mechanism | Note |
+|---|---|---|
+| `elliptical_cavity_2D` | `pass_fail_check` present, reference = 0.0 | reference is a placeholder, not a gold |
+| `elliptical_cavity_pressurized_2D` | critical cracking pressure at max(D) ≥ 0.5 | |
+| `two_elliptical_cavities_2D` | `pass_fail_check` present | blocked on the mesh floor |
+| `bubble_fracture_2D` | `pass_fail_check` present | |
+| `spherical_void_tension_3D` | **none — emits no `non-regression.json`** | see below |
+
+`spherical_void_tension_3D` was renamed from `spherical_cavity_pressurized`: per
+Jiang's methodology ("the pressure inside bubbles is not considered") the internal
+Neumann pressure was removed, and `make_bcs.py` now applies only symmetry clamps
+plus a `Dirichlet_z` displacement ramp on `zmax`. It is a remote-tension RVE with
+an unpressurised void — the old name described a load case that no longer exists.
+
+Its post-processing was rewritten at the same time to extract the macroscopic
+Σ_zz–E_zz curve, replacing the original analytic σ_rr/σ_tt/σ_vm check. The old
+`non-regression_gold.json` (σ_rr/σ_tt/σ_vm) was orphaned by that rewrite and has
+been deleted; the case's `non-regression.py` never calls `pass_fail_check`, so the
+suite reports `MISSING non-regression.json` and the case cannot pass. **A metric
+must be chosen before it can be blessed.**
+
+## Parametric sweeps
+
+`study_theta.py`, `study_jiang.py` and `study_pressure_sweep.py` run each sample in
+an isolated copy of the case under `.sweep/` — see `z3st/utils/case_sweep.py`. They
+never write the tracked `mesh.geo` / `geometry.yaml` / `input.yaml` /
+`boundary_conditions.yaml`. Keep it that way: the in-place variant silently
+corrupted `bubble_fracture_2D`'s angle parameterisation once already, by
+overwriting the line that *computed* `ay` from `theta_deg` with a literal.
 
 ## Rules
 

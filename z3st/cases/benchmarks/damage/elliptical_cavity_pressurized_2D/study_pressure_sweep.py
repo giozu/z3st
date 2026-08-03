@@ -20,10 +20,30 @@ import meshio
 import yaml
 import matplotlib.pyplot as plt
 
+from z3st.utils.case_sweep import make_variant
+
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(CASE_DIR, "output")
-BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
-INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
+
+# Each stage (coarse / refine / ultra) runs in its own isolated copy of the
+# case under ../.sweep/ -- this script writes boundary_conditions.yaml and
+# input.yaml, and previously wrote the case's OWN tracked copies, leaving the
+# case configured for whichever stage happened to finish last (or die).
+# begin_stage() rebinds the write targets onto a throwaway variant instead.
+VARIANT_DIR = None
+OUTPUT_DIR = None
+BC_FILE = None
+INPUT_FILE = None
+
+
+def begin_stage(label):
+    """Materialise a fresh variant for this stage and point the writers at it."""
+    global VARIANT_DIR, OUTPUT_DIR, BC_FILE, INPUT_FILE
+    VARIANT_DIR = make_variant(CASE_DIR, label)
+    OUTPUT_DIR = os.path.join(VARIANT_DIR, "output")
+    BC_FILE = os.path.join(VARIANT_DIR, "boundary_conditions.yaml")
+    INPUT_FILE = os.path.join(VARIANT_DIR, "input.yaml")
+    print(f"[stage] {label} -> {os.path.relpath(VARIANT_DIR, CASE_DIR)}")
+    return VARIANT_DIR
 
 
 def write_boundary_conditions(p_max, n_steps):
@@ -87,9 +107,12 @@ def run_sim(log_name):
     z3st_root = os.path.abspath(os.path.join(CASE_DIR, "../../../../.."))
     env["PYTHONPATH"] = z3st_root + ":" + env.get("PYTHONPATH", "")
 
-    log_path = os.path.join(CASE_DIR, log_name)
+    subprocess.run(["gmsh", "mesh.geo", "-2"], cwd=VARIANT_DIR, check=True,
+                   env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    log_path = os.path.join(VARIANT_DIR, log_name)
     with open(log_path, "w") as log_file:
-        subprocess.run(["python3", "-m", "z3st"], cwd=CASE_DIR, check=True,
+        subprocess.run(["python3", "-m", "z3st"], cwd=VARIANT_DIR, check=True,
                         stdout=log_file, stderr=subprocess.STDOUT, env=env)
     return log_path
 
@@ -186,6 +209,7 @@ def main():
     P_MAX_COARSE = 1.5e9   # 1.5 GPa, 10x the placeholder guess
     N_STEPS_COARSE = 150
 
+    begin_stage("coarse")
     write_boundary_conditions(P_MAX_COARSE, N_STEPS_COARSE)
     set_n_steps(N_STEPS_COARSE, P_MAX_COARSE)
     log_path = run_sim("log_study_coarse.txt")
@@ -219,6 +243,7 @@ def main():
     P_MAX_REFINE = bracket[1] * 1.1  # small margin past the upper bracket
     N_STEPS_REFINE = 401
 
+    begin_stage("refine")
     write_boundary_conditions(P_MAX_REFINE, N_STEPS_REFINE)
     set_n_steps(N_STEPS_REFINE, P_MAX_REFINE)
     log_path = run_sim("log_study_refine.txt")
@@ -256,6 +281,7 @@ def main():
     P_MAX_ULTRA = bracket_r[1] * 1.05  # small margin past the refined upper bracket
     N_STEPS_ULTRA = 401
 
+    begin_stage("ultra")
     write_boundary_conditions(P_MAX_ULTRA, N_STEPS_ULTRA)
     set_n_steps(N_STEPS_ULTRA, P_MAX_ULTRA)
     set_stag_tol(STAG_TOL_ULTRA)
