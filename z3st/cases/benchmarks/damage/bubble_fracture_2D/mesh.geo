@@ -24,7 +24,7 @@ If(!Exists(Ly))
   Ly = 60e-6;
 EndIf
 If(!Exists(h_cavity))
-  h_cavity = 0.5e-6;   // fine mesh size at the cavity boundary
+  h_cavity = 0.125e-6; // fine mesh size at the cavity boundary; mesh floor lc >= 4h with lc = 0.5 um
 EndIf
 If(!Exists(h_plate))
   h_plate = 4.0e-6;    // coarse mesh size

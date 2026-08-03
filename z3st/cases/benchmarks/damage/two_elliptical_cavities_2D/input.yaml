@@ -56,6 +56,7 @@ damage:
   convergence: rel_norm # rel_norm | norm
   # lc: 0.004
   lc: 5.0e-7 #as the article 
+  split: miehe          # AT2 default, stated explicitly; see damage_model.py:328
   hybrid_constraint: true
 
 

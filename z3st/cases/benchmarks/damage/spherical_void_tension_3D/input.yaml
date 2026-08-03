@@ -55,6 +55,7 @@ damage:
                       # Raised lc instead of refining: halving h in 3D is ~8x the elements.
                       # Derived Gc at sigma_c = 150 MPa moves 0.078 -> 0.156 J/m2.
                       # lc = 1 um is still R_void/7.9, so the void stays resolved.
+  split: amor          # AT1 default, stated explicitly; see damage_model.py:328
   hybrid_constraint: true
   rtol: 1.0e-6
   stag_tol: 1.0e-6

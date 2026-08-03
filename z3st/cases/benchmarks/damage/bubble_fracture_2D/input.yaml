@@ -61,7 +61,9 @@ damage:
   rtol: 1.0e-6
   stag_tol: 1.0e-4
   convergence: rel_norm
-  lc: 2.0e-6          # 2 µm regularization length
+  lc: 5.0e-7          # unified with the 2D cavity family so every 2D case derives the
+                      # same Gc from sigma_c and comparisons are like-for-like.
+                      # Requires h_cavity = 0.125 um to keep lc >= 4h (mesh.geo).
   hybrid_constraint: true
 
 # lhr:

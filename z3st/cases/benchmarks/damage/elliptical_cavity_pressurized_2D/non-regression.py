@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: single_elliptical_cavity_2D_copy (pressure-driven cavity cracking)
+Z3ST case: elliptical_cavity_pressurized_2D (pressure-driven cavity cracking)
 
 non-regression script
 ---------------------

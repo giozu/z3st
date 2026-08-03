@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: single_elliptical_cavity_2D
+Z3ST case: elliptical_cavity_tension_2D
 
 non-regression script
 ---------------------
@@ -57,6 +57,9 @@ E = float(mat_data.get('E'))
 # --.. ..- .-.. .-.. --- extract fields --.. ..- .-.. .-.. ---
 strains = []
 stresses = []
+max_damage = []          # per step, for the initiation metric
+
+DAMAGE_CRITICAL_THRESHOLD = 0.5
 
 print("[INFO] Extracting macroscopic stress and strain from VTU files over time...")
 for vtu in vtu_files:
@@ -64,6 +67,7 @@ for vtu in vtu_files:
     
     x, y, _, disp = extract_field(vtu_path, field_name="Displacement")
     _, _, _, sigma = extract_field(vtu_path, field_name="Stress (points)")
+    _, _, _, D = extract_field(vtu_path, field_name="Damage")
     
     # Macroscopic stress: average of sigma_yy on the top boundary (ymax)
     # This avoids compressive numerical artifacts at the crack tip which distort a global point average
@@ -75,6 +79,7 @@ for vtu in vtu_files:
         print(f"[WARNING] For file {vtu}: No nodes found on the top boundary (y={Ly}). Stress will be zero.")
         stresses.append(0.0)
         strains.append(0.0)
+        max_damage.append(float(np.max(D)))
         continue # Go to next vtu file
 
     # --- CALCULATION ---
@@ -94,6 +99,7 @@ for vtu in vtu_files:
     print(f"  -> {vtu}: Déplacement ymax = {u_y_top:.3e} m | Strain = {u_y_top/Ly:.4e} | Stress_yy = {sigma_yy_macro*1e-6:.2f} MPa")
 
     stresses.append(sigma_yy_macro * 1e-6) # Convert to MPa
+    max_damage.append(float(np.max(D)))
 
 sigma_yy_max = np.max(stresses) if stresses else 0.0
 
@@ -118,15 +124,48 @@ if int(np.argmax(stresses)) == len(stresses) - 1:
     sys.exit("[ERROR] stress peaks at the last step: the ramp ends before fracture, so no "
              "softening branch was captured -- extend the ramp before blessing")
 
+# --.. ..- .-.. .-.. --- headline metric: initiation, not peak --.. ..- .-.. .-.. ---
+# The quantity this case guards is the REMOTE REACTION STRESS AT CRACK
+# INITIATION -- the macroscopic sigma_yy at the first step where max(Damage)
+# crosses the threshold. That is what pairs with the pressurised sibling's
+# critical cracking pressure. The peak macroscopic stress over the whole ramp
+# is a different (post-initiation) quantity and is reported for information
+# only; see CALIBRATION.md.
+max_damage = np.asarray(max_damage, dtype=float)
+above = np.where(max_damage >= DAMAGE_CRITICAL_THRESHOLD)[0]
+
+if above.size == 0:
+    sys.exit(
+        f"[ERROR] max(Damage) never reached {DAMAGE_CRITICAL_THRESHOLD} over the ramp "
+        f"(peaked at {max_damage.max():.4f}): the crack never initiated, so there is no "
+        f"initiation stress to report. Extend the ramp before blessing."
+    )
+
+i_init = int(above[0])
+initiation_stress = float(stresses[i_init])
+initiation_strain = float(strains[i_init])
+
+print("\n" + "=" * 70)
+print(f"  CRACK INITIATION at step {i_init}: remote sigma_yy = {initiation_stress:.2f} MPa "
+      f"(strain {initiation_strain:.4e}, max D = {max_damage[i_init]:.4f})")
+print(f"  peak macroscopic sigma_yy over the ramp: {sigma_yy_max:.2f} MPa  [informational]")
+print("=" * 70 + "\n")
+
 errors = {
-    "max_stress_yy": {
-        "numerical": float(sigma_yy_max),
+    "initiation_stress_MPa": {
+        "numerical": initiation_stress,
+        "reference": 0.0,
+        "rel_error": 0.0
+    },
+    "initiation_strain": {
+        "numerical": initiation_strain,
         "reference": 0.0,
         "rel_error": 0.0
     }
 }
 TOLERANCE = 1.0e-2
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+regression_check(errors, CASE_DIR)
 
 # --.. ..- .-.. .-.. --- plot Stress vs Strain --.. ..- .-.. .-.. ---
 plt.figure(figsize=(10, 6))
@@ -143,13 +182,3 @@ plot_path_ss = os.path.join(CASE_DIR, "output", "stress_strain_jiang.png")
 plt.tight_layout()
 plt.savefig(plot_path_ss, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path_ss}")
-
-errors = {
-    "max_stress_yy": {
-        "numerical": float(sigma_yy_max),
-        "reference": 0.0,
-        "rel_error": 0.0
-    }
-}
-TOLERANCE = 1.0e-2
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
