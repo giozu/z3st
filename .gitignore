@@ -58,3 +58,9 @@ energies.txt
 *.synctex.gz
 *.bbl
 *.blg
+
+# --- run artefacts from the feature/PFF case transfer (regenerable) ---
+z3st/cases/**/log_study*.txt
+z3st/cases/**/*.vtk
+z3st/cases/**/generate.yaml
+z3st/cases/**/output/stress_strain.txt

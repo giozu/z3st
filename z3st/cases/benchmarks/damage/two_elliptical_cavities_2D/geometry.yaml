@@ -1,0 +1,24 @@
+name: box_with_cavity
+geometry_type: rect
+
+Lx: 62.77590162e-6     # box length in x (meters)
+Ly: 62.77590162e-6     # box length in y (meters)
+
+ax: 11.2e-6        # semi-axis of ellipsoid in x (meters)
+ay: 8.03e-6      # semi-axis of ellipsoid in y (meters)
+
+# Approximation 2D d'une bulle lenticulaire (Cas i de Jiang)
+# cavity:
+#   type: ellipse
+#   x_c: 0.0
+#   y_c: 0.0
+#   ax: 11.2e-6
+#   ay: 8.0e-6
+
+labels:
+  uo2: 1
+  cavity: 2
+  ymin: 3
+  xmin: 4
+  xmax: 5
+  ymax: 6
