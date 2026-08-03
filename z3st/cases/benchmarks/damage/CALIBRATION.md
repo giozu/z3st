@@ -97,15 +97,38 @@ Each case's own `(model, ℓ)` with E = 385 GPa:
 before its result (peak σ_yy = 116.5 MPa at ε = 7.17e-4) can be blessed.
 `spherical_void_tension_3D` needs either `h_sph ≤ 0.125 µm` or `lc ≥ 1.0 µm`.
 
-## Consistency check against measured results
+## Measured results (run 2026-08-03, sigma_c = 150 MPa)
 
-At σ_c = 150 MPa the cases produce: 116.5 MPa peak macroscopic stress
-(two cavities, remote tension), 188 MPa remote reaction stress and 177 MPa
-internal cavity pressure at initiation (single lenticular cavity). All sit inside
-or adjacent to the [100, 200] MPa envelope, which is the expected behaviour —
-macroscopic rupture stress is reduced below σ_c by the stress concentration, and
-the pressurised number is a *pressure*, not a stress, so it is not required to
-match σ_c at all (see `elliptical_cavity_pressurized_2D/compare_tip_stress.py`).
+| Case | Metric | Value | Baptiste's earlier figure |
+|---|---|---|---|
+| `elliptical_cavity_pressurized_2D` | critical cracking pressure | **179.06 MPa** (step 294, max D = 0.586) | 177 MPa — **1.2% apart** |
+| `spherical_void_tension_3D` | peak macroscopic σ_zz | **116.6 MPa** at E_zz = 3.40e-4, softening → 0.0005 | (case had no metric) |
+| `elliptical_cavity_2D` | peak macroscopic σ_yy | **82.66 MPa** | 188 MPa — *different quantity* |
+| `two_elliptical_cavities_2D` | peak macroscopic σ_yy | **53.65 MPa**, max D = 1.0 | **116.52 MPa** |
+| `bubble_fracture_2D` | critical cracking pressure | **none** — D ≡ 0 up to 80 MPa | — |
+
+### The mesh floor was inflating the two-cavity strength by 2.2x
+
+`two_elliptical_cavities_2D` dropped from 116.52 to 53.65 MPa. Two things changed at
+once — the mesh (`h_cavity` 0.15 → 0.125 µm, fixing the `ℓ ≥ 4h` violation) and the
+material repoint (shared `uo2.yaml` → `uo2_jiang.yaml`, E 358 → 385 GPa with `G_c`
+re-derived) — so the drop was initially ambiguous.
+
+`elliptical_cavity_pressurized_2D` separates them. It took **only** the material
+repoint; its mesh was already inside the floor (`h_cavity` = 0.05 µm → 4h = 0.2 µm vs
+ℓ = 0.5 µm) and was not touched. It reproduces Baptiste's 177 MPa to within 1.2%. Both
+cases run AT2 at the same `lc = 0.5 µm`, so the comparison is like-for-like.
+
+**Conclusion: the material repoint is neutral; the entire two-cavity change is the mesh
+floor.** Under-resolving the damage band makes the crack artificially hard to form, so
+the specimen carries more load before failing. The original 116.52 MPa was a mesh
+artifact, not a material property — which is precisely why `ℓ ≥ 4h` is a blessing
+precondition and not a style preference.
+
+Sanity of the remaining numbers at σ_c = 150 MPa: a macroscopic peak of 82.66 MPa for a
+single cavity implies a stress-concentration factor of ~1.8, and the pressurised number
+is a *pressure*, not a stress, so it is not required to track σ_c at all (see
+`elliptical_cavity_pressurized_2D/compare_tip_stress.py`).
 
 ## Case status
 
@@ -170,6 +193,9 @@ Until one is chosen the case cannot be blessed — `non-regression.py` exits non
 rather than reporting a false PASS.
 
 ### 2. Which number is `elliptical_cavity_2D`'s headline?
+
+(The mesh-vs-material confound noted here earlier is resolved — see
+"Measured results" above. What remains is purely which quantity the case guards.)
 
 The run gives **peak macroscopic σ_yy = 82.66 MPa**. Baptiste's notes quote **188 MPa**,
 but that is a different quantity — the *remote reaction stress at crack initiation*

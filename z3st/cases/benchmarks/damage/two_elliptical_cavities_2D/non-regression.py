@@ -94,7 +94,10 @@ except Exception:
     d_max = 0.0
 
 mat_name = list(input_data.get("materials", {}).keys())[0]
-stress_field_name = f"Stress_{mat_name}"
+# The XDMF/HDF5 writer emits a single unsuffixed "Stress" dataset; the
+# per-material name (Stress_<mat>) only exists in the separate
+# stress_<mat>.xdmf files written by output.py, not in results.h5.
+stress_field_name = "Stress"
 x, y, _, sigma = extract_field_xdmf(XDMF_FILE, field_name=stress_field_name)
 sigma_yy_final = np.max(sigma[:, 4]) / 1e6 # Convert to MPa
 
