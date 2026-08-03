@@ -567,9 +567,40 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local, since 2026-0
 - `verification/mechanics/full_cylinder`
 - `benchmarks/pellet_quench_3D` (3D reference McClenny reproducer), `benchmarks/pellet_quench_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the primary case for the paper's case-14 chapter). See §9c for the variant rationale. (`14_full_cylinder_thermal_2D_rz`, the axisymmetric thermal-verification variant with damage off, was removed on 2026-06-11 — axisymmetric transient-cooling verification is no longer exercised by any case.)
 
-**15 — Cavities and pressurised bodies**
-- `regression/elliptical_cavity_2D`, `regression/two_elliptical_cavities_2D`
+**15 — Cavities and pressurised bodies (elastic)**
+- `regression/elliptical_cavity_2D` — elastic, `oxide.yaml`, no damage. NOTE: this is the
+  *ancestor* of the phase-field cavity family below and shares its leaf name with
+  `benchmarks/damage/elliptical_cavity_tension_2D`; they are different cases.
 - `verification/mechanics/spherical_cavity`
+
+**15b — UO₂ cavity / bubble phase-field fracture** (added 2026-08-03, after Jiang et al. 2020)
+
+A five-case family studying crack initiation from explicit porosity in UO₂, all on the
+`uo2_jiang.yaml` card. **Read `benchmarks/damage/CALIBRATION.md` before touching any of
+them** — it holds the calibration envelope, the formulation rationale, the `ℓ ≥ 4h` mesh
+floor, and the measured results.
+
+| Case | Model | ℓ | Load | Guarded metric |
+|---|---|---|---|---|
+| `benchmarks/damage/elliptical_cavity_tension_2D` | AT2/Miehe | 0.5 µm | remote `Dirichlet_y` ramp | remote stress at crack initiation |
+| `benchmarks/damage/elliptical_cavity_pressurized_2D` | AT2/Miehe | 0.5 µm | cavity pressure ramp | critical cracking pressure |
+| `benchmarks/damage/two_elliptical_cavities_2D` | AT2/Miehe | 0.5 µm | remote tension | peak macroscopic σ_yy |
+| `benchmarks/damage/bubble_fracture_2D` | AT1/Amor | 0.5 µm | cavity pressure ramp (80 MPa ceiling) | max damage attained |
+| `benchmarks/damage/spherical_void_tension_3D` | AT1/Amor | 1.0 µm | remote `Dirichlet_z` ramp, 3D RVE | peak σ_zz, strain at peak, softening ratio |
+
+Two formulations on purpose: AT2/Miehe has no elastic threshold, so the Jiang-reproduction
+cases resolve the whole stress–strain curve; AT1/Amor's sharp threshold suits the
+does-it-crack-at-all question. These are **not** comparable with the `pellet_quench`
+family (AT1 + `star_convex`, σ_c = 1 GPa on the shared `uo2.yaml`) — different study,
+different card.
+
+`σ_c` is the single calibrated knob (150 MPa, envelope [100, 200]); `G_c` is derived per
+case by `spine.py::load_materials` from that case's own `lc`, and **overrides** any `Gc`
+written on the card.
+
+Parametric studies (`study_theta.py`, `study_jiang.py`, `study_pressure_sweep.py`) run each
+sample in an isolated copy under `.sweep/` via `z3st/utils/case_sweep.py`; they must never
+write the tracked case files.
 
 **16 — Multi-body coupling**
 - `regression/coaxial_gap_3D`
@@ -787,7 +818,25 @@ The following capabilities are **not present** in Z3ST v0.1.0 and would need to 
 
 ---
 
-## 9c. Active work-in-progress: case 14 thermal-shock fracture (UO2)
+## 9c. Work-in-progress: phase-field fracture (UO2)
+
+Two threads, both phase-field, on **different calibrations that must not be mixed**:
+
+1. **Cavity / bubble micromechanics** — the five-case family in §15b, on `uo2_jiang.yaml`
+   at σ_c = 150 MPa, isothermal. Branch `integration/PFF`. Status, decisions and open
+   questions live in `benchmarks/damage/CALIBRATION.md`; that file is authoritative, not
+   this section.
+   **Next step: an ℓ-convergence check.** Three of the five cases sit exactly at
+   `ℓ = 4h` with no margin, and three of the five headline numbers moved once
+   discretisation was fixed — the two-cavity strength halved when its mesh floor was
+   corrected (116.52 → 53.65 MPa), and `bubble_fracture_2D` went from zero damage to
+   complete cracking when ℓ went 2.0 → 0.5 µm. Until convergence is demonstrated, none of
+   these numbers should be blessed as golds.
+
+2. **Case-14 thermal shock** — below, on the shared `uo2.yaml` at σ_c = 1 GPa. State as of
+   2026-05-15.
+
+### Case 14 thermal-shock fracture (UO2)
 
 The case-14 family is being calibrated against McClenny et al., JNM 565 (2022) 153719, in preparation for figures in the companion paper at `~/research-manuscripts/z3st_paper/`. State as of 2026-05-15.
 
@@ -882,7 +931,7 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/models/cracking_model.py`               | Barani isotropic-softening fuel cracking (§4.8)       |
 | `z3st/models/porosity_migration_model.py`     | Thermal-gradient pore migration, SU/SUPG (§4.9)       |
 | `z3st/models/nn_conductivity.py`              | Neural-network k(T): Picard or external-operator Newton |
-| `z3st/materials/*.yaml`                       | Material cards                                        |
+| `z3st/materials/*.yaml`                       | Material cards (`uo2.yaml` = pellet_quench, σ_c 1 GPa; `uo2_jiang.yaml` = cavity/bubble family, σ_c 150 MPa) |
 | `z3st/materials/{ceramic,oxide}.py`           | Python callables for `k(T)`, `Gc(mesh)`                |
 | `z3st/materials/{fuel_profiles,fuel_swelling}.py` | Fuel-behaviour callables: radial power `f(r,bu)`, swelling(bu) |
 | `z3st/utils/writer.py`                        | Unified `OutputWriter` (VTU / single-file XDMF; merged fields) |
@@ -892,6 +941,7 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/utils/utils_verification.py`            | Analytical benchmarks                                  |
 | `z3st/utils/z-gui.py`, `interactive_gui.ipynb`| Interactive viewers                                   |
 | `z3st/utils/geo_files/*.geo`                  | Reusable Gmsh templates                                |
+| `z3st/utils/case_sweep.py`                    | Isolated parametric-sweep variants (`.sweep/`); study scripts must not edit tracked case files |
 | `z3st/cases/…`                                | ~40 verification / validation / demo cases            |
 | `docs/source/*.rst`                           | Sphinx user & API documentation                        |
 
