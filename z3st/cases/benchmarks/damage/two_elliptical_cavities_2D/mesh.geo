@@ -32,7 +32,8 @@ rho = ay*ay/ax;
 Printf("Computed curvature radius rho: %g", rho);
 
 h_plate = 1.5 * scale;     // coarse mesh size (1.5 microns)
-h_cavity = 0.15 * scale;    // extremely fine mesh size to prevent crack locking
+h_cavity = 0.125 * scale;  // mesh floor: lc >= 4h with lc = 0.5 um (was 0.15 -> 4h = 0.6 um > lc)
+                          // refined rather than raising lc, so the derived Gc is unchanged
 
 // Rectangular plate
 Rectangle(1) = {-Lx/2, -Ly/2, 0, Lx, Ly};

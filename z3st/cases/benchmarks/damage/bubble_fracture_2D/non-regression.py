@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: single_elliptical_cavity_2D
+Z3ST case: bubble_fracture_2D (pressure-driven bubble cracking)
 
 non-regression script
 ---------------------
+Ramps an internal pressure on the cavity boundary (Neumann BC) instead of a
+prescribed displacement on ymax. Tracks the phase-field Damage over the
+pressure ramp and reports the critical cracking pressure: the applied
+pressure at the first load step where max(Damage) over the whole domain
+reaches DAMAGE_CRITICAL_THRESHOLD.
 """
 
 import os, re, sys
@@ -23,6 +28,8 @@ from z3st.utils.utils_verification import *
 # Pressure: megapascal (MPa)
 # Energy: picojoule (pJ)
 
+DAMAGE_CRITICAL_THRESHOLD = 0.5
+
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
 
@@ -38,73 +45,71 @@ if not vtu_files:
     sys.exit(1)
 
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../../../materials/uo2_jiang.yaml")
-GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
+BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
 
-# Geometry
-with open(GEOMETRY_FILE, 'r') as f:
-    geom_data = yaml.safe_load(f)
-ax = float(geom_data['cavity']['ax'])
-ay = float(geom_data['cavity']['ay'])
-Lx = float(geom_data.get('Lx'))
-Ly = float(geom_data.get('Ly'))
+# --.. ..- .-.. .-.. --- applied pressure ramp --.. ..- .-.. .-.. ---
+with open(BC_FILE, 'r') as f:
+    bc_data = yaml.safe_load(f)
 
-# Material
-with open(MATERIAL_FILE, 'r') as f:
-    mat_data = yaml.safe_load(f)
-E = float(mat_data.get('E'))
+cavity_bc = next(
+    bc for bc in bc_data["mechanical"]["uo2"]
+    if bc.get("region") == "cavity" and bc.get("type") == "Neumann"
+)
+pressures_pa = np.asarray(cavity_bc["traction"], dtype=float)
+pressures_mpa = pressures_pa * 1e-6
 
-# --.. ..- .-.. .-.. --- extract fields --.. ..- .-.. .-.. ---
-strains = []
-stresses = []
+if len(pressures_pa) != len(vtu_files):
+    print(f"[WARNING] {len(pressures_pa)} pressure steps in boundary_conditions.yaml "
+          f"!= {len(vtu_files)} VTU files found; truncating to the shorter of the two.")
+n_steps = min(len(pressures_pa), len(vtu_files))
+vtu_files = vtu_files[:n_steps]
+pressures_mpa = pressures_mpa[:n_steps]
 
-print("[INFO] Extracting macroscopic stress and strain from VTU files over time...")
+# --.. ..- .-.. .-.. --- extract Damage field over the ramp --.. ..- .-.. .-.. ---
+max_damage = []
+
+print("[INFO] Extracting max(Damage) over the domain for each pressure step...")
 for vtu in vtu_files:
     vtu_path = os.path.join(OUTPUT_DIR, vtu)
-    
-    x, y, _, disp = extract_field(vtu_path, field_name="Displacement")
-    _, _, _, sigma = extract_field(vtu_path, field_name="Stress_uo2 (points)")
-    
-    # Macroscopic stress: average of sigma_yy on the top boundary (ymax)
-    # This avoids compressive numerical artifacts at the crack tip which distort a global point average
-    top_nodes_mask = np.abs(y - Ly) < 1e-6
+    _, _, _, D = extract_field(vtu_path, field_name="Damage")
+    d_max = float(np.max(D))
+    max_damage.append(d_max)
 
-    # --- DIAGNOSTIC ---
-    # Check if any nodes are found on the top boundary. If not, something is wrong.
-    if not np.any(top_nodes_mask):
-        print(f"[WARNING] For file {vtu}: No nodes found on the top boundary (y={Ly}). Stress will be zero.")
-        stresses.append(0.0)
-        strains.append(0.0)
-        continue # Go to next vtu file
+max_damage = np.asarray(max_damage)
 
-    # --- CALCULATION ---
-    # Macroscopic strain: average y-displacement on top / Ly
-    u_y_top = np.mean(disp[top_nodes_mask, 1])
-    strains.append(u_y_top / Ly)
+# --.. ..- .-.. .-.. --- critical cracking pressure --.. ..- .-.. .-.. ---
+crack_idx = np.argmax(max_damage >= DAMAGE_CRITICAL_THRESHOLD) if np.any(max_damage >= DAMAGE_CRITICAL_THRESHOLD) else None
 
-    # Extraction robuste de sigma_yy : on calcule la moyenne de chaque composante 
-    # sur le bord supérieur, et on prend celle qui a la plus grande valeur absolue 
-    # (puisque nous sommes en traction pure selon Y)
-    top_sigma_mean = np.mean(sigma[top_nodes_mask], axis=0)
-    idx_yy = np.argmax(np.abs(top_sigma_mean))
-    sigma_yy_macro = top_sigma_mean[idx_yy]
-        
-    print(f"  -> {vtu}: Déplacement ymax = {u_y_top:.3e} m | Strain = {u_y_top/Ly:.4e} | Stress_yy = {sigma_yy_macro*1e-6:.2f} MPa")
+if crack_idx is not None:
+    p_critical = float(pressures_mpa[crack_idx])
+    print("\n" + "="*70)
+    print(f"{'█'*70}")
+    print(f"  📊 CRITICAL CRACKING PRESSURE: {p_critical:.2f} MPa  (step {crack_idx}, max D = {max_damage[crack_idx]:.4f})")
+    print(f"{'█'*70}")
+    print("="*70 + "\n")
+else:
+    p_critical = 0.0
+    print(f"\n[WARNING] max(Damage) never reached {DAMAGE_CRITICAL_THRESHOLD} over the pressure ramp "
+          f"(max reached: {np.max(max_damage):.4f} at {pressures_mpa[np.argmax(max_damage)]:.2f} MPa). "
+          f"Increase P_MAX in generate_yaml.py to bracket the critical pressure.\n")
 
-    stresses.append(sigma_yy_macro * 1e-6) # Convert to MPa
-
-sigma_yy_max = np.max(stresses) if stresses else 0.0
-
-# --.. ..- .-.. .-.. --- Display Max Rupture Stress --.. ..- .-.. .-.. ---
-print("\n" + "="*70)
-print(f"{'█'*70}")
-print(f"  📊 MAXIMUM RUPTURE STRESS: {sigma_yy_max:.2f} MPa")
-print(f"{'█'*70}")
-print("="*70 + "\n")
+# --.. ..- .-.. .-.. --- degenerate-run guard --.. ..- .-.. .-.. ---
+# The reference below is a placeholder (0.0), so pass_fail_check cannot fail.
+# Without this guard a ramp that never cracked anything reports PASS, and
+# blessing it would freeze "no cracking" as the expected answer.
+if p_critical is None or not np.isfinite(p_critical) or p_critical <= 0.0:
+    sys.exit(
+        f"[ERROR] no critical cracking pressure found: max(Damage) peaked at "
+        f"{np.max(max_damage):.4f}, below the {DAMAGE_CRITICAL_THRESHOLD} threshold, "
+        f"over a ramp reaching {np.abs(pressures_mpa).max():.1f} MPa. Either the ramp "
+        f"is too short to bracket the critical pressure (extend it) or the result is "
+        f"'this cavity does not crack in this range' -- which is a finding to record "
+        f"deliberately, not a gold to bless by default."
+    )
 
 errors = {
-    "max_stress_yy": {
-        "numerical": float(sigma_yy_max),
+    "critical_pressure_MPa": {
+        "numerical": p_critical,
         "reference": 0.0,
         "rel_error": 0.0
     }
@@ -112,28 +117,46 @@ errors = {
 TOLERANCE = 1.0e-2
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 
-# --.. ..- .-.. .-.. --- plot Stress vs Strain --.. ..- .-.. .-.. ---
+# --.. ..- .-.. .-.. --- plot Pressure vs max(Damage) --.. ..- .-.. .-.. ---
 plt.figure(figsize=(10, 6))
-
-plt.plot(strains, stresses, 'b-o', markersize=4, label=r"Z3ST - $\sigma_{yy}$ (Top Boundary Average)")
-
-plt.xlabel(r"Macroscopic Strain $\varepsilon_{yy}$ (-)")
-plt.ylabel(r"Average Stress $\sigma_{yy}$ (MPa)")
-plt.title("Stress-Strain Curve (Jiang 2020 Reproduction)")
+plt.plot(pressures_mpa, max_damage, 'b-o', markersize=4, label=r"max(Damage) over domain")
+plt.axhline(DAMAGE_CRITICAL_THRESHOLD, color='gray', ls='--', alpha=0.7,
+            label=f"Critical threshold D = {DAMAGE_CRITICAL_THRESHOLD}")
+if crack_idx is not None:
+    plt.axvline(p_critical, color='r', ls=':', alpha=0.8,
+                label=f"Critical pressure = {p_critical:.2f} MPa")
+plt.xlabel("Applied cavity pressure (MPa)")
+plt.ylabel("max(Damage) (-)")
+plt.title("Cavity pressurization: damage evolution vs. applied pressure")
 plt.grid(True, ls=':', alpha=0.6)
 plt.legend()
-
-plot_path_ss = os.path.join(CASE_DIR, "output", "stress_strain_jiang.png")
 plt.tight_layout()
-plt.savefig(plot_path_ss, dpi=300)
-print(f"[INFO] Plot saved in: {plot_path_ss}")
+plot_path_damage = os.path.join(CASE_DIR, "output", "damage_vs_pressure.png")
+plt.savefig(plot_path_damage, dpi=300)
+print(f"[INFO] Plot saved in: {plot_path_damage}")
 
-errors = {
-    "max_stress_yy": {
-        "numerical": float(sigma_yy_max),
-        "reference": 0.0,
-        "rel_error": 0.0
-    }
-}
-TOLERANCE = 1.0e-2
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+# --.. ..- .-.. .-.. --- plot Pressure vs energies --.. ..- .-.. .-.. ---
+energy_file = os.path.join(CASE_DIR, "energies.txt")
+if os.path.exists(energy_file):
+    energy_data = np.genfromtxt(energy_file, names=True, skip_header=0)
+    steps = energy_data["Step"].astype(int)
+    mask = steps < n_steps
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(pressures_mpa[steps[mask]], energy_data["E_el"][mask], 'b-o', markersize=3, label=r"Elastic $E_{el}$")
+    plt.plot(pressures_mpa[steps[mask]], energy_data["E_frac"][mask], 'r-s', markersize=3, label=r"Fracture $E_{frac}$")
+    plt.plot(pressures_mpa[steps[mask]], energy_data["E_tot"][mask], 'k--', lw=1.5, label=r"Total $E_{tot}$")
+    if crack_idx is not None:
+        plt.axvline(p_critical, color='r', ls=':', alpha=0.8,
+                    label=f"Critical pressure = {p_critical:.2f} MPa")
+    plt.xlabel("Applied cavity pressure (MPa)")
+    plt.ylabel("Energy (J)")
+    plt.title("Global energy balance vs. applied pressure")
+    plt.grid(True, ls=':', alpha=0.6)
+    plt.legend(loc="upper left", fontsize="small")
+    plt.tight_layout()
+    plot_path_energy = os.path.join(CASE_DIR, "output", "energy_vs_pressure.png")
+    plt.savefig(plot_path_energy, dpi=300)
+    print(f"[INFO] Plot saved in: {plot_path_energy}")
+else:
+    print(f"[WARN] {energy_file} not found; skipping energy vs. pressure plot.")

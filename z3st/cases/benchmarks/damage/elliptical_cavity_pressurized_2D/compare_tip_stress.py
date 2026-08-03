@@ -138,7 +138,7 @@ def analyze_case(case_dir, lc, ax, ay):
 
     direction = anchor / np.linalg.norm(anchor)  # radially outward from (0,0)
 
-    _, _, _, S = extract_field(vtu_path, field_name="Stress_uo2 (points)")
+    _, _, _, S = extract_field(vtu_path, field_name="Stress (points)")
     distances = np.array(STANDOFF_MULTIPLES_OF_LC) * lc
     raw_anchor = probe(x, y, S, tuple(anchor))
     rows = [probe(x, y, S, tuple(anchor + d * direction)) for d in distances]

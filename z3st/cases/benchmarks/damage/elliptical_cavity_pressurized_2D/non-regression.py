@@ -93,6 +93,20 @@ else:
           f"(max reached: {np.max(max_damage):.4f} at {pressures_mpa[np.argmax(max_damage)]:.2f} MPa). "
           f"Increase P_MAX in generate_yaml.py to bracket the critical pressure.\n")
 
+# --.. ..- .-.. .-.. --- degenerate-run guard --.. ..- .-.. .-.. ---
+# The reference below is a placeholder (0.0), so pass_fail_check cannot fail.
+# Without this guard a ramp that never cracked anything reports PASS, and
+# blessing it would freeze "no cracking" as the expected answer.
+if p_critical is None or not np.isfinite(p_critical) or p_critical <= 0.0:
+    sys.exit(
+        f"[ERROR] no critical cracking pressure found: max(Damage) peaked at "
+        f"{np.max(max_damage):.4f}, below the {DAMAGE_CRITICAL_THRESHOLD} threshold, "
+        f"over a ramp reaching {np.abs(pressures_mpa).max():.1f} MPa. Either the ramp "
+        f"is too short to bracket the critical pressure (extend it) or the result is "
+        f"'this cavity does not crack in this range' -- which is a finding to record "
+        f"deliberately, not a gold to bless by default."
+    )
+
 errors = {
     "critical_pressure_MPa": {
         "numerical": p_critical,

@@ -106,13 +106,14 @@ def harvest_curve(variant, Ly):
     for vtu in vtus:
         path = os.path.join(out_dir, vtu)
         _, y, _, disp = extract_field(path, field_name="Displacement")
-        _, _, _, sigma = extract_field(path, field_name="Stress_uo2 (points)")
+        _, _, _, sigma = extract_field(path, field_name="Stress (points)")
         top = np.abs(y - Ly) < 1e-6
         if not np.any(top):
             continue
         strains.append(float(np.mean(disp[top, 1])) / Ly)
+        # component 4 of the flattened 3x3 tensor = sigma_yy
         mean_sigma = np.mean(sigma[top], axis=0)
-        stresses.append(float(mean_sigma[np.argmax(np.abs(mean_sigma))]) * 1e-6)
+        stresses.append(float(mean_sigma[4]) * 1e-6)
     return strains, stresses
 
 

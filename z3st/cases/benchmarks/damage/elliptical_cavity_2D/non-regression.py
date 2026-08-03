@@ -63,7 +63,7 @@ for vtu in vtu_files:
     vtu_path = os.path.join(OUTPUT_DIR, vtu)
     
     x, y, _, disp = extract_field(vtu_path, field_name="Displacement")
-    _, _, _, sigma = extract_field(vtu_path, field_name="Stress_uo2 (points)")
+    _, _, _, sigma = extract_field(vtu_path, field_name="Stress (points)")
     
     # Macroscopic stress: average of sigma_yy on the top boundary (ymax)
     # This avoids compressive numerical artifacts at the crack tip which distort a global point average
@@ -85,9 +85,11 @@ for vtu in vtu_files:
     # Extraction robuste de sigma_yy : on calcule la moyenne de chaque composante 
     # sur le bord supérieur, et on prend celle qui a la plus grande valeur absolue 
     # (puisque nous sommes en traction pure selon Y)
+    # Stress is written as a flattened 3x3 tensor (9 components, row-major),
+    # so sigma_yy is component 4. The previous largest-magnitude heuristic
+    # would silently return sigma_xx wherever it happened to dominate.
     top_sigma_mean = np.mean(sigma[top_nodes_mask], axis=0)
-    idx_yy = np.argmax(np.abs(top_sigma_mean))
-    sigma_yy_macro = top_sigma_mean[idx_yy]
+    sigma_yy_macro = top_sigma_mean[4]
         
     print(f"  -> {vtu}: Déplacement ymax = {u_y_top:.3e} m | Strain = {u_y_top/Ly:.4e} | Stress_yy = {sigma_yy_macro*1e-6:.2f} MPa")
 
@@ -101,6 +103,20 @@ print(f"{'█'*70}")
 print(f"  📊 MAXIMUM RUPTURE STRESS: {sigma_yy_max:.2f} MPa")
 print(f"{'█'*70}")
 print("="*70 + "\n")
+
+# --.. ..- .-.. .-.. --- degenerate-run guards --.. ..- .-.. .-.. ---
+# The reference below is a placeholder (0.0), so pass_fail_check cannot fail:
+# without these guards a run that produced no load at all still reports PASS.
+if len(stresses) < 3:
+    sys.exit(f"[ERROR] only {len(stresses)} steps recovered; nothing to characterise")
+if sigma_yy_max <= 1.0:
+    sys.exit(f"[ERROR] peak macroscopic sigma_yy is {sigma_yy_max:.3e} MPa -- the specimen "
+             "never loaded up. Check that a remote load is actually applied on ymax; a "
+             "cavity-pressure-driven case leaves the top surface traction-free and must "
+             "use the critical-cracking-pressure post-processing instead.")
+if int(np.argmax(stresses)) == len(stresses) - 1:
+    sys.exit("[ERROR] stress peaks at the last step: the ramp ends before fracture, so no "
+             "softening branch was captured -- extend the ramp before blessing")
 
 errors = {
     "max_stress_yy": {

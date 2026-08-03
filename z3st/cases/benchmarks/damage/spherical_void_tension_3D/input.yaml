@@ -51,7 +51,10 @@ damage:
   type: AT1
   solver: linear
   linear_solver: iterative_amg
-  lc: 5.0e-7
+  lc: 1.0e-6          # mesh floor: lc >= 4h with h_sph = 0.25 um (was 5.0e-7 -> violated).
+                      # Raised lc instead of refining: halving h in 3D is ~8x the elements.
+                      # Derived Gc at sigma_c = 150 MPa moves 0.078 -> 0.156 J/m2.
+                      # lc = 1 um is still R_void/7.9, so the void stays resolved.
   hybrid_constraint: true
   rtol: 1.0e-6
   stag_tol: 1.0e-6
