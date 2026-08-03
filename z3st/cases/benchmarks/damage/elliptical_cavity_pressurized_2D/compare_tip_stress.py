@@ -3,8 +3,8 @@
 Compare the local stress state ahead of the cavity tip, at the moment of
 crack initiation (max(Damage) >= DAMAGE_THRESHOLD), between:
 
-  - 15_single_elliptical_cavity_2D       (remote displacement loading, ymax)
-  - 15_single_elliptical_cavity_2D_copy  (internal pressure loading, cavity)
+  - elliptical_cavity_2D              (remote displacement loading, ymax)
+  - elliptical_cavity_pressurized_2D  (internal pressure loading, cavity)
 
 Both cases now share the same lenticular cavity geometry (ax=11.2um,
 ay=5um) and the same calibrated material (uo2.yaml, sigma_c=150 MPa), so
@@ -46,7 +46,7 @@ import matplotlib.pyplot as plt
 from z3st.utils.utils_extract_vtu import extract_field
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-ORIGINAL_DIR = os.path.normpath(os.path.join(THIS_DIR, "..", "15_single_elliptical_cavity_2D"))
+ORIGINAL_DIR = os.path.normpath(os.path.join(THIS_DIR, "..", "elliptical_cavity_2D"))
 COPY_DIR = THIS_DIR
 
 DAMAGE_THRESHOLD = 0.5

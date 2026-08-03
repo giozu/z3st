@@ -1,4 +1,8 @@
 name: "UO2_Jiang_2020_GB"
+# Material card for the UO2 cavity / bubble phase-field cases, after Jiang et al.
+# (2020), J. Nucl. Mater. -- see benchmarks/damage/CALIBRATION.md for the full
+# reasoning behind the phase-field entries below.
+
 E: 385.0e+9          # 385 GPa
 nu: 0.23             # Poisson ratio
 rho: 10970.0
@@ -7,4 +11,23 @@ alpha: 1.0e-5
 k: 5.0
 T_ref: 293.15
 T_initial: 293.15
-Gc: 2.0              # 2 J/m^2 (0.002 MPa.mm)
+
+# --- phase-field calibration -------------------------------------------------
+# sigma_c is the ONE calibrated quantity. Gc is derived per case from this
+# sigma_c and the case's own lc + damage.type (AT1/AT2) in spine.py, and any Gc
+# written here would be overridden. Do not set an active Gc key on this card.
+#
+#   nominal   : 150 MPa  (UO2 tensile strength)
+#   envelope  : [100, 200] MPa -- report results across this range, not at a
+#               single value. Too much is still unmodelled (no burnup
+#               dependence, no T-dependence of the fracture properties, no
+#               GB/transgranular distinction) to justify one final number.
+sigma_c: 150.0e+6
+
+# Gc: 2.0            # (J/m2) Jiang's grain-boundary fracture energy. KEPT AS
+#                    # REFERENCE ONLY -- at the lc these cases can mesh
+#                    # (0.5-2 um) it implies sigma_c = 380-403 MPa, ~2.5x UO2's
+#                    # real tensile strength. Reaching 150 MPa with Gc = 2.0
+#                    # would need lc = 3.6 um (AT2) / 12.8 um (AT1), which
+#                    # exceeds the cavity semi-axis (11.2 um) and would smear
+#                    # the crack over the whole defect. See CALIBRATION.md.

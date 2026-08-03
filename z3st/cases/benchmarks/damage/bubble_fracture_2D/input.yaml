@@ -10,11 +10,9 @@ boundary_conditions_path: boundary_conditions.yaml
 
 materials:
   uo2: ../../../../materials/uo2_jiang.yaml
-  # NOTE: repointed from the shared uo2.yaml during the feature/PFF -> develop transfer.
-  # The shared card is calibrated for pellet_quench (sigma_c = 1 GPa); Baptiste's cases
-  # were developed against sigma_c = 150 MPa / T_ref = 1023.15 K. uo2_jiang.yaml gives Gc
-  # directly (Gc = 2.0) and T_ref = 293.15 -- TODO(Baptiste): confirm before blessing golds.
-
+  # Calibration: sigma_c is the single knob (150 MPa nominal, [100, 200] MPa
+  # envelope); Gc is derived from sigma_c + this case's lc in spine.py.
+  # See ../CALIBRATION.md before changing lc or quoting any result.
 
 regime: 2D
 
