@@ -139,6 +139,44 @@ never write the tracked `mesh.geo` / `geometry.yaml` / `input.yaml` /
 corrupted `bubble_fracture_2D`'s angle parameterisation once already, by
 overwriting the line that *computed* `ay` from `theta_deg` with a literal.
 
+## Open — next steps for Baptiste
+
+Two decisions are deliberately left open. Both are physics calls, not maintenance.
+
+### 1. `bubble_fracture_2D` — what should the ramp answer?
+
+As configured the case ramps internal cavity pressure to **80 MPa over 401 steps and
+`max(Damage)` stays at exactly 0.0000** — correct AT1 behaviour below the elastic
+threshold, not a numerical failure. The comparable `elliptical_cavity_pressurized_2D`
+needs ~180–240 MPa to crack.
+
+80 MPa is not an arbitrary ceiling: high-burnup bubble pressure is ~50 MPa and LOCA
+transients reach ~100 MPa. So the case currently states *fission-gas pressure alone,
+in the realistic range, does not crack the matrix under this calibration* — plausibly
+the interesting result, implying coalescence or a superimposed far-field load is
+needed to initiate fracture.
+
+- **Option A — extend the ramp to ~250 MPa.** Yields a critical cracking pressure
+  comparable with the elliptical case, but at pressures well above anything physical.
+  Treat it as a material property, not an operating condition.
+- **Option B — keep the 80 MPa ceiling** and record the negative result deliberately.
+  Then the metric should become *max damage attained*, not *critical pressure*, and
+  the case documents a bound rather than a crossing.
+
+Doing both is reasonable: keep 80 MPa as the physical statement, add the extended ramp
+as a parametric study via `study_pressure_sweep.py`.
+
+Until one is chosen the case cannot be blessed — `non-regression.py` exits non-zero
+rather than reporting a false PASS.
+
+### 2. Which number is `elliptical_cavity_2D`'s headline?
+
+The run gives **peak macroscopic σ_yy = 82.66 MPa**. Baptiste's notes quote **188 MPa**,
+but that is a different quantity — the *remote reaction stress at crack initiation*
+from `compare_tip_stress.py`, not the peak over the ramp. With σ_c = 150 MPa a
+macroscopic peak of ~83 MPa implies a stress concentration factor of ~1.8 at the
+cavity, which is sane. Confirm which one the case is meant to guard before blessing.
+
 ## Rules
 
 1. Never write `Gc` as an active key on a card these cases use — set `sigma_c`.
