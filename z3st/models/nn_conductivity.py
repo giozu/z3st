@@ -65,8 +65,12 @@ class NNConductivity:
                   "clamped before evaluation (warning shown once).")
         return T_cl
 
-    def __call__(self, T_array):
-        """T_array [K] -> k_array (W/m/K), same shape, evaluated in float64."""
+    def __call__(self, T_array, **aux):
+        """T_array [K] -> k_array (W/m/K), same shape, evaluated in float64.
+
+        Auxiliary state is accepted so this model is
+        interchangeable with data-driven models that do consume it; the network
+        is a pure k(T), so the extra fields are ignored here."""
         torch = self._torch
         T = np.asarray(T_array)
         T_cl = self._clamp_T(T)
@@ -77,8 +81,9 @@ class NNConductivity:
         k = np.maximum(k, self.k_floor)
         return k.astype(T.dtype).reshape(T.shape)
 
-    def value_and_grad(self, T_array):
+    def value_and_grad(self, T_array, **aux):
         """(k, dk/dT) at T_array (K), for the external-operator tangent.
+        Auxiliary fields are accepted and ignored, as in __call__.
         Where the training-window clamp or the positivity floor is active the
         tangent is zeroed, consistent with the guarded value."""
         torch = self._torch
@@ -96,16 +101,21 @@ class NNConductivity:
         return k_np, dk_np
 
 
-def make_external_operator(nn, T, quadrature_degree=2, scheme="default"):
-    """Build k = NN(T) as a FEMExternalOperator on a scalar quadrature space.
+def make_external_operator(nn, T, quadrature_degree=2, scheme="default",
+                           aux_operands=None, aux_names=None):
+    """Build k = model(T, ...) as a FEMExternalOperator on a scalar quadrature space.
 
     The network becomes a UFL symbol that can be
     placed in a form and differentiated (ufl.derivative spawns the dk/dT
     operator). Requires the optional `dolfinx-external-operator` package.
 
-    nn: an NNConductivity instance.
+    nn: a conductivity model (NNConductivity, or any callable exposing the same
+        __call__/value_and_grad interface).
     T:  the temperature Function the operator wraps — must be the SAME Function
         the Newton solver iterates, so updates propagate.
+    aux_operands / aux_names: optional extra operands (Pu fraction, burnup, ...)
+        passed to the model by keyword. They are FROZEN in the Newton tangent —
+        only T is differentiated — so they must not themselves depend on T.
     The integration measure in the residual MUST use the same quadrature_degree
     and scheme as passed here, or assembly fails on a quadrature mismatch.
     """
@@ -119,17 +129,28 @@ def make_external_operator(nn, T, quadrature_degree=2, scheme="default"):
     )
     Q = dolfinx.fem.functionspace(mesh, Qe)
 
+    aux_operands = tuple(aux_operands or ())
+    aux_names = tuple(aux_names or ())
+    if len(aux_operands) != len(aux_names):
+        raise ValueError("aux_operands and aux_names must have the same length")
+    operands = (T,) + aux_operands
+
+    def _kwargs(aux_values):
+        return {name: value for name, value in zip(aux_names, aux_values)}
+
     def k_external(derivatives):
-        # multi-index has one entry per operand: (0,) -> value k, (1,) -> dk/dT.
+        # multi-index has one entry per operand. Only the first operand, T, is
+        # differentiated in the Newton tangent; auxiliaries are frozen fields.
         # The package fills a FLAT ref_coefficient, so ravel (operands arrive
         # shaped (ncells, nquad)).
-        if derivatives == (0,):
-            return lambda T_np: nn(T_np).ravel()
-        if derivatives == (1,):
-            return lambda T_np: nn.value_and_grad(T_np)[1].ravel()
+        if derivatives == (0,) * len(operands):
+            return lambda T_np, *aux: nn(T_np, **_kwargs(aux)).ravel()
+        if derivatives == (1,) + (0,) * len(aux_operands):
+            return lambda T_np, *aux: nn.value_and_grad(T_np, **_kwargs(aux))[1].ravel()
         raise NotImplementedError(f"k(T) derivative {derivatives} not implemented")
 
-    return FEMExternalOperator(T, function_space=Q, external_function=k_external)
+    return FEMExternalOperator(*operands, function_space=Q,
+                               external_function=k_external)
 
 
 def load_from_card(card, base_dir=None):

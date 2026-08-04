@@ -278,7 +278,7 @@ class Solver:
 
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=None):
 
-        # Non-linear thermal solver (k = NN(T) external operator, Newton with
+        # Non-linear thermal solver (k = model(T) external operator, Newton with
         # autodiff tangent), dispatched before the linear assembly.
         if self.th_cfg.get("solver", "linear") != "linear":
             return self._thermal_step_nonlinear(
@@ -430,13 +430,13 @@ class Solver:
             for aux in cache["gap_aux"]:
                 self._refresh_gap_pair(aux, T_new)
 
-        # Lagged update of any neural-network conductivity field: re-evaluate
-        # k = NN(T) at the current iterate so the (linear) form sees the updated
+        # Lagged update of any data-driven conductivity field: re-evaluate
+        # k = model(T) at the current iterate so the (linear) form sees the updated
         # coefficient on the next solve (Picard). Mutates the Function in place;
         # the cached form uses it by reference.
         for material in self.materials.values():
-            if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
-                material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
+            if "_k_model" in material and isinstance(material.get("k"), dolfinx.fem.Function):
+                material["k"].x.array[:] = material["_k_model"](T_new.x.array)
                 material["k"].x.scatter_forward()
 
         # Lagged update of porosity-dependent material properties
@@ -495,7 +495,7 @@ class Solver:
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
     def _thermal_step_nonlinear(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
-        """k = NN(T) as a FEMExternalOperator, solved by Newton with the
+        """k = model(T) as a FEMExternalOperator, solved by Newton with the
         autodiff tangent dk/dT (Latyshev et al. external operators). Scope:
         STATIONARY conduction with Dirichlet (and Neumann) BCs. Transient mass
         terms and Robin/gap BCs are not yet handled here — they raise
@@ -520,9 +520,9 @@ class Solver:
                 "Newton, thermal: Robin/gap BCs not yet supported."
             )
         for label, material in self.materials.items():
-            if "_k_nn" not in material:
+            if "_k_model" not in material:
                 raise NotImplementedError(
-                    f"Newton, thermal requires a neural-network k card; "
+                    f"Newton, thermal requires a data-driven k card; "
                     f"material '{label}' has none."
                 )
 
@@ -546,7 +546,7 @@ class Solver:
         )
         if rebuild:
             print("\n[INFO] Assembling NON-LINEAR thermal problem "
-                  "(k = NN(T) external operator, Newton)...")
+                  "(k = data-driven external operator, Newton)...")
             v_t = ufl.TestFunction(self.V_t)
             dT = ufl.TrialFunction(self.V_t)
             nl_meta = {"quadrature_degree": deg, "quadrature_scheme": "default"}
@@ -562,7 +562,7 @@ class Solver:
                 dx = dx_nl[tag]
                 # NB: do not overwrite material["k"] (the writer's heat-flux
                 # Function); the external operator is the solver's own object.
-                k_op = make_external_operator(material["_k_nn"], T_new, quadrature_degree=deg)
+                k_op = make_external_operator(material["_k_model"], T_new, quadrature_degree=deg)
                 # residual of  ∫ k ∇T·∇v dx − ∫ q''' v dx
                 F += w * k_op * ufl.inner(ufl.grad(T_new), ufl.grad(v_t)) * dx
                 F += -w * self.q_third * v_t * dx
@@ -645,8 +645,8 @@ class Solver:
         # Refresh the writer-facing k Function (a coefficient on V_t) from the
         # converged temperature, so the output heat flux -k·∇T is consistent.
         for material in self.materials.values():
-            if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
-                material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
+            if "_k_model" in material and isinstance(material.get("k"), dolfinx.fem.Function):
+                material["k"].x.array[:] = material["_k_model"](T_new.x.array)
                 material["k"].x.scatter_forward()
 
         # Staggered-convergence bookkeeping (same metrics as the linear path)

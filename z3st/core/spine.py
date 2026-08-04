@@ -6,6 +6,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import importlib
+import inspect
 import sys
 
 import dolfinx
@@ -95,6 +96,22 @@ class Spine(
         mod = importlib.import_module(module_path)
         return getattr(mod, func_name)
 
+    def call_material_function(self, func, T, material):
+        """Call a material hook with optional material/model state-bus args.
+
+        """
+        try:
+            params = inspect.signature(func).parameters
+        except (TypeError, ValueError):
+            return func(T)
+
+        kwargs = {}
+        if "material" in params:
+            kwargs["material"] = material
+        if "model" in params:
+            kwargs["model"] = self
+        return func(T, **kwargs)
+
     def load_materials(self, **materials):
         print(f"[spine.load_materials]")
 
@@ -147,7 +164,7 @@ class Spine(
                         str(mat["k"].get("type", "")).lower() in ("neural_network", "nn"):
                     print(f"  → k defined as neural network: {mat['k'].get('weights')}")
                     from z3st.models.nn_conductivity import load_from_card
-                    mat["_k_nn"] = load_from_card(mat["k"])
+                    mat["_k_model"] = load_from_card(mat["k"])
                 elif isinstance(mat["k"], str):
                     print(f"  → k defined as symbolic function: {mat['k']}")
                     k_func = self.resolve_function(mat["k"])
@@ -431,16 +448,16 @@ class Spine(
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
                 k_func = mat["_k_func"]
-                mat["k"] = k_func(self.T)
+                mat["k"] = self.call_material_function(k_func, self.T, mat)
                 print("\nk expression for", name, "→", mat["k"])
 
-            # Neural-network conductivity
-            if "_k_nn" in mat and self.T is not None:
-                k_fn = dolfinx.fem.Function(self.V_t, name=f"k_nn_{name}")
-                k_fn.x.array[:] = mat["_k_nn"](self.T.x.array)
+            # Data-driven conductivity
+            if "_k_model" in mat and self.T is not None:
+                k_fn = dolfinx.fem.Function(self.V_t, name=f"k_model_{name}")
+                k_fn.x.array[:] = mat["_k_model"](self.T.x.array)
                 k_fn.x.scatter_forward()
                 mat["k"] = k_fn
-                print(f"\nk neural-network field for {name} → Function on V_t "
+                print(f"\nk data-driven field for {name} → Function on V_t "
                       f"(min={k_fn.x.array.min():.3f}, max={k_fn.x.array.max():.3f} W/m/K)")
 
             # Porosity-dependent conductivity
