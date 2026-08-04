@@ -1,0 +1,27 @@
+{
+    "results": {
+        "center_temperature": {
+            "numerical": 1256.001595346425,
+            "reference": 1255.300865583845,
+            "abs_error": 0.7007297625798401,
+            "rel_error": 0.0011576553122949011,
+            "status": "PASS"
+        },
+        "radial_profile_l2": {
+            "numerical": 0.17903084617906417,
+            "reference": 0.0,
+            "abs_error": 0.17903084617906417,
+            "rel_error": 0.00047184616407955045,
+            "status": "PASS"
+        },
+        "radial_profile_linf": {
+            "numerical": 0.7007297625798401,
+            "reference": 0.0,
+            "abs_error": 0.7007297625798401,
+            "rel_error": 0.0011576553122949011,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.03,
+    "summary": "PASS"
+}

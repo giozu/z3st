@@ -129,12 +129,28 @@ if os.path.exists(log_path):
     if hits:
         errors["integrated_power"] = _entry(float(hits[-1]), lhr * Lz)
 
+def _regression_only(value):
+    """Metric with no closed form: gold-comparison protection only."""
+    return {"numerical": float(value), "reference": None,
+            "abs_error": 0.0, "rel_error": 0.0}
+
+
 if not is_olander:
     k_func, k_label = _conductivity(mat)
     T_center_ref = _kirchhoff_center(k_func, R, T_surface, q_vol)
     errors["center_temperature_kirchhoff"] = _entry(float(np.max(T)), T_center_ref)
 else:
     k_func, k_label = _conductivity(mat, burnup=float(np.max(bu)), Pu=float(np.max(Pu_line)))
+    # With a radially varying Pu the 1-D Kirchhoff closed form does not apply,
+    # so there is no analytic reference for the centre temperature. Without
+    # something standing in for it the gold would protect only finite_fields
+    # (0 vs 0) and integrated_power (fixed by the BC): a regression moving the
+    # temperature field by hundreds of K would pass unnoticed. Register the
+    # solution's own scalars for gold comparison only.
+    errors["T_max_K"] = _regression_only(np.max(T_all))
+    errors["T_center_midplane_K"] = _regression_only(np.max(T))
+    errors["Pu_max_line"] = _regression_only(np.max(Pu_line))
+    errors["burnup_max_MWd_kgHM"] = _regression_only(np.max(bu_all))
 
 plt.figure(figsize=(7, 5))
 plt.plot(r * 1e3, T, "o-", ms=3.5, lw=1.8, label=f"Tmax={np.max(T):.1f} K")

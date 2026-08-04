@@ -1,3 +1,16 @@
 #!/bin/bash
 cd "${0%/*}" || exit 1
-rm -rf output mesh.msh log_mesh.md log_z3st.md
+
+echo "Cleaning current directory..."
+
+# Never "rm -rf output": the blessed non-regression_gold.json lives there and
+# the suite runs Allclean before every case, so wiping the directory would
+# silently disable the gold-regression check.
+rm -f output/non-regression.json
+rm -f output/case_summary.json output/conductivity_impact.json
+rm -f output/*.vtu output/*.pvd output/*.xdmf output/*.h5
+rm -f output/*.png output/*.csv
+rm -f *.msh
+rm -f log_*.md
+
+echo "Done. Output and temporary files deleted."

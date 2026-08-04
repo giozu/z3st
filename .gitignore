@@ -49,8 +49,11 @@ input_check.txt
 *.vtu
 energies.txt
 
-# --. Trained model weights --..
+# --. Trained model weights and fitted checkpoints --..
+# Both are regenerated before every run by the owning case (train_knet.py,
+# make_synthetic_gpr.py), so no binary artefact is tracked.
 *.pt
+*.npz
 
 # --. LaTeX build artifacts (slides.pdf is force-tracked) --..
 *.aux
