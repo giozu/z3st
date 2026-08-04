@@ -1,0 +1,36 @@
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  fuel: fuel.yaml
+
+regime: axisymmetric
+
+solver_settings:
+  coupling: staggered
+  max_iters: 80
+  relax_T: 1.0
+  relax_adaptive: false
+
+models:
+  thermal: true
+  mechanical: false
+
+thermal:
+  solver: newton
+  linear_solver: direct_mumps
+  rtol: 1.0e-10
+  stag_tol: 1.0e-8
+  convergence: rel_norm
+  analysis: stationary
+  quadrature_degree: 2
+
+lhr:
+- 30000.0
+time:
+- 0.0
+n_steps: 1
+
+output:
+  format: vtu

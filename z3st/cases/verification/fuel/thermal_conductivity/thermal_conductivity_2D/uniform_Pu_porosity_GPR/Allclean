@@ -1,0 +1,3 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+rm -rf output mesh.msh log_mesh.md log_z3st.md

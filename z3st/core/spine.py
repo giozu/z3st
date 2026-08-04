@@ -165,6 +165,17 @@ class Spine(
                     print(f"  → k defined as neural network: {mat['k'].get('weights')}")
                     from z3st.models.nn_conductivity import load_from_card
                     mat["_k_model"] = load_from_card(mat["k"])
+                elif isinstance(mat["k"], dict) and \
+                        str(mat["k"].get("type", "")).lower() in ("gpr", "gaussian_process"):
+                    print(f"  → k defined as Gaussian-process model: "
+                          f"{mat['k'].get('model', mat['k'].get('path'))}")
+                    from z3st.models.gpr_conductivity import load_from_card
+                    mat["_k_model"] = load_from_card(mat["k"], material=mat)
+                elif isinstance(mat["k"], dict) and \
+                        str(mat["k"].get("type", "")).lower() in ("magni", "magni_mox"):
+                    print("  → k defined as Magni MA-MOX data-driven model")
+                    from z3st.models.magni_conductivity import load_from_card
+                    mat["_k_model"] = load_from_card(mat["k"], material=mat)
                 elif isinstance(mat["k"], str):
                     print(f"  → k defined as symbolic function: {mat['k']}")
                     k_func = self.resolve_function(mat["k"])

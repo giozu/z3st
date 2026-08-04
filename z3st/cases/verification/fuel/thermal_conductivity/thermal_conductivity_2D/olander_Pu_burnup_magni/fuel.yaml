@@ -1,0 +1,30 @@
+name: MA-MOX-Olander-Magni
+fissile: true
+
+k:
+  type: magni
+  use_burnup_field: true
+
+Pu: 0.20
+Pu_profile: olander
+Am: 0.00
+Np: 0.00
+x: 0.02
+p: 0.12
+
+radial_profile: materials.fuel_profiles.olander_plutonium_redistribution
+olander_D: 0.01
+olander_alpha: 10.0
+olander_rstar_fraction: conserve
+olander_burnup_scale: 20.0
+
+E: 170e+9
+nu: 0.29
+cp: 330.0
+alpha: 1.45e-5
+T_ref: 650.0
+T_initial: 650.0
+rho: 11000.0
+heavy_metal_fraction: 0.88
+mu_gamma: 0.0
+gamma_heating: 0.0
