@@ -27,6 +27,12 @@ cache/
 log.*
 *.log
 non-regression.json
+
+# --. Per-case run summaries produced by the thermal-conductivity comparisons --..
+case_summary.json
+conductivity_impact.json
+comparison_summary.json
+fit_metrics.json
 z3st/cases/**/log_*.md
 !z3st/cases/verification/mechanics/uniaxial_tension/log_*.md
 input_check.txt
