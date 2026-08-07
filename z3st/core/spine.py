@@ -70,8 +70,6 @@ class Spine(
             ThermalModel.__init__(self)
         if self.on.get("mechanical", False):
             MechanicalModel.__init__(self)
-        if self.on.get("gap", False):
-            GapModel.__init__(self)
         if self.on.get("contact", False):
             ContactModel.__init__(self)
         if self.on.get("damage", False):

@@ -316,33 +316,6 @@ class MechanicalModel:
             f"  [INFO] {bc_type} mechanical BC on '{mat_type}' → {blocked} = 0.0 at region '{region_name}'"
         )
 
-    def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):
-        """
-        DirichletBC on a vectorial space, using Constant or Functiont.
-
-        Parameters:
-            mesh: dolfinx.mesh.Mesh
-            V: dolfinx.fem.FunctionSpace (collapsed)
-            dofs: np.ndarray
-            displacement: list, tuple, np.ndarray
-            tdim: int
-
-        Returns:
-            dolfinx.fem.DirichletBC
-        """
-        displacement = np.array(displacement, dtype=PETSc.ScalarType)
-
-        if displacement.ndim == 1 and displacement.size == tdim:
-            # print(f"  create_dirichlet_bc with Constant")
-            return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, displacement), dofs, V)
-        elif displacement.ndim == 2 and displacement.shape == (tdim, 1):
-            # print(f"  create_dirichlet_bc with Function")
-            u_d = dolfinx.fem.Function(V)
-            u_d.interpolate(lambda x: np.tile(displacement, (1, x.shape[1])))
-            return dolfinx.fem.dirichletbc(u_d, dofs)
-        else:
-            raise ValueError(f"Invalid displacement format: shape {displacement.shape}")
-
     def epsilon(self, u):
         """
         Compute the infinitesimal strain tensor epsilon.
@@ -442,22 +415,6 @@ class MechanicalModel:
             F_def = ufl.Identity(d) + ufl.grad(u)
 
         return ufl.variable(F_def)
-
-    def epsilon_hyperelastic(self, u):
-        """
-        Green-Lagrange strain tensor for finite deformations.
-
-        E = (1/2)(FᵀF - I) = (1/2)(C - I)
-
-        Parameters:
-            u: Displacement field.
-
-        Returns:
-            Green-Lagrange strain tensor (UFL expression).
-        """
-        F_def = self.deformation_gradient(u)
-        dim = F_def.ufl_shape[0]
-        return 0.5 * (F_def.T * F_def - ufl.Identity(dim))
 
     def sigma_mech(self, u, material):
         """
@@ -903,32 +860,3 @@ class MechanicalModel:
         sigma = self.sigma_mech(u, material)
         eps = self.epsilon(u)
         return 0.5 * ufl.inner(sigma, eps)
-
-    def zero_displacement(self, mesh, dofs, V):
-        """
-        Returns a DirichletBC with zero displacement vector.
-
-        Parameters:
-            mesh (dolfinx.Mesh): The mesh object.
-            dofs (array-like): Degrees of freedom where BC is applied.
-            V (FunctionSpace): The function space.
-
-        Returns:
-            dolfinx.fem.DirichletBC: The zero displacement boundary condition.
-        """
-        return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, (0.0, 0.0, 0.0)), dofs, V)
-
-    def fixed_displacement(self, mesh, dofs, V, displacement):
-        """
-        Returns a DirichletBC with a specified displacement vector.
-
-        Parameters:
-            mesh (dolfinx.Mesh): The mesh object.
-            dofs (array-like): Degrees of freedom where BC is applied.
-            V (FunctionSpace): The function space (vector-valued).
-            displacement (tuple or list): The displacement vector (e.g. (0.0, 0.0, 0.0)).
-
-        Returns:
-            dolfinx.fem.DirichletBC: The displacement boundary condition.
-        """
-        return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, displacement), dofs, V)
