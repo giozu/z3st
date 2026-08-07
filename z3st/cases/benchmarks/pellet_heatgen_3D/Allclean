@@ -1,13 +1,2 @@
 #!/bin/bash
-cd "${0%/*}" || exit 1
-
-echo "Cleaning current directory..."
-
-rm -f output/non-regression.json
-rm -f output/fields.xdmf output/fields.h5
-rm -f output/*.png
-rm -f output/*.csv
-rm -f *.msh
-rm -f log_*.md
-
-echo "Done. Output and temporary files deleted."
+. "$(python3 -c 'import z3st,os;print(os.path.dirname(z3st.__file__))')/utils/allclean.sh"

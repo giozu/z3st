@@ -1,14 +1,3 @@
 #!/bin/bash
-cd "${0%/*}" || exit 1
-
-set -e
-
-echo "Executing z3st.py..."
-
-gmsh mesh.geo -2 > log_mesh.md
-
-python3 -m z3st > log_z3st.md
-
-python3 non-regression.py
-
-python3 ../../../utils/plot_convergence.py log_z3st.md
+DIM=2
+. "$(python3 -c 'import z3st,os;print(os.path.dirname(z3st.__file__))')/utils/allrun.sh"
