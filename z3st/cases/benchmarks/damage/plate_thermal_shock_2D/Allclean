@@ -3,7 +3,12 @@ cd "${0%/*}" || exit 1
 
 echo "Cleaning current directory..."
 
-rm -rf output/
+# Never "rm -rf output": the blessed non-regression_gold.json lives there and the
+# suite runs Allclean before every case, so wiping the directory would disable
+# this case's gold-regression check. Deleting by extension keeps the gold by
+# construction. Note output/*.json is NOT usable -- it would match the gold.
+rm -f output/non-regression.json output/case_summary.json
+rm -f output/*.vtu output/*.pvd output/*.xdmf output/*.h5 output/*.png output/*.csv
 rm -f energies.txt
 rm -f log_*.md log.z3st
 
