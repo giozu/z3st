@@ -57,12 +57,16 @@ for case_name in "${CASES[@]}"; do
     if [[ $exit_code -eq 0 && -f "output/non-regression.json" ]]; then
         summary_status=$(grep -o '"summary": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
         regression_status=$(grep -o '"regression": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
-        if [[ "$summary_status" == "FAIL" ]]; then
+        # Require PASS rather than "not FAIL". Every CI case has a blessed gold,
+        # so both verdicts must be present: an EMPTY one means the check never
+        # ran (a deleted gold, an Allclean wiping output/, a script that died
+        # before writing) and would otherwise sail through as a non-failure.
+        if [[ "$summary_status" != "PASS" ]]; then
             exit_code=1
-            fail_reason=" (analytic tolerance)"
-        elif [[ "$regression_status" == "FAIL" ]]; then
+            fail_reason=" (analytic tolerance: ${summary_status:-verdict missing})"
+        elif [[ "$regression_status" != "PASS" ]]; then
             exit_code=1
-            fail_reason=" (regression vs gold)"
+            fail_reason=" (regression vs gold: ${regression_status:-verdict missing, gold absent})"
         fi
     fi
 

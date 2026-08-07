@@ -333,6 +333,16 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+## Contributor acknowledgements
+
+Beyond the author, the following people have contributed to Z3ST:
+
+* **Romain Turgis** (ENSTA Paris) — the `verification/fuel/creep_shrink_fit_2D`
+  case and its analysis scripts, verifying the relaxation of the pellet–cladding
+  contact pressure by Norton creep against the closed form of Esposito et al.,
+  *Int. J. Pressure Vessels and Piping* **185** (2020) 104126.
+  Internship at Politecnico di Milano, 2026-05-25 → 2026-07-31.
+
 ---
 
 ## FEniCSx project acknowledgement
