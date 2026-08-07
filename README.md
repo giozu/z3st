@@ -108,7 +108,7 @@ These cases serve both as:
 * **Parallel performance** — PETSc with MUMPS / GAMG / HYPRE BoomerAMG, MPI via `MPI.COMM_WORLD`
 * **Post-processing ecosystem** — VTU and XDMF time-series output through a unified writer that pre-compiles all interpolation expressions once at setup; ParaView- and PyVista-compatible
 * **Continuous integration** — per-case `non-regression.py` vs. version-controlled gold JSON, summarised on every commit via GitHub Actions
-* **Documented API** — Sphinx sources under `docs/source/`, built by GitHub Actions; UML class diagram in [`docs/architecture.md`](docs/architecture.md)
+* **Documented API** — Sphinx sources under `docs/source/`, built by GitHub Actions; UML class diagram in [`docs/source/architecture.md`](docs/source/architecture.md)
 
 ---
 

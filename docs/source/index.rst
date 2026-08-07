@@ -75,6 +75,7 @@ Documentation Contents
    :caption: User Guide
 
    usage
+   architecture
    physics_models
    staggered_theory
    examples
