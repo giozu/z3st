@@ -67,7 +67,6 @@ z3st/
     │   ├── finite_element_setup.py   FE function spaces (V_t, V_m, V_d, V_c, V_pl, Q)
     │   ├── solver.py                 staggered solver, PETSc options
     │   ├── spine.py                  Spine — top-level driver (multi-inheritance of mixins)
-    │   ├── diagnostic.py             structured logger
     │   └── mesh/                     mesh sub-package
     │       ├── reader.py             Gmsh → dolfinx loader
     │       ├── manager.py            MeshManager (tags, geometry metrics, normals)
@@ -95,15 +94,13 @@ z3st/
     │                                               radial power f(r,bu) + burnup-driven swelling(bu)
     ├── utils/                        post-processing + helpers
     │   ├── writer.py                 unified VTU / XDMF OutputWriter (pre-compiled, single-pass)
-    │   ├── mesh_builder.py           build simple meshes from YAML geometry
+    │   ├── logger.py                 framework-wide logger (`log`)
     │   ├── plot_convergence.py       staggered-residual plots
     │   ├── utils_extract_vtu.py      scalar/vector/tensor extraction from VTU
     │   ├── utils_extract_xdmf.py     same for XDMF
     │   ├── utils_load.py             YAML loader + power-history generator
     │   ├── utils_plot.py             1D/radial plots (T(r), σ_rr(r), …)
     │   ├── utils_verification.py     reference analytical benchmarks
-    │   ├── output.py                 stdout / JSON helpers
-    │   ├── z-gui.py                  interactive PyVista 3D viewer
     │   ├── interactive_gui.ipynb     notebook front-end
     │   └── geo_files/                reusable Gmsh .geo templates
     │       ├── annulus_3D.geo, coaxial_cylinders_2D.geo,
@@ -308,9 +305,9 @@ with upwind interior-facet flux for advection, SIPG for diffusion, and a **mass-
 - `manager.py` — `MeshManager` stores geometry metadata (`geometry_type ∈ {rect, cyl/cylinder, sphere}`, `Lx, Ly, Lz, Ri, Ro`), the `label_map` from `geometry.yaml`, computes area/perimeter/inner_radius and exposes `locate_domain_dofs`, `locate_facets_dofs`, facet normals, dimensions.
 - `plotter.py` — optional PyVista viewer for surface tags.
 
-### 3.5 `core/diagnostic.py`
+### 3.5 `utils/logger.py`
 
-Custom structured logger (`log.info`, `log.warning`, …) reused across modules.
+Framework-wide `logging` logger named `z3st` (`log.info`, `log.warning`, …), reused across modules.
 
 ---
 
@@ -870,7 +867,7 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/core/finite_element_setup.py`           | Allocates `V_t, V_m, V_d, V_c, V_pl, Q`               |
 | `z3st/core/solver.py`                         | Staggered solver, PETSc options, DG cluster solver    |
 | `z3st/core/mesh/{reader,manager,plotter}.py`  | Mesh IO, tag management, PyVista preview              |
-| `z3st/core/diagnostic.py`                     | Structured logger                                     |
+| `z3st/utils/logger.py`                       | Framework-wide logger (`log`)                         |
 | `z3st/models/thermal_model.py`                | Thermal BCs + heat-flux diagnostics                   |
 | `z3st/models/mechanical_model.py`             | Strain/stress tensors, constitutive routes, mech BCs  |
 | `z3st/models/damage_model.py`                 | AT1/AT2 phase-field, energy splits, history update    |
@@ -890,7 +887,7 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/utils/utils_plot.py`, `plot_convergence.py` | Plotting helpers                                  |
 | `z3st/utils/utils_extract_{vtu,xdmf}.py`      | Field extraction from output files                    |
 | `z3st/utils/utils_verification.py`            | Analytical benchmarks                                  |
-| `z3st/utils/z-gui.py`, `interactive_gui.ipynb`| Interactive viewers                                   |
+| `z3st/utils/interactive_gui.ipynb`            | Interactive viewer (notebook)                         |
 | `z3st/utils/geo_files/*.geo`                  | Reusable Gmsh templates                                |
 | `z3st/cases/…`                                | ~40 verification / validation / demo cases            |
 | `docs/source/*.rst`                           | Sphinx user & API documentation                        |

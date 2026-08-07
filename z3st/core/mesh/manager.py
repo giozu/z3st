@@ -10,7 +10,7 @@ import numpy as np
 import ufl
 from dolfinx import fem, mesh
 
-from z3st.core.diagnostic import log
+from z3st.utils.logger import log
 
 
 class MeshManager:

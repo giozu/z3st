@@ -135,7 +135,6 @@ z3st/                                # repository root
     │   ├── spine.py                 # top-level Spine driver
     │   ├── solver.py                # staggered solver, PETSc options
     │   ├── finite_element_setup.py  # V_t / V_m / V_d / V_c / V_pl / Q
-    │   ├── diagnostic.py
     │   └── mesh/                    # Gmsh loader, MeshManager, PyVista preview
     │       ├── reader.py
     │       ├── manager.py
@@ -158,15 +157,13 @@ z3st/                                # repository root
     │   └── ceramic.py, oxide.py, fuel_*.py, zircaloy_E.py  # k(T), Gc(x), swelling, E(T) callables
     ├── utils/                       # post-processing + helpers
     │   ├── writer.py                # unified VTU / XDMF OutputWriter
-    │   ├── mesh_builder.py
+    │   ├── logger.py                # framework-wide logger
     │   ├── plot_convergence.py
     │   ├── utils_extract_vtu.py     # field extraction from VTU
     │   ├── utils_extract_xdmf.py    # same for XDMF
     │   ├── utils_load.py            # YAML loader + power-history generator
     │   ├── utils_plot.py            # 1D / radial plots
     │   ├── utils_verification.py    # analytical benchmarks
-    │   ├── output.py                # stdout / JSON helpers
-    │   ├── z-gui.py                 # interactive PyVista viewer
     │   └── geo_files/               # reusable Gmsh templates
     ├── ai/                          # agent onboarding (PROMPT.md, CONTEXT.md)
     ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
@@ -281,7 +278,6 @@ Full compatibility with **ParaView** and **PyVista** enables both automated and 
 | `writer.py`            | Unified `OutputWriter`: per-step VTU files or single-file XDMF time series              |
 | `utils_extract_vtu.py` | Extracts scalar/vector fields and stress components from VTU outputs                    |
 | `utils_plot.py`        | Generates 1D and radial plots (e.g. T(r), σ<sub>rr</sub>(r)) and can be easily extended |
-| `z-gui.py`             | Interactive 3D viewer built on PyVista for exploratory visualization                    |
 | ...                    | ...                                                                                     |
 
 

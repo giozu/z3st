@@ -10,7 +10,7 @@ from pathlib import Path
 import dolfinx
 from mpi4py import MPI
 
-from z3st.core.diagnostic import log
+from z3st.utils.logger import log
 
 
 class GmshMeshReader:

@@ -10,7 +10,7 @@ import numpy as np
 import pyvista
 from dolfinx.plot import vtk_mesh
 
-from z3st.core.diagnostic import log
+from z3st.utils.logger import log
 
 
 class MeshPlotter:

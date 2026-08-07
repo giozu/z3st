@@ -78,10 +78,10 @@ Output
    :undoc-members:
    :show-inheritance:
 
-Diagnostics
------------
+Logging
+-------
 
-.. automodule:: z3st.core.diagnostic
+.. automodule:: z3st.utils.logger
    :members:
    :undoc-members:
    :show-inheritance:

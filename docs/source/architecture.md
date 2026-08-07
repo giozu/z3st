@@ -155,9 +155,9 @@ flowchart TD
   spine --> models[models/*.py<br/>10 physics mixins]
   manager --> reader[core/mesh/reader.py]
   manager --> plotter[core/mesh/plotter.py]
-  manager --> diagnostic[core/diagnostic.py]
-  reader --> diagnostic
-  plotter --> diagnostic
+  manager --> logging[utils/logger.py]
+  reader --> logging
+  plotter --> logging
   solver --> nn[models/nn_conductivity.py]
 ```
 
