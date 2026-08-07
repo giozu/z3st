@@ -130,8 +130,6 @@ class Solver:
         print("[Solver] initializer")
         solver_settings = self.input_file.get("solver_settings", {})
 
-        self.coupling = solver_settings.get("coupling", "staggered")
-
         self.relax_T = float(solver_settings.get("relax_T", 0.9))
         self.relax_u = float(solver_settings.get("relax_u", 0.4))
         self.relax_D = float(solver_settings.get("relax_D", 0.4))
