@@ -24,7 +24,6 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
-import pandas as pd
 
 def plot_field_along_r_xyz(
     x,
@@ -188,10 +187,10 @@ def radial_average_kernel(x, y, z, field, r_points=None, bandwidth=0.0005):
 def radial_average_round(x, y, z, field_name, field, decimals=4):
     print(f"[INFO] Performing radial averaging (decimals={decimals})")
     r = np.sqrt(x**2 + y**2 + z**2)
-    df = pd.DataFrame({"r": r, field_name: field})
-    df["r"] = df["r"].round(decimals)
-    df = df.groupby("r", as_index=False)[field_name].mean()
-    return df["r"].to_numpy(), df[field_name].to_numpy()
+    # numpy spelling of groupby(r).mean(): unique gives sorted keys + per-sample
+    # group index, bincount sums per group, dividing by the counts gives the mean.
+    keys, inv = np.unique(np.round(r, decimals), return_inverse=True)
+    return keys, np.bincount(inv, weights=field) / np.bincount(inv)
 
 
 def plotter_sigma_temperature_cylinder(

@@ -22,7 +22,6 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pyvista as pv
-import pandas as pd
 import yaml
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
@@ -110,14 +109,14 @@ def extract_mid_cylinder(grid):
     sigma_zz = s[:, 8] # Hoop
     
     # Save CSV
-    df = pd.DataFrame({
-        "r": r,
-        "sigma_rr": sigma_rr,
-        "sigma_axial": sigma_yy,
-        "sigma_hoop": sigma_zz
-    })
     csv_path = os.path.join(OUT_DIR, "stress_cylinder_mid.csv")
-    df.to_csv(csv_path, index=False)
+    np.savetxt(
+        csv_path,
+        np.column_stack([r, sigma_rr, sigma_yy, sigma_zz]),
+        delimiter=",",
+        header="r,sigma_rr,sigma_axial,sigma_hoop",
+        comments="",
+    )
     print(f"[INFO] Saved CSV: {csv_path}")
     
     # Plot
@@ -211,16 +210,14 @@ def extract_head_middle(grid):
     sig_meridional = sig_xx * s**2 + sig_yy * c**2 - 2 * sig_xy * c * s
     
     # Save CSV
-    df = pd.DataFrame({
-        "r_spherical": r_sph,
-        "x": x_s,
-        "y": y_s,
-        "sigma_normal": sig_normal,
-        "sigma_meridional": sig_meridional,
-        "sigma_hoop": sig_zz
-    })
     csv_path = os.path.join(OUT_DIR, "stress_head_mid.csv")
-    df.to_csv(csv_path, index=False)
+    np.savetxt(
+        csv_path,
+        np.column_stack([r_sph, x_s, y_s, sig_normal, sig_meridional, sig_zz]),
+        delimiter=",",
+        header="r_spherical,x,y,sigma_normal,sigma_meridional,sigma_hoop",
+        comments="",
+    )
     print(f"[INFO] Saved CSV: {csv_path}")
     
     # Plot

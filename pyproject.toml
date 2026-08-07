@@ -17,23 +17,30 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.10"
+license = "Apache-2.0"
 
 # Dependencies (pip-installable only)
 dependencies = [
     "numpy>=2",   # np.trapezoid (numpy 2 API) is used across the verification cases
-    "scipy",
-    "sympy",
-    "pandas",
+    "scipy",      # cKDTree (gap/contact pairing), special.k0 (analytic source term)
     "matplotlib",
     "pyvista>=0.42",
-    "meshio",
-    "h5py",
     "pyyaml",
-    "gmsh",
+    "gmsh",       # utils/geo_files/pellet_fragmented.py (run by hand)
+]
+
+[project.urls]
+Homepage = "https://github.com/giozu/z3st"
+
+[project.optional-dependencies]
+# Post-processing of output files. Not needed to run a case: h5py reads the XDMF
+# HDF5 sidecar, pandas is used by one study script (cases/studies/attenuation_map).
+post = [
+    "h5py",
+    "pandas",
 ]
 
 # Optional dependencies for docs
-[project.optional-dependencies]
 docs = [
     "sphinx",
     "myst-parser",
@@ -47,7 +54,6 @@ dev = [
     "pytest-cov",
     "black",
     "flake8",
-    "rich",
 ]
 
 # Optional: Neural network material laws, via FEniCSx external operators.
