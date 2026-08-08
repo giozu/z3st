@@ -200,7 +200,7 @@ class MechanicalModel:
             # axial component (which is the only physically
             # meaningful one on a line).
             n_vec = ufl.as_vector([self.normal[0]])
-        elif regime in ["axisymmetric", "2d", "plane_stress"]:
+        elif regime in ["axisymmetric", "2d"]:
             n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
         else:
             n_vec = self.normal
@@ -418,38 +418,13 @@ class MechanicalModel:
 
     def sigma_mech(self, u, material):
         """
-        Mechanical Cauchy stress σ(u) with two selectable constitutive routes.
+        Mechanical Cauchy stress σ(u).
 
-        Mode selection (by material dict)
-        --.--.--.--.-
+        Mode selection (by ``material["constitutive_mode"]``): ``hyperelastic``,
+        ``plasticity``, ``custom``, or the default isotropic Lamé
+        σ = λ tr(ε) I + 2 G ε (``1d`` reduces to σ = E ε, uniaxial stress).
 
-        - If ``material["constitutive"] == "voigt"``:
-
-        σ = C_voigt · ε_voigt  (6×6 · 6×1) → mapped back to 3×3.
-
-        * If ``material["C_matrix"]`` (6×6) is provided, use it (anisotropy allowed).
-        * Else, build isotropic C from (λ, G) with shear blocks = 2G.
-
-        Voigt order used here: [xx, yy, zz, yz, xz, xy] with **no factor 2** on shear strains.
-
-
-        - Else (default = ``"lame"``):
-
-        σ = λ tr(ε) I + 2 G ε
-
-
-        Plane-stress handling
-        --.--.-----
-
-        If ``self.mech_regime == "plane_stress"``, the returned tensor is modified
-        to enforce σ_zz = 0 in an x–y plane-stress sense.
-
-
-        Notes
-        -----
-        * Assumes 3D (tdim == 3). For 2D, adapt Voigt packing/unpacking.
-        * ε = sym(∇u) is small strain.
-
+        ε = sym(∇u) is small strain.
         """
 
         # The constitutive_mode promotion (lame -> plasticity for materials
@@ -460,63 +435,7 @@ class MechanicalModel:
         mode = material.get("constitutive_mode", "lame")
         regime = self.regime
 
-        if mode == "voigt":
-            # small strain
-            eps = self.epsilon(u)
-
-            # ε in ENGINEERING Voigt (6x1), order: [xx, yy, zz, yz, xz, xy]
-            # with γ = 2ε on the shear rows — the convention every literature
-            # stiffness matrix (C44 = G) expects. Feeding tensor shear strains
-            # to a user C_matrix would halve the shear stresses.
-            eps_voigt = ufl.as_vector(
-                [
-                    eps[0, 0],
-                    eps[1, 1],
-                    eps[2, 2],
-                    2.0 * eps[1, 2],  # γ_yz
-                    2.0 * eps[0, 2],  # γ_xz
-                    2.0 * eps[0, 1],  # γ_xy
-                ]
-            )
-
-            # Elasticity matrix C (6x6)
-            if "C_matrix" in material and material["C_matrix"] is not None:
-                C_user = material.get("C_matrix", None)
-                if C_user is not None:
-                    C_np = np.asarray(C_user, dtype=dolfinx.default_scalar_type)
-                    if C_np.shape != (6, 6):
-                        raise ValueError(f"C_matrix must be 6x6, got {C_np.shape}")
-                    C = ufl.as_matrix(C_np.tolist())
-
-            else:
-                lmbda = material["lmbda"]
-                G = material["G"]
-
-                # isotropic, homogeneous — engineering-Voigt convention
-                # (C44 = G acting on γ = 2ε), matching the strain vector above;
-                # σ_xy = G·γ_xy = 2G·ε_xy, identical to the previous behaviour.
-                C = ufl.as_matrix(
-                    [
-                        [lmbda + 2 * G, lmbda, lmbda, 0, 0, 0],
-                        [lmbda, lmbda + 2 * G, lmbda, 0, 0, 0],
-                        [lmbda, lmbda, lmbda + 2 * G, 0, 0, 0],
-                        [0, 0, 0, G, 0, 0],  # yz
-                        [0, 0, 0, 0, G, 0],  # xz
-                        [0, 0, 0, 0, 0, G],  # xy
-                    ]
-                )
-
-            # σ in Voigt, then map back to 3x3
-            sigma_voigt = C * eps_voigt
-            sigma = ufl.as_tensor(
-                [
-                    [sigma_voigt[0], sigma_voigt[5], sigma_voigt[4]],
-                    [sigma_voigt[5], sigma_voigt[1], sigma_voigt[3]],
-                    [sigma_voigt[4], sigma_voigt[3], sigma_voigt[2]],
-                ]
-            )
-
-        elif mode == "hyperelastic":
+        if mode == "hyperelastic":
             sigma = self.sigma_hyperelastic(u, material)
 
         elif mode == "plasticity":
@@ -544,24 +463,12 @@ class MechanicalModel:
                 raise RuntimeError(f"Failed to load/execute custom stress function '{stress_func_path}': {e}")
 
         else:
-            # Plane-stress reduction (x–y plane).
-            if regime == "plane_stress":
-
-                lmbda_ps = (
-                    2 * material["G"] * material["lmbda"] / (material["lmbda"] + 2 * material["G"])
-                )
-
-                eps = self.epsilon(u)
-                sigma = (
-                    lmbda_ps * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
-                )
-
             # True 1D structural element (line mesh): uniaxial *stress* state,
             # sigma_yy = sigma_zz = 0. The axial stiffness is therefore the
             # engineering Young's modulus E, giving sigma_11 = E eps_11.
             # epsilon() returns the 3x3 strain padded with only eps_xx != 0, so
             # E * eps has only sigma_xx = E eps_xx and zero transverse stress.
-            elif regime == "1d":
+            if regime == "1d":
                 eps = self.epsilon(u)
                 sigma = material["E"] * eps
 
@@ -724,21 +631,6 @@ class MechanicalModel:
 
         return eps_star
 
-    def _lmbda_eff(self, material):
-        """Regime-consistent first Lamé parameter.
-
-        The plane-stress reduction λ_ps = 2Gλ/(λ + 2G) must be used wherever a
-        stress or energy is formed as λ tr(·) I + 2G (·), or the eigenstress and
-        the energy density become inconsistent with sigma_mech (a ~35 % thermal
-        eigenstress overshoot at ν = 0.3 in regime plane_stress).
-        """
-        if str(getattr(self, "regime", "3d")).lower() == "plane_stress":
-            return (
-                2 * material["G"] * material["lmbda"]
-                / (material["lmbda"] + 2 * material["G"])
-            )
-        return material["lmbda"]
-
     def sigma_th(self, T, material):
         """
         Eigenstress −ℂ : ε* moved to the right-hand side of the momentum
@@ -768,7 +660,7 @@ class MechanicalModel:
             sigma_eig = material["E"] * eps_star
         else:
             sigma_eig = (
-                self._lmbda_eff(material) * ufl.tr(eps_star) * ufl.Identity(dim)
+                material["lmbda"] * ufl.tr(eps_star) * ufl.Identity(dim)
                 + 2.0 * material["G"] * eps_star
             )
 
@@ -792,7 +684,7 @@ class MechanicalModel:
         material has no thermal-expansion properties, eps_el = eps(u) and
         we recover the previous formula.
 
-        For other constitutive modes (voigt / hyperelastic / plasticity /
+        For other constitutive modes (hyperelastic / plasticity /
         custom), fall back to 0.5 * sigma_mech(u, material) : eps(u) on
         total strain. Those modes don't have thermal coupling wired up in
         z3st, so the simpler formula is used.
@@ -819,7 +711,7 @@ class MechanicalModel:
                 factor = material["alpha"] * (T - material["T_ref"])
                 dim = eps.ufl_shape[0]
                 regime = str(getattr(self, "regime", "3d")).lower()
-                if regime in ("2d", "plane_stress") and dim == 3:
+                if regime == "2d" and dim == 3:
                     I_inplane = ufl.as_tensor([
                         [1.0, 0.0, 0.0],
                         [0.0, 1.0, 0.0],
@@ -839,7 +731,7 @@ class MechanicalModel:
                 psi_el = 0.5 * material["E"] * ufl.inner(eps_el, eps_el)
             else:
                 psi_el = 0.5 * (
-                    self._lmbda_eff(material) * ufl.tr(eps_el) ** 2
+                    material["lmbda"] * ufl.tr(eps_el) ** 2
                     + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
                 )
             # Damage degradation: mirrors sigma_mech / sigma_th. Without this

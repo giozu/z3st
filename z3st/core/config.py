@@ -89,7 +89,7 @@ class Config:
         # Normalised to lowercase ("2D" → "2d"); downstream regime branches
         # assume one of these five values, so reject anything else up front.
         self.regime = self.input_file.get("regime", "2d").lower()
-        valid_regimes = {"1d", "2d", "3d", "axisymmetric", "plane_stress"}
+        valid_regimes = {"1d", "2d", "3d", "axisymmetric"}
         if self.regime not in valid_regimes:
             raise ValueError(
                 f"Invalid regime '{self.regime}'. Must be one of {sorted(valid_regimes)}."

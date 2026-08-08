@@ -775,7 +775,7 @@ class Solver:
                     regime = self.regime
                     if self.mgr.tdim == 1:
                         n_vec = ufl.as_vector([self.normal[0]])
-                    elif regime in ["axisymmetric", "2d", "plane_stress"]:
+                    elif regime in ["axisymmetric", "2d"]:
                         n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
                     else:
                         n_vec = self.normal
@@ -797,7 +797,7 @@ class Solver:
                 regime = self.regime
                 if self.mgr.tdim == 1:
                     body_force = dolfinx.fem.Constant(self.mesh, (-rho * g,))
-                elif regime in ["axisymmetric", "2d", "plane_stress"]:
+                elif regime in ["axisymmetric", "2d"]:
                     # 2D: (F_r, F_z) or (F_x, F_y)
                     body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
                 else:

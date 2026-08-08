@@ -80,16 +80,13 @@ class DamageModel:
           stress in an infinite cylinder but cannot drive radial cracks).
           We therefore zero out the z-component of eth in plane strain.
 
-        - PLANE STRESS (regime: plane_stress) has sigma_zz = 0 by
-          construction, so the z-thermal-expansion creates no real stress
-          either. Same treatment.
         """
         if T is None or "alpha" not in material or "T_ref" not in material:
             return None
         factor = material["alpha"] * (T - material["T_ref"])
 
         regime = str(getattr(self, "regime", "3d")).lower()
-        if regime in ("2d", "plane_stress") and dim == 3:
+        if regime == "2d" and dim == 3:
             # Eigenstrain active in the in-plane components only.
             I_inplane = ufl.as_tensor([
                 [1.0, 0.0, 0.0],

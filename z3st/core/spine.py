@@ -256,8 +256,6 @@ class Spine(
             constitutive_mode = mat.get("constitutive", "lame").lower()
             mat["constitutive_mode"] = constitutive_mode
             print(f"  → constitutive model: {constitutive_mode}")
-            if constitutive_mode == "voigt" and mat.get("C_matrix") is not None:
-                print("    using user-provided C_matrix (6x6)")
 
             if self.on.get("plasticity", False) and constitutive_mode == "lame" \
                     and "yield_strength" in mat:
@@ -594,7 +592,7 @@ class Spine(
                 P_int = dolfinx.fem.assemble_scalar(self._power_forms[name])
                 P_int = self.mesh.comm.allreduce(P_int, op=MPI.SUM)
                 unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
-                        "plane_stress": "W/m", "1d": "W/m²"}.get(self.regime, "W")
+                        "1d": "W/m²"}.get(self.regime, "W")
                 print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
