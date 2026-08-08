@@ -1,0 +1,34 @@
+{
+    "results": {
+        "center_void_porosity": {
+            "numerical": 0.9999996671430398,
+            "reference": 1.0,
+            "abs_error": 3.3285696021678746e-07,
+            "rel_error": 3.3285696021678746e-07,
+            "status": "PASS"
+        },
+        "void_radius_relative": {
+            "numerical": 0.18,
+            "reference": 0.2,
+            "abs_error": 0.020000000000000018,
+            "rel_error": 0.10000000000000009,
+            "status": "PASS"
+        },
+        "rim_fabricated_porosity": {
+            "numerical": 0.1499999827301521,
+            "reference": 0.15,
+            "abs_error": 1.72698478850819e-08,
+            "rel_error": 1.1513231923387934e-07,
+            "status": "PASS"
+        },
+        "center_temperature": {
+            "numerical": 2968.5153581123227,
+            "reference": 2968.5153581123227,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.3,
+    "summary": "PASS"
+}
