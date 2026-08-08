@@ -58,18 +58,16 @@ import dolfinx
 import ufl
 from dolfinx.fem.petsc import assemble_matrix
 
+from z3st.utils.non_regression import case_paths, finish, metric
 from z3st.core.mesh import load_mesh
 from z3st.utils.utils_extract_vtu import (
     list_fields,
     extract_field,
     extract_displacement,
 )
-from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 MATERIAL_FILE = os.path.join(CASE_DIR, "../../../materials/steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
@@ -227,12 +225,7 @@ errors = {
         "abs_error": float(np.max(np.abs(sigma_zz - sigma_zz_ref))),
         "rel_error": sigma_zz_err,
     },
-    "u_xL": {
-        "numerical": u_xL_num,
-        "reference": u_xL_ref,
-        "abs_error": abs(u_xL_num - u_xL_ref),
-        "rel_error": u_xL_err,
-    },
+    "u_xL": metric(u_xL_num, u_xL_ref, rel=u_xL_err),
 }
 
 # --.. ..- .-.. .-.. --- stiffness matrix extraction --.. ..- .-.. .-.. --
@@ -490,7 +483,4 @@ decomp_path = os.path.join(CASE_DIR, "output", "displacement_decomposition.png")
 plt.savefig(decomp_path, dpi=200)
 print(f"[INFO] Displacement decomposition plotted at: {decomp_path}")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
