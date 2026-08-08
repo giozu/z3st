@@ -1,0 +1,27 @@
+{
+    "results": {
+        "finite_fields": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "integrated_power": {
+            "numerical": 600.0,
+            "reference": 600.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "center_temperature_kirchhoff": {
+            "numerical": 1521.360159888139,
+            "reference": 1520.3029301521697,
+            "abs_error": 1.0572297359692584,
+            "rel_error": 0.0006954072869302689,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.03,
+    "summary": "PASS"
+}

@@ -88,7 +88,7 @@ These cases serve both as:
 ## Key features
 
 * **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling; adaptive or Aitken Δ² dynamic relaxation, per-step form caching, optional gap-conductance damping
-* **Adaptive time-stepping** — optional, off by default; when a step stalls under strongly coupled non-linear physics the solver snapshots the converged state, bisects `dt`, and re-solves the step as internal sub-steps (output stays on the original grid), aborting cleanly only if it cannot converge at `dt_min`
+* **Adaptive time-stepping** — optional, off by default; when a step stalls under strongly coupled non-linear physics the solver snapshots the converged state, bisects `dt`, and re-solves the step as internal sub-steps (output stays on the original grid), aborting only if it cannot converge at `dt_min`
 * **Hot-reloadable parameters** — an allow-listed subset of `input.yaml` (tolerances, relaxation factors, `max_iters`) can be edited mid-run and is picked up at the next step boundary, for steering long simulations without restarting
 * **Multi-regime kinematics** — `2d` plane strain, `3d`, `axisymmetric`, and `plane_stress` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
 * **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
@@ -108,7 +108,7 @@ These cases serve both as:
 * **Parallel performance** — PETSc with MUMPS / GAMG / HYPRE BoomerAMG, MPI via `MPI.COMM_WORLD`
 * **Post-processing ecosystem** — VTU and XDMF time-series output through a unified writer that pre-compiles all interpolation expressions once at setup; ParaView- and PyVista-compatible
 * **Continuous integration** — per-case `non-regression.py` vs. version-controlled gold JSON, summarised on every commit via GitHub Actions
-* **Documented API** — Sphinx sources under `docs/source/`, built by GitHub Actions
+* **Documented API** — Sphinx sources under `docs/source/`, built by GitHub Actions; UML class diagram in [`docs/source/architecture.md`](docs/source/architecture.md)
 
 ---
 
@@ -119,7 +119,6 @@ z3st/                                # repository root
 ├── LICENSE                          # Apache 2.0
 ├── README.md
 ├── CITATION.cff
-├── CONTEXT.md                       # design + work-log document
 ├── pyproject.toml / setup.py
 ├── z3st_env.yml                     # Conda env recipe (FEniCSx + deps)
 ├── docs/                            # Sphinx documentation
@@ -169,6 +168,7 @@ z3st/                                # repository root
     │   ├── output.py                # stdout / JSON helpers
     │   ├── z-gui.py                 # interactive PyVista viewer
     │   └── geo_files/               # reusable Gmsh templates
+    ├── ai/                          # agent onboarding (PROMPT.md, CONTEXT.md)
     ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
     ├── examples/                    # minimal didactic setups
     └── cases/                       # ~50 verification / validation / demo cases
@@ -188,7 +188,7 @@ z3st/                                # repository root
         └── non-regression_summary.txt
 ```
 
-The full case catalogue and per-module details are in `CONTEXT.md`.
+The full case catalogue and per-module details are in `z3st/ai/CONTEXT.md`.
 
 ---
 
@@ -333,6 +333,16 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+## Contributor acknowledgements
+
+Beyond the author, the following people have contributed to Z3ST:
+
+* **Romain Turgis** (ENSTA Paris) — the `verification/fuel/creep_shrink_fit_2D`
+  case and its analysis scripts, verifying the relaxation of the pellet–cladding
+  contact pressure by Norton creep against the closed form of Esposito et al.,
+  *Int. J. Pressure Vessels and Piping* **185** (2020) 104126.
+  Internship at Politecnico di Milano, 2026-05-25 → 2026-07-31.
+
 ---
 
 ## FEniCSx project acknowledgement
@@ -413,7 +423,7 @@ acknowledged:
 
 ## License & author
 
-If you use Z3ST in your research, please cite this little work.
+If you use Z3ST in your research, please cite it.
 
 ```bibtex
 @misc{Z3ST2026,

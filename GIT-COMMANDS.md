@@ -143,6 +143,9 @@ git stash drop <stash_id>
 # Undo local modifications (reset to HEAD)
 git reset --hard HEAD
 
+# Undo local modifications (reset to remote main)
+git reset --hard origin/main
+
 # Undo changes in a specific file
 git checkout -- <file>
 

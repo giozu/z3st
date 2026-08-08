@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: full_cylinder
 
-non-regression script
------------------------
-Analytical solution for radial temperature in a full cylinder with uniform volumetric heat generation.
-
+Full cylinder with uniform volumetric heat generation. Reference is the
+analytical radial temperature profile.
 """
 
 import os

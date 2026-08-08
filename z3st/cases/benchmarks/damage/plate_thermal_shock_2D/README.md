@@ -7,13 +7,13 @@ Danho & Kondo (2025), *An incremental variational method to the coupling
 between gradient damage, thermoelasticity and heat conduction*,
 C. R. Mecanique **353**:1063-1084 (Fig. 1-3).
 
-### The point of this case
+### Scope
 
-There is **no pre-crack and no damage seed** anywhere (look at
+There is **no pre-crack and no damage seed** anywhere (see
 `boundary_conditions.yaml`: there is no `damage:` block). Cracks must
-**nucleate** from the pristine quenched edges. This is the
-gradient-damage instability, not seeded propagation: the AT1 model has a
-true elastic threshold `w1 = 3*Gc/(8*lc)` (strength
+**nucleate** from the quenched edges. This is the
+gradient-damage instability, not seeded propagation: the AT1 model has an
+elastic threshold `w1 = 3*Gc/(8*lc)` (strength
 `sigma_c = sqrt(3*E*Gc/(8*lc)) ~ 243 MPa`), and where the transient
 thermoelastic tension at the cooled surface exceeds it, damage localises
 into bands of width ~`lc`. A continuous damage front along the edge is
@@ -51,7 +51,7 @@ longer ones (Kamagate Fig. 2d).
   ~`2e-5` (`lc/4.5`) once nucleation is confirmed, for crack counts that
   no longer move with refinement.
 
-### Honest caveats
+### Caveats
 
 - The **number** of cracks is sensitive to mesh / `lc` / heterogeneity —
   a known feature of this benchmark. Match the pattern and the

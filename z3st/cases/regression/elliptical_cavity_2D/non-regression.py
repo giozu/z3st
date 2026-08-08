@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: single_elliptical_cavity_2D
@@ -91,3 +92,4 @@ errors = {
 }
 TOLERANCE = 1.0e-2
 pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+regression_check(errors, CASE_DIR)

@@ -1,10 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-import matplotlib.cm as cm
+import matplotlib
 import numpy as np
 import pyvista
 from dolfinx.plot import vtk_mesh
@@ -29,11 +30,15 @@ class MeshPlotter:
         unique_tags = np.unique(self.facet_tags.values)
         print("[INFO] Face labels present:", unique_tags)
 
-        colors = cm.get_cmap("tab10", len(unique_tags))
+        # matplotlib.colormaps: cm.get_cmap was removed in matplotlib >= 3.9.
+        cmap = matplotlib.colormaps["tab10"]
+        inv_labels = {tag: name for name, tag in self.label_map.items()}
         label_map = {}
         for i, tag in enumerate(unique_tags):
-            label_name = list(self.label_map.keys())[list(self.label_map.values()).index(tag)]
-            label_map[tag] = (label_name, colors(i)[:3])
+            # Unlabelled physical surfaces (or an empty labels: block) must not
+            # crash the preview — show the raw tag number instead.
+            label_name = inv_labels.get(tag, f"tag {tag}")
+            label_map[tag] = (label_name, cmap(i % cmap.N)[:3])
 
         plotter = pyvista.Plotter()
         for tag, (name, color) in label_map.items():

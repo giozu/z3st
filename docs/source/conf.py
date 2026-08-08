@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -43,6 +44,7 @@ extensions = [
     # Type hints and doc improvements
     "sphinx_autodoc_typehints",
     "myst_parser",  # enables Markdown support
+    "sphinxcontrib.mermaid",  # renders the ```mermaid blocks in architecture.md
 ]
 
 templates_path = ["_templates"]
@@ -155,3 +157,17 @@ myst_enable_extensions = [
     "replacements",
 ]
 myst_heading_anchors = 3  # automatic anchors up to H3
+
+# Route ```mermaid fenced blocks to the mermaid directive instead of rendering
+# them as literal code. This keeps architecture.md readable as plain
+# Markdown on GitHub while Sphinx draws the diagrams.
+myst_fence_as_directive = ["mermaid"]
+
+# ============================================================================
+# MERMAID CONFIGURATION
+# ============================================================================
+
+# Diagrams are drawn client-side by mermaid.js loaded from a CDN, so the docs
+# build needs no Node.js or headless browser.
+mermaid_version = "10.9.1"
+mermaid_output_format = "raw"

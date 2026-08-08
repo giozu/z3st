@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """Force-displacement curve for SENS.
 
 Two-stage workflow:

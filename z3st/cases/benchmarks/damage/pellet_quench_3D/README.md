@@ -1,12 +1,11 @@
 # UO2 pellet thermal-shock fracture - phase-field simulation (3D)
-## z3st application case (gold-standard McClenny reproducer)
+## z3st application case (McClenny reproducer)
 
 ### Role
 
-This is the **3D, gold-standard** reproduction of the McClenny et al.
+This is the **3D** reproduction of the McClenny et al.
 (JNM 565, 2022) UO2 pellet thermal-shock experiment. It is the only
-case-14 variant that captures all dimensions of the experiment
-faithfully:
+case-14 variant that captures all dimensions of the experiment:
 
 - A 60-deg azimuthal contact wedge on the lateral surface (1/6 of the
   total pellet surface area, matching McClenny Fig. 4).

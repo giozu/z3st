@@ -1,0 +1,48 @@
+{
+    "results": {
+        "finite_fields": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "integrated_power": {
+            "numerical": 587.1654,
+            "reference": 600.0,
+            "abs_error": 12.834600000000023,
+            "rel_error": 0.02139100000000004,
+            "status": "PASS"
+        },
+        "T_max_K": {
+            "numerical": 1383.5876654145948,
+            "reference": null,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "T_center_midplane_K": {
+            "numerical": 1383.5876654145736,
+            "reference": null,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "Pu_max_line": {
+            "numerical": 0.29407057896985905,
+            "reference": null,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "burnup_max_MWd_kgHM": {
+            "numerical": 79.29825892938642,
+            "reference": null,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.03,
+    "summary": "PASS"
+}

@@ -7,8 +7,8 @@ k:
   weights: knet.pt
 
 # Reference law the network is trained to reproduce. The solver ignores this
-# block (it only reads the NN card above); train_knet.py and non-regression.py
-# read it as source for the law k(T).
+# block (it reads only the NN card above); train_knet.py and non-regression.py
+# read it for the law k(T).
 k_law:
   a: 0.05                   # W/m/K
   b: 3.75e-4                # W/m/K^2

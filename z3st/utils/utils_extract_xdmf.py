@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -8,6 +9,14 @@
 import os
 import h5py
 import numpy as np
+
+def _step_sort_key(s):
+    """Total-order-safe sort key for step names: numeric steps sort before any
+    non-numeric names, and the two groups never compare across types."""
+    try:
+        return (0, float(s.replace("_", ".")))
+    except ValueError:
+        return (1, s)
 
 def list_fields_xdmf(xdmf_path):
     """
@@ -28,6 +37,21 @@ def list_fields_xdmf(xdmf_path):
     for field in fields:
         print(f"  → {field}")
     return fields
+
+def list_steps_xdmf(xdmf_path, field_name):
+    """
+    List all saved step identifiers for the given field, in solution order.
+    """
+    h5_path = xdmf_path.replace(".xdmf", ".h5")
+    if not os.path.exists(h5_path):
+        raise FileNotFoundError(f"H5 file not found: {h5_path}")
+
+    with h5py.File(h5_path, 'r') as f:
+        if 'Function' not in f or field_name not in f['Function']:
+            available = list(f['Function'].keys()) if 'Function' in f else []
+            raise ValueError(f"Field '{field_name}' not found in {h5_path}. Available: {available}")
+
+        return sorted(f[f"Function/{field_name}"].keys(), key=_step_sort_key)
 
 def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True):
     """
@@ -64,15 +88,7 @@ def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True)
         
         # Steps are names of datasets, usually strings representing time or step index
         # We sort them numerically if possible
-        def try_float(s):
-            # total-order-safe key: numeric steps sort before any non-numeric
-            # names, and the two groups never compare across types
-            try:
-                return (0, float(s.replace("_", ".")))
-            except ValueError:
-                return (1, s)
-
-        steps = sorted(field_group.keys(), key=try_float)
+        steps = sorted(field_group.keys(), key=_step_sort_key)
         target_step = steps[step_index]
         data = np.array(field_group[target_step])
         # Match the VTU extractor's contract: scalar fields as (N,), not (N, 1).

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -45,6 +46,22 @@ class FiniteElementSetup:
         if self.on.get("cluster", False):
             self.V_c = dolfinx.fem.functionspace(self.mesh, ("DG", 1))
             print("Cluster function space (V_c):", self.V_c)
+            
+        # --. Porosity migration --..
+        # Two discretisations are available, selected by porosity.discretisation:
+        #  - "cg"  (default): Lagrange-1, used by the SU/SUPG-stabilised solve
+        #    (Barani et al. 2022). Benchmark-validated path.
+        #  - "dg": discontinuous Lagrange-1, used by the upwind(+SIPG) solve —
+        #    the same operator family as cluster dynamics (V_c). The pore
+        #    velocity v = mobility(T) grad(T) is advection-dominated, so the
+        #    upwind facet flux supplies the stabilisation directly.
+        if self.on.get("porosity", False):
+            self.porosity_discretisation = str(
+                self.input_file.get("porosity", {}).get("discretisation", "cg")
+            ).lower()
+            family = "DG" if self.porosity_discretisation == "dg" else "Lagrange"
+            self.V_p = dolfinx.fem.functionspace(self.mesh, (family, 1))
+            print(f"Porosity function space (V_p): {self.V_p} [{self.porosity_discretisation}]")
     
         # --. Plasticity --..
         if self.on.get("plasticity", False):

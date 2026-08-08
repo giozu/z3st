@@ -1,0 +1,14 @@
+{
+    "results": {
+        "contact_pressure": {
+            "numerical": 74.19062066568185,
+            "reference": 74.97482188258607,
+            "abs_error": 0.7842012169042221,
+            "rel_error": 0.0116242421472316,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.05,
+    "summary": "PASS",
+    "regression": "PASS"
+}

@@ -16,7 +16,7 @@ Units: micron / second / kg / micronewton / MPa / picojoule (a consistent set:
 
 ## Files
 
-- `parametric_study.py` — **the main deliverable.** Two analytical `p_crit(Fc,
+- `parametric_study.py` — the main driver. Two analytical `p_crit(Fc,
   Gc)` references (a fracture-mechanics SIF estimate, recommended, plus the
   superseded strength estimate, for contrast) and an FEM sweep that regenerates
   the mesh at each `Fc`, ramps the bubble pressure, detects GB percolation, and
@@ -32,9 +32,9 @@ Units: micron / second / kg / micronewton / MPa / picojoule (a consistent set:
 - `input.yaml` / `boundary_conditions.yaml` — the **committed config**: the
   equilibrium-pressure baseline (bubble pressure ramped to 15 MPa).
 
-## Output state (IMPORTANT — read before trusting the plots)
+## Output state (IMPORTANT — two figure families in `output/`)
 
-Two distinct families of figures live in `output/` (all PNGs are gitignored):
+Both families of figures live in `output/` (all PNGs are gitignored):
 
 - **Baseline diagnostics** — `fields_overview.png`, `stress_profile_tip.png`,
   `gc_profile_check.png`. These are the *committed 15 MPa no-fracture* state,
@@ -61,7 +61,7 @@ unconservative. The recommended reference is now a fracture-mechanics SIF
 with `F(Fc)` their non-dimensional Mode-I SIF (`F_sif`, Eqs. 5/9) and `σ_h` a
 compressive hydrostatic restraint (Eqs. 6/8 — the external-restraint lever). For
 this case: `K_Ic = 0.138 MPa·µm½`, giving `Fc 0.2/0.4/0.6 → 414/365/308 MPa` —
-the **right trend and magnitude** (hundreds of MPa), closing the gap to the FEM
+the correct trend and magnitude (hundreds of MPa), closing the gap to the FEM
 from ~17× to **~4–6×**.
 
 The residual ~4–6× is **expected and physical**: Chakraborty assumes a *sharp*
@@ -70,7 +70,7 @@ pre-crack (LEFM), but the phase-field bubble tip is a *smooth* ellipse
 length `ℓ_ch = K_Ic²/σ_c² ≈ 42 nm ≈ ρ`, so the case sits in the
 **strength↔toughness transition** — neither pure-strength (old formula) nor
 pure-LEFM (Chakraborty) is exact, and the FEM (which resolves a smooth-tip,
-finite-`lc`, *percolating* crack) is rightly the highest of the three:
+finite-`lc`, *percolating* crack) is the highest of the three:
 `strength < SIF-LEFM < phase-field-percolation`.
 
 ## OPEN DECISION (deferred) — the (Gc, lc) regime
@@ -107,7 +107,7 @@ The case **is in the local regression suite** (`Allrun` + a blessed
 with `cp output/non-regression.json output/non-regression_gold.json` after a
 sanity-checked baseline run. `Allclean` preserves the gold and the sweep figures.
 
-## Already fixed this round
+## Recent changes
 
 - Non-regression metrics reconciled to the no-fracture baseline (`max_damage`
   ref 0, `max_stress_yy` ref = ligament-corrected tip concentration with
@@ -126,18 +126,16 @@ sanity-checked baseline run. `Allclean` preserves the gold and the sweep figures
 ## Background literature (GB-bubble overpressurisation → fragmentation / FGR)
 
 PDFs are in `paper/` (named `AuthorYear_Keyword.pdf`). Context for the open
-`(Gc, lc)` decision: the literature does **not** expect GB
-cracking at equilibrium pressure — it expects it under *transient
-over-pressurisation*, modulated by external mechanical restraint. So the GPa-scale
-`p_crit` this case finds is qualitatively consistent with over-pressure being the
-trigger, not a sign the regime is wrong.
+`(Gc, lc)` decision (see OPEN DECISION above): the literature does **not** expect
+GB cracking at equilibrium pressure — it expects it under *transient
+over-pressurisation*, modulated by external mechanical restraint.
 
 Closest analytical/FEM precedents to swap in for the current first-approximation
 `σ_c·(1−Fc)/K_t` reference (which is ~17× below this case's FEM `p_crit`):
 
 - Chakraborty et al. (2014), *J. Nucl. Mater.* — Mode-I non-dimensional **SIF for
   lenticular GB bubbles** under bubble pressure + hydrostatic stress (exact
-  geometry of this case; the natural analytical reference).
+  geometry of this case; the recommended analytical reference).
   https://doi.org/10.1016/j.jnucmat.2014.04.023
 - Cappellari et al. (2025), *J. Nucl. Mater.* — PoliMi/**SCIANTIX** physics-based
   GB FGR model applying fracture mechanics to bubble-overpressure micro-cracking;

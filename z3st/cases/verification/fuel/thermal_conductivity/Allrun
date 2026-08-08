@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+cd "${0%/*}" || exit 1
+
+(cd thermal_conductivity_magni && bash ./Allrun)
+(cd thermal_conductivity_GPR && bash ./Allrun)
+
+python3 compare_cases.py

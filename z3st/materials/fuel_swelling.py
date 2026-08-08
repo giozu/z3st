@@ -1,10 +1,11 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
-Fuel swelling as a state-dependent eigenstrain (the eigenstrain bus).
+Fuel swelling as a state-dependent eigenstrain.
 
 A fuel material card names one of these via ``eigenstrain:
 materials.fuel_swelling.<name>``; ``spine.load_materials`` resolves it to
@@ -12,7 +13,7 @@ materials.fuel_swelling.<name>``; ``spine.load_materials`` resolves it to
 total inelastic strain ε*, so the eigenstress -C:ε* needs no further change and
 the Newton tangent stays automatic.
 
-Signature (the eigenstrain-bus contract)::
+Signature::
 
     fn(T, material, model=None, dim=3) -> UFL tensor (dim x dim)
 

@@ -1,0 +1,17 @@
+thermal:
+  fuel:
+  - type: Dirichlet
+    region: outer
+    temperature: 650.0
+
+  - type: Neumann
+    region: bottom
+    flux: 0.0
+
+  - type: Neumann
+    region: top
+    flux: 0.0
+
+  - type: Neumann
+    region: inner
+    flux: 0.0

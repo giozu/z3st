@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -14,12 +15,10 @@ from petsc4py import PETSc
 
 class ClusterDynamicsModel:
     """
-    Cluster dynamics model for defect evolution.
+    1D cluster dynamics model for defect cluster size distributions.
 
-    This module implements a 1D cluster dynamics model for simulating
-    the evolution of defect cluster size distributions.
-
-    Solves the diffusion equation for cluster density c(n,t) where n is cluster size.
+    Solves an advection-diffusion equation for cluster density c(n,t),
+    where n is cluster size.
     """
     
     def __init__(self):
@@ -63,12 +62,14 @@ class ClusterDynamicsModel:
             
             if val is not None:
                 if region_name is not None:
-                    # Apply to a specific named region (defined in geometry.yaml)
+                    # Apply to a specific named region (defined in geometry.yaml).
+                    # Domain regions are cell-tagged, and DG dofs attach to cells
+                    # rather than facets — the old facet-based lookup found no
+                    # dofs for the DG-1 space and silently left c = 0.
                     region_id = self.label_map.get(region_name)
                     if region_id is not None:
-                        facets = self.facet_tags.find(region_id)
-                        dofs = dolfinx.fem.locate_dofs_topological(self.V_c, self.fdim, facets)
-                        
+                        dofs = self.mgr.locate_domain_dofs(label=region_id, V=self.V_c)
+
                         if len(dofs) > 0:
                             self.c.x.array[dofs] = float(val)
                             self.c_n.x.array[dofs] = float(val)

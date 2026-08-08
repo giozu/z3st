@@ -1,0 +1,13 @@
+name: cylinder
+geometry_type: cyl
+
+Ri: 0.000
+Ro: 0.0041
+Lz: 0.020
+
+labels:
+  inner: 1
+  outer: 2
+  bottom: 3
+  top: 4
+  fuel: 10

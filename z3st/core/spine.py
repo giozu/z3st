@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -5,6 +6,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import importlib
+import inspect
 import sys
 
 import dolfinx
@@ -27,10 +29,11 @@ from z3st.models.mechanical_model import MechanicalModel
 from z3st.models.thermal_model import ThermalModel
 from z3st.models.cluster_dynamic_model import ClusterDynamicsModel
 from z3st.models.plasticity_model import PlasticityModel
+from z3st.models.porosity_migration_model import PorosityMigrationModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel, PorosityMigrationModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -77,9 +80,12 @@ class Spine(
             ClusterDynamicsModel.__init__(self)
         if self.on.get("plasticity", False):
             PlasticityModel.__init__(self)
+        if self.on.get("porosity", False):
+            PorosityMigrationModel.__init__(self)
 
     def parameters(self, lhr):
-        self.g = 0.0  # m/s2
+        # Gravity body force (m/s²), opt-in via mechanical.gravity
+        self.g = float(self.input_file.get("mechanical", {}).get("gravity", 0.0))
         self.lhr = lhr
         # Rescale the elastic constants
         if getattr(self, "materials", None):
@@ -89,6 +95,22 @@ class Spine(
         module_path, func_name = path.rsplit(".", 1)
         mod = importlib.import_module(module_path)
         return getattr(mod, func_name)
+
+    def call_material_function(self, func, T, material):
+        """Call a material hook with optional material/model state-bus args.
+
+        """
+        try:
+            params = inspect.signature(func).parameters
+        except (TypeError, ValueError):
+            return func(T)
+
+        kwargs = {}
+        if "material" in params:
+            kwargs["material"] = material
+        if "model" in params:
+            kwargs["model"] = self
+        return func(T, **kwargs)
 
     def load_materials(self, **materials):
         print(f"[spine.load_materials]")
@@ -101,11 +123,11 @@ class Spine(
             print(f"Material loaded: {name}")
 
             if "E" in mat and "nu" in mat:
-                # E and/or nu may be given as a symbolic "module.func" card,
-                # Then, the derived elastic constants are built as UFL expressions in the T field by
-                # initialize_fields (T does not exist yet here). 
-                # NOTE: a symbolic E/nu is not yet compatible with the per-step cracking rescale or
-                # the numpy creep predictor.
+                # E and/or nu may be a symbolic "module.func" card; the derived
+                # elastic constants are then built as UFL expressions in the T
+                # field by initialize_fields (T does not exist yet here).
+                # NOTE: symbolic E/nu is not yet compatible with the per-step
+                # cracking rescale or the numpy creep predictor.
                 def _is_symbolic(v):
                     if not isinstance(v, str):
                         return False
@@ -142,7 +164,18 @@ class Spine(
                         str(mat["k"].get("type", "")).lower() in ("neural_network", "nn"):
                     print(f"  → k defined as neural network: {mat['k'].get('weights')}")
                     from z3st.models.nn_conductivity import load_from_card
-                    mat["_k_nn"] = load_from_card(mat["k"])
+                    mat["_k_model"] = load_from_card(mat["k"])
+                elif isinstance(mat["k"], dict) and \
+                        str(mat["k"].get("type", "")).lower() in ("gpr", "gaussian_process"):
+                    print(f"  → k defined as Gaussian-process model: "
+                          f"{mat['k'].get('model', mat['k'].get('path'))}")
+                    from z3st.models.gpr_conductivity import load_from_card
+                    mat["_k_model"] = load_from_card(mat["k"], material=mat)
+                elif isinstance(mat["k"], dict) and \
+                        str(mat["k"].get("type", "")).lower() in ("magni", "magni_mox"):
+                    print("  → k defined as Magni MA-MOX data-driven model")
+                    from z3st.models.magni_conductivity import load_from_card
+                    mat["_k_model"] = load_from_card(mat["k"], material=mat)
                 elif isinstance(mat["k"], str):
                     print(f"  → k defined as symbolic function: {mat['k']}")
                     k_func = self.resolve_function(mat["k"])
@@ -186,6 +219,20 @@ class Spine(
             dmg_type = getattr(self, "dmg_cfg", {}).get("type")
 
             if lc:
+                if sigma_c is not None or (
+                    Gc is not None and isinstance(Gc, (int, float, np.floating, np.integer))
+                ):
+                    # The Gc ↔ sigma_c identities below need a NUMERIC Young's
+                    # modulus; with a symbolic "module.func" E card the raw
+                    # string would reach an arithmetic op as an opaque TypeError.
+                    if not isinstance(mat.get("E"), (int, float, np.floating, np.integer)):
+                        raise ValueError(
+                            f"Material '{name}': the Gc <-> sigma_c conversion "
+                            "requires a numeric E on the card; a symbolic "
+                            "(temperature-dependent) E cannot be combined with "
+                            "lc + sigma_c/Gc. Provide Gc AND sigma_c explicitly "
+                            "instead."
+                        )
                 if sigma_c is not None:
                     if dmg_type == "AT2":
                         Gc = (256/27) * lc * (sigma_c**2) / mat["E"]
@@ -321,10 +368,15 @@ class Spine(
 
         self.q_third = None
         self.burnup = None
+        self.gas_swelling = None      # SCIANTIX total gaseous swelling ΔV/V (eigenstrain bus)
+        self.fg_fields = None         # dict of per-dof FG concentration Functions (at/m^3, output)
+        self.sciantix_field = None    # the per-dof SciantixField driver
+        self._sciantix_dofs = None    # V_t dof indices the field covers
         self.T = None
         self.u = None
         self.D = None
         self.c = None
+        self.porosity = None
 
         # Temperature
         if self.on.get("thermal", False):
@@ -341,6 +393,11 @@ class Spine(
                 self.burnup = dolfinx.fem.Function(self.V_t, name="Burnup")
                 self.burnup.x.array[:] = 0.0
                 print("Initialized burnup field (fissile material present).")
+
+                # SCIANTIX gaseous-swelling field (fission-gas coupling, opt-in via
+                # models.fission_gas; default off).
+                if self.on.get("fission_gas", False):
+                    self._init_sciantix_field()
 
             print("\nInitializing the temperature field...")
             self.T = dolfinx.fem.Function(self.V_t, name="Temperature")
@@ -387,21 +444,38 @@ class Spine(
             print("\nSetting cluster initial conditions...")
             self.set_cluster_initial_conditions()
 
+        # Porosity variables
+        if self.on.get("porosity", False):
+            print("\nInitializing the porosity field...")
+            self.porosity = dolfinx.fem.Function(self.V_p, name="Porosity")
+            self.porosity.x.array[:] = 0.0
+            self.porosity_n = dolfinx.fem.Function(self.V_p, name="Porosity_old")
+            self.porosity_n.x.array[:] = 0.0
+
+            print("\nSetting porosity initial conditions...")
+            self.set_porosity_initial_conditions()
+
         # Material properties
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
                 k_func = mat["_k_func"]
-                mat["k"] = k_func(self.T)
+                mat["k"] = self.call_material_function(k_func, self.T, mat)
                 print("\nk expression for", name, "→", mat["k"])
 
-            # Neural-network conductivity
-            if "_k_nn" in mat and self.T is not None:
-                k_fn = dolfinx.fem.Function(self.V_t, name=f"k_nn_{name}")
-                k_fn.x.array[:] = mat["_k_nn"](self.T.x.array)
+            # Data-driven conductivity
+            if "_k_model" in mat and self.T is not None:
+                k_fn = dolfinx.fem.Function(self.V_t, name=f"k_model_{name}")
+                k_fn.x.array[:] = mat["_k_model"](self.T.x.array)
                 k_fn.x.scatter_forward()
                 mat["k"] = k_fn
-                print(f"\nk neural-network field for {name} → Function on V_t "
+                print(f"\nk data-driven field for {name} → Function on V_t "
                       f"(min={k_fn.x.array.min():.3f}, max={k_fn.x.array.max():.3f} W/m/K)")
+
+            # Porosity-dependent conductivity
+            if mat.get("thermal_conductivity_model") == "kato_porosity" and self.T is not None:
+                k_fn = dolfinx.fem.Function(self.V_t, name=f"k_porosity_{name}")
+                mat["k"] = k_fn
+                print(f"\nInitialized porosity-dependent thermal conductivity field for {name}")
 
             # Temperature-dependent elastic constants: build lmbda/G/bulk_modulus
             # as UFL expressions in the live T field, so the per-iteration T
@@ -433,9 +507,12 @@ class Spine(
                     mat["sigma_c"] = ufl.sqrt((27 * mat["E"] * mat["Gc"]) / (256 * lc))
                     print(f"  - Material '{name}': sigma_c (AT2) evaluated from Gc expression")
 
-                elif dmg_type == "AT1" and "E" in mat:
+                if dmg_type == "AT1" and "E" in mat:
                     mat["sigma_c"] = ufl.sqrt((3 * mat["E"] * mat["Gc"]) / (8 * lc))
                     print(f"  - Material '{name}': sigma_c (AT1) evaluated from Gc expression")
+
+        if self.on.get("porosity", False):
+            self.update_porosity_dependent_properties(self.T, self.porosity)
 
 
     def set_power(self):
@@ -452,16 +529,14 @@ class Spine(
                 print("Fissile material")
                 q_val = self.lhr / self.area
 
-                # Power form factors — the source bus. A fissile material may
-                # shape its own volumetric source through the callables
-                # ``radial_profile`` f(r, bu) (the natural home of a TUBRNP-style
-                # rim profile later) and/or ``axial_profile`` f(z) (e.g. the
-                # chopped cosine). Each callable receives the dof coordinates and
-                # the *current* local burnup. The composite f_r·f_z is normalised
-                # ONCE to nodal mean 1, so the shaping *redistributes* the linear
-                # heat rate without changing its integral — with a single profile
-                # this reduces exactly to the previous behaviour. Default (no
-                # callables): f ≡ 1, the flat source.
+                # Power form factors. A fissile material may shape its own
+                # volumetric source through the callables ``radial_profile``
+                # f(r, bu) (intended for a TUBRNP-style rim profile later) and/or
+                # ``axial_profile`` f(z) (e.g. the chopped cosine). Each callable
+                # receives the dof coordinates and the current local burnup. The
+                # composite f_r·f_z is normalised once to nodal mean 1, so the
+                # shaping redistributes the linear heat rate without changing its
+                # integral. Default (no callables): f ≡ 1, the flat source.
                 shape = np.ones(len(dofs))
                 rprof = mat.get("_radial_profile_func")
                 zprof = mat.get("_axial_profile_func")
@@ -476,11 +551,23 @@ class Spine(
                         shape = shape * np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
                     if zprof is not None:
                         shape = shape * np.asarray(zprof(coords, bu_vals, mat, model=self), dtype=float)
-                    # Nodal-mean normalisation of the composite; the area-weighted
-                    # integral refinement lands with the TUBRNP profile.
-                    mean = shape.mean()
+                    # Nodal-mean normalisation. The mean is global over owned
+                    # dofs — a rank-local mean would normalise each partition
+                    # independently and make q''' partition-dependent.
+                    n_owned = self.V_t.dofmap.index_map.size_local
+                    dofs_arr = np.asarray(dofs)
+                    owned = dofs_arr < n_owned
+                    s_loc = float(shape[owned].sum()) if owned.any() else 0.0
+                    n_loc = int(np.count_nonzero(owned))
+                    s_glob = self.mesh.comm.allreduce(s_loc, op=MPI.SUM)
+                    n_glob = self.mesh.comm.allreduce(n_loc, op=MPI.SUM)
+                    mean = s_glob / n_glob if n_glob > 0 else 0.0
                     if mean > 0:
                         shape = shape / mean
+                    else:
+                        print(f"  [WARNING] power profile on '{name}' has "
+                              f"non-positive mean ({mean:.3e}); shaping skipped.")
+                        shape = np.ones(len(dofs))
 
                 # Accumulate: if multiple sources are configured on the same
                 # material (e.g. fissile + gamma_heating below), they should
@@ -492,10 +579,9 @@ class Spine(
                 # Integrated-power diagnostic: the exact FE integral of the
                 # fissile source over this material, with the regime weight
                 # (2πr in axisymmetric). For a rod this should track LHR·Lz;
-                # a radially peaked profile deviates slightly because the
-                # mean-1 normalisation is nodal, not area-weighted — printing
-                # the integral makes that approximation visible. The form is
-                # compiled once and cached (q_third updates in place).
+                # a radially peaked profile deviates slightly because the mean-1
+                # normalisation is nodal, not area-weighted. The form is compiled
+                # once and cached (q_third updates in place).
                 if not hasattr(self, "_power_forms"):
                     self._power_forms = {}
                 if name not in self._power_forms:
@@ -575,9 +661,8 @@ class Spine(
         self.q_third.x.scatter_forward()
 
     def update_state(self, dt):
-        """Advance each material's own history over a step of ``dt`` seconds — the
-        state channel of the "fuel is a material" contract (alongside the property
-        and eigenstrain buses). Called once per step, *after* the solve.
+        """Advance each material's own history over a step of ``dt`` seconds.
+        Called once per step, *after* the solve.
 
         Burnup: a fissile material accumulates its local burnup from the deposited
         fission power. The volumetric source ``q_third`` [W/m³] is the energy
@@ -588,15 +673,18 @@ class Spine(
 
             Δbu = q_third · dt / (ρ · HM_frac · 8.64e10)   [MWd/kgU]
 
-        No feedback is applied here — burnup is *recorded*. The downstream
-        behaviours that consume it (fuel-k(bu), swelling(bu,T), FGR) read this
-        field through their own buses, so a fissile case with no such behaviour is
-        unaffected in its solve (only the new burnup field changes).
+        No feedback is applied here — burnup is recorded. Downstream behaviours
+        that consume it (fuel-k(bu), swelling(bu,T), FGR) read this field, so a
+        fissile case without such behaviour is unaffected in its solve.
         """
         if self.burnup is None or dt <= 0.0:
             return
 
         SECONDS_PER_MWD = 8.64e10  # 86400 s/day × 1e6 W/MW
+
+        # Capture burnup at step-start so SCIANTIX gets the (old, new) pair
+        bu_old = (self.burnup.x.array[self._sciantix_dofs].copy()
+                  if self.sciantix_field is not None else None)
 
         for name, mat in self.materials.items():
             if not mat.get("fissile", False):
@@ -614,9 +702,102 @@ class Spine(
         self.burnup.x.scatter_forward()
         print(f"[update_state] burnup max = {self.burnup.x.array.max():.4e} MWd/kgU")
 
+        # --. SCIANTIX gaseous swelling (opt-in; rides the eigenstrain bus) --..
+        if self.sciantix_field is not None:
+            self._update_sciantix(dt, bu_old)
+
+    def _init_sciantix_field(self):
+        """Build the per-dof SCIANTIX field over the fissile region (opt-in coupling).
+
+        One SCIANTIX integration point per ``V_t`` dof of every fissile material,
+        seeded from the case's ``input_initial_conditions.txt``. Requires
+        ``libsciantix.so`` (``config.sciantix_lib`` or ``$SCIANTIX_LIB``) plus
+        ``input_settings.txt`` and ``input_initial_conditions.txt`` in the run
+        directory — the same files a SCIANTIX standalone run needs.
+        """
+        from z3st.coupling.sciantix.sciantix_binding import SciantixField
+
+        dof_lists = [
+            self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+            for name, mat in self.materials.items() if mat.get("fissile", False)
+        ]
+        self._sciantix_dofs = (
+            np.unique(np.concatenate(dof_lists)) if dof_lists else np.array([], dtype=np.int64)
+        )
+        # Per-dof heavy-metal fraction for the burnup unit conversion at the
+        # handoff: Z3ST's RADAR burnup is MWd/kgU (per kg heavy metal), while the
+        # binding's H_BURNUP_OLD/NEW history slots are MWd/kgUO2 — SCIANTIX must
+        # see bu·hm or every burnup-driven model runs ~1/hm (≈13%) too burnt.
+        n_dofs = (self.V_t.dofmap.index_map.size_local
+                  + self.V_t.dofmap.index_map.num_ghosts)
+        hm_full = np.full(n_dofs, 0.8815)
+        for name, mat in self.materials.items():
+            if mat.get("fissile", False):
+                dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+                hm_full[dofs] = float(mat.get("heavy_metal_fraction", 0.8815))
+        self._sciantix_hm = hm_full[self._sciantix_dofs]
+        self.gas_swelling = dolfinx.fem.Function(self.V_t, name="Gaseous swelling")
+        self.gas_swelling.x.array[:] = 0.0
+
+        # Per-dof total fission-gas (Xe + Kr) concentration fields [at/m^3], for the
+        # Paraview output and the FG plots — one Function per SCIANTIX gas state.
+        # Names mirror SciantixField.gas_concentrations() keys.
+        self.fg_fields = {
+            "produced":       dolfinx.fem.Function(self.V_t, name="FG produced (at_m3)"),
+            "in_grain":       dolfinx.fem.Function(self.V_t, name="FG in grain (at_m3)"),
+            "grain_boundary": dolfinx.fem.Function(self.V_t, name="FG at grain boundary (at_m3)"),
+            "released":       dolfinx.fem.Function(self.V_t, name="FG released (at_m3)"),
+        }
+        for fn in self.fg_fields.values():
+            fn.x.array[:] = 0.0
+
+        n = int(self._sciantix_dofs.size)
+        if n == 0:
+            print("[sciantix] no fissile dofs; gaseous-swelling field stays zero.")
+            return
+        print(f"[sciantix] building SCIANTIX field over {n} fissile dofs ...")
+        self.sciantix_field = SciantixField(
+            n, libpath=self.sciantix_lib, ic_path=self.sciantix_ic
+        )
+        print("[sciantix] field initialised (library loaded, initial conditions seeded).")
+
+    def _update_sciantix(self, dt, bu_old):
+        """Advance every SCIANTIX point by ``dt`` and refresh ``gas_swelling``.
+
+        Local conditions per dof: temperature from ``self.T``; volumetric fission
+        rate from the deposited power, ``fission_rate = q_third / E_fission``
+        [fiss/m³ s] with ``E_fission`` from ``config.sciantix_energy_per_fission``;
+        and the host burnup pair (``bu_old`` captured at step-start, ``bu_new`` the
+        just-updated ``self.burnup``) transferred to SCIANTIX (it does not compute
+        burnup in a coupling build — Z3ST's RADAR model owns it).
+        """
+        dofs = self._sciantix_dofs
+        T = self.T.x.array[dofs]
+        fission_rate = self.q_third.x.array[dofs] / self.sciantix_energy_per_fission
+        # Convert MWd/kgU (Z3ST RADAR) → MWd/kgUO2 (SCIANTIX history slots).
+        bu_old_uo2 = bu_old * self._sciantix_hm if bu_old is not None else None
+        bu_new_uo2 = self.burnup.x.array[dofs] * self._sciantix_hm
+        gs = self.sciantix_field.step(dt, T, fission_rate,
+                                      burnup_old=bu_old_uo2, burnup_new=bu_new_uo2)
+        self.gas_swelling.x.array[dofs] = gs
+        self.gas_swelling.x.scatter_forward()
+        print(f"[update_state] gaseous swelling max = {self.gas_swelling.x.array.max():.4e} (ΔV/V)")
+
+        # Fission-gas (Xe + Kr) concentration fields for output / FG plots.
+        conc = self.sciantix_field.gas_concentrations()
+        for key, fn in self.fg_fields.items():
+            fn.x.array[dofs] = conc[key]
+            fn.x.scatter_forward()
+        prod = self.fg_fields["produced"].x.array[dofs]
+        rel = self.fg_fields["released"].x.array[dofs]
+        fgr = float(rel.sum() / prod.sum()) if prod.sum() > 0 else 0.0
+        print(f"[update_state] fission gas: produced max = {prod.max():.4e} at/m³, "
+              f"fuel-avg FGR = {fgr:.4f}")
+
     _SNAPSHOT_FIELDS = (
-        "T", "u", "D", "H", "burnup", "c", "c_n",
+        "T", "u", "D", "H", "burnup", "gas_swelling", "c", "c_n",
         "p", "ep", "p_n", "ep_n",
+        "porosity", "porosity_n",
     )  # dolfinx Functions
     _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
     _SNAPSHOT_MATERIAL_KEYS = ("E", "nu", "bulk_modulus", "_lhr_max")
@@ -641,8 +822,8 @@ class Spine(
           the failed attempt's stiffness degradation) and the live lmbda/G
           Constants.
 
-        NOT captured: iteration scratch (``_aitken_R_prev``, ``_h_gap_prev``) —
-        solve_staggered resets those at entry.
+        NOT captured: iteration scratch (``_aitken_R_prev``, ``_aitken_p_R_prev``,
+        ``_h_gap_prev``) — solve_staggered resets those at entry.
 
         IMPORTANT: take the snapshot at the very start of a (sub)step, BEFORE
         parameters()/set_power()/update_state() run, so ``_lhr_max`` and burnup
@@ -669,6 +850,10 @@ class Spine(
                     msnap[k + ".value"] = float(v.value)
             if msnap:
                 snap["materials"][mname] = msnap
+        # SCIANTIX per-point C-state (variables/diffusion_modes/history) — the
+        # gas_swelling dolfinx field alone is not enough to roll back a step.
+        if self.sciantix_field is not None:
+            snap["sciantix"] = self.sciantix_field.snapshot()
         return snap
 
     def restore_state(self, snap):
@@ -694,6 +879,8 @@ class Spine(
                         target.value = val
                 else:
                     mat[key] = val
+        if "sciantix" in snap and self.sciantix_field is not None:
+            self.sciantix_field.restore(snap["sciantix"])
 
     def solve(self, max_iters=100, dt=0.0):
         print("\n")
@@ -706,8 +893,8 @@ class Spine(
         print(f"Coupling = {self.coupling}")
 
         if self.coupling == "staggered":
-            # Return the convergence verdict so the time loop can react to a
-            # stalled step. solve_staggered returns True on convergence, False if it exhausts max_iter.
+            # Return the convergence result so the time loop can react to a
+            # stalled step: True on convergence, False if it exhausts max_iter.
             return self.solve_staggered(
                 max_iter=max_iters,
                 dt=dt,

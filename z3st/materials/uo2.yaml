@@ -5,7 +5,7 @@ nu: 0.23            # (-)  - Poisson's ratio
 
 k: 5.0              # (W/(m·K)) - Thermal conductivity
 cp: 280.0           # (J/(kg·K)) - Specific heat capacity
-rho: 10970.0        # (kg/m³) - Density
+rho: 10960.0        # (kg/m³) - Density
 
 heavy_metal_fraction: 0.8815  # (-) M_U / M_UO2 = 238.0289 / 270.027; burnup accumulated per kg heavy metal
 

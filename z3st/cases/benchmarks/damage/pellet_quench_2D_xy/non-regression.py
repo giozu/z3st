@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: benchmarks/pellet_quench_2D_xy
@@ -141,9 +142,8 @@ last = all_snapshots[-1]
 T_last = last["T"]
 T_mean_final = float(np.mean(T_last))
 # Partial-quench transient: the domain-mean temperature must lie between the
-# cold-bath (Dirichlet/Robin) temperature and the initial temperature. The old
-# check compared the mean against an all-or-nothing endpoint (T_initial or
-# T_quench), which is unphysical mid-transient and failed by construction.
+# cold-bath (Dirichlet/Robin) temperature and the initial temperature. (An
+# endpoint check against T_initial or T_quench is unphysical mid-transient.)
 T_lo = min(T_quench, T_initial)
 T_hi = max(T_quench, T_initial)
 in_range = (T_lo - 1.0) <= T_mean_final <= (T_hi + 1.0)

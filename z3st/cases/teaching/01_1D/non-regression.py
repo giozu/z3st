@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: teaching/01_1D  --  1D bar in uniaxial tension on a true 1D mesh,
@@ -244,9 +245,9 @@ errors = {
 #     K_e = E / L_e * [[+1, -1], [-1, +1]]
 #
 # (the engineering-bar element stiffness, regime: 1d). This block is purely
-# diagnostic / pedagogical -- it does not affect the pass/fail of the case, but
-# it makes z3st's FE assembly visible and lets the student verify it by hand
-# against the textbook formula.
+# diagnostic / pedagogical -- it does not affect the pass/fail of the case; it
+# makes z3st's FE assembly visible so the student can check it by hand against
+# Bower's formula.
 
 print("\n" + "=" * 72)
 print("Stiffness matrix extraction (Bower ch. 7.2 / 8.1.5)")

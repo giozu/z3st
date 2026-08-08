@@ -2,7 +2,7 @@ name: cylinder
 geometry_type: cyl
 
 Ro: 0.01    # (m)
-Lz: 0.01    # (m)
+Lz: 0.005   # (m)
 
 labels:
   uo2: 10

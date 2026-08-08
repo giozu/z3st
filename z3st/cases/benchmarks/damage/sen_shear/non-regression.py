@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """Quick diagnostic for the SENS shear test.
 
 Processes only the **last** available VTU file (no per-step loop), so it

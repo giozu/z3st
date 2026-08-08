@@ -1,0 +1,21 @@
+name: fuel_rod_disk_3d
+geometry_type: cyl-cyl
+
+inner_radius_1: 0.0      # (m)
+outer_radius_1: 0.0041   # (m)
+inner_radius_2: 0.00413  # (m)
+outer_radius_2: 0.00475  # (m)
+Lz: 0.001                # (m)
+
+labels:
+  ymin_1: 1
+  lateral_1: 3
+  xmin_1: 7
+  zmin_1: 8
+  ymin_2: 2
+  outer_2: 4
+  inner_2: 5
+  xmin_2: 6
+  zmin_2: 10
+  cyl_1: 1
+  cyl_2: 2

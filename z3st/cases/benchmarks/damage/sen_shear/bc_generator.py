@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """Generate the boundary-conditions YAML.
 
 A top-edge shear-displacement ramp paired with a fixed bottom edge and a

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """Quick diagnostic for the SENT tension test.
 
 Processes only the **last** available VTU file (no per-step loop), so it

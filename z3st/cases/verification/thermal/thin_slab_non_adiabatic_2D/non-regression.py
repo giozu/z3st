@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: verification/thermal/thin_slab_non_adiabatic_2D
@@ -90,7 +91,6 @@ sigma_th_ref = sigma_th(x_s, analytic_T(x_s), c=1.0)
 T_ref = analytic_T(x_T)
 max_sigma_T = np.max(sigma_yy)
 
-# Numerical maximum thermal stress
 max_sigma_T = np.max(sigma_yy)
 
 # Plot

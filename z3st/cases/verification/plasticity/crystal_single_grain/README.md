@@ -98,7 +98,7 @@ n = 5
 
 **Z3ST Result:** σ_zz = 707.9 MPa (error: +12.5%)
 
-The curve is **approaching saturation** but hasn't reached steady state yet (would require ~2-3% strain).
+The curve is approaching saturation but has not reached steady state yet (would require ~2-3% strain).
 
 ## Automatic Differentiation
 
@@ -111,7 +111,7 @@ With n=5 power law, the slip rate derivative is:
 dγ̇/dτ = (n·γ₀/g₀) · (τ/g₀)^(n-1)
 ```
 
-At τ = 2×g₀, this derivative varies by **16×** compared to τ = g₀!
+At τ = 2×g₀, this derivative varies by 16× compared to τ = g₀.
 
 Manual Jacobian implementation would be:
 - ❌ Error-prone (complex chain rule through Schmid tensor)
@@ -130,7 +130,7 @@ Manual Jacobian implementation would be:
 tau_var = ufl.variable(tau)  # Mark as differentiation variable
 gamma_dot = gamma0 * (abs(tau_var/g0))**n_pow * ufl.sign(tau_var)
 
-# UFL computes ∂γ̇/∂τ symbolically when assembling Jacobian!
+# UFL computes ∂γ̇/∂τ symbolically when assembling the Jacobian
 ```
 
 ## Running the Case
@@ -179,7 +179,7 @@ Step 10:
   ✓ Converged in 2 iterations
 ```
 
-**Why so fast?** Exact Jacobian from automatic differentiation!
+The fast convergence follows from the exact Jacobian provided by automatic differentiation.
 
 ### Schmid Factor Calculation
 
@@ -204,7 +204,7 @@ For uniaxial stress σ_zz:
 ======================================================================
 ```
 
-Three independent methods verify the same result!
+Three independent methods give the same result.
 
 ## Non-Regression Tests
 
@@ -297,10 +297,10 @@ This case demonstrates:
 
 1. **UFL Symbolic Differentiation** eliminates error-prone manual Jacobian derivation
 2. **FEniCSx Quadrature Spaces** enable efficient history variable storage
-3. **Custom Constitutive Models** integrate seamlessly with Newton solver
-4. **Semi-Analytical Verification** validates numerical implementation
+3. **Custom Constitutive Models** integrate with the Newton solver
+4. **Semi-Analytical Verification** validates the numerical implementation
 
-**Key Innovation:** Combining crystal plasticity (complex constitutive law) with automatic differentiation (exact Jacobians) in a production-quality FEM code.
+The case combines crystal plasticity (a nonlinear constitutive law) with automatic differentiation (exact Jacobians) in a production FEM code.
 
 ## Future Work: Comparison with MFront/MGIS
 
@@ -324,17 +324,15 @@ For the FEniCS 2026 conference, a comparison is planned with:
 
 ### Why This Comparison Matters
 
-MFront is the **industry standard** for constitutive modeling in:
+MFront is widely used for constitutive modeling in:
 - Industry (CEA, EDF)
 - Aerospace (Safran, Airbus)
 - Research institutions worldwide
 
-Demonstrating that **Z3ST+UFL achieves equivalent accuracy** with:
+The goal is to show that Z3ST+UFL achieves equivalent accuracy with:
 - ✅ **90% less code**
 - ✅ **Zero manual derivatives**
 - ✅ **Easier maintenance and extension**
-
-...makes a strong case for **automatic differentiation in production FEM codes**.
 
 ### Planned Verification
 
@@ -345,7 +343,7 @@ The comparison will include:
 4. **Stress-strain curve comparison** (should match within numerical precision)
 5. **Convergence comparison** (iterations per step, wall time)
 
-This will provide **quantitative evidence** that automatic differentiation is ready for industrial applications.
+This will provide quantitative evidence that automatic differentiation is suitable for industrial applications.
 
 ## References
 

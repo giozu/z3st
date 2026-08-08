@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -71,8 +72,7 @@ def view_vtu(
     material=None,
 ):
     """
-    Loads and visualizes a .vtu file exported by Z3ST with 3D plots using PyVista.
-    # ... tutto il resto della funzione view_vtu deve essere indentato correttamente ...
+    Load and visualize a Z3ST .vtu file with 3D PyVista plots.
     """
     # --- File Loading and Initial Checks ---
     try:

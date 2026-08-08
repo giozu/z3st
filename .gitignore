@@ -6,8 +6,9 @@
 
 # --. IDE / editor / assistant files --..
 .vscode/
-.claude/
-CONTEXT.md
+.claude/*
+!.claude/agents/
+!.claude/agents/*.md
 CLAUDE.md
 punch_list.md
 
@@ -20,15 +21,21 @@ build/
 cache/
 
 # --. Batch and temporary scripts --..
-ba_*
-pwr_rod_2D_backup
+*.batch
 
 # --. Log and JSON files --..
 log.*
 *.log
 non-regression.json
+
+# --. Per-case run summaries produced by the thermal-conductivity comparisons --..
+case_summary.json
+conductivity_impact.json
+comparison_summary.json
+fit_metrics.json
 z3st/cases/**/log_*.md
 !z3st/cases/verification/mechanics/uniaxial_tension/log_*.md
+input_check.txt
 
 # --. Data / results / figures --..
 *.csv
@@ -41,6 +48,12 @@ z3st/cases/**/log_*.md
 *.xdmf
 *.vtu
 energies.txt
+
+# --. Trained model weights and fitted checkpoints --..
+# Both are regenerated before every run by the owning case (train_knet.py,
+# make_synthetic_gpr.py), so no binary artefact is tracked.
+*.pt
+*.npz
 
 # --. LaTeX build artifacts (slides.pdf is force-tracked) --..
 *.aux

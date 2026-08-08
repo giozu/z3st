@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: 2_thin_cylindrical_shell
@@ -118,8 +119,7 @@ list_fields(VTU_FILE)
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
-# Numerical results
-# Temperature
+# Numerical temperature
 x_T, z_T, _, T_all = extract_field(VTU_FILE, field_name="Temperature")
 mask = np.abs(z_T - z_target) < z_tol
 sort_idx = np.argsort(x_T[mask])

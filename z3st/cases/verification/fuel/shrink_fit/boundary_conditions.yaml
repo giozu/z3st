@@ -1,0 +1,64 @@
+thermal:
+  cyl_1:
+  # Pellet at uniform temperature, ramped from 300 K to 1500 K over 13 steps.
+  # There is no volumetric heat generation (lhr = 0 in input.yaml), so the
+  # pellet field is uniform: its free expansion is exactly alpha*(T-T_ref)*b
+  # with no self-equilibrated thermal stress, which is what makes the Lame
+  # interference-fit reference in non-regression.py exact rather than
+  # approximate. Closing the 30 um cold gap needs dT = 665 K (T ~ 958 K); at
+  # 1500 K the interference is 24.4 um.
+  - type: Dirichlet
+    region: xmax_1
+    temperature:
+    - 300.0
+    - 400.0
+    - 500.0
+    - 600.0
+    - 700.0
+    - 800.0
+    - 900.0
+    - 1000.0
+    - 1100.0
+    - 1200.0
+    - 1300.0
+    - 1400.0
+    - 1500.0
+  - type: Neumann
+    region: xmin_1        # symmetry axis
+    flux: 0.0
+  - type: Neumann
+    region: ymin_1
+    flux: 0.0
+  - type: Neumann
+    region: ymax_1
+    flux: 0.0
+
+  cyl_2:
+  # Cladding held at its reference temperature, so it adds no thermal
+  # expansion of its own to the interference.
+  - type: Dirichlet
+    region: xmax_2
+    temperature: 300.0 # (K)
+  - type: Neumann
+    region: xmin_2        # inner surface: no heat crosses the gap
+    flux: 0.0
+  - type: Neumann
+    region: ymin_2
+    flux: 0.0
+  - type: Neumann
+    region: ymax_2
+    flux: 0.0
+
+mechanical:
+  cyl_1:
+  - type: Clamp_x
+    region: xmin_1        # u_r = 0 on the symmetry axis
+  - type: Clamp_y
+    region: ymin_1        # u_z = 0
+    # xmax_1: free until penalty contact engages
+
+  cyl_2:
+  - type: Clamp_y
+    region: ymin_2        # u_z = 0
+    # xmin_2: free until penalty contact engages
+    # xmax_2: free

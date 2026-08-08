@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -27,26 +28,34 @@ class GmshMeshReader:
 
         log.info(f"Loading mesh from {mesh_path.name}")
 
-        try:
-            # FEniCSx ≥ 0.10.0 – returns an object with attributes mesh, cell_tags, facet_tags
+        # Feature-detect the ≥ 0.10 API instead of catching AttributeError
+        # around the call: the old broad except could mask a genuine
+        # AttributeError raised INSIDE read_from_msh.
+        if hasattr(dolfinx.io, "gmsh") and hasattr(dolfinx.io.gmsh, "read_from_msh"):
+            # FEniCSx ≥ 0.10.0 – returns an object with attributes mesh,
+            # cell_tags, facet_tags. Honour the reader's communicator and the
+            # requested gdim (hard-coding COMM_WORLD deadlocks callers on a
+            # sub-communicator; dropping gdim returned gdim-3 meshes for 2-D
+            # requests).
             mesh_data = dolfinx.io.gmsh.read_from_msh(
                 str(mesh_path),
-                MPI.COMM_WORLD,
-                rank=self.rank,
+                self.comm,
+                rank=0,
+                gdim=gdim,
             )
             mesh, cell_tags, facet_tags = (
                 mesh_data.mesh,
                 mesh_data.cell_tags,
                 mesh_data.facet_tags,
             )
-        except AttributeError:
+        else:
             # Backward compatibility for FEniCSx ≤ 0.9.x
             from dolfinx import io
 
             mesh, cell_tags, facet_tags = io.gmshio.read_from_msh(
                 str(mesh_path),
                 comm=self.comm,
-                rank=self.rank,
+                rank=0,
                 gdim=gdim,
             )
 

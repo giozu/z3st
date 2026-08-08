@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: verification/fuel/creep_irradiation
 
-Verifies the irradiation-creep term (eps_dot = B·phi·sigma) 
-of models/creep_model.py on a uniaxial bar.
+Verifies the irradiation-creep term (eps_dot = B·phi·sigma) of
+models/creep_model.py on a uniaxial bar.
 
-The axisymmetric bar carries a constant axial traction sigma at uniform T. With
+The axisymmetric bar carries a constant axial traction sigma at uniform T, with
 B the irradiation-creep coefficient and phi the fast flux:
 
   1. total axial strain    u_z(L)/L = sigma/E + B·phi·sigma·t

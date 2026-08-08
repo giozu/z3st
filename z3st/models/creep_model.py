@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -26,9 +27,9 @@ thermal Norton). g is increasing and concave with g(0) ≤ 0, so Newton
 converges monotonically and the base (σ_eq_trial − 3GΔγ) never goes
 negative at the root — the linear term preserves both properties.
 
-The scalar equation is solved by a **predictor–corrector split** that keeps
-the exact consistent tangent without symbolic nesting (a fully unrolled
-symbolic Newton makes the AD Jacobian explode combinatorially in FFCx):
+The scalar equation is solved by a predictor–corrector split that keeps the
+exact consistent tangent without symbolic nesting (a fully unrolled symbolic
+Newton makes the AD Jacobian grow combinatorially in FFCx):
 
 * a DG0 *predictor* field Δγ₀ holds the exact root, computed cell-wise by a
   vectorised numpy Newton after every mechanical solve (cheap, warm-started);
@@ -37,10 +38,9 @@ symbolic Newton makes the AD Jacobian explode combinatorially in FFCx):
 
 At staggered convergence the predictor equals the root, the correction
 vanishes, and ``ufl.derivative`` of the one-step formula yields exactly the
-implicit-function-theorem derivative −(∂g/∂u)/g' — the textbook consistent
-tangent — through an expression tree of trivial size. The global problem
-stays on the displacement space alone, so every BC / traction / contact path
-is reused unchanged.
+implicit-function-theorem consistent tangent −(∂g/∂u)/g' through a small
+expression tree. The global problem stays on the displacement space alone, so
+every BC / traction / contact path is reused unchanged.
 
 The accumulated ε_cr lives on a DG0 tensor space per creeping material and is
 advanced once per converged time step (mirroring ``update_plastic_history``).
@@ -55,6 +55,7 @@ the same run — spine.load_materials guards this.
 import dolfinx
 import numpy as np
 import ufl
+from mpi4py import MPI
 
 R_GAS = 8.314462618          # (J/(mol·K)) universal gas constant
 _SIG_EQ_FLOOR = 1.0          # (Pa) regularisation of σ_eq_trial in the flow direction
@@ -190,6 +191,19 @@ class CreepModel:
             if dt <= 0.0:
                 pred.x.array[:] = 0.0
                 continue
+            # No early exit when this rank owns no cells of the material, so
+            # that every rank reaches pred.x.scatter_forward() below. pred lives
+            # on the whole mesh, not on a submesh restricted to this material,
+            # so its ghost update is a neighbourhood collective over the full
+            # mesh communicator, and letting some ranks skip it while others
+            # call it is asymmetric collective usage. Measured on 12 ranks of
+            # creep_shrink_fit_2D (9 of them owning no clad cells) it does not
+            # in fact hang - a rank with no owned cells of the material also
+            # assembles no integrals over it, so the ghost entries it fails to
+            # refresh are never read. This is symmetry hygiene, matching
+            # update_creep_state, not a fix for an observed failure.
+            # Empty-cell ranks fall through with zero-size arrays; only the
+            # reductions below need guarding.
 
             # σ_eq_trial on the material's cells (DG0 interpolation)
             _, _, sig_eq_tr = self._creep_trial(u, material, T)
@@ -200,11 +214,13 @@ class CreepModel:
             tmp.interpolate(expr, cells0=cells)
             sig = tmp.x.array[cells]
 
-            # With creep_A0 == 0, A(T) = A0·exp(-Q/RT) folds to a meshless
-            # UFL constant and dolfinx cannot derive the Expression's MPI
-            # communicator, so short-circuit to zeros instead of interpolating.
-            if float(material["creep_A0"]) == 0.0:
-                Adt = np.zeros_like(sig)
+            # With creep_A0 == 0 or creep_Q == 0, A(T) = A0·exp(-Q/RT) folds to a
+            # meshless UFL constant and dolfinx cannot derive the Expression's MPI
+            # communicator, so short-circuit to zeros or the constant value instead of
+            # interpolating.
+            if float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0:
+                A_val = float(material["creep_A0"])
+                Adt = dt * np.full_like(sig, A_val)
             else:
                 Texpr = dolfinx.fem.Expression(
                     ufl.as_ufl(self._creep_A(material, T)),
@@ -227,12 +243,30 @@ class CreepModel:
                 g = x - Adt * base**n - Cdt * base
                 gp = 1.0 + 3.0 * G * (n * Adt * np.maximum(base, 1.0) ** (n - 1.0) + Cdt)
                 x = np.clip(x - g / gp, 0.0, sig / (3.0 * G) * (1 - 1e-12))
+            # Loud check that the fixed-iteration Newton actually converged: a
+            # high Norton exponent with Δt·A·σⁿ ≫ σ/3G can need more than
+            # _PRED_NEWTON_ITS contractions, and a silently unconverged root
+            # would be treated as exact by the symbolic Newton step.
+            base = np.maximum(sig - 3.0 * G * x, 0.0)
+            g_res = x - Adt * base**n - Cdt * base
+            res_scale = np.maximum(np.abs(x), 1e-30)
+            worst = float(np.max(np.abs(g_res) / res_scale)) if x.size else 0.0
+            if worst > 1e-8:
+                print(f"  [WARNING] creep predictor Newton for '{name}' not "
+                      f"fully converged (max rel residual {worst:.2e}); "
+                      "consider smaller dt.")
             pred.x.array[cells] = x
             pred.x.scatter_forward()
 
-            scale = max(float(np.abs(x).max()), 1e-30)
-            change = float(np.abs(x - x_old).max()) / scale
-            max_change = max(max_change, change)
+            if x.size:
+                scale = max(float(np.abs(x).max()), 1e-30)
+                change = float(np.abs(x - x_old).max()) / scale
+                max_change = max(max_change, change)
+        # The predictor change gates the staggered convergence test: all ranks
+        # must agree on it, or one rank can exit solve_staggered while another
+        # re-enters a collective solve (deadlock).
+        if dt > 0.0 and self.mesh.comm.size > 1:
+            max_change = self.mesh.comm.allreduce(max_change, op=MPI.MAX)
         return max_change
 
     def update_creep_state(self, u, T):

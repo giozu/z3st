@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -7,6 +8,7 @@
 
 import dolfinx
 import numpy as np
+from mpi4py import MPI
 from petsc4py import PETSc
 
 
@@ -36,11 +38,20 @@ class GapModel:
                 gap_size = max(float(live_gap), floor)
                 gap_label = "live, deformed"
             else:
+                name_a = getattr(self, "gap_surface_a", "lateral_1")
+                name_b = getattr(self, "gap_surface_b", "inner_2")
+                missing = [n for n in (name_a, name_b) if n not in self.label_map]
+                if missing:
+                    raise KeyError(
+                        f"Gas gap conductance: surface label(s) {missing} not in "
+                        "the geometry label map — set models.gap_conductance."
+                        "surface_a / surface_b to the paired facet labels."
+                    )
                 gap_size = self.average_gap_distance(
                     self.mesh,
                     self.facet_tags,
-                    label_a=self.label_map["lateral_1"],
-                    label_b=self.label_map["inner_2"],
+                    label_a=self.label_map[name_a],
+                    label_b=self.label_map[name_b],
                 )
                 gap_label = "cold, undeformed"
 
@@ -104,8 +115,16 @@ class GapModel:
 
         # harmonic mean of the two solid conductivities; a symbolic k(T) card
         # is evaluated at the current gap temperature (UFL folds constants, so
-        # k_func(float) returns a plain number)
-        ks = [k for k in (self._k_at_gap(m) for m in self.materials.values())
+        # k_func(float) returns a plain number). Prefer the two materials of
+        # the gap pair itself (recorded by set_gap_temperature) — a rod model
+        # can carry other conducting cards (spring, coolant, structure) whose
+        # dict position must not decide the contact conductance.
+        pair = getattr(self, "_gap_pair_labels", None)
+        mats = ([self.materials[n] for n in pair if n in self.materials]
+                if pair is not None else [])
+        if len(mats) < 2:
+            mats = list(self.materials.values())
+        ks = [k for k in (self._k_at_gap(m) for m in mats)
               if k is not None]
         if len(ks) < 2:
             print(
@@ -144,26 +163,53 @@ class GapModel:
         return None
 
     def set_gap_temperature(self, T_i):
+        """Mean gap temperature from the first Robin BC that carries a
+        ``pair:`` entry (convective Robin entries — h_conv/T_ext — are skipped,
+        and every material's BC list is scanned until a pair is found).
+
+        MPI-safe: each surface mean is a global sum over *owned* dofs divided
+        by the global count, so all ranks agree on ``gap_temperature`` even
+        when the paired surfaces are split across partitions.
+        """
+        comm = self.mesh.comm
+        n_owned = self.V_t.dofmap.index_map.size_local
+
+        def global_mean(dofs):
+            dofs = np.asarray(dofs)
+            owned = dofs[dofs < n_owned] if dofs.size else dofs
+            s = comm.allreduce(float(T_i.x.array[owned].sum()) if owned.size else 0.0,
+                               op=MPI.SUM)
+            n = comm.allreduce(int(owned.size), op=MPI.SUM)
+            return s / n if n > 0 else None
 
         for label in self.materials:
-            for bc_info in self.robin_thermal[label]:
+            for bc_info in self.robin_thermal.get(label, []):
+                if "pair" not in bc_info:
+                    continue  # convective Robin BC, not a gap coupling
                 region_id = bc_info["id"]
                 pair_region = bc_info["pair"]
 
-                dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
-                dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
+                mean_here = global_mean(self.mgr.locate_facets_dofs(region_id, self.V_t))
+                mean_other = global_mean(
+                    self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
+                )
+                if mean_here is None or mean_other is None:
+                    print("  [WARNING] gap pair surface has no dofs anywhere; "
+                          "gap temperature not updated.")
+                    return
 
-                T_here = T_i.x.array[dofs_here]
-                T_other = T_i.x.array[dofs_other]
-
-                self.gap_temperature = 0.5 * (T_here.mean() + T_other.mean())
+                self.gap_temperature = 0.5 * (mean_here + mean_other)
+                # Remember the paired regions so the Ross-Stoute contact term
+                # uses the conductivities of the actual contacting materials.
+                self._gap_pair_labels = (label, pair_region)
 
                 print(
                     f"  → Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K"
                 )
+                return
 
-                break
-            break
+        print("  [WARNING] Gas gap model active but no Robin BC with a 'pair:' "
+              "entry was found; gap temperature not updated.")
 
     def average_gap_distance(self, mesh, ft, label_a, label_b):
 
@@ -188,11 +234,30 @@ class GapModel:
         centroids_a = facet_centroids(facets_a)
         centroids_b = facet_centroids(facets_b)
 
+        # MPI: gather both surfaces globally — with the mesh partitioned, a rank
+        # can own facets of only one side (empty-tree crash) or miss the true
+        # nearest neighbour across a rank boundary. Gap surfaces are small, so
+        # allgathering their centroids is cheap and makes the result identical
+        # on every rank.
+        comm = mesh.comm
+        if comm.size > 1:
+            gdim = x.shape[1]
+            centroids_a = np.concatenate(
+                [c.reshape(-1, gdim) for c in comm.allgather(centroids_a)]
+            )
+            centroids_b = np.concatenate(
+                [c.reshape(-1, gdim) for c in comm.allgather(centroids_b)]
+            )
+
+        if centroids_a.size == 0 or centroids_b.size == 0:
+            raise RuntimeError(
+                f"average_gap_distance: no facets found for gap labels "
+                f"{label_a}/{label_b} — check the geometry label map."
+            )
+
         from scipy.spatial import cKDTree
 
         tree_b = cKDTree(centroids_b)
         distances, _ = tree_b.query(centroids_a, k=1)
-
-        # print(f"Average distance cyl_1 - cyl_2: {distances.mean()*1e3:.3e} mm")
 
         return distances.mean()

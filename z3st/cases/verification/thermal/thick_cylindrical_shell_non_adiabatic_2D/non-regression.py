@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: verification/thermal/thick_cylindrical_shell_non_adiabatic_2D
@@ -145,7 +146,7 @@ sigma_rr_ana_th, sigma_tt_ana_th, sigma_zz_ana_th = analytical_thermal_stress(r_
 # Numerical maximum thermal stress (hoop)
 max_sigma_T = np.max(sigma_tt)
 
-# map
+# attenuation map estimate of peak thermal stress
 print(f"Ro/Ri = {Ro/Ri:.2f}")
 print(f"mu*Ri = {mu*Ri:.2f}")
 sigma_T_map = 0.7

@@ -1,0 +1,16 @@
+thermal:
+  fuel:
+  - type: Dirichlet
+    region: outer
+    temperature:
+    - 623.0
+    - 690.7
+    - 758.4
+    - 826.1
+    - 893.8
+    - 961.5
+    - 1029.2
+    - 1096.9
+    - 1164.6
+    - 1232.3
+    - 1300.0

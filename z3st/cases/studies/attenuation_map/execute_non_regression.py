@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 """
 Batch automation - re-run only non-regression tests in all attenuation folders.
 

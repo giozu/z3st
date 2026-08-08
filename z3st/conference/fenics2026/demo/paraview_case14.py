@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # =====================================================================
 # Z3ST -- FEniCS 2026 demo: case-14 crack-propagation visualization
 #

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -286,6 +287,15 @@ class MechanicalModel:
         """
         axis_names = ("u_x", "u_y", "u_z")
         free_axis = {"Slip_x": 0, "Slip_y": 1, "Slip_z": 2}[bc_type]
+        if free_axis >= self.tdim:
+            # Mirror the Clamp_z guard: Slip_z on a 2-D mesh would silently
+            # block BOTH in-plane components (a full clamp), not slip.
+            raise ValueError(
+                f"\n[ERROR] Boundary condition '{bc_type}' is not valid on a "
+                f"{self.tdim}D mesh: the free axis does not exist, so every "
+                f"in-plane component would be blocked (a full clamp). Use "
+                f"Slip_x/Slip_y instead."
+            )
         constrained = [i for i in (0, 1, 2) if i != free_axis and i < self.tdim]
 
         for i in constrained:
@@ -475,7 +485,7 @@ class MechanicalModel:
         --.--.-----
 
         If ``self.mech_regime == "plane_stress"``, the returned tensor is modified
-        to enforce σ_zz = 0 in an x–y plane-stress sense (same behaviour as before).
+        to enforce σ_zz = 0 in an x–y plane-stress sense.
 
 
         Notes
@@ -497,15 +507,18 @@ class MechanicalModel:
             # small strain
             eps = self.epsilon(u)
 
-            # ε in Voigt (6x1), order: [xx, yy, zz, yz, xz, xy]
+            # ε in ENGINEERING Voigt (6x1), order: [xx, yy, zz, yz, xz, xy]
+            # with γ = 2ε on the shear rows — the convention every literature
+            # stiffness matrix (C44 = G) expects. Feeding tensor shear strains
+            # to a user C_matrix would halve the shear stresses.
             eps_voigt = ufl.as_vector(
                 [
                     eps[0, 0],
                     eps[1, 1],
                     eps[2, 2],
-                    eps[1, 2],  # yz
-                    eps[0, 2],  # xz
-                    eps[0, 1],  # xy
+                    2.0 * eps[1, 2],  # γ_yz
+                    2.0 * eps[0, 2],  # γ_xz
+                    2.0 * eps[0, 1],  # γ_xy
                 ]
             )
 
@@ -522,15 +535,17 @@ class MechanicalModel:
                 lmbda = material["lmbda"]
                 G = material["G"]
 
-                # isotropic, homogeneous
+                # isotropic, homogeneous — engineering-Voigt convention
+                # (C44 = G acting on γ = 2ε), matching the strain vector above;
+                # σ_xy = G·γ_xy = 2G·ε_xy, identical to the previous behaviour.
                 C = ufl.as_matrix(
                     [
                         [lmbda + 2 * G, lmbda, lmbda, 0, 0, 0],
                         [lmbda, lmbda + 2 * G, lmbda, 0, 0, 0],
                         [lmbda, lmbda, lmbda + 2 * G, 0, 0, 0],
-                        [0, 0, 0, 2 * G, 0, 0],  # yz
-                        [0, 0, 0, 0, 2 * G, 0],  # xz
-                        [0, 0, 0, 0, 0, 2 * G],  # xy
+                        [0, 0, 0, G, 0, 0],  # yz
+                        [0, 0, 0, 0, G, 0],  # xz
+                        [0, 0, 0, 0, 0, G],  # xy
                     ]
                 )
 
@@ -752,6 +767,21 @@ class MechanicalModel:
 
         return eps_star
 
+    def _lmbda_eff(self, material):
+        """Regime-consistent first Lamé parameter.
+
+        The plane-stress reduction λ_ps = 2Gλ/(λ + 2G) must be used wherever a
+        stress or energy is formed as λ tr(·) I + 2G (·), or the eigenstress and
+        the energy density become inconsistent with sigma_mech (a ~35 % thermal
+        eigenstress overshoot at ν = 0.3 in regime plane_stress).
+        """
+        if str(getattr(self, "regime", "3d")).lower() == "plane_stress":
+            return (
+                2 * material["G"] * material["lmbda"]
+                / (material["lmbda"] + 2 * material["G"])
+            )
+        return material["lmbda"]
+
     def sigma_th(self, T, material):
         """
         Eigenstress −ℂ : ε* moved to the right-hand side of the momentum
@@ -776,11 +806,12 @@ class MechanicalModel:
         # Eigenstress ℂ : ε*. For the engineering 1D bar the stiffness is E
         # (uniaxial); otherwise the isotropic Lamé contraction λ tr(ε*) I + 2G ε*
         # — which for ε* = αΔT I recovers exactly the (3λ + 2G) αΔT thermal form.
+        # λ is regime-consistent (λ_ps in plane stress, mirroring sigma_mech).
         if self.regime == "1d":
             sigma_eig = material["E"] * eps_star
         else:
             sigma_eig = (
-                material["lmbda"] * ufl.tr(eps_star) * ufl.Identity(dim)
+                self._lmbda_eff(material) * ufl.tr(eps_star) * ufl.Identity(dim)
                 + 2.0 * material["G"] * eps_star
             )
 
@@ -851,7 +882,7 @@ class MechanicalModel:
                 psi_el = 0.5 * material["E"] * ufl.inner(eps_el, eps_el)
             else:
                 psi_el = 0.5 * (
-                    material["lmbda"] * ufl.tr(eps_el) ** 2
+                    self._lmbda_eff(material) * ufl.tr(eps_el) ** 2
                     + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
                 )
             # Damage degradation: mirrors sigma_mech / sigma_th. Without this

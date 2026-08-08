@@ -1,0 +1,16 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+for case in \
+  uniform_Pu_porosity_magni \
+  uniform_Pu_porosity_GPR \
+  olander_Pu_burnup_magni \
+  olander_Pu_burnup_GPR
+do
+  (cd "$case" && bash ./Allclean)
+done
+
+rm -f temperature_profile_comparison.png \
+      thermal_conductivity_comparison.png \
+      burnup_temperature_evolution.png \
+      comparison_summary.json

@@ -1,0 +1,38 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+#   ./Allrun_mpi        # 4 ranks (default)
+#   ./Allrun_mpi 2      # 2 ranks
+NP="${1:-4}"
+
+# Pin BLAS to 1 thread per rank so the MPI ranks do not oversubscribe the cores.
+export PATH="/home/giovanni/miniconda3/envs/z3st/bin:$PATH" # conda activate z3st
+export OMP_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+# SCIANTIX coupling (models.fission_gas) needs a -DCOUPLING_TU *shared* library.
+# No default is invented here: this used to default to /tmp/libsciantix_tu.so,
+# a path the coupling README explicitly warns against, which turned a clear
+# setup error into a confusing one. If SCIANTIX_LIB is unset the binding falls
+# back to the loader's search for "libsciantix.so" (a system install).
+if [ -n "${SCIANTIX_LIB:-}" ] && [ ! -f "$SCIANTIX_LIB" ]; then
+  echo "[Allrun_mpi] ERROR: SCIANTIX_LIB='$SCIANTIX_LIB' does not exist." >&2
+  echo "        Build it as described in z3st/coupling/sciantix/README.md, section 1." >&2
+  echo "        Note -DCOUPLING_TU is required: without it the library still loads" >&2
+  echo "        and runs, but SCIANTIX computes its own burnup and ignores Z3ST's." >&2
+  exit 1
+elif [ -z "${SCIANTIX_LIB:-}" ]; then
+  echo "[Allrun_mpi] SCIANTIX_LIB unset; relying on the loader to find libsciantix.so."
+fi
+
+echo "[Allrun_mpi] Solving on $NP rank(s)..."
+gmsh mesh.geo -2 > log_mesh.md
+start=$SECONDS
+Z3ST_PLAIN_LOG=1 mpirun -n "$NP" python3 -m z3st > log_z3st.md
+echo "[Allrun_mpi] Solve completed in $((SECONDS - start)) s on $NP rank(s)  (solver log: log_z3st.md)"
+
+# post-processing runs serially
+python3 non-regression.py
+python3 plots.py
+
+echo "[Allrun_mpi] Done."

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: verification/thermal/thick_slab_adiabatic_3D
@@ -81,7 +82,7 @@ T_ref = analytic_T(x_T)
 sigma_th_ref = sigma_th(x_T, T_ref, c=1.0)
 max_sigma_T = np.max(sigma_yy)
 
-# map
+# attenuation map estimate of peak thermal stress
 print(f"Ro/Ri = {2.4/2:.2f}")
 print(f"mu*Ri = {mu*2:.2f}")
 sigma_T_map = 0.91

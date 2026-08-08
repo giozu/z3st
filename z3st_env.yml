@@ -18,7 +18,7 @@ dependencies:
 - fenics-dolfinx=0.11.0    # includes ufl, basix, petsc, slepc, mpi4py; Z3ST targets 0.11.0 (matches CI image dolfinx/dolfinx:v0.11.0)
 
   # --. Scientific stack --..
-- numpy
+- numpy>=2    # np.trapezoid (numpy 2 API) is used across the verification cases
 - scipy
 - sympy
 - pandas

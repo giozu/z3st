@@ -1,6 +1,8 @@
 #!/bin/bash
 cd "${0%/*}" || exit 1
 
+set -e
+
 echo "Executing z3st.py..."
 
 gmsh mesh.geo -1 > log_mesh.md

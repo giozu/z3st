@@ -1,0 +1,34 @@
+thermal:
+  cyl_1:
+  - type: Dirichlet
+    region: lateral_1
+    temperature:
+    - 300.0
+    - 500.0
+    - 700.0
+    - 900.0
+    - 1100.0
+    - 1300.0
+    - 1500.0
+
+  cyl_2:
+  - type: Dirichlet
+    region: outer_2
+    temperature: 300.0
+
+mechanical:
+  cyl_1:
+  - type: Clamp_x
+    region: xmin_1        # symmetry plane
+  - type: Clamp_y
+    region: ymin_1        # symmetry plane
+  - type: Clamp_z
+    region: zmin_1
+
+  cyl_2:
+  - type: Clamp_x
+    region: xmin_2        # symmetry plane
+  - type: Clamp_y
+    region: ymin_2        # symmetry plane
+  - type: Clamp_z
+    region: zmin_2

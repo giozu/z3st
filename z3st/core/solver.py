@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -20,6 +21,110 @@ def _as_bool(v):
     return str(v).strip().lower() in ("1", "true", "yes", "on")
 
 
+def _rigid_body_modes(V, regime=None):
+    """Zero-strain rigid-body displacement modes of the elastic operator, as a
+    list of Functions.
+
+    Cartesian: 3 modes in 2D (2 translations + 1 in-plane rotation), 6 in 3D. 
+    Axisymmetric (r,z): only axial translation
+    """
+
+    bs = V.dofmap.index_map_bs
+    x = V.tabulate_dof_coordinates()  # one row per node (block); columns are x,y,z
+
+    if regime == "axisymmetric":
+        # components are (u_r, u_z) since x[0]=r, x[1]=z; keep only u_z=const
+        mode = dolfinx.fem.Function(V)
+        mode.x.array[1::bs] = 1.0
+        modes = [mode]
+    else:
+        n_modes = 3 if bs == 2 else 6
+        modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
+
+        # translations: unit displacement along each axis
+        for i in range(bs):
+            modes[i].x.array[i::bs] = 1.0
+
+        # rotations: infinitesimal rigid rotation fields
+        if bs == 2:
+            modes[2].x.array[0::bs] = -x[:, 1]
+            modes[2].x.array[1::bs] = x[:, 0]
+        else:
+            modes[3].x.array[1::bs] = -x[:, 2]
+            modes[3].x.array[2::bs] = x[:, 1]
+            modes[4].x.array[0::bs] = x[:, 2]
+            modes[4].x.array[2::bs] = -x[:, 0]
+            modes[5].x.array[0::bs] = -x[:, 1]
+            modes[5].x.array[1::bs] = x[:, 0]
+
+    for m in modes:
+        m.x.scatter_forward()
+    return modes
+
+
+def build_rigid_body_nullspace(V, regime=None):
+    """Rigid-body near-nullspace (kernel of the elastic operator) for GAMG.
+
+    Without it the Krylov count per elasticity solve is large and scaling
+    suffers. 3 modes in 2D (2 translations + 1 rotation), 6 in 3D, 1 in
+    axisymmetric, orthonormalised. Used by GAMG via
+    MatSetNearNullSpace; ignored by Hypre/LU."""
+    modes = _rigid_body_modes(V, regime)
+
+    basis = [m.x for m in modes]
+    dolfinx.la.orthonormalize(basis)
+
+    return PETSc.NullSpace().create(
+        vectors=[m.x.petsc_vec for m in modes], comm=V.mesh.comm
+    )
+
+
+def build_constrained_rigid_nullspace(V, bcs, tol=1e-9, regime=None):
+    """Nullspace of the rigid-body modes the BCs leave free, to attach with
+    MatSetNullSpace when the mechanical system is singular (the BCs do not pin
+    every rigid mode, e.g. a cylinder clamped only in z). KSP then projects
+    these modes out of the solve.
+
+    Of the candidate modes (6 in 3D, 3 in cartesian 2D, 1 in axisymmetric), keep
+    only those already zero on every constrained dof -- those still in the
+    kernel of the constrained operator. 
+    Return ``None`` if none survive (the BCs
+    pin every mode -> system non-singular), so the caller can skip attaching.
+    """
+    bs = V.dofmap.index_map_bs
+    modes = _rigid_body_modes(V, regime)
+
+    # constrained (owned) dof indices across all BCs, unrolled into V
+    n_owned = V.dofmap.index_map.size_local * bs
+    idx_lists = []
+    for bc in bcs:
+        dofs = bc._cpp_object.dof_indices()[0]
+        idx_lists.append(np.asarray(dofs, dtype=np.int64))
+    constrained = (
+        np.unique(np.concatenate(idx_lists)) if idx_lists else np.empty(0, dtype=np.int64)
+    )
+    constrained = constrained[constrained < n_owned]
+
+    kept = []
+    for m in modes:
+        a = m.x.array
+        scale = float(np.max(np.abs(a[:n_owned]))) if n_owned else 0.0
+        scale = V.mesh.comm.allreduce(scale, op=MPI.MAX)
+        viol = float(np.max(np.abs(a[constrained]))) if constrained.size else 0.0
+        viol = V.mesh.comm.allreduce(viol, op=MPI.MAX)
+        if scale == 0.0 or viol <= tol * scale:
+            kept.append(m)
+
+    if not kept:
+        return None
+
+    basis = [m.x for m in kept]
+    dolfinx.la.orthonormalize(basis)
+    return PETSc.NullSpace().create(
+        vectors=[m.x.petsc_vec for m in kept], comm=V.mesh.comm
+    )
+
+
 class Solver:
     def __init__(self):
         print("[Solver] initializer")
@@ -30,7 +135,7 @@ class Solver:
         self.relax_T = float(solver_settings.get("relax_T", 0.9))
         self.relax_u = float(solver_settings.get("relax_u", 0.4))
         self.relax_D = float(solver_settings.get("relax_D", 0.4))
-        self._relax_u0 = self.relax_u  # initial value, restored per step by Aitken
+        self._relax_u0 = self.relax_u  # restored per step by Aitken
 
         print("  Applied relaxation factor:")
         print(f"  → Temperature  : {self.relax_T}")
@@ -83,21 +188,17 @@ class Solver:
 
     def invalidate_dt_caches(self):
         """Drop every cached form that bakes dt in, forcing a rebuild at the
-        current dt on the next solve. Single owner of the dt-dependent cache
-        list: add any new dt-baking cache to ``_DT_DEPENDENT_CACHES`` rather
-        than nulling it ad hoc from the time loop."""
+        current dt on the next solve. Add any new dt-baking cache to
+        ``_DT_DEPENDENT_CACHES`` rather than nulling it ad hoc from the time loop."""
         for name in self._DT_DEPENDENT_CACHES:
             setattr(self, name, None)
 
     def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
-        """
-        Returns PETSc options for the linear solver based on the physics.
-
-        physics: "thermal", "mechanical" or "damage".
-        """
-        if physics not in ["thermal", "mechanical", "damage"]:
+        """PETSc options for the linear solver of ``physics`` (thermal, mechanical,
+        damage or porosity) and ``solver_type``."""
+        if physics not in ["thermal", "mechanical", "damage", "porosity"]:
             raise ValueError(
-                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical' or 'damage'."
+                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical', 'damage' or 'porosity'."
             )
 
         # 1) KSP type
@@ -138,12 +239,8 @@ class Solver:
         """Build dx_tags and ds_tags measures with axisymmetric and cartesian support."""
         x = ufl.SpatialCoordinate(self.mesh)
         regime = self.regime
-        
-        # Integration weight logic:
-        # - Axisymmetric: 2*pi*r
-        # - Cartesian 2D: 1.0 (Area)
-        # - 3D: 1.0 (Volume)
 
+        # Integration weight: 2*pi*r for axisymmetric, 1.0 for Cartesian 2D/3D.
         if regime == "axisymmetric":
             self.weight = 2.0 * ufl.pi * x[0]
         elif regime == "2d":
@@ -156,24 +253,33 @@ class Solver:
             metadata = {"quadrature_degree": self.q_degree, "quadrature_scheme": "default"}
             print(f"  [Solver] Using quadrature degree {self.q_degree} for integration measures.")
 
+        # Measures over the GLOBAL tag set, not per locally-present tag: under MPI
+        # a rank may hold no entities of a tag the assembly still loops over (its
+        # measure then contributes nothing on that rank).
         self.dx_tags = {
             tag: ufl.Measure(
                 "dx", domain=self.mesh, subdomain_data=self.cell_tags, subdomain_id=tag, metadata=metadata
             )
-            for tag in np.unique(self.cell_tags.values)
+            for tag in self._global_tags(self.cell_tags.values)
         }
 
         self.ds_tags = {
             id_: ufl.Measure(
                 "ds", domain=self.mesh, subdomain_data=self.facet_tags, subdomain_id=id_
             )
-            for id_ in np.unique(self.facet_tags.values)
+            for id_ in self._global_tags(self.facet_tags.values)
         }
 
-    def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
+    def _global_tags(self, local_values):
+        """Union of unique tag values across all MPI ranks (sorted)."""
+        local = np.unique(local_values)
+        gathered = self.mesh.comm.allgather(local)
+        return np.unique(np.concatenate(gathered)) if gathered else local
 
-        # A non-linear thermal solver (k = NN(T) external operator,
-        # Newton with autodiff tangent). Dispatched before the linear assembly.
+    def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=None):
+
+        # Non-linear thermal solver (k = model(T) external operator, Newton with
+        # autodiff tangent), dispatched before the linear assembly.
         if self.th_cfg.get("solver", "linear") != "linear":
             return self._thermal_step_nonlinear(
                 T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
@@ -201,11 +307,9 @@ class Solver:
         dt = self.dt
         transient = analysis == "transient"
 
-        # The compiled forms are step-invariant: between staggered iterations
-        # only Functions (T_new, T_other, q_third) and Constants (h_gap) change,
-        # all consumed by reference at assembly. Build the LinearProblem once
-        # per time step and only refresh those objects per iteration —
-        # LinearProblem.solve() reassembles A and b from the stored forms.
+        # Forms are step-invariant: only Functions (T_new, T_other, q_third) and
+        # Constants (h_gap) change between iterations, used by reference. Build
+        # the LinearProblem once per step; solve() reassembles A,b from the forms.
         cache = getattr(self, "_th_cache", None)
         rebuild = (
             cache is None
@@ -232,7 +336,14 @@ class Solver:
 
                 # Diffusion + source (always present)
                 a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
-                L_t += w * self.q_third * v_t * dx
+                if self.on.get("porosity", False) and p_new is not None:
+                    p0 = float(material.get("initial_porosity", 0.0))
+                    if p0 < 0.99:
+                        L_t += w * self.q_third * ((1.0 - p_new) / (1.0 - p0)) * v_t * dx
+                    else:
+                        L_t += w * self.q_third * v_t * dx
+                else:
+                    L_t += w * self.q_third * v_t * dx
 
                 # Mass term (backward Euler, only for transient)
                 # self.T holds the converged temperature from the previous time step (T^n)
@@ -244,10 +355,14 @@ class Solver:
 
                 dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
                 q_vals = self.q_third.x.array[dofs]
-                print(
-                    f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, "
-                    f"max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
-                )
+                # under MPI a rank may hold no cells of this material -> empty slice
+                if q_vals.size:
+                    print(
+                        f"  → q_third[{label}](W/m3) min = {q_vals.min():.2e}, "
+                        f"max = {q_vals.max():.2e}, mean = {q_vals.mean():.2e}"
+                    )
+                else:
+                    print(f"  → q_third[{label}](W/m3): no local cells on this rank")
 
             # Neumann
             for label in self.materials:
@@ -273,10 +388,9 @@ class Solver:
                         T_other = dolfinx.fem.Function(self.V_t)
                         dofs_here = self.mgr.locate_facets_dofs(region_id, self.V_t)
                         dofs_other = self.mgr.locate_facets_dofs(self.label_map[pair_region], self.V_t)
-                        T_other.x.array[dofs_here] = T_new.x.array[dofs_other]
-                        gap_aux.append(
-                            {"fn": T_other, "dofs_here": dofs_here, "dofs_other": dofs_other}
-                        )
+                        aux = self._build_gap_pair_aux(T_other, dofs_here, dofs_other)
+                        self._refresh_gap_pair(aux, T_new)
+                        gap_aux.append(aux)
 
                         a_t += w * h_gap * u_t * v_t * ds_robin
                         L_t += w * h_gap * T_other * v_t * ds_robin
@@ -314,16 +428,20 @@ class Solver:
             # gap conductance Constant and paired-surface temperatures.
             self.set_gap_conductance(T_new)
             for aux in cache["gap_aux"]:
-                aux["fn"].x.array[aux["dofs_here"]] = T_new.x.array[aux["dofs_other"]]
+                self._refresh_gap_pair(aux, T_new)
 
-        # Lagged update of any neural-network conductivity field: re-evaluate
-        # k = NN(T) at the current iterate so the (linear) form sees the updated
+        # Lagged update of any data-driven conductivity field: re-evaluate
+        # k = model(T) at the current iterate so the (linear) form sees the updated
         # coefficient on the next solve (Picard). Mutates the Function in place;
-        # the cached form consumes it by reference.
+        # the cached form uses it by reference.
         for material in self.materials.values():
-            if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
-                material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
+            if "_k_model" in material and isinstance(material.get("k"), dolfinx.fem.Function):
+                material["k"].x.array[:] = material["_k_model"](T_new.x.array)
                 material["k"].x.scatter_forward()
+
+        # Lagged update of porosity-dependent material properties
+        if self.on.get("porosity", False) and p_new is not None:
+            self.update_porosity_dependent_properties(T_new, p_new)
 
         bcs_thermal_actual = self._bc_objects(self.dirichlet_thermal)
 
@@ -376,12 +494,43 @@ class Solver:
 
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
+    def _thermal_conductivity_aux_operands(self, material):
+        """Auxiliary operands for data-driven k(T, ...).
+
+        These operands are evaluated at quadrature points by
+        dolfinx-external-operator and passed to the conductivity model by name.
+        They are intentionally treated as frozen fields in the Newton tangent;
+        only T is differentiated.
+        """
+        aux_operands = []
+        aux_names = []
+        k_card = material.get("k", {}) if isinstance(material.get("k"), dict) else {}
+
+        if str(material.get("Pu_profile", "")).lower() == "olander":
+            from z3st.materials.fuel_profiles import olander_plutonium_ufl
+
+            x = ufl.SpatialCoordinate(self.mesh)
+            r = ufl.sqrt(x[0] * x[0] + x[1] * x[1]) if self.regime == "3d" else x[0]
+            R = float(material.get("olander_radius", 0.0))
+            if R <= 0.0:
+                R = max(float(getattr(self, "inner_radius", 0.0) or 0.0),
+                        (float(self.area) / np.pi) ** 0.5 if float(self.area) > 0.0 else 1.0)
+            bu = self.burnup if self.burnup is not None else None
+            aux_operands.append(olander_plutonium_ufl(r, bu, material, R))
+            aux_names.append("Pu")
+
+        if _as_bool(k_card.get("use_burnup_field", False)) and self.burnup is not None:
+            aux_operands.append(self.burnup)
+            aux_names.append("burnup")
+
+        return aux_operands, aux_names
+
     def _thermal_step_nonlinear(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
-        """Tier-2 thermal solve: k = NN(T) as a FEMExternalOperator, solved by
-        Newton with the autodiff tangent dk/dT (Latyshev et al. external
-        operators). Showcase scope: STATIONARY conduction with Dirichlet (and
-        Neumann) BCs. Transient mass terms and Robin/gap BCs are not yet handled
-        on this path — they raise a clear NotImplementedError.
+        """k = model(T) as a FEMExternalOperator, solved by Newton with the
+        autodiff tangent dk/dT (Latyshev et al. external operators). Scope:
+        STATIONARY conduction with Dirichlet (and Neumann) BCs. Transient mass
+        terms and Robin/gap BCs are not yet handled here — they raise
+        NotImplementedError.
         """
         from dolfinx_external_operator import (
             evaluate_external_operators,
@@ -395,16 +544,16 @@ class Solver:
         # --- scope guards -------------------------------------------------
         if self.th_cfg.get("analysis", "stationary") == "transient":
             raise NotImplementedError(
-                "Tier-2 (newton) thermal: transient analysis not yet supported."
+                "Newton, thermal: transient analysis not yet supported."
             )
         if any(self.robin_thermal.get(label) for label in self.materials):
             raise NotImplementedError(
-                "Tier-2 (newton) thermal: Robin/gap BCs not yet supported."
+                "Newton, thermal: Robin/gap BCs not yet supported."
             )
         for label, material in self.materials.items():
-            if "_k_nn" not in material:
+            if "_k_model" not in material:
                 raise NotImplementedError(
-                    f"Tier-2 (newton) thermal requires a neural-network k card; "
+                    f"Newton, thermal requires a data-driven k card; "
                     f"material '{label}' has none."
                 )
 
@@ -428,14 +577,14 @@ class Solver:
         )
         if rebuild:
             print("\n[INFO] Assembling NON-LINEAR thermal problem "
-                  "(k = NN(T) external operator, Newton)...")
+                  "(k = data-driven external operator, Newton)...")
             v_t = ufl.TestFunction(self.V_t)
             dT = ufl.TrialFunction(self.V_t)
             nl_meta = {"quadrature_degree": deg, "quadrature_scheme": "default"}
             dx_nl = {
                 tag: ufl.Measure("dx", domain=self.mesh, subdomain_data=self.cell_tags,
                                  subdomain_id=tag, metadata=nl_meta)
-                for tag in np.unique(self.cell_tags.values)
+                for tag in self._global_tags(self.cell_tags.values)
             }
 
             F = 0
@@ -444,7 +593,11 @@ class Solver:
                 dx = dx_nl[tag]
                 # NB: do not overwrite material["k"] (the writer's heat-flux
                 # Function); the external operator is the solver's own object.
-                k_op = make_external_operator(material["_k_nn"], T_new, quadrature_degree=deg)
+                aux_operands, aux_names = self._thermal_conductivity_aux_operands(material)
+                k_op = make_external_operator(
+                    material["_k_model"], T_new, quadrature_degree=deg,
+                    aux_operands=aux_operands, aux_names=aux_names,
+                )
                 # residual of  ∫ k ∇T·∇v dx − ∫ q''' v dx
                 F += w * k_op * ufl.inner(ufl.grad(T_new), ufl.grad(v_t)) * dx
                 F += -w * self.q_third * v_t * dx
@@ -527,8 +680,8 @@ class Solver:
         # Refresh the writer-facing k Function (a coefficient on V_t) from the
         # converged temperature, so the output heat flux -k·∇T is consistent.
         for material in self.materials.values():
-            if "_k_nn" in material and isinstance(material.get("k"), dolfinx.fem.Function):
-                material["k"].x.array[:] = material["_k_nn"](T_new.x.array)
+            if "_k_model" in material and isinstance(material.get("k"), dolfinx.fem.Function):
+                material["k"].x.array[:] = material["_k_model"](T_new.x.array)
                 material["k"].x.scatter_forward()
 
         # Staggered-convergence bookkeeping (same metrics as the linear path)
@@ -549,12 +702,11 @@ class Solver:
 
         w = self.weight
 
-        # A creeping material, or a plasticity / hyperelastic constitutive
-        # mode, makes the stress σ(u) nonlinear in u, so the step must go
-        # through the SNES path regardless of the configured solver (otherwise
-        # the "linear" branch would assemble a non-bilinear form as if it were
-        # bilinear). The shipped nonlinear cases already set solver: newton;
-        # this guard protects against a solver: linear misconfiguration.
+        # Creep, or a plasticity / hyperelastic constitutive mode, makes σ(u)
+        # nonlinear in u, so the step must go through the SNES path regardless
+        # of the configured solver (the "linear" branch would otherwise assemble
+        # a non-bilinear form as if it were bilinear). Guards against a
+        # solver: linear misconfiguration.
         creep_present = any(self.creep_active(m) for m in self.materials.values())
         nonlinear_constitutive = any(
             m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
@@ -566,25 +718,16 @@ class Solver:
             and not nonlinear_constitutive
         )
 
-        # Creep predictor Δγ₀ at the current iterate, BEFORE assembling: a
+        # Creep predictor at the current iterate, befire assembling: a
         # stale predictor can zero the symbolic correction (base clamp) and
         # let |Δu| pass spuriously. Its change feeds the convergence test.
         creep_pred_change = 0.0
         if creep_present:
             creep_pred_change = self.update_creep_predictor(u_new, T_current)
 
-        # Penalty contact: update the contact pressure from the current
-        # displacement iterate (explicit / fixed-point) — a persistent Constant
-        # consumed by the cached form. The contact traction t = -p*n is treated
-        # as an external load, driven to consistency by the staggered loop.
-        if self.on.get("contact", False):
-            self.update_contact_pressure(u_new)
-
-        # The compiled forms are step-invariant: between staggered iterations
-        # only Functions (u_new, T_current, creep predictor/state, burnup) and
-        # Constants (contact pressure, BC values) change, all consumed by
-        # reference at assembly time. Build the problem once per time step;
-        # solve() reassembles from the stored forms.
+        # Forms are step-invariant: only Functions (u_new, T_current, creep
+        # predictor/state, burnup) and Constants (contact pressure, BC values)
+        # change between iterations, used by reference. Build once per step.
         cache = getattr(self, "_mech_cache", None)
         rebuild = (
             cache is None
@@ -725,6 +868,25 @@ class Solver:
                     petsc_options=petsc_opts_mech,
                     petsc_options_prefix="mechanical_",
                 )
+                # Elasticity AMG needs the rigid-body kernel to scale; attach
+                # it to the operator (GAMG use it, LU/Hypre ignore it).
+                if self.mech_cfg["linear_solver"].startswith("iterative"):
+                    problem_m.A.setNearNullSpace(
+                        build_rigid_body_nullspace(self.V_m, regime=self.regime)
+                    )
+
+                # Opt-in: project the floating rigid-body modes out of the solve
+                # for a body the BCs leave rigid-singular. KSP then removes the kernel from RHS and
+                # solution -> unique minimal-norm displacement, fewer
+                # staggered iterations. Default off; the standard BC-pinned case
+                # has no nullspace and must not get one.
+                if _as_bool(self.mech_cfg.get("remove_rigid_nullspace", False)):
+                    ns = build_constrained_rigid_nullspace(
+                        self.V_m, bcs_mech, regime=self.regime
+                    )
+                    if ns is not None:
+                        problem_m.A.setNullSpace(ns)
+                        print("  [INFO] rigid-body nullspace removed from mechanical solve")
             else:
                 print("  Non-linear solver (SNES Newton)")
                 linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")
@@ -777,23 +939,34 @@ class Solver:
         dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
         problem_m.solve()
 
+        # Penalty contact: measure the gap from the raw solve and set the pressure used by the next solve.
+        # On exact samples the secant update in ContactModel pins the
+        # consistent pressure within a couple of iterations, independent of
+        # the relaxation factor.
+        if self.on.get("contact", False):
+            self.update_contact_pressure(u_new)
+
         # Relax. With Aitken Δ² enabled the relaxation factor is recomputed
         # each iteration from the last two raw residuals R_k = ũ_k − u_old_k:
         #   ω_{k+1} = −ω_k · (R_{k−1} · ΔR)/|ΔR|²,  ΔR = R_k − R_{k−1},
-        # clamped to [relax_min, relax_max]. (Serial dot products: the suite
-        # runs single-rank; an MPI allreduce belongs here if that changes.)
+        # clamped to [relax_min, relax_max]. Dot products are global: restricted
+        # to owned dofs (ghosts would be double-counted) and allreduce'd, so omega
+        # is rank-independent under MPI. In serial this reduces to the local dot.
         if getattr(self, "relax_aitken", False):
             R = u_new.x.array - u_old.x.array
             R_prev = getattr(self, "_aitken_R_prev", None)
             omega = float(getattr(self, "_aitken_omega", self.relax_u))
             if R_prev is not None and R_prev.shape == R.shape:
                 dR = R - R_prev
-                denom = float(np.dot(dR, dR))
+                no = self.V_m.dofmap.index_map.size_local * self.V_m.dofmap.index_map_bs
+                comm = self.mesh.comm
+                denom = comm.allreduce(float(np.dot(dR[:no], dR[:no])), op=MPI.SUM)
+                num = comm.allreduce(float(np.dot(R_prev[:no], dR[:no])), op=MPI.SUM)
                 # Noise guard: when the residual barely changed (converged or
                 # zero-load step), the quotient is numerical garbage — keep ω.
-                R_norm = float(np.linalg.norm(R))
+                R_norm = comm.allreduce(float(np.dot(R[:no], R[:no])), op=MPI.SUM) ** 0.5
                 if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(R_norm, 1e-300):
-                    omega = -omega * float(np.dot(R_prev, dR)) / denom
+                    omega = -omega * num / denom
                     omega = float(min(max(omega, self.relax_min), self.relax_max))
             self._aitken_R_prev = R.copy()
             self._aitken_omega = omega
@@ -872,10 +1045,20 @@ class Solver:
             print(
                 f"Solving damage problem for '{label}' material"
             )
-            
+
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
 
+            missing = [k for k in ("Gc", "sigma_c", "E") if k not in material]
+            if missing:
+                # Every material in the domain participates in the phase-field
+                # problem; fail with a config-level message rather than a bare
+                # KeyError at the first damage assembly.
+                raise ValueError(
+                    f"Damage model is ON but material '{label}' lacks "
+                    f"{missing}. Give it sigma_c or Gc on its card (the other "
+                    "is derived at load time), or disable damage for this run."
+                )
             Gc = material["Gc"]
             sigma_c = material["sigma_c"]
             E = material["E"]
@@ -948,7 +1131,14 @@ class Solver:
             D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
-        D_new.x.array[:] = np.maximum(D_new.x.array, D_old.x.array)
+        # Irreversibility against the last CONVERGED step (anchor captured in
+        # solve_staggered), not the previous staggered iterate: an overshooting
+        # early iterate must remain retractable within the step, while D can
+        # never drop below its converged history.
+        D_floor = getattr(self, "_D_step_start", None)
+        D_new.x.array[:] = np.maximum(
+            D_new.x.array, D_floor if D_floor is not None else D_old.x.array
+        )
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         # Convergence
@@ -996,20 +1186,20 @@ class Solver:
     def _cluster_step(self, c_new, c_old, dt):
         """
         Solve the cluster dynamics step with mass conservation using DG.
-        
-        Solves: ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n²
 
-        Case v > 0: The clusters grow. The distribution moves to the right (larger n).
-        Case v < 0: The clusters shrink (evaporation/dissolution). The distribution moves to the left (towards n=1).
+        Solves ∂c/∂t = -v ∂c/∂n + D ∂²c/∂n² (v > 0 grows clusters, v < 0
+        shrinks them) under the constraint C_tot = ∫ c·n dn = constant.
 
-        C_tot = ∫ c·n dn = constant
-        
-        DG formulation:
-        - Upwind for advection
-        - Symmetric Interior Penalty (SIPG) for diffusion
+        DG formulation: upwind for advection, Symmetric Interior Penalty (SIPG)
+        for diffusion.
+
+        ``c_old`` is the t^n time level (``self.c_n``, frozen by solve_staggered
+        at the start of the step) and must not be overwritten here: this step is
+        re-solved from the same t^n state on every staggered iteration (exactly
+        like the porosity model's ``p_n`), copying the current iterate into
+        ``c_old`` would advance the cluster field by an extra dt per iteration.
         """
-        c_old.x.array[:] = c_new.x.array
-        
+
         u_c, v_c = ufl.TrialFunction(self.V_c), ufl.TestFunction(self.V_c)
         
         # Parameters
@@ -1057,9 +1247,12 @@ class Solver:
             # Volume term
             a += - u_c * v_vel * v_c.dx(0) * ufl.dx
             
-            # Interior facets
+            # Interior facets: standard upwind flux v_n·avg(u) + ½|v_n|·jump(u).
+            # (avg(u*v*n) alone collapses to ½ v_n jump(u) — the consistent
+            # central term must be written explicitly or the facet coupling
+            # vanishes for continuous solutions and the scheme is inconsistent.)
             v_n = v_vel * n[0]
-            a += (ufl.avg(u_c * v_vel * n[0]) * ufl.jump(v_c) \
+            a += (v_n('+') * ufl.avg(u_c) * ufl.jump(v_c) \
                  + 0.5 * abs(v_n('+')) * ufl.jump(u_c) * ufl.jump(v_c)) * ufl.dS
             
             # Boundary facets (outflow/inflow)
@@ -1078,7 +1271,9 @@ class Solver:
             # Solve
             petsc_options = {
                 "ksp_type": "gmres",
-                "pc_type": "ilu",
+                # bjacobi(+ilu per block) — plain ilu is serial-only in PETSc
+                # and fails on distributed (mpiaij) matrices.
+                "pc_type": "bjacobi",
                 "ksp_rtol": 1e-12,
                 "ksp_atol": 1e-15,
                 "ksp_max_it": 1000,
@@ -1105,19 +1300,75 @@ class Solver:
         )
         
         if self.C_tot_target is not None:
-            if abs(C_tot_curr_new) > 0.0:
+            # Rescale only when the current mass is a sane same-sign quantity:
+            # a near-zero or sign-flipped ∫c·n (possible with DG undershoots)
+            # would otherwise scale the whole field by a huge/negative factor.
+            if (C_tot_curr_new * self.C_tot_target > 0.0
+                    and abs(C_tot_curr_new) > 1e-12 * abs(self.C_tot_target)):
                 renorm_factor = self.C_tot_target / C_tot_curr_new
                 c_new.x.array[:] *= renorm_factor
-                
+
                 print(f"  [Cluster] Mass conservation: target = {self.C_tot_target:.6e}")
                 print(f"  [Cluster] Mass conservation: before = {C_tot_curr_new:.6e}")
                 print(f"  [Cluster] Mass conservation: factor = {renorm_factor:.8f}")
             else:
-                print("  [Cluster] Warning: mass is zero, cannot renormalize.")
+                print(f"  [Cluster] WARNING: current mass {C_tot_curr_new:.3e} is "
+                      f"degenerate vs target {self.C_tot_target:.3e}; skipping "
+                      "renormalization this iteration.")
 
         c_max_local = float(np.max(c_new.x.array)) if c_new.x.array.size > 0 else float("-inf")
         c_max = self.mesh.comm.allreduce(c_max_local, op=MPI.MAX)
         print(f"   [Diagnostics] Max density c_max: {c_max:.2f}")
+
+    def _build_gap_pair_aux(self, fn, dofs_here, dofs_other):
+        """Geometric matching between two paired gap surfaces (built once per
+        step alongside the cached thermal form).
+
+        Each here-surface dof is paired with its geometrically nearest dof on
+        the other surface. The previous positional copy
+        ``T_other[dofs_here] = T[dofs_other]`` assumed the two index-sorted dof
+        arrays had equal length and matching order — not guaranteed even in
+        serial, and never with the surfaces split across MPI ranks. Owned
+        other-side coordinates are allgathered once here; per iteration only
+        the surface *values* travel (:meth:`_refresh_gap_pair`).
+        """
+        from scipy.spatial import cKDTree
+
+        comm = self.mesh.comm
+        coords = self.V_t.tabulate_dof_coordinates()
+        n_owned = self.V_t.dofmap.index_map.size_local
+        dofs_here = np.asarray(dofs_here)
+        dofs_other = np.asarray(dofs_other)
+        other_owned = dofs_other[dofs_other < n_owned] if dofs_other.size else dofs_other
+
+        other_xyz = coords[other_owned]
+        if comm.size > 1:
+            gdim = coords.shape[1]
+            other_xyz = np.concatenate(
+                [a.reshape(-1, gdim) for a in comm.allgather(other_xyz)]
+            )
+        if other_xyz.shape[0] == 0:
+            raise RuntimeError(
+                "Gap pair: the paired surface has no dofs on any rank — check "
+                "the 'pair:' label in boundary_conditions.yaml."
+            )
+        nn = (cKDTree(other_xyz).query(coords[dofs_here], k=1)[1]
+              if dofs_here.size else np.array([], dtype=np.int64))
+        return {"fn": fn, "dofs_here": dofs_here, "other_owned": other_owned,
+                "nn": nn}
+
+    def _refresh_gap_pair(self, aux, T_new):
+        """Copy the paired surface's current temperatures onto the persistent
+        T_other Function through the precomputed nearest-neighbour map. In
+        parallel the owned other-side values are allgathered in the same rank
+        order as the coordinates were at build time."""
+        comm = self.mesh.comm
+        vals = T_new.x.array[aux["other_owned"]]
+        if comm.size > 1:
+            vals = np.concatenate([np.atleast_1d(v) for v in comm.allgather(vals)])
+        if aux["dofs_here"].size:
+            aux["fn"].x.array[aux["dofs_here"]] = vals[aux["nn"]]
+        aux["fn"].x.scatter_forward()
 
     def solve_staggered(
         self,
@@ -1173,6 +1424,14 @@ class Solver:
             D_new = dolfinx.fem.Function(self.V_d)
             D_new.x.array[:] = self.D.x.array
             D_old = dolfinx.fem.Function(self.V_d)
+            # Irreversibility anchors: D and H ratchet against the last
+            # CONVERGED step, not against intermediate staggered iterates.
+            # Ratcheting per iterate let an overshooting early iterate (e.g.
+            # first mechanical pass with a not-yet-converged temperature)
+            # permanently inflate the crack driving force / damage field.
+            self._D_step_start = self.D.x.array.copy()
+            if getattr(self, "H", None) is not None:
+                self._H_step_start = self.H.x.array.copy()
         else:
             D_new = D_old = None
 
@@ -1182,6 +1441,16 @@ class Solver:
             self.c_n.x.array[:] = self.c.x.array
         else:
             c_new = None
+
+        if self.on.get("porosity", False):
+            p_new = dolfinx.fem.Function(self.V_p)
+            p_new.x.array[:] = self.porosity.x.array
+            self.porosity_n.x.array[:] = self.porosity.x.array
+            conv_porosity = True
+            prev_res_p = None
+        else:
+            p_new = None
+            conv_porosity = True
 
         prev_res_T = None
         prev_res_u = None
@@ -1198,6 +1467,14 @@ class Solver:
             self._aitken_omega = getattr(self, "_relax_u0", self.relax_u)
             self.relax_u = self._aitken_omega
         self._h_gap_prev = None
+        # Porosity Aitken state (porosity.aitken) — separate from the displacement
+        # accelerator above; nulling R_prev restarts ω from porosity.aitken_omega0.
+        self._aitken_p_R_prev = None
+        self._aitken_p_omega = None
+        # Contact secant history: the free gap changes with the step's thermal
+        # state, so a cross-step sample pair would give a bogus slope.
+        if self.on.get("contact", False):
+            self.reset_contact_history()
 
         for iteration in range(max_iter):
             print(f"\n--- Staggering iteration {iteration+1}/{max_iter} ---")
@@ -1210,7 +1487,7 @@ class Solver:
             # --. THERMAL STEP --..
             if self.on.get("thermal", False):
                 conv_th, _, _, prev_res_T = self._thermal_step(
-                    T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T
+                    T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=p_new
                 )
 
             # --. MECHANICAL STEP --..
@@ -1238,10 +1515,14 @@ class Solver:
             if self.on.get("cluster", False):
                 self._cluster_step(c_new, self.c_n, dt)
 
+            # --. POROSITY STEP --..
+            if self.on.get("porosity", False):
+                conv_porosity, _, _, prev_res_p = self._porosity_step(p_new, self.porosity_n, dt, T_new, stag_tol_th, prev_res_p)
+
             # --.. GLOBAL CONVERGENCE --..
             print("\nConvergence check")
 
-            if conv_th and conv_mech and conv_damage:
+            if conv_th and conv_mech and conv_damage and conv_porosity:
                 print(f"\n[SUCCESS] Staggered solver converged in {iteration+1} iterations.")
 
                 if self.on.get("thermal", False):
@@ -1255,6 +1536,9 @@ class Solver:
                 
                 if self.on.get("cluster", False):
                     self.c.x.array[:] = c_new.x.array
+
+                if self.on.get("porosity", False):
+                    self.porosity.x.array[:] = p_new.x.array
 
                 if self.on.get("mechanical", False) and self.on.get("plasticity", False):
                     self.update_plastic_history(u_new)
@@ -1277,5 +1561,19 @@ class Solver:
             self.D.x.array[:] = D_new.x.array
         if self.on.get("cluster", False):
             self.c.x.array[:] = c_new.x.array
+        if self.on.get("porosity", False):
+            self.porosity.x.array[:] = p_new.x.array
+
+        # Advance the internal-variable history exactly as on the converged
+        # exit: the fields above are being ACCEPTED, and leaving ε_p / ε_cr at
+        # the previous step while time moves on hands the next step a
+        # displacement inconsistent with its internal state (the adaptive grid
+        # rolls all of this back anyway via snapshot/restore before a retry).
+        if self.on.get("mechanical", False) and self.on.get("plasticity", False):
+            self.update_plastic_history(u_new)
+        if self.on.get("mechanical", False) and any(
+            self.creep_active(m) for m in self.materials.values()
+        ):
+            self.update_creep_state(u_new, T_new)
 
         return False

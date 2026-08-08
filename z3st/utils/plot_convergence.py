@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST convergence plot --.. ..- .-.. .-.. ---
 """
 Z3ST case: convergence plot

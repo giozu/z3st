@@ -121,7 +121,7 @@ seg_P() {
   cue "Contact is a penalty — pressure proportional to penetration, equal/opposite tractions."
   cue "Nothing is prescribed: the pressure EMERGES, the cladding is pushed outward — that is load transfer."
   cue "And it feeds back thermally: contact raises the gap conductance, so the fuel cools the moment it touches."
-  echo "${G}  → verified to 3.5% against the analytical Lamé interference-fit (stress state confirmed plane-stress).${Z}"
+  echo "${G}  → verified to 1.0% against the analytical Lamé interference-fit (stress state confirmed plane-stress).${Z}"
   cue "The penalty tangent? The same AD path — ufl.derivative — no hand-coded contact Jacobian."
   echo
   cue "The burnup beat: same physics over an 1800-DAY irradiation — swelling closes the gap at ~21 MWd/kgU,"
@@ -129,8 +129,9 @@ seg_P() {
   echo "  baked story: ${B}$BAKED/pcmi_burnup_curves.png${Z}"
   open_imgs "$BAKED/pcmi_burnup_curves.png"
   echo
-  echo "${Y}  (optional, live — watch the gap close and contact switch on):${Z}"
-  echo "    ${B}cd $CASES/sandbox/U_coaxial_contact_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
+  echo "${Y}  (optional — watch the gap close and contact switch on; not a quick run:${Z}"
+  echo "${Y}   ~700 days over 38 steps with adaptive dt):${Z}"
+  echo "    ${B}cd $CASES/regression/pwr_rod_2D && Z3ST_PLAIN_LOG=1 python3 -m z3st | grep -E 'STEP|contact'${Z}"
 }
 
 seg_K() {

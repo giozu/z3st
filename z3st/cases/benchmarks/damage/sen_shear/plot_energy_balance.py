@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """Standalone energy-balance plot for the SENS shear test.
 
 Reads ``energies.txt`` and writes ``energy_balance.png``: three traces

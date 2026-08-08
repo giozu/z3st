@@ -1,0 +1,29 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+#   ./Allrun_mpi        # 4 ranks (default)
+#   ./Allrun_mpi 2      # 2 ranks
+NP="${1:-4}"
+
+# Pin BLAS to 1 thread per rank so the MPI ranks do not oversubscribe the cores.
+export PATH="/home/giovanni/miniconda3/envs/z3st/bin:$PATH" # conda activate z3st
+export OMP_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+./Allclean
+
+if [ ! -f mesh.msh ] || [ mesh.geo -nt mesh.msh ]; then
+    echo "[Allrun_mpi] Generating mesh from mesh.geo..."
+    gmsh -2 mesh.geo -format msh2 > log_mesh.md
+else
+    echo "[Allrun_mpi] Reusing existing mesh.msh (mesh.geo unchanged since)."
+fi
+
+echo "[Allrun_mpi] Solving on $NP rank(s)..."
+start=$SECONDS
+Z3ST_PLAIN_LOG=1 mpirun -n "$NP" python3 -m z3st > log_z3st.md
+echo "[Allrun_mpi] Solve completed in $((SECONDS - start)) s on $NP rank(s)  (solver log: log_z3st.md)"
+
+python3 plot_damage.py
+
+echo "[Allrun_mpi] Done."

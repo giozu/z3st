@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -22,12 +23,11 @@ Naming conventions (preserved from the previous code path):
   - XDMF                                 : single ``output/<basename>.xdmf`` + ``.h5``
 
 A ``vtkhdf`` backend was prototyped against dolfinx 0.10 but reverted: the
-0.10 ``dolfinx.io.vtkhdf`` submodule exposes a functional API
-(``write_mesh / write_point_data / write_cell_data``) that has no
-field-name parameter, so writing the many named z3st fields (T, u, strain,
-per-material stress, von Mises, hydrostatic, heat flux, ...) into a single
-file is not currently expressible. Revisit when dolfinx ships a class-based
-``VTKHDFFile`` with per-field naming.
+0.10 ``dolfinx.io.vtkhdf`` functional API
+(``write_mesh / write_point_data / write_cell_data``) has no field-name
+parameter, so the many named z3st fields cannot be written into a single
+file. Revisit when dolfinx ships a class-based ``VTKHDFFile`` with per-field
+naming.
 """
 
 import os
@@ -42,6 +42,20 @@ from dolfinx.io import XDMFFile
 # ---------------------------------------------------------------------------
 # Derived-field helpers (numpy on host arrays after interpolation)
 # ---------------------------------------------------------------------------
+
+def _zero_nonfinite(arr, name):
+    """Replace non-finite entries by 0 for export, but WARN when they are
+    widespread: the legitimate source is the axisymmetric r=0 axis line (a
+    handful of nodes), whereas a diverged solve produces NaN everywhere — and
+    silently exporting an all-zero field would let a garbage run look clean."""
+    bad = ~np.isfinite(arr)
+    n_bad = int(np.count_nonzero(bad))
+    if n_bad > max(1, arr.size // 100):
+        print(f"  [OutputWriter] WARNING: {name}: {n_bad}/{arr.size} non-finite "
+              "values zeroed in output — far more than an axisymmetric axis "
+              "line; the solve may have produced NaN stresses.")
+    return np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
+
 
 def _von_mises(sig):
     """Von Mises equivalent stress for an (..., 3, 3) batch.
@@ -58,14 +72,14 @@ def _von_mises(sig):
             0.5 * ((s_xx - s_yy) ** 2 + (s_yy - s_zz) ** 2 + (s_zz - s_xx) ** 2)
             + 3.0 * (s_xy ** 2 + s_yz ** 2 + s_zx ** 2)
         )
-    return np.nan_to_num(vm, nan=0.0, posinf=0.0, neginf=0.0)
+    return _zero_nonfinite(vm, "VonMises")
 
 
 def _hydrostatic(sig):
     """Hydrostatic pressure p = tr(sigma) / 3 on an (..., 3, 3) batch. Guarded
     for the same axisymmetric r=0 NaN as :func:`_von_mises`."""
     p = (sig[..., 0, 0] + sig[..., 1, 1] + sig[..., 2, 2]) / 3.0
-    return np.nan_to_num(p, nan=0.0, posinf=0.0, neginf=0.0)
+    return _zero_nonfinite(p, "Hydrostatic")
 
 
 # ---------------------------------------------------------------------------
@@ -103,19 +117,30 @@ class OutputWriter:
                 "('vtkhdf' was prototyped but reverted — see module docstring.)"
             )
 
+        # Fallback
+        if fmt == "vtu" and problem.mesh.comm.size > 1:
+            if problem.mesh.comm.rank == 0:
+                print(f"[WARNING] VTU output is serial-only; running on "
+                      f"{problem.mesh.comm.size} MPI ranks -> switching to XDMF "
+                      "to avoid a corrupted file. Set 'format: xdmf' to silence this.")
+            fmt = "xdmf"
+
         self.problem = problem
         self.format = fmt
         self.output_dir = output_dir
         self.n_steps = max(1, int(n_steps))
         os.makedirs(output_dir, exist_ok=True)
 
+        # Normalise to the format's extension
+        ext = self._DEFAULT_EXT[fmt]
         if filename is None:
-            filename = f"fields{self._DEFAULT_EXT[fmt]}"
+            filename = "fields"
+        filename = os.path.splitext(filename)[0] + ext
         self.filename = filename
 
-        # The UFL expressions we pre-compile below live on problem.strain,
-        # problem.stress[name], etc., which are populated by get_results().
-        # Call once now if the user hasn't already.
+        # The UFL expressions pre-compiled below live on problem.strain,
+        # problem.stress[name], etc., populated by get_results(). Call it now
+        # if the user hasn't.
         if not hasattr(problem, "stress") or not hasattr(problem, "strain"):
             problem.get_results()
 
@@ -142,8 +167,7 @@ class OutputWriter:
         self.V_c_cg = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
 
         # Pre-allocate Function targets and compile Expressions for each
-        # symbolic UFL field the problem exposes. Each block is gated on
-        # the relevant physics being active.
+        # symbolic UFL field, gated on the relevant physics being active.
         self._strain_fn_cells = None
         self._strain_fn_points = None
         self._strain_expr_cells = None
@@ -157,6 +181,7 @@ class OutputWriter:
         self._psi_fn_cells = None
         self._psi_fn_points = None
         self._heatflux_fn = None
+        self._contact_pressure_fn = None
         self._stress_sources = []      # list of (expr_cells, expr_points, cells)
         self._psi_sources = []         # list of (expr_cells, expr_points, cells)
         self._heatflux_sources = []    # list of (expr_cells, cells)
@@ -165,7 +190,9 @@ class OutputWriter:
         self._H_cell_fn = None
         self._H_cell_expr = None
         self._c_cg_fn = None
+        self._p_cg_fn = None         # CG1 view of DG porosity for output (lazy)
         self._p_proj_problem = None  # cumulative plastic strain (lazy)
+        self._u_out_fn = None        # CG1 vertex view of u for P2+ output (lazy)
 
         on = problem.on
 
@@ -186,10 +213,16 @@ class OutputWriter:
             # interpolation. None -> fill the whole mesh (single-domain case).
             if cell_tags is None:
                 return None
-            try:
-                return cell_tags.find(problem.label_map[name])
-            except Exception:
+            label = getattr(problem, "label_map", {}).get(name)
+            if label is None:
+                # Loud, not silent: with None this material's expression fills
+                # EVERY cell of the merged field (last writer wins) — correct
+                # only when it is the sole material.
+                print(f"[OutputWriter] WARNING: material '{name}' has no entry "
+                      "in the geometry label map; its output expressions will "
+                      "fill the whole mesh (single-material assumption).")
                 return None
+            return cell_tags.find(label)
 
         mats = problem.materials
         mech = on.get("mechanical", False)
@@ -203,6 +236,12 @@ class OutputWriter:
             self._psi_fn_points = dolfinx.fem.Function(self.V_scalar_points, name="StrainEnergyDensity")
         if therm:
             self._heatflux_fn = dolfinx.fem.Function(self.V_vector_cells, name="HeatFlux")
+
+        # Contact pressure: a single domain-wide scalar
+        if on.get("contact", False) and getattr(problem, "contact_pressure", None) is not None:
+            self._contact_pressure_fn = dolfinx.fem.Function(
+                self.V_scalar_cells, name="ContactPressure"
+            )
 
         for name, material in mats.items():
             cells = _mat_cells(name)
@@ -238,6 +277,16 @@ class OutputWriter:
         # Cluster: pre-allocated CG1 Function for XDMF visualisation.
         if on.get("cluster", False) and getattr(problem, "c", None) is not None:
             self._c_cg_fn = dolfinx.fem.Function(self.V_c_cg, name="ClusterDensity")
+
+        # Porosity: with the DG discretisation, point_data needs a CG1 projection
+        # (the same DG->CG1 interpolation the cluster field uses). The CG path
+        # writes its Lagrange-1 field directly, so no helper is needed there.
+        if (
+            on.get("porosity", False)
+            and getattr(problem, "porosity", None) is not None
+            and getattr(problem, "porosity_discretisation", "cg") == "dg"
+        ):
+            self._p_cg_fn = dolfinx.fem.Function(self.V_c_cg, name="Porosity")
 
         # XDMF: open file once and write mesh header.
         self._ts_file = None
@@ -306,9 +355,32 @@ class OutputWriter:
             L = ufl.inner(ufl_expr, v) * dx
             return dolfinx.fem.petsc.LinearProblem(
                 a, L,
-                petsc_options={"ksp_type": "preonly", "pc_type": "lu"},
+                # MUMPS: plain PETSc LU is serial-only and errors on
+                # distributed (mpiaij) matrices.
+                petsc_options={"ksp_type": "preonly", "pc_type": "lu",
+                               "pc_factor_mat_solver_type": "mumps"},
                 petsc_options_prefix=f"z3st_proj_{id(ufl_expr):x}_",
             )
+
+    def _u_for_output(self, u):
+        """Return displacement as a CG1 vertex field for VTU/XDMF.
+
+        VTU and legacy XDMF expect one value per mesh vertex, but a P2 (or higher)
+        mechanical space carries extra dofs (edge midpoints), so ``u.x.array`` is
+        longer than ``#vertices × tdim`` and a direct reshape/write fails. For such
+        spaces we interpolate ``u`` once per step onto a cached CG1 vector field;
+        for P1 ``u`` (already vertex-resolution) it is returned unchanged.
+        """
+        n_vert = self.mesh.geometry.x.shape[0]
+        tdim = self.mesh.topology.dim
+        if u.x.array.size == n_vert * tdim:
+            return u
+        if self._u_out_fn is None:
+            V = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1, (tdim,)))
+            self._u_out_fn = dolfinx.fem.Function(V, name="Displacement")
+        self._u_out_fn.interpolate(u)
+        self._u_out_fn.x.scatter_forward()
+        return self._u_out_fn
 
     @staticmethod
     def _refresh_into(target_fn, source, cells=None):
@@ -323,9 +395,23 @@ class OutputWriter:
                 target_fn.interpolate(source, cells0=cells)
         else:
             # LinearProblem path (quadrature-sourced, e.g. custom plasticity).
-            # Only used by single-material cases, so a whole-mesh copy is exact.
+            # The projection solves on the whole mesh; restrict the copy to the
+            # material's own cells so it cannot clobber the other materials'
+            # entries in the shared merged field.
             result = source.solve()
-            target_fn.x.array[:] = result.x.array[:]
+            if cells is None:
+                target_fn.x.array[:] = result.x.array[:]
+            else:
+                V = target_fn.function_space
+                dofs = dolfinx.fem.locate_dofs_topological(
+                    V, V.mesh.topology.dim, np.asarray(cells, dtype=np.int32)
+                )
+                bs = V.dofmap.bs
+                if bs == 1:
+                    target_fn.x.array[dofs] = result.x.array[dofs]
+                else:
+                    for k in range(bs):
+                        target_fn.x.array[dofs * bs + k] = result.x.array[dofs * bs + k]
 
     def _refresh(self):
         """Refresh every interpolated/projected Function from its source."""
@@ -344,6 +430,9 @@ class OutputWriter:
         for src_c, cells in self._heatflux_sources:
             self._refresh_into(self._heatflux_fn, src_c, cells)
 
+        if self._contact_pressure_fn is not None:
+            self._contact_pressure_fn.x.array[:] = float(self.problem.contact_pressure.value)
+
         if self._D_cell_expr is not None:
             self._refresh_into(self._D_cell_fn, self._D_cell_expr)
         if self._H_cell_expr is not None:
@@ -352,6 +441,10 @@ class OutputWriter:
         # Cluster: DG1 → CG1 Function-to-Function interpolation for XDMF/VTU.
         if self._c_cg_fn is not None:
             self._c_cg_fn.interpolate(self.problem.c)
+
+        # Porosity (DG only): same DG1 → CG1 projection for output.
+        if self._p_cg_fn is not None:
+            self._p_cg_fn.interpolate(self.problem.porosity)
 
     def _write_timeseries(self, t):
         """Append the current state to the open XDMF file at time ``t``."""
@@ -362,7 +455,7 @@ class OutputWriter:
         if on.get("thermal", False) and p.T is not None:
             write(p.T, t)
         if on.get("mechanical", False) and p.u is not None:
-            write(p.u, t)
+            write(self._u_for_output(p.u), t)
         if self._strain_fn_cells is not None:
             write(self._strain_fn_cells, t)
         if self._stress_fn_cells is not None:
@@ -371,12 +464,22 @@ class OutputWriter:
             write(self._psi_fn_cells, t)
         if self._heatflux_fn is not None:
             write(self._heatflux_fn, t)
+        if self._contact_pressure_fn is not None:
+            write(self._contact_pressure_fn, t)
         if on.get("damage", False) and p.D is not None:
             write(p.D, t)
         if self._c_cg_fn is not None:
             write(self._c_cg_fn, t)
         if getattr(p, "burnup", None) is not None:
             write(p.burnup, t)
+        # SCIANTIX coupling fields (only present when models.fission_gas is on)
+        if getattr(p, "gas_swelling", None) is not None:
+            write(p.gas_swelling, t)
+        if getattr(p, "fg_fields", None):
+            for fn in p.fg_fields.values():
+                write(fn, t)
+        if on.get("porosity", False) and getattr(p, "porosity", None) is not None:
+            write(self._p_cg_fn if self._p_cg_fn is not None else p.porosity, t)
 
     def _write_vtu(self, step):
         p = self.problem
@@ -390,7 +493,8 @@ class OutputWriter:
         if on.get("thermal", False) and p.T is not None:
             grid.point_data["Temperature"] = p.T.x.array
         if on.get("mechanical", False) and p.u is not None:
-            grid.point_data["Displacement"] = p.u.x.array.reshape(n_points, self.tdim)
+            u_out = self._u_for_output(p.u)
+            grid.point_data["Displacement"] = u_out.x.array.reshape(n_points, self.tdim)
 
         # Material IDs
         ct = getattr(p, "cell_tags", None) or getattr(p, "tags", None)
@@ -432,6 +536,10 @@ class OutputWriter:
         if self._heatflux_fn is not None:
             grid.cell_data["HeatFlux (cells)"] = self._heatflux_fn.x.array.reshape(-1, 3)
 
+        # Contact pressure — uniform scalar broadcast over every cell
+        if self._contact_pressure_fn is not None:
+            grid.cell_data["ContactPressure"] = self._contact_pressure_fn.x.array.copy()
+
         # Cluster density
         if self._c_cg_fn is not None:
             grid.point_data["ClusterDensity"] = self._c_cg_fn.x.array
@@ -440,6 +548,14 @@ class OutputWriter:
         if getattr(p, "burnup", None) is not None:
             grid.point_data["Burnup"] = p.burnup.x.array
 
+        # SCIANTIX coupling fields (only present when models.fission_gas is on):
+        # total gaseous swelling ΔV/V and the Xe+Kr concentrations (at/m^3).
+        if getattr(p, "gas_swelling", None) is not None:
+            grid.point_data["Gaseous swelling"] = p.gas_swelling.x.array
+        if getattr(p, "fg_fields", None):
+            for fn in p.fg_fields.values():
+                grid.point_data[fn.name] = fn.x.array
+
         # Damage + crack-driving-force
         if on.get("damage", False) and p.D is not None:
             grid.point_data["Damage"] = p.D.x.array.copy()
@@ -447,6 +563,11 @@ class OutputWriter:
                 grid.cell_data["Damage"] = self._D_cell_fn.x.array.copy()
             if self._H_cell_fn is not None:
                 grid.cell_data["CrackDrivingForce"] = self._H_cell_fn.x.array.copy()
+
+        # Porosity (DG is projected to CG1 first; CG writes its nodal field).
+        if on.get("porosity", False) and getattr(p, "porosity", None) is not None:
+            poro_out = self._p_cg_fn if self._p_cg_fn is not None else p.porosity
+            grid.point_data["Porosity"] = poro_out.x.array.copy()
 
         # Plasticity: cumulative plastic strain p lives on a quadrature space.
         # Projection per step is needed; the LinearProblem is built once.

@@ -1,0 +1,12 @@
+{
+    "results": {
+        "max_stress_yy": {
+            "numerical": 2.586485957964088,
+            "reference": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

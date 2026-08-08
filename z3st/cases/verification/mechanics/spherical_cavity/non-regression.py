@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: spherical_pressurized_cavity
-
-non-regression script
----------------------
-
 """
 
 import os

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -9,8 +10,6 @@ import glob
 import os
 
 import dolfinx
-
-# Import necessary modules
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

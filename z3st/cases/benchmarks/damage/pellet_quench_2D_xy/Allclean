@@ -3,8 +3,10 @@ cd "${0%/*}" || exit 1
 
 echo "Cleaning current directory..."
 
-rm -rf output/ __pycache__/
+rm -f output/fields_*.vtu output/fields.xdmf output/fields.h5
+rm -f output/non-regression.json output/*.png
+rm -rf __pycache__/
 rm -f log_*.md log.z3st
 rm -f energies.txt
 
-echo "Done. Output and temporary files deleted (mesh preserved)."
+echo "Done. Output and temporary files deleted (mesh and gold preserved)."

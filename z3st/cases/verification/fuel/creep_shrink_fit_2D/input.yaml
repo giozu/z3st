@@ -1,0 +1,80 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  fuel: fuel.yaml
+  clad: clad.yaml
+
+regime: axisymmetric
+
+solver_settings:
+  coupling: staggered
+  max_iters: 60
+  relax_T: 0.9
+  relax_u: 0.3
+  relax_adaptive: true
+  relax_aitken: true
+  relax_growth: 1.1
+  relax_shrink: 0.6
+  relax_min: 0.03
+  relax_max: 0.9
+
+models:
+  thermal: true
+  mechanical: true
+  gap_conductance:
+    type: Gas
+    value: 15.8                 # (He)
+    relax: 0.5                  # under-relax h_gap: damps the gap-h-T feedback
+    contact_coupling:
+      enabled: true
+      meyer_hardness: 9.65e8    # (Pa) Zry
+      gas_thickness: 4.0e-6     # (m)
+  contact:
+    surface_a: lateral_1        # pellet outer
+    surface_b: inner_2          # clad inner
+    penalty_stiffness: 3.5e12   # (Pa/m)
+    initial_gap: -10.0e-6       # (m) NEGATIVE = radial interference: shrink fit
+                                #      active from t = 0, per Esposito eq. (21)
+
+mechanical:
+  solver: nonlinear
+  linear_solver: direct_mumps
+  rtol: 1.0e-4
+  stag_tol: 1.0e-4
+  convergence: rel_norm
+
+thermal:
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-5
+  stag_tol: 1.0e-5
+  convergence: rel_norm
+  analysis: stationary
+
+lhr:
+- 0.0
+- 20000.0
+- 20000.0
+time:
+- 0.0
+- 6.048e+7     # 700 days
+- 2.16e+8    # 2500 days
+n_steps:
+- 14
+- 20
+
+time_adaptivity:
+  enabled: true
+  dt_min: 1.0e+4
+  max_cuts: 8
+
+output:
+  format: xdmf

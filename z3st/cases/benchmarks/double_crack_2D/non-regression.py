@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: stress_strain_curve_double_crack
@@ -84,7 +85,7 @@ h_max_list = []
 for step, vtufile in enumerate(VTU_FILES):
     print(f"\n[STEP {step}] Processing {os.path.basename(vtufile)}")
 
-    # Stress extraction - usa vtufile (minuscolo)
+    # Stress extraction
     x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress (cells)")
     mask = np.abs(x_S - x_target) < mask_tol
     stresses.append(float(np.mean(S_all[mask, 4])))

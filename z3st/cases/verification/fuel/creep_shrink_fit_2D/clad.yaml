@@ -1,0 +1,38 @@
+name: zircaloy-4
+
+E: 99.3e9     # (Pa)
+nu: 0.37      # (-)
+
+k: 17.0           # (W/m·K)
+alpha: 7.5e-6     # (1/K)
+cp: 350           # (J/kg·K)
+T_ref: 300        # (K)
+T_initial: 580.0  # (K)
+
+rho: 6500                   # (kg/m³)
+melting_temperature: 2123   # (K)
+
+creep: norton
+creep_n: 3.0         # (-)
+
+# ISOTHERMAL Norton law, to match Esposito et al. (2020). Their eq. (9) is
+# eps_eq_dot = A.sigma_eq^n with A a constant [h^-1] (see the paper's
+# nomenclature): there is no Arrhenius factor at all, temperature enters only
+# through the interference Delta via alpha.dT. So creep_Q = 0 here.
+#
+# CAREFUL: creep_Q = 0 makes A(T) = A0 identically, so A0 must be the
+# Arrhenius factor already folded in at the operating temperature. The
+# Zircaloy card value 2.82e-24 Pa^-n s^-1 is the *prefactor* that goes with
+# creep_Q = 1.2e5; using it with creep_Q = 0 would run the cladding ~1e10
+# times too fast. Re-based here as
+#     A0_iso = 2.82e-24 . exp(-1.2e5 / (R . T_ref)),  T_ref = 600 K
+# which is the same A(T) the verification/fuel/creep case reports at 600 K.
+creep_Q: 0           # (J/mol) isothermal, see above
+creep_A0: 1.0083e-34 # (Pa^-n s^-1) = A0(2.82e-24) folded at T_ref = 600 K
+
+# Irradiation creep is deliberately OFF in this case. Esposito eq. (21) is a
+# pure Norton derivation with no in-pile term, so the linear ε̇_irr = B·φ·σ
+# contribution would break the very comparison this case verifies. The PWR
+# values are kept here, commented, for anyone re-enabling it:
+#   creep_irr_B: 2.0e-36  # (Pa^-1 per n/m^2) irradiation-creep coefficient
+#   fast_flux: 7.0e17     # (n/(m^2.s), E > 1 MeV)

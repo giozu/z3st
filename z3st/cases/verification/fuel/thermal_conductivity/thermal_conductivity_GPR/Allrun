@@ -1,0 +1,11 @@
+#!/bin/bash
+set -e
+cd "${0%/*}" || exit 1
+# The GPR checkpoint is fitted to a known analytic residual and rebuilt
+# before every run, so nothing binary is committed (cf. train_knet.py).
+python3 ../../../../studies/magni_gpr_conductivity/make_synthetic_gpr.py
+python3 ../../../../studies/magni_gpr_conductivity/verify_machinery.py
+
+gmsh mesh.geo -2 > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 non-regression.py

@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
@@ -28,12 +29,10 @@ def _install_markdown_stdout():
     _tagged     = re.compile(r"^(\s*)\[(INFO|WARNING|ERROR|SUCCESS|DESCRIPTION)\](\s+.*)?$")
 
     def transform(line):
-        # Strip CR for safety on mixed line endings.
         s = line.rstrip("\r")
 
         if _morse_line.match(s):
-            # `***` (not `---`) avoids setext-heading ambiguity in markdown.
-            return ""  # blank line; the divider proper is emitted as a separate token
+            return ""
         m = _step.match(s)
         if m:
             num, rest = m.group(1), m.group(2).strip()
@@ -68,10 +67,9 @@ def _install_markdown_stdout():
                 return 0
             self._buf += s
             parts = self._buf.split("\n")
-            self._buf = parts.pop()  # last fragment may be partial
+            self._buf = parts.pop()
             for line in parts:
                 if _morse_line.match(line.rstrip("\r")):
-                    # `***` (not `---`) avoids markdown setext-heading ambiguity.
                     self._raw.write("\n***\n\n")
                 else:
                     self._raw.write(transform(line) + "\n")
@@ -108,11 +106,49 @@ complex geometries, and user-defined boundary conditions.
 )
 
 # --. Z3ST modules --..
+from mpi4py import MPI
+
 from z3st.core.spine import Spine
 from z3st.utils.utils_load import generate_power_history, load
 from z3st.utils.writer import OutputWriter
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
+
+
+# --. Environment banner --..
+# A gold reference is only reproducible on the versions that produced it, so
+# the run records them: comparing against a gold made on a different dolfinx
+# or numpy is not a like-for-like comparison. Rank 0 only, so the MPI log
+# holds one copy. Every lookup falls back to "n/a" rather than failing the run.
+def _print_environment():
+    import importlib
+
+    def _version(module):
+        try:
+            return str(getattr(importlib.import_module(module), "__version__"))
+        except Exception:
+            return "n/a"
+
+    try:
+        from petsc4py import PETSc
+
+        petsc = ".".join(str(v) for v in PETSc.Sys.getVersion())
+    except Exception:
+        petsc = "n/a"
+
+    print("[INFO] Environment")
+    print(f"  → python    : {sys.version.split()[0]}")
+    print(f"  → dolfinx   : {_version('dolfinx')}")
+    print(f"  → basix     : {_version('basix')}")
+    print(f"  → ufl       : {_version('ufl')}")
+    print(f"  → petsc     : {petsc}")
+    print(f"  → numpy     : {_version('numpy')}")
+    print(f"  → scipy     : {_version('scipy')}")
+    print(f"  → MPI ranks : {MPI.COMM_WORLD.size}")
+
+
+if MPI.COMM_WORLD.rank == 0:
+    _print_environment()
 
 
 # --. Hot-reload of input.yaml parameters --..
@@ -154,15 +190,34 @@ _SOLVER_SETTINGS_CASTS = {
     "relax_max":      float,
 }
 
+# Casts for every hot-reloadable key: values are validated/cast before landing
+# in the shared config dicts, so a mid-run typo is rejected instead of poisoning the solver state.
+_HOT_BLOCK_CASTS = {
+    "damage": {"stag_tol": float, "rtol": float,
+               "hybrid_constraint": _to_bool, "gamma_star": float},
+    "mechanical": {"stag_tol": float, "rtol": float},
+    "thermal": {"stag_tol": float, "rtol": float},
+    "solver_settings": _SOLVER_SETTINGS_CASTS,
+}
 
 def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
     """Re-read input.yaml and propagate allow-listed parameter changes
-    in-place into ``input_file``."""
-    try:
-        with open(input_path, "r") as f:
-            new_input = yaml.safe_load(f)
-    except (FileNotFoundError, yaml.YAMLError):
-        return  # mid-edit; skip this cycle silently
+    in-place into ``input_file``.
+
+    MPI: only rank 0 touches the file; the parsed dict is broadcast so every
+    rank applies exactly the same values (per-rank reads around a mid-run edit
+    could otherwise diverge tolerances → mismatched collectives → deadlock).
+    """
+    comm = MPI.COMM_WORLD
+    new_input = None
+    if comm.rank == 0:
+        try:
+            with open(input_path, "r") as f:
+                new_input = yaml.safe_load(f)
+        except (FileNotFoundError, yaml.YAMLError):
+            new_input = None  # mid-edit; skip this cycle silently
+    if comm.size > 1:
+        new_input = comm.bcast(new_input, root=0)
 
     if not isinstance(new_input, dict):
         return
@@ -175,15 +230,26 @@ def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
         for key in keys:
             new_val = new_block.get(key, _MISSING)
             old_val = old_block.get(key, _MISSING)
-            if new_val is _MISSING or new_val == old_val:
+            if new_val is _MISSING:
+                continue
+            caster = _HOT_BLOCK_CASTS.get(block, {}).get(key)
+            if caster is not None:
+                try:
+                    new_val = caster(new_val)
+                except (TypeError, ValueError):
+                    print(f"  [hot-reload] ignoring {block}.{key} = {new_val!r} "
+                          f"(not a valid {caster.__name__})")
+                    continue
+            if new_val == old_val:
                 continue
             old_block[key] = new_val
             if block == "solver_settings" and hasattr(problem, key):
-                caster = _SOLVER_SETTINGS_CASTS.get(key, lambda v: v)
-                try:
-                    setattr(problem, key, caster(new_val))
-                except (TypeError, ValueError):
-                    pass  # keep the previous attribute value silently
+                setattr(problem, key, new_val)
+                if key == "relax_u" and hasattr(problem, "_relax_u0"):
+                    # Aitken restarts relax_u from _relax_u0 at every step —
+                    # without this, a hot-reloaded relax_u is silently
+                    # overwritten at the next step boundary.
+                    problem._relax_u0 = new_val
             print(f"  [hot-reload] {block}.{key}: {old_val} → {new_val}")
 
 
@@ -282,7 +348,11 @@ if __name__ == "__main__":
     output_format = output_cfg.get("format", "vtu").lower()
     output_filename = output_cfg.get("filename")  # None → writer picks per-format default
 
-    if os.path.exists('energies.txt'): os.remove('energies.txt')
+    # Rank-0 only: a per-rank check-then-remove races in parallel (two ranks
+    # pass exists(), the slower remove raises FileNotFoundError). The later
+    # append is rank-0 only as well.
+    if MPI.COMM_WORLD.rank == 0 and os.path.exists('energies.txt'):
+        os.remove('energies.txt')
 
     # --. Geometry --..
     geometry = load(input_file["geometry_path"])
@@ -306,7 +376,9 @@ if __name__ == "__main__":
     # --. History --..
     t_points = input_file.get("time")
     lhr_points = input_file.get("lhr")
-    raw_n_steps = input_file.get("n_steps")
+    # Default matches Config's n_steps default; without it an input.yaml with
+    # no n_steps key crashed on None - 1 before the run started.
+    raw_n_steps = input_file.get("n_steps", 10)
     n_increments = raw_n_steps if isinstance(raw_n_steps, (list, tuple)) else raw_n_steps - 1
 
     times, lhrs, n_steps = generate_power_history(
