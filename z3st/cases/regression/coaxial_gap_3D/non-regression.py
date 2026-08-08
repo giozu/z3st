@@ -13,14 +13,12 @@ import os
 import yaml
 import numpy as np
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_plot import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import case_paths, error_metric, finish
+from z3st.utils.utils_extract_vtu import average_section_radial, extract_temperature, list_fields
+from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 MATERIAL_FILE_1 = os.path.join(CASE_DIR, "../../../materials/ceramic.yaml")
 MATERIAL_FILE_2 = os.path.join(CASE_DIR, "../../../materials/steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
@@ -147,22 +145,11 @@ Linf_T = float(np.max(np.abs((T - T_ref))))
 RelL2_T = float(L2_T / np.mean(np.abs(T_ref)))
 
 errors = {
-    "L2_error_T": {
-        "numerical": L2_T,
-        "reference": 0.0,
-        "abs_error": L2_T,
-        "rel_error": RelL2_T,
-    },
-    "Linf_error_T": {
-        "numerical": Linf_T,
-        "reference": 0.0,
-        "abs_error": Linf_T,
-        "rel_error": Linf_T / np.mean(np.abs(T_ref)),
-    },
+    "L2_error_T": error_metric(L2_T, rel=RelL2_T),
+    "Linf_error_T": error_metric(Linf_T, rel=Linf_T / np.mean(np.abs(T_ref))),
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 
 print("\n[INFO] Non-regression completed.\n")

@@ -14,25 +14,18 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-import yaml
 
-from z3st.utils.utils_extract_xdmf import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import finish, load_case
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf, list_fields_xdmf
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
 XDMF_FILE = os.path.join(CASE_DIR, "output", "fields.xdmf")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 
-with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
-    geom = yaml.safe_load(f)
+geom, inp, mat = load_case(CASE_DIR)
 Ri, Ro, Lz = float(geom["Ri"]), float(geom["Ro"]), float(geom["Lz"])  # m
 
-with open(os.path.join(CASE_DIR, "input.yaml")) as f:
-    inp = yaml.safe_load(f)
-mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
-with open(mat_path) as f:
-    mat = yaml.safe_load(f)
 LHR = float(inp["lhr"][0])  # W/m
 
 k = float(mat["k"])  # W/m.K (constant)
@@ -231,7 +224,6 @@ errors = {
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 
 print("\n[INFO] Non-regression completed.\n")

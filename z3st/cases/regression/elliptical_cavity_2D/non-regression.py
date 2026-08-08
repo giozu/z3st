@@ -13,8 +13,8 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.utils_extract_vtu import extract_field
+from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 # Units of measure for micromechanics
 # Length: micrometer (μm)

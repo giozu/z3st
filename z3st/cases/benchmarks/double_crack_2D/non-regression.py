@@ -15,8 +15,7 @@ import os, yaml, re
 import numpy as np
 from glob import glob
 import matplotlib.pyplot as plt
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.utils_extract_vtu import extract_field
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)

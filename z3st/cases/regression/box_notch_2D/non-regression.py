@@ -14,13 +14,11 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import case_paths, finish
+from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 MATERIAL_FILE = os.path.join(CASE_DIR, "../../../materials/high_carbon_steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
@@ -153,8 +151,7 @@ errors = {
     }
 }
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 
 print(f"\n[INFO] Max damage: {d_max:.4f}")
 print(f"[INFO] Max sigma_yy: {sigma_yy_max*1e-6:.2f} MPa")
