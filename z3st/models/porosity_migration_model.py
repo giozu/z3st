@@ -11,6 +11,8 @@ import numpy as np
 from mpi4py import MPI
 from petsc4py import PETSc
 
+from z3st.core.solver import aitken_omega
+
 
 class PorosityMigrationModel:
     """
@@ -604,21 +606,13 @@ class PorosityMigrationModel:
             r_k = p_new.x.array - p_prev_iter
             r_prev = getattr(self, "_aitken_p_R_prev", None)
             omega0 = float(self.porosity_cfg.get("aitken_omega0", 0.5))
-            if r_prev is not None and r_prev.shape == r_k.shape:
-                no = self.V_p.dofmap.index_map.size_local
-                comm = self.mesh.comm
-                dr = r_k - r_prev
-                # Owned-dof dot products, allreduce'd so omega is rank-independent.
-                denom = comm.allreduce(float(np.dot(dr[:no], dr[:no])), op=MPI.SUM)
-                num = comm.allreduce(float(np.dot(r_prev[:no], dr[:no])), op=MPI.SUM)
-                r_norm = comm.allreduce(float(np.dot(r_k[:no], r_k[:no])), op=MPI.SUM) ** 0.5
-                omega = float(getattr(self, "_aitken_p_omega", omega0))
-                # Noise guard: a barely-changed residual gives a garbage quotient.
-                if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(r_norm, 1e-300):
-                    omega = float(np.clip(-omega * num / denom, 0.05, 1.0))
-            else:
-                # First staggered iteration of the step (R_prev reset by driver).
-                omega = omega0
+            # Unlike the displacement loop, porosity restarts from omega0 on the
+            # first staggered iteration of a step rather than carrying omega over.
+            usable = r_prev is not None and r_prev.shape == r_k.shape
+            omega = aitken_omega(
+                r_k, r_prev,
+                float(getattr(self, "_aitken_p_omega", omega0)) if usable else omega0,
+                self.mesh.comm, self.V_p.dofmap.index_map.size_local, 0.05, 1.0)
             self._aitken_p_R_prev = r_k.copy()
             self._aitken_p_omega = omega
             p_new.x.array[:] = p_prev_iter + omega * r_k

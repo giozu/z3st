@@ -21,6 +21,39 @@ def _as_bool(v):
     return str(v).strip().lower() in ("1", "true", "yes", "on")
 
 
+def aitken_omega(r_k, r_prev, omega, comm, n_owned, lo, hi):
+    """Aitken \u0394\u00b2 relaxation factor from the last two staggered residuals.
+
+        \u03c9_{k+1} = -\u03c9_k (r_{k-1}\u00b7\u0394r) / |\u0394r|\u00b2,   \u0394r = r_k - r_{k-1}
+
+    clamped to ``[lo, hi]``. Dot products run over owned dofs only -- ghosts would
+    be double-counted -- and are allreduce'd, so \u03c9 is rank-independent under MPI;
+    in serial this reduces to the local dot.
+
+    ``omega`` is returned unchanged when there is no usable previous residual, or
+    when \u0394r is numerical noise: a barely-changed residual (converged, or a
+    zero-load step) makes the quotient garbage.
+
+    Callers own the clamp and the starting \u03c9 because the two uses differ: the
+    displacement loop clamps to [relax_min, relax_max] and carries \u03c9 across time
+    steps, while porosity clamps to [0.05, 1] and restarts from aitken_omega0.
+    """
+    if r_prev is None or r_prev.shape != r_k.shape:
+        return omega
+
+    dr = r_k - r_prev
+
+    def _dot(a, b):
+        return comm.allreduce(float(np.dot(a[:n_owned], b[:n_owned])), op=MPI.SUM)
+
+    denom = _dot(dr, dr)
+    num = _dot(r_prev, dr)
+    r_norm = _dot(r_k, r_k) ** 0.5
+    if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(r_norm, 1e-300):
+        return float(min(max(-omega * num / denom, lo), hi))
+    return omega
+
+
 def _rigid_body_modes(V, regime=None):
     """Zero-strain rigid-body displacement modes of the elastic operator, as a
     list of Functions.
@@ -280,6 +313,62 @@ class Solver:
         gathered = self.mesh.comm.allgather(local)
         return np.unique(np.concatenate(gathered)) if gathered else local
 
+    def _stagger_residual(self, new, old, cfg, tol, label):
+        """Staggered increment of one field: convergence verdict plus both norms.
+
+        The same six-step dance -- scatter both, copy, axpy(-1), two norms, guard
+        the division -- was written out four times, once per physics. Returns
+        ``(converged, norm_d, rel_norm_d, residual)``, where ``residual`` is
+        whichever norm ``cfg["convergence"]`` selects: it is what the adaptive
+        relaxation controller tracks.
+
+        The printed strings are parsed by utils/plot_convergence.py, which
+        greps the solver log for exactly "||dX||/||X|| = <float>". Changing the
+        spacing or the label empties the convergence plots.
+        """
+        new.x.scatter_forward()
+        old.x.scatter_forward()
+
+        v_new, v_old = new.x.petsc_vec, old.x.petsc_vec
+        diff = v_new.copy()
+        diff.axpy(-1.0, v_old)
+
+        norm_d = diff.norm(PETSc.NormType.NORM_2)
+        norm_new = v_new.norm(PETSc.NormType.NORM_2)
+        rel_norm_d = norm_d / norm_new if norm_new > 1e-15 else norm_d
+
+        # No case sets convergence: norm (all 138 say rel_norm), but keeping the
+        # option costs two lines here instead of eight in each of four copies.
+        if cfg["convergence"] == "norm":
+            print(f"  ||Δ{label}|| = {norm_d:.3e}")
+            residual = norm_d
+        else:
+            print(f"  ||Δ{label}||/||{label}|| = {rel_norm_d:.3e}")
+            residual = rel_norm_d
+
+        return residual < tol, norm_d, rel_norm_d, residual
+
+    def _adapt_relax(self, name, residual, prev_residual):
+        """EMA-smoothed grow/shrink of ``self.relax_<name>``; returns the new EMA.
+
+        Written out three times, identical bar the attribute name. Grows the
+        factor while the residual beats its own moving average, shrinks it
+        otherwise, and clamps to [relax_min, relax_max].
+        """
+        attr = f"relax_{name}"
+        if prev_residual is None:
+            new_prev = residual
+        else:
+            ema = 0.3 * residual + 0.7 * prev_residual
+            current = getattr(self, attr)
+            if residual < ema:
+                setattr(self, attr, min(current * self.relax_growth, self.relax_max))
+            else:
+                setattr(self, attr, max(current * self.relax_shrink, self.relax_min))
+            new_prev = ema
+        print(f"  [adaptive] {attr}={getattr(self, attr):.2f}")
+        return new_prev
+
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=None):
 
         # Non-linear thermal solver (k = model(T) external operator, Newton with
@@ -460,41 +549,11 @@ class Solver:
         T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
         dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
 
-        # Convergenza (norma o rel_norm)
-        T_new.x.scatter_forward()
-        T_old.x.scatter_forward()
-
-        vec_T_new = T_new.x.petsc_vec
-        vec_T_old = T_old.x.petsc_vec
-
-        diff_T = vec_T_new.copy()
-        diff_T.axpy(-1.0, vec_T_old)
-
-        norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
-        norm_T = vec_T_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-15 else norm_dT
-
-        if self.th_cfg["convergence"] == "norm":
-            print(f"  ||ΔT|| = {norm_dT:.3e}")
-            conv_th = norm_dT < stag_tol_th
-            res_curr = norm_dT
-        else:
-            print(f"  ||ΔT||/||T|| = {rel_norm_dT:.3e}")
-            conv_th = rel_norm_dT < stag_tol_th
-            res_curr = rel_norm_dT
+        conv_th, norm_dT, rel_norm_dT, res_curr = self._stagger_residual(
+            T_new, T_old, self.th_cfg, stag_tol_th, "T")
 
         if self.relax_adaptive:
-            if prev_res_T is not None:
-                ema_alpha = 0.3
-                ema_T = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_T
-                if res_curr < ema_T:
-                    self.relax_T = min(self.relax_T * self.relax_growth, self.relax_max)
-                else:
-                    self.relax_T = max(self.relax_T * self.relax_shrink, self.relax_min)
-                prev_res_T = ema_T
-            else:
-                prev_res_T = res_curr
-            print(f"  [adaptive] relax_T={self.relax_T:.2f}")
+            prev_res_T = self._adapt_relax("T", res_curr, prev_res_T)
 
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
@@ -688,16 +747,11 @@ class Solver:
                 material["k"].x.array[:] = material["_k_model"](T_new.x.array)
                 material["k"].x.scatter_forward()
 
-        # Staggered-convergence bookkeeping (same metrics as the linear path)
-        T_new.x.scatter_forward()
-        T_old.x.scatter_forward()
-        diff_T = T_new.x.petsc_vec.copy()
-        diff_T.axpy(-1.0, T_old.x.petsc_vec)
-        norm_dT = diff_T.norm(PETSc.NormType.NORM_2)
-        norm_T = T_new.x.petsc_vec.norm(PETSc.NormType.NORM_2)
-        rel_norm_dT = norm_dT / norm_T if norm_T > 1e-15 else norm_dT
-        conv_th = (norm_dT < stag_tol_th) if self.th_cfg["convergence"] == "norm" \
-            else (rel_norm_dT < stag_tol_th)
+        # Same metrics as the linear path. This path now prints the residual
+        # too, so plot_convergence picks up nonlinear-thermal cases -- their T
+        # channel used to come out empty.
+        conv_th, norm_dT, rel_norm_dT, _ = self._stagger_residual(
+            T_new, T_old, self.th_cfg, stag_tol_th, "T")
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
 
     def _mechanical_step(self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current):
@@ -959,19 +1013,10 @@ class Solver:
         if getattr(self, "relax_aitken", False):
             R = u_new.x.array - u_old.x.array
             R_prev = getattr(self, "_aitken_R_prev", None)
-            omega = float(getattr(self, "_aitken_omega", self.relax_u))
-            if R_prev is not None and R_prev.shape == R.shape:
-                dR = R - R_prev
-                no = self.V_m.dofmap.index_map.size_local * self.V_m.dofmap.index_map_bs
-                comm = self.mesh.comm
-                denom = comm.allreduce(float(np.dot(dR[:no], dR[:no])), op=MPI.SUM)
-                num = comm.allreduce(float(np.dot(R_prev[:no], dR[:no])), op=MPI.SUM)
-                # Noise guard: when the residual barely changed (converged or
-                # zero-load step), the quotient is numerical garbage — keep ω.
-                R_norm = comm.allreduce(float(np.dot(R[:no], R[:no])), op=MPI.SUM) ** 0.5
-                if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(R_norm, 1e-300):
-                    omega = -omega * num / denom
-                    omega = float(min(max(omega, self.relax_min), self.relax_max))
+            no = self.V_m.dofmap.index_map.size_local * self.V_m.dofmap.index_map_bs
+            omega = aitken_omega(
+                R, R_prev, float(getattr(self, "_aitken_omega", self.relax_u)),
+                self.mesh.comm, no, self.relax_min, self.relax_max)
             self._aitken_R_prev = R.copy()
             self._aitken_omega = omega
             self.relax_u = omega
@@ -980,28 +1025,8 @@ class Solver:
         u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
         dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
 
-        # Convergence
-        u_new.x.scatter_forward()
-        u_old.x.scatter_forward()
-
-        vec_u_new = u_new.x.petsc_vec
-        vec_u_old = u_old.x.petsc_vec
-
-        diff_u = vec_u_new.copy()
-        diff_u.axpy(-1.0, vec_u_old)
-
-        norm_du = diff_u.norm(PETSc.NormType.NORM_2)
-        norm_u = vec_u_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_du = norm_du / norm_u if norm_u > 1e-15 else norm_du
-
-        if self.mech_cfg["convergence"] == "norm":
-            print(f"  ||Δu|| = {norm_du:.3e}")
-            conv_mech = norm_du < stag_tol_mech
-            res_curr = norm_du
-        else:
-            print(f"  ||Δu||/||u|| = {rel_norm_du:.3e}")
-            conv_mech = rel_norm_du < stag_tol_mech
-            res_curr = rel_norm_du
+        conv_mech, norm_du, rel_norm_du, res_curr = self._stagger_residual(
+            u_new, u_old, self.mech_cfg, stag_tol_mech, "u")
 
         # The creep predictor must be consistent with u as well — |Δu| alone
         # can pass on the first iteration of a step while Δγ₀ is still moving.
@@ -1012,17 +1037,7 @@ class Solver:
 
         # Heuristic grow/shrink controller — superseded by Aitken when enabled
         if self.relax_adaptive and not getattr(self, "relax_aitken", False):
-            if prev_res_u is not None:
-                ema_alpha = 0.3
-                ema_u = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_u
-                if res_curr < ema_u:
-                    self.relax_u = min(self.relax_u * self.relax_growth, self.relax_max)
-                else:
-                    self.relax_u = max(self.relax_u * self.relax_shrink, self.relax_min)
-                prev_res_u = ema_u
-            else:
-                prev_res_u = res_curr
-            print(f"  [adaptive] relax_u={self.relax_u:.2f}")
+            prev_res_u = self._adapt_relax("u", res_curr, prev_res_u)
 
         return conv_mech, norm_du, rel_norm_du, prev_res_u
 
@@ -1145,41 +1160,11 @@ class Solver:
         )
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
-        # Convergence
-        D_new.x.scatter_forward()
-        D_old.x.scatter_forward()
-
-        vec_D_new = D_new.x.petsc_vec
-        vec_D_old = D_old.x.petsc_vec
-
-        diff_D = vec_D_new.copy()
-        diff_D.axpy(-1.0, vec_D_old)
-
-        norm_dD = diff_D.norm(PETSc.NormType.NORM_2)
-        norm_D = vec_D_new.norm(PETSc.NormType.NORM_2)
-        rel_norm_dD = norm_dD / norm_D if norm_D > 1e-15 else norm_dD
-
-        if self.dmg_cfg["convergence"] == "norm":
-            print(f"  ||ΔD|| = {norm_dD:.3e}")
-            conv_damage = norm_dD < stag_tol_dmg
-            res_curr = norm_dD
-        else:
-            print(f"  ||ΔD||/||D|| = {rel_norm_dD:.3e}")
-            conv_damage = rel_norm_dD < stag_tol_dmg
-            res_curr = rel_norm_dD
+        conv_damage, norm_dD, rel_norm_dD, res_curr = self._stagger_residual(
+            D_new, D_old, self.dmg_cfg, stag_tol_dmg, "D")
 
         if self.relax_adaptive:
-            if prev_res_D is not None:
-                ema_alpha = 0.3
-                ema_D = ema_alpha * res_curr + (1 - ema_alpha) * prev_res_D
-                if res_curr < ema_D:
-                    self.relax_D = min(self.relax_D * self.relax_growth, self.relax_max)
-                else:
-                    self.relax_D = max(self.relax_D * self.relax_shrink, self.relax_min)
-                prev_res_D = ema_D
-            else:
-                prev_res_D = res_curr
-            print(f"  [adaptive] relax_D={self.relax_D:.2f}")
+            prev_res_D = self._adapt_relax("D", res_curr, prev_res_D)
 
         # Residual in L_inf norm
         res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)

@@ -30,46 +30,41 @@ class MagniConductivity:
             return float(arr)
         return arr.reshape(shape)
 
+    def _args(self, T, Pu, Am, Np, x, p, burnup):
+        """Per-dof composition of the six card fields, broadcast to T's shape.
+
+        The same six ``_local`` calls appeared in both __call__ and
+        value_and_grad.
+        """
+        return dict(
+            Pu=self._local(Pu, self.Pu, T.shape),
+            Am=self._local(Am, self.Am, T.shape),
+            Np=self._local(Np, self.Np, T.shape),
+            x=self._local(x, self.x, T.shape),
+            p=self._local(p, self.p, T.shape),
+            burnup=self._local(burnup, self.burnup, T.shape),
+        )
+
     def __call__(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        Pu = self._local(Pu, self.Pu, T.shape)
-        Am = self._local(Am, self.Am, T.shape)
-        Np = self._local(Np, self.Np, T.shape)
-        x = self._local(x, self.x, T.shape)
-        p = self._local(p, self.p, T.shape)
-        burnup = self._local(burnup, self.burnup, T.shape)
-        return k_numpy(
-            T,
-            Pu=Pu,
-            Am=Am,
-            Np=Np,
-            x=x,
-            p=p,
-            burnup=burnup,
-        ).reshape(T.shape)
+        return k_numpy(T, **self._args(T, Pu, Am, Np, x, p, burnup)).reshape(T.shape)
 
     def value_and_grad(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        Pu = self._local(Pu, self.Pu, T.shape)
-        Am = self._local(Am, self.Am, T.shape)
-        Np = self._local(Np, self.Np, T.shape)
-        x = self._local(x, self.x, T.shape)
-        p = self._local(p, self.p, T.shape)
-        burnup = self._local(burnup, self.burnup, T.shape)
-        k = self(T, Pu=Pu, Am=Am, Np=Np, x=x, p=p, burnup=burnup)
-        dk = dk_dT_numpy(
-            T,
-            Pu=Pu,
-            Am=Am,
-            Np=Np,
-            x=x,
-            p=p,
-            burnup=burnup,
-        ).reshape(T.shape)
-        return k, dk
+        # k_numpy directly rather than self(...): __call__ would re-run _local on
+        # the already-composed values. _local is idempotent there, so the result is
+        # unchanged, but the second pass was pure work.
+        kw = self._args(T, Pu, Am, Np, x, p, burnup)
+        return k_numpy(T, **kw).reshape(T.shape), dk_dT_numpy(T, **kw).reshape(T.shape)
 
 
-def _card_value(card, material, *keys, default=0.0):
+def card_value(card, material, *keys, default=0.0):
+    """First of ``keys`` found in the ``k`` card, else in the material dict.
+
+    Distinct from ``magni_mox_thermal._card_value``, which searches a single dict
+    and casts to float: this one searches two and returns the raw value. Shared
+    with gpr_conductivity, which had a byte-identical copy.
+    """
     for src in (card, material or {}):
         for key in keys:
             if key in src:
@@ -79,19 +74,19 @@ def _card_value(card, material, *keys, default=0.0):
 
 def load_from_card(card, material=None, base_dir=None):
     """Build a :class:`MagniConductivity` from a material ``k`` card."""
-    om = _card_value(card, material, "OM", "O_M", "oxygen_to_metal", default=None)
-    x = _card_value(card, material, "x", default=None)
+    om = card_value(card, material, "OM", "O_M", "oxygen_to_metal", default=None)
+    x = card_value(card, material, "x", default=None)
     if x is None:
         x = 0.0 if om is None else 2.0 - float(om)
 
     return MagniConductivity(
-        Pu=_card_value(card, material, "Pu", "pu", "Pu_fraction", "plutonium", default=0.0),
-        Am=_card_value(card, material, "Am", "am", "Am_fraction", "americium", default=0.0),
-        Np=_card_value(card, material, "Np", "np", "Np_fraction", "neptunium", default=0.0),
+        Pu=card_value(card, material, "Pu", "pu", "Pu_fraction", "plutonium", default=0.0),
+        Am=card_value(card, material, "Am", "am", "Am_fraction", "americium", default=0.0),
+        Np=card_value(card, material, "Np", "np", "Np_fraction", "neptunium", default=0.0),
         x=x,
-        p=_card_value(card, material, "p", "porosity", default=0.0),
-        burnup=_card_value(card, material, "burnup", "bu", default=0.0),
+        p=card_value(card, material, "p", "porosity", default=0.0),
+        burnup=card_value(card, material, "burnup", "bu", default=0.0),
     )
 
 
-__all__ = ["MagniConductivity", "load_from_card"]
+__all__ = ["MagniConductivity", "card_value", "load_from_card"]
