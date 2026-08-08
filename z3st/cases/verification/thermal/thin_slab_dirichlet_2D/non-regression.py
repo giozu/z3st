@@ -14,26 +14,17 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-import yaml
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import case_paths, error_metric, finish, load_case, metric
+from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 
 # Geometry and material (loaded from YAML)
-with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
-    geom = yaml.safe_load(f)
+geom, inp, mat = load_case(CASE_DIR)
 Lx, Ly = float(geom["Lx"]), float(geom["Ly"])  # m (geometry dimensions)
 
-with open(os.path.join(CASE_DIR, "input.yaml")) as f:
-    inp = yaml.safe_load(f)
-mat_path = os.path.join(CASE_DIR, next(iter(inp["materials"].values())))
-with open(mat_path) as f:
-    mat = yaml.safe_load(f)
 k, E, nu, alpha = (
     float(mat["k"]),
     float(mat["E"]),
@@ -147,34 +138,11 @@ RelErr_Tmax = abs(Tmax_num - Tmax_ref) / Tmax_ref
 err_sigma = np.sqrt(np.mean((sigma_yy - sigma_th_ref) ** 2)) / np.max(np.abs(sigma_th_ref))
 
 errors = {
-    "L2_error_T": {
-        "numerical": L2_T,
-        "reference": 0.0,
-        "abs_error": L2_T,
-        "rel_error": RelL2_T,
-    },
-    "Linf_error_T": {
-        "numerical": Linf_T,
-        "reference": 0.0,
-        "abs_error": Linf_T,
-        "rel_error": Linf_T / np.mean(np.abs(T_ref)),
-    },
-    "T_max": {
-        "numerical": Tmax_num,
-        "reference": Tmax_ref,
-        "abs_error": abs(Tmax_num - Tmax_ref),
-        "rel_error": RelErr_Tmax,
-    },
-    "L2_error_sigma_yy": {
-        "numerical": float(err_sigma),
-        "reference": 0.0,
-        "abs_error": float(err_sigma),
-        "rel_error": float(err_sigma),
-    },
+    "L2_error_T": error_metric(L2_T, rel=RelL2_T),
+    "Linf_error_T": error_metric(Linf_T, rel=Linf_T / np.mean(np.abs(T_ref))),
+    "T_max": metric(Tmax_num, Tmax_ref, rel=RelErr_Tmax),
+    "L2_error_sigma_yy": error_metric(err_sigma),
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
