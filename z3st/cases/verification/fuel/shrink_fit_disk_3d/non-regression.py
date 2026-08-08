@@ -28,8 +28,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 CASE = os.path.dirname(__file__)
 OUT = os.path.join(CASE, "output")

@@ -15,7 +15,8 @@ import os
 import json
 import numpy as np
 
-from z3st.utils.utils_verification import pass_fail_check, regression_check
+from z3st.utils.non_regression import finish, metric
+
 
 R_GAS = 8.314462618
 CASE_DIR = os.path.dirname(__file__)
@@ -42,24 +43,9 @@ max_c3_err = rob.get("max_c3_rel_error", None)
 TOLERANCE = 1e-1
 
 errors = {
-    "selected_cubic_norton_only": {
-        "numerical": selected_cubic_only,
-        "reference": 1.0,
-        "abs_error": float(abs(selected_cubic_only - 1.0)),
-        "rel_error": float(abs(selected_cubic_only - 1.0)),
-    },
-    "identified_cubic_coefficient": {
-        "numerical": float(c3),
-        "reference": float(C3_TRUE),
-        "abs_error": float(abs(c3 - C3_TRUE)),
-        "rel_error": float(abs(c3 - C3_TRUE) / C3_TRUE),
-    },
-    "robustness_cubic_only_fraction": {
-        "numerical": float(frac_cubic_only),
-        "reference": 1.0,
-        "abs_error": float(abs(frac_cubic_only - 1.0)),
-        "rel_error": float(abs(frac_cubic_only - 1.0)),
-    },
+    "selected_cubic_norton_only": metric(selected_cubic_only, 1.0, rel=abs(selected_cubic_only - 1.0)),
+    "identified_cubic_coefficient": metric(c3, C3_TRUE),
+    "robustness_cubic_only_fraction": metric(frac_cubic_only, 1.0, rel=abs(frac_cubic_only - 1.0)),
 }
 if max_c3_err is not None:
     errors["robustness_max_cubic_coeff_error"] = {
@@ -74,7 +60,4 @@ print(f"[INFO] c[S^3] = {c3:.4e} 1/s (true {C3_TRUE:.4e} 1/s)")
 print(f"[INFO] robustness: cubic-only in {rob.get('n_cubic_only', 0)}/{n_seeds} "
       f"seeds, max coeff error {(max_c3_err or 0.0) * 100:.2f}%")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

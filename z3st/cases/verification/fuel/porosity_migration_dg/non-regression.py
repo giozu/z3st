@@ -32,6 +32,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from z3st.utils.non_regression import metric
 from z3st.utils.utils_extract_vtu import extract_field
 from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 from z3st.utils.utils_verification import pass_fail_check, regression_check
@@ -138,24 +139,9 @@ print(f"[INFO] Rim porosity         : {p_rim:.4f} (expected ~ 0.15)")
 # --. Paper-anchored absolute checks --..
 VOID_RADIUS_REF = 0.20  # Barani Fig. 4: gradient/velocity null inside ~0.2 r/Ro
 errors = {
-    "center_void_porosity": {
-        "numerical": p_center,
-        "reference": 1.0,
-        "abs_error": float(abs(p_center - 1.0)),
-        "rel_error": float(abs(p_center - 1.0) / 1.0),
-    },
-    "void_radius_relative": {
-        "numerical": void_radius_rel,
-        "reference": VOID_RADIUS_REF,
-        "abs_error": float(abs(void_radius_rel - VOID_RADIUS_REF)),
-        "rel_error": float(abs(void_radius_rel - VOID_RADIUS_REF) / VOID_RADIUS_REF),
-    },
-    "rim_fabricated_porosity": {
-        "numerical": p_rim,
-        "reference": 0.15,
-        "abs_error": float(abs(p_rim - 0.15)),
-        "rel_error": float(abs(p_rim - 0.15) / 0.15),
-    },
+    "center_void_porosity": metric(p_center, 1.0),
+    "void_radius_relative": metric(void_radius_rel, VOID_RADIUS_REF),
+    "rim_fabricated_porosity": metric(p_rim, 0.15),
 }
 
 # Centre temperature: tracked for regression reproducibility only (no paper value).

@@ -47,8 +47,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import metric
+from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 CASE = os.path.dirname(__file__)
 OUT = os.path.join(CASE, "output")
@@ -311,12 +311,7 @@ else:
     print("[INFO] gap never closes: verifying final open gap vs free expansion")
     gap_err = abs(gap_z3st[-1] - gap_free[-1]) / g0
     errors = {
-        "final_gap": {
-            "numerical": float(gap_z3st[-1]),
-            "reference": float(gap_free[-1]),
-            "abs_error": float(abs(gap_z3st[-1] - gap_free[-1])),
-            "rel_error": float(gap_err),
-        },
+        "final_gap": metric(gap_z3st[-1], gap_free[-1], rel=gap_err),
         "spurious_contact_pressure": {
             "numerical": float(p_z3st.max()),
             "reference": 0.0,

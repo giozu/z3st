@@ -41,8 +41,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from z3st.utils.non_regression import finish
 from z3st.utils.utils_extract_xdmf import extract_field_xdmf, list_fields_xdmf
-from z3st.utils.utils_verification import pass_fail_check, regression_check
 from z3st.utils.utils_load import generate_power_history
 
 CASE_DIR = os.path.dirname(__file__)
@@ -130,8 +130,7 @@ errors = {
     "T_max_peak_K": _regression_only(t_max_peak),
 }
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 
 # --. Interference and contact pressure analysis --..
 def plot_interference_pressure():

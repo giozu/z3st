@@ -20,9 +20,9 @@ import numpy as np
 import pyvista as pv
 import yaml
 
+from z3st.utils.non_regression import error_metric, finish, metric
 from z3st.materials.magni_mox_thermal import k_numpy
 from z3st.models.gpr_conductivity import GPRConductivity
-from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 
 CASE_DIR = os.path.dirname(__file__)
@@ -143,24 +143,9 @@ with open(os.path.join(OUT, "conductivity_impact.json"), "w") as f:
     json.dump(impact, f, indent=2)
 
 errors = {
-    "center_temperature": {
-        "numerical": T_center_num,
-        "reference": T_center_ref,
-        "abs_error": abs(T_center_num - T_center_ref),
-        "rel_error": abs(T_center_num - T_center_ref) / max(abs(T_center_ref - T_s), 1.0),
-    },
-    "radial_profile_l2": {
-        "numerical": profile_l2,
-        "reference": 0.0,
-        "abs_error": profile_l2,
-        "rel_error": profile_l2 / rise_scale,
-    },
-    "radial_profile_linf": {
-        "numerical": profile_linf,
-        "reference": 0.0,
-        "abs_error": profile_linf,
-        "rel_error": profile_linf / max(float(np.max(np.abs(rise_ref))), 1.0),
-    },
+    "center_temperature": metric(T_center_num, T_center_ref, rel=abs(T_center_num - T_center_ref) / max(abs(T_center_ref - T_s), 1.0)),
+    "radial_profile_l2": error_metric(profile_l2, rel=profile_l2 / rise_scale),
+    "radial_profile_linf": error_metric(profile_linf, rel=profile_linf / max(float(np.max(np.abs(rise_ref))), 1.0)),
 }
 
 plt.figure(figsize=(7, 5))
@@ -174,6 +159,4 @@ plt.legend()
 plt.tight_layout()
 plt.savefig(os.path.join(OUT, "radial_temperature_profile.png"), dpi=160)
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

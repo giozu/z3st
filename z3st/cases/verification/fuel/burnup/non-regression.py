@@ -38,8 +38,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import finish, metric
+from z3st.utils.utils_extract_vtu import extract_field
 from z3st.utils.utils_load import generate_power_history
 from z3st.materials.fuel_profiles import rim_peaking
 
@@ -97,18 +97,8 @@ print(f"[INFO] burnup core = {bu_core:.2f}, rim = {bu_rim:.2f} MWd/kgU")
 print(f"[INFO] rim/core ratio: numerical = {ratio:.4f}, analytical (1+A) = {RATIO_REF:.4f}")
 
 errors = {
-    "burnup_mean_closed_form": {
-        "numerical": bu_mean,
-        "reference": BU_MEAN_REF,
-        "abs_error": float(abs(bu_mean - BU_MEAN_REF)),
-        "rel_error": float(abs(bu_mean - BU_MEAN_REF) / BU_MEAN_REF),
-    },
-    "rim_core_ratio": {
-        "numerical": ratio,
-        "reference": RATIO_REF,
-        "abs_error": float(abs(ratio - RATIO_REF)),
-        "rel_error": float(abs(ratio - RATIO_REF) / RATIO_REF),
-    },
+    "burnup_mean_closed_form": metric(bu_mean, BU_MEAN_REF),
+    "rim_core_ratio": metric(ratio, RATIO_REF),
 }
 
 # --. integrated power (parsed from the solver log) --..
@@ -221,7 +211,4 @@ try:
 except Exception as e:
     print(f"[WARNING] pyvista render skipped: {type(e).__name__}: {e}")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

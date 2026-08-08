@@ -27,8 +27,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_verification import *
-from z3st.utils.utils_extract_xdmf import *
+from z3st.utils.non_regression import finish, metric
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 R_GAS = 8.314462618
 
@@ -99,12 +99,7 @@ print(f"[INFO] backward-Euler defect vs exact at this dt: {be_defect:.2%} "
       f"(shrinks O(dt) with more steps)")
 
 errors = {
-    "sigma_relaxed_vs_backward_euler": {
-        "numerical": sigma_end,
-        "reference": SIGMA_BE_END,
-        "abs_error": float(abs(sigma_end - SIGMA_BE_END)),
-        "rel_error": float(abs(sigma_end - SIGMA_BE_END) / SIGMA_BE_END),
-    },
+    "sigma_relaxed_vs_backward_euler": metric(sigma_end, SIGMA_BE_END),
     "time_discretisation_defect": {
         "numerical": float(abs(sigma_end - SIGMA_EXACT_END) / SIGMA_EXACT_END),
         "reference": float(be_defect),
@@ -143,7 +138,4 @@ try:
 except Exception as e:
     print(f"[WARNING] relaxation plot skipped: {type(e).__name__}: {e}")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
