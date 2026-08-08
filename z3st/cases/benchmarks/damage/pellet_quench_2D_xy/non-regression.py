@@ -24,7 +24,6 @@ Diagnostic outputs (all in output/):
 """
 
 import os
-import json
 import glob
 
 import matplotlib.pyplot as plt
@@ -32,6 +31,8 @@ import matplotlib.tri as mtri
 import numpy as np
 import pyvista as pv
 import yaml
+
+from z3st.utils.non_regression import finish, tracked
 
 # --.. ..- .-.. .-.. --- load parameters --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -149,17 +150,15 @@ T_hi = max(T_quench, T_initial)
 in_range = (T_lo - 1.0) <= T_mean_final <= (T_hi + 1.0)
 print(f"\n[CHECK] Final t = {last['t']:.2e} s, T_mean = {T_mean_final:.1f} K "
       f"(partial quench: must lie within [{T_lo:.1f}, {T_hi:.1f}] K)")
-errors["T_final_mean_in_range"] = {
-    "numerical": T_mean_final, "reference": [T_lo, T_hi],
-    "rel_error": 0.0, "pass": bool(in_range),
-}
+# Was a range check against [T_lo, T_hi], a 760 K wide window that only ever
+# caught a grossly wrong result. tracked() keeps the value under the gold
+# regression check instead, which is far tighter than the range ever was.
+errors["T_final_mean_in_range"] = tracked(T_mean_final)
 
 if last["D"] is not None:
     D_max = float(np.max(last["D"]))
     print(f"[CHECK] D_max at final time: {D_max:.4e}")
-    errors["D_max_final"] = {
-        "numerical": D_max, "reference": 1.0, "rel_error": float(abs(D_max - 1.0)), "pass": True
-    }
+    errors["D_max_final"] = tracked(D_max)
 
 
 # --.. ..- .-.. .-.. --- plot: energy balance --.. ..- .-.. .-.. ---
@@ -430,9 +429,7 @@ try:
         plt.close(fig5)
         print(f"[INFO] Angular damage plot saved: {plot_path5}")
 
-        errors["crack_count_above_0p5"] = {
-            "numerical": n_cracks, "reference": 3, "rel_error": 0.0, "pass": True
-        }
+        errors["crack_count_above_0p5"] = tracked(n_cracks)
         print(f"[INFO] Estimated crack count (max over radial shells, D>0.5): "
               f"{n_cracks}  [best shell {best_band[0]:.2f}-{best_band[1]:.2f} Ro]")
     else:
@@ -442,18 +439,7 @@ except Exception as e:
 
 
 # --.. ..- .-.. .-.. --- pass/fail --.. ..- .-.. .-.. ---
-print(f"\nPass/Fail check (tolerance = {TOLERANCE:.1e})")
-all_pass = True
-for key, val in errors.items():
-    if "pass" in val:
-        status = "PASS" if val["pass"] else "FAIL"
-    else:
-        status = "PASS" if val["rel_error"] < TOLERANCE else "FAIL"
-    if status == "FAIL":
-        all_pass = False
-    print(f"  {key:<28s} -> rel err = {val['rel_error']:.2e}  -> {status}")
-
-with open(OUT_JSON, "w") as f:
-    json.dump(errors, f, indent=2)
-print(f"\n[INFO] Results written to: {OUT_JSON}")
-print(f"\n[SUMMARY] {'PASS' if all_pass else 'FAIL'}")
+# Previously a hand-rolled copy of pass_fail_check writing a bare
+# json.dump(errors): no "summary" key, so the driver could not read a verdict and
+# the blessed gold next to it was never compared against anything.
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

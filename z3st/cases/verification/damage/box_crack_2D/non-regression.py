@@ -14,12 +14,12 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-from z3st.utils.non_regression import case_paths, finish
+from z3st.utils.non_regression import case_paths, finish, tracked
 from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../../materials/high_carbon_steel.yaml")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../../../materials/high_carbon_steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
 INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
@@ -83,6 +83,24 @@ idx_v = np.argsort(y_d[mask_vert])
 y_slice_prof = y_d[mask_vert][idx_v]
 d_slice_prof = D_all[mask_vert][idx_v]
 
+# --.. ..- .-.. .-.. --- AT2 localisation length --.. ..- .-.. .-.. ---
+# The AT2 optimal profile transverse to a fully localised crack is
+#     D(y) = exp(-|y - y0| / lc)
+# so log D falls linearly with slope -1/lc. Fitting that slope measures the
+# length the model actually localises over, which is the defining property of
+# the regularisation -- and it is a far better check than an RMS against the
+# profile itself: exp(-|y|/lc) is the 1-D infinite-domain solution, and in a
+# finite 2-D domain the residual elastic field makes the tail fatter (D is ~40 %
+# above exp(-2) at 2*lc). The fit is therefore restricted to the core, |y-y0| < lc,
+# where the analytic profile holds.
+y_core = y_slice_prof[np.argmax(d_slice_prof)]
+r_slice = np.abs(y_slice_prof - y_core)
+core = (r_slice > 0) & (r_slice < lc) & (d_slice_prof > 1e-6)
+slope = np.polyfit(r_slice[core], np.log(d_slice_prof[core]), 1)[0]
+lc_measured = -1.0 / slope
+print(f"[INFO] AT2 localisation length: measured {lc_measured*1e3:.3f} mm vs lc = {lc*1e3:.3f} mm "
+      f"({len(r_slice[core])} points, |y-y0| < lc)")
+
 # --.. ..- .-.. .-.. --- plotting --.. ..- .-.. .-.. ---
 
 # PLOT 1:
@@ -143,7 +161,15 @@ errors = {
         "numerical": float(sigma_yy_max),
         "reference": sigma_c,
         "rel_error": float(abs(sigma_yy_max - sigma_c)/sigma_c)
-    }
+    },
+    # tracked, not compared against lc: the measured length sits ~11 % above lc
+    # (2.227 mm vs 2.000 mm), and the half-width at D = 0.5 independently agrees
+    # at +10 % against lc*ln2. That offset is physical -- finite domain, residual
+    # elastic field -- not an error, so asserting |L - lc|/lc < TOLERANCE would
+    # fail the case for the wrong reason. Recording it puts the value under the
+    # gold regression check, which pins it far more tightly than a 15 % window
+    # would, and the printed line above states the comparison for a reader.
+    "localisation_length": tracked(lc_measured),
 }
 
 finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

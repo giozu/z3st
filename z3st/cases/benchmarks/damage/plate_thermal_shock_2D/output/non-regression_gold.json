@@ -1,0 +1,69 @@
+{
+    "results": {
+        "T_min_final": {
+            "numerical": 300.0,
+            "reference": 300.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "T_max_final": {
+            "numerical": 550.0014821086851,
+            "reference": 550.0014821086851,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "T_mean_final": {
+            "numerical": 403.92842647069796,
+            "reference": 403.92842647069796,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "D_max_final": {
+            "numerical": 1.0,
+            "reference": 1.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "D_mean_final": {
+            "numerical": 0.226270465279185,
+            "reference": 0.226270465279185,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "damaged_node_fraction": {
+            "numerical": 0.25223240721002393,
+            "reference": 0.25223240721002393,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "E_el_final": {
+            "numerical": 2.77265,
+            "reference": 2.77265,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "E_frac_final": {
+            "numerical": 3.448725,
+            "reference": 3.448725,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "E_tot_final": {
+            "numerical": 6.221375,
+            "reference": 6.221375,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

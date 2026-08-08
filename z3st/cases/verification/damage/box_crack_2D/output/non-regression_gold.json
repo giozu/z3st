@@ -7,12 +7,20 @@
             "status": "PASS"
         },
         "max_stress_yy": {
-            "numerical": 161774056.7972602,
+            "numerical": 161774063.44259974,
             "reference": 172917294.17556822,
-            "rel_error": 0.06444258471332519,
+            "rel_error": 0.06444254628258533,
+            "status": "PASS"
+        },
+        "localisation_length": {
+            "numerical": 0.002226614076572116,
+            "reference": 0.002226614076572116,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
             "status": "PASS"
         }
     },
     "tolerance": 0.07,
-    "summary": "PASS"
+    "summary": "PASS",
+    "regression": "PASS"
 }

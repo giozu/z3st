@@ -1,0 +1,27 @@
+{
+    "results": {
+        "u_max_final": {
+            "numerical": 0.001191481500814351,
+            "reference": 0.001191481500814351,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "sigma_final": {
+            "numerical": 366568165.6322625,
+            "reference": 366568165.6322625,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "eps_final": {
+            "numerical": 0.016971441156065102,
+            "reference": 0.016971441156065102,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

@@ -15,6 +15,7 @@ import os, yaml, re
 import numpy as np
 from glob import glob
 import matplotlib.pyplot as plt
+from z3st.utils.non_regression import finish, tracked
 from z3st.utils.utils_extract_vtu import extract_field
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
@@ -24,7 +25,7 @@ OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 VTU_FILES = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
 
 INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../../materials/steel.yaml")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../../../materials/steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
@@ -220,3 +221,17 @@ ax1.legend(lns, labs, loc='center left', frameon=True, shadow=True)
 plt.title(f"Z3ST: Crack initiation & softening\nNotch tip evolution (x={x_target:.3f}m)")
 fig.tight_layout()
 plt.savefig(os.path.join(OUTPUT_DIR, "damage_evolution.png"), dpi=300)
+
+
+# --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
+# This benchmark carries no closed-form reference, so every metric is tracked():
+# recorded in the gold and guarded against regression, without inventing a
+# pass/fail criterion. Previously the script computed these and wrote no verdict
+# at all, which left the case out of the discovered suite entirely.
+errors = {
+    "u_max_final": tracked(displacements[-1]),
+    "sigma_final": tracked(stresses[-1]),
+    "eps_final": tracked(strains[-1]),
+}
+
+finish(errors, 1e-2, OUT_JSON, CASE_DIR)

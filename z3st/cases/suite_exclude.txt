@@ -1,6 +1,14 @@
 # Cases excluded from non-regression_local.sh
+#
+# One case per line, with the reason as a trailing comment. An excluded case is
+# skipped even when named on the command line, so it can only be checked by
+# running its non-regression.py by hand — which still performs the gold
+# regression comparison.
 
-regression/pwr_rod_2D
-verification/fuel/creep_law_discovery
-benchmarks/damage/plate_thermal_shock_2D
-benchmarks/damage/pellet_quench_2D_xy
+# --. too slow for a routine suite run; verify by hand when touching damage --..
+benchmarks/damage/sen_shear      # 796 steps, ~2 h. Ambati SENS figure reproducer; the phase-field is already covered by pellet_quench_2D_xy, plate_thermal_shock_2D, double_crack_2D, notched_plate_2D, box_crack_2D, box_notch_2D and two_elliptical_cavities_2D
+benchmarks/damage/sen_tension    # 701 steps, ~1.5 h. Ambati SENT figure reproducer; same coverage argument as sen_shear
+verification/fuel/creep_law_discovery   # 501 steps. Reason not recorded when it was excluded; the step count is the likely cause
+
+# --. reason not recorded when excluded; kept out pending a decision --..
+regression/pwr_rod_2D            # PWR fuel-rod PCMI. Reason unknown — it does carry a gold and passed a manual run on 2026-08-08
