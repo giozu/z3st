@@ -58,8 +58,8 @@ if VTU_FILES:
 
         # F_y = integral of sigma_yy along top edge (per unit out-of-plane depth).
         # Component index 4 of the row-major flattened 3x3 stress tensor.
-        if "Stress_steel (points)" in m.point_data:
-            S_top = np.asarray(m.point_data["Stress_steel (points)"])[top_mask, 4]
+        if "Stress (points)" in m.point_data:
+            S_top = np.asarray(m.point_data["Stress (points)"])[top_mask, 4]
             x_top = x_pts[top_mask]
             order = np.argsort(x_top)
             F_per_depth = float(np.trapezoid(S_top[order], x_top[order]))

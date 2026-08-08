@@ -63,7 +63,7 @@ def extract_mid_cylinder(grid):
         coords = grid.points
         stress_flat = grid.point_data["Stress (points)"]
     else:
-        print("[ERROR] 'Stress_steel' not found in fields.")
+        print("[ERROR] no 'Stress (cells)' or 'Stress (points)' field found.")
         return
 
     # Filter by Y position

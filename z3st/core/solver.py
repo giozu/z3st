@@ -25,7 +25,9 @@ def _rigid_body_modes(V, regime=None):
     """Zero-strain rigid-body displacement modes of the elastic operator, as a
     list of Functions.
 
-    Cartesian: 3 modes in 2D (2 translations + 1 in-plane rotation), 6 in 3D. 
+    Cartesian: 1 mode in 1D (axial translation; a line element has no rigid
+    rotation within its own dimension), 3 in 2D (2 translations + 1 in-plane
+    rotation), 6 in 3D.
     Axisymmetric (r,z): only axial translation
     """
 
@@ -38,18 +40,22 @@ def _rigid_body_modes(V, regime=None):
         mode.x.array[1::bs] = 1.0
         modes = [mode]
     else:
-        n_modes = 3 if bs == 2 else 6
+        # bs is the number of displacement components: 1 on a line mesh, 2 in
+        # plane, 3 in 3D. The old "3 if bs == 2 else 6" sent bs == 1 down the 3-D
+        # branch, which then indexed x[:, 2] and raised a broadcast error -- so
+        # every regime: 1d case with mechanics on died here.
+        n_modes = {1: 1, 2: 3}.get(bs, 6)
         modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
 
         # translations: unit displacement along each axis
         for i in range(bs):
             modes[i].x.array[i::bs] = 1.0
 
-        # rotations: infinitesimal rigid rotation fields
+        # rotations: infinitesimal rigid rotation fields. None in 1D.
         if bs == 2:
             modes[2].x.array[0::bs] = -x[:, 1]
             modes[2].x.array[1::bs] = x[:, 0]
-        else:
+        elif bs == 3:
             modes[3].x.array[1::bs] = -x[:, 2]
             modes[3].x.array[2::bs] = x[:, 1]
             modes[4].x.array[0::bs] = x[:, 2]
