@@ -127,7 +127,6 @@ Computing symbolic result fields (strain, stress, ...)
 
 
 Current step = 0 | dt = 0.00e+00 s
-Coupling = staggered
   → Max iterations              : 100
   → Staggering tolerance |ΔT|   : 1.0e-04
   → Staggering tolerance |Δu|   : 1.0e-08
@@ -252,5 +251,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 1.52 s
+Simulation completed in 5.83 s
 Total time steps solved: 1
