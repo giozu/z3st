@@ -832,13 +832,7 @@ class Solver:
                     bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
                     print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
 
-                    regime = self.regime
-                    if self.mgr.tdim == 1:
-                        n_vec = ufl.as_vector([self.normal[0]])
-                    elif regime in ["axisymmetric", "2d"]:
-                        n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
-                    else:
-                        n_vec = self.normal
+                    n_vec = self._regime_normal()
 
                     bc["value"] = bc["const"] * n_vec
 

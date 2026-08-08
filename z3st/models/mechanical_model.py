@@ -35,6 +35,24 @@ class MechanicalModel:
     # BC types that free one axis and block the other two (frictionless slip).
     _SLIP_BC_TYPES = ("Slip_x", "Slip_y", "Slip_z")
 
+    def _regime_normal(self):
+        """Facet normal restricted to the regime's displacement components.
+
+        On a 1-D mesh V_m has a single component, so the test function is rank-1
+        of size 1 and the traction vector must match: self.normal still carries
+        gdim = 3 entries because gmsh stores 3-D node coordinates, and only the
+        axial one is physically meaningful on a line. Axisymmetric and 2-D keep
+        (r, z) / (x, y); 3-D uses the normal as is.
+
+        The staggered traction update in solver.py needs the same vector, and had
+        a copy of this dispatch.
+        """
+        if self.mgr.tdim == 1:
+            return ufl.as_vector([self.normal[0]])
+        if self.regime in ["axisymmetric", "2d"]:
+            return ufl.as_vector([self.normal[0], self.normal[1]])
+        return self.normal
+
     def set_mechanical_boundary_conditions(self, V_u):
         """
         Apply mechanical boundary conditions.
@@ -190,20 +208,7 @@ class MechanicalModel:
         # scalar constant (Pa)
         traction_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_val))
 
-        # normal vector according to the mechanical regime
-        regime = self.regime
-        if self.mgr.tdim == 1:
-            # 1D mesh: V_m has one component; the test function v_m
-            # is rank-1 of size 1, so the traction n_vec must be a
-            # 1-vector. self.normal still has gdim = 3 entries
-            # because gmsh stores 3D node coords; we only keep the
-            # axial component (which is the only physically
-            # meaningful one on a line).
-            n_vec = ufl.as_vector([self.normal[0]])
-        elif regime in ["axisymmetric", "2d"]:
-            n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
-        else:
-            n_vec = self.normal
+        n_vec = self._regime_normal()
 
         # T = p * n
         traction_expr = traction_const * n_vec

@@ -221,18 +221,11 @@ class GapModel:
         fdim = topology.dim - 1
 
         topology.create_connectivity(fdim, 0)  # facet → vertex
-        connectivity = topology.connectivity(fdim, 0)
-
-        def facet_centroids(facets):
-            centroids = []
-            for facet in facets:
-                vertex_indices = connectivity.links(facet)
-                coords = x[vertex_indices]
-                centroids.append(coords.mean(axis=0))
-            return np.array(centroids)
-
-        centroids_a = facet_centroids(facets_a)
-        centroids_b = facet_centroids(facets_b)
+        # dolfinx computes entity midpoints in C++; the Python loop this replaces
+        # did the same thing (mean of the facet's vertex coordinates) one facet at
+        # a time.
+        centroids_a = dolfinx.mesh.compute_midpoints(mesh, fdim, facets_a)
+        centroids_b = dolfinx.mesh.compute_midpoints(mesh, fdim, facets_b)
 
         # MPI: gather both surfaces globally — with the mesh partitioned, a rank
         # can own facets of only one side (empty-tree crash) or miss the true
