@@ -562,21 +562,21 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local, since 2026-0
 - `verification/mechanics/thermal_gradient_2D`, `verification/mechanics/thermal_gradient_3D`
 - `verification/mechanics/annular_cylinder`
 - `verification/mechanics/full_cylinder`
-- `benchmarks/pellet_quench_3D` (3D reference McClenny reproducer), `benchmarks/pellet_quench_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the primary case for the paper's case-14 chapter). See §9c for the variant rationale. (`14_full_cylinder_thermal_2D_rz`, the axisymmetric thermal-verification variant with damage off, was removed on 2026-06-11 — axisymmetric transient-cooling verification is no longer exercised by any case.)
+- `benchmarks/damage/pellet_quench_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the primary case for the paper's case-14 chapter). See §9c for the variant rationale. (`14_full_cylinder_thermal_2D_rz`, the axisymmetric thermal-verification variant with damage off, was removed on 2026-06-11 — axisymmetric transient-cooling verification is no longer exercised by any case.)
 
 **15 — Cavities and pressurised bodies**
-- `regression/elliptical_cavity_2D`, `regression/two_elliptical_cavities_2D`
+- `verification/mechanics/elliptical_cavity_2D`, `regression/two_elliptical_cavities_2D`
 - `verification/mechanics/spherical_cavity`
 
 **16 — Multi-body coupling**
-- `regression/coaxial_gap_3D`
+- `verification/thermal/coaxial_gap_3D`
 
 **17 — Stress–strain curves**
-- `verification/plasticity/stress_strain_displacement`, `verification/plasticity/stress_strain_stress`
-- `benchmarks/double_crack_2D`, `benchmarks/notched_plate_2D`
+- `verification/mechanics/stress_strain_displacement`, `verification/mechanics/stress_strain_stress`
+- `verification/damage/double_crack_2D`, `verification/damage/notched_plate_2D`
 
 **18 — 2D fracture benchmarks**
-- `regression/box_crack_2D`, `regression/box_notch_2D`
+- `verification/damage/box_crack_2D`, `verification/damage/box_notch_2D`
 
 **19 — Single-edge notched (classical phase-field benchmarks)**
 - `benchmarks/sen_shear`
@@ -792,13 +792,13 @@ The case-14 family is being calibrated against McClenny et al., JNM 565 (2022) 1
 
 | Case directory | Role | Why |
 |---|---|---|
-| `benchmarks/pellet_quench_3D/` (3D) | Reference McClenny reproducer. | Captures the 60° azimuthal wedge AND the radial-only heat transfer (top/bottom faces zero-flux, matching McClenny's alumina-spacer design). |
+| `benchmarks/damage/pellet_quench_3D/` (3D) — **removed 2026-08-08** | Was: reference McClenny reproducer, capturing the 60° azimuthal wedge and the radial-only heat transfer. | Never carried a gold, so it protected nothing, and it reproduced the same experiment as the 2D-xy variant. It was the only `damage: true` case at `regime: 3d`, but the damage block branches on dimension in exactly one place (`damage_model.py`, zeroing the z eigenstrain for 2d) — the phase-field kernels are dimension-generic UFL, so 3D exercised no materially distinct path. Kept-or-golded was the real choice; limbo cost 402 lines of maintenance for no coverage. |
 | `benchmarks/pellet_quench_2D_xy/` (2D plane strain) | McClenny Fig. 8 reproducer at lower compute cost. | Plane strain (no axial gradients) is consistent with the alumina spacer's role; the 60° contact arc on a transverse cross-section is McClenny's 2D representation (their Fig. 8 top, Fig. A.13, Fig. A.14). Modeled as upper-half disc with mirror symmetry on y=0 (= 30° contact in the upper half). |
 | `14_full_cylinder_thermal_2D_rz/` (2D axisymmetric) — **removed 2026-06-11** | Was: verification only (thermal + linear-elastic, damage disabled). | Axisymmetric mode mathematically prohibits azimuthal variation, so it cannot represent the 60° contact wedge — any axisymmetric idealization either contradicts McClenny's experimental design or produces an unphysical annular damage band. Its only value was verifying the axisymmetric thermal solver against the analytic Bessel-series solution; deemed not worth keeping. |
 
 The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 notes "Insulation is placed on one side of the fuel pellet to ... eliminate axial thermal contact between the bottom of the capsule and the UO2 so that conductive radial heat transfer was the primary method of heat transfer to occur. This was intentionally designed to form a stress concentration on the contact region to induce fracturing." This means the experiment is actively radial-only by design — plane strain (2D-xy) is the *correct* dimensional reduction, and any axisymmetric variant with axial gradients (e.g. cooling only the top face) would *contradict* the experiment.
 
-**Methodological framing (the paper's contribution).** Z3ST's damage block implements the **Ambati et al. (2015) hybrid (isotropic-anisotropic) phase-field formulation** (Comput Mech 55:383-405, Eq. 27). McClenny et al. instead use the **Miehe anisotropic formulation with viscous Allen-Cahn evolution** (their Eq. 10, with viscosity `eta = 1e-8 s/mm`). The case-14 chapter is therefore not "same problem, same model, different code"; it is a benchmark in which the hybrid model — whose mechanical block is linear and which has no viscosity-tuned kinetics — captures the same crack topology at a per-iteration cost roughly an order of magnitude lower (Ambati §3.1). The Ambati paper is checked into `z3st/cases/benchmarks/pellet_quench_3D/`.
+**Methodological framing (the paper's contribution).** Z3ST's damage block implements the **Ambati et al. (2015) hybrid (isotropic-anisotropic) phase-field formulation** (Comput Mech 55:383-405, Eq. 27). McClenny et al. instead use the **Miehe anisotropic formulation with viscous Allen-Cahn evolution** (their Eq. 10, with viscosity `eta = 1e-8 s/mm`). The case-14 chapter is therefore not "same problem, same model, different code"; it is a benchmark in which the hybrid model — whose mechanical block is linear and which has no viscosity-tuned kinetics — captures the same crack topology at a per-iteration cost roughly an order of magnitude lower (Ambati §3.1). (The Ambati paper was never actually checked into the repository, despite this note's earlier claim.)
 
 **Implementation correspondence:** verified against the Ambati paper on 2026-05-05.
 - Eq. (27a) `sigma = (1-D)^2 dPsi0/de` ↔ `damage_model.py:30-37` `g(D) = (1-D)^2 + K`, applied to the full stress in the linear mechanical block of `solver.py::_mechanical_step`.
@@ -821,12 +821,8 @@ The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 not
 
 **What still needs running (the user runs these locally — do not invoke from this assistant):**
 ```bash
-# 3D (gold standard)
-cd ~/z3st/z3st/cases/benchmarks/pellet_quench_3D/
-./Allrun
-
 # 2D-xy (McClenny Fig. 8 reproducer)
-cd ~/z3st/z3st/cases/benchmarks/pellet_quench_2D_xy/
+cd ~/z3st/z3st/cases/benchmarks/damage/pellet_quench_2D_xy/
 ./Allrun
 
 ```

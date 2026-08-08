@@ -9,9 +9,9 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  solid: ../../../materials/oxide.yaml
+  solid: ../../../../materials/oxide.yaml
 
-regime: 2D
+regime: 2d
 
 solver_settings:
   coupling: staggered

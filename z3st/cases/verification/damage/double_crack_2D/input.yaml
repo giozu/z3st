@@ -11,42 +11,52 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../../../materials/steel.yaml
 
-regime: 2D
+regime: 2d
 
 solver_settings:
   coupling: staggered
-  max_iters: 100
+  max_iters: 200
   relax_T: 0.9
-  relax_u: 0.7
-  relax_adaptive: true
+  relax_u: 1.0
+  relax_D: 0.8
+  relax_adaptive: false
   relax_growth: 1.2
   relax_shrink: 0.8
   relax_min: 0.05
   relax_max: 0.95
-
+  
 models:
   thermal: false
   mechanical: true
+  damage: true
 
 mechanical:
-  solver: linear
-  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
+  solver: linear # linear | non-linear
+  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
-  debug: false
 
 thermal:
-  solver: linear
-  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-8
+  solver: linear # linear | non-linear
+  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
+  rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
+
+damage:
+  type: AT2
+  solver: linear
+  linear_solver: iterative_hypre # direct_mumps | iterative_amg | iterative_hypre
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm # rel_norm | norm
+  lc: 0.002
 
 lhr:
 - 0.0
 - 0.0
 time:
 - 0.0
-- 10.0
+- 3600.0
 n_steps: 5

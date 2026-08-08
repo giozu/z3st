@@ -11,7 +11,7 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../../../materials/steel.yaml
 
-regime: 2D
+regime: 2d
 
 solver_settings:
   coupling: staggered
@@ -19,8 +19,8 @@ solver_settings:
   relax_T: 0.9
   relax_u: 0.7
   relax_adaptive: true
-  relax_growth: 1.1
-  relax_shrink: 0.9
+  relax_growth: 1.2
+  relax_shrink: 0.8
   relax_min: 0.05
   relax_max: 0.95
 
@@ -31,7 +31,7 @@ models:
 mechanical:
   solver: linear
   linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
-  rtol: 1.0e-8
+  rtol: 1.0e-6
   stag_tol: 1.0e-6
   convergence: rel_norm # rel_norm | norm
   debug: false

@@ -169,14 +169,17 @@ z3st/                                # repository root
     ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
     ├── examples/                    # minimal didactic setups
     └── cases/                       # ~50 verification / validation / demo cases
-        ├── verification/            # analytic closed-form checks
+        ├── verification/            # single-effect checks against a closed-form solution
         │   ├── thermal/             #   slabs, shells, heated box
         │   ├── mechanics/           #   Lamé, GPS, Mariotte, cylinders, cavities
         │   ├── plasticity/          #   J2 hardening, crystal-plasticity demo
-        │   └── fuel/                #   swelling, burnup, creep, contact, law discovery
-        ├── benchmarks/              # literature reproducers (SENT/SENS, pellet quench)
-        ├── regression/              # gold-only guards (incl. PWR fuel-rod PCMI)
-        ├── studies/                 # mesh sensitivity, attenuation map
+        │   └── fuel/                #   swelling, burnup, creep, conductivity, law discovery
+        ├── benchmarks/              # literature reproducers (Ambati SENT/SENS, McClenny
+        │   └── damage/              #   pellet quench, Kamagate plate) — all damage ones here
+        ├── regression/              # integrated multi-physics configurations with no single
+        │                            # closed-form answer; some do carry partial analytic
+        │                            # references, all are guarded by a blessed gold
+        ├── studies/                 # parametric sweeps (mesh sensitivity, attenuation map)
         ├── sandbox/                 # work in progress (never in the suite)
         ├── teaching/
         ├── non-regression_local.sh  # discovery-based local suite

@@ -9,9 +9,9 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../../materials/high_carbon_steel.yaml
+  steel: ../../../../materials/high_carbon_steel.yaml
 
-regime: 2D
+regime: 2d
 
 solver_settings:
   coupling: staggered

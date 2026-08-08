@@ -19,7 +19,7 @@ from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
-MATERIAL_FILE = os.path.join(CASE_DIR, "../../../materials/high_carbon_steel.yaml")
+MATERIAL_FILE = os.path.join(CASE_DIR, "../../../../materials/high_carbon_steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
 INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")

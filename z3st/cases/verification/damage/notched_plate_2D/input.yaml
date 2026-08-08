@@ -9,9 +9,9 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
-  steel: ../../../materials/high_carbon_steel.yaml
+  steel: ../../../../materials/high_carbon_steel.yaml
 
-regime: 2D
+regime: 2d
 
 solver_settings:
   coupling: staggered
@@ -48,8 +48,10 @@ damage:
   convergence: rel_norm # rel_norm | norm
   lc: 0.002
 
-lhr: 
+lhr:
 - 0.0
-time: 
 - 0.0
-n_steps: 1
+time:
+- 0.0
+- 3600.0
+n_steps: 6

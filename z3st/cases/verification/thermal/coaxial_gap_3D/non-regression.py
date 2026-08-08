@@ -19,8 +19,8 @@ from z3st.utils.utils_plot import plotter_sigma_temperature_cylinder
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
-MATERIAL_FILE_1 = os.path.join(CASE_DIR, "../../../materials/ceramic.yaml")
-MATERIAL_FILE_2 = os.path.join(CASE_DIR, "../../../materials/steel.yaml")
+MATERIAL_FILE_1 = os.path.join(CASE_DIR, "../../../../materials/ceramic.yaml")
+MATERIAL_FILE_2 = os.path.join(CASE_DIR, "../../../../materials/steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
 INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")

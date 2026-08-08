@@ -10,7 +10,7 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   plate: plate_ceramic.yaml
 
-regime: 2D
+regime: 2d
 
 output:
   format: xdmf
