@@ -610,7 +610,7 @@ This couples the :ref:`thermal gap model <gap-conductance>` to the
 penalty model computes on closure raises the gap conductance, which in turn cools
 the pellet -- the physically observed effect that pellet--clad contact improves
 heat transfer and lowers fuel temperature. In the demonstration case
-``U_coaxial_contact_2D`` the fuel centreline temperature drops once contact
+``regression/pwr_rod_2D`` the fuel centreline temperature drops once contact
 engages. The coupling is explicit within the staggered loop (the thermal step
 uses the contact pressure from the previous mechanical step) and is enabled by
 ``gap_conductance.contact_coupling`` in ``input.yaml``. Implemented in
@@ -734,8 +734,8 @@ pressure is then applied uniformly over the interface.
    of the residual, consistent with the automatic-differentiation philosophy used
    elsewhere in Z3ST.
 
-The model is exercised by the demonstration case ``U_coaxial_contact_2D``: a 2D
-axisymmetric UO\ :sub:`2` pellet and Zircaloy cladding separated by a 30 µm gap.
+The model is exercised by the demonstration case ``regression/pwr_rod_2D``: a 2D
+axisymmetric UO\ :sub:`2` pellet and Zircaloy cladding separated by a 65 µm gap.
 As the linear heat rate is ramped, the pellet heats and expands, the gap closes
 progressively, contact engages, an emergent (not prescribed) contact pressure
 builds, and the cladding is driven outward -- the load transfer that is the
@@ -743,7 +743,7 @@ signature of PCMI. Implemented in
 :class:`z3st.models.contact_model.ContactModel`.
 
 **Verification.** The penalty contact pressure is verified against the analytical
-**Lamé interference-fit** solution in case ``verification/fuel/coaxial_contact``. The
+**Lamé interference-fit** solution in case ``verification/fuel/shrink_fit``. The
 pellet is heated *uniformly* (a ramped Dirichlet temperature) while the cladding
 is held at its reference temperature, so the radial interference is known in
 closed form,

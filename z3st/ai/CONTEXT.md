@@ -844,7 +844,7 @@ case**, so neither suite can notice if a commit breaks it:
 
 | model | lines | state |
 |---|---|---|
-| `models/cluster_dynamic_model.py` | 153 | its only case, `sandbox/U_cluster_dynamics_test`, has neither a gold nor a `non-regression.py`, and `sandbox/` is never scanned by the local driver |
+| `models/cluster_dynamic_model.py` | 153 | **closed 2026-08-09**: the sandbox case was promoted to `verification/cluster/mass_conservation_1D` with a `non-regression.py` and a gold (9 s, in `cases_ci.txt`). It pins total defect mass and the per-step rescale factor; the physics of that 1.9–3.6 % pre-rescale loss is still open |
 
 Closing it needs a new case with a blessed gold, not a line in `cases_ci.txt`.
 
