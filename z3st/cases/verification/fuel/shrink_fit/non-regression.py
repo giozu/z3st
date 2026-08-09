@@ -7,9 +7,8 @@ interference-fit pressure.
 
 The pellet carries no volumetric heat generation (lhr = 0): it is driven by a
 Dirichlet ramp on its outer surface, 300 K to 1500 K over the 13 steps, and
-its temperature field is therefore uniform. That is deliberate. A uniform
-field expands the pellet stress-free, so the outer-surface displacement is
-exactly
+its temperature field is therefore uniform. A uniform field expands the pellet
+stress-free, so the outer-surface displacement is exactly
 
     u(b) = alpha_f * (T - T_ref) * b
 
@@ -22,10 +21,9 @@ which gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
 
     p = delta / { b [ (1/E_c)((c^2+b^2)/(c^2-b^2) + nu_c) + (1/E_f)(1 - nu_f) ] }
 
-plane-stress form, consistent with the axially-free pellet. The reference is
-exact rather than approximate, which is the point of driving the case this
-way: under volumetric heating the pellet develops a radial gradient, and the
-free-expansion displacement then depends on the area-averaged temperature
+plane-stress form, consistent with the axially-free pellet. Under volumetric
+heating the pellet develops a radial gradient instead, and the free-expansion
+displacement then depends on the area-averaged temperature
 
     u(b) = alpha_f * b * Tbar(b),   Tbar(b) = (2/b^2) int_0^b T(r) r dr
 
@@ -47,8 +45,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import metric
+from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 CASE = os.path.dirname(__file__)
 OUT = os.path.join(CASE, "output")
@@ -80,8 +78,7 @@ amean = lambda v, r, lo, hi: (lambda m: np.sum(v[m] * r[m]) / np.sum(r[m]))((r >
 # (utils/writer.py), a uniform broadcast of the ContactModel's own live scalar
 # -- the value it actually applied as traction in the mechanical weak form.
 # Re-deriving it from the Displacement field is fragile (nodal-tolerance picks
-# between the two facing surfaces, mesh/geometry drift, etc.), so this reads
-# the solver's own number directly instead of reconstructing it.
+# between the two facing surfaces, mesh/geometry drift).
 #
 # The gap itself is not (yet) an exported field, so it is still parsed from
 # the run log's "[contact] ... gap=... um" line (converged/last sample per
@@ -145,13 +142,10 @@ mask = p_lame > 1.0
 if mask.any():
     # Deviation measured relative to the characteristic (peak) contact
     # pressure, not the local per-step value. At contact onset the penalty
-    # pressure p = k_pen * interpenetration necessarily lags the analytical
-    # Lame line, which jumps from zero the instant the interference is
-    # positive; dividing by the tiny local p_lame there would turn that small,
-    # expected absolute lag into a spurious large relative error. Normalising
-    # by the peak pressure scale measures the physically meaningful quantity:
-    # the agreement in established contact and the finite-penalty-stiffness
-    # residual near peak load.
+    # pressure p = k_pen * interpenetration lags the analytical Lame line,
+    # which jumps from zero the instant the interference is positive. The peak
+    # pressure scale measures the agreement in established contact and the
+    # finite-penalty-stiffness residual near peak load.
     p_scale = p_lame[mask].max()
     rel = np.abs(p_z3st[mask] - p_lame[mask]) / p_scale
     print(f"[INFO] closed-gap steps: {mask.sum()}, dev vs Lame rel. to peak "
@@ -169,7 +163,7 @@ def plot_stress_profiles():
             sigma_th = alpha*E [ (1/b^2) I(b) + (1/r^2) I(r) - (T-T_ref) ],
         with I(r) = int_0^r (T-T_ref) r' dr', plus the uniform contact
         contribution -p so that sigma_rr(b) = -p at the interface. The pellet is
-        NOT under a uniform hydrostatic -p: the radial temperature gradient sets
+        not under a uniform hydrostatic -p: the radial temperature gradient sets
         up self-equilibrated thermal stresses (tensile hoop at the cool rim,
         compression in the hot core) that dominate the interior field.
       * clad (bci <= r <= c): Lame tube under internal pressure p,
@@ -221,8 +215,7 @@ def plot_stress_profiles():
     stt_clad = kk * (1.0 + c**2 / rcl**2)
 
     # Two panels with independent scales: the pellet carries GPa-level thermal
-    # stresses that would otherwise crush the ~100 MPa cladding response and
-    # hide its Lame comparison.
+    # stresses, the cladding response is ~100 MPa.
     C_RR, C_TT = "#4C72B0", "#C44E52"
     fig, (axp, axc) = plt.subplots(
         1, 2, figsize=(10.5, 4.6), gridspec_kw={"width_ratios": [2.2, 1.0]})
@@ -311,12 +304,7 @@ else:
     print("[INFO] gap never closes: verifying final open gap vs free expansion")
     gap_err = abs(gap_z3st[-1] - gap_free[-1]) / g0
     errors = {
-        "final_gap": {
-            "numerical": float(gap_z3st[-1]),
-            "reference": float(gap_free[-1]),
-            "abs_error": float(abs(gap_z3st[-1] - gap_free[-1])),
-            "rel_error": float(gap_err),
-        },
+        "final_gap": metric(gap_z3st[-1], gap_free[-1], rel=gap_err),
         "spurious_contact_pressure": {
             "numerical": float(p_z3st.max()),
             "reference": 0.0,

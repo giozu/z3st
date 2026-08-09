@@ -11,10 +11,9 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: swell.yaml
 
-regime: 3D
+regime: 3d
 
 solver_settings:
-  coupling: staggered
   max_iters: 10
   relax_u: 1.0
   relax_adaptive: false

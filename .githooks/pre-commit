@@ -1,0 +1,52 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: refuse a commit that the static checks already know is broken.
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+# Enable once per clone:
+#     git config core.hooksPath .githooks
+#
+# 2.4 s, no simulation, no environment beyond the one that runs z3st. It exists
+# because two commits on 2026-08-09 were pushed, reached CI, and failed there on
+# things this script finds in seconds: h5py declared as optional while library
+# code imports it at module level (six cases dead on ModuleNotFoundError), and
+# the CI driver invoking mpi_smoke.sh at a path that does not exist.
+#
+# What it CANNOT do, so that nobody trusts it further than it goes: it does not
+# run a case, does not judge whether a gold is physically right, and does not
+# know whether the solver still converges. Those need the suite. A green hook
+# means "no known-static defect", never "this works".
+
+# The first python3 on PATH is not enough. An editable install makes z3st
+# importable from conda *base* too, where pyflakes is absent -- check `names`
+# then self-skips, reports that as a finding, and the hook refuses the commit for
+# a reason that has nothing to do with the tree. So require both z3st and the
+# checks' own dependency, and look past PATH if the shell's python3 lacks them.
+# Override with Z3ST_PYTHON=/path/to/python.
+PY=""
+for cand in ${Z3ST_PYTHON:+"$Z3ST_PYTHON"} python3 \
+            "$(dirname "${CONDA_EXE:-/nonexistent}")"/../envs/*/bin/python; do
+    command -v "$cand" >/dev/null 2>&1 || continue
+    if "$cand" -c "import z3st, pyflakes" 2>/dev/null; then PY="$cand"; break; fi
+done
+
+if [ -z "$PY" ]; then
+    echo "pre-commit: no interpreter with both z3st and pyflakes; audit_checks NOT run" >&2
+    echo "  activate the environment (pip install -e '.[dev]'), set Z3ST_PYTHON," >&2
+    echo "  or commit with --no-verify and say so." >&2
+    exit 1
+fi
+
+echo "pre-commit: z3st.utils.audit_checks ($PY)"
+if ! "$PY" -m z3st.utils.audit_checks; then
+    cat >&2 <<'MSG'
+
+pre-commit: refusing the commit — the findings above are static, so they are
+already true of the tree you are about to commit and will be true on CI.
+
+Fix them, or override deliberately with:
+    git commit --no-verify
+MSG
+    exit 1
+fi

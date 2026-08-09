@@ -15,13 +15,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import case_paths, finish, load_case
+from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 
 with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
     geom = yaml.safe_load(f)
@@ -98,7 +96,4 @@ errors = {
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

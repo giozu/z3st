@@ -33,7 +33,6 @@ Date: 11/10/2025
 import os
 
 import numpy as np
-import pandas as pd
 import pyvista as pv
 
 
@@ -474,26 +473,37 @@ def extract_cylindrical_field(
     ftt = fxx * s**2 + fyy * c**2 - 2 * fxy * s * c
     fzz = fzz
 
-    import pandas as pd
-
-    df = pd.DataFrame({"r": r, "frr": frr, "ftt": ftt, "fzz": fzz}).sort_values("r")
-
     if average:
-        df["r"] = df["r"].round(decimals)
-        df = df.groupby("r")[["frr", "ftt", "fzz"]].mean().reset_index()
+        r, frr, ftt, fzz = _group_mean(r, frr, ftt, fzz, decimals=decimals)
+    else:
+        order = np.argsort(r)
+        r, frr, ftt, fzz = r[order], frr[order], ftt[order], fzz[order]
 
     if save_results:
         out_dir = os.path.join(case_dir, "output")
         os.makedirs(out_dir, exist_ok=True)
         csv_path = os.path.join(out_dir, f"{field_hint.lower()}_cylindrical_z{z_fixed:.2f}.csv")
-        df.to_csv(csv_path, index=False)
+        np.savetxt(
+            csv_path,
+            np.column_stack([r, frr, ftt, fzz]),
+            delimiter=",",
+            header="r,frr,ftt,fzz",
+            comments="",
+        )
 
-    return (
-        df["r"].to_numpy(),
-        df["frr"].to_numpy(),
-        df["ftt"].to_numpy(),
-        df["fzz"].to_numpy(),
-    )
+    return r, frr, ftt, fzz
+
+
+def _group_mean(key, *values, decimals):
+    """Mean of each value array over rounded-key groups, sorted by key.
+
+    The numpy spelling of ``DataFrame.groupby(key).mean()``: np.unique gives the
+    sorted unique keys plus, for every sample, the index of its group; bincount
+    then sums per group, and dividing by the counts turns the sums into means.
+    """
+    k, inv = np.unique(np.round(key, decimals), return_inverse=True)
+    counts = np.bincount(inv)
+    return (k, *(np.bincount(inv, weights=v) / counts for v in values))
 
 
 def average_section(x, y, z, field, y0, z0, tol=1e-3, decimals=5, label="field"):
@@ -501,12 +511,7 @@ def average_section(x, y, z, field, y0, z0, tol=1e-3, decimals=5, label="field")
     mask = (np.abs(y - y0) < tol) & (np.abs(z - z0) < tol)
     if not np.any(mask):
         raise RuntimeError(f"[ERROR] No points found for {label} (tol={tol})")
-    df = (
-        pd.DataFrame({"x": x[mask].round(decimals), label: field[mask]})
-        .groupby("x", as_index=False)
-        .mean()
-    )
-    return df["x"].to_numpy(), df[label].to_numpy()
+    return _group_mean(x[mask], field[mask], decimals=decimals)
 
 
 def average_section_radial(x, y, z, field, z_target, tol=1e-3, decimals=5):
@@ -515,6 +520,4 @@ def average_section_radial(x, y, z, field, z_target, tol=1e-3, decimals=5):
     mask = np.abs(z - z_target) < tol
     if not np.any(mask):
         raise RuntimeError(f"No points found near z={z_target:.3f} ± {tol:.1e}")
-    df = pd.DataFrame({"r": r[mask].round(decimals), "f": field[mask]})
-    df = df.groupby("r", as_index=False).mean()
-    return df["r"].to_numpy(), df["f"].to_numpy()
+    return _group_mean(r[mask], field[mask], decimals=decimals)

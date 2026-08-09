@@ -1,0 +1,77 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.2.0 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  fuel: fuel.yaml
+
+regime: 2d
+
+solver_settings:
+  max_iters: 30
+  relax_T: 0.8
+  relax_adaptive: false
+
+models:
+  thermal: true
+  porosity: true
+
+output:
+  format: xdmf
+
+thermal:
+  analysis: transient
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-8
+  stag_tol: 1.0e-7
+  convergence: rel_norm
+
+# Upwind DG variant of the sibling porosity_migration case (which is CG+SU/SUPG).
+# SSP-RK3 in time, Kuzmin vertex limiter for the discrete maximum principle, and
+# a conservative saturation cap enforcing the physical p <= 1 bound.
+porosity:
+  linear_solver: direct_mumps
+  rtol: 1.0e-8
+  stag_tol_rel: 1.0e-6
+  stag_tol_abs: 1.0e-8
+  discretisation: dg
+  dg_integrator: ssprk3
+  dg_limiter: vertex
+  saturation_cap: true
+  aitken: true
+  aitken_omega0: 0.5
+
+lhr:
+- 0.0
+- 312.5
+- 625.0
+- 937.5
+- 1250.0
+- 1562.5
+- 1875.0
+- 2187.5
+- 2500.0
+- 2812.5
+- 3125.0
+
+time:
+- 0.0
+- 1000.0
+- 2000.0
+- 3000.0
+- 4000.0
+- 5000.0
+- 6000.0
+- 7000.0
+- 8000.0
+- 9000.0
+- 10000.0
+
+n_steps: 200

@@ -16,13 +16,12 @@ import yaml
 import matplotlib.pyplot as plt
 import numpy as np
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import case_paths, error_metric, metric
+from z3st.utils.utils_extract_vtu import extract_field, list_fields
+from z3st.utils.utils_verification import pass_fail_check
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 
 # Geometry and material
 MATERIAL_FILE = os.path.join(CASE_DIR, "vessel_steel.yaml")
@@ -254,36 +253,11 @@ Tmax_ref = float(np.max(T_ref))
 RelErr_Tmax = abs(Tmax_num - Tmax_ref) / Tmax_ref
 
 errors = {
-    "L2_error_T": {
-        "numerical": L2_T,
-        "reference": 0.0,
-        "abs_error": L2_T,
-        "rel_error": RelL2_T,
-    },
-    "Linf_error_T": {
-        "numerical": Linf_T,
-        "reference": 0.0,
-        "abs_error": Linf_T,
-        "rel_error": Linf_T / np.mean(np.abs(T_ref)),
-    },
-    "T_max": {
-        "numerical": Tmax_num,
-        "reference": Tmax_ref,
-        "abs_error": abs(Tmax_num - Tmax_ref),
-        "rel_error": RelErr_Tmax,
-    },
-    "L2_error_sigma_tt": {
-        "numerical": float(err_tt),
-        "reference": 0.0,
-        "abs_error": float(err_tt),
-        "rel_error": float(err_tt),
-    },
-    "L2_error_sigma_zz": {
-        "numerical": float(err_zz),
-        "reference": 0.0,
-        "abs_error": float(err_zz),
-        "rel_error": float(err_zz),
-    },
+    "L2_error_T": error_metric(L2_T, rel=RelL2_T),
+    "Linf_error_T": error_metric(Linf_T, rel=Linf_T / np.mean(np.abs(T_ref))),
+    "T_max": metric(Tmax_num, Tmax_ref, rel=RelErr_Tmax),
+    "L2_error_sigma_tt": error_metric(err_tt),
+    "L2_error_sigma_zz": error_metric(err_zz),
     "sigma_th_tt": {
         "numerical": np.max(sigma_tt),
         "reference": 0.0,

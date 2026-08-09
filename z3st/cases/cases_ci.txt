@@ -1,20 +1,55 @@
 # CI case list, consumed by non-regression_github.sh
-# This is a tight subset of the local suite (non-regression_local.sh),
-# chosen for fast CI turnaround under the dolfinx/dolfinx:stable container
-# budget. Each case here:
-#   - has a stable output/non-regression_gold.json,
-#   - runs in well under one minute,
-#   - exercises one physics path that's not covered by another listed case
+#
+# A tight subset of the local suite (non-regression_local.sh), chosen so that CI
+# stays a per-commit gate rather than a nightly job. Membership rule:
+#   - a stable output/non-regression_gold.json, and
+#   - it exercises a physics path no other listed case reaches.
+#
+# Budget: 14 min 47 s total, from the times measured by a full local
+# suite run on 2026-08-09. Most cases are well under a minute; two are not, and
+# they are listed with their cost because they buy coverage nothing else does.
+# Re-measure before adding anything: ./non-regression_local.sh prints per-case times.
+#
+# Every model is now reached by at least one gold-carrying case. The two gaps this
+# header used to record are closed:
+#   cluster_dynamic_model.py -- verification/cluster/mass_conservation_1D, 9 s, listed below.
+#   contact_model.py         -- never was a gap. contact is configured as a BLOCK,
+#                               models.contact: {surface_a: ..., ...}, and Config takes
+#                               bool() of it, so grepping "contact: true" finds nothing
+#                               while six cases enable it. Four carry a gold: shrink_fit,
+#                               shrink_fit_disk, shrink_fit_disk_3d and pwr_rod_2D (the
+#                               last excluded from the local suite, see suite_exclude.txt).
+#                               fg_test_2D and creep_shrink_fit_2D were blessed on
+#                               2026-08-09, so all six are now discovered.
+#
+# Run `python -m z3st.utils.audit_checks` to re-derive all of the above; it is where
+# the goldless-case list comes from and takes four seconds.
+#
+# Every case here runs SERIALLY. Parallel execution works -- it is used by hand -- but
+# no case in either suite exercises it, so neither suite can notice a regression in it.
+# An mpi_smoke.sh existed briefly on 2026-08-09 and was removed: see README.
 
+# --. thermal --..
 verification/thermal/thin_slab_dirichlet_2D
 verification/thermal/thin_cylindrical_shell_dirichlet_2D
 verification/thermal/thick_slab_adiabatic_3D
 verification/thermal/box_heated
+verification/thermal/coaxial_gap_3D   # 74 s
+
+
+# --. mechanics and plasticity --..
 verification/mechanics/full_cylinder
-regression/coaxial_gap_3D
-regression/box_crack_2D
 verification/plasticity/j2_hardening_2D
 verification/plasticity/crystal_single_grain
+
+
+# --. damage --..
+verification/damage/box_crack_2D
+verification/damage/box_notch_2D
+regression/two_elliptical_cavities_2D   # 80 s
+
+
+# --. fuel behaviour --..
 verification/fuel/shrink_fit_disk
 verification/fuel/swelling
 verification/fuel/burnup
@@ -25,3 +60,9 @@ verification/fuel/creep
 verification/fuel/creep_relaxation
 verification/fuel/creep_irradiation
 verification/fuel/cracking
+
+
+# --. porosity migration: the only coverage of porosity_migration_model.py (674
+# lines). The DG variant is used rather than the CG one because it is cheaper.
+# --..
+verification/fuel/porosity_migration_dg   # 364 s

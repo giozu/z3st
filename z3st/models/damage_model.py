@@ -7,6 +7,7 @@
 
 
 import dolfinx
+import dolfinx.fem.petsc
 import numpy as np
 import ufl
 from mpi4py import MPI
@@ -22,15 +23,11 @@ class DamageModel:
             raise ValueError("'damage' entry missing in input.yaml (but damage model is enabled).")
 
         # Default linear-solver backend; user can override in input.yaml.
-        # Done after the missing-block check so an entirely absent damage
-        # block still surfaces clearly rather than being silently filled in.
+        # Set after the missing-block check above.
         self.dmg_cfg.setdefault("linear_solver", "iterative_hypre")
 
-        # Validate damage type up-front. Without this, a typo like 'at1' or
-        # 'AT-1' silently skips the Gc<->sigma_c auto-conversion in
-        # spine.py::load_materials and the run crashes later inside
-        # _damage_step with a confusing KeyError('Gc') or 'Unknown damage
-        # type'.
+        # Validate damage type up-front: only these two spellings trigger the
+        # Gc<->sigma_c auto-conversion in spine.py::load_materials.
         dmg_type = self.dmg_cfg.get("type")
         if dmg_type not in ("AT1", "AT2"):
             raise ValueError(
@@ -59,7 +56,7 @@ class DamageModel:
 
         Returns None if T is missing or the material has no thermal-expansion
         properties. The damage driving force must be evaluated on the
-        ELASTIC (mechanical) strain eps_el = eps(u) - eth, not on the total
+        elastic (mechanical) strain eps_el = eps(u) - eth, not on the total
         strain eps(u). Otherwise uniform thermal expansion in the bulk
         produces a spurious psi_pos that drives damage everywhere.
 
@@ -69,7 +66,7 @@ class DamageModel:
           dynamic (computed from u). The full isotropic eigenstrain
           alpha*(T-T_ref)*I is correct.
 
-        - In 2D Cartesian PLANE STRAIN (regime: 2d in z3st), eps_zz is
+        - In 2D Cartesian plane strain (regime: 2d in z3st), eps_zz is
           forced to 0 by the geometric constraint. Subtracting a non-zero
           eth_zz = alpha*(T-T_ref) would create eps_el_zz = -alpha*(T-T_ref),
           whose deviatoric component injects a spurious psi_pos
@@ -80,16 +77,13 @@ class DamageModel:
           stress in an infinite cylinder but cannot drive radial cracks).
           We therefore zero out the z-component of eth in plane strain.
 
-        - PLANE STRESS (regime: plane_stress) has sigma_zz = 0 by
-          construction, so the z-thermal-expansion creates no real stress
-          either. Same treatment.
         """
         if T is None or "alpha" not in material or "T_ref" not in material:
             return None
         factor = material["alpha"] * (T - material["T_ref"])
 
         regime = str(getattr(self, "regime", "3d")).lower()
-        if regime in ("2d", "plane_stress") and dim == 3:
+        if regime == "2d" and dim == 3:
             # Eigenstrain active in the in-plane components only.
             I_inplane = ufl.as_tensor([
                 [1.0, 0.0, 0.0],
@@ -237,9 +231,7 @@ class DamageModel:
         (total strain when T is None) and K_n = lambda + 2*mu/n is Amor's
         n-dimensional bulk modulus (Amor, Marigo & Maurini 2009), with n the
         strain-tensor dimension. With K_n the split is an exact orthogonal
-        decomposition, psi_pos + psi_neg = psi_el; the previous lambda-based
-        convention dropped the (mu/n) tr^2 part of the volumetric energy
-        (~30 % of the hydrostatic-tension driving force at nu = 0.3).
+        decomposition, psi_pos + psi_neg = psi_el.
         """
         lam = material["lmbda"]
         G = material["G"]
@@ -326,7 +318,7 @@ class DamageModel:
           1. ``damage.split: amor | miehe | star_convex`` in input.yaml
              (explicit override).
           2. Default (no ``split`` key): AT2 -> Miehe spectral, AT1 -> Amor
-             volumetric/deviatoric. This preserves z3st's historical pairing.
+             volumetric/deviatoric.
 
         Returns (psi_pos, psi_neg) in physical units (J/m^3).
 
@@ -417,10 +409,9 @@ class DamageModel:
         if damage_type == "AT1":
             self.H.x.array[:] = H_new_array
         elif damage_type == "AT2":
-            # Ratchet against the last CONVERGED step's history (anchor
+            # Ratchet against the last converged step's history (anchor
             # captured by solve_staggered at step start), not against the
-            # running iterate: maxing in place every staggered iteration let
-            # unconverged intermediate states permanently inflate H.
+            # running iterate.
             H_floor = getattr(self, "_H_step_start", None)
             if H_floor is None:
                 H_floor = self.H.x.array
@@ -482,8 +473,7 @@ class DamageModel:
             E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * w * dx))
 
         # assemble_scalar returns per-rank partial sums; reduce so every
-        # rank returns the same global value and downstream callers see
-        # the physical energy (not the rank-0 share).
+        # rank returns the same global value.
         comm = self.mesh.comm
         E_el = comm.allreduce(E_el, op=MPI.SUM)
         E_frac = comm.allreduce(E_frac, op=MPI.SUM)
@@ -524,8 +514,7 @@ class DamageModel:
 
                         if mat_type not in self.dirichlet_damage:
                             # A typo'd material key in boundary_conditions.yaml
-                            # must degrade like the other malformed-BC paths,
-                            # not crash setup with a bare KeyError.
+                            # is skipped, as the other malformed-BC paths are.
                             print(f"  [ERROR] Damage BC block keyed by unknown "
                                   f"material '{mat_type}' — known: "
                                   f"{sorted(self.dirichlet_damage)}. Skipped.")
@@ -537,3 +526,138 @@ class DamageModel:
                         })
 
                         print(f"  [INFO] Dirichlet damage BC on '{mat_type}' → D = {val_d} at region '{region_name}'")
+
+    # --.. ..- .-.. .-.. --- staggered step --.. ..- .-.. .-.. ---
+    # solver.py owns the staggered loop and the services this step calls
+    # (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
+    # _value_at_step, _build_measures, aitken_omega); Spine inherits both.
+    def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, prev_res_D):
+
+        D_old.x.array[:] = D_new.x.array
+        
+        w = self.weight
+        
+        lc = float(self.dmg_cfg["lc"])
+        damage_type = self.dmg_cfg["type"]
+
+        print(f"\n[INFO] Assembling damage ({damage_type}) problem...")
+
+        u_d, v_d = ufl.TrialFunction(self.V_d), ufl.TestFunction(self.V_d)
+        a_d, L_d = 0, 0
+
+        bcs_d = []
+        for mat_name in self.materials:
+            for bc_entry in self.dirichlet_damage.get(mat_name, []):
+                bcs_d.append(bc_entry["value"])
+
+        for label, material in self.materials.items():
+            print(
+                f"Solving damage problem for '{label}' material"
+            )
+
+            tag = self.label_map[label]
+            dx = self.dx_tags[tag]
+
+            missing = [k for k in ("Gc", "sigma_c", "E") if k not in material]
+            if missing:
+                # Every material in the domain participates in the phase-field
+                # problem.
+                raise ValueError(
+                    f"Damage model is ON but material '{label}' lacks "
+                    f"{missing}. Give it sigma_c or Gc on its card (the other "
+                    "is derived at load time), or disable damage for this run."
+                )
+            Gc = material["Gc"]
+            sigma_c = material["sigma_c"]
+            E = material["E"]
+
+            if damage_type == "AT2":
+                
+                a_d += w*((self.H + 1.0) * u_d * v_d 
+                + lc**2 * ufl.inner(ufl.grad(u_d), ufl.grad(v_d))) * dx
+                L_d += w*self.H * v_d * dx
+
+            elif damage_type == "AT1":
+
+                # AT1 surface energy density (Pham-Marigo-Bourdin convention):
+                #   E_s = (3*Gc/8) * integral( D/lc + lc * |grad D|^2 ) dx
+                # Variation w.r.t. D yields the strong form
+                #   -(3*Gc*lc/4) * Laplacian(D) + 2*H*D = 2*H - 3*Gc/(8*lc)
+                # The constant -3*Gc/(8*lc) on the RHS produces the sharp
+                # AT1 elastic threshold: no damage until 2H > 3*Gc/(8*lc),
+                # i.e. sigma > sigma_c.
+                #
+                # Irreversibility (D_n+1 >= D_n) is enforced after the
+                # linear solve via np.maximum(D_new, D_old).
+                # A symmetric
+                # (D - D_old)^2 penalty in the weak form would freeze
+                # D ~= D_old whenever the penalty coefficient dominates the
+                # driving force 2H, which is the typical regime in
+                # thermal-shock cases where 2H is small. The post-solve
+                # max-projection is the correct one-sided enforcement.
+                #
+                # A small Tikhonov shift (diag_shift) stabilises the linear
+                # system in cells where H = 0 (otherwise the LHS bilinear
+                # form would be just the Laplacian, which is positive
+                # semi-definite with a constant nullspace under natural BCs).
+                cw = 8.0 / 3.0
+                pref = Gc / cw                       # = 3*Gc/8  (surface density coeff)
+                grad_coeff = 2.0 * pref * lc         # = 3*Gc*lc/4 (bilinear form coeff)
+                diag_shift = 1.0e-8 * (Gc / lc)
+
+                # Gc and sigma_c may be UFL expressions (when the material's
+                # Gc comes from a Python callable on the mesh, e.g.
+                # materials/oxide.py::Gc). The {:.2e} format then raises
+                # TypeError. Format scalars normally; show a type tag for
+                # non-scalars.
+                Gc_str = f"{Gc:.2e}" if isinstance(Gc, (int, float, np.floating, np.integer)) else f"<{type(Gc).__name__}>"
+                sc_str = f"{sigma_c:.2e}" if isinstance(sigma_c, (int, float, np.floating, np.integer)) else f"<{type(sigma_c).__name__}>"
+                print(f"  - Material '{label}': AT1 solve. Gc={Gc_str}, sigma_c={sc_str}")
+
+                a_d += w * (2.0 * self.H + diag_shift) * u_d * v_d * dx \
+                     + w * grad_coeff * ufl.inner(ufl.grad(u_d), ufl.grad(v_d)) * dx
+
+                L_d += w * (2.0 * self.H - (pref / lc)) * v_d * dx
+
+        petsc_opts_damage = self.get_solver_options(
+            physics="damage",
+            solver_type=self.dmg_cfg["linear_solver"],
+            rtol=rtol_dmg,
+        )
+
+        problem_d = dolfinx.fem.petsc.LinearProblem(
+            a_d,
+            L_d,
+            bcs=bcs_d,
+            u=D_new,
+            petsc_options=petsc_opts_damage,
+            petsc_options_prefix="damage_",
+        )
+        problem_d.solve()
+        
+        if damage_type == "AT1":
+            # Clipping:
+            D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
+
+        D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
+        # Irreversibility against the last CONVERGED step (anchor captured in
+        # solve_staggered), not the previous staggered iterate: an overshooting
+        # early iterate must remain retractable within the step, while D can
+        # never drop below its converged history.
+        D_floor = getattr(self, "_D_step_start", None)
+        D_new.x.array[:] = np.maximum(
+            D_new.x.array, D_floor if D_floor is not None else D_old.x.array
+        )
+        D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
+
+        conv_damage, norm_dD, rel_norm_dD, res_curr = self._stagger_residual(
+            D_new, D_old, self.dmg_cfg, stag_tol_dmg, "D")
+
+        if self.relax_adaptive:
+            prev_res_D = self._adapt_relax("D", res_curr, prev_res_D)
+
+        # Residual in L_inf norm
+        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
+        print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
+
+        return conv_damage, norm_dD, rel_norm_dD, prev_res_D

@@ -21,7 +21,7 @@ from z3st.utils.utils_load import generate_power_history
 
 pv.OFF_SCREEN = True
 # start_xvfb is deprecated in recent PyVista but is the working headless path
-# here; silence the deprecation notice rather than change the render backend.
+# here; the deprecation notice is silenced.
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     try:

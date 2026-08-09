@@ -11,17 +11,14 @@ correlation as a Gaussian process over the log residual
 
     r = log(k_data / k_magni).
 
-To verify the machinery -- kernel evaluation, de-standardisation, the Newton
-tangent dk/dT, the external-operator plumbing -- we do NOT need experimental
-data. We need a residual whose value AND derivative are known in closed form,
-exactly as `train_knet.py` fits the neural-network hook to the analytic law
-k(T) = 1/(a + b*T) rather than to measurements.
+Verifying the machinery -- kernel evaluation, de-standardisation, the Newton
+tangent dk/dT, the external-operator plumbing -- needs a residual whose value
+and derivative are known in closed form, as `train_knet.py` fits the
+neural-network hook to the analytic law k(T) = 1/(a + b*T).
 
 This module defines that residual. `make_synthetic_gpr.py` samples it to build
 a checkpoint; the non-regression check then asks whether the fitted GPR
-reproduces it. Nothing here is experimental data and nothing here is a physical
-claim: the correction is a deliberately smooth, bounded fiction whose only
-purpose is to have an answer to compare against.
+reproduces it. It is not experimental data and not a physical claim.
 
     r(T, Pu, p) = A * sin(pi * (T - T_LO) / (T_HI - T_LO))
                 + B * (Pu - PU_REF)

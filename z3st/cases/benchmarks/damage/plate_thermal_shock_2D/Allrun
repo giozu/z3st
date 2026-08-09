@@ -14,6 +14,8 @@ fi
 
 python3 -m z3st > log_z3st.md
 
+python3 non-regression.py
+
 echo "[Allrun] Rendering damage field..."
 python3 plot_damage.py
 

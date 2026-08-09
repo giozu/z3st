@@ -1,23 +1,28 @@
 {
-  "T_final_mean_in_range": {
-    "numerical": 735.2658759939804,
-    "reference": [
-      263.15,
-      1023.15
-    ],
-    "rel_error": 0.0,
-    "pass": true
-  },
-  "D_max_final": {
-    "numerical": 1.0,
-    "reference": 1.0,
-    "rel_error": 0.0,
-    "pass": true
-  },
-  "crack_count_above_0p5": {
-    "numerical": 5,
-    "reference": 3,
-    "rel_error": 0.0,
-    "pass": true
-  }
+    "results": {
+        "T_final_mean_in_range": {
+            "numerical": 735.2658759939804,
+            "reference": 735.2658759939804,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "D_max_final": {
+            "numerical": 1.0,
+            "reference": 1.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_above_0p5": {
+            "numerical": 5.0,
+            "reference": 5.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.05,
+    "summary": "PASS",
+    "regression": "PASS"
 }

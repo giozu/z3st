@@ -23,7 +23,7 @@ v() = BooleanDifference{ Volume{1}; Delete; }{ Volume{2}; Delete; };
 // get surfaces of the resulting shell
 s[] = Boundary{ Volume{v()}; };
 
-// you now have two spherical surfaces in s[]
+// s[] holds the two spherical surfaces
 // assign physical groups
 Physical Surface("outer") = {s[0]};   // outer sphere
 Physical Surface("inner") = {s[1]};   // inner sphere

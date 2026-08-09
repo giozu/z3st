@@ -250,7 +250,7 @@ def run_stages(verbose=False):
     rule. Returns (active, z, z_full, shares_full, path, loss_full, loss_final),
     where active/z describe the selected model. Reads ``sigma_data`` through
     residuals_and_jacobian/strain_shares, so the caller sets that global before
-    invoking (the primary run and the robustness sweep both do)."""
+    invoking."""
     # stage 1: seed each candidate alone by a coarse 1D scan
     z_single = np.empty(K_FULL)
     for i in range(K_FULL):
@@ -319,10 +319,9 @@ if active == [2]:
           "discretisation defect of the FEM data (model-form discrepancy).")
 
 # ---------------------------------------------------------------------------
-# robustness: repeat the identification over independent noise realisations,
-# so the "recovered in every realisation" claim is reproducible from the suite
-# rather than asserted. Each seed draws a fresh 2% multiplicative-noise vector
-# and runs the same three-stage selection.
+# robustness: repeat the identification over independent noise realisations.
+# Each seed draws a fresh 2% multiplicative-noise vector and runs the same
+# three-stage selection.
 # ---------------------------------------------------------------------------
 N_SEEDS = 10
 robustness = []

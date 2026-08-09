@@ -19,10 +19,9 @@ burnup, for 95 % TD UO2,
 
 valid 298-3120 K: ~8.7 at 300 K, ~5.3 at 580 K, ~3.0 at 1200 K, ~2.4 at
 1600 K. It tracks the Fink (J. Nucl. Mater. 279, 2000) recommendation within
-a few per cent over this range — but it is NOT the Fink equation (Fink uses
-t = T/1000 with a different rational form), so verify against modified NFI,
-not Fink, when checking values. Burnup degradation (Lucuta factors) is a later
-refinement behind the same hook once the k(T) contract carries the state bus.
+a few per cent over this range.
+
+Burnup degradation (Lucuta factors) is not included.
 """
 
 import ufl

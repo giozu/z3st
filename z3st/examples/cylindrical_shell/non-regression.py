@@ -17,13 +17,11 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import case_paths, error_metric, finish
+from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 
 # Geometry and material
 Ri, Ro, Lz = 0.02, 0.03, 0.50  # m          inner and outer radius, height
@@ -65,7 +63,7 @@ print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
 # Stress
-x_S, z_S, _, S_all = extract_field(VTU_FILE, field_name="Stress_steel (cells)")
+x_S, z_S, _, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
 mask = np.abs(z_S - z_target) < z_tol
 sort_idx = np.argsort(x_S[mask])
 
@@ -191,46 +189,15 @@ err_eps_zz = np.sqrt(np.mean((epsilon_zz - epsilon_zz_ana_L) ** 2)) / np.sqrt(
 )
 
 errors = {
-    "L2_error_sigma_rr": {
-        "numerical": float(err_rr),
-        "reference": 0.0,
-        "abs_error": float(err_rr),
-        "rel_error": float(err_rr),
-    },
-    "L2_error_sigma_tt": {
-        "numerical": float(err_tt),
-        "reference": 0.0,
-        "abs_error": float(err_tt),
-        "rel_error": float(err_tt),
-    },
-    "L2_error_sigma_zz": {
-        "numerical": float(err_zz),
-        "reference": 0.0,
-        "abs_error": float(err_zz),
-        "rel_error": float(err_zz),
-    },
-    "L2_error_strain_rr": {
-        "numerical": float(err_eps_rr),
-        "reference": 0.0,
-        "abs_error": float(err_eps_rr),
-        "rel_error": float(err_eps_rr),
-    },
-    "L2_error_strain_tt": {
-        "numerical": float(err_eps_tt),
-        "reference": 0.0,
-        "abs_error": float(err_eps_tt),
-        "rel_error": float(err_eps_tt),
-    },
-    "L2_error_strain_zz": {
-        "numerical": float(err_eps_zz),
-        "reference": 0.0,
-        "abs_error": float(err_eps_zz),
-        "rel_error": float(err_eps_zz),
-    },
+    "L2_error_sigma_rr": error_metric(err_rr),
+    "L2_error_sigma_tt": error_metric(err_tt),
+    "L2_error_sigma_zz": error_metric(err_zz),
+    "L2_error_strain_rr": error_metric(err_eps_rr),
+    "L2_error_strain_tt": error_metric(err_eps_tt),
+    "L2_error_strain_zz": error_metric(err_eps_zz),
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 
 print("\n[INFO] Non-regression completed.\n")

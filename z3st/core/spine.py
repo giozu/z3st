@@ -70,8 +70,6 @@ class Spine(
             ThermalModel.__init__(self)
         if self.on.get("mechanical", False):
             MechanicalModel.__init__(self)
-        if self.on.get("gap", False):
-            GapModel.__init__(self)
         if self.on.get("contact", False):
             ContactModel.__init__(self)
         if self.on.get("damage", False):
@@ -258,8 +256,6 @@ class Spine(
             constitutive_mode = mat.get("constitutive", "lame").lower()
             mat["constitutive_mode"] = constitutive_mode
             print(f"  → constitutive model: {constitutive_mode}")
-            if constitutive_mode == "voigt" and mat.get("C_matrix") is not None:
-                print("    using user-provided C_matrix (6x6)")
 
             if self.on.get("plasticity", False) and constitutive_mode == "lame" \
                     and "yield_strength" in mat:
@@ -596,7 +592,7 @@ class Spine(
                 P_int = dolfinx.fem.assemble_scalar(self._power_forms[name])
                 P_int = self.mesh.comm.allreduce(P_int, op=MPI.SUM)
                 unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
-                        "plane_stress": "W/m", "1d": "W/m²"}.get(self.regime, "W")
+                        "1d": "W/m²"}.get(self.regime, "W")
                 print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
@@ -890,23 +886,19 @@ class Spine(
         print("\n")
 
         print(f"Current step = {self.current_step} | dt = {dt:.2e} s")
-        print(f"Coupling = {self.coupling}")
 
-        if self.coupling == "staggered":
-            # Return the convergence result so the time loop can react to a
-            # stalled step: True on convergence, False if it exhausts max_iter.
-            return self.solve_staggered(
-                max_iter=max_iters,
-                dt=dt,
-                rtol_th=self.th_cfg.get("rtol", 1e-6) if self.on.get("thermal") else 1e-6,
-                rtol_mech=self.mech_cfg.get("rtol", 1e-6) if self.on.get("mechanical") else 1e-6,
-                rtol_dmg=self.dmg_cfg.get("rtol", 1e-6) if hasattr(self, 'dmg_cfg') else 1e-6,
-                stag_tol_th=self.th_cfg.get("stag_tol", 1e-4) if self.on.get("thermal") else 1e-4,
-                stag_tol_mech=self.mech_cfg.get("stag_tol", 1e-4) if self.on.get("mechanical") else 1e-4,
-                stag_tol_dmg=self.dmg_cfg.get("stag_tol", 1e-4) if hasattr(self, 'dmg_cfg') else 1e-4
-            )
-        else:
-            raise ValueError(f"Unknown coupling strategy: {self.coupling}. Only staggered coupling is supported.")
+        # Return the convergence result so the time loop can react to a stalled
+        # step: True on convergence, False if it exhausts max_iter.
+        return self.solve_staggered(
+            max_iter=max_iters,
+            dt=dt,
+            rtol_th=self.th_cfg.get("rtol", 1e-6) if self.on.get("thermal") else 1e-6,
+            rtol_mech=self.mech_cfg.get("rtol", 1e-6) if self.on.get("mechanical") else 1e-6,
+            rtol_dmg=self.dmg_cfg.get("rtol", 1e-6) if hasattr(self, 'dmg_cfg') else 1e-6,
+            stag_tol_th=self.th_cfg.get("stag_tol", 1e-4) if self.on.get("thermal") else 1e-4,
+            stag_tol_mech=self.mech_cfg.get("stag_tol", 1e-4) if self.on.get("mechanical") else 1e-4,
+            stag_tol_dmg=self.dmg_cfg.get("stag_tol", 1e-4) if hasattr(self, 'dmg_cfg') else 1e-4
+        )
 
     def get_results(self):
         if not (self.on.get("mechanical", False) or self.on.get("thermal", False)):

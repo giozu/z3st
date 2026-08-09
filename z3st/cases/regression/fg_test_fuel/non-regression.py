@@ -25,7 +25,7 @@ import csv
 import yaml
 import numpy as np
 
-from z3st.utils.utils_verification import pass_fail_check, regression_check
+from z3st.utils.non_regression import finish, metric
 from z3st.utils.utils_load import generate_power_history
 
 CASE_DIR = os.path.dirname(__file__)
@@ -83,19 +83,11 @@ def _regression_only(value):
             "abs_error": 0.0, "rel_error": 0.0}
 
 errors = {
-    "burnup_avg_final": {
-        "numerical": bu_avg,
-        "reference": BU_REF,
-        "abs_error": float(abs(bu_avg - BU_REF)),
-        "rel_error": float(abs(bu_avg - BU_REF) / BU_REF),
-    },
+    "burnup_avg_final": metric(bu_avg, BU_REF),
     "burnup_max_final": _regression_only(bu_max),
     "T_max_final_K": _regression_only(t_max_final),
     "T_max_peak_K": _regression_only(t_max_peak),
     "fgr_final": _regression_only(fgr),
 }
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

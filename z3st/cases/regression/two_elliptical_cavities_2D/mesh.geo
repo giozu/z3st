@@ -37,8 +37,7 @@ Printf("Computed curvature radius rho: %g", rho);
 
 h_plate = scale * 0.00400; // coarse mesh size (bulk grains — no damage there)
 // Resolve the AT2 damage band: phase-field needs h < lc/2. With lc = 0.004 µm
-// (input.yaml) that means 0.002 µm along the grain boundary / bubble tips,
-// otherwise the damage band cannot localise and the GB never fractures.
+// (input.yaml) that means 0.002 µm along the grain boundary / bubble tips.
 h_cavity = 0.002;
 
 // Rectangular plate

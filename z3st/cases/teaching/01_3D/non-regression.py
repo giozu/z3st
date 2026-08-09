@@ -34,17 +34,15 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
+from z3st.utils.non_regression import case_paths, error_metric, finish, metric
 from z3st.utils.utils_extract_vtu import (
     list_fields,
     extract_field,
     extract_displacement,
 )
-from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 MATERIAL_FILE = os.path.join(CASE_DIR, "../../../materials/steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
@@ -205,27 +203,9 @@ errors = {
         "abs_error": float(np.max(np.abs(sigma_xx - sigma_xx_ref))),
         "rel_error": sigma_xx_err,
     },
-    "sigma_yy_max_abs": {
-        "numerical": float(np.max(np.abs(sigma_yy))),
-        "reference": 0.0,
-        "abs_error": float(np.max(np.abs(sigma_yy))),
-        "rel_error": sigma_yy_err,
-    },
-    "sigma_zz_max_abs": {
-        "numerical": float(np.max(np.abs(sigma_zz))),
-        "reference": 0.0,
-        "abs_error": float(np.max(np.abs(sigma_zz))),
-        "rel_error": sigma_zz_err,
-    },
-    "u_xL": {
-        "numerical": u_xL_num,
-        "reference": u_xL_ref,
-        "abs_error": abs(u_xL_num - u_xL_ref),
-        "rel_error": u_xL_err,
-    },
+    "sigma_yy_max_abs": error_metric(np.max(np.abs(sigma_yy)), rel=sigma_yy_err),
+    "sigma_zz_max_abs": error_metric(np.max(np.abs(sigma_zz)), rel=sigma_zz_err),
+    "u_xL": metric(u_xL_num, u_xL_ref, rel=u_xL_err),
 }
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

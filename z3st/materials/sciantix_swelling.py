@@ -15,8 +15,7 @@ and returns the isotropic eigenstrain::
 
     ε* = (ΔV/V) / 3 · I
 
-like ``fuel_swelling.solid_swelling`` reads ``model.burnup`` — so the
-eigenstress -C:ε* needs no further change and the Newton tangent stays automatic.
+like ``fuel_swelling.solid_swelling`` reads ``model.burnup``.
 
 A fuel material card opts in with::
 
@@ -40,8 +39,7 @@ def gaseous_swelling(T, material, model=None, dim=3):
 
     Reads ``model.gas_swelling`` (a dolfinx Function on the thermal space, total
     ΔV/V from intra- + intergranular gas). Returns ``0`` if the coupling is off
-    (no field), so a card may carry this callable harmlessly when SCIANTIX is
-    disabled.
+    (no field).
     """
     del T, material   # bus-contract args, unused here (depends only on the field)
     I = ufl.Identity(dim)
@@ -79,9 +77,8 @@ def with_solid_densification(T, material, model=None, dim=3):
     Use this in place of ``solid_gas_densification`` to take the gaseous term from the
     SCIANTIX field instead of the analytic sigmoid; the solid and
     densification terms (cards ``swelling_rate``, ``densification_dv``,
-    ``densification_bu``) are unchanged and stay UFL expressions in ``model.burnup``,
-    so the u-tangent is untouched. SCIANTIX runs with ``iDensification = 0`` — Z3ST
-    owns densification — so the two do not double-count.
+    ``densification_bu``) stay UFL expressions in ``model.burnup``.
+    SCIANTIX runs with ``iDensification = 0``; Z3ST owns densification.
     """
     eps = gaseous_swelling(T, material, model=model, dim=dim)
     bu = getattr(model, "burnup", None)

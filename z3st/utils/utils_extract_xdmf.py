@@ -91,9 +91,7 @@ def extract_field_xdmf(xdmf_path, field_name, step_index=-1, return_coords=True)
         steps = sorted(field_group.keys(), key=_step_sort_key)
         target_step = steps[step_index]
         data = np.array(field_group[target_step])
-        # Match the VTU extractor's contract: scalar fields as (N,), not (N, 1).
-        # Otherwise `field - analytic` broadcasts (N,1)-(N,) -> (N,N) and
-        # pointwise metrics (e.g. Linf) blow up even though the values are right.
+
         if data.ndim == 2 and data.shape[1] == 1:
             data = data[:, 0]
 

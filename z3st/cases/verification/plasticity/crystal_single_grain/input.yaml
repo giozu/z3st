@@ -11,10 +11,9 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   grain: single_crystal.yaml
 
-regime: 3D
+regime: 3d
 
 solver_settings:
-  coupling: staggered
   max_iters: 50
   relax_u: 1.0
 

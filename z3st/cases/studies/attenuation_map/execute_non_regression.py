@@ -11,7 +11,7 @@ This lightweight script loops over all attenuation case folders (e.g. ba_XXX_mua
 copies the latest `non-regression.py` from the base directory into each case,
 and executes it there.
 
-It does NOT rerun Gmsh or Z3ST - it only performs the post-processing stage.
+It does not rerun Gmsh or Z3ST - only the post-processing stage.
 """
 
 import shutil
@@ -51,7 +51,6 @@ def run_cmd(cmd, cwd):
 # =============================================================================
 log("\n=== NON-REGRESSION RE-RUN START ===")
 
-# Loop over all subdirectories in ROOT
 for case_dir in sorted([d for d in ROOT.iterdir() if d.is_dir()]):
     nonreg_dst = case_dir / "non-regression.py"
     done_file = case_dir / "output/non-regression.json"

@@ -6,7 +6,6 @@
 //
 // --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
-// Use built-in kernel instead of OpenCASCADE (important for transfinite meshing)
 SetFactory("Built-in");
 
 Lx = 0.200; // (m)

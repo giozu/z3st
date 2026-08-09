@@ -1,0 +1,41 @@
+{
+    "results": {
+        "D_max": {
+            "numerical": 1.0,
+            "reference": 1.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "sigma_vm_max_MPa": {
+            "numerical": 3694.177697973872,
+            "reference": 3694.177697973872,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "E_el_final": {
+            "numerical": 2.549864,
+            "reference": 2.549864,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "E_frac_final": {
+            "numerical": 2.029547,
+            "reference": 2.029547,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "E_tot_final": {
+            "numerical": 4.579411,
+            "reference": 4.579411,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

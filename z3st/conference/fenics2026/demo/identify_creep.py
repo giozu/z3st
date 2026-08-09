@@ -16,8 +16,7 @@ same implicit backward-Euler recursion the FEM solver uses,
 
     sigma_{k+1} + E*dt*A*sigma_{k+1}^n = sigma_k .
 
-The demo message, in one sentence: *the time integrator is differentiable* —
-forward-mode automatic differentiation (dual numbers, implemented below in
+The time integrator is differentiable: forward-mode automatic differentiation (dual numbers, implemented below in
 ~40 lines, no external AD library) propagates d(sigma)/d(theta) through every
 Newton-corrected implicit step, and Gauss-Newton least squares recovers the
 parameters from noisy synthetic data.

@@ -64,7 +64,7 @@ Step 3: Create and Activate the Conda Environment
 
    conda create -n z3st python=3.12 -y
    conda activate z3st
-   conda install -c conda-forge fenics-dolfinx pyvista meshio matplotlib pandas numpy ipywidgets jupyterlab pyqt pyyaml scipy sympy -y
+   conda install -c conda-forge fenics-dolfinx pyvista matplotlib numpy ipywidgets jupyterlab pyqt pyyaml scipy h5py pandas -y
    pip install gmsh
 
 Step 4: Install Z3ST in Editable Mode
@@ -187,7 +187,6 @@ This file controls the solver, physics models, and time stepping:
 
    # Solver settings
    solver_settings:
-     coupling: staggered
      max_iters: 100
      relax_T: 0.9
      relax_u: 0.7

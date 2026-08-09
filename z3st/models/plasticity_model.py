@@ -35,6 +35,33 @@ class PlasticityModel:
         self.ep_n = dolfinx.fem.Function(self.V_pl, name="PlasticStrainTensor_old")
         self.ep_n.x.array[:] = 0.0
         
+    def _j2_return_map(self, u, material):
+        """Trial state and radial return for J2 with linear isotropic hardening.
+
+        Returns ``(sigma_tr, dp, n_flow, mu)``. Both consumers need the same
+        predictor and the same plastic multiplier and finish differently:
+        sigma_plastic wants the corrected stress, get_plastic_internal_variables
+        wants the increments.
+        """
+        eps = self.epsilon(u)
+        eps_el_tr = eps - self.ep_n                     # trial elastic strain
+
+        lmbda = material["lmbda"]
+        mu = material["G"]
+        H = material["hardening_modulus"]
+
+        I = ufl.Identity(eps.ufl_shape[0])
+        sigma_tr = lmbda * ufl.tr(eps_el_tr) * I + 2 * mu * eps_el_tr
+        s_tr = sigma_tr - (1. / 3.) * ufl.tr(sigma_tr) * I          # deviator
+        sigma_eq_tr = ufl.sqrt(1.5 * ufl.inner(s_tr, s_tr))         # von Mises
+
+        # Yield stress grows linearly with the accumulated plastic strain.
+        f_val = sigma_eq_tr - (material["yield_strength"] + H * self.p_n)
+        dp = ufl.conditional(ufl.gt(f_val, 0), f_val / (3 * mu + H), 0.0)
+        n_flow = ufl.conditional(ufl.gt(sigma_eq_tr, 0), s_tr / sigma_eq_tr, s_tr * 0)
+
+        return sigma_tr, dp, n_flow, mu
+
     def sigma_plastic(self, u, material):
         """
         Calculate stress and update internal variables using return mapping (J2 plasticity).
@@ -50,44 +77,8 @@ class PlasticityModel:
             J2 Plasticity with isotropic hardening.
         """
         
-        # Elastic predictor
-        eps = self.epsilon(u) # Total strain
-        eps_el_tr = eps - self.ep_n # Trial elastic strain
-        
-        lmbda = material["lmbda"]
-        mu = material["G"]
-        
-        # Sigma trial
-        dim = eps.ufl_shape[0]
-        I = ufl.Identity(dim)
-        
-        sigma_tr = lmbda * ufl.tr(eps_el_tr) * I + 2 * mu * eps_el_tr
-        
-        # Yield condition
-        # Deviatoric stress (trial)
-        s_dev_tr = sigma_tr - (1./3.) * ufl.tr(sigma_tr) * I
-        
-        # Von Mises equivalent stress (trial)
-        sigma_eq_tr = ufl.sqrt(1.5 * ufl.inner(s_dev_tr, s_dev_tr))
-        
-        # Yield stress
-        # sigma_y = sigma_0 + H * p # Linearly plastic J2, yield strength increases with plastic strain
-        sigma_y = material["yield_strength"]
-        H = material["hardening_modulus"]
-        sigma_y_n = sigma_y + H * self.p_n
-
-        # Check yield condition: f = sigma_eq_tr - sigma_y(p_n) <= 0
-        f_val = sigma_eq_tr - sigma_y_n
-        
-        # Return mapping
-        dp = ufl.conditional(ufl.gt(f_val, 0), f_val / (3*mu + H), 0.0)
-        
-        # Update
-        n_flow = ufl.conditional(ufl.gt(sigma_eq_tr, 0), s_dev_tr / sigma_eq_tr, s_dev_tr*0)
-        
-        sigma = sigma_tr - 3*mu*dp*n_flow
-        
-        return sigma
+        sigma_tr, dp, n_flow, mu = self._j2_return_map(u, material)
+        return sigma_tr - 3 * mu * dp * n_flow
 
     def get_plastic_internal_variables(self, u, material):
         """
@@ -122,33 +113,9 @@ class PlasticityModel:
                 raise AttributeError(f"Module {module_path} does not have 'get_cp_internal_variables' function")
 
         # Standard J2 plasticity
-        eps = self.epsilon(u)
-        eps_el_tr = eps - self.ep_n
-
-        lmbda = material["lmbda"]
-        mu = material["G"]
-
-        dim = eps.ufl_shape[0]
-        I = ufl.Identity(dim)
-        sigma_tr = lmbda * ufl.tr(eps_el_tr) * I + 2 * mu * eps_el_tr
-
-        s_tr = sigma_tr - (1./3.) * ufl.tr(sigma_tr) * I
-        sigma_eq_tr = ufl.sqrt(1.5 * ufl.inner(s_tr, s_tr))
-
-        sigma_y = material["yield_strength"]
-        H = material["hardening_modulus"]
-
-        sigma_y_n = sigma_y + H * self.p_n
-        f_val = sigma_eq_tr - sigma_y_n
-
-        dp = ufl.conditional(ufl.gt(f_val, 0), f_val / (3*mu + H), 0.0)
-        n_flow = ufl.conditional(ufl.gt(sigma_eq_tr, 0), s_tr / sigma_eq_tr, s_tr*0)
-
-        # Updated internal variables
-        p_new = self.p_n + dp
-        ep_new = self.ep_n + 1.5 * dp * n_flow # plastic strain increment (J2) = 3/2 * dp * n_flow
-
-        return ep_new, p_new
+        _, dp, n_flow, _ = self._j2_return_map(u, material)
+        # J2 plastic strain increment = 3/2 * dp * n_flow
+        return self.ep_n + 1.5 * dp * n_flow, self.p_n + dp
 
     def update_plastic_history(self, u):
         """
@@ -159,8 +126,7 @@ class PlasticityModel:
         mode = self.plasticity_cfg.get("mode", "j2")
         for name, mat in self.materials.items():
             # Mixed runs: skip materials that carry no plastic law (e.g. an
-            # elastic clad next to a plastic fuel) — the unconditional
-            # yield_strength read crashed such cases with a KeyError.
+            # elastic clad next to a plastic fuel).
             if mode != "custom" and "yield_strength" not in mat:
                 continue
             ep_expr, p_expr = self.get_plastic_internal_variables(u, mat)
@@ -178,10 +144,6 @@ class PlasticityModel:
             self.ep.interpolate(expr_ep, cells)
             self.p.interpolate(expr_p, cells)
 
-        # Refresh the history copies ONCE, after every material's cells have
-        # been interpolated: the per-material expressions reference ep_n/p_n,
-        # so overwriting them inside the loop would hand later materials an
-        # already-advanced trial state if cell sets ever overlapped.
         self.ep_n.x.array[:] = self.ep.x.array[:]
         self.p_n.x.array[:] = self.p.x.array[:]
 

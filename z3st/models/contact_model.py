@@ -37,8 +37,7 @@ class ContactModel:
     iterate it enters the linear mechanical solve on the RHS (an updated
     Neumann load); the staggered relaxation loop drives the fixed point.
 
-    This is the explicit counterpart of constraint-based (Lagrange) contact and
-    reuses the existing staggered solver.
+    This is the explicit counterpart of constraint-based (Lagrange) contact.
 
     The mean radial displacement on a surface is computed as a boundary-integral
     average  <u>_Γ = (∫_Γ u·n ds) / (∫_Γ ds)  via assemble_scalar, which is
@@ -176,8 +175,8 @@ class ContactModel:
     def contact_traction(self, v):
         """
         Contact contribution to the mechanical weak form, summed over both
-        facing surfaces. Traction is t = -p * n with n the OUTWARD facet
-        normal of each surface, so penetration pushes the bodies apart.
+        facing surfaces. Traction is t = -p * n with n the outward facet
+        normal of each surface.
 
         Returns the UFL form  sum_Γ  w * dot(-p*n, v) ds  (the external-load
         term to be added to L_m in the linear solve).

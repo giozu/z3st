@@ -1,0 +1,12 @@
+name: sector
+geometry_type: sector
+area: 1.4045e-6       # Area of 22.5 deg sector = pi/16 * Ro^2 (m²)
+perimeter: 1.0505e-3  # Outer arc length = Ro * theta (m)
+Ro: 0.002675          # Outer radius (m)
+Lz: 0.0
+
+labels:
+  outer: 2
+  bottom: 3
+  top: 4
+  fuel: 10

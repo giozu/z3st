@@ -11,10 +11,9 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../../../materials/vessel_steel_0.yaml
 
-regime: 3D
+regime: 3d
 
 solver_settings:
-  coupling: staggered
   max_iters: 100
   relax_T: 0.9
   relax_u: 0.7

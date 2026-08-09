@@ -60,12 +60,6 @@ def parse_convergence_log(logfile: str = "log_z3st.md"):
         step_num = step_blocks[i]
         step_text = step_blocks[i+1]
 
-        # Split the step into per-iteration blocks on the staggering header so
-        # each channel is parsed ONLY within its own iteration's text. (A single
-        # regex with re.DOTALL and optional lazy groups could bleed: a channel
-        # absent in iteration k would capture iteration k+n's value and consume
-        # the headers in between, dropping/misaligning iterations.)
-        # re.split with a capturing group yields [preamble, num1, body1, num2, body2, ...].
         iter_chunks = re.split(r"--- Staggering iteration\s+(\d+)/\d+\s+---", step_text)
 
         it_step, dT_step, du_step, dD_step = [], [], [], []
@@ -123,7 +117,7 @@ def plot_convergence(steps_data, save_path="convergence.png"):
         all_dcreep.extend(step["dcreep"]); all_hgap.extend(step["hgap"])
         all_gap.extend(step.get("gap", [None] * n)); all_p.extend(step.get("p", [None] * n))
         # A staggering-iteration counter that does not increase marks a fresh
-        # solve attempt within the SAME grid step — i.e. an adaptive sub-step
+        # solve attempt within the same grid step — i.e. an adaptive sub-step
         # restart after a [substep] dt cut. Flag those as sub-step boundaries.
         iters = step.get("iters", [])
         for j in range(1, len(iters)):
@@ -137,8 +131,8 @@ def plot_convergence(steps_data, save_path="convergence.png"):
     has_contact = any(v is not None for v in all_gap) or any(v is not None for v in all_p)
 
     # Two stacked panels (sharing the iteration axis) when contact data is
-    # present: residuals + h_gap on top, gap/pressure state below. Otherwise
-    # the single residual panel as before.
+    # present: residuals + h_gap on top, gap/pressure state below. Otherwise a
+    # single residual panel.
     if has_contact:
         fig, (ax, ax_b) = plt.subplots(2, 1, figsize=(12, 8), sharex=True,
                                        gridspec_kw={"height_ratios": [2, 1]})

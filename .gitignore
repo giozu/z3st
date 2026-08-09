@@ -67,3 +67,4 @@ energies.txt
 *.synctex.gz
 *.bbl
 *.blg
+force_displacement.txt

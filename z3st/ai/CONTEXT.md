@@ -8,7 +8,7 @@
 - **Continuous integration:** GitHub Actions (`.github/workflows/ci.yml`, `static.yml`)
 - **Docs:** Sphinx sources under `docs/source/`, built by GitHub Actions
 - **Python:** ≥ 3.10 (pyproject.toml)
-- **Runtime dependencies:** `numpy`, `scipy`, `sympy`, `pandas`, `matplotlib`, `pyvista≥0.42`, `meshio`, `pyyaml`, `gmsh` + (external) **dolfinx / FEniCSx / basix / UFL / PETSc / MPI** provided by the Conda env `z3st_env.yml`.
+- **Runtime dependencies:** `numpy≥2`, `scipy`, `matplotlib`, `pyvista≥0.42`, `pyyaml`, `gmsh` (extras: `post` = `h5py`, `pandas`; `docs`; `dev`; `nn` = `torch`) + (external) **dolfinx / FEniCSx / basix / UFL / PETSc / MPI** provided by the Conda env `z3st_env.yml`.
 
 > **Students:** onboarding, working agreements, and per-student topic/branch tracking
 > live in the private note `../personal_stuff/z3st_students.md` (not in this repo).
@@ -47,7 +47,7 @@ z3st/
 ├── README.md
 ├── CITATION.cff
 ├── GIT-COMMANDS.md                   internal git cheat-sheet
-├── pyproject.toml / setup.py         installable Python package
+├── pyproject.toml                    installable Python package (PEP 621; setup.py removed 2026-08-07)
 ├── z3st_env.yml                      Conda env recipe (FEniCSx + deps)
 ├── clean.sh                          cleanup helper
 ├── docs/                             Sphinx documentation
@@ -65,16 +65,16 @@ z3st/
     ├── core/                         FEM core infrastructure
     │   ├── config.py                 Config mixin (parses input.yaml)
     │   ├── finite_element_setup.py   FE function spaces (V_t, V_m, V_d, V_c, V_pl, Q)
-    │   ├── solver.py                 staggered solver, PETSc options
+    │   ├── solver.py                 staggered loop + services (577 lines; the
+    │   │                             physics steps live in models/, see §3.3)
     │   ├── spine.py                  Spine — top-level driver (multi-inheritance of mixins)
-    │   ├── diagnostic.py             structured logger
     │   └── mesh/                     mesh sub-package
     │       ├── reader.py             Gmsh → dolfinx loader
     │       ├── manager.py            MeshManager (tags, geometry metrics, normals)
     │       └── plotter.py            PyVista mesh/tag preview
     ├── models/                       physical model mixins (plugged into Spine)
     │   ├── thermal_model.py          heat conduction + Dirichlet/Neumann/Robin BCs
-    │   ├── mechanical_model.py       linear, Voigt, hyperelastic, plane_stress, custom
+    │   ├── mechanical_model.py       linear Lamé, hyperelastic, plasticity, custom
     │   ├── damage_model.py           phase-field AT1/AT2, Miehe/Amor splits
     │   ├── plasticity_model.py       J2 (return mapping) + custom crystal plasticity hook
     │   ├── gap_model.py              Fixed / Gas gap conductance (+ contact-coupled)
@@ -95,15 +95,13 @@ z3st/
     │                                               radial power f(r,bu) + burnup-driven swelling(bu)
     ├── utils/                        post-processing + helpers
     │   ├── writer.py                 unified VTU / XDMF OutputWriter (pre-compiled, single-pass)
-    │   ├── mesh_builder.py           build simple meshes from YAML geometry
+    │   ├── logger.py                 framework-wide logger (`log`)
     │   ├── plot_convergence.py       staggered-residual plots
     │   ├── utils_extract_vtu.py      scalar/vector/tensor extraction from VTU
     │   ├── utils_extract_xdmf.py     same for XDMF
     │   ├── utils_load.py             YAML loader + power-history generator
     │   ├── utils_plot.py             1D/radial plots (T(r), σ_rr(r), …)
     │   ├── utils_verification.py     reference analytical benchmarks
-    │   ├── output.py                 stdout / JSON helpers
-    │   ├── z-gui.py                  interactive PyVista 3D viewer
     │   ├── interactive_gui.ipynb     notebook front-end
     │   └── geo_files/                reusable Gmsh .geo templates
     │       ├── annulus_3D.geo, coaxial_cylinders_2D.geo,
@@ -114,8 +112,9 @@ z3st/
     │   ├── thin_slab/
     │   └── cylindrical_shell/
     └── cases/                        verification / validation / demo cases
-        ├── non-regression.sh, non-regression_github.sh
-        ├── non-regression_github.py, non-regression_summary.txt
+        ├── non-regression_local.sh    discovery-based suite (Allrun + gold)
+        ├── non-regression_github.sh   CI suite, reads cases_ci.txt
+        ├── cases_ci.txt, suite_exclude.txt
         └── <one folder per case — see §6>
 ```
 
@@ -180,7 +179,9 @@ CLI flags:
 - `--debug`       enable verbose debugging
 - `--mesh_plot`   preview surface tags with PyVista (via `core.mesh.plotter.MeshPlotter`)
 
-**Markdown log filter** (`__main__.py`, top of file). When `sys.stdout` is *not* a TTY (i.e., the user redirected output, e.g. `python -m z3st > log.md`), a line-by-line stdout shim rewrites the existing decorated output into Markdown:
+**stdout filters** (`__main__.py::_install_stdout_filters`, top of file). One wrapper, installed unconditionally on every MPI rank, carrying two independent per-write flags: `markdown` and `emit`. **Both must stay unconditional** — the wrapper cannot be installed on some ranks and not others, because dolfinx's PETSc wrappers do collective work in `__del__` and a rank holding a different set of live objects has the collector order those destructors differently, deadlocking the run at exit. And it cannot be gated on `isatty()`, because under `mpirun` stdout *is* a tty even when the shell redirects to a file. An earlier attempt did both and hung every MPI run. **Nothing automated guards this.** Every case in both suites runs serially, so a regression here is invisible to them; parallel runs are exercised by hand. An `mpi_smoke.sh` was added and removed on 2026-08-09 -- it never once failed on the property it was written for, only on its own wiring.
+
+`emit` is false on every rank but 0, so the ~260 diagnostic prints are not repeated once per process; `[WARNING]` and `[ERROR]` lines pass from all ranks. `markdown` is false under `Z3ST_PLAIN_LOG=1` or on a tty; when true (i.e., the user redirected output, e.g. `python -m z3st > log.md`), a line-by-line stdout shim rewrites the existing decorated output into Markdown:
 - Morse-code dividers `--.. ..- .-.. .-.. --- ...` → `***` (horizontal rule; `***` rather than `---` to avoid setext-heading ambiguity).
 - `[STEP NN/MM] rest` → `## Step NN/MM: rest`.
 - `--- Staggering iteration N/M ---` → `#### Iteration N/M`.
@@ -189,7 +190,7 @@ CLI flags:
 - `[DESCRIPTION]` → `## Description`.
 - `[INFO|WARNING|ERROR|SUCCESS] body` → `**[TAG]** body`.
 
-Interactive runs are pass-through. Set `Z3ST_PLAIN_LOG=1` to force the raw, unfiltered output even when redirected. None of the solver / model / config modules were touched; the filter is a single point of intercept in `__main__.py`.
+Interactive runs and `Z3ST_PLAIN_LOG=1` are pass-through for the markdown transform, but the rank gate still applies. None of the solver / model / config modules were touched; the filter is a single point of intercept in `__main__.py`.
 
 **Hot-reload of input.yaml parameters** (`__main__.py`, `_reload_hot_params`). At the start of each time step, `__main__.py` re-reads `input.yaml` and propagates allow-listed parameter changes in-place into the in-memory config dicts (which are shared by reference with `problem.dmg_cfg` / `mech_cfg` / `th_cfg`, so the changes are immediately visible to the solver on the next step). The user can edit `input.yaml` mid-run and changes apply at the next step boundary (latency ≤ one step's wall-time). A one-line notice is printed when a value actually changes; silent on no-change steps. The reload is robust to mid-edit reads (transient `yaml.YAMLError` / `FileNotFoundError` → silent skip; the previous values stay in effect).
 
@@ -213,7 +214,7 @@ Parses the user YAML and fills:
 - `self.gap_model`, `self.h_gap_value` from `models.gap_conductance`
 - paths to geometry, mesh, boundary conditions
 - `self.n_steps`
-- `self.regime ∈ {1d, 2d, 3d, axisymmetric, plane_stress}` (validated up front since 2026-06-10; `1d` is used by the teaching cases)
+- `self.regime ∈ {1d, 2d, 3d, axisymmetric}` (validated up front since 2026-06-10; `1d` is used by the teaching cases; `plane_stress` removed 2026-08-08 — no case ever set it)
 
 ### 3.2 `core/finite_element_setup.py — FiniteElementSetup`
 
@@ -232,11 +233,51 @@ Allocates the FE function spaces on `self.mesh`:
 
 ### 3.3 `core/solver.py — Solver`
 
-Implements the staggered solver and PETSc options.
+Implements the staggered loop and the services the physics mixins consume.
+
+**Where the steps live (changed 2026-08-09).** `solver.py` went from 1579 lines to
+577: each physics mixin now owns its own staggered step, and the solver provides
+services rather than containing the physics. The `_*_step` subsections below are
+still the reference for what each step does; only their home moved.
+
+| step | file |
+|---|---|
+| `_thermal_step`, `_thermal_step_nonlinear` | `models/thermal_model.py` (with `_thermal_conductivity_aux_operands`, `_build_gap_pair_aux`, `_refresh_gap_pair`) |
+| `_mechanical_step` | `models/mechanical_model.py` |
+| `_damage_step` | `models/damage_model.py` |
+| `_cluster_step` | `models/cluster_dynamic_model.py` |
+| `_porosity_step` | `models/porosity_migration_model.py` (was always there) |
+
+Still in `solver.py`: `solve_staggered`, `get_solver_options`, `_stagger_residual`,
+`_adapt_relax`, `_bc_objects`, `_value_at_step`, `_build_measures`, `_global_tags`,
+`invalidate_dt_caches`, and at module level `as_bool`, `aitken_omega` and the three
+rigid-body nullspace builders. `Spine` multiply-inherits everything, so every call
+site is unchanged and `self._thermal_step(...)` still resolves.
 
 **Aitken Δ² dynamic relaxation** (2026-06-12, `solver_settings.relax_aitken: true`, default off, hot-reloadable): the displacement relaxation factor is recomputed every staggered iteration from the last two raw residuals R_k = ũ_k − u_k as ω_{k+1} = −ω_k·(R_{k−1}·ΔR)/|ΔR|², clamped to [relax_min, relax_max] — the standard cure for slowly-contracting interface coupling (Küttler & Wall). Supersedes the heuristic grow/shrink controller for u (thermal keeps the EMA controller). Two safeguards, both load-bearing: ω restarts from the configured `relax_u` at every time step (the recursion scales each new ω from the previous one, so a clamped-at-the-floor ω from a degenerate step — e.g. the zero-power initial step — would otherwise poison every later estimate), and the update is skipped when ‖ΔR‖ < 1e-8·‖R‖ (converged/zero-load steps produce a garbage quotient). Motivation: the PCMI contact phase of `regression/pwr_rod_2D` ran ~130-190 staggered iterations/step with the heuristic controller collapsed to relax_min.
 
 **Per-step form caching** (2026-06-12): `_thermal_step` and `_mechanical_step` build their UFL forms and Linear/Nonlinear problem objects **once per time step** (cache keyed on `current_step` and the solution-Function identities) instead of once per staggered iteration; `LinearProblem.solve()` reassembles A and b from the stored forms, and every iteration-varying input is consumed by reference — the gap conductance is a persistent `Constant` owned by the gap model, the paired-surface temperatures persistent Functions refreshed per iteration, the contact pressure was already a `Constant`, and creep predictor/state, burnup, and T live in Functions. Per-step rebuild is forced anyway by dt (creep) and the cracking rescale, which both bake floats. Effect: a 109-step PWR-rod run drops from ~2 500 UFL form constructions to ~109. Validated bit-for-bit against the gold suite (7 cases PASS/PASS spanning thermal cache, gap-pair refresh, contact, SNES creep).
+
+**Shared step helpers** (2026-08-08, audit Tier 3). Four physics steps had written
+out the same staggered bookkeeping:
+- `_stagger_residual(new, old, cfg, tol, label)` — scatter both, `copy`, `axpy(-1)`,
+  the two norms, the guarded division, and the verdict. Returns
+  `(converged, norm_d, rel_norm_d, residual)`. **The printed strings are parsed by
+  `utils/plot_convergence.py`**, which greps the solver log for exactly
+  `||ΔX||/||X|| = <float>`: changing the label or the spacing empties every
+  convergence plot, with nothing to catch it.
+- `_adapt_relax(name, residual, prev)` — the EMA grow/shrink controller, previously
+  written three times (T, u, D) identical bar the attribute name.
+- `aitken_omega(r_k, r_prev, omega, comm, n_owned, lo, hi)` — module level, shared
+  with `porosity_migration_model`. The caller owns the clamp and the starting ω
+  because the two uses genuinely differ: the displacement loop clamps to
+  `[relax_min, relax_max]` and carries ω across time steps, porosity clamps to a
+  hard-coded `[0.05, 1]` and restarts from `aitken_omega0`.
+- `_regime_normal()` lives on `MechanicalModel` and is called from the solver's
+  traction update, which had a copy of the dispatch.
+
+The `coupling` key is gone (2026-08-08): all cases said `staggered`, the other
+branch raised, so `solve()` calls `solve_staggered` directly.
 
 **PETSc options** via `get_solver_options(physics, solver_type, rtol)`:
 - `direct_mumps`  → LU + MUMPS (`preonly`)
@@ -308,9 +349,24 @@ with upwind interior-facet flux for advection, SIPG for diffusion, and a **mass-
 - `manager.py` — `MeshManager` stores geometry metadata (`geometry_type ∈ {rect, cyl/cylinder, sphere}`, `Lx, Ly, Lz, Ri, Ro`), the `label_map` from `geometry.yaml`, computes area/perimeter/inner_radius and exposes `locate_domain_dofs`, `locate_facets_dofs`, facet normals, dimensions.
 - `plotter.py` — optional PyVista viewer for surface tags.
 
-### 3.5 `core/diagnostic.py`
+### 3.5 `utils/logger.py`
 
-Custom structured logger (`log.info`, `log.warning`, …) reused across modules.
+Framework-wide `logging` logger named `z3st` (`log.info`, `log.warning`, …), reused
+across modules. Two things about it are load-bearing (both fixed 2026-08-09):
+
+- **It writes to stdout, not stderr.** The case `Allrun` redirects stdout only, so on
+  stderr its output never reached `log_z3st.md` — the mesh diagnostics were absent
+  from the very file CI dumps when a case fails. The handler targets stdout through a
+  late-bound proxy, so it does not matter whether `__main__` wrapped the stream before
+  this module was imported. The `[LEVEL] message` format is what the markdown filter
+  already renders as `**[LEVEL]** message`.
+- **A rank filter**: INFO from rank 0 only, WARNING and ERROR from every rank. It is
+  the only gate when z3st is imported as a library; under `python -m z3st` the stdout
+  wrapper gates the same way (see §2.3).
+
+It keeps its own handler with `propagate = False`. An earlier `logging.basicConfig`
+here configured the *root* logger, which silently set the level and format for
+matplotlib, h5py and anything else that logs.
 
 ---
 
@@ -330,7 +386,6 @@ Constitutive modes (via `material.constitutive` — see §5):
 | mode            | Behaviour                                                            |
 |-----------------|----------------------------------------------------------------------|
 | `lame` (default)| Isotropic small-strain `σ = λ tr(ε) I + 2 G ε`                       |
-| `voigt`         | Uses user-provided 6×6 `C_matrix`, or isotropic fallback             |
 | `hyperelastic`  | Neo-Hookean `ψ = μ/2(I_C − 3) − μ ln J + λ/2 (ln J)²`, σ = (1/J) P F⊤ |
 | `plasticity`    | J2 return-mapping with linear isotropic hardening                     |
 | `custom`        | Loads `material.stress_function = "pkg.mod.func"`, `σ = f(u, T, material, model)` |
@@ -339,7 +394,6 @@ Regime handling in `epsilon(u)`:
 - **axisymmetric:** strain in cylindrical coords `(r, θ, z)`; `ε_rr = ∂u_r/∂r`, `ε_θθ = u_r/r`, `ε_zz = ∂u_z/∂z`, `ε_rz = ½(∂u_r/∂z + ∂u_z/∂r)`.
 - **2D:** 3×3 tensor with zero z-components (plane strain).
 - **3D:** `sym(∇u)`.
-- **plane_stress:** replaces `λ` with `λ_ps = 2 G λ / (λ + 2G)` and forces `σ_zz = σ_xz = σ_yz = 0`.
 
 BC types (`set_mechanical_boundary_conditions`): `Dirichlet`, `Dirichlet_x/y/z`, `Neumann` (scalar traction along facet normal), `Clamp_x/y/z`, `Slip_x/y/z`. Step-dependent BCs supported via a list of values of length `n_steps`.
 
@@ -505,8 +559,7 @@ Materials are plain YAML cards. Common fields:
 | `sigma_c` / `Gc`    | Pa, J/m²   | Phase-field critical stress OR fracture energy (one is derived from the other given `lc`) |
 | `yield_strength`    | Pa         | Initial yield stress (J2 plasticity)                    |
 | `hardening_modulus` | Pa         | Linear isotropic hardening modulus                      |
-| `constitutive`      | string     | `lame`, `voigt`, `hyperelastic`, `plasticity`, `custom` |
-| `C_matrix`          | 6×6        | User-provided elasticity matrix (for `voigt` mode)      |
+| `constitutive`      | string     | `lame`, `hyperelastic`, `plasticity`, `custom` |
 | `stress_function`   | string     | `"pkg.mod.func"` for `constitutive: custom`             |
 
 The framework auto-fills `lmbda`, `G`, `bulk_modulus` from `(E, ν)` at material load time.
@@ -538,7 +591,7 @@ Each case folder is self-contained:
 └── output/                   auto-generated VTU/XDMF + plots
 ```
 
-The suite is driven by `z3st/cases/non-regression_local.sh` (local, since 2026-06-11) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. The local suite is discovery-based: every directory under `cases/` with both an `Allrun` and a blessed `output/non-regression_gold.json` is a member (`sandbox/` is never scanned); exceptions live in `cases/suite_exclude.txt` with a reason per line, and `--list` prints the discovered set. A case is protected if and only if it has a gold. The CI list is curated separately in `cases/cases_ci.txt` (performance budget, not coverage); `non-regression_github.sh` reads it. The old hand-maintained `non-regression.sh` was deleted on 2026-06-11 once the discovery runner was validated. Each case's `non-regression.json` carries two verdicts (since 2026-06-10): `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL (previously only Allrun crashes failed CI — numerical regressions were invisible).
+The suite is driven by `z3st/cases/non-regression_local.sh` (local, since 2026-06-11) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. The local suite is discovery-based: every directory under `cases/` with both an `Allrun` and a blessed `output/non-regression_gold.json` is a member (`sandbox/` is never scanned); exceptions live in `cases/suite_exclude.txt` with a reason per line, and `--list` prints the discovered set. A case is protected if and only if it has a gold. The CI list is curated separately in `cases/cases_ci.txt`, which `non-regression_github.sh` reads. Since 2026-08-09 it is chosen for **coverage** against a stated time budget (22 cases, 14 min 47 s, from measured per-case times) rather than purely for speed; its header records the two models no case reaches at all, so nobody looks for them there. The old hand-maintained `non-regression.sh` was deleted on 2026-06-11 once the discovery runner was validated. Each case's `non-regression.json` carries two verdicts (since 2026-06-10): `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL (previously only Allrun crashes failed CI — numerical regressions were invisible).
 
 ### 6.1 Catalogue of cases
 
@@ -565,25 +618,25 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local, since 2026-0
 - `verification/mechanics/thermal_gradient_2D`, `verification/mechanics/thermal_gradient_3D`
 - `verification/mechanics/annular_cylinder`
 - `verification/mechanics/full_cylinder`
-- `benchmarks/pellet_quench_3D` (3D reference McClenny reproducer), `benchmarks/pellet_quench_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the primary case for the paper's case-14 chapter). See §9c for the variant rationale. (`14_full_cylinder_thermal_2D_rz`, the axisymmetric thermal-verification variant with damage off, was removed on 2026-06-11 — axisymmetric transient-cooling verification is no longer exercised by any case.)
+- `benchmarks/damage/pellet_quench_2D_xy` (plane-strain McClenny Fig. 8 reproducer — the primary case for the paper's case-14 chapter). See §9c for the variant rationale. (`14_full_cylinder_thermal_2D_rz`, the axisymmetric thermal-verification variant with damage off, was removed on 2026-06-11 — axisymmetric transient-cooling verification is no longer exercised by any case.)
 
 **15 — Cavities and pressurised bodies**
-- `regression/elliptical_cavity_2D`, `regression/two_elliptical_cavities_2D`
+- `verification/mechanics/elliptical_cavity_2D`, `regression/two_elliptical_cavities_2D`
 - `verification/mechanics/spherical_cavity`
 
 **16 — Multi-body coupling**
-- `regression/coaxial_gap_3D`
+- `verification/thermal/coaxial_gap_3D`
 
 **17 — Stress–strain curves**
-- `verification/plasticity/stress_strain_displacement`, `verification/plasticity/stress_strain_stress`
-- `benchmarks/double_crack_2D`, `benchmarks/notched_plate_2D`
+- `verification/mechanics/stress_strain_displacement`, `verification/mechanics/stress_strain_stress`
+- `verification/damage/double_crack_2D`, `verification/damage/notched_plate_2D`
 
 **18 — 2D fracture benchmarks**
-- `regression/box_crack_2D`, `regression/box_notch_2D`
+- `verification/damage/box_crack_2D`, `verification/damage/box_notch_2D`
 
 **19 — Single-edge notched (classical phase-field benchmarks)**
-- `benchmarks/sen_shear`
-- `benchmarks/sen_tension`
+- `benchmarks/damage/sen_shear`
+- `benchmarks/damage/sen_tension`
 
 **20 — Plasticity**
 - `verification/plasticity/j2_hardening_2D`
@@ -607,7 +660,7 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local, since 2026-0
 - `regression/pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm cold gap, Zircaloy clad), the framework's integral fuel-performance case. Physics (after the 2026-06-12 fidelity upgrade): Fink (2000) UO2 k(T) (`materials/fuel_thermal.py`), Robin coolant film (h = 3.5e4 W/(m²·K), T = 580 K — replaces the old Dirichlet wall), burnup + rim-peaking radial power, solid + gaseous swelling with early-life densification (`fuel_swelling.solid_gas_densification`), Barani isotropic-softening fuel cracking (§4.8: n ≈ 6.6 at power, E_iso/E ≈ 0.11), Zircaloy thermal Norton + irradiation creep (§4.5bis), Gas gap conductance with contact coupling (+ relax 0.5 damping), penalty contact, 15.5 MPa coolant and 2 MPa He fill-gas pressures. History: ramp to 20 kW/m in 20 d (core-average rod, ex 25), 1800 d hold; weighted time grid `n_steps: [8, 60, 40]` (per-segment intervals — fine through the gap-closure window at ~330 d, strided across the creep plateau). Solver: MUMPS both blocks, Aitken Δ² relaxation, mech stag_tol 5e-4. Definitive run (2026-06-12, gold blessed): T_max peaks at 1210.8 K at day 65 (Fink k(T) at 20 kW/m), PCMI onset at day 315 / 9.95 MWd/kgU average burnup, the contact-conductance feedback then cools the pellet to 1149.7 K (−61 K on closure), and the contact pressure plateaus at 22.35 MPa under irradiation + thermal clad creep; end of life at 1800 d with 58.23 MWd/kgU average (139.1 peak rim) and gap −0.45 µm. Mean burnup matches the closed form to machine precision. Wall-clock 105 min for 109 steps (~35 staggered iterations per contact step with Aitken + h-damping, vs 160-190 without — the pre-sprint configuration would have taken several hours). The pre-upgrade gold (constant k = 5, Dirichlet coolant, no cracking/irradiation creep, 25 kW/m / 1100 d: onset 17.1 MWd/kgU, p = 30.7 MPa, bu = 44.5 MWd/kgU) was obsolete by design. Gold-protected (end-state PCMI scalars from `output/history.csv`, mean burnup against the closed form) but opted out of the routine local suite via `cases/suite_exclude.txt` (run on demand); not in CI.
 - `verification/thermal/spherical_shell` — gold-protected (semi-analytic checks); added to the local suite list on 2026-06-11.
 - `U_pressure_vessel_2D` — moved to `cases/sandbox/` on 2026-06-11: its `non-regression.py` only extracts CSV/plots (no asserts, never writes `non-regression.json`), and the `non-regression_gold.json` on disk is orphaned — it holds Lamé-style L2 errors the current script cannot produce (likely inherited from a deleted case). See punch list CASES-FOLLOWUP-8.
-- `U_cluster_dynamics_test`, `U_quarter_block` — unvalidated sandboxes, moved to `cases/sandbox/` on 2026-06-11. (`U_box_knotch_3D`, `U_slab_contact`, `U_thick_cylindrical_shell_plane_stress` were removed in commit f1bb70b; note this leaves the `plane_stress` regime with no exercising case.)
+- `U_cluster_dynamics_test`, `U_quarter_block` — unvalidated sandboxes, moved to `cases/sandbox/` on 2026-06-11. (`U_box_knotch_3D`, `U_slab_contact`, `U_thick_cylindrical_shell_plane_stress` were removed in commit f1bb70b; note this leaves the `plane_stress` regime with no exercising case — the regime was accordingly removed on 2026-08-08, two months later.)
 
 **verification/plasticity/crystal_single_grain** — crystal-plasticity single-grain demo using the `custom` constitutive + `plasticity.mode: custom` hook.
 
@@ -621,10 +674,9 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   uo2: ../../materials/uo2.yaml
 
-regime: axisymmetric            # 2d | 3d | axisymmetric | plane_stress
+regime: axisymmetric            # 1d | 2d | 3d | axisymmetric
 
 solver_settings:
-  coupling: staggered
   max_iters: 200
   relax_T: 0.8
   relax_u: 0.6
@@ -719,8 +771,8 @@ Damage BC types: `Dirichlet` (`D = const`).
 |-----------------------------------|---------------------------------------------------------------------|
 | Stationary heat conduction        | ✓ (linear)                                                          |
 | Transient heat conduction         | ✓ backward-Euler                                                    |
-| Linear elasticity                 | ✓ Lamé / Voigt / plane-stress                                       |
-| Anisotropic elasticity            | ✓ via user-provided 6×6 `C_matrix`                                  |
+| Linear elasticity                 | ✓ isotropic Lamé (1d / 2d plane strain / 3d / axisymmetric)         |
+| Anisotropic elasticity            | ✗ the Voigt route and `C_matrix` were removed 2026-08-08: no case set them |
 | Hyperelasticity                   | ✓ Neo-Hookean (SNES Newton)                                         |
 | Thermo-mechanical coupling        | ✓ staggered; adaptive (EMA grow/shrink) or Aitken Δ² dynamic relaxation (`relax_aitken`); per-step form caching; gap-conductance under-relaxation (`gap_conductance.relax`) |
 | Phase-field fracture (AT1, AT2)   | ✓ Miehe/Amor split, hybrid constraint, irreversibility              |
@@ -785,6 +837,34 @@ The following capabilities are **not present** in Z3ST v0.1.0 and would need to 
 
 - **Multi-point constraints / periodic BCs with master-node coupling** — `dolfinx_mpc` is listed as a planned integration but is not yet wired into the BC infrastructure. This is required for enforcing constant stress triaxiality on an RVE (e.g. Eq. 22 of Aydiner et al.) and for true periodic boundary conditions on polycrystalline cells.
 
+### 9bis.1 Implemented but untested (found 2026-08-09)
+
+One model is implemented and reachable from configuration but exercised by **no
+case**, so neither suite can notice if a commit breaks it:
+
+| model | lines | state |
+|---|---|---|
+| `models/cluster_dynamic_model.py` | 153 | **closed 2026-08-09**: the sandbox case was promoted to `verification/cluster/mass_conservation_1D` with a `non-regression.py` and a gold (9 s, in `cases_ci.txt`). It pins total defect mass and the per-step rescale factor; the physics of that 1.9–3.6 % pre-rescale loss is still open |
+
+Closing it needs a new case with a blessed gold, not a line in `cases_ci.txt`.
+
+**A methodological warning, from getting this wrong first.** `contact_model.py` was
+initially listed here as having zero cases. It has seven, three of them with golds,
+and `verification/fuel/shrink_fit_disk` is in CI. The error: contact is configured
+as a *block* —
+
+```yaml
+models:
+  contact:
+    surface_a: lateral_1
+    penalty_stiffness: 5.0e13
+```
+
+— and `Config` stores `bool(models.get("contact", False))`, which is `True` for any
+non-empty dict. Grepping for `contact: true` finds none of them. When auditing which
+cases reach a model, parse the yaml and evaluate the switch the way `Config` does;
+a grep for a syntactic form answers a different question.
+
 ---
 
 ## 9c. Active work-in-progress: case 14 thermal-shock fracture (UO2)
@@ -795,17 +875,17 @@ The case-14 family is being calibrated against McClenny et al., JNM 565 (2022) 1
 
 | Case directory | Role | Why |
 |---|---|---|
-| `benchmarks/pellet_quench_3D/` (3D) | Reference McClenny reproducer. | Captures the 60° azimuthal wedge AND the radial-only heat transfer (top/bottom faces zero-flux, matching McClenny's alumina-spacer design). |
-| `benchmarks/pellet_quench_2D_xy/` (2D plane strain) | McClenny Fig. 8 reproducer at lower compute cost. | Plane strain (no axial gradients) is consistent with the alumina spacer's role; the 60° contact arc on a transverse cross-section is McClenny's 2D representation (their Fig. 8 top, Fig. A.13, Fig. A.14). Modeled as upper-half disc with mirror symmetry on y=0 (= 30° contact in the upper half). |
+| `benchmarks/damage/pellet_quench_3D/` (3D) — **removed 2026-08-08** | Was: reference McClenny reproducer, capturing the 60° azimuthal wedge and the radial-only heat transfer. | Never carried a gold, so it protected nothing, and it reproduced the same experiment as the 2D-xy variant. It was the only `damage: true` case at `regime: 3d`, but the damage block branches on dimension in exactly one place (`damage_model.py`, zeroing the z eigenstrain for 2d) — the phase-field kernels are dimension-generic UFL, so 3D exercised no materially distinct path. Kept-or-golded was the real choice; limbo cost 402 lines of maintenance for no coverage. |
+| `benchmarks/damage/pellet_quench_2D_xy/` (2D plane strain) | McClenny Fig. 8 reproducer at lower compute cost. | Plane strain (no axial gradients) is consistent with the alumina spacer's role; the 60° contact arc on a transverse cross-section is McClenny's 2D representation (their Fig. 8 top, Fig. A.13, Fig. A.14). Modeled as upper-half disc with mirror symmetry on y=0 (= 30° contact in the upper half). |
 | `14_full_cylinder_thermal_2D_rz/` (2D axisymmetric) — **removed 2026-06-11** | Was: verification only (thermal + linear-elastic, damage disabled). | Axisymmetric mode mathematically prohibits azimuthal variation, so it cannot represent the 60° contact wedge — any axisymmetric idealization either contradicts McClenny's experimental design or produces an unphysical annular damage band. Its only value was verifying the axisymmetric thermal solver against the analytic Bessel-series solution; deemed not worth keeping. |
 
 The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 notes "Insulation is placed on one side of the fuel pellet to ... eliminate axial thermal contact between the bottom of the capsule and the UO2 so that conductive radial heat transfer was the primary method of heat transfer to occur. This was intentionally designed to form a stress concentration on the contact region to induce fracturing." This means the experiment is actively radial-only by design — plane strain (2D-xy) is the *correct* dimensional reduction, and any axisymmetric variant with axial gradients (e.g. cooling only the top face) would *contradict* the experiment.
 
-**Methodological framing (the paper's contribution).** Z3ST's damage block implements the **Ambati et al. (2015) hybrid (isotropic-anisotropic) phase-field formulation** (Comput Mech 55:383-405, Eq. 27). McClenny et al. instead use the **Miehe anisotropic formulation with viscous Allen-Cahn evolution** (their Eq. 10, with viscosity `eta = 1e-8 s/mm`). The case-14 chapter is therefore not "same problem, same model, different code"; it is a benchmark in which the hybrid model — whose mechanical block is linear and which has no viscosity-tuned kinetics — captures the same crack topology at a per-iteration cost roughly an order of magnitude lower (Ambati §3.1). The Ambati paper is checked into `z3st/cases/benchmarks/pellet_quench_3D/`.
+**Methodological framing (the paper's contribution).** Z3ST's damage block implements the **Ambati et al. (2015) hybrid (isotropic-anisotropic) phase-field formulation** (Comput Mech 55:383-405, Eq. 27). McClenny et al. instead use the **Miehe anisotropic formulation with viscous Allen-Cahn evolution** (their Eq. 10, with viscosity `eta = 1e-8 s/mm`). The case-14 chapter is therefore not "same problem, same model, different code"; it is a benchmark in which the hybrid model — whose mechanical block is linear and which has no viscosity-tuned kinetics — captures the same crack topology at a per-iteration cost roughly an order of magnitude lower (Ambati §3.1). (The Ambati paper was never actually checked into the repository, despite this note's earlier claim.)
 
 **Implementation correspondence:** verified against the Ambati paper on 2026-05-05.
 - Eq. (27a) `sigma = (1-D)^2 dPsi0/de` ↔ `damage_model.py:30-37` `g(D) = (1-D)^2 + K`, applied to the full stress in the linear mechanical block of `solver.py::_mechanical_step`.
-- Eq. (27b) `-l^2 Lap d + d = (2l/Gc)(1-d) H+` ↔ `solver.py:528-530` AT2 weak form (`(H+1) u v + l^2 grad u . grad v = H v`), with `H = (2l/Gc) Psi+` from `damage_model.py:54` and irreversibility `H = max(H_old, H_new)` at line 252.
+- Eq. (27b) `-l^2 Lap d + d = (2l/Gc)(1-d) H+` ↔ `damage_model.py::_damage_step` AT2 weak form (`(H+1) u v + l^2 grad u . grad v = H v`), with `H = (2l/Gc) Psi+` from `damage_model.py:54` and irreversibility `H = max(H_old, H_new)` at line 252.
 - Eq. (27c) `Psi+ < Psi- => d := 0` ↔ `damage_model.py:233-245`, **softened**: Z3ST sets `H -> 0` in compression cells rather than `D -> 0`. Equivalent under monotonic loading (the thermal-shock case here); more physical than the literal Ambati projection under cyclic loading because it preserves accumulated damage. This deviation is intentional and documented in the docstring of `update_history`.
 
 **Calibration choice (uo2.yaml, 2026-05-15):**
@@ -819,17 +899,13 @@ The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 not
 
 **Two structural code fixes applied 2026-05-06/07 (regime-aware elastic strain in the damage driver):**
 1. The damage driving force `psi_pos` is evaluated on the *elastic* strain `eps_el = eps(u) − α·(T−T_ref)·I`, not on the total strain `eps(u)`. Without this, uniform thermal expansion in the bulk (where the body is unconstrained) produces a spurious `psi_pos` that drives damage everywhere, leading to a runaway `E_el` cascade. Fixed in `damage_model.py::psi_amor_split`, `psi_miehe_spectral`, `psi_split`, `crack_driving_force`, `update_history`; `solver.py::solve_staggered` now passes `T=T_new` to `update_history`.
-2. The thermal eigenstrain z-component is *suppressed* in 2D Cartesian regimes (`regime: 2d` or `plane_stress`). Otherwise the plane-strain constraint `eps_zz = 0` combined with `eth_zz = α·ΔT` produces `eps_el_zz = −α·ΔT`, whose deviatoric component generates a uniform bulk `psi_pos ≈ (2/3)·G·α²·ΔT² ≈ 5.6 MJ/m³` at our parameters — exactly at the AT1 threshold for `σc = 2 GPa`, causing immediate divergence. Fixed in `damage_model.py::_thermal_eigenstrain` and mirrored in `mechanical_model.py::elastic_energy_density`. Axisymmetric and 3D regimes are unaffected (their `eps_zz` is dynamic).
+2. The thermal eigenstrain z-component is *suppressed* in 2D Cartesian regimes (`regime: 2d`). Otherwise the plane-strain constraint `eps_zz = 0` combined with `eth_zz = α·ΔT` produces `eps_el_zz = −α·ΔT`, whose deviatoric component generates a uniform bulk `psi_pos ≈ (2/3)·G·α²·ΔT² ≈ 5.6 MJ/m³` at our parameters — exactly at the AT1 threshold for `σc = 2 GPa`, causing immediate divergence. Fixed in `damage_model.py::_thermal_eigenstrain` and mirrored in `mechanical_model.py::elastic_energy_density`. Axisymmetric and 3D regimes are unaffected (their `eps_zz` is dynamic).
 3. `compute_energy_balance` now (a) uses the elastic strain for `E_el` (consistent with (1)), (b) applies the regime weight `w = 2π·r` for axisymmetric integrals.
 
 **What still needs running (the user runs these locally — do not invoke from this assistant):**
 ```bash
-# 3D (gold standard)
-cd ~/z3st/z3st/cases/benchmarks/pellet_quench_3D/
-./Allrun
-
 # 2D-xy (McClenny Fig. 8 reproducer)
-cd ~/z3st/z3st/cases/benchmarks/pellet_quench_2D_xy/
+cd ~/z3st/z3st/cases/benchmarks/damage/pellet_quench_2D_xy/
 ./Allrun
 
 ```
@@ -870,7 +946,7 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/core/finite_element_setup.py`           | Allocates `V_t, V_m, V_d, V_c, V_pl, Q`               |
 | `z3st/core/solver.py`                         | Staggered solver, PETSc options, DG cluster solver    |
 | `z3st/core/mesh/{reader,manager,plotter}.py`  | Mesh IO, tag management, PyVista preview              |
-| `z3st/core/diagnostic.py`                     | Structured logger                                     |
+| `z3st/utils/logger.py`                       | Framework-wide logger (`log`)                         |
 | `z3st/models/thermal_model.py`                | Thermal BCs + heat-flux diagnostics                   |
 | `z3st/models/mechanical_model.py`             | Strain/stress tensors, constitutive routes, mech BCs  |
 | `z3st/models/damage_model.py`                 | AT1/AT2 phase-field, energy splits, history update    |
@@ -890,7 +966,7 @@ With σc = 1 GPa, the AT1 threshold is crossed not just at the singular crack ti
 | `z3st/utils/utils_plot.py`, `plot_convergence.py` | Plotting helpers                                  |
 | `z3st/utils/utils_extract_{vtu,xdmf}.py`      | Field extraction from output files                    |
 | `z3st/utils/utils_verification.py`            | Analytical benchmarks                                  |
-| `z3st/utils/z-gui.py`, `interactive_gui.ipynb`| Interactive viewers                                   |
+| `z3st/utils/interactive_gui.ipynb`            | Interactive viewer (notebook)                         |
 | `z3st/utils/geo_files/*.geo`                  | Reusable Gmsh templates                                |
 | `z3st/cases/…`                                | ~40 verification / validation / demo cases            |
 | `docs/source/*.rst`                           | Sphinx user & API documentation                        |

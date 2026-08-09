@@ -5,7 +5,7 @@
 Z3ST case: verification/fuel/creep
 
 Verifies implicit Norton creep (incremental variational principle, tangent by
-AD — models/creep_model.py) on a CONSTANT-STRESS uniaxial bar.
+AD — models/creep_model.py) on a constant-stress uniaxial bar.
 
 The axisymmetric bar carries a constant axial traction sigma at uniform T,
 backward Euler is exact.
@@ -15,7 +15,7 @@ lateral rates -1/2 of that):
   1. total axial strain    u_z(L)/L = sigma/E + A·sigma^n·t
   2. creep part            u_z(L)/L - sigma/E = A·sigma^n·t
   3. radial strain         u_r(Ro)/Ro = -nu·sigma/E - (1/2)·A·sigma^n·t
-     (checks the deviatoric flow direction, not just the magnitude)
+     (checks the deviatoric flow direction)
 
 One figure: axial strain vs time, Z3ST per-step vs the closed form.
 """
@@ -27,8 +27,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_verification import *
-from z3st.utils.utils_extract_xdmf import *
+from z3st.utils.non_regression import finish, metric
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 R_GAS = 8.314462618
 
@@ -85,24 +85,9 @@ print(f"[INFO] eps_cr  : numerical = {eps_cr_num:.6e}, analytical = {EPS_CR:.6e}
 print(f"[INFO] eps_rr  : numerical = {eps_rr:.6e}, analytical = {EPS_RR_REF:.6e}")
 
 errors = {
-    "axial_strain_total": {
-        "numerical": eps_zz,
-        "reference": EPS_ZZ_REF,
-        "abs_error": float(abs(eps_zz - EPS_ZZ_REF)),
-        "rel_error": float(abs(eps_zz - EPS_ZZ_REF) / EPS_ZZ_REF),
-    },
-    "creep_strain": {
-        "numerical": eps_cr_num,
-        "reference": EPS_CR,
-        "abs_error": float(abs(eps_cr_num - EPS_CR)),
-        "rel_error": float(abs(eps_cr_num - EPS_CR) / EPS_CR),
-    },
-    "radial_strain_deviatoric": {
-        "numerical": eps_rr,
-        "reference": EPS_RR_REF,
-        "abs_error": float(abs(eps_rr - EPS_RR_REF)),
-        "rel_error": float(abs(eps_rr - EPS_RR_REF) / abs(EPS_RR_REF)),
-    },
+    "axial_strain_total": metric(eps_zz, EPS_ZZ_REF),
+    "creep_strain": metric(eps_cr_num, EPS_CR),
+    "radial_strain_deviatoric": metric(eps_rr, EPS_RR_REF),
 }
 
 # --. figure: axial strain accumulation vs the closed form --..
@@ -131,7 +116,4 @@ try:
 except Exception as e:
     print(f"[WARNING] history plot skipped: {type(e).__name__}: {e}")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

@@ -55,7 +55,6 @@ The staggered scheme alternates between thermal and mechanical solves until both
    regime: 2D
 
    solver_settings:
-     coupling: staggered
      max_iters: 100
      relax_T: 0.9
      relax_u: 0.7

@@ -11,15 +11,24 @@ import re
 import time
 
 import yaml
+from mpi4py import MPI
 
 
-# --. Markdown stdout filter --..
-# Disable explicitly with Z3ST_PLAIN_LOG=1.
-def _install_markdown_stdout():
-    if os.environ.get("Z3ST_PLAIN_LOG"):
-        return
-    if sys.stdout.isatty():
-        return
+# --. stdout filters: MPI rank gate, then markdown --..
+# The rank gate is unconditional; the markdown transform is disabled with
+# Z3ST_PLAIN_LOG=1 or when stdout is a terminal.
+def _install_stdout_filters():
+    # Every rank runs the same code, so an N-process run would repeat all ~260
+    # diagnostic prints N times. Exceptions go to stderr, which is untouched, and
+    # log.warning/error reach stdout from every rank (see utils/logger.py).
+    # The wrapper is installed unconditionally, on every rank, and decides per
+    # write what to do. Two constraints on that:
+    #  * rank symmetry. dolfinx's PETSc wrappers do collective work in __del__, so
+    #    if one rank carries a different set of live objects the collector orders
+    #    those destructors differently and the run deadlocks at exit.
+    #  * under mpirun, sys.stdout.isatty() is True even when the shell redirects to
+    #    a file -- mpirun interposes a pty, so isatty() cannot gate the mechanism.
+    _markdown = not (os.environ.get("Z3ST_PLAIN_LOG") or sys.stdout.isatty())
 
     _morse_line = re.compile(r"^\s*(?:--\.\. \.\.- \.-\.\. \.-\.\. ---\s*)+$")
     _step       = re.compile(r"^\[STEP (\d+/\d+)\]\s*(.*)$")
@@ -27,6 +36,7 @@ def _install_markdown_stdout():
     _spine_hdr  = re.compile(r"^\s*--\. (.+) --\.\.\s*$")
     _underscore = re.compile(r"^__([^_].*?[^_])__\s*$")
     _tagged     = re.compile(r"^(\s*)\[(INFO|WARNING|ERROR|SUCCESS|DESCRIPTION)\](\s+.*)?$")
+    _WARN_OR_ERROR = re.compile(r"^\s*\[(WARNING|ERROR)\]", re.M)
 
     def transform(line):
         s = line.rstrip("\r")
@@ -58,13 +68,28 @@ def _install_markdown_stdout():
     raw = sys.stdout
 
     class MarkdownStream:
-        def __init__(self, raw):
+        """Markdown transform plus the MPI rank gate.
+
+        ``emit`` is False on every rank but 0. The gate lives inside this one
+        class, and the class is installed on every rank, so the object graph
+        stays identical across ranks (see _install_stdout_filters).
+        """
+
+        def __init__(self, raw, emit=True, markdown=True):
             self._raw = raw
             self._buf = ""
+            self._emit = emit
+            self._markdown = markdown
 
         def write(self, s):
             if not s:
                 return 0
+            # Rank gate: ~260 diagnostic prints would otherwise repeat once per
+            # process. WARNING and ERROR lines pass from every rank.
+            if not self._emit and not _WARN_OR_ERROR.search(s):
+                return len(s)
+            if not self._markdown:
+                return self._raw.write(s)
             self._buf += s
             parts = self._buf.split("\n")
             self._buf = parts.pop()
@@ -77,17 +102,18 @@ def _install_markdown_stdout():
 
         def flush(self):
             if self._buf:
-                self._raw.write(transform(self._buf))
+                if self._emit:
+                    self._raw.write(transform(self._buf))
                 self._buf = ""
             self._raw.flush()
 
         def __getattr__(self, name):
             return getattr(self._raw, name)
 
-    sys.stdout = MarkdownStream(raw)
+    sys.stdout = MarkdownStream(raw, emit=MPI.COMM_WORLD.rank == 0, markdown=_markdown)
 
 
-_install_markdown_stdout()
+_install_stdout_filters()
 
 
 print(
@@ -106,8 +132,8 @@ complex geometries, and user-defined boundary conditions.
 )
 
 # --. Z3ST modules --..
-from mpi4py import MPI
-
+# MPI is imported at the top of this file: the stdout rank gate needs it before
+# anything heavy is loaded.
 from z3st.core.spine import Spine
 from z3st.utils.utils_load import generate_power_history, load
 from z3st.utils.writer import OutputWriter
@@ -116,10 +142,8 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
 # --. Environment banner --..
-# A gold reference is only reproducible on the versions that produced it, so
-# the run records them: comparing against a gold made on a different dolfinx
-# or numpy is not a like-for-like comparison. Rank 0 only, so the MPI log
-# holds one copy. Every lookup falls back to "n/a" rather than failing the run.
+# The run records the versions a gold reference was produced on. Rank 0 only,
+# so the MPI log holds one copy. Every lookup falls back to "n/a".
 def _print_environment():
     import importlib
 
@@ -191,7 +215,7 @@ _SOLVER_SETTINGS_CASTS = {
 }
 
 # Casts for every hot-reloadable key: values are validated/cast before landing
-# in the shared config dicts, so a mid-run typo is rejected instead of poisoning the solver state.
+# in the shared config dicts.
 _HOT_BLOCK_CASTS = {
     "damage": {"stag_tol": float, "rtol": float,
                "hybrid_constraint": _to_bool, "gamma_star": float},
@@ -246,9 +270,8 @@ def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
             if block == "solver_settings" and hasattr(problem, key):
                 setattr(problem, key, new_val)
                 if key == "relax_u" and hasattr(problem, "_relax_u0"):
-                    # Aitken restarts relax_u from _relax_u0 at every step —
-                    # without this, a hot-reloaded relax_u is silently
-                    # overwritten at the next step boundary.
+                    # Aitken restarts relax_u from _relax_u0 at every step, so
+                    # the hot-reloaded value is written there too.
                     problem._relax_u0 = new_val
             print(f"  [hot-reload] {block}.{key}: {old_val} → {new_val}")
 
@@ -376,8 +399,7 @@ if __name__ == "__main__":
     # --. History --..
     t_points = input_file.get("time")
     lhr_points = input_file.get("lhr")
-    # Default matches Config's n_steps default; without it an input.yaml with
-    # no n_steps key crashed on None - 1 before the run started.
+    # Default matches Config's n_steps default.
     raw_n_steps = input_file.get("n_steps", 10)
     n_increments = raw_n_steps if isinstance(raw_n_steps, (list, tuple)) else raw_n_steps - 1
 

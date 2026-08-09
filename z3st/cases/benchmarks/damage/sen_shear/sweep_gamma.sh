@@ -41,7 +41,7 @@ grep -q "^[[:space:]]*split:[[:space:]]*star_convex" input.yaml || {
     echo "                       The gamma_star value will be ignored (only star_convex reads it)."
 }
 
-# Backup input.yaml once (so we can restore at the end).
+# Backup input.yaml once; restored at the end.
 if [[ ! -f input.yaml.sweep_backup ]]; then
     cp input.yaml input.yaml.sweep_backup
     echo "[sweep_gamma] Backed up input.yaml → input.yaml.sweep_backup"
@@ -80,32 +80,29 @@ for i in "${!GAMMA_VALUES[@]}"; do
     echo "[sweep_gamma] Run finished in ${elapsed}s"
 
     # Generate force-displacement curve from the fresh output/fields_*.vtu.
-    # Non-fatal: a missing stress field or other plot-script issue should not
-    # abort the rest of the sweep — surface the warning and continue.
+    # Non-fatal: a plot-script failure does not abort the sweep.
     if [[ -f plot_force_displacement.py ]]; then
         python3 plot_force_displacement.py \
             || echo "[sweep_gamma] WARNING: plot_force_displacement.py failed (sweep continuing)"
     fi
 
     # Preserve outputs + diagnostics + the input.yaml that produced them.
-    # The force_displacement.{csv,png} pair lives inside output/ already and
-    # therefore travels along with `cp -r output`. A tagged copy of the PNG
-    # at the case root makes side-by-side comparison easy.
+    # The force_displacement.{csv,png} pair lives inside output/ already.
     cp -r output "$out_dir"
     [[ -f energies.txt                       ]] && cp energies.txt                       "$energies_file"
     [[ -f convergence.png                    ]] && cp convergence.png                    "$conv_file"
     [[ -f log_z3st.md                        ]] && cp log_z3st.md                        "$log_file"
     [[ -f output/force_displacement.png      ]] && cp output/force_displacement.png      "$fd_file"
     # Streaming force-displacement file from diagnostics.py (if installed).
-    # Snapshotted into the per-tag output dir AND tagged at the case root so
-    # that plot_force_displacement.py can find it post-hoc via either path.
+    # Snapshotted into the per-tag output dir and tagged at the case root;
+    # plot_force_displacement.py reads it post-hoc via either path.
     [[ -f force_displacement.txt             ]] && cp force_displacement.txt             "$out_dir/force_displacement.txt"
     [[ -f force_displacement.txt             ]] && cp force_displacement.txt             "force_displacement_starconvex_${tag}.txt"
     cp input.yaml "$out_dir/input.yaml.snapshot"
     echo "[sweep_gamma] Saved: $out_dir/  $energies_file  ($conv_file)  ($log_file)  ($fd_file)"
 done
 
-# Restore original input.yaml (with whatever gamma_star value it had before the sweep).
+# Restore original input.yaml, with its pre-sweep gamma_star value.
 if [[ -f input.yaml.sweep_backup ]]; then
     cp input.yaml.sweep_backup input.yaml
     echo

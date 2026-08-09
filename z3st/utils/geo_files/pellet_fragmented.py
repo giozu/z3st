@@ -16,7 +16,7 @@ Workflow:
             ├── case_002_...
             └── ...
 
-To make a SINGLE case, set each list in SWEEP CONFIGURATION to one value.
+For a single case, set each list in SWEEP CONFIGURATION to one value.
 Set H = 0 in DEFAULTS to generate a 2D (planar) fragmented disk instead of
 the extruded 3D pellet.
 RCI / RCO in DEFAULTS add an intact cladding ring (annulus in 2D, tube in

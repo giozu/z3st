@@ -38,8 +38,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import finish, metric
+from z3st.utils.utils_extract_vtu import extract_field
 from z3st.utils.utils_load import generate_power_history
 from z3st.materials.fuel_profiles import rim_peaking
 
@@ -47,9 +47,8 @@ CASE_DIR = os.path.dirname(__file__)
 OUT = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(OUT, "non-regression.json")
 
-# Burnup is a state that accumulates over the run, so the verification reads the
-# *final* step. A multi-step run writes per-step files (fields_NNNN.vtu); a
-# single-step run writes fields.vtu — handle both.
+# Burnup accumulates over the run -> read the *final* step. A multi-step run
+# writes per-step files (fields_NNNN.vtu), a single-step run writes fields.vtu.
 _single = os.path.join(OUT, "fields.vtu")
 _steps = sorted(glob.glob(os.path.join(OUT, "fields_*.vtu")))
 VTU_FILE = _steps[-1] if _steps else _single
@@ -97,23 +96,13 @@ print(f"[INFO] burnup core = {bu_core:.2f}, rim = {bu_rim:.2f} MWd/kgU")
 print(f"[INFO] rim/core ratio: numerical = {ratio:.4f}, analytical (1+A) = {RATIO_REF:.4f}")
 
 errors = {
-    "burnup_mean_closed_form": {
-        "numerical": bu_mean,
-        "reference": BU_MEAN_REF,
-        "abs_error": float(abs(bu_mean - BU_MEAN_REF)),
-        "rel_error": float(abs(bu_mean - BU_MEAN_REF) / BU_MEAN_REF),
-    },
-    "rim_core_ratio": {
-        "numerical": ratio,
-        "reference": RATIO_REF,
-        "abs_error": float(abs(ratio - RATIO_REF)),
-        "rel_error": float(abs(ratio - RATIO_REF) / RATIO_REF),
-    },
+    "burnup_mean_closed_form": metric(bu_mean, BU_MEAN_REF),
+    "rim_core_ratio": metric(ratio, RATIO_REF),
 }
 
 # --. integrated power (parsed from the solver log) --..
 # set_power prints the exact FE integral of the fissile source. For a radially
-# peaked profile the integral does NOT equal LHR·Lz: the mean-1 normalisation
+# peaked profile the integral does not equal LHR·Lz: the mean-1 normalisation
 # is nodal (uniform in r), while the integral carries the 2πr area weight, so
 #
 #   P / (LHR·Lz) = <f>_area / <f>_nodal = [1 + 2A/(p+2)] / [1 + A/(p+1)]
@@ -123,8 +112,8 @@ import re
 LOG = os.path.join(CASE_DIR, "log_z3st.md")
 F_AREA = 1.0 + 2.0 * A / (p_exp + 2.0)              # continuum area-weighted mean
 F_NODAL_CONT = 1.0 + A / (p_exp + 1.0)              # continuum nodal (line) mean
-# Normalise by the DISCRETE nodal mean over the actual fuel dofs (O(1/N) above
-# the continuum value) — replicate it exactly so the check is mesh-independent.
+# Normalise by the discrete nodal mean over the actual fuel dofs, O(1/N) above
+# the continuum value.
 _coords = np.column_stack([np.asarray(x), np.asarray(y), np.asarray(z)])
 F_NODAL = float(np.mean(rim_peaking(_coords, np.zeros(len(_coords)), mat, model=None)))
 P_REF = lhr * Lz * F_AREA / F_NODAL
@@ -221,7 +210,4 @@ try:
 except Exception as e:
     print(f"[WARNING] pyvista render skipped: {type(e).__name__}: {e}")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

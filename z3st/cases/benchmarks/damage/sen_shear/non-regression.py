@@ -2,14 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 """Quick diagnostic for the SENS shear test.
 
-Processes only the **last** available VTU file (no per-step loop), so it
-runs in a few seconds and is safe to invoke while the simulation is still
-writing new steps. Generates the ParaView-style field plots of the final
-state (damage, sigma_xy, sigma_xx, sigma_vm, crack-driving force) plus the
-global energy balance read directly from energies.txt.
+Processes only the last available VTU file (no per-step loop), so it runs in
+a few seconds and is safe to invoke while the simulation is still writing new
+steps. Generates the ParaView-style field plots of the final state (damage,
+sigma_xy, sigma_xx, sigma_vm, crack-driving force) plus the global energy
+balance read directly from energies.txt.
 
-For per-step diagnostics (F-u curve, damage evolution panels), use a
-separate post-processing script after the simulation completes.
+Not covered: per-step diagnostics (F-u curve, damage evolution panels).
 """
 
 import os
@@ -22,6 +21,8 @@ import numpy as np
 import pyvista as pv
 import yaml
 
+from z3st.utils.non_regression import finish, tracked
+
 # ----- configuration --------------------------------------------------------
 CASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
@@ -29,6 +30,13 @@ VTU_FILES  = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
 if not VTU_FILES:
     raise FileNotFoundError(f"No VTU files found in {OUTPUT_DIR}")
 LAST_VTU = VTU_FILES[-1]
+OUT_JSON = os.path.join(OUTPUT_DIR, "non-regression.json")
+
+# This benchmark has no closed-form reference: it reproduces Ambati's figures.
+# Every metric is tracked() -- recorded in the gold and guarded against
+# regression, never a pass/fail criterion.
+metrics = {}
+TOLERANCE = 1e-2
 
 with open(os.path.join(CASE_DIR, "input.yaml")) as f:
     cfg = yaml.safe_load(f)
@@ -146,6 +154,7 @@ if D_field is not None:
                cbar_label="Damage D", cmap="hot_r", vmin=0.0, vmax=1.0)
     print("[INFO] damage_field.png saved")
     print(f"          max D = {float(np.max(D_field)):.4f}")
+    metrics["D_max"] = tracked(np.max(D_field))
 
 S = _get(m, ["Stress (points)", "Stress (points)"])
 if S is not None and S.ndim == 2 and S.shape[1] >= 9:
@@ -156,6 +165,7 @@ if S is not None and S.ndim == 2 and S.shape[1] >= 9:
                title="Von Mises equivalent stress (99th-pct clip)",
                cbar_label="sigma_vm (MPa)", cmap="viridis", vmin=0.0, vmax=vm_hi)
     print("[INFO] stress_vm_field.png saved")
+    metrics["sigma_vm_max_MPa"] = tracked(np.nanmax(vm))
 
     sxy = S[:, 1] / 1e6
     sxy_abs = max(float(np.nanpercentile(np.abs(sxy), 99.0)), 1.0)
@@ -211,5 +221,10 @@ if os.path.exists(energy_file):
     print("[INFO] energy_balance.png saved")
     print(f"          final  E_el = {data['E_el'][-1]:.3f} J, "
           f"E_frac = {data['E_frac'][-1]:.3f} J  (step {int(data['Step'][-1])})")
+    metrics["E_el_final"] = tracked(data["E_el"][-1])
+    metrics["E_frac_final"] = tracked(data["E_frac"][-1])
+    metrics["E_tot_final"] = tracked(data["E_tot"][-1])
 else:
     print(f"[WARN] {energy_file} not found; skipping energy plot.")
+
+finish(metrics, TOLERANCE, OUT_JSON, CASE_DIR)

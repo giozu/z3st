@@ -127,7 +127,7 @@ def single_crystal_stress(u, T, material, model=None):
     # ε_p^{n+1} = ε_p^n + Δt · ε̇_p^{n+1}
     eps_p_new = eps_p_old + dt * eps_p_dot
 
-    # -- 10. Final Stress (using NEW plastic strain)
+    # -- 10. Final Stress (using the new plastic strain)
     # σ = C:(ε_total - ε_p^{n+1})
     sigma = lmbda * ufl.tr(eps - eps_p_new) * ufl.Identity(dim) + 2 * mu * (eps - eps_p_new)
 

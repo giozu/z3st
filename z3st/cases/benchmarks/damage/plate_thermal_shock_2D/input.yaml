@@ -10,13 +10,12 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   plate: plate_ceramic.yaml
 
-regime: 2D
+regime: 2d
 
 output:
   format: xdmf
 
 solver_settings:
-  coupling: staggered
   max_iters: 200
   relax_T: 0.8
   relax_u: 0.6

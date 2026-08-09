@@ -8,9 +8,18 @@
 import sys
 
 import dolfinx
+import dolfinx.fem.petsc
 import numpy as np
 import ufl
+from dolfinx.fem.petsc import NonlinearProblem
 from petsc4py import PETSc
+
+from z3st.core.solver import (
+    aitken_omega,
+    as_bool,
+    build_constrained_rigid_nullspace,
+    build_rigid_body_nullspace,
+)
 
 class MechanicalModel:
     def __init__(self):
@@ -34,6 +43,23 @@ class MechanicalModel:
     )
     # BC types that free one axis and block the other two (frictionless slip).
     _SLIP_BC_TYPES = ("Slip_x", "Slip_y", "Slip_z")
+
+    def _regime_normal(self):
+        """Facet normal restricted to the regime's displacement components.
+
+        On a 1-D mesh V_m has a single component, so the test function is rank-1
+        of size 1 and the traction vector must match: self.normal still carries
+        gdim = 3 entries because gmsh stores 3-D node coordinates, and only the
+        axial one is physically meaningful on a line. Axisymmetric and 2-D keep
+        (r, z) / (x, y); 3-D uses the normal as is.
+
+        The staggered traction update in solver.py needs the same vector.
+        """
+        if self.mgr.tdim == 1:
+            return ufl.as_vector([self.normal[0]])
+        if self.regime in ["axisymmetric", "2d"]:
+            return ufl.as_vector([self.normal[0], self.normal[1]])
+        return self.normal
 
     def set_mechanical_boundary_conditions(self, V_u):
         """
@@ -190,20 +216,7 @@ class MechanicalModel:
         # scalar constant (Pa)
         traction_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(initial_val))
 
-        # normal vector according to the mechanical regime
-        regime = self.regime
-        if self.mgr.tdim == 1:
-            # 1D mesh: V_m has one component; the test function v_m
-            # is rank-1 of size 1, so the traction n_vec must be a
-            # 1-vector. self.normal still has gdim = 3 entries
-            # because gmsh stores 3D node coords; we only keep the
-            # axial component (which is the only physically
-            # meaningful one on a line).
-            n_vec = ufl.as_vector([self.normal[0]])
-        elif regime in ["axisymmetric", "2d", "plane_stress"]:
-            n_vec = ufl.as_vector([self.normal[0], self.normal[1]])
-        else:
-            n_vec = self.normal
+        n_vec = self._regime_normal()
 
         # T = p * n
         traction_expr = traction_const * n_vec
@@ -260,7 +273,7 @@ class MechanicalModel:
         # dolfinx refuses V_u.sub(0) -- "Cannot extract subsystem...
         # no subsystems". Since the Clamp_z check above already
         # rejects Clamp_y / Clamp_z for tdim==1, the only valid
-        # component is c_idx == 0, which IS V_u itself.
+        # component is c_idx == 0, which is V_u itself.
         if self.tdim == 1:
             dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
             bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
@@ -289,7 +302,7 @@ class MechanicalModel:
         free_axis = {"Slip_x": 0, "Slip_y": 1, "Slip_z": 2}[bc_type]
         if free_axis >= self.tdim:
             # Mirror the Clamp_z guard: Slip_z on a 2-D mesh would silently
-            # block BOTH in-plane components (a full clamp), not slip.
+            # block both in-plane components (a full clamp), not slip.
             raise ValueError(
                 f"\n[ERROR] Boundary condition '{bc_type}' is not valid on a "
                 f"{self.tdim}D mesh: the free axis does not exist, so every "
@@ -315,33 +328,6 @@ class MechanicalModel:
         print(
             f"  [INFO] {bc_type} mechanical BC on '{mat_type}' → {blocked} = 0.0 at region '{region_name}'"
         )
-
-    def create_dirichlet_bc(self, mesh, V, dofs, displacement, tdim):
-        """
-        DirichletBC on a vectorial space, using Constant or Functiont.
-
-        Parameters:
-            mesh: dolfinx.mesh.Mesh
-            V: dolfinx.fem.FunctionSpace (collapsed)
-            dofs: np.ndarray
-            displacement: list, tuple, np.ndarray
-            tdim: int
-
-        Returns:
-            dolfinx.fem.DirichletBC
-        """
-        displacement = np.array(displacement, dtype=PETSc.ScalarType)
-
-        if displacement.ndim == 1 and displacement.size == tdim:
-            # print(f"  create_dirichlet_bc with Constant")
-            return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, displacement), dofs, V)
-        elif displacement.ndim == 2 and displacement.shape == (tdim, 1):
-            # print(f"  create_dirichlet_bc with Function")
-            u_d = dolfinx.fem.Function(V)
-            u_d.interpolate(lambda x: np.tile(displacement, (1, x.shape[1])))
-            return dolfinx.fem.dirichletbc(u_d, dofs)
-        else:
-            raise ValueError(f"Invalid displacement format: shape {displacement.shape}")
 
     def epsilon(self, u):
         """
@@ -443,123 +429,25 @@ class MechanicalModel:
 
         return ufl.variable(F_def)
 
-    def epsilon_hyperelastic(self, u):
-        """
-        Green-Lagrange strain tensor for finite deformations.
-
-        E = (1/2)(FᵀF - I) = (1/2)(C - I)
-
-        Parameters:
-            u: Displacement field.
-
-        Returns:
-            Green-Lagrange strain tensor (UFL expression).
-        """
-        F_def = self.deformation_gradient(u)
-        dim = F_def.ufl_shape[0]
-        return 0.5 * (F_def.T * F_def - ufl.Identity(dim))
-
     def sigma_mech(self, u, material):
         """
-        Mechanical Cauchy stress σ(u) with two selectable constitutive routes.
+        Mechanical Cauchy stress σ(u).
 
-        Mode selection (by material dict)
-        --.--.--.--.-
+        Mode selection (by ``material["constitutive_mode"]``): ``hyperelastic``,
+        ``plasticity``, ``custom``, or the default isotropic Lamé
+        σ = λ tr(ε) I + 2 G ε (``1d`` reduces to σ = E ε, uniaxial stress).
 
-        - If ``material["constitutive"] == "voigt"``:
-
-        σ = C_voigt · ε_voigt  (6×6 · 6×1) → mapped back to 3×3.
-
-        * If ``material["C_matrix"]`` (6×6) is provided, use it (anisotropy allowed).
-        * Else, build isotropic C from (λ, G) with shear blocks = 2G.
-
-        Voigt order used here: [xx, yy, zz, yz, xz, xy] with **no factor 2** on shear strains.
-
-
-        - Else (default = ``"lame"``):
-
-        σ = λ tr(ε) I + 2 G ε
-
-
-        Plane-stress handling
-        --.--.-----
-
-        If ``self.mech_regime == "plane_stress"``, the returned tensor is modified
-        to enforce σ_zz = 0 in an x–y plane-stress sense.
-
-
-        Notes
-        -----
-        * Assumes 3D (tdim == 3). For 2D, adapt Voigt packing/unpacking.
-        * ε = sym(∇u) is small strain.
-
+        ε = sym(∇u) is small strain.
         """
 
         # The constitutive_mode promotion (lame -> plasticity for materials
         # with yield_strength when plasticity is on) lives in
         # spine.py::load_materials so the material dict is deterministic at
-        # load time. By the time sigma_mech is called the mode is already
-        # the final one; we just read it.
+        # load time.
         mode = material.get("constitutive_mode", "lame")
         regime = self.regime
 
-        if mode == "voigt":
-            # small strain
-            eps = self.epsilon(u)
-
-            # ε in ENGINEERING Voigt (6x1), order: [xx, yy, zz, yz, xz, xy]
-            # with γ = 2ε on the shear rows — the convention every literature
-            # stiffness matrix (C44 = G) expects. Feeding tensor shear strains
-            # to a user C_matrix would halve the shear stresses.
-            eps_voigt = ufl.as_vector(
-                [
-                    eps[0, 0],
-                    eps[1, 1],
-                    eps[2, 2],
-                    2.0 * eps[1, 2],  # γ_yz
-                    2.0 * eps[0, 2],  # γ_xz
-                    2.0 * eps[0, 1],  # γ_xy
-                ]
-            )
-
-            # Elasticity matrix C (6x6)
-            if "C_matrix" in material and material["C_matrix"] is not None:
-                C_user = material.get("C_matrix", None)
-                if C_user is not None:
-                    C_np = np.asarray(C_user, dtype=dolfinx.default_scalar_type)
-                    if C_np.shape != (6, 6):
-                        raise ValueError(f"C_matrix must be 6x6, got {C_np.shape}")
-                    C = ufl.as_matrix(C_np.tolist())
-
-            else:
-                lmbda = material["lmbda"]
-                G = material["G"]
-
-                # isotropic, homogeneous — engineering-Voigt convention
-                # (C44 = G acting on γ = 2ε), matching the strain vector above;
-                # σ_xy = G·γ_xy = 2G·ε_xy, identical to the previous behaviour.
-                C = ufl.as_matrix(
-                    [
-                        [lmbda + 2 * G, lmbda, lmbda, 0, 0, 0],
-                        [lmbda, lmbda + 2 * G, lmbda, 0, 0, 0],
-                        [lmbda, lmbda, lmbda + 2 * G, 0, 0, 0],
-                        [0, 0, 0, G, 0, 0],  # yz
-                        [0, 0, 0, 0, G, 0],  # xz
-                        [0, 0, 0, 0, 0, G],  # xy
-                    ]
-                )
-
-            # σ in Voigt, then map back to 3x3
-            sigma_voigt = C * eps_voigt
-            sigma = ufl.as_tensor(
-                [
-                    [sigma_voigt[0], sigma_voigt[5], sigma_voigt[4]],
-                    [sigma_voigt[5], sigma_voigt[1], sigma_voigt[3]],
-                    [sigma_voigt[4], sigma_voigt[3], sigma_voigt[2]],
-                ]
-            )
-
-        elif mode == "hyperelastic":
+        if mode == "hyperelastic":
             sigma = self.sigma_hyperelastic(u, material)
 
         elif mode == "plasticity":
@@ -587,24 +475,12 @@ class MechanicalModel:
                 raise RuntimeError(f"Failed to load/execute custom stress function '{stress_func_path}': {e}")
 
         else:
-            # Plane-stress reduction (x–y plane).
-            if regime == "plane_stress":
-
-                lmbda_ps = (
-                    2 * material["G"] * material["lmbda"] / (material["lmbda"] + 2 * material["G"])
-                )
-
-                eps = self.epsilon(u)
-                sigma = (
-                    lmbda_ps * ufl.tr(eps) * ufl.Identity(self.tdim) + 2.0 * material["G"] * eps
-                )
-
             # True 1D structural element (line mesh): uniaxial *stress* state,
             # sigma_yy = sigma_zz = 0. The axial stiffness is therefore the
             # engineering Young's modulus E, giving sigma_11 = E eps_11.
             # epsilon() returns the 3x3 strain padded with only eps_xx != 0, so
             # E * eps has only sigma_xx = E eps_xx and zero transverse stress.
-            elif regime == "1d":
+            if regime == "1d":
                 eps = self.epsilon(u)
                 sigma = material["E"] * eps
 
@@ -767,21 +643,6 @@ class MechanicalModel:
 
         return eps_star
 
-    def _lmbda_eff(self, material):
-        """Regime-consistent first Lamé parameter.
-
-        The plane-stress reduction λ_ps = 2Gλ/(λ + 2G) must be used wherever a
-        stress or energy is formed as λ tr(·) I + 2G (·), or the eigenstress and
-        the energy density become inconsistent with sigma_mech (a ~35 % thermal
-        eigenstress overshoot at ν = 0.3 in regime plane_stress).
-        """
-        if str(getattr(self, "regime", "3d")).lower() == "plane_stress":
-            return (
-                2 * material["G"] * material["lmbda"]
-                / (material["lmbda"] + 2 * material["G"])
-            )
-        return material["lmbda"]
-
     def sigma_th(self, T, material):
         """
         Eigenstress −ℂ : ε* moved to the right-hand side of the momentum
@@ -789,7 +650,7 @@ class MechanicalModel:
         :meth:`eigenstrain`. For a purely thermal eigenstrain this reduces to
         the classical σ_th = −(3λ + 2G) α (T − T_ref) I (and −E α (T − T_ref)
         in regime "1d"); fuel swelling/creep enter through the same channel
-        once the material supplies them, so equilibrium needs no further change.
+        once the material supplies them.
 
         Damage coupling: when damage is active the eigenstress is degraded by
         g(D) = (1−D)² + K, mirroring σ_mech. Without this a fully damaged cell
@@ -811,7 +672,7 @@ class MechanicalModel:
             sigma_eig = material["E"] * eps_star
         else:
             sigma_eig = (
-                self._lmbda_eff(material) * ufl.tr(eps_star) * ufl.Identity(dim)
+                material["lmbda"] * ufl.tr(eps_star) * ufl.Identity(dim)
                 + 2.0 * material["G"] * eps_star
             )
 
@@ -832,20 +693,17 @@ class MechanicalModel:
 
         where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
         (total strain minus thermal eigenstrain). When T is None or the
-        material has no thermal-expansion properties, eps_el = eps(u) and
-        we recover the previous formula.
+        material has no thermal-expansion properties, eps_el = eps(u).
 
-        For other constitutive modes (voigt / hyperelastic / plasticity /
+        For other constitutive modes (hyperelastic / plasticity /
         custom), fall back to 0.5 * sigma_mech(u, material) : eps(u) on
         total strain. Those modes don't have thermal coupling wired up in
         z3st, so the simpler formula is used.
 
-        Why the elastic strain matters: the energy that can be released by
-        cracking is the *elastic* strain energy. Uniform thermal expansion
-        in an unconstrained body produces total strain but zero elastic
-        strain and zero releasable energy, so the bulk's psi_el should be
-        ~0. Using eps(u) directly would pollute psi_el with thermal expansion
-        and lead to spurious E_el offsets in the energies.txt diagnostic.
+        The energy released by cracking is the elastic strain energy: uniform
+        thermal expansion in an unconstrained body produces total strain but
+        zero elastic strain and zero releasable energy, so the bulk's psi_el
+        is ~0.
         """
         mode = material.get("constitutive_mode", "lame")
 
@@ -857,12 +715,12 @@ class MechanicalModel:
                 # geometrically constrained / sigma_zz is zero -- including
                 # eth_zz would produce a spurious bulk psi_el. See the
                 # docstring of DamageModel._thermal_eigenstrain for the full
-                # rationale; we duplicate the logic here so that
-                # MechanicalModel does not need to import DamageModel.
+                # rationale; the logic is duplicated here so MechanicalModel
+                # need not import DamageModel.
                 factor = material["alpha"] * (T - material["T_ref"])
                 dim = eps.ufl_shape[0]
                 regime = str(getattr(self, "regime", "3d")).lower()
-                if regime in ("2d", "plane_stress") and dim == 3:
+                if regime == "2d" and dim == 3:
                     I_inplane = ufl.as_tensor([
                         [1.0, 0.0, 0.0],
                         [0.0, 1.0, 0.0],
@@ -882,16 +740,13 @@ class MechanicalModel:
                 psi_el = 0.5 * material["E"] * ufl.inner(eps_el, eps_el)
             else:
                 psi_el = 0.5 * (
-                    self._lmbda_eff(material) * ufl.tr(eps_el) ** 2
+                    material["lmbda"] * ufl.tr(eps_el) ** 2
                     + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
                 )
-            # Damage degradation: mirrors sigma_mech / sigma_th. Without this
-            # weighting, cells under a prescribed D=1 BC (e.g. the notch slit
-            # of the SENT cases or the seed of case 14_*_cracking_2D_xy)
-            # absorb the displacement-controlled BC into huge strain while
-            # carrying near-zero stress -- the equilibrium is well-posed but
-            # psi_el = 0.5*E*eps^2 explodes, inflating the E_el diagnostic
-            # by orders of magnitude. (Simple g(D)*psi rather than
+            # Damage degradation: mirrors sigma_mech / sigma_th. Cells under a
+            # prescribed D=1 BC otherwise absorb the displacement-controlled BC
+            # into huge strain while carrying near-zero stress, inflating the
+            # E_el diagnostic. (Simple g(D)*psi rather than
             # g(D)*psi+ + psi-: small overcount in compression cells, but
             # those don't carry significant D under the hybrid constraint.)
             if self.on.get("damage", False):
@@ -904,31 +759,285 @@ class MechanicalModel:
         eps = self.epsilon(u)
         return 0.5 * ufl.inner(sigma, eps)
 
-    def zero_displacement(self, mesh, dofs, V):
-        """
-        Returns a DirichletBC with zero displacement vector.
+    # --.. ..- .-.. .-.. --- staggered step --.. ..- .-.. .-.. ---
+    # solver.py owns the staggered loop and the services this step calls
+    # (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
+    # _value_at_step, _build_measures, aitken_omega); Spine inherits both.
+    def _mechanical_step(self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current):
 
-        Parameters:
-            mesh (dolfinx.Mesh): The mesh object.
-            dofs (array-like): Degrees of freedom where BC is applied.
-            V (FunctionSpace): The function space.
+        u_old.x.array[:] = u_new.x.array
 
-        Returns:
-            dolfinx.fem.DirichletBC: The zero displacement boundary condition.
-        """
-        return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, (0.0, 0.0, 0.0)), dofs, V)
+        w = self.weight
 
-    def fixed_displacement(self, mesh, dofs, V, displacement):
-        """
-        Returns a DirichletBC with a specified displacement vector.
+        # Creep, or a plasticity / hyperelastic constitutive mode, makes σ(u)
+        # nonlinear in u, so the step must go through the SNES path regardless
+        # of the configured solver (the "linear" branch would otherwise assemble
+        # a non-bilinear form as if it were bilinear). Guards against a
+        # solver: linear misconfiguration.
+        creep_present = any(self.creep_active(m) for m in self.materials.values())
+        nonlinear_constitutive = any(
+            m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
+            for m in self.materials.values()
+        )
+        linear = (
+            self.mech_cfg["solver"] == "linear"
+            and not creep_present
+            and not nonlinear_constitutive
+        )
 
-        Parameters:
-            mesh (dolfinx.Mesh): The mesh object.
-            dofs (array-like): Degrees of freedom where BC is applied.
-            V (FunctionSpace): The function space (vector-valued).
-            displacement (tuple or list): The displacement vector (e.g. (0.0, 0.0, 0.0)).
+        # Creep predictor at the current iterate, befire assembling: a
+        # stale predictor can zero the symbolic correction (base clamp) and
+        # let |Δu| pass spuriously. Its change feeds the convergence test.
+        creep_pred_change = 0.0
+        if creep_present:
+            creep_pred_change = self.update_creep_predictor(u_new, T_current)
 
-        Returns:
-            dolfinx.fem.DirichletBC: The displacement boundary condition.
-        """
-        return dolfinx.fem.dirichletbc(dolfinx.fem.Constant(mesh, displacement), dofs, V)
+        # Forms are step-invariant: only Functions (u_new, T_current, creep
+        # predictor/state, burnup) and Constants (contact pressure, BC values)
+        # change between iterations, used by reference. Build once per step.
+        cache = getattr(self, "_mech_cache", None)
+        rebuild = (
+            cache is None
+            or cache["step"] != self.current_step
+            or cache["u_new"] is not u_new
+            or cache["T"] is not T_current
+        )
+
+        bcs_mech = self._bc_objects(self.dirichlet_mechanical)
+
+        if rebuild:
+            print("\n[INFO] Assembling mechanical problem...")
+            if self.mech_cfg["solver"] == "linear" and creep_present:
+                print("  [INFO] creep active → mechanical step promoted to the nonlinear (SNES) path")
+
+            # --- update step-dependent displacement ---
+            for _, bc_list in self.dirichlet_mechanical.items():
+                for bc in bc_list:
+                    # Skip BCs that are Clamp, Slip, etc. (not yet step-dependent)
+                    if not isinstance(bc, dict):
+                        continue
+
+                    raw = bc.get("raw", None)
+                    if isinstance(raw, list):
+                        val = self._value_at_step(raw)
+                        bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
+                        print(f"  [INFO] Updating Displacement Dirichlet on region {bc['id']} → {val}")
+
+            # --- update step-dependent tractions ---
+            for _, bc_list in self.traction.items():
+                for bc in bc_list:
+                    raw = bc.get("raw", None)
+
+                    if isinstance(raw, list):
+                        val = self._value_at_step(raw)
+                    elif isinstance(raw, (int, float)):
+                        val = raw
+                    else:
+                        raise RuntimeError(
+                            f"Invalid traction 'raw' format (got {type(raw).__name__}: {raw!r}); "
+                            f"expected a scalar or a list of length n_steps"
+                        )
+
+                    bc["const"].value = np.array(val, dtype=dolfinx.default_scalar_type)
+                    print(f"  [INFO] Updating traction on region {bc['id']} → {val} Pa")
+
+                    n_vec = self._regime_normal()
+
+                    bc["value"] = bc["const"] * n_vec
+
+            u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
+            a_m, L_m = 0, 0
+            F_m = 0
+
+            for label, material in self.materials.items():
+                tag = self.label_map[label]
+                dx = self.dx_tags[tag]
+                print(f"  Building weak form, volume integrals (dx) for {label}, tag = {tag}")
+
+                rho = dolfinx.default_scalar_type(material["rho"])
+                g = dolfinx.default_scalar_type(self.g)
+
+                regime = self.regime
+                if self.mgr.tdim == 1:
+                    body_force = dolfinx.fem.Constant(self.mesh, (-rho * g,))
+                elif regime in ["axisymmetric", "2d"]:
+                    # 2D: (F_r, F_z) or (F_x, F_y)
+                    body_force = dolfinx.fem.Constant(self.mesh, (0.0, -rho * g))
+                else:
+                    # 3D: (F_x, F_y, F_z)
+                    body_force = dolfinx.fem.Constant(self.mesh, (0.0, 0.0, -rho * g))
+
+                if linear:
+                    sigma = self.sigma_mech(u_m, material)
+                    a_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
+                    L_m += w * ufl.dot(body_force, v_m) * dx
+                    # Eigenstress -C:ε* (thermal + material eigenstrains, assembled when the material requires it.
+                    if self.applies_eigenstress(material):
+                        L_m -= w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+                else:
+                    mode = material.get("constitutive_mode", "lame")
+                    if self.creep_active(material):
+                        # Condensed implicit creep stress (creep_model.py). The
+                        # eigenstrain ε* is inside σ(u) — no separate eigenstress.
+                        sigma = self.creep_stress(u_new, material, T_current, self.dt)
+                        F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx
+                        F_m -= w * ufl.dot(body_force, v_m) * dx
+                    elif mode == "hyperelastic":
+                        F_m += self.hyperelastic_residual(u_new, v_m, material, dx, w)
+                        F_m -= w * ufl.dot(body_force, v_m) * dx
+                        if self.applies_eigenstress(material):
+                            F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+                    else:
+                        sigma = self.sigma_mech(u_new, material)
+                        F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
+                        # Eigenstress on the residual — mirrors the linear path.
+                        if self.applies_eigenstress(material):
+                            F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
+
+            # Traction BCs
+            for label in self.materials:
+                for bc_info in self.traction[label]:
+                    print(f"  Applying mechanical traction on subdomain id = {bc_info['id']}")
+                    ds = self.ds_tags[bc_info["id"]]
+                    if linear:
+                        L_m += w * ufl.dot(bc_info["value"], v_m) * ds
+                    else:
+                        F_m -= w * ufl.dot(bc_info["value"], v_m) * ds
+
+            # Contact traction (persistent pressure Constant, updated above)
+            if self.on.get("contact", False):
+                contact_form = self.contact_traction(v_m)
+                if linear:
+                    L_m += contact_form
+                else:
+                    F_m -= contact_form
+
+            if linear:
+                print("  Linear solver")
+                petsc_opts_mech = self.get_solver_options(
+                    solver_type=self.mech_cfg["linear_solver"],
+                    physics="mechanical",
+                    rtol=rtol_mech,
+                )
+                problem_m = dolfinx.fem.petsc.LinearProblem(
+                    a_m,
+                    L_m,
+                    bcs=bcs_mech,
+                    u=u_new,
+                    petsc_options=petsc_opts_mech,
+                    petsc_options_prefix="mechanical_",
+                )
+                # Elasticity AMG needs the rigid-body kernel to scale; attach
+                # it to the operator (GAMG use it, LU/Hypre ignore it).
+                if self.mech_cfg["linear_solver"].startswith("iterative"):
+                    problem_m.A.setNearNullSpace(
+                        build_rigid_body_nullspace(self.V_m, regime=self.regime)
+                    )
+
+                # Opt-in: project the floating rigid-body modes out of the solve
+                # for a body the BCs leave rigid-singular. KSP then removes the kernel from RHS and
+                # solution -> unique minimal-norm displacement, fewer
+                # staggered iterations. Default off; the standard BC-pinned case
+                # has no nullspace and must not get one.
+                if as_bool(self.mech_cfg.get("remove_rigid_nullspace", False)):
+                    ns = build_constrained_rigid_nullspace(
+                        self.V_m, bcs_mech, regime=self.regime
+                    )
+                    if ns is not None:
+                        problem_m.A.setNullSpace(ns)
+                        print("  [INFO] rigid-body nullspace removed from mechanical solve")
+            else:
+                print("  Non-linear solver (SNES Newton)")
+                linear_solver = self.mech_cfg.get("linear_solver", "direct_mumps")
+
+                # SNES Newton options + inner linear solver
+                if linear_solver == "direct_mumps":
+                    petsc_opts_mech = {
+                        "snes_type": "newtonls",
+                        "snes_linesearch_type": "basic",
+                        "snes_atol": rtol_mech,
+                        "snes_rtol": rtol_mech,
+                        "snes_max_it": int(self.mech_cfg.get("snes_max_it", 50)),
+                        "ksp_type": "preonly",
+                        "pc_type": "lu",
+                        "pc_factor_mat_solver_type": "mumps",
+                    }
+                else:
+                    # Iterative inner solver (AMG / HYPRE)
+                    ksp_opts = self.get_solver_options(
+                        solver_type=linear_solver,
+                        physics="mechanical",
+                        rtol=rtol_mech,
+                    )
+                    petsc_opts_mech = {
+                        "snes_type": "newtonls",
+                        "snes_linesearch_type": "bt",
+                        "snes_atol": rtol_mech,
+                        "snes_rtol": rtol_mech,
+                        "snes_max_it": 100,
+                        "snes_divergence_tolerance": 1e10,
+                        **ksp_opts,
+                    }
+
+                problem_m = NonlinearProblem(
+                    F_m,
+                    u_new,
+                    bcs=bcs_mech,
+                    petsc_options=petsc_opts_mech,
+                    petsc_options_prefix="elasticity_",
+                )
+
+            self._mech_cache = {
+                "step": self.current_step,
+                "u_new": u_new,
+                "T": T_current,
+                "problem": problem_m,
+            }
+
+        problem_m = self._mech_cache["problem"]
+        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
+        problem_m.solve()
+
+        # Penalty contact: measure the gap from the raw solve and set the pressure used by the next solve.
+        # On exact samples the secant update in ContactModel pins the
+        # consistent pressure within a couple of iterations, independent of
+        # the relaxation factor.
+        if self.on.get("contact", False):
+            self.update_contact_pressure(u_new)
+
+        # Relax. With Aitken Δ² enabled the relaxation factor is recomputed
+        # each iteration from the last two raw residuals R_k = ũ_k − u_old_k:
+        #   ω_{k+1} = −ω_k · (R_{k−1} · ΔR)/|ΔR|²,  ΔR = R_k − R_{k−1},
+        # clamped to [relax_min, relax_max]. Dot products are global: restricted
+        # to owned dofs (ghosts would be double-counted) and allreduce'd, so omega
+        # is rank-independent under MPI. In serial this reduces to the local dot.
+        if getattr(self, "relax_aitken", False):
+            R = u_new.x.array - u_old.x.array
+            R_prev = getattr(self, "_aitken_R_prev", None)
+            no = self.V_m.dofmap.index_map.size_local * self.V_m.dofmap.index_map_bs
+            omega = aitken_omega(
+                R, R_prev, float(getattr(self, "_aitken_omega", self.relax_u)),
+                self.mesh.comm, no, self.relax_min, self.relax_max)
+            self._aitken_R_prev = R.copy()
+            self._aitken_omega = omega
+            self.relax_u = omega
+            print(f"  [aitken] relax_u={omega:.3f}")
+
+        u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
+        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
+
+        conv_mech, norm_du, rel_norm_du, res_curr = self._stagger_residual(
+            u_new, u_old, self.mech_cfg, stag_tol_mech, "u")
+
+        # The creep predictor must be consistent with u as well — |Δu| alone
+        # can pass on the first iteration of a step while Δγ₀ is still moving.
+        if creep_present:
+            print(f"  [creep] predictor rel change = {creep_pred_change:.3e}")
+            pred_tol = max(stag_tol_mech, 1e-8)
+            conv_mech = conv_mech and creep_pred_change < pred_tol
+
+        # Heuristic grow/shrink controller — superseded by Aitken when enabled
+        if self.relax_adaptive and not getattr(self, "relax_aitken", False):
+            prev_res_u = self._adapt_relax("u", res_curr, prev_res_u)
+
+        return conv_mech, norm_du, rel_norm_du, prev_res_u

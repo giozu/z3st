@@ -11,10 +11,22 @@ import numpy as np
 from mpi4py import MPI
 from petsc4py import PETSc
 
+from z3st.core.solver import aitken_omega
+
 
 class PorosityMigrationModel:
     """
     Porosity migration model representing thermal-gradient-driven pore transport.
+
+    Two discretisations of the same transport equation. The CG path (default) uses
+    SU/SUPG stabilisation and reproduces Barani et al. (2022). The DG path uses an
+    upwind flux with an optional SIPG block, SSP-RK3 in time, a Kuzmin vertex
+    limiter for the discrete maximum principle, and a conservative saturation cap;
+    it is exercised by cases/verification/fuel/porosity_migration_dg.
+
+    The DG derivation -- weak form, facet-flux consistency, CFL estimate,
+    boundedness proof and the mass-conservation statement -- lives in a separate
+    write-up that is not part of this repository.
     """
 
     def __init__(self):
@@ -122,7 +134,7 @@ class PorosityMigrationModel:
         alpha_K in [0, 1], the largest value keeping every vertex value within
         the range of the cell means of the cells sharing that vertex.
 
-        Two guarantees (docs/dg/formulation.md §4):
+        Two guarantees, both provable from the construction above:
           * cell mean (hence ∫p, the void volume) is preserved exactly for any
             alpha_K -> conservative, unlike np.clip;
           * no new extrema (discrete maximum principle): if all cell means are
@@ -203,14 +215,13 @@ class PorosityMigrationModel:
 
     def _apply_saturation_cap(self, p_func, v_vec=None):
         """Conservative saturation cap: enforce cell-mean porosity ≤ 1 (a void
-        cannot exceed unit porosity) WITHOUT discarding mass. The excess mass of an
+        cannot exceed unit porosity) without discarding mass. The excess mass of an
         over-saturated cell is redistributed to its neighbours in proportion to
         their remaining capacity (1 − p̄), swept until no cell mean exceeds 1.
         Capacity is largest in the emptier (outer) cells, so the excess flows
-        outward and the saturated void core *grows* — the physically faithful
-        alternative to the non-conservative np.clip. Total ∫p is preserved to
+        outward and the saturated void core grows. Total ∫p is preserved to
         round-off; the subsequent vertex limiter keeps the DG dofs in [0,1].
-        Enabled by porosity.saturation_cap (docs/dg/formulation.md §4, Fase 4.2)."""
+        Enabled by porosity.saturation_cap."""
         if getattr(self, "_sat_cache", None) is None:
             self._build_saturation_cache()
         nbr, ptr, area, dofs, nbr_d = self._sat_cache
@@ -223,7 +234,7 @@ class PorosityMigrationModel:
         total0 = mass.sum()
         sweeps = int(self.porosity_cfg.get("saturation_sweeps", 200))
 
-        # Per-cell velocity (DG0) to direct the excess UPSTREAM (against v, i.e.
+        # Per-cell velocity (DG0) to direct the excess upstream (against v, i.e.
         # outward): a saturated cell pushes its excess back toward the cells the
         # pores came from, so the void front advances against the pore flow and
         # the redistribution converges in O(front-depth) sweeps, not diffusively.
@@ -284,7 +295,7 @@ class PorosityMigrationModel:
         Explicit 3-stage SSP-RK3 (Shu–Osher) advance of the DG pore-advection
         equation over [t^n, t^n + dt], starting from p_n, with internal
         sub-stepping to the advective CFL and the vertex limiter applied after
-        every stage (docs/dg/formulation.md §3.3).
+        every stage (SSP needs the limiter at every stage, not just at the end).
 
         Semi-discrete form:  M dp/dt = R(p),  R(p) = -S(p) + g, where S collects
         the upwind facet flux, the -∫ p v·∇w volume term, the outflow boundary
@@ -306,7 +317,7 @@ class PorosityMigrationModel:
         h_e = ufl.CellDiameter(mesh)
 
         # --- CFL sub-step count from per-cell h/|v|_max ---
-        # Use the per-cell MAXIMUM |v| (over the cell's DG1 vertices), not the
+        # Use the per-cell maximum |v| (over the cell's DG1 vertices), not the
         # centroid value: the pore velocity peaks where ∇T is steepest, so a
         # centroid (DG0) estimate understates the peak and the explicit step goes
         # unstable (negative p). A safety factor dg_cfl_safety adds margin.
@@ -406,8 +417,8 @@ class PorosityMigrationModel:
         stabilisation, inside the staggered T-p fixed-point loop.
 
         p_new : current porosity iterate, updated in place.
-        p_n   : porosity at the start of the time step (t^n). Held FIXED here and
-                used only for the backward-Euler time term — it must NOT be
+        p_n   : porosity at the start of the time step (t^n). Held fixed here and
+                used only for the backward-Euler time term — it must not be
                 overwritten, otherwise each staggered iteration would advect a
                 full dt forward from the previous iterate.
         """
@@ -454,7 +465,7 @@ class PorosityMigrationModel:
 
         dg_explicit = False
         if disc == "dg":
-            # Time integrator (docs/dg/formulation.md §3.3): "ssprk3" (default,
+            # Time integrator: "ssprk3" (default,
             # explicit, bounded, sidesteps the staggered stiffness) or "be"
             # (implicit Backward-Euler, the assembled system below).
             integrator = str(self.porosity_cfg.get("dg_integrator", "ssprk3")).lower()
@@ -470,7 +481,6 @@ class PorosityMigrationModel:
             a_p -= u_p * ufl.dot(v_vec, ufl.grad(v_test)) * ufl.dx
             L_p = (p_n / dt_const) * v_test * ufl.dx
 
-            # Interior facets: pure upwinding on the (discontinuous, since T is
             # Interior facets: pure upwinding on the (discontinuous, since T is
             # P1) normal velocity vn = avg(v)·n⁺. The upwind trace is taken from
             # the cell the flow comes from; jump(w) = w⁺ - w⁻.
@@ -545,8 +555,7 @@ class PorosityMigrationModel:
                 p_inflow_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(float(rim_inflow)))
                 # Standard weak inflow/outflow split: the prescribed value enters
                 # only where v·n < 0 (inflow); where the rim is locally outflow the
-                # unknown leaves through the LHS term. Applying the full v·n
-                # against p_inflow injected a spurious source on outflow segments.
+                # unknown leaves through the LHS term.
                 v_n = ufl.dot(v_vec, n_vec)
                 v_n_in = ufl.conditional(ufl.lt(v_n, 0.0), v_n, 0.0)
                 v_n_out = ufl.conditional(ufl.gt(v_n, 0.0), v_n, 0.0)
@@ -568,9 +577,9 @@ class PorosityMigrationModel:
 
         # Enforce the physical bounds [0, 1]. The CG path can only project
         # pointwise (np.clip), which is non-conservative. The DG path defaults to
-        # the vertex-based limiter (porosity.dg_limiter), which is bounded AND
-        # mass-conserving (docs/dg/formulation.md §4); "clamp" reproduces the old
-        # behaviour for the Fase-4 limiter-vs-clamp study, "none" disables it.
+        # the vertex-based limiter (porosity.dg_limiter), which is bounded and
+        # mass-conserving (it rescales the slope, leaving the cell mean and hence
+        # ∫p untouched); "clamp" clips pointwise, "none" disables it.
         # SSP-RK3 already limited every stage, so skip the post-step limiter there.
         if disc == "dg":
             if not dg_explicit:
@@ -604,21 +613,13 @@ class PorosityMigrationModel:
             r_k = p_new.x.array - p_prev_iter
             r_prev = getattr(self, "_aitken_p_R_prev", None)
             omega0 = float(self.porosity_cfg.get("aitken_omega0", 0.5))
-            if r_prev is not None and r_prev.shape == r_k.shape:
-                no = self.V_p.dofmap.index_map.size_local
-                comm = self.mesh.comm
-                dr = r_k - r_prev
-                # Owned-dof dot products, allreduce'd so omega is rank-independent.
-                denom = comm.allreduce(float(np.dot(dr[:no], dr[:no])), op=MPI.SUM)
-                num = comm.allreduce(float(np.dot(r_prev[:no], dr[:no])), op=MPI.SUM)
-                r_norm = comm.allreduce(float(np.dot(r_k[:no], r_k[:no])), op=MPI.SUM) ** 0.5
-                omega = float(getattr(self, "_aitken_p_omega", omega0))
-                # Noise guard: a barely-changed residual gives a garbage quotient.
-                if denom > 1e-30 and denom ** 0.5 > 1e-8 * max(r_norm, 1e-300):
-                    omega = float(np.clip(-omega * num / denom, 0.05, 1.0))
-            else:
-                # First staggered iteration of the step (R_prev reset by driver).
-                omega = omega0
+            # Unlike the displacement loop, porosity restarts from omega0 on the
+            # first staggered iteration of a step rather than carrying omega over.
+            usable = r_prev is not None and r_prev.shape == r_k.shape
+            omega = aitken_omega(
+                r_k, r_prev,
+                float(getattr(self, "_aitken_p_omega", omega0)) if usable else omega0,
+                self.mesh.comm, self.V_p.dofmap.index_map.size_local, 0.05, 1.0)
             self._aitken_p_R_prev = r_k.copy()
             self._aitken_p_omega = omega
             p_new.x.array[:] = p_prev_iter + omega * r_k
@@ -633,11 +634,12 @@ class PorosityMigrationModel:
         # Convergence between successive staggered iterates. Two metrics
         # (porosity.conv_metric):
         #  - "max_dof" (default): mixed rel/abs max over DOFs (Barani Eq. 2).
-        #  - "integral": relative change of the CONSERVED void volume
+        #  - "integral": relative change of the conserved void volume
         #    Q = ∫p between iterates, |Q_k - Q_{k-1}|/Q < stag_tol_rel. At
         #    saturation the front DOFs flicker (max_dof never converges) while
         #    the total void volume is steady — the physically meaningful measure
-        #    of staggered convergence (docs/dg/formulation.md §5, Fase 4.2).
+        #    of staggered convergence: dQ/dt = -(boundary efflux) holds exactly for
+        #    this scheme, so a steady Q means a converged transport step.
         eps_rel = float(self.porosity_cfg.get("stag_tol_rel", 1.0e-6))
         eps_abs = float(self.porosity_cfg.get("stag_tol_abs", 1.0e-8))
         n_owned = self.V_p.dofmap.index_map.size_local

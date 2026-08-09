@@ -40,9 +40,8 @@ HISTORY_CSV = os.path.join(OUT, "history.csv")
 # 1. VARIABLES A DEFINIR
 # =====================================================================
 
-# Every constant below is read from this case's own YAML files, so the
-# analytical overlay can never be computed with parameters that differ from
-# the ones the solver ran. See case_params.py.
+# Every constant below is read from this case's own YAML files.
+# See case_params.py.
 from case_params import (
     R_GAS, R_PELLET, R_CLAD_I, R_CLAD_O, G0, K_PEN, T_TOTAL, NB_STEPS,
     E_EL, NU, E_FUEL, NU_FUEL, ALPHA, G, CREEP_A0, CREEP_N, CREEP_Q, SIGMA0,
@@ -164,9 +163,8 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
 
     if not np.any(contact_mask):
         # No interference at any recorded time, so there is no assembled shrink
-        # fit to relax and the analytical pressure is identically zero. Return
-        # here: idx0 and t_rel below are only meaningful once contact exists,
-        # and the step-5 branch used them unconditionally.
+        # fit to relax and the analytical pressure is identically zero. idx0
+        # and t_rel below are only meaningful once contact exists.
         return Pk / 1e6, f, k1, k2, phi
 
     idx0 = np.argmax(contact_mask)        # premier indice de contact
@@ -287,9 +285,8 @@ _skew = abs(len(t_array) - len(Temp))
 if _skew > 2:
     # More than a step or two apart is not adaptive time stepping: the usual
     # cause is that history.csv was appended to by a previous run because
-    # Allclean was skipped, in which case the leading rows silently belong to
-    # the wrong simulation. Truncating would "work" and produce a plausible
-    # figure built on stale data, so refuse instead.
+    # Allclean was skipped, in which case the leading rows belong to the wrong
+    # simulation.
     raise ValueError(
         f"history.csv has {len(t_array)} steps but the XDMF series has "
         f"{len(Temp)}: too far apart to be time adaptivity. history.csv is "

@@ -4,14 +4,13 @@
 """
 Z3ST case: verification/fuel/axial_table
 
-Verifies the TABULATED axial power source bus (axial_profile ->
+Verifies the tabulated axial power source bus (axial_profile ->
 fuel_profiles.tabulated_axial -> set_power) on a tall axisymmetric fuel
 column. The axial form factor is a piecewise-linear table f(z_i) from the
-material card — the standard fuel-performance input (node-wise peaking
-factors from a core-physics calculation).
+material card.
 
 Burnup accumulates as bu(z) = q(z)·t/(rho·HM·8.64e10), so the final burnup
-field IS the normalised profile. Three closed-form checks:
+field is the normalised profile. Three closed-form checks:
 
   1. accumulation magnitude — nodal-mean burnup = flat closed form
          bu_mean = q_avg * t_total / (rho * HM * 8.64e10)
@@ -34,8 +33,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import finish, metric
+from z3st.utils.utils_extract_vtu import extract_field
 
 CASE_DIR = os.path.dirname(__file__)
 OUT = os.path.join(CASE_DIR, "output")
@@ -95,24 +94,9 @@ print(f"[INFO] peak/mean ratio   : numerical = {peak_ratio:.4f}, "
       f"analytical (trapezoid) = {PEAK_RATIO_REF:.4f}")
 
 errors = {
-    "burnup_mean_closed_form": {
-        "numerical": bu_mean,
-        "reference": BU_MEAN_REF,
-        "abs_error": float(abs(bu_mean - BU_MEAN_REF)),
-        "rel_error": float(abs(bu_mean - BU_MEAN_REF) / BU_MEAN_REF),
-    },
-    "table_node_ratio": {
-        "numerical": node_ratio,
-        "reference": NODE_RATIO_REF,
-        "abs_error": float(abs(node_ratio - NODE_RATIO_REF)),
-        "rel_error": float(abs(node_ratio - NODE_RATIO_REF) / NODE_RATIO_REF),
-    },
-    "peak_mean_ratio": {
-        "numerical": peak_ratio,
-        "reference": PEAK_RATIO_REF,
-        "abs_error": float(abs(peak_ratio - PEAK_RATIO_REF)),
-        "rel_error": float(abs(peak_ratio - PEAK_RATIO_REF) / PEAK_RATIO_REF),
-    },
+    "burnup_mean_closed_form": metric(bu_mean, BU_MEAN_REF),
+    "table_node_ratio": metric(node_ratio, NODE_RATIO_REF),
+    "peak_mean_ratio": metric(peak_ratio, PEAK_RATIO_REF),
 }
 
 # --. integrated power (parsed from the solver log) --..
@@ -164,7 +148,4 @@ try:
 except Exception as e:
     print(f"[WARNING] axial-profile plot skipped: {type(e).__name__}: {e}")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

@@ -142,11 +142,8 @@ if not is_olander:
 else:
     k_func, k_label = _conductivity(mat, burnup=float(np.max(bu)), Pu=float(np.max(Pu_line)))
     # With a radially varying Pu the 1-D Kirchhoff closed form does not apply,
-    # so there is no analytic reference for the centre temperature. Without
-    # something standing in for it the gold would protect only finite_fields
-    # (0 vs 0) and integrated_power (fixed by the BC): a regression moving the
-    # temperature field by hundreds of K would pass unnoticed. Register the
-    # solution's own scalars for gold comparison only.
+    # so there is no analytic reference for the centre temperature. Register
+    # the solution's own scalars for gold comparison only.
     errors["T_max_K"] = _regression_only(np.max(T_all))
     errors["T_center_midplane_K"] = _regression_only(np.max(T))
     errors["Pu_max_line"] = _regression_only(np.max(Pu_line))

@@ -1,0 +1,15 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+echo "Cleaning current directory..."
+
+# Never "rm -rf output": the blessed non-regression_gold.json lives there, and the
+# suite runs Allclean before every case. output/*.json is also unusable -- it
+# matches the gold. Delete by explicit name and by extension.
+rm -f output/non-regression.json output/case_summary.json
+rm -f output/*.vtu output/*.pvd output/*.xdmf output/*.h5 output/*.png output/*.csv
+rm -f *.msh
+rm -f *.png
+rm -f log_*.md
+
+echo "Done. All output and temporary files cleaned."

@@ -20,12 +20,10 @@ import os
 import yaml
 import numpy as np
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import case_paths, finish, metric
+from z3st.utils.utils_extract_vtu import extract_field
 
-CASE_DIR = os.path.dirname(__file__)
-VTU_FILE = os.path.join(CASE_DIR, "output", "fields.vtu")
-OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
+CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
 
 # --. geometry + material from the case YAML files --..
 with open(os.path.join(CASE_DIR, "geometry.yaml")) as f:
@@ -56,12 +54,7 @@ print(f"[INFO] mean |von Mises|: {vm_num:.3e} Pa  (free swelling ⇒ ≈ 0)")
 print(f"[INFO] bulk modulus K = {K:.3e} Pa; fully constrained would give σ = -K·s = {-K*s:.3e} Pa")
 
 errors = {
-    "u_x_free": {
-        "numerical": ux_num,
-        "reference": UX_REF,
-        "abs_error": float(abs(ux_num - UX_REF)),
-        "rel_error": float(abs(ux_num - UX_REF) / UX_REF),
-    },
+    "u_x_free": metric(ux_num, UX_REF),
     "stress_free_residual": {
         # spurious stress normalised by the constrained-stress scale K·s
         "numerical": vm_num,
@@ -71,7 +64,4 @@ errors = {
     },
 }
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

@@ -172,7 +172,7 @@ if __name__ == "__main__":
     #
     # Default: three-stage Ambati-style ramp.
     #   coarse pre-bifurcation     (0      ->  8 um)   delta_u = 100 nm
-    #   FINE bifurcation window    (8      -> 15 um)   delta_u =  10 nm   <-- converged kink-angle window
+    #   fine bifurcation window    (8      -> 15 um)   delta_u =  10 nm   <-- converged kink-angle window
     #   coarse softening tail      (15     -> 30 um)   delta_u = 100 nm
     #
     # For a uniform single-stage ramp, use one segment instead, e.g.

@@ -1,0 +1,41 @@
+{
+    "results": {
+        "C_tot_target": {
+            "numerical": 1000.0,
+            "reference": 1000.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "C_tot_before_rescale_final": {
+            "numerical": 1018.78,
+            "reference": 1018.78,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "rel_gap_before_rescale": {
+            "numerical": 0.018779999999999974,
+            "reference": 0.018779999999999974,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "worst_rescale_deviation": {
+            "numerical": 0.03635955999999996,
+            "reference": 0.03635955999999996,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "c_max_final": {
+            "numerical": 118.47062025042928,
+            "reference": 118.47062025042928,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

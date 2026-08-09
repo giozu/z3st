@@ -10,7 +10,7 @@ import numpy as np
 import pyvista
 from dolfinx.plot import vtk_mesh
 
-from z3st.core.diagnostic import log
+from z3st.utils.logger import log
 
 
 class MeshPlotter:
@@ -28,7 +28,7 @@ class MeshPlotter:
         surface = pyvista.UnstructuredGrid(topology, cell_types, self.mesh.geometry.x)
 
         unique_tags = np.unique(self.facet_tags.values)
-        print("[INFO] Face labels present:", unique_tags)
+        log.info(f"Face labels present: {unique_tags}")
 
         # matplotlib.colormaps: cm.get_cmap was removed in matplotlib >= 3.9.
         cmap = matplotlib.colormaps["tab10"]

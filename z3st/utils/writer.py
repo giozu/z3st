@@ -14,20 +14,13 @@ cumulative plastic strain).
 
 The class pre-allocates all FE function spaces, Function objects, and
 ``dolfinx.fem.Expression`` objects in ``__init__``. Per-step ``write(t, step)``
-does only interpolation + I/O, so the UFL JIT-compile that used to happen
-inside the time loop in ``__main__.py`` now happens once at setup time.
+does only interpolation + I/O; the UFL JIT compile happens once, at setup time.
 
-Naming conventions (preserved from the previous code path):
+Naming conventions:
   - VTU, ``n_steps == 1``                : ``output/<basename>.vtu``
   - VTU, ``n_steps > 1``                 : ``output/<basename>_NNNN.vtu``
   - XDMF                                 : single ``output/<basename>.xdmf`` + ``.h5``
 
-A ``vtkhdf`` backend was prototyped against dolfinx 0.10 but reverted: the
-0.10 ``dolfinx.io.vtkhdf`` functional API
-(``write_mesh / write_point_data / write_cell_data``) has no field-name
-parameter, so the many named z3st fields cannot be written into a single
-file. Revisit when dolfinx ships a class-based ``VTKHDFFile`` with per-field
-naming.
 """
 
 import os
@@ -44,10 +37,9 @@ from dolfinx.io import XDMFFile
 # ---------------------------------------------------------------------------
 
 def _zero_nonfinite(arr, name):
-    """Replace non-finite entries by 0 for export, but WARN when they are
+    """Replace non-finite entries by 0 for export, warning when they are
     widespread: the legitimate source is the axisymmetric r=0 axis line (a
-    handful of nodes), whereas a diverged solve produces NaN everywhere — and
-    silently exporting an all-zero field would let a garbage run look clean."""
+    handful of nodes), whereas a diverged solve produces NaN everywhere."""
     bad = ~np.isfinite(arr)
     n_bad = int(np.count_nonzero(bad))
     if n_bad > max(1, arr.size // 100):
@@ -63,7 +55,7 @@ def _von_mises(sig):
     In the axisymmetric regime the hoop strain eps_tt = u_r / r is singular at
     the axis r=0, so the stress carries NaN at axis nodes. Suppress the
     resulting 'invalid value' warning and return a finite field (0 at the
-    singular nodes) rather than poisoning the exported VonMises field with NaN.
+    singular nodes).
     """
     s_xx, s_yy, s_zz = sig[..., 0, 0], sig[..., 1, 1], sig[..., 2, 2]
     s_xy, s_yz, s_zx = sig[..., 0, 1], sig[..., 1, 2], sig[..., 2, 0]
@@ -173,9 +165,8 @@ class OutputWriter:
         self._strain_expr_cells = None
         self._strain_expr_points = None
         # Merged output: single domain-wide fields (one Stress, one HeatFlux, ...)
-        # instead of one per material. Each material fills only its own cells, so
-        # cell values are bit-identical to the old per-material fields; point
-        # values can differ only at material interfaces (last writer wins).
+        # instead of one per material. Each material fills only its own cells;
+        # point values can differ at material interfaces (last writer wins).
         self._stress_fn_cells = None
         self._stress_fn_points = None
         self._psi_fn_cells = None
@@ -215,9 +206,9 @@ class OutputWriter:
                 return None
             label = getattr(problem, "label_map", {}).get(name)
             if label is None:
-                # Loud, not silent: with None this material's expression fills
-                # EVERY cell of the merged field (last writer wins) — correct
-                # only when it is the sole material.
+                # With None this material's expression fills every cell of the
+                # merged field (last writer wins), correct only when it is the
+                # sole material.
                 print(f"[OutputWriter] WARNING: material '{name}' has no entry "
                       "in the geometry label map; its output expressions will "
                       "fill the whole mesh (single-material assumption).")
@@ -337,9 +328,8 @@ class OutputWriter:
 
             ValueError: Mismatch of tabulation points and element points.
 
-        For those we fall back to projection. The fallback path costs one
-        linear solve per write() call, which is acceptable here because the
-        ``LinearProblem`` matrix is assembled once and re-used per step.
+        For those we fall back to projection: one linear solve per write() call,
+        with the ``LinearProblem`` matrix assembled once and re-used per step.
         """
         try:
             return dolfinx.fem.Expression(ufl_expr, V.element.interpolation_points)
@@ -395,9 +385,8 @@ class OutputWriter:
                 target_fn.interpolate(source, cells0=cells)
         else:
             # LinearProblem path (quadrature-sourced, e.g. custom plasticity).
-            # The projection solves on the whole mesh; restrict the copy to the
-            # material's own cells so it cannot clobber the other materials'
-            # entries in the shared merged field.
+            # The projection solves on the whole mesh; the copy is restricted to
+            # the material's own cells.
             result = source.solve()
             if cells is None:
                 target_fn.x.array[:] = result.x.array[:]

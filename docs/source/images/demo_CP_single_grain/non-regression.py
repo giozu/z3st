@@ -17,8 +17,8 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.non_regression import error_metric, finish, metric
+from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(__file__)
@@ -223,28 +223,10 @@ else:
 
 # Error dictionary
 errors = {
-    "sigma_zz_final": {
-        "numerical": float(sigma_zz_final),
-        "reference": float(sigma_sat_analytical),
-        "abs_error": float(abs(sigma_zz_final - sigma_sat_analytical)),
-        "rel_error": float(saturation_error),
-    },
-    "epsilon_zz_final": {
-        "numerical": float(epsilon_zz_final),
-        "reference": float(APPLIED_STRAIN_MAX),
-        "abs_error": float(abs(epsilon_zz_final - APPLIED_STRAIN_MAX)),
-        "rel_error": float(rel_error_strain),
-    },
-    "saturation_convergence": {
-        "numerical": float(saturation_error * 100),
-        "reference": 0.0,
-        "abs_error": float(saturation_error * 100),
-        "rel_error": float(saturation_error),
-    },
+    "sigma_zz_final": metric(sigma_zz_final, sigma_sat_analytical, rel=saturation_error),
+    "epsilon_zz_final": metric(epsilon_zz_final, APPLIED_STRAIN_MAX, rel=rel_error_strain),
+    "saturation_convergence": error_metric(saturation_error * 100, rel=saturation_error),
 }
 
 # --.. ..- .-.. .-.. --- pass/fail + regression --.. ..- .-.. .-.. ---
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

@@ -24,7 +24,6 @@ Diagnostic outputs (all in output/):
 """
 
 import os
-import json
 import glob
 
 import matplotlib.pyplot as plt
@@ -32,6 +31,8 @@ import matplotlib.tri as mtri
 import numpy as np
 import pyvista as pv
 import yaml
+
+from z3st.utils.non_regression import finish, tracked
 
 # --.. ..- .-.. .-.. --- load parameters --.. ..- .-.. .-.. ---
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -141,25 +142,19 @@ errors = {}
 last = all_snapshots[-1]
 T_last = last["T"]
 T_mean_final = float(np.mean(T_last))
-# Partial-quench transient: the domain-mean temperature must lie between the
-# cold-bath (Dirichlet/Robin) temperature and the initial temperature. (An
-# endpoint check against T_initial or T_quench is unphysical mid-transient.)
+# Partial-quench transient: the domain-mean temperature lies between the
+# cold-bath (Dirichlet/Robin) temperature and the initial temperature.
 T_lo = min(T_quench, T_initial)
 T_hi = max(T_quench, T_initial)
 in_range = (T_lo - 1.0) <= T_mean_final <= (T_hi + 1.0)
 print(f"\n[CHECK] Final t = {last['t']:.2e} s, T_mean = {T_mean_final:.1f} K "
       f"(partial quench: must lie within [{T_lo:.1f}, {T_hi:.1f}] K)")
-errors["T_final_mean_in_range"] = {
-    "numerical": T_mean_final, "reference": [T_lo, T_hi],
-    "rel_error": 0.0, "pass": bool(in_range),
-}
+errors["T_final_mean_in_range"] = tracked(T_mean_final)
 
 if last["D"] is not None:
     D_max = float(np.max(last["D"]))
     print(f"[CHECK] D_max at final time: {D_max:.4e}")
-    errors["D_max_final"] = {
-        "numerical": D_max, "reference": 1.0, "rel_error": float(abs(D_max - 1.0)), "pass": True
-    }
+    errors["D_max_final"] = tracked(D_max)
 
 
 # --.. ..- .-.. .-.. --- plot: energy balance --.. ..- .-.. .-.. ---
@@ -356,8 +351,7 @@ try:
             print(f"[INFO] Hoop stress plot saved: {os.path.join(OUT_DIR, 'stress_hoop_field.png')}")
 
     # ------ Bonus: angular damage scan at the outer ring ------
-    # Shows the discrete crack count within the contact wedge. Requires the
-    # damage field, so guarded on damage_name.
+    # Shows the discrete crack count within the contact wedge.
     if damage_name is not None:
         D_field_local = np.asarray(last_mesh_pv.point_data[damage_name]).reshape(-1)
         r_pts = np.sqrt(x_pts**2 + y_pts**2)
@@ -382,8 +376,8 @@ try:
         def count_segments(prof, thr=0.5):
             """Number of discrete D>=thr arcs. Empty (NaN) bins are filled from
             their nearest populated neighbour first, so a missing bin never reads
-            as a separation, while every populated D<thr bin -- however narrow --
-            does separate two cracks."""
+            as a separation, while every populated D<thr bin separates two
+            cracks."""
             mask = np.isnan(prof)
             if mask.all():
                 return 0
@@ -396,9 +390,8 @@ try:
             return int(np.sum((~above[:-1]) & (above[1:]))) + int(above[0])
 
         # Thermal-shock cracks merge into one continuous band at the very rim and
-        # fade out deeper in, so a single hand-picked shell mis-counts (the old
-        # 0.90-0.99 Ro band sat where the fingers are fused). Sweep overlapping
-        # shells and take the one where the fingers are most separated.
+        # fade out deeper in. Sweep overlapping shells and take the one where the
+        # fingers are most separated.
         bands = [(c - 0.06, c + 0.06) for c in np.arange(0.62, 0.96, 0.03)]
         best_n, best_prof, best_band = 0, angular_dmax(0.80, 0.90), (0.80, 0.90)
         for r_lo, r_hi in bands:
@@ -430,9 +423,7 @@ try:
         plt.close(fig5)
         print(f"[INFO] Angular damage plot saved: {plot_path5}")
 
-        errors["crack_count_above_0p5"] = {
-            "numerical": n_cracks, "reference": 3, "rel_error": 0.0, "pass": True
-        }
+        errors["crack_count_above_0p5"] = tracked(n_cracks)
         print(f"[INFO] Estimated crack count (max over radial shells, D>0.5): "
               f"{n_cracks}  [best shell {best_band[0]:.2f}-{best_band[1]:.2f} Ro]")
     else:
@@ -442,18 +433,4 @@ except Exception as e:
 
 
 # --.. ..- .-.. .-.. --- pass/fail --.. ..- .-.. .-.. ---
-print(f"\nPass/Fail check (tolerance = {TOLERANCE:.1e})")
-all_pass = True
-for key, val in errors.items():
-    if "pass" in val:
-        status = "PASS" if val["pass"] else "FAIL"
-    else:
-        status = "PASS" if val["rel_error"] < TOLERANCE else "FAIL"
-    if status == "FAIL":
-        all_pass = False
-    print(f"  {key:<28s} -> rel err = {val['rel_error']:.2e}  -> {status}")
-
-with open(OUT_JSON, "w") as f:
-    json.dump(errors, f, indent=2)
-print(f"\n[INFO] Results written to: {OUT_JSON}")
-print(f"\n[SUMMARY] {'PASS' if all_pass else 'FAIL'}")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

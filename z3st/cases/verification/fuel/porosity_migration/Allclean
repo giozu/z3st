@@ -1,3 +1,2 @@
 #!/bin/bash
-rm -f mesh.msh log_mesh.md log_z3st.md non-regression.json *.png
-rm -f output/non-regression.json output/*.xdmf output/*.h5 output/*.vtu output/*.png
+. "$(python3 -c 'import z3st,os;print(os.path.dirname(z3st.__file__))')/utils/allclean.sh"

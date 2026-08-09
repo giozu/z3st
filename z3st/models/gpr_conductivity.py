@@ -19,6 +19,7 @@ import os
 import numpy as np
 
 from z3st.materials.magni_mox_thermal import dk_dT_numpy, k_numpy
+from z3st.models.magni_conductivity import card_value
 
 
 class GPRConductivity:
@@ -131,41 +132,41 @@ class GPRConductivity:
 
         return residual.reshape(T.shape), dmean_dT.reshape(T.shape)
 
+    def _args(self, T, Pu, Am, Np, x, p, burnup):
+        """Per-dof composition of the six card fields, broadcast to T's shape.
+
+        Deliberately not shared with MagniConductivity._args: this one keeps the
+        stored scalar when the argument is None (the GPR kernel wants flat
+        features, so _local here returns a ravelled array) and reshapes to T only
+        when a field was supplied. Magni always goes through _local.
+        """
+        def one(value, fallback):
+            if value is None:
+                return fallback
+            return self._local(value, fallback, T.shape).reshape(T.shape)
+
+        return dict(
+            Pu=one(Pu, self.Pu), Am=one(Am, self.Am), Np=one(Np, self.Np),
+            x=one(x, self.x), p=one(p, self.p), burnup=one(burnup, self.burnup),
+        )
+
     def __call__(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        Pu_v = self.Pu if Pu is None else self._local(Pu, self.Pu, T.shape).reshape(T.shape)
-        Am_v = self.Am if Am is None else self._local(Am, self.Am, T.shape).reshape(T.shape)
-        Np_v = self.Np if Np is None else self._local(Np, self.Np, T.shape).reshape(T.shape)
-        x_v = self.x if x is None else self._local(x, self.x, T.shape).reshape(T.shape)
-        p_v = self.p if p is None else self._local(p, self.p, T.shape).reshape(T.shape)
-        burnup_v = self.burnup if burnup is None else self._local(burnup, self.burnup, T.shape).reshape(T.shape)
-        residual, _ = self._residual_and_dT(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
-        base = k_numpy(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
+        kw = self._args(T, Pu, Am, Np, x, p, burnup)
+        residual, _ = self._residual_and_dT(T, **kw)
+        base = k_numpy(T, **kw)
         return (base * np.exp(residual)).astype(T.dtype).reshape(T.shape)
 
     def value_and_grad(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        Pu_v = self.Pu if Pu is None else self._local(Pu, self.Pu, T.shape).reshape(T.shape)
-        Am_v = self.Am if Am is None else self._local(Am, self.Am, T.shape).reshape(T.shape)
-        Np_v = self.Np if Np is None else self._local(Np, self.Np, T.shape).reshape(T.shape)
-        x_v = self.x if x is None else self._local(x, self.x, T.shape).reshape(T.shape)
-        p_v = self.p if p is None else self._local(p, self.p, T.shape).reshape(T.shape)
-        burnup_v = self.burnup if burnup is None else self._local(burnup, self.burnup, T.shape).reshape(T.shape)
-        residual, dres_dT = self._residual_and_dT(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
-        base = k_numpy(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
-        dbase = dk_dT_numpy(T, Pu=Pu_v, Am=Am_v, Np=Np_v, x=x_v, p=p_v, burnup=burnup_v)
+        kw = self._args(T, Pu, Am, Np, x, p, burnup)
+        residual, dres_dT = self._residual_and_dT(T, **kw)
+        base = k_numpy(T, **kw)
+        dbase = dk_dT_numpy(T, **kw)
         exp_r = np.exp(residual)
         k = base * exp_r
         dk = exp_r * (dbase + base * dres_dT)
         return k.reshape(T.shape), dk.reshape(T.shape)
-
-
-def _card_value(card, material, *keys, default=0.0):
-    for src in (card, material or {}):
-        for key in keys:
-            if key in src:
-                return src[key]
-    return default
 
 
 def load_from_card(card, material=None, base_dir=None):
@@ -176,19 +177,19 @@ def load_from_card(card, material=None, base_dir=None):
     if base_dir is not None and not os.path.isabs(model_path):
         model_path = os.path.join(base_dir, model_path)
 
-    om = _card_value(card, material, "OM", "O_M", "oxygen_to_metal", default=None)
-    x = _card_value(card, material, "x", default=None)
+    om = card_value(card, material, "OM", "O_M", "oxygen_to_metal", default=None)
+    x = card_value(card, material, "x", default=None)
     if x is None:
         x = 0.0 if om is None else 2.0 - float(om)
 
     return GPRConductivity(
         model_path,
-        Pu=_card_value(card, material, "Pu", "pu", "Pu_fraction", "plutonium", default=0.0),
-        Am=_card_value(card, material, "Am", "am", "Am_fraction", "americium", default=0.0),
-        Np=_card_value(card, material, "Np", "np", "Np_fraction", "neptunium", default=0.0),
+        Pu=card_value(card, material, "Pu", "pu", "Pu_fraction", "plutonium", default=0.0),
+        Am=card_value(card, material, "Am", "am", "Am_fraction", "americium", default=0.0),
+        Np=card_value(card, material, "Np", "np", "Np_fraction", "neptunium", default=0.0),
         x=x,
-        p=_card_value(card, material, "p", "porosity", default=0.0),
-        burnup=_card_value(card, material, "burnup", "bu", default=0.0),
+        p=card_value(card, material, "p", "porosity", default=0.0),
+        burnup=card_value(card, material, "burnup", "bu", default=0.0),
         mode=card.get("mode", "mean"),
         xi=card.get("xi", card.get("sigma_multiplier", 0.0)),
     )

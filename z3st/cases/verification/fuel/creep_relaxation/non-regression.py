@@ -13,8 +13,8 @@ Checks:
   1. sigma_end vs the scalar backward-Euler replica of the same recursion, 
      sigma_{k+1} + E*dt*A*sigma_{k+1}^n = sigma_k,
      solved per step by a scalar Newton.
-  2. sigma_end vs the exact closed form
-     shrinks as O(dt) with n_steps (re-run with more steps to see it drop).
+  2. sigma_end vs the exact closed form; the defect shrinks as O(dt) with
+     n_steps.
 
 One figure: sigma(t), Z3ST per-step vs scalar BE vs the exact solution.
 """
@@ -27,8 +27,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from z3st.utils.utils_verification import *
-from z3st.utils.utils_extract_xdmf import *
+from z3st.utils.non_regression import finish, metric
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 R_GAS = 8.314462618
 
@@ -99,12 +99,7 @@ print(f"[INFO] backward-Euler defect vs exact at this dt: {be_defect:.2%} "
       f"(shrinks O(dt) with more steps)")
 
 errors = {
-    "sigma_relaxed_vs_backward_euler": {
-        "numerical": sigma_end,
-        "reference": SIGMA_BE_END,
-        "abs_error": float(abs(sigma_end - SIGMA_BE_END)),
-        "rel_error": float(abs(sigma_end - SIGMA_BE_END) / SIGMA_BE_END),
-    },
+    "sigma_relaxed_vs_backward_euler": metric(sigma_end, SIGMA_BE_END),
     "time_discretisation_defect": {
         "numerical": float(abs(sigma_end - SIGMA_EXACT_END) / SIGMA_EXACT_END),
         "reference": float(be_defect),
@@ -143,7 +138,4 @@ try:
 except Exception as e:
     print(f"[WARNING] relaxation plot skipped: {type(e).__name__}: {e}")
 
-pass_fail_check(errors, TOLERANCE, OUT_JSON, CASE_DIR)
-regression_check(errors, CASE_DIR)
-
-print("\n[INFO] non-regression completed.\n")
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

@@ -17,9 +17,7 @@ and calls ``per_step(problem, step, t)`` after every converged step.
 Under MPI the field statistics are reduced across ranks and only rank 0 writes,
 so the CSV holds one row per step with global values. The reductions are
 collective and must therefore run on every rank before the rank-0 write. The
-file is truncated on the first call of a run rather than appended to, so a
-re-run without ``Allclean`` replaces the previous history instead of
-concatenating with it.
+file is truncated on the first call of a run rather than appended to.
 """
 
 import os

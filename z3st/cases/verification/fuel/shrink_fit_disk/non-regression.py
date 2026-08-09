@@ -25,8 +25,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from z3st.utils.utils_extract_vtu import *
-from z3st.utils.utils_verification import *
+from z3st.utils.utils_verification import pass_fail_check, regression_check
 
 CASE = os.path.dirname(__file__)
 OUT = os.path.join(CASE, "output")
@@ -90,9 +89,7 @@ print("[INFO] contact_pressure_verification.png saved")
 mask = p_lame > 10.0
 if not mask.any():
     # No step reaches the threshold, so there is no established contact to
-    # compare against the Lame interference fit. Stop with a verdict: the
-    # errors dict below indexes this mask and would otherwise raise
-    # NameError on `rel` and ValueError on an empty reduction.
+    # compare against the Lame interference fit.
     raise SystemExit(
         "[FAIL] contact never reached the 10 MPa verification threshold; "
         "the case premise (the gap closes under the temperature ramp) does not hold"

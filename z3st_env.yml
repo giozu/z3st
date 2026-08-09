@@ -20,11 +20,10 @@ dependencies:
   # --. Scientific stack --..
 - numpy>=2    # np.trapezoid (numpy 2 API) is used across the verification cases
 - scipy
-- sympy
-- pandas
+- pandas    # post-processing only (one study script)
+- h5py      # utils_extract_xdmf.py reads the XDMF HDF5 sidecar: required, not optional
 - matplotlib
-- pyvista
-- meshio
+- pyvista>=0.42
 
   # --. Jupyter / visualization --..
 - jupyterlab
@@ -56,7 +55,4 @@ dependencies:
   # --. Install via pip (not conda!) --..
 - pip:
   - gmsh
-  - sphinx
-  - sphinx-book-theme
-  - myst-parser
-  - sphinx-autodoc-typehints
+  # docs: pip install -e '.[docs]'

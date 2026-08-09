@@ -16,12 +16,10 @@ Two animations:
      contact pressure, temperature -- with a marker sweeping the time axis so
      the mesh and the curves advance together.
 
-     NOTE on the warp factor: the unmeshed 65 um pellet-clad gap is baked into
-     the mesh coordinates and is NOT scaled by warp_by_vector (only the
-     displacement is). Exaggerating the warp therefore makes the pellet
-     visually overrun the clad by ~(factor-1)x65 um, which is unphysical. The
-     faithful animation is factor = 1.0; the quantitative gap-closure / contact
-     story is carried by the side-panel curves.
+     Warp factor: the unmeshed 65 um pellet-clad gap is baked into the mesh
+     coordinates and is not scaled by warp_by_vector (only the displacement
+     is), so a factor > 1 makes the pellet overrun the clad by ~(factor-1)x65
+     um. The faithful animation is factor = 1.0.
 
   2. damage_evolution.gif (benchmarks/damage/pellet_quench_2D_xy)
      AT1 phase-field damage field over the thermal-shock transient, cracks
