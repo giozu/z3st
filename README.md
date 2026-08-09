@@ -105,7 +105,7 @@ These cases serve both as:
 * **Material database** — YAML-based cards (`materials/`): UO₂, multiple steel families (austenitic, martensitic, high-carbon, T91, 15-15Ti, vessel), Zircaloy, ceramics, oxides, plastic, lead, H₂O
 * **Mesh input** — Gmsh `.msh` files or YAML-driven mesh builder; reusable Gmsh templates under `utils/geo_files/`
 * **YAML-driven configuration** — three plain-text files per case (`input.yaml`, `geometry.yaml`, `boundary_conditions.yaml`); reproducible, diffable, version-controllable
-* **Parallel performance** — PETSc with MUMPS / GAMG / HYPRE BoomerAMG, MPI via `MPI.COMM_WORLD`
+* **Parallel performance** — PETSc with MUMPS / GAMG / HYPRE BoomerAMG, MPI via `MPI.COMM_WORLD`. Cases run under `mpirun` and are checked by hand; note that **neither suite exercises this** — every case in `non-regression_local.sh` and in `cases_ci.txt` runs serially, so a parallel-only regression would not be caught automatically
 * **Post-processing ecosystem** — VTU and XDMF time-series output through a unified writer that pre-compiles all interpolation expressions once at setup; ParaView- and PyVista-compatible
 * **Continuous integration** — per-case `non-regression.py` vs. version-controlled gold JSON, summarised on every commit via GitHub Actions
 * **Documented API** — Sphinx sources under `docs/source/`, built by GitHub Actions; UML class diagram in [`docs/source/architecture.md`](docs/source/architecture.md)
@@ -345,7 +345,7 @@ verdict, a case that writes a verdict with no gold, a NaN in a gold, an undefine
 dependency imported by library code but not declared, a method name colliding across
 `Spine`'s 13 mixins, a stale case path in the docs, a broken path in a driver, a shell
 syntax error in any of the 166 shell files, and a script the CI workflow invokes but that
-does not exist.
+does not exist. None of them runs anything in parallel.
 
 To have git refuse a commit they reject, once per clone:
 

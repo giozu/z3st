@@ -25,11 +25,9 @@
 # Run `python -m z3st.utils.audit_checks` to re-derive all of the above; it is where
 # the goldless-case list comes from and takes four seconds.
 #
-# After the cases, the driver runs ./mpi_smoke.sh: mass_conservation_1D on 2 ranks,
-# 10 s. It is not in the list below because it is not a case -- it guards a property
-# of the runtime, not of the physics. Every case here runs serially, so nothing else
-# in CI would notice a rank-asymmetry deadlock at exit or output multiplied by the
-# rank count. Both have happened.
+# Every case here runs SERIALLY. Parallel execution works -- it is used by hand -- but
+# no case in either suite exercises it, so neither suite can notice a regression in it.
+# An mpi_smoke.sh existed briefly on 2026-08-09 and was removed: see README.
 
 # --. thermal --..
 verification/thermal/thin_slab_dirichlet_2D
