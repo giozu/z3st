@@ -1,0 +1,34 @@
+{
+    "results": {
+        "sigma_xx_max_err": {
+            "numerical": 100000001.12052587,
+            "reference": 100000000.0,
+            "abs_error": 1.1205258667469025,
+            "rel_error": 1.1205258667469025e-08,
+            "status": "PASS"
+        },
+        "sigma_yy_max_abs": {
+            "numerical": 0.8958026021718979,
+            "reference": 0.0,
+            "abs_error": 0.8958026021718979,
+            "rel_error": 8.958026021718978e-09,
+            "status": "PASS"
+        },
+        "sigma_zz_max_abs": {
+            "numerical": 2.5743261985480785,
+            "reference": 0.0,
+            "abs_error": 2.5743261985480785,
+            "rel_error": 2.5743261985480785e-08,
+            "status": "PASS"
+        },
+        "u_xL": {
+            "numerical": 0.0004999999999615378,
+            "reference": 0.0005,
+            "abs_error": 3.846218048914052e-14,
+            "rel_error": 7.692436097828104e-11,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.0001,
+    "summary": "PASS"
+}
