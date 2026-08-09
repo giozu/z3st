@@ -35,6 +35,7 @@ import yaml
 import numpy as np
 
 from case_params import (
+    check_consistency,
     elastic_factor, R_CLAD_I, R_CLAD_O, E_FUEL, NU_FUEL, E_EL, NU,
 )
 from z3st.utils.non_regression import finish
@@ -44,6 +45,14 @@ CASE_DIR = os.path.dirname(__file__)
 OUT = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(OUT, "non-regression.json")
 HISTORY = os.path.join(OUT, "history.csv")
+
+_problems = check_consistency()
+if _problems:
+    raise SystemExit(
+        "[non-regression] configuration is incoherent with Esposito eq. (21); "
+        "the comparison would be meaningless:\n  - "
+        + "\n  - ".join(_problems)
+    )
 
 TOLERANCE = 1e-2
 
