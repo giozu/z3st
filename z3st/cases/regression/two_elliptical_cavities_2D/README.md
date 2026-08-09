@@ -75,6 +75,10 @@ finite-`lc`, *percolating* crack) is the highest of the three:
 
 ## OPEN DECISION (deferred) — the (Gc, lc) regime
 
+`Gc` has a single source, `materials/oxide.py` (`Gc(mesh)` as UFL,
+`Gc_numpy(y)` for post-processing); the case scripts import it rather than
+restating it.
+
 With the current `Gc_gb = 0.1 pJ/µm²` and `lc = 4 nm`, `σ_c ≈ 670 MPa` and the
 smooth-tip/finite-`lc` transition above push GB failure to **~1–2.4 GPa** bubble
 pressure (validated: `Fc 0.2/0.4/0.6 → p_crit 2368/2053/1105 MPa`).
@@ -106,22 +110,6 @@ The case **is in the local regression suite** (`Allrun` + a blessed
 `output/non-regression_gold.json`; ~120 s, so kept out of the CI subset). Re-bless
 with `cp output/non-regression.json output/non-regression_gold.json` after a
 sanity-checked baseline run. `Allclean` preserves the gold and the sweep figures.
-
-## Recent changes
-
-- Non-regression metrics reconciled to the no-fracture baseline (`max_damage`
-  ref 0, `max_stress_yy` ref = ligament-corrected tip concentration with
-  `p_applied` read from the ramp) + a gold + `regression_check`; case joined the
-  local suite. `Allclean` no longer wipes `output/` wholesale (gold preserved).
-- Analytical reference upgraded: fracture-mechanics SIF (`p_crit_sif`,
-  Chakraborty 2014) added alongside the superseded strength estimate; see the
-  "Analytical reference" section.
-- `parametric_study.py` made config-driven (edit the `CASES` block, run all).
-- `Gc` reconciled: `materials/oxide.py` is the single source (`Gc(mesh)` UFL +
-  `Gc_numpy(y)`); the script imports it (a stray `*1e-6` in a local copy is gone).
-- Output field name corrected (`Stress_solid → Stress`).
-- Mesh refined (`h_cavity = lc/2`) and parametrised by `Fc`.
-- Cleaner diagnostic plots (field overview, GB stress profile, Gc, fracture map).
 
 ## Background literature (GB-bubble overpressurisation → fragmentation / FGR)
 

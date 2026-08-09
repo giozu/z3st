@@ -54,7 +54,7 @@ Diff the output against a SCIANTIX **standalone** run with the same
 `input_history.txt` (same T, fission rate, dt) — they must match. That closes the
 binding correctness gap before any Z3ST integration.
 
-## 3. Array layout (verified against SCIANTIX v2.2.1, 2026-06-18)
+## 3. Array layout (verified against the SCIANTIX v2.2.1 source)
 
 `include/MainVariables.h`: `options[40]`, `history[20]`, `variables[300]`,
 `scaling_factors[20]`, `diffusion_modes[720]` (= 18 mode blocks × 40 modes).
@@ -82,8 +82,7 @@ Z3ST's `spine.update_state` passes the per-dof burnup pair automatically.
 ## 4. Z3ST integration — IMPLEMENTED (the eigenstrain bus)
 
 SCIANTIX gaseous swelling is a **numerical, stateful per-point field**, not a UFL
-expression — so it rides the **state bus**, exactly like burnup/creep. Wired in
-2026-06-19 (punch-list **CODE-FEATURE-4**), default OFF:
+expression — so it rides the **state bus**, exactly like burnup/creep. Default OFF:
 
 1. `SciantixField` (in `sciantix_binding.py`) holds one SCIANTIX point per `V_t`
    dof of the fissile region; the library + model settings are read once and shared.
@@ -138,8 +137,8 @@ remain uncomputed in a coupling build (also inside the skipped `Burnup()`); they
 no Z3ST consumer yet, but a model needing them would face the same gap.
 
 ## Status
-Binding written against SCIANTIX 2.2.1; array map verified against source
-2026-06-18 and **validated end-to-end the same day**.
+Binding written against SCIANTIX 2.2.1; array map verified against that source
+and **validated end to end**.
 
 Build the shared lib exactly as in §1 — same `-DCOUPLING_TU`, same persistent
 path. (Earlier revisions of this section showed the build without the macro and
@@ -152,7 +151,7 @@ SCIANTIX_LIB=<sciantix>/build/libsciantix_tu.so \
   PYTHONPATH=<z3st>/z3st/coupling/sciantix python3 \
   <z3st>/z3st/coupling/sciantix/validate_baker.py
 ```
-Result (2026-06-18): all four engineering outputs match the standalone gold to
+Result: all four engineering outputs match the standalone gold to
 ~1e-7 relative error — FGR 0.132097, intragranular swelling 3.07e-4, intergranular
 swelling 0.0417, burnup 6.719. **[VALIDATION] PASS.**
 
@@ -165,7 +164,7 @@ Two non-obvious facts this surfaced (both handled in `load_initial_conditions`):
    Without the grain-boundary defaults the intergranular model returns `nan` and
    releases nothing.
 
-Coupling-build check (2026-06-19): with a `-DCOUPLING_TU` lib SCIANTIX skips its own
+Coupling-build check: with a `-DCOUPLING_TU` lib SCIANTIX skips its own
 burnup and consumes Z3ST's (fed via `history[7]/[8]`); driving the gold burnup
 trajectory reproduces the same gas outputs (~1e-7) and burnup matches exactly — so
 the host-owns-burnup design is verified. `validate_baker.py` feeds the burnup

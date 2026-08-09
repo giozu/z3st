@@ -11,14 +11,12 @@ import os
 import warnings
 
 import numpy as np
-import yaml
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pyvista as pv
 
-from z3st.utils.utils_load import generate_power_history
-from z3st.utils.utils_extract_xdmf import *
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 pv.OFF_SCREEN = True
 # start_xvfb is deprecated in recent PyVista but is the working headless path
@@ -32,88 +30,26 @@ with warnings.catch_warnings():
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "output")
+HISTORY_CSV = os.path.join(OUT, "history.csv")
 
 # parameters
 # Geometry, material and solver constants come from this case's YAML files.
 # See case_params.py.
 from case_params import (
-    R_GAS, R_PELLET, R_CLAD_I, R_CLAD_O, G0, K_PEN, T_TOTAL, NB_STEPS,
-    E_EL, NU, E_FUEL, NU_FUEL, ALPHA, G, CREEP_A0, CREEP_N, CREEP_Q, SIGMA0,
+    R_GAS, R_PELLET, R_CLAD_I, R_CLAD_O, E_EL, NU, E_FUEL, NU_FUEL,
+    CREEP_A0, CREEP_N, CREEP_Q, elastic_factor, report,
 )
 
-def burnup_per_step(files):
-    """Average burnup (MWd/kgU), from the Burnup VTU field"""
-    bu = []
-    for f in files:
-        g = pv.read(f)
-        if "Burnup" not in g.point_data:
-            bu.append(0.0)
-            continue
-        r = g.points[:, 0]
-        b = g.point_data["Burnup"]
-        fuel = r <= R_PELLET + 1e-6
-        bu.append(float(b[fuel].mean()))
-    return np.array(bu)
 
 
-def _imposed_lhr_kwm():
-    """LHR (kW/m) """
-    with open(os.path.join(HERE, "input.yaml")) as f:
-        inp = yaml.safe_load(f)
-    raw = inp["n_steps"]
-    n_increments = raw if isinstance(raw, (list, tuple)) else int(raw) - 1
-    _, lhrs, _ = generate_power_history(inp["time"], inp["lhr"],
-                                        n_steps=n_increments, filename=None)
-    return np.array(lhrs) / 1e3
 
 
-LHR = _imposed_lhr_kwm()
 
 TOL = 2.0e-5
 
 
-def surface_mean_ur(grid, r_target):
-    r = grid.points[:, 0]
-    ur = grid.point_data["Displacement"][:, 0]
-    sel = np.abs(r - r_target) < TOL
-    return ur[sel].mean(), ur[sel]
 
 
-# ----------------------------------------------------------------------
-# 0. LHR vs time
-# ----------------------------------------------------------------------
-def plot_history():
-    with open(os.path.join(HERE, "input.yaml")) as f:
-        inp = yaml.safe_load(f)
-    t_points = inp["time"]
-    lhr_points = inp["lhr"]
-    raw = inp["n_steps"]
-    n_increments = raw if isinstance(raw, (list, tuple)) else int(raw) - 1
-    times, lhrs, _ = generate_power_history(t_points, lhr_points,
-                                            n_steps=n_increments, filename=None)
-
-    # display time in hours if the ramp is long, else seconds
-    span = max(t_points) - min(t_points)
-    if span >= 3600:
-        tscale, tunit = 1.0 / 3600.0, "h"
-    else:
-        tscale, tunit = 1.0, "s"
-
-    fig, ax = plt.subplots(figsize=(6.4, 4.2))
-    ax.plot(np.array(t_points) * tscale, np.array(lhr_points) / 1e3, "-",
-            color="#C44E52", lw=1.5, alpha=0.6, label="imposed ramp")
-    ax.plot(np.array(times) * tscale, np.array(lhrs) / 1e3, "o",
-            color="#C44E52", ms=6, label="solve steps")
-    ax.set_xlabel(f"time ({tunit})")
-    ax.set_ylabel("linear heat rate (kW/m)")
-    ax.set_title("Imposed power history (transient)")
-    ax.grid(alpha=0.3)
-    ax.legend()
-    fig.tight_layout()
-    fig.savefig(os.path.join(OUT, "power_history.png"), dpi=150)
-    plt.close(fig)
-    print(f"  wrote output/power_history.png  ({len(times)} steps: "
-          f"{', '.join(f'{q/1e3:.0f}' for q in lhrs)} kW/m)")
 
 
 # ----------------------------------------------------------------------
@@ -140,123 +76,41 @@ def plot_mesh():
     print("  wrote output/mesh.png")
 
 
-# ----------------------------------------------------------------------
-# 2. PCMI CURVES (gap, contact pressure, load transfer) vs LHR
-# ----------------------------------------------------------------------
-def plot_pcmi_curves():
-    """Prefers output/history.csv (written by diagnostics.py)
-    It works for VTU *or* XDMF runs. Falls back to per-step VTU reads when no CSV
-    is present."""
-    if os.path.exists(os.path.join(OUT, "history.csv")):
-        _pcmi_from_csv()
-    else:
-        _pcmi_from_vtu()
 
 
-def _pcmi_from_csv():
-    d = np.genfromtxt(os.path.join(OUT, "history.csv"), delimiter=",", names=True)
-    bu = np.atleast_1d(d["burnup_avg_MWdkgU"])
-    days = np.atleast_1d(d["time_days"])
-    gaps = np.atleast_1d(d["gap_um"])
-    pres = np.atleast_1d(d["contact_pressure_MPa"])
-    tmax = np.atleast_1d(d["T_max_K"])
-    tmin = np.atleast_1d(d["T_min_K"])
-
-    fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
-
-    ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
-    ax1.plot(bu, gaps, "o-", color="#4C72B0", label="gap")
-    ax1.axhline(0, color="grey", lw=0.8, ls=":")
-    ax1.set_xlabel("fuel-average burnup (MWd/kgU)")
-    ax1.set_ylabel("gap (um)", color="#4C72B0")
-    ax1.tick_params(axis="y", labelcolor="#4C72B0")
-    ax2 = ax1.twinx()
-    ax2.plot(bu, pres, "s--", color="#C44E52", label="contact pressure")
-    ax2.set_ylabel("contact pressure (MPa)", color="#C44E52")
-    ax2.tick_params(axis="y", labelcolor="#C44E52")
-
-    ax3.set_title("Operating history")
-    ax3.plot(days, bu, "o-", color="#55A868", label="fuel-avg burnup")
-    ax3.set_xlabel("time (days)")
-    ax3.set_ylabel("burnup (MWd/kgU)", color="#55A868")
-    ax3.tick_params(axis="y", labelcolor="#55A868")
-    ax4 = ax3.twinx()
-    ax4.plot(days, tmax, "^--", color="#911B1F", label="max temperature")
-    ax4.plot(days, tmin, "^--", color="#BE7375", label="min temperature")
-    ax4.set_ylabel("temperature (K)", color="#C44E52")
-    ax4.tick_params(axis="y", labelcolor="#C44E52")
-    ax3.grid(alpha=0.3)
-
-    fig.tight_layout()
-    fig.savefig(os.path.join(OUT, "pcmi_curves.png"), dpi=150)
-    plt.close(fig)
-    print("  wrote output/pcmi_curves.png  (from history.csv)")
-    onset = next((bu[i] for i in range(len(bu)) if pres[i] > 0.0), None)
-    onset_s = f"{onset:.1f} MWd/kgU" if onset is not None else "not reached"
-    print(f"    PCMI onset at burnup = {onset_s}")
-    print(f"    final: bu={bu[-1]:.1f} MWd/kgU, gap={gaps[-1]:+.2f} um, "
-          f"p={pres[-1]:.1f} MPa, T_max={tmax[-1]:.0f} K")
 
 
-def _pcmi_from_vtu():
-    files = sorted(glob.glob(os.path.join(OUT, "*.vtu")))
-    bu = burnup_per_step(files)        # rod-average burnup (MWd/kgU), x-axis
-    gaps, pres, ur_p, ur_c, tmax = [], [], [], [], []
-    for f in files:
-        g = pv.read(f)
-        urp, _ = surface_mean_ur(g, R_PELLET)
-        urc, _ = surface_mean_ur(g, R_CLAD_I)
-        gap = G0 + urc - urp
-        gaps.append(gap * 1e6)             # um
-        pres.append(K_PEN * max(0.0, -gap) / 1e6)  # MPa
-        ur_p.append(urp * 1e6)
-        ur_c.append(urc * 1e6)
-        tmax.append(float(g.point_data["Temperature"].max()))
-
-    fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
-
-    # left: gap closure + contact pressure vs burnup
-    ax1.plot(bu, gaps, "o-", color="#4C72B0", label="gap")
-    ax1.axhline(0, color="grey", lw=0.8, ls=":")
-    ax1.set_xlabel("rod-average burnup (MWd/kgU)")
-    ax1.set_ylabel("gap (um)", color="#4C72B0")
-    ax1.tick_params(axis="y", labelcolor="#4C72B0")
-    ax2 = ax1.twinx()
-    ax2.plot(bu, pres, "s--", color="#C44E52", label="contact pressure")
-    ax2.set_ylabel("contact pressure (MPa)", color="#C44E52")
-    ax2.tick_params(axis="y", labelcolor="#C44E52")
-    ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
-
-    # right: load transfer (radial displacement of the two surfaces) vs burnup
-    ax3.plot(bu, ur_p, "o-", color="#4C72B0", label="pellet outer (swelling + thermal)")
-    ax3.plot(bu, ur_c, "s-", color="#DD8452", label="clad inner (pushed out on contact)")
-    ax3.set_xlabel("rod-average burnup (MWd/kgU)")
-    ax3.set_ylabel("radial displacement (um)")
-    ax3.set_title("Load transfer (clad pushed out on contact)")
-    ax3.legend(loc="upper left")
-    ax3.grid(alpha=0.3)
-
-    fig.tight_layout()
-    fig.savefig(os.path.join(OUT, "pcmi_curves.png"), dpi=150)
-    plt.close(fig)
-    print("  wrote output/pcmi_curves.png")
-    # report PCMI onset (first step where the gap closes)
-    onset = next((bu[i] for i in range(len(bu)) if pres[i] > 0.0), None)
-    onset_str = f"{onset:.1f} MWd/kgU" if onset is not None else "not reached"
-    print(f"    PCMI onset at burnup = {onset_str}")
-    print(f"    final: bu={bu[-1]:.1f} MWd/kgU, gap={gaps[-1]:+.2f} um, "
-          f"p={pres[-1]:.1f} MPa, T_max={tmax[-1]:.0f} K")
 
 
 # ----------------------------------------------------------------------
 # 2b. RADIAL PROFILE at mid-height
 # ----------------------------------------------------------------------
+_HISTORY = None
+
+
+def history():
+    """history.csv as a named record array, read once per process."""
+    global _HISTORY
+    if _HISTORY is None:
+        _HISTORY = np.genfromtxt(HISTORY_CSV, delimiter=",", names=True, dtype=float)
+    return _HISTORY
+
+
+def _step_days(n):
+    """Solve-step times in days, read from history.csv (falls back to indices)."""
+    if os.path.exists(HISTORY_CSV):
+        s = np.atleast_1d(history()["time_s"]) / 86400.0
+        if len(s) >= n:
+            return s[:n]
+    return np.arange(n, dtype=float)
+
+
 def plot_radial_profile():
     files = sorted(glob.glob(os.path.join(OUT, "*.vtu")))
     z_mid = 0.005          # mid-height (m)
     dz = 3.0e-4            # band half-width to pick a horizontal cut
 
-    bu = burnup_per_step(files)        # MWd/kgU per step, for the legend
+    days = _step_days(len(files))      # solve-step times, for the legend
     n = len(files)
     label_every = max(1, n // 6)       # 6 labelled curves, rest unlabelled
     fig, ax = plt.subplots(figsize=(7.2, 4.8))
@@ -274,7 +128,7 @@ def plot_radial_profile():
             o = np.argsort(rb[sel])
             ax.plot(rb[sel][o] * 1e3, ub[sel][o], "-", color=color, lw=1.8)
         if i % label_every == 0 or i == n - 1:
-            ax.plot([], [], "-", color=color, lw=1.8, label=f"{bu[i]:.0f} MWd/kgU")
+            ax.plot([], [], "-", color=color, lw=1.8, label=f"{days[i]:.0f} d")
 
     # shade the gap region
     ax.axvspan(R_PELLET * 1e3, R_CLAD_I * 1e3, color="0.85", alpha=0.7)
@@ -283,8 +137,8 @@ def plot_radial_profile():
     ax.set_xlabel("radius r (mm)")
     ax.set_ylabel("radial displacement u_r (um)")
     ax.set_title("Radial displacement profile (mid-height)\n"
-                 "pellet swells with burnup, gap closes, clad pushed out")
-    ax.legend(title="burnup", fontsize=8, ncol=2)
+                 "clad creeps under the shrink-fit interference, contact pressure relaxes")
+    ax.legend(title="time", fontsize=8, ncol=2)
     ax.grid(alpha=0.3)
     ax.text(0.97, 0.06, "fresh (0 MWd/kgU) curve is non-zero: thermal\n"
             "expansion from T_ref (293 K) to 580 K coolant",
@@ -319,7 +173,6 @@ def _stress_profile_data():
         # the solver keeps fields.h5 locked while running; read-only access to
         # flushed steps is safe, so disable HDF5 locking before h5py loads
         os.environ.setdefault("HDF5_USE_FILE_LOCKING", "FALSE")
-        from z3st.utils.utils_extract_xdmf import extract_field_xdmf
         xdmf = os.path.join(OUT, "fields.xdmf")
         if not os.path.exists(xdmf):
             return None
@@ -371,153 +224,10 @@ def plot_stress_profile():
         print(f"      {name:12s} r={rt * 1e3:6.3f} mm   "
               f"sigma_rr={srr:9.1f}   sigma_theta={stt:9.1f}")
 
-def sigma_exact(t,T, sigma0_actual=None):
-    """Exact solution for the Norton creep stress relaxation problem with variable temperature"""
-    # For variable temperature, we need to integrate the temperature-dependent creep rate
-    # dσ/dt = -E * A(T) * σ^n where A(T) = A0 * exp(-Q/RT)
-    # This requires numerical integration
-    # Note: Creep depends on the magnitude of stress, so we use absolute values
-    # and preserve the sign of the initial stress
-    
-    # Use actual initial stress if provided, otherwise use calculated SIGMA0
-    sigma0 = sigma0_actual if sigma0_actual is not None else SIGMA0
-    sigma_vals = [sigma0]  # Initial stress (compressive, negative)
-    sign = np.sign(sigma0)  # Preserve the sign
-    
-    for i in range(1, len(t)):
-        # Numerical integration using trapezoidal rule
-        dt = t[i] - t[i-1]
-        if dt <= 0:
-            sigma_vals.append(sigma_vals[-1])
-            continue
-        # Average temperature over the time step
-        T_avg = 0.5 * (T[i] + T[i-1])
-        # Temperature-dependent creep coefficient
-        A_T = CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T_avg))
-        # Analytical solution for constant A over small time step
-        # |σ(t+dt)| = [|σ(t)|^(1-n) + (n-1)*E*A*dt]^(-1/(n-1))
-        sigma_prev_abs = abs(sigma_vals[-1])
-        # Calculate the term carefully to avoid numerical issues
-        sigma_pow = sigma_prev_abs**(1 - CREEP_N)
-        creep_term = (CREEP_N - 1) * 3 * G * A_T * dt
-        term = sigma_pow + creep_term
-        # Ensure term is positive for the power calculation
-        if term <= 0:
-            # If term becomes negative or zero, use previous value
-            sigma_new_abs = sigma_prev_abs
-        else:
-            sigma_new_abs = term**(-1 / (CREEP_N - 1))
-        # Restore the original sign
-        sigma_new = sign * sigma_new_abs
-        sigma_vals.append(sigma_new)
-    return sigma_vals
-
-def sigma_exact_2(t,sigma0):
-    A=np.exp(-CREEP_Q/(R_GAS*600.0))*CREEP_A0
-    return (sigma0 ** (1.0 - CREEP_N) + (CREEP_N - 1.0) * E_EL * A * np.asarray(t)) ** (-1.0 / (CREEP_N - 1.0))
-
-def plot_sigma_eq_profile():
-    XDMF_FILE = os.path.join(OUT, "fields.xdmf")
-    # Load actual simulation times from history.csv
-    history_file = os.path.join(OUT, "history.csv")
-    if os.path.exists(history_file):
-        history_data = np.genfromtxt(history_file, delimiter=",", names=True)
-        times = np.atleast_1d(history_data["time_s"])
-    else:
-        # Fallback to synthetic times if history.csv doesn't exist
-        times = np.linspace(0.0, T_TOTAL, NB_STEPS + 1)
-
-    sig_steps = []
-    sigma, outer_clad_T = extract_clad_point_vonmises(XDMF_FILE)
-    # Use actual simulation time steps and temperatures
-    # Use the actual initial axial stress from the simulation instead of calculated SIGMA0
-    sigma_actual = sigma[0] if sigma is not None else None
-    sigma_vals = sigma_exact(times,outer_clad_T,sigma_actual)
-    plt.figure(figsize=(7, 5))
-    plt.plot(times / 86400.0, np.array(sigma_vals) / 1e6, "k-", lw=2.5, alpha=0.7,
-             label="Exact  [σ₀^{1−n} + 3(n−1) G integral(Gt)]^{−1/(n−1)}")
-    if sigma is not None:
-        plt.plot(times / 86400.0, np.array(sigma) / 1e6, "+", ms=8, mfc="none",
-                 mec="r", mew=2, label="Z3ST (implicit, AD tangent)")
-    plt.xlabel("time (days)")
-    plt.ylabel("equivalent stress von Mises σ_eq (MPa)")
-    plt.title("Norton creep stress relaxation with variable temperature\n"
-              f"σ₀ = {sigma_actual/1e6:.2f} MPa, T varies with time, n = {CREEP_N:.0f}")
-    plt.grid(True, ls=":", alpha=0.6)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(os.path.join(OUT, "stress_relaxation.png"), dpi=150)
-    print("[INFO] stress_relaxation.png saved")
-    # also extract outer-clad von Mises series and save CSV
-
-    # Calculate error statistics for the plotted points
-    if sigma is not None:
-        # Calculate absolute errors between exact solution and Z3ST results
-        errors = np.abs((np.array(sigma_vals) - np.array(sigma)))
-        print(f"Sigma vals: {sigma_vals}")
-        print(f"Sigma: {sigma}")
-        # Calculate biggest error (maximum absolute error)
-        max_error = np.max(errors)
-        # Calculate average error (mean absolute error)
-        avg_error = np.mean(errors)
-        print(f"[INFO] Error statistics for plotted points:")
-        print(f"      Biggest error: {max_error/1e6:.6f} MPa")
-        print(f"      Average error: {avg_error/1e6:.6f} MPa")
-
-    return 0
 
 
-def extract_clad_point_vonmises(xdmf_file,
-                                r_target=(R_CLAD_I+R_CLAD_O)/2,
-                                z_target=0.005):
-    """
-    Extract von Mises stress and temperature at one material point
-    located in the middle of the cladding thickness.
-    """
-
-    vm = []
-    Temp = []
-
-    for k in range(NB_STEPS+1):
-
-        r, z, _, S = extract_field_xdmf(
-            xdmf_file,
-            "Stress",
-            step_index=k
-        )
-
-        xT, yT, zT, T = extract_field_xdmf(
-            xdmf_file,
-            "Temperature",
-            step_index=k
-        )
-
-        S = np.asarray(S).reshape(-1,3,3)
-
-        #
-        # recherche du point le plus proche
-        #
-        d2 = (r-r_target)**2 + (z-z_target)**2
-
-        i = np.argmin(d2)
-
-        sigma = S[i]
-
-        #
-        # déviateur
-        #
-        p = np.trace(sigma)/3.0
-
-        s = sigma-p*np.eye(3)
 
 
-        sigma_eq = np.sqrt(1.5*np.sum(s*s))
-
-        vm.append(sigma_eq)
-
-        Temp.append(T[i])
-
-    return np.array(vm), np.array(Temp)
 
 # ----------------------------------------------------------------------
 # 3. FINAL-STEP FIELDS: temperature, radial displacement, clad von Mises
@@ -543,7 +253,6 @@ def plot_fields():
 
     # cell-centre radius to split pellet / clad robustly
     cc = grid.cell_centers().points[:, 0]
-    pellet = grid.extract_cells(np.where(cc <= R_PELLET + 1e-6)[0])
     clad = grid.extract_cells(np.where(cc > R_CLAD_I - 1e-6)[0])
 
     # ---- (a) temperature ----
@@ -586,16 +295,250 @@ def plot_fields():
         print("  wrote output/field_clad_vonmises.png")
 
 
+def load_history_interference():
+    """Load gap and interference from history.csv."""
+    if not os.path.exists(HISTORY_CSV):
+        raise FileNotFoundError(f"{HISTORY_CSV} not found. Run the case first.")
+
+    data = history()
+    time_s = data["time_s"]
+    time_h = time_s / 3600.0
+    time_days = time_s / 86400.0
+    gap_um = data["gap_um"]
+    pressure = data["contact_pressure_MPa"]
+    interference_um = np.maximum(0.0, -gap_um)  # negative gap -> interference
+    # No truncation to a nominal step count: with time_adaptivity enabled the
+    # number of steps actually written is a runtime outcome, not sum(n_steps).
+    # The history is aligned against the XDMF step count below instead.
+    return time_h, time_days, gap_um, interference_um, pressure
+
+def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
+    """
+    Contact pressure Pk(t) of a shrink-fit joint under creep.
+
+    Parameters
+    ----------
+    t : array_like
+        Times [h].
+    Delta : float or array_like
+        Radial interference [mm]. Scalar or array.
+    a, b, c : float
+        Inner, common and outer radii [mm].
+    E1, nu1 : float
+        Young's modulus and Poisson's ratio of the shaft.
+    E2, nu2 : float
+        Young's modulus and Poisson's ratio of the hub.
+    A, n : float
+        Norton-law parameters (hub).
+
+    Returns
+    -------
+    Pk : ndarray
+        Contact pressure [MPa] at each time in t.
+    f, k1, k2, phi : float
+        Intermediate quantities.
+    """
+    t = np.asarray(t, dtype=float)
+    Delta = np.asarray(Delta, dtype=float)
+    # Ensure Young moduli are in MPa for the formula (E may be defined in Pa)
+    E1 = float(E1) 
+    E2 = float(E2) 
+    Delta_arr = np.full_like(t, float(Delta[0]), dtype=float) if Delta.ndim == 0 else np.broadcast_to(Delta, t.shape).astype(float)
+    Delta_safe = np.maximum(Delta_arr, 0)
+
+    # --- Step 1: elastic factor f (eq. 4-5) ---
+    # Pk = Delta_u_el / [ b/E1*((a^2+b^2)/(b^2-a^2)+nu1) + b/E2*((c^2+b^2)/(c^2-b^2)-nu2) ]
+    f = elastic_factor(a, b, c, E1, nu1, E2, nu2)  # [MPa/mm]
+
+    # --- Step 2: k1, shaft creep contribution (eq. 16) ---
+    # k1 = 0 for a solid shaft (a = 0): near-hydrostatic compression
+    if a == 0:
+        k1 = 0.0
+    else:
+        k1 = (np.sqrt(3) / 2) * (
+            (np.sqrt(3) / n) * (a**(2/n) * b**(2/n)) / (b**(2/n) - a**(2/n))
+        ) ** n
+
+    # --- Step 3: k2, hub creep contribution (eq. 20) ---
+    k2=(np.sqrt(3) / 2) * (
+            (np.sqrt(3) / n) * (c**(2/n) * b**(2/n)) / (c**(2/n) - b**(2/n))
+        ) ** n
+
+    # --- Step 4: phi, relaxation rate (eq. 21-22) ---
+    phi = -(CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T)) / b) * f**n * (k2 - k1)
+    contact_mask = Delta_arr > 1e-9          # seuil physique, pas 1e-12
+    Pk = np.zeros_like(t)
+
+    if not np.any(contact_mask):
+        # No interference at any recorded time, so there is no assembled shrink
+        # fit to relax and the analytical pressure is identically zero. idx0
+        # and t_rel below are only meaningful once contact exists.
+        return Pk / 1e6, f, k1, k2, phi
+
+    idx0 = np.argmax(contact_mask)        # premier indice de contact
+    t0 = t[idx0]                          # time at which creep starts
+    t_rel = t[idx0:] - t0
+
+
+    # --- Step 5: elastic interference Delta_u_el(t) (eq. 21) ---
+    if n == 1:
+        # n = 1 is the special case: no relaxation (see the paper's Discussion)
+        Delta_u_el = Delta_arr.copy()
+    else:
+        # Avoid dividing by zero when Delta_safe == 0 (no interference)
+        Delta_u_el = np.zeros_like(Delta_arr, dtype=float)
+
+
+        numer = 1 + phi[idx0:] * (1 - n) * t_rel / (Delta_safe[idx0:] ** (1 - n))
+        Delta_u_el[idx0:] = Delta_arr[idx0:] * (numer) ** (1 / (1 - n))
+
+    # --- Step 6: contact pressure Pk(t) = Delta_u_el(t) * f (eq. 5/21) ---
+    Pk = Delta_u_el * f
+    return Pk/1e6, f, k1, k2, phi
+
+
+
+def plot_contact_pressure_evolution():
+    """Esposito eq. (21) against the Z3ST contact pressure over the relaxation."""
+    _problems = report()
+    if _problems:
+        warnings.warn(
+            "case is inconsistent with the Esposito comparison; see the warnings "
+            "above. The analytical curve below is not a valid verification.",
+            RuntimeWarning,
+        )
+
+    # --- Joint geometry [mm] ---
+    a = 0.0      # shaft inner radius (a = 0 for a solid shaft)
+    b = R_CLAD_I    # rayon commun (interface de contact)
+    c = R_CLAD_O     # hub outer radius
+
+    # --- Elastic properties ---
+    E1, nu1 = E_FUEL, NU_FUEL   # shaft  [MPa, -]
+    E2, nu2 = E_EL, NU   # hub  [MPa, -]
+
+    # --- Creep properties (Norton law: eps_eq_dot = A * sigma_eq^n) ---
+    # Hub properties (A2, n2). For a solid shaft (a = 0) k1 = 0 and the shaft
+    # properties do not enter.
+    n = CREEP_N                  # exponent used in the law (n1 = n2 assumed)
+    A = CREEP_A0               # Norton parameter used in phi (hub)
+
+    # --- Time / interference table read from history.csv ---
+    # t_array : time [days]
+    # Delta   : radial interference [mm] (scalar or array)
+
+
+    t_array, time_days, gap_um, interference_um, pressure = load_history_interference()
+    Delta = np.maximum(interference_um * 1e-6, 0.0)  # [mm] : 1 µm = 1e-6 m
+
+    t_array=t_array*3600
+    # =====================================================================
+    # 2. CONTACT-PRESSURE CLOSED FORM
+    # =====================================================================
+
+
+
+
+
+    # =====================================================================
+    # 3. EVALUATION AND OUTPUT
+    # =====================================================================
+
+    # Clad temperature per step, from the same CSV as everything else: the
+    # closed form uses it only through exp(-Q/(R*T)), and every series below is
+    # then aligned by construction.
+    Temp = history()["T_max_K"]
+
+    Pk, f, k1, k2, phi = contact_pressure(
+        t_array, Delta, a, b, c, E1, nu1, E2, nu2, A, n, Temp
+    )
+
+
+
+    print(f"Elastic factor f     = {f:.5f} MPa/m")
+    print(f"k1                   = {k1:.5e}")
+    print(f"k2                   = {k2:.5e}")
+    print()
+    print("Table read from history.csv:")
+    print(f"{'t [days]':>10} | {'gap [um]':>10} | {'interference [um]':>18}")
+    print("-" * 45)
+    step = max(1, len(t_array) // 20)
+    for ti, gap_i, inter_i in zip(time_days[::step], gap_um[::step], interference_um[::step]):
+        print(f"{ti:10.1f} | {gap_i:10.3f} | {inter_i:18.3f}")
+    print()
+    print(f"{'t [days]':>10} | {'Pk [MPa]':>10}")
+    print("-" * 25)
+    for ti, Pi in zip(time_days[::5], Pk[::5]):
+        print(f"{ti:10.1f} | {Pi:10.3f}")
+
+    # --- Figure: Pk = f(t) ---
+    fig, ax = plt.subplots(figsize=(7, 5))
+    ax.plot(time_days, Pk, "-", color="#4C72B0", lw=1.8,
+            label=f"Esposito eq. (21) — Tresca hub, n = {n:g}")
+    ax.plot(time_days, pressure, "o", ms=5, mfc="none", mec="#C44E52", mew=1.6,
+            label="Z3ST — J2 (von Mises), penalty contact")
+    ax.set_xlabel("time (days)")
+    ax.set_ylabel("contact pressure $P_k$ (MPa)")
+    ax.set_title("Shrink-fit contact pressure relaxing under Norton creep\n"
+                 "clad hub on a pellet shaft, isothermal at 580 K")
+    ax.grid(alpha=0.3)
+    ax.legend()
+    fig.tight_layout()
+    output_path = os.path.join(OUT, "contact_pressure_evolution.png")
+    fig.savefig(output_path, dpi=150)
+    plt.close(fig)
+    print(f"Figure written to {output_path}")
+
+
+def plot_interference_pressure():
+    """Contact pressure against the interference that produces it.
+
+    p = f * Delta is linear while the joint stays elastic, so the slope of this
+    curve is the elastic factor of Esposito eq. (4). Interference is the closed
+    gap: gap < 0 in history.csv means the surfaces overlap.
+    """
+    d = history()
+    pressure_mpa = np.asarray(d["contact_pressure_MPa"], dtype=float)
+    gap_um = np.asarray(d["gap_um"], dtype=float)
+    time_days = np.asarray(d["time_days"], dtype=float)
+    interference = np.maximum(0.0, -gap_um * 1e-6)   # um -> m, positive part
+
+    # Create plot
+    fig, ax2 = plt.subplots(figsize=(6.4, 4.6))
+    
+    # Middle plot: Contact pressure vs interference
+    ax2.plot(interference * 1e6, pressure_mpa, "b-s", lw=2, ms=4, label="p vs interference")
+    ax2.set_xlabel("Interference (μm)")
+    ax2.set_ylabel("Contact pressure (MPa)")
+    ax2.set_title("Contact pressure as function of interference")
+    ax2.grid(True, ls=":", alpha=0.6)
+    ax2.legend()
+    
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "interference_pressure.png"), dpi=150)
+    plt.close(fig)
+    print("[INFO] interference_pressure.png saved")
+    
+    # Print summary statistics
+    contact_steps = pressure_mpa > 0
+    if contact_steps.any():
+        print(f"[INFO] Contact initiated at time: {time_days[contact_steps][0]:.1f} days")
+        print(f"[INFO] Contact initiated at interference: {interference[contact_steps][0]*1e6:.3f} μm")
+        print(f"[INFO] Final interference: {interference[-1]*1e6:.3f} μm")
+        print(f"[INFO] Final contact pressure: {pressure_mpa[-1]:.2f} MPa")
+    else:
+        print("[INFO] No contact detected during simulation")
+
+
 if __name__ == "__main__":
     have_vtu = bool(glob.glob(os.path.join(OUT, "*.vtu")))
     have_csv = os.path.exists(os.path.join(OUT, "history.csv"))
     if not have_vtu and not have_csv:
         raise SystemExit("No output found - run the case first (Allrun).")
     print("[plots] generating figures...")
-    plot_history()
-    plot_pcmi_curves()           # CSV-preferred; works for XDMF-only runs too
     plot_stress_profile()        # VTU-preferred; falls back to the XDMF h5
-    plot_sigma_eq_profile()        # VTU-preferred; falls back to the XDMF h5
+    plot_interference_pressure()
+    plot_contact_pressure_evolution()   # Esposito eq. (21) overlay
     if have_vtu:
         plot_mesh()
         plot_radial_profile()

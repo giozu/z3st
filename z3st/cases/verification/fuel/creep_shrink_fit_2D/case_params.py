@@ -154,3 +154,15 @@ def report():
 
 if __name__ == "__main__":
     report()
+
+
+def elastic_factor(a, b, c, E1, nu1, E2, nu2):
+    """Esposito eq. (4): Pk = f * Delta_u_el, the elastic stiffness of the joint.
+
+    Shaft a..b (a = 0 for a solid shaft), hub b..c. Purely elastic Lame, with no
+    creep and no equivalent-stress criterion, so it carries none of the
+    Tresca/von Mises bias that separates eq. (21) from a J2 solver.
+    """
+    denom = ((b / E1) * ((a**2 + b**2) / (b**2 - a**2) + nu1)
+             + (b / E2) * ((c**2 + b**2) / (c**2 - b**2) - nu2))
+    return 1.0 / denom

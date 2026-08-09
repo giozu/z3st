@@ -24,6 +24,7 @@ dependencies:
 - h5py      # utils_extract_xdmf.py reads the XDMF HDF5 sidecar: required, not optional
 - matplotlib
 - pyvista>=0.42
+- shapely   # utils/geo_files/pellet_fragmented.py imports it at module level
 
   # --. Jupyter / visualization --..
 - jupyterlab

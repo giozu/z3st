@@ -91,10 +91,27 @@ outcome for ambiguous prose, never a reason to start deciding.
    | `*.geo` (gmsh) | ~85 | `//`, `/* */` |
    | `Allrun` `Allclean` `Allrun_mpi` `*.sh` `.githooks/*` | ~170 | `#` |
    | `*.txt` `*.toml` `Makefile` `.gitignore` | ~17 | `#` |
+   | `*.md` `*.rst` (rule 1 only) | ~40 | prose |
 
-   Skip binaries, `*.json` (no comment syntax), and `*.md` / `*.rst` / `*.tex` —
-   those are documents, where prose is the content and these rules do not apply.
-   Say in your closing lines if you skipped anything else.
+   Skip binaries and `*.json` (no comment syntax). Say in your closing lines if
+   you skipped anything else.
+
+   **Documents — `*.md`, `*.rst`, `*.tex` — are in scope, but only for rule 1.**
+   In a document the prose *is* the content: it may argue, explain why, and
+   repeat itself for a reader arriving at that section cold, so rules 2, 3 and 4
+   do not apply there. Rule 1 does, and documents are where history accumulates
+   worst — struck-through `~~Fixed:~~` entries, a `## Recent changes` section,
+   dated validation notes, the genealogy of a branch. A document describes what
+   the code is, not how it got there.
+
+   Before deleting a changelog section, check every fact in it against the rest
+   of the file. Some live *only* there, and those are not history — move them to
+   the section that should have carried them, then delete.
+
+   Keep in documents: author and attribution lines, internship and funding
+   credits, citations, and which upstream version or paper something was
+   verified against. In markdown, mark a borderline with an HTML comment,
+   `<!-- [TBC] ... -->`, so it stays searchable without rendering.
 
 2. **Two files whose comments are load-bearing, and are not yours to trim:**
    - `z3st/cases/suite_exclude.txt` — the trailing comment on each line is the

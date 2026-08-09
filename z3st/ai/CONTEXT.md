@@ -266,8 +266,8 @@ out the same staggered bookkeeping:
   `utils/plot_convergence.py`**, which greps the solver log for exactly
   `||ΔX||/||X|| = <float>`: changing the label or the spacing empties every
   convergence plot, with nothing to catch it.
-- `_adapt_relax(name, residual, prev)` — the EMA grow/shrink controller, previously
-  written three times (T, u, D) identical bar the attribute name.
+- `_adapt_relax(name, residual, prev)` — the EMA grow/shrink controller, shared
+  by T, u and D.
 - `aitken_omega(r_k, r_prev, omega, comm, n_owned, lo, hi)` — module level, shared
   with `porosity_migration_model`. The caller owns the clamp and the starting ω
   because the two uses genuinely differ: the displacement loop clamps to
@@ -446,7 +446,7 @@ Two modes (selected via `models.gap_conductance.type`):
 
 Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to another subdomain.
 
-**Contact-coupled conductance.** When `gap_conductance.contact_coupling.enabled` is set, a solid-contact term is added on gap closure (Todreas & Kazimi, *Nuclear Systems I*, 3rd ed., Eqs. 8.141/8.142): the emergent contact pressure (from `contact_model`) raises `h_gap` above the open-gap gas value, so closing the gap cools the fuel. Parameters: `meyer_hardness` (Pa), `gas_thickness` (m, roughness-based residual gas space). The Ross-Stoute harmonic mean accepts symbolic k(T) cards by evaluating them at the current mean gap temperature (`_k_at_gap`; UFL folds constants, so `k_func(float)` is a plain number) — previously a symbolic fuel conductivity silently zeroed `h_contact` and disabled the contact-cooling feedback.
+**Contact-coupled conductance.** When `gap_conductance.contact_coupling.enabled` is set, a solid-contact term is added on gap closure (Todreas & Kazimi, *Nuclear Systems I*, 3rd ed., Eqs. 8.141/8.142): the emergent contact pressure (from `contact_model`) raises `h_gap` above the open-gap gas value, so closing the gap cools the fuel. Parameters: `meyer_hardness` (Pa), `gas_thickness` (m, roughness-based residual gas space). The Ross-Stoute harmonic mean accepts symbolic k(T) cards by evaluating them at the current mean gap temperature (`_k_at_gap`; UFL folds constants, so `k_func(float)` is a plain number). A symbolic fuel conductivity would otherwise zero `h_contact` and disable the contact-cooling feedback.
 
 **Conductance under-relaxation** (`models.gap_conductance.relax`, default 1.0 = off): h is damped between staggered iterations, `h ← ω·h_new + (1−ω)·h_prev`, with the memory reset every time step. The contact-pressure → conductance → temperature → expansion → pressure feedback is the loop that chatters on gap closure; damping h attacks it at the source. `h_gap` is returned as a persistent `Constant` (updated in place) so the cached thermal form needs no rebuild.
 
@@ -829,7 +829,7 @@ Optional flags: `--debug`, `--mesh_plot`.
 
 ## 10. Missing capabilities
 
-The following capabilities are **not present** in Z3ST v0.1.0 and would need to be implemented to reproduce polycrystalline-RVE studies such as Aydiner et al. (2024) on dual-phase steels:
+The following capabilities are **not present** in Z3ST and would need to be implemented to reproduce polycrystalline-RVE studies such as Aydiner et al. (2024) on dual-phase steels:
 
 - **Cohesive zone model (e.g. Park–Paulino–Roesler / PPR)** — no `models/cohesive_model.py` exists. Intergranular decohesion (F/F, F/M) requires zero-thickness interface elements with a traction–separation law, which FEniCSx does not support natively as ABAQUS UEL does. Would need either a custom implementation (mesh duplication along grain boundaries + paired surface elements with a traction–separation potential) or a reformulation via discontinuous Galerkin / penalty-based surface terms.
 

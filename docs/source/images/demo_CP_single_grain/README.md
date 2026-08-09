@@ -49,7 +49,7 @@ P = ½(m⊗n + n⊗m)                            [Schmid tensor]
 | γ₀ | 0.001 s⁻¹ | Reference slip rate |
 | n | 5 | Power law exponent |
 
-**File:** [`../../materials/single_crystal.yaml`](../../materials/single_crystal.yaml)
+**File:** [`single_crystal.yaml`](single_crystal.yaml)
 
 ## Geometry and Loading
 
@@ -228,9 +228,9 @@ The `non-regression.py` script performs:
 
 | File | Purpose |
 |------|---------|
-| [`single_crystal_law.py`](../../materials/single_crystal_law.py) | Crystal plasticity constitutive model |
-| [`single_crystal.yaml`](../../materials/single_crystal.yaml) | Material parameters |
-| [`plasticity_model.py`](../../models/plasticity_model.py) | History variable management |
+| [`single_crystal_law.py`](single_crystal_law.py) | Crystal plasticity constitutive model |
+| [`single_crystal.yaml`](single_crystal.yaml) | Material parameters |
+| `z3st/models/plasticity_model.py` | History variable management |
 | [`input.yaml`](input.yaml) | Simulation configuration |
 | [`non-regression.py`](non-regression.py) | Verification and plotting |
 

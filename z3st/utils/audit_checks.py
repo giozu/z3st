@@ -31,6 +31,7 @@ The checks
   mro           method-name collisions between Spine's parent classes
   docs          case paths, dependencies and regime values in the prose
   ci            cases_ci.txt against the tree it names
+  env           pyproject runtime deps are installed by z3st_env.yml
 
 Where a check is a heuristic that might misfire, it says so in its own output.
 
@@ -140,10 +141,23 @@ def check_assertions():
             num, ref, rel = val.get("numerical"), val.get("reference"), val.get("rel_error")
             if any(isinstance(v, list) for v in (num, ref, rel)):
                 continue
+            if ref is None:
+                # tracked()/_regression_only(): no closed form, gold-only protection
+                # by design. Same exemption as reference == numerical below.
+                continue
             try:
                 num, ref, rel = float(num), float(ref), float(rel)
             except (TypeError, ValueError):
+                # Reported, not skipped: an entry this check cannot read is one it
+                # cannot vouch for, and a silent continue makes that look identical
+                # to a clean one.
+                findings.append(
+                    f"{g.parent.parent.relative_to(CASES)} :: {key}: metric fields are "
+                    f"not numeric (numerical={num!r}, reference={ref!r}, rel_error={rel!r}) "
+                    "— UNCHECKED by the assertion audit"
+                )
                 continue
+
             if ref != num and rel == 0.0 and num != 0.0:
                 findings.append(
                     f"{g.parent.parent.relative_to(CASES)} :: {key}: rel_error hard-coded to 0 "
@@ -231,9 +245,20 @@ def check_names():
         out, err = io.StringIO(), io.StringIO()
         pyflakes_check(src, str(path.relative_to(ROOT)), Reporter(out, err))
         for line in (out.getvalue() + err.getvalue()).splitlines():
-            # "unable to detect undefined names" is the import-* warning, not a
-            # finding: filtering on the substring alone reported three of those.
+            # A star import switches pyflakes' undefined-name analysis off for the
+            # whole file, so the loop below can only report "no findings" there.
+            # Reported, not skipped: an unchecked file that reads as a checked one
+            # is the failure this suite exists to prevent. Opt out on the import
+            # line with `# noqa: F403` when the namespace is genuinely external.
             if "unable to detect" in line:
+                star = next((l for l in src.splitlines()
+                             if re.match(r"\s*from\s+\S+\s+import\s+\*", l)), "")
+                if "noqa" not in star:
+                    findings.append(
+                        f"{path.relative_to(ROOT)}: star import disables pyflakes' "
+                        "undefined-name analysis for this whole file — it is UNCHECKED. "
+                        "Import the names explicitly, or mark the line `# noqa: F403`."
+                    )
                 continue
             if "undefined name" in line or "invalid syntax" in line:
                 findings.append(line.strip())
@@ -272,6 +297,15 @@ def check_coverage():
             findings.append(f"{rel}: has a non-regression.py that never writes a verdict")
         elif not gold.exists():
             findings.append(f"{rel}: writes a verdict but has no gold — not discovered")
+
+    # regression_check reads output/non-regression_gold.json and nothing else, so a
+    # gold anywhere else is read by no one: re-blessing the real one leaves the stray
+    # copy behind as a second, silently wrong reference.
+    for stray in sorted(CASES.rglob("*gold*.json")):
+        if stray.parent.name != "output":
+            findings.append(
+                f"{stray.relative_to(CASES)}: gold outside output/, read by nothing"
+            )
 
     exclude = CASES / "suite_exclude.txt"
     if exclude.exists():
@@ -635,6 +669,57 @@ def check_ci():
     return findings
 
 
+def check_env():
+    """Runtime dependencies declared in pyproject.toml must be in z3st_env.yml.
+
+    `pip install -e .` resolves `[project] dependencies`, but the documented way to
+    build a working environment is `conda env create -f z3st_env.yml`, which reads
+    only its own lists. A package present in one and absent from the other installs
+    for whoever runs pip and is missing for whoever follows the README.
+
+    A locally-complete env hides this: the dolfinx conda stack pulls several of these
+    in transitively, so an import succeeds whether or not the file declares it.
+
+    Only the runtime set is compared. Extras are installed by name
+    (`pip install -e '.[dev]'`), so their absence from the env file is correct.
+    """
+    findings = []
+    pyproject = ROOT / "pyproject.toml"
+    env_file = ROOT / "z3st_env.yml"
+    if not (pyproject.exists() and env_file.exists()):
+        return [f"{'pyproject.toml' if not pyproject.exists() else 'z3st_env.yml'} is "
+                "missing — this check cannot have found anything, treat it as unrun"]
+
+    block = re.search(r"^dependencies\s*=\s*\[(.*?)^\]", pyproject.read_text(), re.M | re.S)
+    if not block:
+        return ["pyproject.toml: no [project] dependencies array found — this check "
+                "cannot have found anything, treat it as unrun"]
+
+    def _norm(name):  # PEP 503
+        return re.sub(r"[-_.]+", "-", name).lower()
+
+    declared = {_norm(m.group(1)) for m in re.finditer(r'"([A-Za-z0-9_.-]+)', block.group(1))}
+
+    # Every package name the env file installs, conda entries and the pip: block alike.
+    env_text = env_file.read_text()
+    installed = set()
+    for raw in env_text.splitlines():
+        line = raw.split("#", 1)[0].strip()
+        if not line.startswith("-"):
+            continue
+        name = re.match(r"-\s*([A-Za-z0-9_.-]+)", line)
+        if name:
+            installed.add(_norm(name.group(1)))
+
+    for dep in sorted(declared - installed):
+        findings.append(
+            f"z3st_env.yml: '{dep}' is a runtime dependency in pyproject.toml but the "
+            "env file does not install it — `conda env create -f z3st_env.yml` "
+            "produces an environment that cannot import it"
+        )
+    return findings
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -649,6 +734,7 @@ CHECKS = {
     "shell": check_shell,
     "workflow": check_workflow,
     "ci": check_ci,
+    "env": check_env,
 }
 
 

@@ -118,7 +118,7 @@ the background or in a temporary copy.
 ## Static checks — run these before you hand anything back
 
 ```
-python -m z3st.utils.audit_checks            # 13 checks, ~2.4 s, no simulation
+python -m z3st.utils.audit_checks            # 14 checks, ~2.4 s, no simulation
 python -m z3st.utils.audit_checks --list     # names only
 python -m z3st.utils.audit_checks schema     # one check
 ```
