@@ -14,7 +14,6 @@ materials:
 regime: 2d
 
 solver_settings:
-  coupling: staggered
   max_iters: 30
   relax_T: 0.8
   relax_adaptive: false
@@ -35,7 +34,7 @@ thermal:
   convergence: rel_norm
 
 # Upwind DG variant of the sibling porosity_migration case (which is CG+SU/SUPG).
-# Configuration from the /dg-loop campaign (feature/DG-clean, docs/dg/PROGRESS.md):
+# Configuration validated against the DG development campaign:
 # SSP-RK3 in time, Kuzmin vertex limiter for the discrete maximum principle, and
 # the conservative saturation cap that enforces the physical p <= 1 bound without
 # the non-conservative np.clip the CG path used to rely on.

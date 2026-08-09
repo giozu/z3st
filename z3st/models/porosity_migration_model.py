@@ -17,6 +17,18 @@ from z3st.core.solver import aitken_omega
 class PorosityMigrationModel:
     """
     Porosity migration model representing thermal-gradient-driven pore transport.
+
+    Two discretisations of the same transport equation. The CG path (default) uses
+    SU/SUPG stabilisation and reproduces Barani et al. (2022). The DG path uses an
+    upwind flux with an optional SIPG block, SSP-RK3 in time, a Kuzmin vertex
+    limiter for the discrete maximum principle, and a conservative saturation cap;
+    it is exercised by cases/verification/fuel/porosity_migration_dg.
+
+    The DG derivation -- weak form, facet-flux consistency, CFL estimate,
+    boundedness proof and the mass-conservation statement -- lives in a separate
+    write-up that is not part of this repository. The comments below are therefore
+    self-contained: each states what it guarantees rather than pointing at a
+    section number the reader cannot open.
     """
 
     def __init__(self):
@@ -124,7 +136,7 @@ class PorosityMigrationModel:
         alpha_K in [0, 1], the largest value keeping every vertex value within
         the range of the cell means of the cells sharing that vertex.
 
-        Two guarantees (docs/dg/formulation.md §4):
+        Two guarantees, both provable from the construction above:
           * cell mean (hence ∫p, the void volume) is preserved exactly for any
             alpha_K -> conservative, unlike np.clip;
           * no new extrema (discrete maximum principle): if all cell means are
@@ -212,7 +224,7 @@ class PorosityMigrationModel:
         outward and the saturated void core *grows* — the physically faithful
         alternative to the non-conservative np.clip. Total ∫p is preserved to
         round-off; the subsequent vertex limiter keeps the DG dofs in [0,1].
-        Enabled by porosity.saturation_cap (docs/dg/formulation.md §4, Fase 4.2)."""
+        Enabled by porosity.saturation_cap."""
         if getattr(self, "_sat_cache", None) is None:
             self._build_saturation_cache()
         nbr, ptr, area, dofs, nbr_d = self._sat_cache
@@ -286,7 +298,7 @@ class PorosityMigrationModel:
         Explicit 3-stage SSP-RK3 (Shu–Osher) advance of the DG pore-advection
         equation over [t^n, t^n + dt], starting from p_n, with internal
         sub-stepping to the advective CFL and the vertex limiter applied after
-        every stage (docs/dg/formulation.md §3.3).
+        every stage (SSP needs the limiter at every stage, not just at the end).
 
         Semi-discrete form:  M dp/dt = R(p),  R(p) = -S(p) + g, where S collects
         the upwind facet flux, the -∫ p v·∇w volume term, the outflow boundary
@@ -456,7 +468,7 @@ class PorosityMigrationModel:
 
         dg_explicit = False
         if disc == "dg":
-            # Time integrator (docs/dg/formulation.md §3.3): "ssprk3" (default,
+            # Time integrator: "ssprk3" (default,
             # explicit, bounded, sidesteps the staggered stiffness) or "be"
             # (implicit Backward-Euler, the assembled system below).
             integrator = str(self.porosity_cfg.get("dg_integrator", "ssprk3")).lower()
@@ -571,7 +583,8 @@ class PorosityMigrationModel:
         # Enforce the physical bounds [0, 1]. The CG path can only project
         # pointwise (np.clip), which is non-conservative. The DG path defaults to
         # the vertex-based limiter (porosity.dg_limiter), which is bounded AND
-        # mass-conserving (docs/dg/formulation.md §4); "clamp" reproduces the old
+        # mass-conserving (it rescales the slope, leaving the cell mean and hence
+        # ∫p untouched); "clamp" reproduces the old
         # behaviour for the Fase-4 limiter-vs-clamp study, "none" disables it.
         # SSP-RK3 already limited every stage, so skip the post-step limiter there.
         if disc == "dg":
@@ -631,7 +644,8 @@ class PorosityMigrationModel:
         #    Q = ∫p between iterates, |Q_k - Q_{k-1}|/Q < stag_tol_rel. At
         #    saturation the front DOFs flicker (max_dof never converges) while
         #    the total void volume is steady — the physically meaningful measure
-        #    of staggered convergence (docs/dg/formulation.md §5, Fase 4.2).
+        #    of staggered convergence: dQ/dt = -(boundary efflux) holds exactly for
+        #    this scheme, so a steady Q means a converged transport step.
         eps_rel = float(self.porosity_cfg.get("stag_tol_rel", 1.0e-6))
         eps_abs = float(self.porosity_cfg.get("stag_tol_abs", 1.0e-8))
         n_owned = self.V_p.dofmap.index_map.size_local
