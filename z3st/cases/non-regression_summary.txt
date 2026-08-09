@@ -1,47 +1,71 @@
-Z3ST non-regression summary - Fri Aug  7 12:00:12 PM CEST 2026
+Z3ST non-regression summary - Sun Aug  9 11:28:14 AM CEST 2026
 --.. ..- .-.. .-.. -----.. ..- .-.. .-.. -----.. ..- .-.. .-.. ---
 
-Case: benchmarks/pellet_heatgen_3D [OK]
+Case: benchmarks/damage/pellet_quench_2D_xy [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 70s
+  Time            : 351s
 
-Case: regression/box_crack_2D [OK]
+Case: benchmarks/damage/plate_thermal_shock_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 30s
-
-Case: regression/box_notch_2D [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 44s
-
-Case: regression/coaxial_gap_3D [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 60s
-
-Case: regression/elliptical_cavity_2D [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 8s
+  Time            : 913s
 
 Case: regression/two_elliptical_cavities_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 68s
+  Time            : 90s
+
+Case: teaching/01_1D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 11s
+
+Case: teaching/01_3D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 7s
+
+Case: verification/cluster/mass_conservation_1D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 9s
+
+Case: verification/damage/box_crack_2D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 41s
+
+Case: verification/damage/box_notch_2D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 57s
+
+Case: verification/damage/double_crack_2D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 155s
+
+Case: verification/damage/notched_plate_2D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 219s
 
 Case: verification/fuel/axial_power [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 8s
 
 Case: verification/fuel/axial_table [OK]
   Run             : OK
@@ -53,61 +77,73 @@ Case: verification/fuel/burnup [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 9s
 
 Case: verification/fuel/cracking [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 6s
+  Time            : 7s
 
 Case: verification/fuel/creep [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 19s
+  Time            : 24s
 
 Case: verification/fuel/creep_irradiation [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 11s
 
 Case: verification/fuel/creep_relaxation [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 26s
+  Time            : 44s
 
 Case: verification/fuel/fuel_swelling [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 6s
+  Time            : 7s
+
+Case: verification/fuel/pellet_heatgen_3D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 85s
 
 Case: verification/fuel/porosity_migration [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 499s
+  Time            : 547s
+
+Case: verification/fuel/porosity_migration_dg [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 349s
 
 Case: verification/fuel/shrink_fit [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 22s
+  Time            : 23s
 
 Case: verification/fuel/shrink_fit_disk [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 22s
+  Time            : 21s
 
 Case: verification/fuel/shrink_fit_disk_3d [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 89s
+  Time            : 107s
 
 Case: verification/fuel/swelling [OK]
   Run             : OK
@@ -125,13 +161,13 @@ Case: verification/fuel/thermal_conductivity/thermal_conductivity_2D/olander_Pu_
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 5s
+  Time            : 6s
 
 Case: verification/fuel/thermal_conductivity/thermal_conductivity_2D/uniform_Pu_porosity_GPR [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 5s
+  Time            : 6s
 
 Case: verification/fuel/thermal_conductivity/thermal_conductivity_2D/uniform_Pu_porosity_magni [OK]
   Run             : OK
@@ -143,7 +179,7 @@ Case: verification/fuel/thermal_conductivity/thermal_conductivity_GPR [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 5s
+  Time            : 6s
 
 Case: verification/fuel/thermal_conductivity/thermal_conductivity_magni [OK]
   Run             : OK
@@ -157,11 +193,17 @@ Case: verification/mechanics/annular_cylinder [OK]
   Gold regression : PASS
   Time            : 9s
 
+Case: verification/mechanics/elliptical_cavity_2D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 8s
+
 Case: verification/mechanics/full_cylinder [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 9s
+  Time            : 19s
 
 Case: verification/mechanics/lame_gps_2D [OK]
   Run             : OK
@@ -173,43 +215,55 @@ Case: verification/mechanics/lame_gps_3D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 92s
+  Time            : 146s
 
 Case: verification/mechanics/lame_plane_strain_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 8s
 
 Case: verification/mechanics/mariotte_thin_shell [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 9s
 
 Case: verification/mechanics/spherical_cavity [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 53s
+  Time            : 70s
+
+Case: verification/mechanics/stress_strain_displacement [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 9s
+
+Case: verification/mechanics/stress_strain_stress [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 8s
 
 Case: verification/mechanics/thermal_gradient_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 10s
+  Time            : 8s
 
 Case: verification/mechanics/thermal_gradient_3D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 175s
+  Time            : 176s
 
 Case: verification/mechanics/uniaxial_tension [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 8s
 
 Case: verification/mechanics/uniaxial_tension_nonlinear [OK]
   Run             : OK
@@ -221,85 +275,79 @@ Case: verification/plasticity/crystal_single_grain [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 14s
+  Time            : 17s
 
 Case: verification/plasticity/j2_hardening_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 42s
-
-Case: verification/plasticity/stress_strain_displacement [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 8s
-
-Case: verification/plasticity/stress_strain_stress [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 8s
+  Time            : 53s
 
 Case: verification/thermal/box_heated [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 17s
+  Time            : 19s
+
+Case: verification/thermal/coaxial_gap_3D [OK]
+  Run             : OK
+  Non-regression  : PASS
+  Gold regression : PASS
+  Time            : 73s
 
 Case: verification/thermal/nn_conductivity_slab_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 14s
+  Time            : 16s
 
 Case: verification/thermal/spherical_shell [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 124s
+  Time            : 126s
 
 Case: verification/thermal/thick_cylindrical_shell_adiabatic_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 9s
+  Time            : 10s
 
 Case: verification/thermal/thick_cylindrical_shell_non_adiabatic_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 9s
 
 Case: verification/thermal/thick_slab_adiabatic_3D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 10s
+  Time            : 11s
 
 Case: verification/thermal/thick_slab_non_adiabatic_3D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 15s
+  Time            : 17s
 
 Case: verification/thermal/thin_cylindrical_shell_adiabatic_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 10s
 
 Case: verification/thermal/thin_cylindrical_shell_dirichlet_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 10s
 
 Case: verification/thermal/thin_cylindrical_shell_non_adiabatic_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 8s
+  Time            : 9s
 
 Case: verification/thermal/thin_slab_adiabatic_2D [OK]
   Run             : OK
@@ -311,7 +359,7 @@ Case: verification/thermal/thin_slab_dirichlet_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 6s
+  Time            : 7s
 
 Case: verification/thermal/thin_slab_neumann_2D [OK]
   Run             : OK
@@ -323,11 +371,11 @@ Case: verification/thermal/thin_slab_neumann_3D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 10s
+  Time            : 12s
 
 Case: verification/thermal/thin_slab_non_adiabatic_2D [OK]
   Run             : OK
   Non-regression  : PASS
   Gold regression : PASS
-  Time            : 7s
+  Time            : 8s
 
