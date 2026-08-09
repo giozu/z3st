@@ -332,6 +332,31 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+Before committing, run the static checks — twelve of them, 2.4 s, no simulation:
+
+```bash
+python -m z3st.utils.audit_checks          # all; --list explains each one
+python -m z3st.utils.audit_checks deps     # or one by name
+```
+
+They cover the things that are true of the tree itself and would otherwise surface
+minutes later on CI: a model no gold-carrying case reaches, a disabled or tautological
+verdict, a case that writes a verdict with no gold, a NaN in a gold, an undefined name, a
+dependency imported by library code but not declared, a method name colliding across
+`Spine`'s 13 mixins, a stale case path in the docs, a broken path in a driver, a shell
+syntax error in any of the 166 shell files, and a script the CI workflow invokes but that
+does not exist.
+
+To have git refuse a commit they reject, once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+A green run means "no known static defect". It does **not** mean the code works: no case
+is run, no gold is judged, no convergence is checked. That is what
+`z3st/cases/non-regression_local.sh` is for.
+
 ## Contributor acknowledgements
 
 Beyond the author, the following people have contributed to Z3ST:

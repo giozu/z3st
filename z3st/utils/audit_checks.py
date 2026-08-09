@@ -40,6 +40,12 @@ Each one exists because it would have caught a real mistake made during the
   coverage      cluster_dynamic_model.py, 153 lines, had its only case in sandbox/
                 with neither a gold nor a script, in a directory the driver never
                 scans.
+  shell         166 files here are shell (13 scripts + 153 Allrun/Allclean stubs) and
+                nothing parsed them. bash -n is the pyflakes of that half of the repo.
+
+  workflow      A path invoked by .github/workflows fails only on a runner, minutes
+                after a push. Nothing local exercises that file.
+
   scripts       The CI driver called "$ROOT_DIR/mpi_smoke.sh" while ROOT_DIR is the
                 package directory, so the guard never ran and reported FAIL for a
                 missing file instead. The script had only been tested directly.
@@ -74,6 +80,7 @@ import json
 import math
 import pathlib
 import re
+import subprocess
 import sys
 
 import yaml
@@ -597,6 +604,61 @@ def check_scripts():
     return sorted(set(findings))
 
 
+def check_shell():
+    """Every shell script parses, and every stub finds the shared runner.
+
+    166 files in this repo are shell: 13 scripts plus 153 per-case Allrun/Allclean
+    stubs. A syntax error in one is invisible until that case runs, and a stub whose
+    sourced path is wrong fails at the same moment. Both are free to check with
+    ``bash -n``, which is what the Python side gets from pyflakes.
+    """
+    findings = []
+    targets = [f for f in ROOT.rglob("*")
+               if f.is_file() and ".git" not in f.parts
+               and (f.suffix == ".sh" or f.name in ("Allrun", "Allclean"))]
+    for f in sorted(targets):
+        r = subprocess.run(["bash", "-n", str(f)], capture_output=True, text=True)
+        if r.returncode != 0:
+            findings.append(f"{f.relative_to(ROOT)}: shell syntax error: "
+                            f"{r.stderr.strip().splitlines()[-1] if r.stderr.strip() else '?'}")
+        # Stubs source the shared runner through the installed package. The path inside
+        # that expression is fixed, so it can be checked even though the prefix is not.
+        for m in re.finditer(r"/utils/(allrun|allclean)\.sh", f.read_text()):
+            if not (ROOT / "z3st" / "utils" / f"{m.group(1)}.sh").exists():
+                findings.append(f"{f.relative_to(ROOT)}: sources utils/{m.group(1)}.sh, "
+                                "which does not exist")
+    if not targets:
+        findings.append("no shell scripts found at all — this check cannot have found "
+                        "anything, treat it as unrun")
+    return sorted(set(findings))
+
+
+def check_workflow():
+    """Scripts the CI workflow invokes must exist in the repo.
+
+    The workflow is the one file nothing else exercises: a path that is wrong there
+    fails only on a runner, minutes after a push, and only for whoever is watching.
+    Outputs (upload-artifact paths) are deliberately not checked -- they are produced
+    by the run, so their absence before it is correct.
+    """
+    findings = []
+    wf_dir = ROOT / ".github" / "workflows"
+    if not wf_dir.is_dir():
+        return ["no .github/workflows directory — this check cannot have found "
+                "anything, treat it as unrun"]
+    for wf in sorted(wf_dir.glob("*.yml")):
+        text = wf.read_text()
+        refs = set(re.findall(r"(?:^|\s)\./(\S+\.(?:sh|py))", text, re.M))
+        refs |= set(re.findall(r"chmod\s+\+x\s+\.?/?(\S+)", text))
+        for ref in sorted(refs):
+            if not (ROOT / ref).exists():
+                findings.append(
+                    f".github/workflows/{wf.name}: invokes ./{ref}, which does not "
+                    "exist — this fails only on a runner"
+                )
+    return sorted(set(findings))
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -608,6 +670,8 @@ CHECKS = {
     "mro": check_mro,
     "deps": check_deps,
     "scripts": check_scripts,
+    "shell": check_shell,
+    "workflow": check_workflow,
 }
 
 

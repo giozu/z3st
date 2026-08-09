@@ -1,0 +1,43 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: refuse a commit that the static checks already know is broken.
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+# Enable once per clone:
+#     git config core.hooksPath .githooks
+#
+# 2.4 s, no simulation, no environment beyond the one that runs z3st. It exists
+# because two commits on 2026-08-09 were pushed, reached CI, and failed there on
+# things this script finds in seconds: h5py declared as optional while library
+# code imports it at module level (six cases dead on ModuleNotFoundError), and
+# the CI driver invoking mpi_smoke.sh at a path that does not exist.
+#
+# What it CANNOT do, so that nobody trusts it further than it goes: it does not
+# run a case, does not judge whether a gold is physically right, and does not
+# know whether the solver still converges. Those need the suite. A green hook
+# means "no known-static defect", never "this works".
+
+if ! command -v python3 >/dev/null; then
+    echo "pre-commit: python3 not found; skipping audit_checks (NOT verified)" >&2
+    exit 0
+fi
+
+if ! python3 -c "import z3st" 2>/dev/null; then
+    echo "pre-commit: z3st not importable (wrong env?); audit_checks NOT run" >&2
+    echo "  activate the environment, or commit with --no-verify and say so." >&2
+    exit 1
+fi
+
+echo "pre-commit: z3st.utils.audit_checks"
+if ! python3 -m z3st.utils.audit_checks; then
+    cat >&2 <<'MSG'
+
+pre-commit: refusing the commit — the findings above are static, so they are
+already true of the tree you are about to commit and will be true on CI.
+
+Fix them, or override deliberately with:
+    git commit --no-verify
+MSG
+    exit 1
+fi
