@@ -55,9 +55,8 @@ factor = WARP_SCALE
 warped = grid.warp_by_vector("u", factor=factor)
 
 # --- render ---
-# Colour by displacement magnitude: it varies over the whole body, so the
-# deformation reads on every surface (temperature only shows on the end faces,
-# the rim being isothermal).
+# Colour by displacement magnitude: it varies over the whole body, unlike
+# temperature, which is isothermal on the rim.
 p = pv.Plotter(off_screen=True, window_size=[1100, 950])
 p.add_mesh(
     grid.extract_surface(), color="lightgray", style="wireframe",

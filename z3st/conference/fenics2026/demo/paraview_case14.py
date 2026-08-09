@@ -8,7 +8,7 @@
 #   * bakes a PNG sequence      :  pvpython paraview_case14.py --render
 #
 # The PNG sequence is the offline fallback for the live demo. Run the
-# --render step ONCE before the conference (preflight.sh does this).
+# --render step once before the conference (preflight.sh does this).
 # =====================================================================
 import os
 import sys
@@ -18,9 +18,9 @@ import re
 from paraview.simple import *  # noqa: F401,F403
 
 # --- locate the case-14 output and the baked-output folder -------------------
-# NOTE: `paraview --script=...` (the GUI) does NOT define __file__ (unlike
-# pvpython), so resolve paths from env vars set by open_paraview.sh, then fall
-# back to __file__ / cwd.
+# `paraview --script=...` (the GUI) does not define __file__, unlike pvpython,
+# so resolve paths from env vars set by open_paraview.sh, then fall back to
+# __file__ / cwd.
 try:
     HERE = os.path.dirname(os.path.abspath(__file__))
 except NameError:

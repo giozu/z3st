@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: validation run for the develop merge
 #
-# Completes the verification left unfinished on the laptop:
+# Phases:
 #   1. environment check      - refuses to run on the wrong interpreter
 #   2. full local suite       - 49 cases, regenerates non-regression_summary.txt
 #   3. pwr_rod_2D             - gold regression, the 1800-day PWR rod case
@@ -10,11 +10,9 @@
 #   5. fg_test_2D on N ranks  - compared column-by-column against the serial run
 #   6. thermal_gradient_3D    - unbuffered, to settle whether it converges
 #
-# Phase 1 is mandatory: the laptop run was invalidated by a PATH where
-# /usr/bin preceded the conda env, so gmsh resolved correctly while python3
-# did not, and half the work ran on dolfinx 0.10.0 / numpy 1.26 instead of
-# 0.11.0 / 2.4. This script fails fast rather than produce results that look
-# fine and are not comparable.
+# Phase 1 is mandatory and cannot be skipped. Results are only comparable on
+# dolfinx 0.11.x and numpy >= 2; a PATH where /usr/bin precedes the conda env
+# resolves gmsh but not python3.
 #
 # Usage:
 #   ./z3st_validate.sh                  # all phases
@@ -267,9 +265,8 @@ PY
 fi
 
 # --.. Phase 6: thermal_gradient_3D, unbuffered.
-# On the laptop this case sat 33 minutes on its first solve at 923% CPU with a
-# buffered log, so slow and non-converging were indistinguishable. Unbuffered
-# output makes the iterations visible. ..--
+# Unbuffered output makes the iterations visible, so a slow first solve is
+# distinguishable from a non-converging one. Timeout 1 h. ..--
 if want 6; then
     log "6. thermal_gradient_3D (unbuffered)"
     C="$CASES/verification/mechanics/thermal_gradient_3D"

@@ -28,7 +28,6 @@ def update_mesh_geo(theta_deg):
         content = f.read()
     
     # Regex to replace "theta = X * Pi / 180;"
-    # We want to replace the number 30 with the new angle
     pattern = r"theta = .* \* Pi / 180;"
     replacement = f"theta = {theta_deg} * Pi / 180;"
     

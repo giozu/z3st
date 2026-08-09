@@ -10,14 +10,14 @@ a (U,Pu)O2 pellet sector brought to 500 W/cm with the outer rim ramped 623->1300
 over 1e4 s. Pores migrate up the thermal gradient and pile up at the centre,
 forming a central void surrounded by a restructured (columnar) low-porosity zone.
 
-The absolute checks are anchored to quantities the paper actually reports, NOT to
+The absolute checks are anchored to quantities the paper actually reports, not to
 values produced by this run:
   1. A central void forms: p(r=0) ~ 1.0.
   2. The central void extends to ~0.2 of the relative radius (Barani Fig. 4: the
      thermal gradient and pore velocity vanish inside ~0.2 r/Ro because p = 1).
-  3. The outer rim keeps its fabrication porosity p ~ 0.15. This is now a genuine
-     prediction (no Dirichlet inflow is imposed; the rim stays at 0.15 because the
-     pore velocity there is negligible).
+  3. The outer rim keeps its fabrication porosity p ~ 0.15 (no Dirichlet inflow
+     is imposed; the rim stays at 0.15 because the pore velocity there is
+     negligible).
 
 The centre temperature is reported for information and tracked by the gold
 regression, but it is not asserted against a fabricated reference (the paper does
@@ -89,7 +89,7 @@ def radial_bin_mean(r_rel_vals, field_vals, nbins=50):
     angles share one radius. Connecting them sorted by radius produces a
     sawtooth at the steep void front (angular spread reaches ~0.5 there). The
     bin mean removes that angular projection noise; the radial mean itself is
-    monotone, so the curve is faithful, not just cosmetically smoothed.
+    monotone.
     """
     edges = np.linspace(0.0, r_rel_vals.max(), nbins + 1)
     idx = np.digitize(r_rel_vals, edges)
@@ -193,9 +193,6 @@ except Exception as e:
 # velocity calibration (Sens constants), which is not yet pinned to a published
 # table — see porosity_migration_model.py. This is a coarse engineering check.
 all_checks = {**errors, **temperature_info}
-# center_temperature carries rel_error 0 (reference == numerical), so it never
-# drives the absolute pass/fail; it is written to the gold purely so the
-# regression check tracks the centre temperature between runs.
 pass_fail_check(all_checks, 0.30, OUT_JSON, CASE_DIR)
 regression_check(all_checks, case_dir=CASE_DIR)
 

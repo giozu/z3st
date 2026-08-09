@@ -47,8 +47,8 @@ def _fraction_value(material, *keys, default=0.0):
     value = _card_value(material, *keys, default=default)
     if value is None:
         return value
-    # Material cards normally use fractions (0.20). Accept percentages (20)
-    # as a convenience because the paper reports applicability in at.%.
+    # Material cards normally use fractions (0.20); percentages (20) are also
+    # accepted, the paper reports applicability in at.%.
     return value / 100.0 if abs(value) > 1.0 else value
 
 

@@ -31,11 +31,7 @@ class MagniConductivity:
         return arr.reshape(shape)
 
     def _args(self, T, Pu, Am, Np, x, p, burnup):
-        """Per-dof composition of the six card fields, broadcast to T's shape.
-
-        The same six ``_local`` calls appeared in both __call__ and
-        value_and_grad.
-        """
+        """Per-dof composition of the six card fields, broadcast to T's shape."""
         return dict(
             Pu=self._local(Pu, self.Pu, T.shape),
             Am=self._local(Am, self.Am, T.shape),
@@ -51,9 +47,8 @@ class MagniConductivity:
 
     def value_and_grad(self, T_array, Pu=None, Am=None, Np=None, x=None, p=None, burnup=None):
         T = np.asarray(T_array, dtype=float)
-        # k_numpy directly rather than self(...): __call__ would re-run _local on
-        # the already-composed values. _local is idempotent there, so the result is
-        # unchanged, but the second pass was pure work.
+        # k_numpy directly rather than self(...), which would re-run _local on
+        # the already-composed values.
         kw = self._args(T, Pu, Am, Np, x, p, burnup)
         return k_numpy(T, **kw).reshape(T.shape), dk_dT_numpy(T, **kw).reshape(T.shape)
 
@@ -63,7 +58,7 @@ def card_value(card, material, *keys, default=0.0):
 
     Distinct from ``magni_mox_thermal._card_value``, which searches a single dict
     and casts to float: this one searches two and returns the raw value. Shared
-    with gpr_conductivity, which had a byte-identical copy.
+    with gpr_conductivity.
     """
     for src in (card, material or {}):
         for key in keys:

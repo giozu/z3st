@@ -4,18 +4,16 @@
 # Author: Giovanni Zullo
 # Version: 0.2.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-"""Fit the GPR conductivity hook to a KNOWN analytic residual.
+"""Fit the GPR conductivity hook to a known analytic residual.
 
 This is the GPR counterpart of the neural-network case's `train_knet.py`: the
 checkpoint is regenerated from scratch before every run, so nothing binary is
 committed and any clone reproduces it bit for bit.
 
-The samples are drawn from `synthetic_residual.py`, not from measurements. The
-point of the exercise is to verify the machinery -- kernel evaluation,
-de-standardisation, the Newton tangent, the external-operator plumbing -- for
-which a residual with a closed-form value and derivative is strictly better
-than experimental data: it gives the non-regression an exact answer to check
-against.
+The samples are drawn from `synthetic_residual.py`, not from measurements.
+What is verified is the machinery -- kernel evaluation, de-standardisation,
+the Newton tangent, the external-operator plumbing -- against a residual whose
+value and derivative are known in closed form.
 
 Assimilating real measurements is a separate workflow; see `fit_gpr.py`.
 

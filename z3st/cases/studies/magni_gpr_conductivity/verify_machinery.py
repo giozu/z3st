@@ -6,7 +6,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """Check that the GPR conductivity hook reproduces a residual it was fitted to.
 
-This verifies the ALGORITHM, not the physics of any particular correction:
+This verifies the algorithm, not the physics of any particular correction:
 kernel evaluation, de-standardisation of features and target, the Newton
 tangent dk/dT, and the composition dependence. The checkpoint is fitted to
 `synthetic_residual`, whose value and derivative are known in closed form, so
@@ -20,7 +20,7 @@ Checks:
                     of __call__ (catches a derivative that is internally
                     consistent but wired to the wrong operand)
   4. composition -- the fit tracks the residual's Pu and p dependence, and does
-                    NOT invent a dependence on Am or x, which the residual does
+                    not invent a dependence on Am or x, which the residual does
                     not contain
 
 Exits non-zero on failure, so a case Allrun running under `set -e` fails.
@@ -100,11 +100,11 @@ def main():
                 failures.append(f"{label}: {name} = {err:.3e} > {tol:.0e}")
         print()
 
-    # The residual depends on Pu and p but NOT on Am or x. A fit that invented
+    # The residual depends on Pu and p but not on Am or x. A fit that invented
     # a dependence there would still reproduce every case above, because the
     # cases all run at a single Am and a single x.
     #
-    # Compare the RESIDUAL, not k: the Magni baseline itself depends on Am and
+    # Compare the residual, not k: the Magni baseline itself depends on Am and
     # x, so k legitimately moves with them even where the correction is flat.
     # What must stay flat is r = log(k_gpr / k_magni).
     print("  composition dependence of the correction")

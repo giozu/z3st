@@ -79,7 +79,7 @@ class GapModel:
         # Under-relax h between staggered iterations (models.gap_conductance.
         # relax, default 1.0 = off): damps the contact-pressure ↔ conductance
         # ↔ temperature feedback at its source. _h_gap_prev is reset at every
-        # time step (solve_staggered), so the damping never lags across steps.
+        # time step (solve_staggered).
         omega_h = float(getattr(self, "gap_relax", 1.0))
         h_prev = getattr(self, "_h_gap_prev", None)
         if omega_h < 1.0 and h_prev is not None:
@@ -115,10 +115,9 @@ class GapModel:
 
         # harmonic mean of the two solid conductivities; a symbolic k(T) card
         # is evaluated at the current gap temperature (UFL folds constants, so
-        # k_func(float) returns a plain number). Prefer the two materials of
-        # the gap pair itself (recorded by set_gap_temperature) — a rod model
-        # can carry other conducting cards (spring, coolant, structure) whose
-        # dict position must not decide the contact conductance.
+        # k_func(float) returns a plain number). The two materials of the gap
+        # pair itself (recorded by set_gap_temperature) are preferred over the
+        # first two conducting cards in the dict.
         pair = getattr(self, "_gap_pair_labels", None)
         mats = ([self.materials[n] for n in pair if n in self.materials]
                 if pair is not None else [])
@@ -221,17 +220,14 @@ class GapModel:
         fdim = topology.dim - 1
 
         topology.create_connectivity(fdim, 0)  # facet → vertex
-        # dolfinx computes entity midpoints in C++; the Python loop this replaces
-        # did the same thing (mean of the facet's vertex coordinates) one facet at
-        # a time.
+        # Entity midpoints: the mean of each facet's vertex coordinates.
         centroids_a = dolfinx.mesh.compute_midpoints(mesh, fdim, facets_a)
         centroids_b = dolfinx.mesh.compute_midpoints(mesh, fdim, facets_b)
 
         # MPI: gather both surfaces globally — with the mesh partitioned, a rank
-        # can own facets of only one side (empty-tree crash) or miss the true
-        # nearest neighbour across a rank boundary. Gap surfaces are small, so
-        # allgathering their centroids is cheap and makes the result identical
-        # on every rank.
+        # can own facets of only one side, and the nearest neighbour can lie
+        # across a rank boundary. Gap surfaces are small, so allgathering their
+        # centroids is cheap.
         comm = mesh.comm
         if comm.size > 1:
             gdim = x.shape[1]

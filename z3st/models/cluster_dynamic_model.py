@@ -65,8 +65,7 @@ class ClusterDynamicsModel:
                 if region_name is not None:
                     # Apply to a specific named region (defined in geometry.yaml).
                     # Domain regions are cell-tagged, and DG dofs attach to cells
-                    # rather than facets — the old facet-based lookup found no
-                    # dofs for the DG-1 space and silently left c = 0.
+                    # rather than facets, so the lookup is cell-based.
                     region_id = self.label_map.get(region_name)
                     if region_id is not None:
                         dofs = self.mgr.locate_domain_dofs(label=region_id, V=self.V_c)
@@ -95,8 +94,8 @@ class ClusterDynamicsModel:
                     # Normalize to the conserved total mass C_tot = ∫ c·n dn.
                     # Default to the current mass (no rescale) so a constant IC
                     # keeps the requested density value; an explicit 'total_mass'
-                    # key overrides. (The 'value' key is the per-DOF density, not
-                    # a mass target — reusing it here was a units conflation.)
+                    # key overrides. The 'value' key is the per-DOF density, not
+                    # a mass target.
                     target_mass = float(ic_config.get("total_mass", current_mass))
                     if current_mass > 0.0:
                         scaling_factor = target_mass / current_mass
@@ -155,11 +154,8 @@ class ClusterDynamicsModel:
                 print(f"  [ERROR] Error applying Gaussian IC: {e}")
 
     # --.. ..- .-.. .-.. --- staggered step --.. ..- .-.. .-.. ---
-    # Moved here from core/solver.py on 2026-08-09. It had no dependency at all on
-    # Solver-owned state -- no get_solver_options, no relaxation attributes, no
-    # measure caches -- so it was the safest of the five physics steps to relocate.
-    # Spine multiply-inherits both classes, so solve_staggered still calls
-    # self._cluster_step(...) unchanged.
+    # This step uses no Solver-owned state: no get_solver_options, no relaxation
+    # attributes, no measure caches. Spine inherits both classes.
     def _cluster_step(self, c_new, c_old, dt):
         """
         Solve the cluster dynamics step with mass conservation using DG.

@@ -22,7 +22,7 @@ from z3st.utils.utils_extract_xdmf import *
 
 pv.OFF_SCREEN = True
 # start_xvfb is deprecated in recent PyVista but is the working headless path
-# here; silence the deprecation notice rather than change the render backend.
+# here; the deprecation notice is silenced.
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
     try:
@@ -34,8 +34,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "output")
 
 # parameters
-# Geometry, material and solver constants come from this case's YAML files
-# rather than being restated here, so they cannot drift. See case_params.py.
+# Geometry, material and solver constants come from this case's YAML files.
+# See case_params.py.
 from case_params import (
     R_GAS, R_PELLET, R_CLAD_I, R_CLAD_O, G0, K_PEN, T_TOTAL, NB_STEPS,
     E_EL, NU, E_FUEL, NU_FUEL, ALPHA, G, CREEP_A0, CREEP_N, CREEP_Q, SIGMA0,
@@ -557,9 +557,8 @@ def plot_fields():
     print("  wrote output/field_temperature.png")
 
     # ---- (b) radial displacement field u_r on the (undeformed) mesh ----
-    # NB: a warped mesh is misleading for contact -- each body warps by its own
-    # displacement, so the pellet (large u_r) visually overruns the clad. Use
-    # plot_radial_profile() for the quantitative gap closure.
+    # A warped mesh is misleading for contact: each body warps by its own
+    # displacement, so the pellet (large u_r) visually overruns the clad.
     p = pv.Plotter(off_screen=True, window_size=(560, 1050))
     p.add_mesh(grid, scalars="u_r_um", cmap="viridis", show_edges=False,
                scalar_bar_args=_bar_args("u_r (um)"))

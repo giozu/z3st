@@ -142,17 +142,13 @@ errors = {}
 last = all_snapshots[-1]
 T_last = last["T"]
 T_mean_final = float(np.mean(T_last))
-# Partial-quench transient: the domain-mean temperature must lie between the
-# cold-bath (Dirichlet/Robin) temperature and the initial temperature. (An
-# endpoint check against T_initial or T_quench is unphysical mid-transient.)
+# Partial-quench transient: the domain-mean temperature lies between the
+# cold-bath (Dirichlet/Robin) temperature and the initial temperature.
 T_lo = min(T_quench, T_initial)
 T_hi = max(T_quench, T_initial)
 in_range = (T_lo - 1.0) <= T_mean_final <= (T_hi + 1.0)
 print(f"\n[CHECK] Final t = {last['t']:.2e} s, T_mean = {T_mean_final:.1f} K "
       f"(partial quench: must lie within [{T_lo:.1f}, {T_hi:.1f}] K)")
-# Was a range check against [T_lo, T_hi], a 760 K wide window that only ever
-# caught a grossly wrong result. tracked() keeps the value under the gold
-# regression check instead, which is far tighter than the range ever was.
 errors["T_final_mean_in_range"] = tracked(T_mean_final)
 
 if last["D"] is not None:
@@ -355,8 +351,7 @@ try:
             print(f"[INFO] Hoop stress plot saved: {os.path.join(OUT_DIR, 'stress_hoop_field.png')}")
 
     # ------ Bonus: angular damage scan at the outer ring ------
-    # Shows the discrete crack count within the contact wedge. Requires the
-    # damage field, so guarded on damage_name.
+    # Shows the discrete crack count within the contact wedge.
     if damage_name is not None:
         D_field_local = np.asarray(last_mesh_pv.point_data[damage_name]).reshape(-1)
         r_pts = np.sqrt(x_pts**2 + y_pts**2)
@@ -381,8 +376,8 @@ try:
         def count_segments(prof, thr=0.5):
             """Number of discrete D>=thr arcs. Empty (NaN) bins are filled from
             their nearest populated neighbour first, so a missing bin never reads
-            as a separation, while every populated D<thr bin -- however narrow --
-            does separate two cracks."""
+            as a separation, while every populated D<thr bin separates two
+            cracks."""
             mask = np.isnan(prof)
             if mask.all():
                 return 0
@@ -395,9 +390,8 @@ try:
             return int(np.sum((~above[:-1]) & (above[1:]))) + int(above[0])
 
         # Thermal-shock cracks merge into one continuous band at the very rim and
-        # fade out deeper in, so a single hand-picked shell mis-counts (the old
-        # 0.90-0.99 Ro band sat where the fingers are fused). Sweep overlapping
-        # shells and take the one where the fingers are most separated.
+        # fade out deeper in. Sweep overlapping shells and take the one where the
+        # fingers are most separated.
         bands = [(c - 0.06, c + 0.06) for c in np.arange(0.62, 0.96, 0.03)]
         best_n, best_prof, best_band = 0, angular_dmax(0.80, 0.90), (0.80, 0.90)
         for r_lo, r_hi in bands:
@@ -439,7 +433,4 @@ except Exception as e:
 
 
 # --.. ..- .-.. .-.. --- pass/fail --.. ..- .-.. .-.. ---
-# Previously a hand-rolled copy of pass_fail_check writing a bare
-# json.dump(errors): no "summary" key, so the driver could not read a verdict and
-# the blessed gold next to it was never compared against anything.
 finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)

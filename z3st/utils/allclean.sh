@@ -10,8 +10,7 @@
 #
 # Never "rm -rf output": the blessed output/non-regression_gold.json lives
 # there, the suite runs Allclean before every case, and wiping the directory
-# would disable that case's gold-regression check. Deleting by extension keeps
-# the gold by construction rather than by everyone remembering to.
+# would disable that case's gold-regression check.
 
 cd "${0%/*}" || exit 1
 

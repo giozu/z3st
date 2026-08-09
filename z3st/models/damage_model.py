@@ -23,15 +23,11 @@ class DamageModel:
             raise ValueError("'damage' entry missing in input.yaml (but damage model is enabled).")
 
         # Default linear-solver backend; user can override in input.yaml.
-        # Done after the missing-block check so an entirely absent damage
-        # block still surfaces clearly rather than being silently filled in.
+        # Set after the missing-block check above.
         self.dmg_cfg.setdefault("linear_solver", "iterative_hypre")
 
-        # Validate damage type up-front. Without this, a typo like 'at1' or
-        # 'AT-1' silently skips the Gc<->sigma_c auto-conversion in
-        # spine.py::load_materials and the run crashes later inside
-        # _damage_step with a confusing KeyError('Gc') or 'Unknown damage
-        # type'.
+        # Validate damage type up-front: only these two spellings trigger the
+        # Gc<->sigma_c auto-conversion in spine.py::load_materials.
         dmg_type = self.dmg_cfg.get("type")
         if dmg_type not in ("AT1", "AT2"):
             raise ValueError(
@@ -60,7 +56,7 @@ class DamageModel:
 
         Returns None if T is missing or the material has no thermal-expansion
         properties. The damage driving force must be evaluated on the
-        ELASTIC (mechanical) strain eps_el = eps(u) - eth, not on the total
+        elastic (mechanical) strain eps_el = eps(u) - eth, not on the total
         strain eps(u). Otherwise uniform thermal expansion in the bulk
         produces a spurious psi_pos that drives damage everywhere.
 
@@ -70,7 +66,7 @@ class DamageModel:
           dynamic (computed from u). The full isotropic eigenstrain
           alpha*(T-T_ref)*I is correct.
 
-        - In 2D Cartesian PLANE STRAIN (regime: 2d in z3st), eps_zz is
+        - In 2D Cartesian plane strain (regime: 2d in z3st), eps_zz is
           forced to 0 by the geometric constraint. Subtracting a non-zero
           eth_zz = alpha*(T-T_ref) would create eps_el_zz = -alpha*(T-T_ref),
           whose deviatoric component injects a spurious psi_pos
@@ -235,9 +231,7 @@ class DamageModel:
         (total strain when T is None) and K_n = lambda + 2*mu/n is Amor's
         n-dimensional bulk modulus (Amor, Marigo & Maurini 2009), with n the
         strain-tensor dimension. With K_n the split is an exact orthogonal
-        decomposition, psi_pos + psi_neg = psi_el; the previous lambda-based
-        convention dropped the (mu/n) tr^2 part of the volumetric energy
-        (~30 % of the hydrostatic-tension driving force at nu = 0.3).
+        decomposition, psi_pos + psi_neg = psi_el.
         """
         lam = material["lmbda"]
         G = material["G"]
@@ -324,7 +318,7 @@ class DamageModel:
           1. ``damage.split: amor | miehe | star_convex`` in input.yaml
              (explicit override).
           2. Default (no ``split`` key): AT2 -> Miehe spectral, AT1 -> Amor
-             volumetric/deviatoric. This preserves z3st's historical pairing.
+             volumetric/deviatoric.
 
         Returns (psi_pos, psi_neg) in physical units (J/m^3).
 
@@ -415,10 +409,9 @@ class DamageModel:
         if damage_type == "AT1":
             self.H.x.array[:] = H_new_array
         elif damage_type == "AT2":
-            # Ratchet against the last CONVERGED step's history (anchor
+            # Ratchet against the last converged step's history (anchor
             # captured by solve_staggered at step start), not against the
-            # running iterate: maxing in place every staggered iteration let
-            # unconverged intermediate states permanently inflate H.
+            # running iterate.
             H_floor = getattr(self, "_H_step_start", None)
             if H_floor is None:
                 H_floor = self.H.x.array
@@ -480,8 +473,7 @@ class DamageModel:
             E_frac += dolfinx.fem.assemble_scalar(dolfinx.fem.form(gamma * w * dx))
 
         # assemble_scalar returns per-rank partial sums; reduce so every
-        # rank returns the same global value and downstream callers see
-        # the physical energy (not the rank-0 share).
+        # rank returns the same global value.
         comm = self.mesh.comm
         E_el = comm.allreduce(E_el, op=MPI.SUM)
         E_frac = comm.allreduce(E_frac, op=MPI.SUM)
@@ -522,8 +514,7 @@ class DamageModel:
 
                         if mat_type not in self.dirichlet_damage:
                             # A typo'd material key in boundary_conditions.yaml
-                            # must degrade like the other malformed-BC paths,
-                            # not crash setup with a bare KeyError.
+                            # is skipped, as the other malformed-BC paths are.
                             print(f"  [ERROR] Damage BC block keyed by unknown "
                                   f"material '{mat_type}' — known: "
                                   f"{sorted(self.dirichlet_damage)}. Skipped.")
@@ -537,11 +528,9 @@ class DamageModel:
                         print(f"  [INFO] Dirichlet damage BC on '{mat_type}' → D = {val_d} at region '{region_name}'")
 
     # --.. ..- .-.. .-.. --- staggered step --.. ..- .-.. .-.. ---
-    # Moved here from core/solver.py on 2026-08-09: the physics steps belong to the
-    # models that own the physics, and solver.py keeps the loop plus the services it
-    # offers (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
-    # _value_at_step, _build_measures, aitken_omega). Spine multiply-inherits both,
-    # so solve_staggered calls these unchanged.
+    # solver.py owns the staggered loop and the services this step calls
+    # (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
+    # _value_at_step, _build_measures, aitken_omega); Spine inherits both.
     def _damage_step(self, D_new, D_old, rtol_dmg, stag_tol_dmg, prev_res_D):
 
         D_old.x.array[:] = D_new.x.array
@@ -572,8 +561,7 @@ class DamageModel:
             missing = [k for k in ("Gc", "sigma_c", "E") if k not in material]
             if missing:
                 # Every material in the domain participates in the phase-field
-                # problem; fail with a config-level message rather than a bare
-                # KeyError at the first damage assembly.
+                # problem.
                 raise ValueError(
                     f"Damage model is ON but material '{label}' lacks "
                     f"{missing}. Give it sigma_c or Gc on its card (the other "
@@ -600,7 +588,8 @@ class DamageModel:
                 # i.e. sigma > sigma_c.
                 #
                 # Irreversibility (D_n+1 >= D_n) is enforced after the
-                # linear solve via np.maximum(D_new, D_old). A symmetric
+                # linear solve via np.maximum(D_new, D_old).
+                # A symmetric
                 # (D - D_old)^2 penalty in the weak form would freeze
                 # D ~= D_old whenever the penalty coefficient dominates the
                 # driving force 2H, which is the typical regime in

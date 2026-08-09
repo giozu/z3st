@@ -187,8 +187,7 @@ except Exception as e:
 sigma_yy_ref = intensification_factor / (1.0 - Fc_area) * p_applied
 
 # Loose analytic tolerance: the tip-concentration estimate is approximate. A
-# pass means the right regime (no fracture, expected concentration); drift vs
-# code/mesh is guarded by regression_check vs gold.
+# pass means the right regime (no fracture, expected concentration).
 TOLERANCE = 0.25
 
 errors = {

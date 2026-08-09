@@ -89,9 +89,7 @@ print("[INFO] contact_pressure_verification.png saved")
 mask = p_lame > 10.0
 if not mask.any():
     # No step reaches the threshold, so there is no established contact to
-    # compare against the Lame interference fit. Stop with a verdict: the
-    # errors dict below indexes this mask and would otherwise raise
-    # NameError on `rel` and ValueError on an empty reduction.
+    # compare against the Lame interference fit.
     raise SystemExit(
         "[FAIL] contact never reached the 10 MPa verification threshold; "
         "the case premise (the gap closes under the temperature ramp) does not hold"

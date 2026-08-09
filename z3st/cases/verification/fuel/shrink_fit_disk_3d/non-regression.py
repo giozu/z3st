@@ -5,7 +5,7 @@
 Verification of the penalty contact pressure against the analytical Lame
 interference-fit pressure, on a 3D quarter-disk segment (the r-theta quarter
 disk extruded along z, with the z0 face as axial mid-plane symmetry and the
-z1 face traction-free). The slice is axially FREE, so — unlike the
+z1 face traction-free). The slice is axially free, so — unlike the
 plane-strain 2D disk case — the exact solution is the open-ended
 (plane-stress, sigma_zz = 0) Lame state. The inner disk is heated uniformly,
 so its free thermal expansion is exactly u(b) = alpha_f (T - T_ref) b and the
@@ -93,9 +93,7 @@ mask = p_lame > 0.25 * p_lame.max()
 if not mask.any():
     # p_lame is identically zero, i.e. the interference never becomes
     # positive, so there is no established contact to compare against the
-    # Lame fit. Stop with a verdict: the errors dict below indexes this mask
-    # and would otherwise raise NameError on `rel` and ValueError on an empty
-    # reduction.
+    # Lame fit.
     raise SystemExit(
         "[FAIL] the interference never becomes positive, so contact never "
         "engages; the case premise (the gap closes under the temperature "

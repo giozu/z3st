@@ -3,9 +3,7 @@ cd "${0%/*}" || exit 1
 
 echo "Cleaning current directory..."
 
-# Never "rm -rf output": the blessed non-regression_gold.json lives there and
-# the suite runs Allclean before every case, so wiping the directory would
-# silently disable the gold-regression check.
+# Never "rm -rf output": the blessed non-regression_gold.json lives there.
 rm -f output/non-regression.json
 rm -f output/case_summary.json output/conductivity_impact.json
 rm -f output/*.vtu output/*.pvd output/*.xdmf output/*.h5

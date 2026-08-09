@@ -206,9 +206,7 @@ class ThermalModel:
             # Assemble the volume (or area in 2D) of the subdomain
             volume = dolfinx.fem.assemble_scalar(dolfinx.fem.form(1.0 * dx))
 
-            # assemble_scalar is per-rank partial; reduce to global sums
-            # so the per-subdomain averages below are physical, not the
-            # rank-0 share of the subdomain.
+            # assemble_scalar is per-rank partial; reduce to global sums.
             comm = self.mesh.comm
             q_integral = comm.allreduce(q_integral, op=MPI.SUM)
             comp_integrals = [comm.allreduce(c, op=MPI.SUM) for c in comp_integrals]
@@ -222,11 +220,9 @@ class ThermalModel:
                 print(f"[INFO] Average heat flux -{name} in {label:<10}: {c_avg:.2f} W/m²")
 
     # --.. ..- .-.. .-.. --- staggered step --.. ..- .-.. .-.. ---
-    # Moved here from core/solver.py on 2026-08-09: the physics steps belong to the
-    # models that own the physics, and solver.py keeps the loop plus the services it
-    # offers (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
-    # _value_at_step, _build_measures, aitken_omega). Spine multiply-inherits both,
-    # so solve_staggered calls these unchanged.
+    # solver.py owns the staggered loop and the services these steps call
+    # (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
+    # _value_at_step, _build_measures, aitken_omega); Spine inherits both.
     def _thermal_step(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=None):
 
         # Non-linear thermal solver (k = model(T) external operator, Newton with
@@ -447,7 +443,7 @@ class ThermalModel:
     def _thermal_step_nonlinear(self, T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T):
         """k = model(T) as a FEMExternalOperator, solved by Newton with the
         autodiff tangent dk/dT (Latyshev et al. external operators). Scope:
-        STATIONARY conduction with Dirichlet (and Neumann) BCs. Transient mass
+        stationary conduction with Dirichlet (and Neumann) BCs. Transient mass
         terms and Robin/gap BCs are not yet handled here — they raise
         NotImplementedError.
         """
@@ -603,23 +599,17 @@ class ThermalModel:
                 material["k"].x.array[:] = material["_k_model"](T_new.x.array)
                 material["k"].x.scatter_forward()
 
-        # Same metrics as the linear path. This path now prints the residual
-        # too, so plot_convergence picks up nonlinear-thermal cases -- their T
-        # channel used to come out empty.
+        # Same metrics as the linear path.
         conv_th, norm_dT, rel_norm_dT, _ = self._stagger_residual(
             T_new, T_old, self.th_cfg, stag_tol_th, "T")
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
+    
     def _build_gap_pair_aux(self, fn, dofs_here, dofs_other):
         """Geometric matching between two paired gap surfaces (built once per
         step alongside the cached thermal form).
 
         Each here-surface dof is paired with its geometrically nearest dof on
-        the other surface. The previous positional copy
-        ``T_other[dofs_here] = T[dofs_other]`` assumed the two index-sorted dof
-        arrays had equal length and matching order — not guaranteed even in
-        serial, and never with the surfaces split across MPI ranks. Owned
-        other-side coordinates are allgathered once here; per iteration only
-        the surface *values* travel (:meth:`_refresh_gap_pair`).
+        the other surface.
         """
         from scipy.spatial import cKDTree
 

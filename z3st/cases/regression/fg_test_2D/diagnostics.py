@@ -56,11 +56,6 @@ def _fg_averages(problem, comm, parallel):
     over those dofs (``problem._sciantix_dofs``); the fractional release uses the
     summed produced/released over the fuel (a volume-consistent average since all
     fissile dofs share the V_t element).
-
-    Collective: the reductions run on every rank. The early return tests only
-    whether the coupling is enabled, which is a global property -- a per-rank
-    test such as ``len(dofs) == 0`` would let a rank without fissile dofs skip
-    the reductions and deadlock the others.
     """
     fields = getattr(problem, "fg_fields", None)
     dofs = getattr(problem, "_sciantix_dofs", None)

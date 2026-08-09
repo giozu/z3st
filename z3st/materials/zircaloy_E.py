@@ -10,9 +10,8 @@ A card opts in via ``E: materials.zircaloy_E.E``
 - spine resolves the function and builds lmbda/G as UFL expressions in the live temperature field (see
 spine.initialize_fields), exactly like the symbolic k(T) hook.
 
-This stub returns a *constant* 99.3 GPa, written
-as a UFL expression in T so the symbolic-E code path is exercised
-while the result is numerically identical to the scalar-E baseline.
+This stub returns a constant 99.3 GPa, written as a UFL expression in T;
+numerically identical to the scalar-E baseline.
 A correlation, e.g. the linear-softening form is
 
     E(T) = 1.088e11 - 5.475e7 * T            (Pa)   (~99 GPa at 300 K)

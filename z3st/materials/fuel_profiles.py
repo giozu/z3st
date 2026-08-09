@@ -9,9 +9,8 @@ These are *multiplicative* shaping factors that modulate the linear heat rate di
 
 A material card may name these via ``radial_profile: materials.fuel_profiles.<name>`` and/or ``axial_profile: materials.fuel_profiles.<name>``;
 ``spine.set_power`` resolves them, evaluates them on the fuel dofs, multiplies
-them together, normalises the composite to mean 1 (so the shaping only
-*redistributes* the linear heat rate, never changes its integral) and multiplies
-the volumetric source by it.
+them together, normalises the composite to mean 1 and multiplies the volumetric
+source by it.
 
 Signature::
 
@@ -22,9 +21,8 @@ Signature::
 - ``material`` : the material card dict (read parameters from it).
 - ``model``    : the solver/spine (regime, geometry, ...).
 
-These are parametric stand-ins: a mechanistic TUBRNP profile (Pu-239 build-up
-from U-238 resonance capture, flux depression) can replace them later behind the
-same interface, with no change to set_power or the burnup bus.
+These are parametric stand-ins, not mechanistic TUBRNP profiles (Pu-239
+build-up from U-238 resonance capture, flux depression).
 """
 
 import numpy as np
@@ -34,7 +32,7 @@ def _global_min_max(vals, model):
     """Min/max of a per-dof array across all MPI ranks. The profile callables
     infer geometry (fuel height, outer radius) from the dof coordinates; with a
     partitioned mesh each rank sees only its own dofs, so rank-local extrema
-    would give every rank a different — and wrong — profile."""
+    would give every rank a different profile."""
     lo = float(vals.min()) if vals.size else float("inf")
     hi = float(vals.max()) if vals.size else float("-inf")
     comm = getattr(getattr(model, "mesh", None), "comm", None)
@@ -81,8 +79,7 @@ def chopped_cosine(coords, burnup, material, model=None):
 
         max f_norm = 1 / [ (2 L' / pi L) sin(pi L / 2 L') ].
 
-    L' < L would make the cosine negative beyond the extrapolated boundary, so
-    the profile is clamped at zero (physically: no fission outside it).
+    The profile is clamped at zero beyond the extrapolated boundary
     """
     z = _axial_coord(coords, model)
     z_min, z_max = _global_min_max(z, model)
@@ -102,9 +99,8 @@ def tabulated_axial(coords, burnup, material, model=None):
         axial_table_f: [f1, f2, ...]   # (-) relative power at each elevation
 
     Outside the table range the end values are held (``np.interp`` clamping).
-    set_power normalises the composite form factor to mean 1, so only the
-    *shape* of the table matters — its absolute scale is irrelevant (peaking
-    factors and raw kW/m readings give the same source).
+    set_power normalises the composite form factor to mean 1, so only the shape
+    of the table matters, not its absolute scale.
     """
     z = _axial_coord(coords, model)
     z_tab = np.asarray(material["axial_table_z"], dtype=float)
@@ -131,8 +127,7 @@ def rim_peaking(coords, burnup, material, model=None):
         radial_peak_amplitude  A  (default 3.0) — rim peak height above the core
         radial_peak_exponent   p  (default 8.0) — how tightly peaked at the rim
 
-    set_power normalises f to mean 1, so the area-average rating (and hence total
-    power) is unchanged; only its radial distribution is shaped.
+    set_power normalises f to mean 1; the area-average rating is unchanged.
     """
     r = _radius(coords, model)
     _, r_max = _global_min_max(r, model)

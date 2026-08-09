@@ -10,8 +10,7 @@ Fuel swelling as a state-dependent eigenstrain.
 A fuel material card names one of these via ``eigenstrain:
 materials.fuel_swelling.<name>``; ``spine.load_materials`` resolves it to
 ``_eigenstrain_func`` and ``MechanicalModel.eigenstrain`` adds its return to the
-total inelastic strain ε*, so the eigenstress -C:ε* needs no further change and
-the Newton tangent stays automatic.
+total inelastic strain ε*.
 
 Signature::
 
@@ -41,9 +40,8 @@ def solid_gas_densification(T, material, model=None, dim=3):
       Cards ``gas_swelling_rate``, ``gas_T_onset``, ``gas_T_width``.
     - Densification: Cards ``densification_dv``and ``densification_bu``. 
 
-    All terms are UFL expressions in the burnup field (and T); 
-    both are fixed coefficients w.r.t. the displacement unknown, so
-    the eigenstress stays a source term and the u-tangent is unchanged.
+    All terms are UFL expressions in the burnup field (and T); both are fixed
+    coefficients w.r.t. the displacement unknown.
     """
     I = ufl.Identity(dim)
     bu = getattr(model, "burnup", None)

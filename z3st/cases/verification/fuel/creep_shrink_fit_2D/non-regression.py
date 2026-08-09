@@ -14,17 +14,14 @@ One metric is checked analytically, and it asserts the absence of burnup:
 
   * ``burnup_avg_final`` — the pellet is ``fissile: false`` on purpose, so the
     accumulated burnup must stay identically zero. Esposito eq. (21) relaxes a
-    shrink fit assembled at a FIXED interference; a fissile pellet grows the
+    shrink fit assembled at a fixed interference; a fissile pellet grows the
     interference through the swelling eigenstrain and the contact pressure
-    rises instead of relaxing, which is the failure mode documented in
-    README.md. This check is the guard against it being re-enabled unnoticed.
+    rises instead of relaxing.
 
     The error is scaled by ``BU_NOMINAL``, the burnup the nominal power history
     in ``input.yaml`` would deposit if the pellet were fissile,
-    bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10). That keeps the metric relative
-    and dimensionless without dividing by the zero reference: any leaked
-    burnup is reported as a fraction of the full nominal value, so switching
-    ``fissile`` back on drives it to 1.0 and fails loudly.
+    bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10). Any leaked burnup is reported as
+    a fraction of the full nominal value.
 
 The PCMI end-state scalars (gap, contact pressure, temperatures) have no
 closed form — they are recorded with ``rel_error = 0`` so the analytic
@@ -88,9 +85,8 @@ times, lhrs, _ = generate_power_history(
     inp["time"], inp["lhr"], n_steps=n_increments, filename=None
 )
 energy_per_m = float(np.sum(np.asarray(lhrs)[1:] * np.diff(np.asarray(times))))
-# Burnup the nominal power history would deposit on a fissile pellet. It is
-# not the expected value here - the pellet is non-fissile and the expected
-# value is zero - it is the scale the zero-assertion is measured against.
+# Burnup the nominal power history would deposit on a fissile pellet: the
+# scale the zero-assertion is measured against, not the expected value.
 BU_NOMINAL = energy_per_m / (area * rho * hm * SECONDS_PER_MWD)
 BU_SCALE = BU_NOMINAL if BU_NOMINAL > 0.0 else 1.0
 

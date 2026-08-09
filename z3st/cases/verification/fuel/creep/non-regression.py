@@ -5,7 +5,7 @@
 Z3ST case: verification/fuel/creep
 
 Verifies implicit Norton creep (incremental variational principle, tangent by
-AD — models/creep_model.py) on a CONSTANT-STRESS uniaxial bar.
+AD — models/creep_model.py) on a constant-stress uniaxial bar.
 
 The axisymmetric bar carries a constant axial traction sigma at uniform T,
 backward Euler is exact.
@@ -15,7 +15,7 @@ lateral rates -1/2 of that):
   1. total axial strain    u_z(L)/L = sigma/E + A·sigma^n·t
   2. creep part            u_z(L)/L - sigma/E = A·sigma^n·t
   3. radial strain         u_r(Ro)/Ro = -nu·sigma/E - (1/2)·A·sigma^n·t
-     (checks the deviatoric flow direction, not just the magnitude)
+     (checks the deviatoric flow direction)
 
 One figure: axial strain vs time, Z3ST per-step vs the closed form.
 """

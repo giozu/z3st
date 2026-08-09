@@ -14,63 +14,29 @@
 
 Exits non-zero if any check reports a finding, so it can gate a commit or a CI job.
 
-Why these seven and not a linter's worth
+The checks
 --.--.--.--.--.--.--.--.--.--.--.--.--.-
 
-Each one exists because it would have caught a real mistake made during the
-2026-08 simplification audit that the test suite could not:
+  models        which cases reach each physics model, evaluating the switch as
+                Config does
+  assertions    gold metrics whose pass/fail is switched off
+  schema        verdict files the suite drivers can read
+  finite        NaN or inf in a blessed gold
+  names         syntax errors and undefined names
+  coverage      cases the driver cannot protect, exclusions with no reason
+  shell         every shell script parses, every stub finds the shared runner
+  workflow      scripts the CI workflow invokes exist
+  scripts       literal $ROOT_DIR paths in the shell drivers resolve
+  deps          third-party imports in library code are declared
+  mro           method-name collisions between Spine's parent classes
+  docs          case paths, dependencies and regime values in the prose
+  ci            cases_ci.txt against the tree it names
 
-  models        `contact` was reported as having zero cases because the search was
-                for `contact: true`, while it is configured as a *block* and Config
-                stores bool() of it. Seven cases enable it. This check evaluates the
-                switch the way Config does instead of matching text.
-  assertions    Two golds carried a hard-coded rel_error of 0 against a reference
-                that differed from the value, so the case passed whatever happened —
-                and a zero reference also sends regression_check down its
-                should-be-zero branch, disabling the gold comparison too.
-  schema        Two cases hand-rolled a copy of pass_fail_check that wrote a bare
-                json.dump(errors) with no "summary" key. The driver could read no
-                verdict, and the blessed gold next to it was never compared.
-  finite        A stale field name sat inside `if name in mesh.point_data:`, so two
-                force-displacement curves were produced with the force set to NaN.
-                No error, no warning, a saved figure missing its only quantity.
-  names         Relocating the physics steps left six undefined names across two
-                files. py_compile sees none of them; they would have surfaced as
-                NameError in whichever case ran first.
-  coverage      cluster_dynamic_model.py, 153 lines, had its only case in sandbox/
-                with neither a gold nor a script, in a directory the driver never
-                scans.
-  shell         166 files here are shell (13 scripts + 153 Allrun/Allclean stubs) and
-                nothing parsed them. bash -n is the pyflakes of that half of the repo.
-
-  workflow      A path invoked by .github/workflows fails only on a runner, minutes
-                after a push. Nothing local exercises that file.
-
-  scripts       The CI driver called "$ROOT_DIR/mpi_smoke.sh" while ROOT_DIR is the
-                package directory, so the guard never ran and reported FAIL for a
-                missing file instead. The script had only been tested directly.
-
-  deps          h5py was moved to an optional extra although library code imports it.
-                Six CI cases died on ModuleNotFoundError; the local suite had passed
-                63/63, because the conda stack provides h5py transitively.
-
-  mro           Spine flattens 13 parent classes into one namespace, so a duplicated
-                method name is resolved silently by MRO order and the loser is never
-                called. Five physics steps moved between those classes on 2026-08-09.
-
-  docs          Four .rst files under docs/source/ still told users to conda install
-                sympy and meshio, and showed a `coupling` key, days after all three
-                were removed. The earlier sweep had grepped three files by name
-                instead of the tree.
-
-The unifying failure was asserting something from a check that could not have shown
-the opposite. Where a check below is a heuristic that might misfire, it says so in
-its own output rather than being silently trusted.
+Where a check is a heuristic that might misfire, it says so in its own output.
 
 Not covered here, because it needs to run something: an `mpirun -n 2` smoke test.
 Rank-asymmetric Python state deadlocks at exit — dolfinx's PETSc wrappers do
 collective work in __del__ — and only an actual parallel run finds it.
-verification/cluster/mass_conservation_1D takes 10 s and is the natural candidate.
 """
 
 import argparse
@@ -192,11 +158,10 @@ def check_schema():
 
     Both drivers grep ``output/non-regression.json`` for a top-level ``"summary"``
     and ``"regression"``. A bare ``json.dump(errors)`` produces a file that parses
-    fine and yields no verdict, which is how two cases stayed effectively unprotected.
+    fine and yields no verdict.
 
     The *gold* is deliberately not checked for a wrapper: regression_check reads it
     as ``gold_data.get("results", gold_data)``, so a bare metric dict is valid there.
-    Requiring one produced 27 false positives on the first version of this check.
     """
     findings = []
     for j in sorted(CASES.rglob("output/non-regression.json")):
@@ -294,11 +259,8 @@ def check_coverage():
         gold = d / "output" / "non-regression_gold.json"
         if not script.exists():
             continue  # aggregators and parametric drivers legitimately have none
-        # follow one level of delegation: some variants exec a shared script
-        # Delegation is real and takes three shapes: a shared script in the parent
-        # directory, one in a *sibling* directory, and one alongside. Missing the
-        # sibling form reported thermal_conductivity_GPR as verdict-less, which was
-        # the same false positive this audit hit by hand earlier.
+        # Follow one level of delegation. It takes three shapes: a shared script in
+        # the parent directory, one in a *sibling* directory, and one alongside.
         sources = [script.read_text()]
         for name in set(re.findall(r"([A-Za-z_][A-Za-z0-9_-]*\.py)", sources[0])):
             for cand in (d / name, d.parent / name,
@@ -331,7 +293,7 @@ def check_docs():
     Deliberately narrow: case paths that no longer exist, dependencies the docs tell
     users to install that the package does not declare, and regime values outside
     Config's whitelist. Broader keyword sweeps produce false positives on prose and
-    on dated changelog entries, which is why they are not attempted here.
+    on dated changelog entries.
     """
     findings = []
     docs = [p for p in list(ROOT.glob("*.md")) + list(ROOT.glob("docs/**/*.rst"))
@@ -351,12 +313,8 @@ def check_docs():
                 continue
             findings.append(f"{p.relative_to(ROOT)}: cites a case that does not exist: {match}")
 
-    # A dependency cross-check was tried here and removed: parsing tokens after
-    # "pip install" swallowed prose ("the", "part", "is", "also", "available") and
-    # flagged legitimate suggestions (pylint for pyreverse, mpich and petsc4py from
-    # the conda stack). Eight of its ten findings were noise, and a check that cries
-    # wolf teaches people to skip the whole tool. Auditing what the docs tell users
-    # to install needs a curated list of removed names, not a regex.
+    # b) no dependency cross-check: auditing what the docs tell users to install
+    # needs a curated list of removed names, not a regex over "pip install" tokens.
 
     # c) regime values
     config = (ROOT / "z3st" / "core" / "config.py").read_text()
@@ -389,14 +347,7 @@ def check_mro():
     the other is never called. Nothing raises, nothing warns, and the case still
     passes if the surviving implementation happens to be close enough.
 
-    That surface was widened on 2026-08-09, when five physics steps moved out of
-    core/solver.py into their models. It was clean then (85 methods, zero
-    collisions); this check is what keeps it clean, because "we looked once" does
-    not survive the next model.
-
-    Parsed with ast rather than by importing Spine: the import pulls in dolfinx and
-    PETSc, and this script's promise is that it needs neither an environment nor a
-    simulation.
+    Parsed with ast rather than by importing Spine, which pulls in dolfinx and PETSc.
     """
     spine = ROOT / "z3st" / "core" / "spine.py"
     tree = ast.parse(spine.read_text())
@@ -435,8 +386,7 @@ def check_mro():
             )
 
     # A base with only dunder methods (Config) contributes no names and is not a
-    # gap; a base whose file was never parsed is. Conflating the two reported
-    # Config as unchecked on the first run of this check.
+    # gap; a base whose file was never parsed is.
     missing = [b for b in bases if b not in found]
     if missing:
         findings.append(
@@ -466,15 +416,8 @@ def check_deps():
         (an extra is the right home). Only the feature breaks, and the code that wrote
         the guard clearly meant it to be optional.
 
-    That distinction is the whole check. h5py was moved to the optional ``post`` extra on
-    2026-08-09 on the grounds it was "not needed to run a case" -- but
-    ``utils/utils_extract_xdmf.py`` imports it at module level and 18 non-regression
-    scripts import that, so it is needed to *check* a case, and Allrun does both. Six CI
-    cases died on ModuleNotFoundError.
-
-    It survived a full 63/63 local suite because the conda dolfinx stack pulls h5py in
-    transitively. **A local run cannot reveal an undeclared dependency, whatever it
-    reports.** Only a fresh environment can -- or this check, in four seconds.
+    A local run cannot reveal an undeclared dependency: the conda dolfinx stack pulls
+    several in transitively. Only a fresh environment can, or this check.
 
     Scope is library code: z3st/ minus cases/ and conference/, which are leaf scripts.
     """
@@ -558,13 +501,8 @@ def check_deps():
 def check_scripts():
     """Literal paths in the shell drivers must resolve.
 
-    ``non-regression_github.sh`` invoked ``"$ROOT_DIR/mpi_smoke.sh"``, but ROOT_DIR is
-    the *package* directory -- the parent of cases/ -- so the file was never found. The
-    driver dutifully reported FAIL: the right verdict for the wrong reason, and a green
-    smoke test would have looked identical to one that never ran.
-
-    It escaped local testing because the script had only ever been invoked directly,
-    never through the driver. Testing a component is not testing its wiring.
+    A path built on ROOT_DIR that names no existing file makes the driver report FAIL,
+    which is indistinguishable from a check that ran and failed.
 
     Only paths whose remainder is a literal are checked; anything with a second variable
     in it (``"$ROOT_DIR/cases/$case_name"``) is built at run time and skipped.
@@ -575,16 +513,13 @@ def check_scripts():
         text = sh.read_text()
         # ROOT_DIR does not mean the same directory in every script: the local driver
         # sets it to its own directory (cases/), the CI driver to the parent (the
-        # package). That collision of meaning is exactly what produced the broken path,
-        # so resolve each script's definition instead of assuming one.
+        # package). Resolve each script's declaration rather than assuming one.
         uses = re.findall(r'"\$\{?ROOT_DIR\}?/([^"$]+)"', text)
         decl = re.search(r'ROOT_DIR="\$\(\s*cd\s+"\$\(\s*dirname\s+"\$\{BASH_SOURCE\[0\]\}"'
                          r'\s*\)((?:/\.\.)*)"\s*&&', text)
         if not decl:
             # Never skip silently: an unparsed declaration means the paths below went
-            # unchecked, which looks exactly like paths that are all fine. The first
-            # version of this check did skip, and stopped detecting the very bug it was
-            # written for.
+            # unchecked, which looks exactly like paths that are all fine.
             if uses:
                 findings.append(
                     f"{sh.relative_to(ROOT)}: uses $ROOT_DIR but its declaration could "
@@ -607,10 +542,9 @@ def check_scripts():
 def check_shell():
     """Every shell script parses, and every stub finds the shared runner.
 
-    166 files in this repo are shell: 13 scripts plus 153 per-case Allrun/Allclean
-    stubs. A syntax error in one is invisible until that case runs, and a stub whose
-    sourced path is wrong fails at the same moment. Both are free to check with
-    ``bash -n``, which is what the Python side gets from pyflakes.
+    Most shell in this repo is per-case Allrun/Allclean stubs. A syntax error in one
+    is invisible until that case runs, and a stub whose sourced path is wrong fails
+    at the same moment. Both are checked with ``bash -n``.
     """
     findings = []
     targets = [f for f in ROOT.rglob("*")
@@ -636,9 +570,8 @@ def check_shell():
 def check_workflow():
     """Scripts the CI workflow invokes must exist in the repo.
 
-    The workflow is the one file nothing else exercises: a path that is wrong there
-    fails only on a runner, minutes after a push, and only for whoever is watching.
-    Outputs (upload-artifact paths) are deliberately not checked -- they are produced
+    Nothing else exercises the workflow: a path that is wrong there fails only on a
+    runner. Outputs (upload-artifact paths) are deliberately not checked -- they are produced
     by the run, so their absence before it is correct.
     """
     findings = []
@@ -665,11 +598,11 @@ def check_ci():
     non-regression_local.sh discovers its cases (Allrun + gold, sandbox pruned);
     non-regression_github.sh instead reads cases_ci.txt, maintained by hand. Renaming
     or dropping a case therefore keeps the local suite correct and leaves the CI list
-    pointing at nothing -- which fails on a runner, minutes after a push.
+    pointing at nothing.
 
-    Deliberately NOT flagged: cases absent from cases_ci.txt. The short list is a
-    documented choice (a per-commit gate under a measured time budget), not an
-    oversight, so 'missing from CI' is the normal state for most cases.
+    Not flagged: cases absent from cases_ci.txt. The short list is a documented
+    choice (a per-commit gate under a measured time budget), so 'missing from CI' is
+    the normal state for most cases.
     """
     findings = []
     ci_file = CASES / "cases_ci.txt"

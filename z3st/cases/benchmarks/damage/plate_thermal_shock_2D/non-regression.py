@@ -7,21 +7,17 @@ Z3ST case: benchmarks/damage/plate_thermal_shock_2D
 Kamagate et al. (2025) quenched-plate replica: crack nucleation under thermal
 shock, no pre-crack and no damage seed.
 
-What this script deliberately does NOT check
---.--.--.--.--.--.--.--.--.--.--.--.--.--.-
+Not checked
+--.--.--.--.-
 
-The **number** of nucleated cracks. README.md says it plainly: the count is
-sensitive to mesh, lc and heterogeneity -- a known feature of this benchmark --
-and the shipped mesh is lc/3, "for a first look", not the lc/4.5 at which counts
-stop moving under refinement. A crack-count metric here would be a coin toss
-dressed up as a check. The sibling pellet_quench_2D_xy shows what that leads to:
-a reference of 3 against a measured 5, kept green by a forced "pass": True.
+The number of nucleated cracks: the count is sensitive to mesh, lc and
+heterogeneity, and the shipped mesh is lc/3, not the lc/4.5 at which counts
+stop moving under refinement.
 
-What it checks instead: quantities that do not depend on how a damage band
-happens to split. The temperature field is effectively one-way (constant k and c,
-damage heat neglected), so it is the most reproducible thing the case produces.
-Everything is tracked() -- recorded in the gold and guarded against regression --
-because the paper gives a pattern to match, not numbers to hit.
+Checked instead: quantities that do not depend on how a damage band splits. The
+temperature field is effectively one-way (constant k and c, damage heat
+neglected). Everything is tracked() -- recorded in the gold and guarded against
+regression; the paper gives a pattern to match, not numbers to hit.
 """
 
 import os
@@ -57,9 +53,8 @@ errors["T_mean_final"] = tracked(T.mean())
 # --.. ..- .-.. .-.. --- damage, final step --.. ..- .-.. .-.. ---
 # D_max is a threshold, not a count: it says whether nucleation happened at all.
 # The damaged-node fraction integrates "how much" damage there is without caring
-# how it splits into bands. It is mesh-dependent in absolute terms, which is
-# harmless here: the regression check compares runs on the same mesh, and a mesh
-# change is exactly the event that should force a re-blessing.
+# how it splits into bands. It is mesh-dependent in absolute terms; the
+# regression check compares runs on the same mesh.
 _, _, _, D = extract_field_xdmf(XDMF_FILE, "Damage", step_index=-1)
 D = np.asarray(D).reshape(-1)
 frac = float(np.count_nonzero(D > 0.5)) / D.size

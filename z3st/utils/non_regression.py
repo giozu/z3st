@@ -7,16 +7,16 @@
 
 """Shared skeleton for the per-case ``non-regression.py`` scripts.
 
-Every case repeated the same prologue (paths, YAML loading), the same
-extract-mask-sort idiom, the same abs/rel arithmetic in the ``errors`` dict and
-the same epilogue. Those live here; each case keeps only what is actually
-specific to it — which fields it reads, its analytic references, its plots.
+The common prologue (paths, YAML loading), the extract-mask-sort idiom, the
+abs/rel arithmetic in the ``errors`` dict and the epilogue live here. Each case
+keeps only what is specific to it: which fields it reads, its analytic
+references, its plots.
 
 Metrics come in three shapes, and the distinction matters because pass/fail
 reads ``rel_error`` only:
 
     metric(value, reference)   a real comparison: abs = |v-r|, rel = |v-r|/r
-    error_metric(value, rel)   the value IS an error (an L2 norm, a
+    error_metric(value, rel)   the value is itself an error (an L2 norm, a
                                non-uniformity): reference 0, abs = value,
                                rel = the supplied relative norm, or value
     tracked(value)             no analytic reference; recorded for the gold
@@ -52,7 +52,7 @@ def load_case(case_dir, material=None):
     """Return ``(geometry, input, material)`` for the case.
 
     ``material`` selects an entry of ``input.yaml::materials`` by key; the
-    default takes the first, which is what every single-material case wants.
+    default takes the first entry.
     """
     geom = load_yaml(case_dir, "geometry.yaml")
     inp = load_yaml(case_dir, "input.yaml")

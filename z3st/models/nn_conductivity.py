@@ -111,12 +111,12 @@ def make_external_operator(nn, T, quadrature_degree=2, scheme="default",
 
     nn: a conductivity model (NNConductivity, or any callable exposing the same
         __call__/value_and_grad interface).
-    T:  the temperature Function the operator wraps — must be the SAME Function
+    T:  the temperature Function the operator wraps — must be the same Function
         the Newton solver iterates, so updates propagate.
     aux_operands / aux_names: optional extra operands (Pu fraction, burnup, ...)
-        passed to the model by keyword. They are FROZEN in the Newton tangent —
+        passed to the model by keyword. They are frozen in the Newton tangent —
         only T is differentiated — so they must not themselves depend on T.
-    The integration measure in the residual MUST use the same quadrature_degree
+    The integration measure in the residual must use the same quadrature_degree
     and scheme as passed here, or assembly fails on a quadrature mismatch.
     """
     import basix
@@ -141,7 +141,7 @@ def make_external_operator(nn, T, quadrature_degree=2, scheme="default",
     def k_external(derivatives):
         # multi-index has one entry per operand. Only the first operand, T, is
         # differentiated in the Newton tangent; auxiliaries are frozen fields.
-        # The package fills a FLAT ref_coefficient, so ravel (operands arrive
+        # The package fills a flat ref_coefficient, so ravel (operands arrive
         # shaped (ncells, nquad)).
         if derivatives == (0,) * len(operands):
             return lambda T_np, *aux: nn(T_np, **_kwargs(aux)).ravel()

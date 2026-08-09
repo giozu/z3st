@@ -2,14 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 """Quick diagnostic for the SENT tension test.
 
-Processes only the **last** available VTU file (no per-step loop), so it
-runs in a few seconds and is safe to invoke while the simulation is still
-writing new steps. Generates the ParaView-style field plots of the final
-state (damage, sigma_yy, sigma_xx, sigma_vm, crack-driving force) plus the
-global energy balance read directly from energies.txt.
+Processes only the last available VTU file (no per-step loop), so it runs in
+a few seconds and is safe to invoke while the simulation is still writing new
+steps. Generates the ParaView-style field plots of the final state (damage,
+sigma_yy, sigma_xx, sigma_vm, crack-driving force) plus the global energy
+balance read directly from energies.txt.
 
-For per-step diagnostics (F-u curve, damage evolution panels), use a
-separate post-processing script after the simulation completes.
+Not covered: per-step diagnostics (F-u curve, damage evolution panels).
 """
 
 import os
@@ -34,8 +33,8 @@ LAST_VTU = VTU_FILES[-1]
 OUT_JSON = os.path.join(OUTPUT_DIR, "non-regression.json")
 
 # This benchmark has no closed-form reference: it reproduces Ambati's figures.
-# Every metric is therefore tracked() -- recorded in the gold and guarded against
-# regression, but never used as a pass/fail criterion we cannot justify.
+# Every metric is tracked() -- recorded in the gold and guarded against
+# regression, never a pass/fail criterion.
 metrics = {}
 TOLERANCE = 1e-2
 

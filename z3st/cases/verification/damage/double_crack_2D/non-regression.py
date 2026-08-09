@@ -61,7 +61,7 @@ x_target, mask_tol = (Dn, 1 / (2 * 40)) # m, m, m (extraction line selection and
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 STRESSES_REF = [0.0, 2.0e8, 4.0e8, 5.5e8, 6.0e8] # (Pa)
-# IMPOSED STRESS: (1 - nu**2) accounts for the 2D PLANE STRAIN conditions (epsilon_zz = 0)
+# Imposed stress: (1 - nu**2) accounts for the 2D plane-strain condition (epsilon_zz = 0)
 STRAINS_REF = [(1 - nu**2) / E * sigma for sigma in STRESSES_REF]   # (/)
 U_X_REF = [eps * Lx for eps in STRAINS_REF]                         # (m)
 
@@ -225,9 +225,8 @@ plt.savefig(os.path.join(OUTPUT_DIR, "damage_evolution.png"), dpi=300)
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 # This benchmark carries no closed-form reference, so every metric is tracked():
-# recorded in the gold and guarded against regression, without inventing a
-# pass/fail criterion. Previously the script computed these and wrote no verdict
-# at all, which left the case out of the discovered suite entirely.
+# recorded in the gold and guarded against regression, without a pass/fail
+# criterion.
 errors = {
     "u_max_final": tracked(displacements[-1]),
     "sigma_final": tracked(stresses[-1]),

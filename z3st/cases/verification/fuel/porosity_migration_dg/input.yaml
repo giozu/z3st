@@ -34,10 +34,8 @@ thermal:
   convergence: rel_norm
 
 # Upwind DG variant of the sibling porosity_migration case (which is CG+SU/SUPG).
-# Configuration validated against the DG development campaign:
 # SSP-RK3 in time, Kuzmin vertex limiter for the discrete maximum principle, and
-# the conservative saturation cap that enforces the physical p <= 1 bound without
-# the non-conservative np.clip the CG path used to rely on.
+# a conservative saturation cap enforcing the physical p <= 1 bound.
 porosity:
   linear_solver: direct_mumps
   rtol: 1.0e-8

@@ -8,7 +8,7 @@ Isotropic softening model for cracking due to thermal stresses in oxide material
 
 The temperature gradient cracks the pellet once the thermal tensile stress
 exceeds the fracture stress. Rather than resolve the crack pattern, the cracked
-material is represented as an ISOTROPICALLY SOFTENED solid: the elastic
+material is represented as an isotropically softened solid: the elastic
 constants are rescaled as a function of the number of macroscopic cracks n,
 conserving principal strains and minimising the squared deviation of the
 principal stresses between the cracked (anisotropic) and equivalent isotropic
@@ -20,24 +20,13 @@ Scaling of the elastic constants, applied from the VIRGIN constants (E, nu):
     E_iso(n)   = f(nu)^n * E
     nu_iso(n)  = nu / (2^n + (2^n - 1) * nu)
 
-Note on the E closed form (reviewed 2026-07-02): nu_iso(n) is the closed form
-of the per-crack recursion nu_{k+1} = nu_k/(2 + nu_k), which admits an
-alternative reading in which E would follow the same recursion,
-E_{k+1} = f(nu_k) E_k (a product that differs from f(nu)^n by ~40 % at
-n = 6.6 and >2x at n = 10). The frozen-nu power form implemented here is the
-paper's published closed form: the 2026-06-12 unit check reproduced the
-paper's Fig. 3 E_iso/E curve at 10/20/40 kW/m, which discriminates decisively
-between the two at high n. The correlation also yields FRACTIONAL n, for
-which only the closed forms in continuous n are well-defined. Do not "fix"
-this to the recursive product without re-checking Fig. 3 of the paper.
-
 Number of cracks, an empirical correlation on the rod-average:
 
     n = 0                                                    LHR <  LHR0
     n = n0 + (n_inf - n0) * (1 - exp(-(LHR - LHR0)/tau))     LHR >= LHR0
 
 with LHR0 = 5 kW/m (first crack, n0 = 1), n_inf = 12, tau = 21 kW/m. Crack
-healing is not modelled, so n is driven by the MAXIMUM rod-average LHR seen so
+healing is not modelled, so n is driven by the maximum rod-average LHR seen so
 far in the power history (irreversible).
 
 Card (material):
@@ -49,8 +38,8 @@ Card (material):
     cracking_tau:   21.0e3    # (W/m)  optional, default 21 kW/m
 
 The rescale is applied once per time step (spine.parameters, i.e. before the
-solve); the mechanical weak form is rebuilt every staggered iteration, so the
-updated lmbda/G are picked up with no further plumbing. The derived constants
+solve); the mechanical weak form is rebuilt every staggered iteration. The
+derived constants
 (lmbda, G, bulk_modulus) are recomputed from (E_iso, nu_iso); the virgin
 values are kept in the card as E_virgin / nu_virgin.
 

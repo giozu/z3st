@@ -4,8 +4,7 @@ import subprocess
 
 
 def test_non_regression_minimal():
-    # The shell driver lives next to this file (z3st/cases/non-regression_github.sh),
-    # not in a top-level tests/ directory.
+    # The shell driver lives next to this file (z3st/cases/non-regression_github.sh).
     script = pathlib.Path(__file__).resolve().parent / "non-regression_github.sh"
     result = subprocess.run(["bash", str(script)], capture_output=True, text=True)
     print(result.stdout)

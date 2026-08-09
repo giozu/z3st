@@ -15,7 +15,7 @@ Lz = 1.0;          // box height  (m)
 
 ax  = 0.04;        // ellipse semi-axis X (m)
 ay  = 0.04;        // ellipse semi-axis Y (m)
-az  = 0.04;        // ellipse semi-axis Y (m)
+az  = 0.04;        // ellipse semi-axis Z (m)
 
 h_box = 0.0500;    // target element size (m)
 h_sph = 0.0025;    // target element size (m)

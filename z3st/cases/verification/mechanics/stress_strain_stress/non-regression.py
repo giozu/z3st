@@ -4,8 +4,6 @@
 """
 Z3ST case: stress_strain_curve_stress
 
-non-regression script
----------------------
 Reconstructs the stress-strain curve from the per-step VTU files (imposed stress).
 """
 
@@ -38,7 +36,7 @@ y_target, mask_tol = (
 
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 STRESSES_REF = [ 0, 1e2, 1e4, 1e6, 1e8 ]                            # (Pa)
-# IMPOSED STRESS: (1 - nu**2) accounts for the 2D PLANE STRAIN conditions (epsilon_zz = 0)
+# Imposed stress: (1 - nu**2) accounts for the 2D plane strain condition (epsilon_zz = 0)
 STRAINS_REF = [(1 - nu**2) / E * sigma for sigma in STRESSES_REF]   # (/)
 U_X_REF = [eps * Lx for eps in STRAINS_REF]                         # (m)
 

@@ -400,8 +400,8 @@ sf_path = os.path.join(CASE_DIR, "output", "shape_functions.png")
 plt.savefig(sf_path, dpi=200)
 print(f"\n[INFO] Shape functions plotted at: {sf_path}")
 
-# Kronecker delta check, evaluated at the EXACT node positions (no sampling
-# bias): build a (n_dofs x n_dofs) table N_ij = N_i(x_j). Should be Identity.
+# Kronecker delta check, evaluated at the exact node positions: build a
+# (n_dofs x n_dofs) table N_ij = N_i(x_j). Should be Identity.
 node_points = np.column_stack([dof_coords[:, 0],
                                np.zeros(n_dofs),
                                np.zeros(n_dofs)])

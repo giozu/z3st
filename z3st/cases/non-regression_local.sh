@@ -120,11 +120,9 @@ for case_name in "${CASES[@]}"; do
 
     case_status="OK"
     # A case is discovered only because it has a blessed gold, so the regression
-    # check must have run and must have passed. An EMPTY verdict means it never
-    # ran -- typically because the gold was deleted (an Allclean doing
-    # "rm -rf output" does exactly that) -- and has to fail loudly: treating it
-    # as a non-failure turns a silently unprotected case green, and it stays
-    # green forever.
+    # check must have run and passed. An empty verdict means it never ran --
+    # typically because an Allclean doing "rm -rf output" deleted the gold -- and
+    # counts as a failure.
     if [[ $exit_code -ne 0 || "$summary_status" != "PASS" || "$regression_status" != "PASS" ]]; then
         case_status="FAIL"
         global_status=1

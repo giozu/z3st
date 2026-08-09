@@ -47,8 +47,7 @@ def _init(problem):
         subdomain_id=ymax_tag,
     )
 
-    # The case has a single material; pick its name dynamically (so this
-    # works if someone renames it).
+    # The case has a single material; pick its name dynamically.
     mat_name = next(iter(problem.materials))
     sigma_xy = problem.stress[mat_name][0, 1]
 

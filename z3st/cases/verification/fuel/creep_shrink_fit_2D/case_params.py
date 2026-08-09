@@ -8,11 +8,6 @@ Single source of truth for the post-processing scripts of this case.
 
 Every geometric, material and solver constant used by ``plots.py`` and
 ``pressure_creep_analysis.py`` is read here from the case's own YAML files.
-Nothing is restated as a literal: an analytical overlay computed with
-parameters that differ from the ones the solver actually ran is not a
-verification, and hand-copied constants silently drift the moment the case is
-retuned.
-
 The only literal below is the universal gas constant.
 """
 
@@ -96,8 +91,7 @@ def check_consistency():
     # negative models.contact.initial_gap, which ContactModel uses verbatim in
     # place of the mesh-derived value. What must agree is therefore the
     # magnitude - the distance the mesh puts between the surfaces against the
-    # distance the solver applies - not the signed value. Comparing the signed
-    # values, as this check first did, can never pass for an interference fit.
+    # distance the solver applies - not the signed value.
     if abs(abs(G0) - abs(INITIAL_GAP)) > 1e-12:
         problems.append(
             f"cold gap from geometry.yaml ({G0:.3e} m) and "
@@ -124,9 +118,9 @@ def check_consistency():
         problems.append(f"clad creep law is '{_clad.get('creep')}', expected 'norton'")
 
     # creep_Q = 0 means A(T) = A0 identically, so A0 must already carry the
-    # Arrhenius factor at the operating temperature. Handing it the raw
-    # Zircaloy prefactor (~1e-24) instead of the folded value (~1e-34) runs the
-    # cladding ~1e10 times too fast, and the error is invisible in the output.
+    # Arrhenius factor at the operating temperature. The raw Zircaloy
+    # prefactor (~1e-24) instead of the folded value (~1e-34) runs the cladding
+    # ~1e10 times too fast.
     if CREEP_Q == 0.0 and CREEP_A0 > 1.0e-30:
         problems.append(
             f"creep_Q = 0 (isothermal) with creep_A0 = {CREEP_A0:.3e} Pa^-n s^-1, "

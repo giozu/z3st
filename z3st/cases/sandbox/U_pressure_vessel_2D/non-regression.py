@@ -53,7 +53,6 @@ def extract_mid_cylinder(grid):
     y_target = -L_cyl / 2.0
     
     # Get Cell Centers and Data
-    # Prefer cell data for stress usually, but let's check what we have
     if "Stress (cells)" in grid.cell_data:
         data_source = "cell"
         coords = grid.cell_centers().points
@@ -92,18 +91,9 @@ def extract_mid_cylinder(grid):
     r = x_vals[sort_idx]
     s = stress_vals[sort_idx]
     
-    # Components (Assuming tensor stored as xx, xy, xz, yx, yy, yz, zx, zy, zz)
-    # Check PyVista/VTK ordering. Usually: XX, YY, ZZ, XY, YZ, XZ or similar.
-    # Check shape first. If it is 9 comps, usually it is full tensor.
-    # In 2D Axisymmetric (X=r, Y=z/axial):
-    # s_xx -> Radial
-    # s_yy -> Axial
-    # s_zz -> Hoop (check if generalized plane strain or axi formulation usage)
-    # s_xy -> Shear
-    
-    # Let's assume standard VTK symmetric tensor order or full 9
-    # For now, let's just plot components 0 (XX), 4 (YY), 8 (ZZ) and maybe 1 (XY)
-    
+    # Full 9-component tensor, order xx, xy, xz, yx, yy, yz, zx, zy, zz.
+    # In 2D axisymmetric (X=r, Y=z/axial): s_xx radial, s_yy axial,
+    # s_zz hoop, s_xy shear.
     sigma_rr = s[:, 0]
     sigma_yy = s[:, 4]
     sigma_zz = s[:, 8] # Hoop
@@ -186,16 +176,9 @@ def extract_head_middle(grid):
     sig_zz = s_s[:, 8] # Hoop global (also Hoop local)
     sig_xy = s_s[:, 1]
     
-    # Transformation to Local Coordinates (Normal, Meridional)
-    # Angle alpha = 45 deg = pi/4
-    # Normal vector n = (cos a, sin a) = (1/sqrt(2), 1/sqrt(2))
-    # Tangent vector t = (sin a, -cos a) = (1/sqrt(2), -1/sqrt(2)) (Wait, check direction)
-    # Tangent to circle is perpendicular to radius. 
-    # If radius is at 45 deg, tangent is at -45 deg (315 deg) or 135 deg.
-    
-    # Let's use rotation matrix for 45 deg.
-    # x' (Normal direction, parallel to radius)
-    # y' (Meridional direction, tangent to radius)
+    # Rotation to local coordinates at alpha = 45 deg = pi/4:
+    # x' normal, parallel to the radius, n = (cos a, sin a)
+    # y' meridional, tangent to the radius, t = (-sin a, cos a)
     
     theta = np.pi / 4
     c = np.cos(theta)

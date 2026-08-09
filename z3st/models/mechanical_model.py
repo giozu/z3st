@@ -53,8 +53,7 @@ class MechanicalModel:
         axial one is physically meaningful on a line. Axisymmetric and 2-D keep
         (r, z) / (x, y); 3-D uses the normal as is.
 
-        The staggered traction update in solver.py needs the same vector, and had
-        a copy of this dispatch.
+        The staggered traction update in solver.py needs the same vector.
         """
         if self.mgr.tdim == 1:
             return ufl.as_vector([self.normal[0]])
@@ -274,7 +273,7 @@ class MechanicalModel:
         # dolfinx refuses V_u.sub(0) -- "Cannot extract subsystem...
         # no subsystems". Since the Clamp_z check above already
         # rejects Clamp_y / Clamp_z for tdim==1, the only valid
-        # component is c_idx == 0, which IS V_u itself.
+        # component is c_idx == 0, which is V_u itself.
         if self.tdim == 1:
             dofs = dolfinx.fem.locate_dofs_topological(V_u, self.fdim, facets)
             bc = dolfinx.fem.dirichletbc(disp_const, dofs, V_u)
@@ -303,7 +302,7 @@ class MechanicalModel:
         free_axis = {"Slip_x": 0, "Slip_y": 1, "Slip_z": 2}[bc_type]
         if free_axis >= self.tdim:
             # Mirror the Clamp_z guard: Slip_z on a 2-D mesh would silently
-            # block BOTH in-plane components (a full clamp), not slip.
+            # block both in-plane components (a full clamp), not slip.
             raise ValueError(
                 f"\n[ERROR] Boundary condition '{bc_type}' is not valid on a "
                 f"{self.tdim}D mesh: the free axis does not exist, so every "
@@ -444,8 +443,7 @@ class MechanicalModel:
         # The constitutive_mode promotion (lame -> plasticity for materials
         # with yield_strength when plasticity is on) lives in
         # spine.py::load_materials so the material dict is deterministic at
-        # load time. By the time sigma_mech is called the mode is already
-        # the final one; we just read it.
+        # load time.
         mode = material.get("constitutive_mode", "lame")
         regime = self.regime
 
@@ -652,7 +650,7 @@ class MechanicalModel:
         :meth:`eigenstrain`. For a purely thermal eigenstrain this reduces to
         the classical σ_th = −(3λ + 2G) α (T − T_ref) I (and −E α (T − T_ref)
         in regime "1d"); fuel swelling/creep enter through the same channel
-        once the material supplies them, so equilibrium needs no further change.
+        once the material supplies them.
 
         Damage coupling: when damage is active the eigenstress is degraded by
         g(D) = (1−D)² + K, mirroring σ_mech. Without this a fully damaged cell
@@ -695,20 +693,17 @@ class MechanicalModel:
 
         where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
         (total strain minus thermal eigenstrain). When T is None or the
-        material has no thermal-expansion properties, eps_el = eps(u) and
-        we recover the previous formula.
+        material has no thermal-expansion properties, eps_el = eps(u).
 
         For other constitutive modes (hyperelastic / plasticity /
         custom), fall back to 0.5 * sigma_mech(u, material) : eps(u) on
         total strain. Those modes don't have thermal coupling wired up in
         z3st, so the simpler formula is used.
 
-        Why the elastic strain matters: the energy that can be released by
-        cracking is the *elastic* strain energy. Uniform thermal expansion
-        in an unconstrained body produces total strain but zero elastic
-        strain and zero releasable energy, so the bulk's psi_el should be
-        ~0. Using eps(u) directly would pollute psi_el with thermal expansion
-        and lead to spurious E_el offsets in the energies.txt diagnostic.
+        The energy released by cracking is the elastic strain energy: uniform
+        thermal expansion in an unconstrained body produces total strain but
+        zero elastic strain and zero releasable energy, so the bulk's psi_el
+        is ~0.
         """
         mode = material.get("constitutive_mode", "lame")
 
@@ -720,8 +715,8 @@ class MechanicalModel:
                 # geometrically constrained / sigma_zz is zero -- including
                 # eth_zz would produce a spurious bulk psi_el. See the
                 # docstring of DamageModel._thermal_eigenstrain for the full
-                # rationale; we duplicate the logic here so that
-                # MechanicalModel does not need to import DamageModel.
+                # rationale; the logic is duplicated here so MechanicalModel
+                # need not import DamageModel.
                 factor = material["alpha"] * (T - material["T_ref"])
                 dim = eps.ufl_shape[0]
                 regime = str(getattr(self, "regime", "3d")).lower()
@@ -748,13 +743,10 @@ class MechanicalModel:
                     material["lmbda"] * ufl.tr(eps_el) ** 2
                     + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
                 )
-            # Damage degradation: mirrors sigma_mech / sigma_th. Without this
-            # weighting, cells under a prescribed D=1 BC (e.g. the notch slit
-            # of the SENT cases or the seed of case 14_*_cracking_2D_xy)
-            # absorb the displacement-controlled BC into huge strain while
-            # carrying near-zero stress -- the equilibrium is well-posed but
-            # psi_el = 0.5*E*eps^2 explodes, inflating the E_el diagnostic
-            # by orders of magnitude. (Simple g(D)*psi rather than
+            # Damage degradation: mirrors sigma_mech / sigma_th. Cells under a
+            # prescribed D=1 BC otherwise absorb the displacement-controlled BC
+            # into huge strain while carrying near-zero stress, inflating the
+            # E_el diagnostic. (Simple g(D)*psi rather than
             # g(D)*psi+ + psi-: small overcount in compression cells, but
             # those don't carry significant D under the hybrid constraint.)
             if self.on.get("damage", False):
@@ -768,11 +760,9 @@ class MechanicalModel:
         return 0.5 * ufl.inner(sigma, eps)
 
     # --.. ..- .-.. .-.. --- staggered step --.. ..- .-.. .-.. ---
-    # Moved here from core/solver.py on 2026-08-09: the physics steps belong to the
-    # models that own the physics, and solver.py keeps the loop plus the services it
-    # offers (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
-    # _value_at_step, _build_measures, aitken_omega). Spine multiply-inherits both,
-    # so solve_staggered calls these unchanged.
+    # solver.py owns the staggered loop and the services this step calls
+    # (get_solver_options, _stagger_residual, _adapt_relax, _bc_objects,
+    # _value_at_step, _build_measures, aitken_omega); Spine inherits both.
     def _mechanical_step(self, u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current):
 
         u_old.x.array[:] = u_new.x.array
@@ -900,9 +890,7 @@ class MechanicalModel:
                     else:
                         sigma = self.sigma_mech(u_new, material)
                         F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
-                        # Eigenstress on the residual — mirrors the linear path
-                        # (previously missing here; only exercised once non-lame /
-                        # creep runs route lame materials through SNES).
+                        # Eigenstress on the residual — mirrors the linear path.
                         if self.applies_eigenstress(material):
                             F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
 

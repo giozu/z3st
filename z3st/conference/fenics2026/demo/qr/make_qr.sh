@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Generate QR-code PNGs for the attract loop using the LaTeX 'qrcode' package.
-# The handout (handout.tex) draws its QR codes natively and does NOT need this.
+# The handout (handout.tex) draws its QR codes natively and does not need this.
 # Run once; the PNGs are force-tracked (see .gitignore here).
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

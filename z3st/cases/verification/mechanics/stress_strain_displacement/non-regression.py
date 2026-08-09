@@ -4,8 +4,6 @@
 """
 Z3ST case: stress_strain_curve_displacement
 
-non-regression script
----------------------
 Reconstructs the stress-strain curve from the per-step VTU files (imposed displacement).
 """
 
@@ -39,7 +37,7 @@ y_target, mask_tol = (
 # --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
 U_X_REF = [0.0, 5e-11, 5e-9, 5e-7, 5e-5]    # (m) imposed displacement
 STRAINS_REF = [ux / Lx for ux in U_X_REF]   # (/)
-# IMPOSED DISPLACEMENT: (1 - nu**2) accounts for the 2D PLANE STRAIN condition
+# Imposed displacement: (1 - nu**2) accounts for the 2D plane strain condition
 STRESSES_REF = [ eps_xx * E / (1 - nu**2) for eps_xx in STRAINS_REF ] # (Pa)
 
 TOLERANCE = 1e-3            # relative tolerance for pass/fail

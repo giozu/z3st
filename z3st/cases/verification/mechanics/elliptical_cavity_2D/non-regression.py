@@ -3,9 +3,6 @@
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
 Z3ST case: single_elliptical_cavity_2D
-
-non-regression script
----------------------
 """
 
 import os
@@ -54,8 +51,7 @@ with open(MATERIAL_FILE, 'r') as f:
 E = float(mat_data.get('E'))
 
 # Internal pressure: the cavity boundary carries an inward Neumann traction, so
-# the pressure is its magnitude. Read it rather than hard-coding, or the analytic
-# reference below silently detaches if boundary_conditions.yaml is retuned.
+# the pressure is its magnitude.
 with open(os.path.join(CASE_DIR, "boundary_conditions.yaml")) as f:
     bc_data = yaml.safe_load(f)
 p_int = abs(float(next(
@@ -65,13 +61,11 @@ p_int = abs(float(next(
 
 # --.. ..- .-.. .-.. --- analytic reference --.. ..- .-.. .-.. ---
 # Pressurised elliptical cavity in a plate (Inglis). The hoop stress peaks at the
-# ends of the major axis, where the hoop direction is y, so it is exactly the
-# quantity this case measures:
+# ends of the major axis, where the hoop direction is y:
 #     sigma_tt(x = +-a, y = 0) = p * (2a/b - 1)
-# The geometry picks b = a/sqrt(3) to the last digit, which makes the closed form
-# 2*sqrt(3) - 1 = 2.464102. Measured is ~5 % above it: the peak sits on a stress
-# concentration whose curvature the mesh only partly resolves, so the tolerance
-# below is set for discretisation error, not for the formula being approximate.
+# The geometry has b = a/sqrt(3), so the closed form is 2*sqrt(3) - 1 = 2.464102.
+# Measured is ~5 % above it: the peak sits on a stress concentration whose
+# curvature the mesh only partly resolves.
 SIGMA_TT_REF = p_int * (2.0 * ax / ay - 1.0)
 
 # --.. ..- .-.. .-.. --- extract fields --.. ..- .-.. .-.. ---
@@ -104,10 +98,6 @@ plt.tight_layout()
 plt.savefig(plot_path, dpi=300)
 print(f"[INFO] Plot saved in: {plot_path}")
 
-# Was: reference 0.0 with rel_error hard-coded to 0.0, which made the check pass
-# unconditionally -- and, because a zero reference sends regression_check down its
-# "should-be-zero residual" branch that defers to the analytic status, disabled the
-# gold comparison too. The case computed the right number and asserted nothing.
 errors = {
     "max_stress_yy": metric(sigma_yy_max, SIGMA_TT_REF),
 }

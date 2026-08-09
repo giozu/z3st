@@ -7,12 +7,10 @@ Reads ``energies.txt`` and writes ``energy_balance.png``: three traces
 notch baseline ``Gc * Dn`` (step 0) and the Ambati Fig. 12d arrest target
 ``Gc * (Dn + 0.55 mm)``.
 
-This is a post-hoc copy of the energy-balance block inside
-``non-regression.py`` (which runs as part of ``Allrun`` and writes the
-plot into ``./output/`` against the live run). Use this script instead
-when you want to regenerate the plot for a backed-up output directory
-(e.g. ``output_starconvex_g00/``, ``output_backup/``) without disturbing
-the live state.
+A post-hoc copy of the energy-balance block inside ``non-regression.py``,
+which runs as part of ``Allrun`` against the live run. This one regenerates
+the plot for a backed-up output directory (e.g. ``output_starconvex_g00/``)
+without touching the live state.
 
 Usage:
     python3 plot_energy_balance.py                       # default: live run

@@ -11,10 +11,8 @@ export OMP_NUM_THREADS=1
 export HDF5_USE_FILE_LOCKING=FALSE
 
 # SCIANTIX coupling (models.fission_gas) needs a -DCOUPLING_TU *shared* library.
-# No default is invented here: this used to default to /tmp/libsciantix_tu.so,
-# a path the coupling README explicitly warns against, which turned a clear
-# setup error into a confusing one. If SCIANTIX_LIB is unset the binding falls
-# back to the loader's search for "libsciantix.so" (a system install).
+# No default is invented here. If SCIANTIX_LIB is unset the binding falls back
+# to the loader's search for "libsciantix.so" (a system install).
 if [ -n "${SCIANTIX_LIB:-}" ] && [ ! -f "$SCIANTIX_LIB" ]; then
   echo "[Allrun_mpi] ERROR: SCIANTIX_LIB='$SCIANTIX_LIB' does not exist." >&2
   echo "        Build it as described in z3st/coupling/sciantix/README.md, section 1." >&2

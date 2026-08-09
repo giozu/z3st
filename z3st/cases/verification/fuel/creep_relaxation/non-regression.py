@@ -13,8 +13,8 @@ Checks:
   1. sigma_end vs the scalar backward-Euler replica of the same recursion, 
      sigma_{k+1} + E*dt*A*sigma_{k+1}^n = sigma_k,
      solved per step by a scalar Newton.
-  2. sigma_end vs the exact closed form
-     shrinks as O(dt) with n_steps (re-run with more steps to see it drop).
+  2. sigma_end vs the exact closed form; the defect shrinks as O(dt) with
+     n_steps.
 
 One figure: sigma(t), Z3ST per-step vs scalar BE vs the exact solution.
 """

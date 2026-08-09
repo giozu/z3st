@@ -18,21 +18,16 @@ from mpi4py import MPI
 # The rank gate is unconditional; the markdown transform is disabled with
 # Z3ST_PLAIN_LOG=1 or when stdout is a terminal.
 def _install_stdout_filters():
-    # Every rank runs the same code, so without this an N-process run repeats all
-    # ~260 diagnostic prints N times. Gating here rather than at the call sites
-    # keeps it to one place -- and print carries no level, so genuine failures are
-    # not what travels this channel: exceptions go to stderr, which is untouched,
-    # and log.warning/error reach stdout from every rank (see utils/logger.py).
+    # Every rank runs the same code, so an N-process run would repeat all ~260
+    # diagnostic prints N times. Exceptions go to stderr, which is untouched, and
+    # log.warning/error reach stdout from every rank (see utils/logger.py).
     # The wrapper is installed unconditionally, on every rank, and decides per
-    # write what to do. Two reasons it cannot be conditional:
+    # write what to do. Two constraints on that:
     #  * rank symmetry. dolfinx's PETSc wrappers do collective work in __del__, so
     #    if one rank carries a different set of live objects the collector orders
-    #    those destructors differently and the run deadlocks at exit. An earlier
-    #    version installed a bespoke sink on non-zero ranks only and hung every MPI
-    #    run, with rank 1 stuck in dolfinx/fem/petsc.py::__del__.
+    #    those destructors differently and the run deadlocks at exit.
     #  * under mpirun, sys.stdout.isatty() is True even when the shell redirects to
-    #    a file -- mpirun interposes a pty. Gating on isatty() therefore switched
-    #    the whole mechanism off in exactly the parallel runs it exists for.
+    #    a file -- mpirun interposes a pty, so isatty() cannot gate the mechanism.
     _markdown = not (os.environ.get("Z3ST_PLAIN_LOG") or sys.stdout.isatty())
 
     _morse_line = re.compile(r"^\s*(?:--\.\. \.\.- \.-\.\. \.-\.\. ---\s*)+$")
@@ -75,16 +70,9 @@ def _install_stdout_filters():
     class MarkdownStream:
         """Markdown transform plus the MPI rank gate.
 
-        ``emit`` is False on every rank but 0, which is how the ~260 diagnostic
-        prints avoid being repeated once per process. The gate lives *inside* this
-        one class, and the class is installed on every rank, because the object
-        graph must stay identical across ranks: dolfinx's PETSc wrappers do
-        collective work in ``__del__``, so if one rank carries a different set of
-        live objects the garbage collector orders those destructors differently and
-        the run deadlocks at exit (observed: rank 1 stuck in
-        dolfinx/fem/petsc.py::__del__ while rank 0 had already finished). An
-        earlier version replaced sys.stdout with a bespoke sink on non-zero ranks
-        only, and hung every MPI run.
+        ``emit`` is False on every rank but 0. The gate lives inside this one
+        class, and the class is installed on every rank, so the object graph
+        stays identical across ranks (see _install_stdout_filters).
         """
 
         def __init__(self, raw, emit=True, markdown=True):
@@ -97,8 +85,7 @@ def _install_stdout_filters():
             if not s:
                 return 0
             # Rank gate: ~260 diagnostic prints would otherwise repeat once per
-            # process. WARNING and ERROR lines pass from every rank -- the logger
-            # tags them, and a failure on one rank is what you need to see.
+            # process. WARNING and ERROR lines pass from every rank.
             if not self._emit and not _WARN_OR_ERROR.search(s):
                 return len(s)
             if not self._markdown:
@@ -155,10 +142,8 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 
 
 # --. Environment banner --..
-# A gold reference is only reproducible on the versions that produced it, so
-# the run records them: comparing against a gold made on a different dolfinx
-# or numpy is not a like-for-like comparison. Rank 0 only, so the MPI log
-# holds one copy. Every lookup falls back to "n/a" rather than failing the run.
+# The run records the versions a gold reference was produced on. Rank 0 only,
+# so the MPI log holds one copy. Every lookup falls back to "n/a".
 def _print_environment():
     import importlib
 
@@ -230,7 +215,7 @@ _SOLVER_SETTINGS_CASTS = {
 }
 
 # Casts for every hot-reloadable key: values are validated/cast before landing
-# in the shared config dicts, so a mid-run typo is rejected instead of poisoning the solver state.
+# in the shared config dicts.
 _HOT_BLOCK_CASTS = {
     "damage": {"stag_tol": float, "rtol": float,
                "hybrid_constraint": _to_bool, "gamma_star": float},
@@ -285,9 +270,8 @@ def _reload_hot_params(problem, input_path: str, input_file: dict) -> None:
             if block == "solver_settings" and hasattr(problem, key):
                 setattr(problem, key, new_val)
                 if key == "relax_u" and hasattr(problem, "_relax_u0"):
-                    # Aitken restarts relax_u from _relax_u0 at every step —
-                    # without this, a hot-reloaded relax_u is silently
-                    # overwritten at the next step boundary.
+                    # Aitken restarts relax_u from _relax_u0 at every step, so
+                    # the hot-reloaded value is written there too.
                     problem._relax_u0 = new_val
             print(f"  [hot-reload] {block}.{key}: {old_val} → {new_val}")
 
@@ -415,8 +399,7 @@ if __name__ == "__main__":
     # --. History --..
     t_points = input_file.get("time")
     lhr_points = input_file.get("lhr")
-    # Default matches Config's n_steps default; without it an input.yaml with
-    # no n_steps key crashed on None - 1 before the run started.
+    # Default matches Config's n_steps default.
     raw_n_steps = input_file.get("n_steps", 10)
     n_increments = raw_n_steps if isinstance(raw_n_steps, (list, tuple)) else raw_n_steps - 1
 

@@ -4,14 +4,13 @@
 """
 Z3ST case: verification/fuel/axial_table
 
-Verifies the TABULATED axial power source bus (axial_profile ->
+Verifies the tabulated axial power source bus (axial_profile ->
 fuel_profiles.tabulated_axial -> set_power) on a tall axisymmetric fuel
 column. The axial form factor is a piecewise-linear table f(z_i) from the
-material card — the standard fuel-performance input (node-wise peaking
-factors from a core-physics calculation).
+material card.
 
 Burnup accumulates as bu(z) = q(z)·t/(rho·HM·8.64e10), so the final burnup
-field IS the normalised profile. Three closed-form checks:
+field is the normalised profile. Three closed-form checks:
 
   1. accumulation magnitude — nodal-mean burnup = flat closed form
          bu_mean = q_avg * t_total / (rho * HM * 8.64e10)

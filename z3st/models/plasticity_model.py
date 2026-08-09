@@ -41,8 +41,7 @@ class PlasticityModel:
         Returns ``(sigma_tr, dp, n_flow, mu)``. Both consumers need the same
         predictor and the same plastic multiplier and finish differently:
         sigma_plastic wants the corrected stress, get_plastic_internal_variables
-        wants the increments. The two used to compute all of this line for line
-        twice.
+        wants the increments.
         """
         eps = self.epsilon(u)
         eps_el_tr = eps - self.ep_n                     # trial elastic strain
@@ -127,8 +126,7 @@ class PlasticityModel:
         mode = self.plasticity_cfg.get("mode", "j2")
         for name, mat in self.materials.items():
             # Mixed runs: skip materials that carry no plastic law (e.g. an
-            # elastic clad next to a plastic fuel) — the unconditional
-            # yield_strength read crashed such cases with a KeyError.
+            # elastic clad next to a plastic fuel).
             if mode != "custom" and "yield_strength" not in mat:
                 continue
             ep_expr, p_expr = self.get_plastic_internal_variables(u, mat)
@@ -146,10 +144,6 @@ class PlasticityModel:
             self.ep.interpolate(expr_ep, cells)
             self.p.interpolate(expr_p, cells)
 
-        # Refresh the history copies ONCE, after every material's cells have
-        # been interpolated: the per-material expressions reference ep_n/p_n,
-        # so overwriting them inside the loop would hand later materials an
-        # already-advanced trial state if cell sets ever overlapped.
         self.ep_n.x.array[:] = self.ep.x.array[:]
         self.p_n.x.array[:] = self.p.x.array[:]
 

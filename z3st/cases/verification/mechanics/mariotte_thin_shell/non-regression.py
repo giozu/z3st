@@ -40,7 +40,6 @@ sigma_zz_ana_M = Pi * Ri / (2 * t)
 list_fields(VTU_FILE)
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-# Numerical results
 print(f"[INFO] Target z-plane for extraction: z = {z_target:.4e} m")
 
 # Numerical results
