@@ -659,6 +659,49 @@ def check_workflow():
     return sorted(set(findings))
 
 
+def check_ci():
+    """The hand-written CI case list against the tree it names.
+
+    non-regression_local.sh discovers its cases (Allrun + gold, sandbox pruned);
+    non-regression_github.sh instead reads cases_ci.txt, maintained by hand. Renaming
+    or dropping a case therefore keeps the local suite correct and leaves the CI list
+    pointing at nothing -- which fails on a runner, minutes after a push.
+
+    Deliberately NOT flagged: cases absent from cases_ci.txt. The short list is a
+    documented choice (a per-commit gate under a measured time budget), not an
+    oversight, so 'missing from CI' is the normal state for most cases.
+    """
+    findings = []
+    ci_file = CASES / "cases_ci.txt"
+    if not ci_file.exists():
+        return ["z3st/cases/cases_ci.txt is missing — this check cannot have found "
+                "anything, treat it as unrun"]
+
+    def _entries(path):
+        for raw in path.read_text().splitlines():
+            line = raw.strip()
+            if line and not line.startswith("#"):
+                yield line.split()[0]
+
+    excluded = set(_entries(CASES / "suite_exclude.txt")) if (CASES / "suite_exclude.txt").exists() else set()
+
+    for name in _entries(ci_file):
+        d = CASES / name
+        if not d.is_dir():
+            findings.append(f"cases_ci.txt: '{name}' is not a directory — CI will fail on a runner")
+        elif not (d / "Allrun").exists():
+            findings.append(f"cases_ci.txt: '{name}' has no Allrun — CI cannot run it")
+        elif not (d / "output" / "non-regression_gold.json").exists():
+            findings.append(f"cases_ci.txt: '{name}' has no gold — CI runs it with no regression check")
+        elif name.split("/")[0] == "sandbox":
+            findings.append(f"cases_ci.txt: '{name}' is under sandbox, which the local suite prunes")
+        if name in excluded:
+            findings.append(
+                f"cases_ci.txt: '{name}' is also in suite_exclude.txt — excluded locally, run in CI"
+            )
+    return findings
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -672,6 +715,7 @@ CHECKS = {
     "scripts": check_scripts,
     "shell": check_shell,
     "workflow": check_workflow,
+    "ci": check_ci,
 }
 
 
