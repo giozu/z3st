@@ -40,6 +40,10 @@ Each one exists because it would have caught a real mistake made during the
   coverage      cluster_dynamic_model.py, 153 lines, had its only case in sandbox/
                 with neither a gold nor a script, in a directory the driver never
                 scans.
+  mro           Spine flattens 13 parent classes into one namespace, so a duplicated
+                method name is resolved silently by MRO order and the loser is never
+                called. Five physics steps moved between those classes on 2026-08-09.
+
   docs          Four .rst files under docs/source/ still told users to conda install
                 sympy and meshio, and showed a `coupling` key, days after all three
                 were removed. The earlier sweep had grepped three files by name
@@ -362,6 +366,71 @@ def check_docs():
     return findings
 
 
+def check_mro():
+    """Method-name collisions between Spine's parent classes.
+
+    ``Spine`` multiply-inherits 13 classes into one flat namespace, so two mixins
+    defining the same method name do not conflict -- the MRO silently picks one and
+    the other is never called. Nothing raises, nothing warns, and the case still
+    passes if the surviving implementation happens to be close enough.
+
+    That surface was widened on 2026-08-09, when five physics steps moved out of
+    core/solver.py into their models. It was clean then (85 methods, zero
+    collisions); this check is what keeps it clean, because "we looked once" does
+    not survive the next model.
+
+    Parsed with ast rather than by importing Spine: the import pulls in dolfinx and
+    PETSc, and this script's promise is that it needs neither an environment nor a
+    simulation.
+    """
+    spine = ROOT / "z3st" / "core" / "spine.py"
+    tree = ast.parse(spine.read_text())
+    bases = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ClassDef) and node.name == "Spine":
+            bases = [b.id for b in node.bases if isinstance(b, ast.Name)]
+    if not bases:
+        return ["z3st/core/spine.py: could not read Spine's base classes — "
+                "this check cannot have found anything, treat it as unrun"]
+
+    owners = {}
+    findings = []
+    found = set()  # classes whose definition was parsed, with or without methods
+    for src in sorted((ROOT / "z3st").rglob("*.py")):
+        try:
+            mod = ast.parse(src.read_text())
+        except SyntaxError:
+            continue  # reported by check_names
+        for node in mod.body:
+            if not isinstance(node, ast.ClassDef) or node.name not in bases:
+                continue
+            found.add(node.name)
+            for item in node.body:
+                if not isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                if item.name.startswith("__"):
+                    continue
+                owners.setdefault(item.name, []).append(node.name)
+
+    for name, classes in sorted(owners.items()):
+        if len(classes) > 1:
+            findings.append(
+                f"{name}() defined in {', '.join(classes)} — the MRO calls "
+                f"{classes[0]}'s and silently discards the rest"
+            )
+
+    # A base with only dunder methods (Config) contributes no names and is not a
+    # gap; a base whose file was never parsed is. Conflating the two reported
+    # Config as unchecked on the first run of this check.
+    missing = [b for b in bases if b not in found]
+    if missing:
+        findings.append(
+            f"z3st/core/spine.py: no class definition found for {', '.join(missing)} — "
+            "a base that was not parsed cannot be checked for collisions"
+        )
+    return findings
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -370,6 +439,7 @@ CHECKS = {
     "names": check_names,
     "coverage": check_coverage,
     "docs": check_docs,
+    "mro": check_mro,
 }
 
 

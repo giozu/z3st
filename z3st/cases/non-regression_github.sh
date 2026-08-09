@@ -89,6 +89,15 @@ for case_name in "${CASES[@]}"; do
     cd "$ROOT_DIR"
 done
 
+# --. rank symmetry and output gating: 10 s, no case can check this --..
+echo ""
+if "$ROOT_DIR/mpi_smoke.sh"; then
+    echo "Case: mpi_smoke -> OK" >> "$SUMMARY_FILE"
+else
+    echo "Case: mpi_smoke -> FAIL" >> "$SUMMARY_FILE"
+    global_status=1
+fi
+
 echo ""
 echo "---------------------------------------"
 echo "Non-regression summary written to: ${SUMMARY_FILE}"

@@ -182,8 +182,11 @@ and the three rigid-body nullspace builders.
 * **One flat namespace** — with 13 parent classes, a method-name collision
   between two mixins resolves silently by MRO order. New model methods should
   carry distinctive names (`creep_stress`, `sigma_plastic`), never generic ones
-  (`stress`, `update`). Checked after the 2026-08-09 step relocation: zero
-  collisions across the 13 mixins.
+  (`stress`, `update`). Zero collisions across the 13 mixins today (85 methods),
+  and `python -m z3st.utils.audit_checks mro` re-derives that in a second, so the
+  claim is reproducible rather than a note about a check someone once ran. Worth
+  knowing when reading it: the surface widened on 2026-08-09, when five physics
+  steps moved from `core/solver.py` into their models.
 * **Rank-symmetric Python state** — dolfinx's PETSc wrappers do collective work in
   `__del__`, so if one MPI rank holds a different set of live Python objects the
   collector orders those destructors differently and the run deadlocks at exit.
