@@ -11,15 +11,29 @@ import re
 import time
 
 import yaml
+from mpi4py import MPI
 
 
-# --. Markdown stdout filter --..
-# Disable explicitly with Z3ST_PLAIN_LOG=1.
-def _install_markdown_stdout():
-    if os.environ.get("Z3ST_PLAIN_LOG"):
-        return
-    if sys.stdout.isatty():
-        return
+# --. stdout filters: MPI rank gate, then markdown --..
+# The rank gate is unconditional; the markdown transform is disabled with
+# Z3ST_PLAIN_LOG=1 or when stdout is a terminal.
+def _install_stdout_filters():
+    # Every rank runs the same code, so without this an N-process run repeats all
+    # ~260 diagnostic prints N times. Gating here rather than at the call sites
+    # keeps it to one place -- and print carries no level, so genuine failures are
+    # not what travels this channel: exceptions go to stderr, which is untouched,
+    # and log.warning/error reach stdout from every rank (see utils/logger.py).
+    # The wrapper is installed unconditionally, on every rank, and decides per
+    # write what to do. Two reasons it cannot be conditional:
+    #  * rank symmetry. dolfinx's PETSc wrappers do collective work in __del__, so
+    #    if one rank carries a different set of live objects the collector orders
+    #    those destructors differently and the run deadlocks at exit. An earlier
+    #    version installed a bespoke sink on non-zero ranks only and hung every MPI
+    #    run, with rank 1 stuck in dolfinx/fem/petsc.py::__del__.
+    #  * under mpirun, sys.stdout.isatty() is True even when the shell redirects to
+    #    a file -- mpirun interposes a pty. Gating on isatty() therefore switched
+    #    the whole mechanism off in exactly the parallel runs it exists for.
+    _markdown = not (os.environ.get("Z3ST_PLAIN_LOG") or sys.stdout.isatty())
 
     _morse_line = re.compile(r"^\s*(?:--\.\. \.\.- \.-\.\. \.-\.\. ---\s*)+$")
     _step       = re.compile(r"^\[STEP (\d+/\d+)\]\s*(.*)$")
@@ -27,6 +41,7 @@ def _install_markdown_stdout():
     _spine_hdr  = re.compile(r"^\s*--\. (.+) --\.\.\s*$")
     _underscore = re.compile(r"^__([^_].*?[^_])__\s*$")
     _tagged     = re.compile(r"^(\s*)\[(INFO|WARNING|ERROR|SUCCESS|DESCRIPTION)\](\s+.*)?$")
+    _WARN_OR_ERROR = re.compile(r"^\s*\[(WARNING|ERROR)\]", re.M)
 
     def transform(line):
         s = line.rstrip("\r")
@@ -58,13 +73,36 @@ def _install_markdown_stdout():
     raw = sys.stdout
 
     class MarkdownStream:
-        def __init__(self, raw):
+        """Markdown transform plus the MPI rank gate.
+
+        ``emit`` is False on every rank but 0, which is how the ~260 diagnostic
+        prints avoid being repeated once per process. The gate lives *inside* this
+        one class, and the class is installed on every rank, because the object
+        graph must stay identical across ranks: dolfinx's PETSc wrappers do
+        collective work in ``__del__``, so if one rank carries a different set of
+        live objects the garbage collector orders those destructors differently and
+        the run deadlocks at exit (observed: rank 1 stuck in
+        dolfinx/fem/petsc.py::__del__ while rank 0 had already finished). An
+        earlier version replaced sys.stdout with a bespoke sink on non-zero ranks
+        only, and hung every MPI run.
+        """
+
+        def __init__(self, raw, emit=True, markdown=True):
             self._raw = raw
             self._buf = ""
+            self._emit = emit
+            self._markdown = markdown
 
         def write(self, s):
             if not s:
                 return 0
+            # Rank gate: ~260 diagnostic prints would otherwise repeat once per
+            # process. WARNING and ERROR lines pass from every rank -- the logger
+            # tags them, and a failure on one rank is what you need to see.
+            if not self._emit and not _WARN_OR_ERROR.search(s):
+                return len(s)
+            if not self._markdown:
+                return self._raw.write(s)
             self._buf += s
             parts = self._buf.split("\n")
             self._buf = parts.pop()
@@ -77,17 +115,18 @@ def _install_markdown_stdout():
 
         def flush(self):
             if self._buf:
-                self._raw.write(transform(self._buf))
+                if self._emit:
+                    self._raw.write(transform(self._buf))
                 self._buf = ""
             self._raw.flush()
 
         def __getattr__(self, name):
             return getattr(self._raw, name)
 
-    sys.stdout = MarkdownStream(raw)
+    sys.stdout = MarkdownStream(raw, emit=MPI.COMM_WORLD.rank == 0, markdown=_markdown)
 
 
-_install_markdown_stdout()
+_install_stdout_filters()
 
 
 print(
@@ -106,8 +145,8 @@ complex geometries, and user-defined boundary conditions.
 )
 
 # --. Z3ST modules --..
-from mpi4py import MPI
-
+# MPI is imported at the top of this file: the stdout rank gate needs it before
+# anything heavy is loaded.
 from z3st.core.spine import Spine
 from z3st.utils.utils_load import generate_power_history, load
 from z3st.utils.writer import OutputWriter
