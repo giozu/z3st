@@ -40,6 +40,10 @@ Each one exists because it would have caught a real mistake made during the
   coverage      cluster_dynamic_model.py, 153 lines, had its only case in sandbox/
                 with neither a gold nor a script, in a directory the driver never
                 scans.
+  scripts       The CI driver called "$ROOT_DIR/mpi_smoke.sh" while ROOT_DIR is the
+                package directory, so the guard never ran and reported FAIL for a
+                missing file instead. The script had only been tested directly.
+
   deps          h5py was moved to an optional extra although library code imports it.
                 Six CI cases died on ModuleNotFoundError; the local suite had passed
                 63/63, because the conda stack provides h5py transitively.
@@ -544,6 +548,55 @@ def check_deps():
     return sorted(set(findings))
 
 
+def check_scripts():
+    """Literal paths in the shell drivers must resolve.
+
+    ``non-regression_github.sh`` invoked ``"$ROOT_DIR/mpi_smoke.sh"``, but ROOT_DIR is
+    the *package* directory -- the parent of cases/ -- so the file was never found. The
+    driver dutifully reported FAIL: the right verdict for the wrong reason, and a green
+    smoke test would have looked identical to one that never ran.
+
+    It escaped local testing because the script had only ever been invoked directly,
+    never through the driver. Testing a component is not testing its wiring.
+
+    Only paths whose remainder is a literal are checked; anything with a second variable
+    in it (``"$ROOT_DIR/cases/$case_name"``) is built at run time and skipped.
+    """
+    findings = []
+    pkg = ROOT / "z3st"
+    for sh in sorted(pkg.rglob("*.sh")):
+        text = sh.read_text()
+        # ROOT_DIR does not mean the same directory in every script: the local driver
+        # sets it to its own directory (cases/), the CI driver to the parent (the
+        # package). That collision of meaning is exactly what produced the broken path,
+        # so resolve each script's definition instead of assuming one.
+        uses = re.findall(r'"\$\{?ROOT_DIR\}?/([^"$]+)"', text)
+        decl = re.search(r'ROOT_DIR="\$\(\s*cd\s+"\$\(\s*dirname\s+"\$\{BASH_SOURCE\[0\]\}"'
+                         r'\s*\)((?:/\.\.)*)"\s*&&', text)
+        if not decl:
+            # Never skip silently: an unparsed declaration means the paths below went
+            # unchecked, which looks exactly like paths that are all fine. The first
+            # version of this check did skip, and stopped detecting the very bug it was
+            # written for.
+            if uses:
+                findings.append(
+                    f"{sh.relative_to(ROOT)}: uses $ROOT_DIR but its declaration could "
+                    "not be parsed — its paths are UNCHECKED, not verified"
+                )
+            continue
+        base = sh.parent
+        for _ in re.findall(r"/\.\.", decl.group(1)):
+            base = base.parent
+        for m in re.finditer(r'"\$\{?ROOT_DIR\}?/([^"$]+)"', text):
+            target = base / m.group(1)
+            if not target.exists():
+                findings.append(
+                    f"{sh.relative_to(ROOT)}: refers to $ROOT_DIR/{m.group(1)}, which "
+                    f"does not exist — ROOT_DIR here is {base.relative_to(ROOT)}/"
+                )
+    return sorted(set(findings))
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -554,6 +607,7 @@ CHECKS = {
     "docs": check_docs,
     "mro": check_mro,
     "deps": check_deps,
+    "scripts": check_scripts,
 }
 
 

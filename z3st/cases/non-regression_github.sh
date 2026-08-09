@@ -91,7 +91,10 @@ done
 
 # --. rank symmetry and output gating: 10 s, no case can check this --..
 echo ""
-if "$ROOT_DIR/mpi_smoke.sh"; then
+# ROOT_DIR is the package directory (the parent of cases/), so the path needs the
+# cases/ segment. Without it the driver reported FAIL for a missing file, which is
+# the right verdict for the wrong reason.
+if "${ROOT_DIR}/cases/mpi_smoke.sh"; then
     echo "Case: mpi_smoke -> OK" >> "$SUMMARY_FILE"
 else
     echo "Case: mpi_smoke -> FAIL" >> "$SUMMARY_FILE"
