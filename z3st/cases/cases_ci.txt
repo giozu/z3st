@@ -19,8 +19,8 @@
 #                               while six cases enable it. Four carry a gold: shrink_fit,
 #                               shrink_fit_disk, shrink_fit_disk_3d and pwr_rod_2D (the
 #                               last excluded from the local suite, see suite_exclude.txt).
-#                               fg_test_2D and creep_shrink_fit_2D write a verdict but
-#                               have no gold, so nothing discovers them.
+#                               fg_test_2D and creep_shrink_fit_2D were blessed on
+#                               2026-08-09, so all six are now discovered.
 #
 # Run `python -m z3st.utils.audit_checks` to re-derive all of the above; it is where
 # the goldless-case list comes from and takes four seconds.
