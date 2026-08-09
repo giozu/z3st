@@ -90,7 +90,7 @@ outcome for ambiguous prose, never a reason to start deciding.
    | `*.py` | ~170 | `#`, docstrings |
    | `*.geo` (gmsh) | ~85 | `//`, `/* */` |
    | `Allrun` `Allclean` `Allrun_mpi` `*.sh` `.githooks/*` | ~170 | `#` |
-   | `*.txt` `Makefile` `.gitignore` | ~16 | `#` |
+   | `*.txt` `*.toml` `Makefile` `.gitignore` | ~17 | `#` |
 
    Skip binaries, `*.json` (no comment syntax), and `*.md` / `*.rst` / `*.tex` —
    those are documents, where prose is the content and these rules do not apply.

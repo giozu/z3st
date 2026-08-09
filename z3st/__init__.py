@@ -3,7 +3,7 @@
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
-Version: 0.2.0 (2026)
+Version: 0.3.0 (2026)
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 
@@ -12,7 +12,7 @@ from importlib import metadata
 try:
     __version__ = metadata.version("z3st")
 except metadata.PackageNotFoundError:
-    __version__ = "0.2.0"
+    __version__ = "0.3.0"
 
 def __getattr__(name):
     """Lazy import of heavy modules (dolfinx-dependent) to allow

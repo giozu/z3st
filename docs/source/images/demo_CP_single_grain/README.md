@@ -364,5 +364,5 @@ See main Z3ST repository for license information.
 ---
 
 **Last Updated:** June 2026
-**Z3ST Version:** 0.2.0
+**Z3ST Version:** 0.3.0
 **FEniCSx Version:** 0.10.0

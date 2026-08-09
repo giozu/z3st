@@ -455,11 +455,11 @@ If you use Z3ST in your research, please cite it.
   title        = {Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis},
   year         = {2026},
   howpublished = {\url{https://github.com/giozu/z3st}},
-  note         = {Version 0.2.0}
+  note         = {Version 0.3.0}
 }
 ```
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
-* **Version:** 0.2.0 (2026)
+* **Version:** 0.3.0 (2026)
 * **License:** Apache 2.0
