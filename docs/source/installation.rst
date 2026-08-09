@@ -10,7 +10,7 @@ To use **Z3ST**, create a new conda environment and install all required depende
 
    conda create -n z3st python=3.12 -y
    conda activate z3st
-   conda install -c conda-forge fenics-dolfinx=0.11.0 pyvista meshio matplotlib pandas numpy ipywidgets jupyterlab pyqt pyyaml scipy sympy -y
+   conda install -c conda-forge fenics-dolfinx=0.11.0 pyvista matplotlib numpy ipywidgets jupyterlab pyqt pyyaml scipy h5py pandas -y
    pip install gmsh
 
 .. note::

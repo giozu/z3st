@@ -65,7 +65,8 @@ z3st/
     ├── core/                         FEM core infrastructure
     │   ├── config.py                 Config mixin (parses input.yaml)
     │   ├── finite_element_setup.py   FE function spaces (V_t, V_m, V_d, V_c, V_pl, Q)
-    │   ├── solver.py                 staggered solver, PETSc options
+    │   ├── solver.py                 staggered loop + services (577 lines; the
+    │   │                             physics steps live in models/, see §3.3)
     │   ├── spine.py                  Spine — top-level driver (multi-inheritance of mixins)
     │   └── mesh/                     mesh sub-package
     │       ├── reader.py             Gmsh → dolfinx loader
@@ -178,7 +179,9 @@ CLI flags:
 - `--debug`       enable verbose debugging
 - `--mesh_plot`   preview surface tags with PyVista (via `core.mesh.plotter.MeshPlotter`)
 
-**Markdown log filter** (`__main__.py`, top of file). When `sys.stdout` is *not* a TTY (i.e., the user redirected output, e.g. `python -m z3st > log.md`), a line-by-line stdout shim rewrites the existing decorated output into Markdown:
+**stdout filters** (`__main__.py::_install_stdout_filters`, top of file). One wrapper, installed unconditionally on every MPI rank, carrying two independent per-write flags: `markdown` and `emit`. **Both must stay unconditional** — the wrapper cannot be installed on some ranks and not others, because dolfinx's PETSc wrappers do collective work in `__del__` and a rank holding a different set of live objects has the collector order those destructors differently, deadlocking the run at exit. And it cannot be gated on `isatty()`, because under `mpirun` stdout *is* a tty even when the shell redirects to a file. An earlier attempt did both and hung every MPI run.
+
+`emit` is false on every rank but 0, so the ~260 diagnostic prints are not repeated once per process; `[WARNING]` and `[ERROR]` lines pass from all ranks. `markdown` is false under `Z3ST_PLAIN_LOG=1` or on a tty; when true (i.e., the user redirected output, e.g. `python -m z3st > log.md`), a line-by-line stdout shim rewrites the existing decorated output into Markdown:
 - Morse-code dividers `--.. ..- .-.. .-.. --- ...` → `***` (horizontal rule; `***` rather than `---` to avoid setext-heading ambiguity).
 - `[STEP NN/MM] rest` → `## Step NN/MM: rest`.
 - `--- Staggering iteration N/M ---` → `#### Iteration N/M`.
@@ -187,7 +190,7 @@ CLI flags:
 - `[DESCRIPTION]` → `## Description`.
 - `[INFO|WARNING|ERROR|SUCCESS] body` → `**[TAG]** body`.
 
-Interactive runs are pass-through. Set `Z3ST_PLAIN_LOG=1` to force the raw, unfiltered output even when redirected. None of the solver / model / config modules were touched; the filter is a single point of intercept in `__main__.py`.
+Interactive runs and `Z3ST_PLAIN_LOG=1` are pass-through for the markdown transform, but the rank gate still applies. None of the solver / model / config modules were touched; the filter is a single point of intercept in `__main__.py`.
 
 **Hot-reload of input.yaml parameters** (`__main__.py`, `_reload_hot_params`). At the start of each time step, `__main__.py` re-reads `input.yaml` and propagates allow-listed parameter changes in-place into the in-memory config dicts (which are shared by reference with `problem.dmg_cfg` / `mech_cfg` / `th_cfg`, so the changes are immediately visible to the solver on the next step). The user can edit `input.yaml` mid-run and changes apply at the next step boundary (latency ≤ one step's wall-time). A one-line notice is printed when a value actually changes; silent on no-change steps. The reload is robust to mid-edit reads (transient `yaml.YAMLError` / `FileNotFoundError` → silent skip; the previous values stay in effect).
 
@@ -230,7 +233,26 @@ Allocates the FE function spaces on `self.mesh`:
 
 ### 3.3 `core/solver.py — Solver`
 
-Implements the staggered solver and PETSc options.
+Implements the staggered loop and the services the physics mixins consume.
+
+**Where the steps live (changed 2026-08-09).** `solver.py` went from 1579 lines to
+577: each physics mixin now owns its own staggered step, and the solver provides
+services rather than containing the physics. The `_*_step` subsections below are
+still the reference for what each step does; only their home moved.
+
+| step | file |
+|---|---|
+| `_thermal_step`, `_thermal_step_nonlinear` | `models/thermal_model.py` (with `_thermal_conductivity_aux_operands`, `_build_gap_pair_aux`, `_refresh_gap_pair`) |
+| `_mechanical_step` | `models/mechanical_model.py` |
+| `_damage_step` | `models/damage_model.py` |
+| `_cluster_step` | `models/cluster_dynamic_model.py` |
+| `_porosity_step` | `models/porosity_migration_model.py` (was always there) |
+
+Still in `solver.py`: `solve_staggered`, `get_solver_options`, `_stagger_residual`,
+`_adapt_relax`, `_bc_objects`, `_value_at_step`, `_build_measures`, `_global_tags`,
+`invalidate_dt_caches`, and at module level `as_bool`, `aitken_omega` and the three
+rigid-body nullspace builders. `Spine` multiply-inherits everything, so every call
+site is unchanged and `self._thermal_step(...)` still resolves.
 
 **Aitken Δ² dynamic relaxation** (2026-06-12, `solver_settings.relax_aitken: true`, default off, hot-reloadable): the displacement relaxation factor is recomputed every staggered iteration from the last two raw residuals R_k = ũ_k − u_k as ω_{k+1} = −ω_k·(R_{k−1}·ΔR)/|ΔR|², clamped to [relax_min, relax_max] — the standard cure for slowly-contracting interface coupling (Küttler & Wall). Supersedes the heuristic grow/shrink controller for u (thermal keeps the EMA controller). Two safeguards, both load-bearing: ω restarts from the configured `relax_u` at every time step (the recursion scales each new ω from the previous one, so a clamped-at-the-floor ω from a degenerate step — e.g. the zero-power initial step — would otherwise poison every later estimate), and the update is skipped when ‖ΔR‖ < 1e-8·‖R‖ (converged/zero-load steps produce a garbage quotient). Motivation: the PCMI contact phase of `regression/pwr_rod_2D` ran ~130-190 staggered iterations/step with the heuristic controller collapsed to relax_min.
 
@@ -329,7 +351,22 @@ with upwind interior-facet flux for advection, SIPG for diffusion, and a **mass-
 
 ### 3.5 `utils/logger.py`
 
-Framework-wide `logging` logger named `z3st` (`log.info`, `log.warning`, …), reused across modules.
+Framework-wide `logging` logger named `z3st` (`log.info`, `log.warning`, …), reused
+across modules. Two things about it are load-bearing (both fixed 2026-08-09):
+
+- **It writes to stdout, not stderr.** The case `Allrun` redirects stdout only, so on
+  stderr its output never reached `log_z3st.md` — the mesh diagnostics were absent
+  from the very file CI dumps when a case fails. The handler targets stdout through a
+  late-bound proxy, so it does not matter whether `__main__` wrapped the stream before
+  this module was imported. The `[LEVEL] message` format is what the markdown filter
+  already renders as `**[LEVEL]** message`.
+- **A rank filter**: INFO from rank 0 only, WARNING and ERROR from every rank. It is
+  the only gate when z3st is imported as a library; under `python -m z3st` the stdout
+  wrapper gates the same way (see §2.3).
+
+It keeps its own handler with `propagate = False`. An earlier `logging.basicConfig`
+here configured the *root* logger, which silently set the level and format for
+matplotlib, h5py and anything else that logs.
 
 ---
 
@@ -848,7 +885,7 @@ The **alumina spacer detail** is critical and easy to overlook: McClenny p.3 not
 
 **Implementation correspondence:** verified against the Ambati paper on 2026-05-05.
 - Eq. (27a) `sigma = (1-D)^2 dPsi0/de` ↔ `damage_model.py:30-37` `g(D) = (1-D)^2 + K`, applied to the full stress in the linear mechanical block of `solver.py::_mechanical_step`.
-- Eq. (27b) `-l^2 Lap d + d = (2l/Gc)(1-d) H+` ↔ `solver.py:528-530` AT2 weak form (`(H+1) u v + l^2 grad u . grad v = H v`), with `H = (2l/Gc) Psi+` from `damage_model.py:54` and irreversibility `H = max(H_old, H_new)` at line 252.
+- Eq. (27b) `-l^2 Lap d + d = (2l/Gc)(1-d) H+` ↔ `damage_model.py::_damage_step` AT2 weak form (`(H+1) u v + l^2 grad u . grad v = H v`), with `H = (2l/Gc) Psi+` from `damage_model.py:54` and irreversibility `H = max(H_old, H_new)` at line 252.
 - Eq. (27c) `Psi+ < Psi- => d := 0` ↔ `damage_model.py:233-245`, **softened**: Z3ST sets `H -> 0` in compression cells rather than `D -> 0`. Equivalent under monotonic loading (the thermal-shock case here); more physical than the literal Ambati projection under cyclic loading because it preserves accumulated damage. This deviation is intentional and documented in the docstring of `update_history`.
 
 **Calibration choice (uo2.yaml, 2026-05-15):**

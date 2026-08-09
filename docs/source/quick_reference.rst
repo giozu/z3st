@@ -58,7 +58,6 @@ input.yaml
 
    # Solver settings
    solver_settings:
-     coupling: staggered
      max_iters: 100
      relax_T: 0.9                # Thermal relaxation
      relax_u: 0.7                # Mechanical relaxation
@@ -359,7 +358,6 @@ Common Workflows
      mechanical: true
 
    solver_settings:
-     coupling: staggered
 
 **4. Phase-field fracture**:
 

@@ -90,7 +90,7 @@ These cases serve both as:
 * **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling; adaptive or Aitken Δ² dynamic relaxation, per-step form caching, optional gap-conductance damping
 * **Adaptive time-stepping** — optional, off by default; when a step stalls under strongly coupled non-linear physics the solver snapshots the converged state, bisects `dt`, and re-solves the step as internal sub-steps (output stays on the original grid), aborting only if it cannot converge at `dt_min`
 * **Hot-reloadable parameters** — an allow-listed subset of `input.yaml` (tolerances, relaxation factors, `max_iters`) can be edited mid-run and is picked up at the next step boundary, for steering long simulations without restarting
-* **Multi-regime kinematics** — `2d` plane strain, `3d`, `axisymmetric`, and `plane_stress` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
+* **Multi-regime kinematics** — `1d`, `2d` plane strain, `3d` and `axisymmetric` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
 * **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
 * **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral or Amor volumetric/deviatoric energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
 * **Creep** — implicit Norton + Arrhenius via the incremental variational principle (radial return condensed onto the displacement space, exact consistent tangent by automatic differentiation), with an optional flux-driven irradiation-creep term for in-pile cladding
@@ -119,7 +119,7 @@ z3st/                                # repository root
 ├── LICENSE                          # Apache 2.0
 ├── README.md
 ├── CITATION.cff
-├── pyproject.toml / setup.py
+├── pyproject.toml                   # installable package (PEP 621)
 ├── z3st_env.yml                     # Conda env recipe (FEniCSx + deps)
 ├── docs/                            # Sphinx documentation
 │   ├── Makefile
@@ -133,7 +133,8 @@ z3st/                                # repository root
     ├── core/                        # FEM core
     │   ├── config.py                # YAML parser
     │   ├── spine.py                 # top-level Spine driver
-    │   ├── solver.py                # staggered solver, PETSc options
+    │   ├── solver.py                # staggered loop + services (physics steps
+    │   │                           #   live in models/, one per mixin)
     │   ├── finite_element_setup.py  # V_t / V_m / V_d / V_c / V_pl / Q
     │   └── mesh/                    # Gmsh loader, MeshManager, PyVista preview
     │       ├── reader.py
@@ -203,10 +204,9 @@ boundary_conditions_path: boundary_conditions.yaml
 materials:
   steel: ../../materials/steel.yaml
 
-regime: 2d                       # 2d | 3d | axisymmetric | plane_stress
+regime: 2d                       # 1d | 2d | 3d | axisymmetric
 
 solver_settings:
-  coupling: staggered
   max_iters: 100
   relax_T: 0.9
   relax_u: 0.7
