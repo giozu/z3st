@@ -14,7 +14,6 @@ materials:
 regime: 2d
 
 solver_settings:
-  coupling: staggered
   max_iters: 20
   relax_T: 0.9
   relax_u: 1.0

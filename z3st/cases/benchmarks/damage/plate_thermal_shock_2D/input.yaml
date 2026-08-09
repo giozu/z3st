@@ -16,7 +16,6 @@ output:
   format: xdmf
 
 solver_settings:
-  coupling: staggered
   max_iters: 200
   relax_T: 0.8
   relax_u: 0.6

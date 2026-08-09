@@ -15,7 +15,6 @@ materials:
 regime: 2d   # in-plane r-theta disk section, plane strain
 
 solver_settings:
-  coupling: staggered
   max_iters: 300
   relax_T: 1.0
   relax_u: 0.3

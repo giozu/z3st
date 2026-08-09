@@ -13,7 +13,6 @@ materials:
 regime: axisymmetric
 
 solver_settings:
-  coupling: staggered
   max_iters: 30
   relax_T: 1.0
   relax_u: 1.0

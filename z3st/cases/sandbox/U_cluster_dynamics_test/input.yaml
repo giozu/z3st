@@ -9,7 +9,6 @@ geometry_path: geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 solver_settings:
-  coupling: staggered
   max_iters: 100
 
 models:
