@@ -802,18 +802,31 @@ The following capabilities are **not present** in Z3ST v0.1.0 and would need to 
 
 ### 9bis.1 Implemented but untested (found 2026-08-09)
 
-Two models are implemented and reachable from configuration, but **no case exercises
-them**, so neither suite can notice if a commit breaks them:
+One model is implemented and reachable from configuration but exercised by **no
+case**, so neither suite can notice if a commit breaks it:
 
 | model | lines | state |
 |---|---|---|
-| `models/contact_model.py` | 197 | **zero cases anywhere in the repository** — no `input.yaml` sets `contact: true` |
-| `models/cluster_dynamic_model.py` | 153 | one case, `sandbox/U_cluster_dynamics_test`, with neither a gold nor a `non-regression.py`; `sandbox/` is never scanned by the local driver |
+| `models/cluster_dynamic_model.py` | 153 | its only case, `sandbox/U_cluster_dynamics_test`, has neither a gold nor a `non-regression.py`, and `sandbox/` is never scanned by the local driver |
 
-Closing this needs two new cases with blessed golds, not a line in `cases_ci.txt`
-(recorded in that file's header too). Note that the penalty PCMI contact is
-exercised *indirectly* by `regression/pwr_rod_2D` — but that case is excluded from
-the local suite and absent from CI, so the coverage is not automatic.
+Closing it needs a new case with a blessed gold, not a line in `cases_ci.txt`.
+
+**A methodological warning, from getting this wrong first.** `contact_model.py` was
+initially listed here as having zero cases. It has seven, three of them with golds,
+and `verification/fuel/shrink_fit_disk` is in CI. The error: contact is configured
+as a *block* —
+
+```yaml
+models:
+  contact:
+    surface_a: lateral_1
+    penalty_stiffness: 5.0e13
+```
+
+— and `Config` stores `bool(models.get("contact", False))`, which is `True` for any
+non-empty dict. Grepping for `contact: true` finds none of them. When auditing which
+cases reach a model, parse the yaml and evaluate the switch the way `Config` does;
+a grep for a syntactic form answers a different question.
 
 ---
 

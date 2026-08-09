@@ -11,11 +11,14 @@
 # Re-measure before adding anything: ./non-regression_local.sh prints per-case times.
 #
 # NOT covered by any case, here or in the local suite -- so CI cannot help:
-#   models/contact_model.py         197 lines, zero cases anywhere in the repo
-#   models/cluster_dynamic_model.py 153 lines, one case in sandbox/ with neither a
-#                                   gold nor a non-regression.py, and sandbox is
-#                                   never scanned
-# Closing those needs two new cases, not a line in this file.
+#   models/cluster_dynamic_model.py 153 lines. Its only case lives in sandbox/ with
+#                                   neither a gold nor a non-regression.py, and
+#                                   sandbox is never scanned. Needs a new case.
+# (An earlier version of this note also listed contact_model.py. That was wrong:
+#  contact is configured as a BLOCK, models.contact: {surface_a: ..., ...}, and
+#  Config takes bool() of it, so seven cases enable it -- three with golds, and
+#  shrink_fit_disk below is one of them. Grep for "contact: true" and you miss
+#  every one.)
 
 # --. thermal --..
 verification/thermal/thin_slab_dirichlet_2D
