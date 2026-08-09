@@ -21,7 +21,7 @@ dependencies:
 - numpy>=2    # np.trapezoid (numpy 2 API) is used across the verification cases
 - scipy
 - pandas    # post-processing only (one study script)
-- h5py      # post-processing only (XDMF HDF5 sidecar)
+- h5py      # utils_extract_xdmf.py reads the XDMF HDF5 sidecar: required, not optional
 - matplotlib
 - pyvista>=0.42
 

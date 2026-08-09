@@ -40,6 +40,10 @@ Each one exists because it would have caught a real mistake made during the
   coverage      cluster_dynamic_model.py, 153 lines, had its only case in sandbox/
                 with neither a gold nor a script, in a directory the driver never
                 scans.
+  deps          h5py was moved to an optional extra although library code imports it.
+                Six CI cases died on ModuleNotFoundError; the local suite had passed
+                63/63, because the conda stack provides h5py transitively.
+
   mro           Spine flattens 13 parent classes into one namespace, so a duplicated
                 method name is resolved silently by MRO order and the loser is never
                 called. Five physics steps moved between those classes on 2026-08-09.
@@ -431,6 +435,115 @@ def check_mro():
     return findings
 
 
+# Installed by conda (the FEniCSx stack) or built by hand (the SCIANTIX binding), so
+# deliberately absent from pyproject. installation.rst documents both.
+_NOT_ON_PYPI = {"dolfinx", "ufl", "basix", "petsc4py", "mpi4py", "slepc4py", "ffcx",
+                "sciantix_binding"}
+
+# import name -> distribution name, where they differ.
+_DIST_ALIASES = {"yaml": "pyyaml", "PIL": "pillow", "sklearn": "scikit-learn"}
+
+
+def check_deps():
+    """Third-party modules imported by library code must be declared somewhere.
+
+    The rule follows *when* the import runs, which is what decides the blast radius:
+
+      * **module level, unguarded** -> must be in ``[project] dependencies``. It runs on
+        import, so a missing one breaks every user of the module.
+      * **inside a function, or guarded by try/except ImportError** -> any group will do
+        (an extra is the right home). Only the feature breaks, and the code that wrote
+        the guard clearly meant it to be optional.
+
+    That distinction is the whole check. h5py was moved to the optional ``post`` extra on
+    2026-08-09 on the grounds it was "not needed to run a case" -- but
+    ``utils/utils_extract_xdmf.py`` imports it at module level and 18 non-regression
+    scripts import that, so it is needed to *check* a case, and Allrun does both. Six CI
+    cases died on ModuleNotFoundError.
+
+    It survived a full 63/63 local suite because the conda dolfinx stack pulls h5py in
+    transitively. **A local run cannot reveal an undeclared dependency, whatever it
+    reports.** Only a fresh environment can -- or this check, in four seconds.
+
+    Scope is library code: z3st/ minus cases/ and conference/, which are leaf scripts.
+    """
+    pyproject = (ROOT / "pyproject.toml").read_text()
+    block = re.search(r"^dependencies\s*=\s*\[(.*?)^\]", pyproject, re.M | re.S)
+    if not block:
+        return ["pyproject.toml: no dependencies array found — this check cannot have "
+                "found anything, treat it as unrun"]
+    # PEP 503: "-" and "_" are equivalent in a distribution name, so normalise both
+    # sides. dolfinx-external-operator is imported as dolfinx_external_operator.
+    def _norm(name):
+        return name.lower().replace("_", "-")
+
+    hard = {_norm(m.group(1)) for m in re.finditer(r'"([A-Za-z0-9_.-]+)', block.group(1))}
+    # Any name quoted anywhere in pyproject counts as "declared somewhere": that covers
+    # every current and future extra without hard-coding their names.
+    # Leading name only: a version spec ("numpy>=2") must still match the module name.
+    anywhere = {_norm(m.group(1)) for m in re.finditer(r'"([A-Za-z0-9_.-]+)', pyproject)}
+
+    findings = []
+    for src in sorted((ROOT / "z3st").rglob("*.py")):
+        rel = src.relative_to(ROOT)
+        if rel.parts[1] in ("cases", "conference"):
+            continue
+        try:
+            tree = ast.parse(src.read_text())
+        except SyntaxError:
+            continue  # reported by check_names
+
+        # Mark every node that sits inside a function or inside a try that handles an
+        # import failure: those imports are deliberately lazy or deliberately optional.
+        lazy = set()
+        for node in ast.walk(tree):
+            guarded = isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            if isinstance(node, ast.Try):
+                guarded = any(
+                    h.type is None
+                    or (isinstance(h.type, ast.Name) and h.type.id in ("ImportError", "Exception"))
+                    for h in node.handlers
+                )
+                children = node.body
+            elif guarded:
+                children = node.body
+            else:
+                continue
+            if guarded:
+                for sub in children:
+                    for inner in ast.walk(sub):
+                        lazy.add(id(inner))
+
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                mods = [a.name.split(".")[0] for a in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                # level > 0 is relative; module is None for "from . import x"
+                mods = [] if node.level or not node.module else [node.module.split(".")[0]]
+            else:
+                continue
+            for mod in mods:
+                if mod in sys.stdlib_module_names or mod in ("z3st", *_NOT_ON_PYPI):
+                    continue
+                # A module shadowed by a file in this repo is a local import, not a
+                # dependency -- __main__ imports a case-local diagnostics.py this way.
+                if any((ROOT / "z3st").rglob(f"{mod}.py")):
+                    continue
+                dist = _norm(_DIST_ALIASES.get(mod, mod))
+                if id(node) in lazy:
+                    if dist not in anywhere:
+                        findings.append(
+                            f"{rel}: imports '{mod}' lazily but '{dist}' is declared in no "
+                            "dependency group — the feature cannot be installed"
+                        )
+                elif dist not in hard:
+                    findings.append(
+                        f"{rel}: imports '{mod}' at module level but '{dist}' is not in "
+                        "[project] dependencies — a fresh install breaks on import"
+                    )
+    return sorted(set(findings))
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -440,6 +553,7 @@ CHECKS = {
     "coverage": check_coverage,
     "docs": check_docs,
     "mro": check_mro,
+    "deps": check_deps,
 }
 
 
