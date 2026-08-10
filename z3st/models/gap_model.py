@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
@@ -226,8 +226,7 @@ class GapModel:
 
         # MPI: gather both surfaces globally — with the mesh partitioned, a rank
         # can own facets of only one side, and the nearest neighbour can lie
-        # across a rank boundary. Gap surfaces are small, so allgathering their
-        # centroids is cheap.
+        # across a rank boundary.
         comm = mesh.comm
         if comm.size > 1:
             gdim = x.shape[1]

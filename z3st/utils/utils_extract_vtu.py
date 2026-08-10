@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 # --.. ..- .-.. .-.. --- Z3ST utility module --.. ..- .-.. .-.. ---
@@ -318,9 +318,7 @@ def extract_principal_stresses(
     return_coords=True,
     prefer="points",
     average=None,
-    n_bins=100,
     decimals=3,
-    bandwidth=0.0005,
 ):
     """
     Extract principal stresses (σ₁, σ₂, σ₃) from a VTU file by diagonalizing
@@ -335,13 +333,9 @@ def extract_principal_stresses(
     prefer : str, optional
         Prefer 'points' or 'cells' when both exist in VTU.
     average : str or None, optional
-        Radial averaging method: 'bins', 'weighted', 'kernel', 'round', or None.
-    n_bins : int, optional
-        Number of bins for 'bins' or 'weighted' averaging.
+        Radial averaging method: 'round', or None.
     decimals : int, optional
         Round precision for 'round' averaging.
-    bandwidth : float, optional
-        Kernel bandwidth for 'kernel' averaging.
 
     Returns
     -------
@@ -369,28 +363,11 @@ def extract_principal_stresses(
     sigma1, sigma2, sigma3 = eigvals[:, 2], eigvals[:, 1], eigvals[:, 0]
 
     if average:
-        from z3st.utils.utils_plot import (
-            radial_average_kernel,
-            radial_average_round,
-            radial_average_uniform_bins,
-            radial_average_weighted,
-        )
+        from z3st.utils.utils_plot import radial_average_round
 
         print(f"[INFO] Applying radial averaging ({average}) on principal stresses...")
 
-        if average == "bins":
-            r_avg, sigma1 = radial_average_uniform_bins(x, y, z, sigma1, n_bins=n_bins)
-            _, sigma2 = radial_average_uniform_bins(x, y, z, sigma2, n_bins=n_bins)
-            _, sigma3 = radial_average_uniform_bins(x, y, z, sigma3, n_bins=n_bins)
-        elif average == "weighted":
-            r_avg, sigma1 = radial_average_weighted(x, y, z, sigma1, n_bins=n_bins)
-            _, sigma2 = radial_average_weighted(x, y, z, sigma2, n_bins=n_bins)
-            _, sigma3 = radial_average_weighted(x, y, z, sigma3, n_bins=n_bins)
-        elif average == "kernel":
-            r_avg, sigma1 = radial_average_kernel(x, y, z, sigma1, bandwidth=bandwidth)
-            _, sigma2 = radial_average_kernel(x, y, z, sigma2, bandwidth=bandwidth)
-            _, sigma3 = radial_average_kernel(x, y, z, sigma3, bandwidth=bandwidth)
-        elif average == "round":
+        if average == "round":
             r_avg, sigma1 = radial_average_round(x, y, z, "sigma1", sigma1, decimals=decimals)
             _, sigma2 = radial_average_round(x, y, z, "sigma2", sigma2, decimals=decimals)
             _, sigma3 = radial_average_round(x, y, z, "sigma3", sigma3, decimals=decimals)

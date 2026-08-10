@@ -103,9 +103,8 @@ rr, TT = plot_field_along_r_xyz(
     f"Temperature (K), R/t = {slenderness:.2f}",
     CASE_DIR,
     color="tab:blue",
-    average="round",  # "round", "bins", "kernel", "weighted", False
+    average="round",  # "round" or False
     decimals=2,
-    n_bins=100,
     r_ref=r_ref,
     f_ref=T_ref,
     label_ref="Analytical solution (slab)",
@@ -113,7 +112,7 @@ rr, TT = plot_field_along_r_xyz(
 
 r, _, _, sigma1, sigma2, sigma3 = extract_principal_stresses(
     VTU_FILE,
-    average="round",  # None, "bins", "weighted", "kernel", "round"
+    average="round",  # "round" or None
     decimals=2,
     return_coords=True,
 )

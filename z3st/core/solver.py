@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import dolfinx
@@ -30,12 +30,11 @@ def aitken_omega(r_k, r_prev, omega, comm, n_owned, lo, hi):
     in serial this reduces to the local dot.
 
     ``omega`` is returned unchanged when there is no usable previous residual, or
-    when \u0394r is numerical noise: a barely-changed residual (converged, or a
-    zero-load step) makes the quotient garbage.
+    when \u0394r is numerical noise (a converged or zero-load step).
 
-    Callers own the clamp and the starting \u03c9 because the two uses differ: the
-    displacement loop clamps to [relax_min, relax_max] and carries \u03c9 across time
-    steps, while porosity clamps to [0.05, 1] and restarts from aitken_omega0.
+    Callers own the clamp and the starting \u03c9: the displacement loop clamps to
+    [relax_min, relax_max] and carries \u03c9 across time steps, porosity clamps to
+    [0.05, 1] and restarts from aitken_omega0.
     """
     if r_prev is None or r_prev.shape != r_k.shape:
         return omega
@@ -73,9 +72,7 @@ def _rigid_body_modes(V, regime=None):
         modes = [mode]
     else:
         # bs is the number of displacement components: 1 on a line mesh, 2 in
-        # plane, 3 in 3D. The old "3 if bs == 2 else 6" sent bs == 1 down the 3-D
-        # branch, which then indexed x[:, 2] and raised a broadcast error -- so
-        # every regime: 1d case with mechanics on died here.
+        # plane, 3 in 3D.
         n_modes = {1: 1, 2: 3}.get(bs, 6)
         modes = [dolfinx.fem.Function(V) for _ in range(n_modes)]
 
@@ -103,10 +100,9 @@ def _rigid_body_modes(V, regime=None):
 def build_rigid_body_nullspace(V, regime=None):
     """Rigid-body near-nullspace (kernel of the elastic operator) for GAMG.
 
-    Without it the Krylov count per elasticity solve is large and scaling
-    suffers. 3 modes in 2D (2 translations + 1 rotation), 6 in 3D, 1 in
-    axisymmetric, orthonormalised. Used by GAMG via
-    MatSetNearNullSpace; ignored by Hypre/LU."""
+    3 modes in 2D (2 translations + 1 rotation), 6 in 3D, 1 in axisymmetric,
+    orthonormalised. Used by GAMG via MatSetNearNullSpace; ignored by
+    Hypre/LU."""
     modes = _rigid_body_modes(V, regime)
 
     basis = [m.x for m in modes]
@@ -125,9 +121,9 @@ def build_constrained_rigid_nullspace(V, bcs, tol=1e-9, regime=None):
 
     Of the candidate modes (6 in 3D, 3 in cartesian 2D, 1 in axisymmetric), keep
     only those already zero on every constrained dof -- those still in the
-    kernel of the constrained operator. 
-    Return ``None`` if none survive (the BCs
-    pin every mode -> system non-singular), so the caller can skip attaching.
+    kernel of the constrained operator.
+    Return ``None`` if none survive: the BCs pin every mode and the system is
+    non-singular.
     """
     bs = V.dofmap.index_map_bs
     modes = _rigid_body_modes(V, regime)
@@ -315,8 +311,7 @@ class Solver:
     def _stagger_residual(self, new, old, cfg, tol, label):
         """Staggered increment of one field: convergence verdict plus both norms.
 
-        The same six-step dance -- scatter both, copy, axpy(-1), two norms, guard
-        the division -- was written out four times, once per physics. Returns
+        Returns
         ``(converged, norm_d, rel_norm_d, residual)``, where ``residual`` is
         whichever norm ``cfg["convergence"]`` selects: it is what the adaptive
         relaxation controller tracks.
@@ -336,8 +331,6 @@ class Solver:
         norm_new = v_new.norm(PETSc.NormType.NORM_2)
         rel_norm_d = norm_d / norm_new if norm_new > 1e-15 else norm_d
 
-        # No case sets convergence: norm (all 138 say rel_norm), but keeping the
-        # option costs two lines here instead of eight in each of four copies.
         if cfg["convergence"] == "norm":
             print(f"  ||Δ{label}|| = {norm_d:.3e}")
             residual = norm_d
@@ -350,7 +343,7 @@ class Solver:
     def _adapt_relax(self, name, residual, prev_residual):
         """EMA-smoothed grow/shrink of ``self.relax_<name>``; returns the new EMA.
 
-        Written out three times, identical bar the attribute name. Grows the
+        Grows the
         factor while the residual beats its own moving average, shrinks it
         otherwise, and clamps to [relax_min, relax_max].
         """
@@ -372,8 +365,8 @@ class Solver:
         self,
         max_iter=20,
         dt=0.0,
-        # stag_tol defaults mirror Spine.solve (the only caller, which always
-        # passes them explicitly) — keep the two in sync.
+        # stag_tol defaults mirror Spine.solve, the only caller, which always
+        # passes them explicitly.
         stag_tol_th=1e-4,
         stag_tol_mech=1e-4,
         stag_tol_dmg=1e-4,
@@ -423,10 +416,7 @@ class Solver:
             D_new.x.array[:] = self.D.x.array
             D_old = dolfinx.fem.Function(self.V_d)
             # Irreversibility anchors: D and H ratchet against the last
-            # CONVERGED step, not against intermediate staggered iterates.
-            # Ratcheting per iterate let an overshooting early iterate (e.g.
-            # first mechanical pass with a not-yet-converged temperature)
-            # permanently inflate the crack driving force / damage field.
+            # converged step, not against intermediate staggered iterates.
             self._D_step_start = self.D.x.array.copy()
             if getattr(self, "H", None) is not None:
                 self._H_step_start = self.H.x.array.copy()
@@ -457,9 +447,8 @@ class Solver:
         # Per-step reset of the iteration-coupling accelerators: the Aitken
         # residual history and the gap-conductance damping memory belong to a
         # single staggered solve, not across time steps. The Aitken factor
-        # restarts from the configured relax_u: the recursion scales each new
-        # ω from the previous one, so a clamped-at-the-floor ω from a noisy
-        # step (e.g. the zero-power initial step) must not be carried over.
+        # restarts from the configured relax_u; the recursion scales each new
+        # ω from the previous one.
         self._aitken_R_prev = None
         if getattr(self, "relax_aitken", False):
             self._aitken_omega = getattr(self, "_relax_u0", self.relax_u)
@@ -469,8 +458,8 @@ class Solver:
         # accelerator above; nulling R_prev restarts ω from porosity.aitken_omega0.
         self._aitken_p_R_prev = None
         self._aitken_p_omega = None
-        # Contact secant history: the free gap changes with the step's thermal
-        # state, so a cross-step sample pair would give a bogus slope.
+        # Contact secant history: per step, the free gap changes with the
+        # step's thermal state.
         if self.on.get("contact", False):
             self.reset_contact_history()
 
@@ -497,9 +486,8 @@ class Solver:
             # --. DAMAGE STEP --..
             if self.on.get("damage", False):
                 # Pass T_new so the damage driving force uses the elastic strain
-                # (eps - alpha*(T - T_ref)*I), not the total strain. Without this,
-                # uniform thermal expansion in the bulk produces a spurious psi_pos
-                # that drives damage in unstressed regions.
+                # (eps - alpha*(T - T_ref)*I), not the total strain: uniform
+                # thermal expansion must not contribute to psi_pos.
                 self.update_history(u_new, T=T_new)
                 conv_damage, _, _, prev_res_D = self._damage_step(
                     D_new,
@@ -563,10 +551,9 @@ class Solver:
             self.porosity.x.array[:] = p_new.x.array
 
         # Advance the internal-variable history exactly as on the converged
-        # exit: the fields above are being ACCEPTED, and leaving ε_p / ε_cr at
-        # the previous step while time moves on hands the next step a
-        # displacement inconsistent with its internal state (the adaptive grid
-        # rolls all of this back anyway via snapshot/restore before a retry).
+        # exit: the fields above are accepted, so ε_p / ε_cr must move with
+        # them. The adaptive grid rolls all of this back via snapshot/restore
+        # before a retry.
         if self.on.get("mechanical", False) and self.on.get("plasticity", False):
             self.update_plastic_history(u_new)
         if self.on.get("mechanical", False) and any(

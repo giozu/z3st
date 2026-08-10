@@ -57,10 +57,8 @@ for case_name in "${CASES[@]}"; do
     if [[ $exit_code -eq 0 && -f "output/non-regression.json" ]]; then
         summary_status=$(grep -o '"summary": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
         regression_status=$(grep -o '"regression": *"[^"]*"' output/non-regression.json | head -1 | cut -d'"' -f4)
-        # Require PASS, not "not FAIL". Every CI case has a blessed gold, so both
-        # verdicts must be present; an empty one means the check never ran (a
-        # deleted gold, an Allclean wiping output/, a script that died before
-        # writing).
+        # Require PASS, not "not FAIL". Every CI case has a blessed gold, so
+        # both verdicts must be present; an empty one means the check never ran.
         if [[ "$summary_status" != "PASS" ]]; then
             exit_code=1
             fail_reason=" (analytic tolerance: ${summary_status:-verdict missing})"
@@ -72,8 +70,7 @@ for case_name in "${CASES[@]}"; do
 
     if [[ $exit_code -ne 0 ]]; then
         echo "Case ${case_name} FAILED (exit code ${exit_code})${fail_reason}"
-        # Dump the tails, which are the only diagnosis for a crash that leaves no
-        # verdict json (solver divergence, missing output, import error).
+        # Dump the tails: the diagnosis for a crash that leaves no verdict json.
         echo "----- last 60 lines of ${case_name} run log (stderr + non-regression) -----"
         tail -n 60 "${case_name//\//_}_log.txt" 2>/dev/null || echo "(no run log captured)"
         echo "----- last 30 lines of solver log (log_z3st.md) -----"

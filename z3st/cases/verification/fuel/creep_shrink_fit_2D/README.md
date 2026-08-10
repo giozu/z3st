@@ -12,36 +12,30 @@ relaxing by Norton creep:
     Pk(t) = Δu_el(t) · f,   Δu_el(t) = Δ · (1 + φ(1-n)·t / Δ^(1-n))^(1/(1-n))
     φ = -(A/b) · f^n · (k1 + k2)
 
-`pressure_creep_analysis.py` evaluates this law and overlays it on the
-simulated `output/history.csv`.
+`plots.py::plot_contact_pressure_evolution` evaluates this law and overlays it
+on the simulated `output/history.csv`. Δ is the interference of the assembled
+joint at temperature, held fixed across the transient — the law relaxes it
+itself — and `f` is corrected for the penalty spring in series with the joint,
+`1/(1/f + 1/K_PEN)`. Both matter: see "Result" and "Convergence" below.
 
 Author of the case and of the analysis scripts: Romain Turgis (ENSTA Paris),
 internship 2026-05-25 → 2026-07-31, supervised by G. Zullo.
-
-## Provenance
-
-The case was developed on the branch `merging/contact` **on top of**
-`regression/pwr_rod_2D`, which it progressively mutated into a different
-physical problem (zero-to-10 μm gap, radially clamped clad outer surface,
-isothermal variants, 2500-day transient). It has been re-planted here as a
-case of its own so that `regression/pwr_rod_2D` stays a PWR rod and keeps its
-blessed gold. Snapshot taken from commit `15b4b4e` ("free boundary
-conditions", 2026-07-16), the most advanced committed state.
 
 ## Parameter handling
 
 `case_params.py` is the single source of truth for the post-processing: it
 reads `geometry.yaml`, `input.yaml`, `clad.yaml` and `fuel.yaml` and exposes
-the resolved constants to `plots.py` and `pressure_creep_analysis.py`. No
+the resolved constants to `plots.py` and `non-regression.py`. No
 geometric or material value is restated as a literal in a script — an
 analytical overlay computed with parameters that differ from the ones the
 solver ran is not a verification.
 
-`case_params.check_consistency()` fails loudly on the traps that invalidate
+`case_params.check_consistency()`, called from `diagnostics.py` before step 0,
+aborts the run on the traps that invalidate
 the comparison silently: a cold gap from `geometry.yaml` whose magnitude
 disagrees with `models.contact.initial_gap`, an `initial_gap` that is a
 clearance rather than an interference, and irradiation creep left switched on.
-`pressure_creep_analysis.py` calls it on every run and warns before plotting.
+`plots.py` calls it on every run and warns before plotting.
 
 The gap check compares magnitudes, not signed values. A conforming mesh has to
 keep the pellet and the cladding disjoint, so `geometry.yaml` can only carry a
@@ -50,36 +44,98 @@ positive clearance, while the interference is expressed by a negative
 The two therefore differ in sign by construction, and only their magnitudes are
 required to agree.
 
-## Result: the case reproduces Esposito to within the paper's own Tresca bias
+## Result: the elastic point verifies, the relaxation trend does not yet
 
-Regenerated 2026-07-28 from a clean serial `./Allrun` on the committed
-configuration (non-fissile pellet, cracking off, traction-free clad OD). The
-previous version of this table predated those changes and was never rerun.
+From a clean serial `./Allrun` on the committed configuration (non-fissile
+pellet, cracking off, traction-free clad OD). Only the t = 0 row is asserted by
+`non-regression.py`; the rest of the table is transcribed by hand and is not
+re-checked by any run.
 
 | t [days] | Z3ST [MPa] | eq. (21) [MPa] | ratio |
 |---|---|---|---|
-| 0 | 24.70 | 24.13 | 1.024 |
-| 500 | 8.31 | 5.33 | 1.560 |
-| 1240 | 5.33 | 3.40 | 1.569 |
-| 2500 | 3.74 | 2.39 | 1.565 |
+| 0 | 24.70 | 25.47 | 0.970 |
+| 600 | 7.26 | 8.54 | 0.850 |
+| 1240 | 5.14 | 6.12 | 0.840 |
+| 2500 | 3.65 | 4.37 | 0.834 |
 
-The elastic starting point agrees to **2.4%**, which verifies the elastic
-factor `f`, the geometry and the material data. Both curves then relax as
-power laws and the ratio settles at ~1.57, flat from day 500 onward.
+The elastic starting point agrees to **3.0%** against a closed form that shares
+nothing with the solver output — see "Elastic point at t = 0".
 
-That residual is **expected and quantified**. Z3ST's creep is J2 (von Mises);
+The relaxation trend does not. The eq. (21) column above holds Δ at the
+assembled interference, 14.73 μm, which is what the law assumes.
+`plots.py::plot_contact_pressure_evolution` instead passes `Δ = -gap_um` **per
+step** (`plots.py:432`) into a law that relaxes Δ itself: the interference
+handed to eq. (21) has already relaxed in the simulation, so the relaxation is
+applied twice.
+
+That changes the reading. The Tresca argument below predicts **1.540**: the
+paper's formulation overestimates the Pk decrease, so the closed form should
+sit *below* Z3ST and the ratio should exceed 1. At 0.83 Z3ST relaxes ~17 %
+*faster* than the closed form (0.834 at 2500 days), which is the opposite
+direction, and the
+criterion difference cannot account for it.
+
+Checked two independent ways, because `K_PEN = 3.5e12` sits within 3 % of the
+joint stiffness `f = 3.42e12` and the penalty contact therefore carries half
+the compliance of the problem:
+
+- soft penalty, closed form corrected for the two springs in series
+  (`dPk/dt = -f_ser·(A/b)·(k2-k1)·Pk^n`, `f_ser = 1.73e12`): ratio **0.855** at
+  2500 days;
+- `K_PEN` raised to 3.5e14, penalty compliance negligible (`f_ser/f = 0.990`,
+  0.13 μm of penetration against 13.75 μm across the joint), closed form
+  applied directly: ratio **0.875** at 2500 days. That run converged in 150 s,
+  so the soft penalty is not a robustness requirement.
+
+Both routes agree to a couple of percent, so the ratio is not an artefact of
+how the penalty spring is handled, and the convergence study below rules out
+the discretisation. Open, and the reason this case does not assert the trend.
+
+### Convergence
+
+The ratio is not a discretisation artefact. Three independent refinements, each
+against the committed configuration:
+
+| refinement | p(2500 d) [MPa] | ratio |
+|---|---|---|
+| committed (`n_r1/n_r2 = 25/7`, P1, `n_steps 56/80`) | 3.648 | 0.834 |
+| mesh `n_r1/n_r2 = 49/21` | 3.731* | 0.853* |
+| `mechanical.order: 2` (P2 displacement) | 3.730* | 0.853* |
+| `n_steps 112/160` | 3.633 | 0.831 |
+
+\* measured at `n_steps 14/20`, against a 3.738 MPa baseline at the same
+stepping: mesh and element order move the pressure by 0.2 %.
+
+Space is converged: doubling the radial divisions and raising the displacement
+field to P2 land on the same 0.853 from two different directions.
+
+Time is the only knob that moves anything, and it moves *away* from 1.540. The
+original `n_steps 14/20` carried an 8.4 % error at 200 days, where the pressure
+halves in two hundred days, against a 112/160 reference; the case now runs
+56/80, whose residual is 1.3 % at 200 days and 0.4 % at 2500. That refinement
+alone took the ratio from 0.855 to 0.834.
+
+`Mesh.ElementOrder = 2` is not usable here: the output writer requires the
+output functions to match the mesh degree (`RuntimeError: Degree of output
+Function must be same as mesh degree`), which is the limitation noted at
+`utils/writer.py:358`. `mechanical.order` (`core/finite_element_setup.py:25`)
+raises the displacement field instead and needs no quadratic mesh.
+
+The Tresca argument itself, for the record. Z3ST's creep is J2 (von Mises);
 eq. (11) of the paper adopts Tresca for the hub, and the paper's own
 Discussion says the formulation is "marginally conservative (overestimate the
 Pk decrease) compared to fem results ... due to the adoption of Tresca's
 equivalent criterion ... which slightly overestimates the equivalent von Mises
 stress adopted by the FEM solver". Tresca exceeds von Mises by 2/√3 on the
 equivalent stress here, and the creep rate goes as σ_eq^n, so the predicted
-bias is (2/√3)^n = **1.540** at n = 3 against **1.565** observed at 2500 days —
-agreement within 2% on the bias itself.
+bias is (2/√3)^n = **1.540** at n = 3. It remains the expected magnitude and
+sign; nothing in the current numbers reproduces it.
 
-So the disagreement is not a defect: it is a known criterion difference,
-reproduced at the right magnitude. A gold blessed on this case should gate on
-that, not on a naive overlay.
+Also open, and a candidate: with the stiff penalty the elastic point falls to
+**-5.7 %** (47.00 MPa against 49.86), against -3.0 % with the soft one, and
+0.85 μm of the 14.73 μm interference is unaccounted for by the joint-plus-
+penalty split. An elastic deficit that grows as the contact stiffens points at
+the contact model rather than at the creep law.
 
 ### What it took to get here
 
@@ -95,97 +151,87 @@ individually plausible wrong answer:
 
 The last row is the paper's shrink fit, and is what the case now carries.
 
-## Remaining open points
+## Configuration constraints
 
-There is no `non-regression_gold.json` in this directory on purpose.
-**The figure Romain reported on 2026-07-20 (excellent agreement with the
-analytical law out to 2500 days) is not reproducible from any commit** — it
-was produced with hand-edited values that were never committed. All four
-causes are fixed below; what is left is the `A0` re-basing temperature and
-the gold itself.
+The case carries `output/non-regression_gold.json` and is a member of the local
+suite. Five settings are required for the comparison with eq. (21) to mean
+anything; `case_params.check_consistency()`, called from `diagnostics.py` before step 0,
+aborts the run on the first three.
 
-1. ~~**Irradiation creep left active.**~~ Fixed: `creep_irr_B` and
-   `fast_flux` are commented out in `clad.yaml`, and `check_consistency()`
-   now refuses to let them come back unnoticed. Esposito's eq. (21) is a pure
-   Norton derivation with no in-pile term.
+1. **Irradiation creep off.** `creep_irr_B` and `fast_flux` are commented out in
+   `clad.yaml`. Esposito eq. (21) is a pure Norton derivation with no in-pile
+   term.
 
-2. ~~**Constants hardcoded in the analysis scripts.**~~ Fixed: they are read
-   from the YAML via `case_params.py`. For the record, the drift that was
-   there — `R_CLAD_I` 0.00453 vs 0.00451, `K_PEN` 5.0e13 vs 3.5e12,
-   `T_TOTAL` 1800 d vs 2500 d, `NB_STEPS` 45/50 vs 34 — and the reported
-   figure is titled `k_pen=3,47e12`, matching none of them.
+2. **Every constant read from the YAML**, through `case_params.py`. An
+   analytical overlay computed with parameters that differ from the ones the
+   solver ran is not a verification, and the two drift apart silently.
 
-3. ~~**`creep_Q`.**~~ Resolved: the case is **isothermal**, `creep_Q: 0`.
-   Esposito's eq. (9) is `ε̇_eq = A·σ_eq^n` with `A` a constant `[h⁻¹]` (see
-   the paper's nomenclature) — there is no Arrhenius factor anywhere in the
-   derivation, and temperature enters only through the interference Δ via
-   `α·ΔT`. This is the path the `models/creep_model.py` fix unblocks.
+3. **`creep_Q: 0` — the case is isothermal.** Esposito eq. (9) is
+   `eps_eq_dot = A*sigma_eq^n` with `A` a constant `[h^-1]` (their
+   nomenclature): there is no Arrhenius factor in the derivation, and
+   temperature enters only through the interference via `alpha*dT`.
 
-   The trap this opens: `creep_Q = 0` makes `A(T) = A0` identically, so `A0`
-   must be the Arrhenius factor *already folded in*. The Zircaloy card value
-   `2.82e-24 Pa⁻ⁿ s⁻¹` is the prefactor that belongs with `creep_Q = 1.2e5`;
-   used with `creep_Q = 0` it runs the cladding ~10¹⁰ times too fast, and
+   The trap: `creep_Q = 0` makes `A(T) = A0` identically, so **`A0` must be the
+   Arrhenius factor already folded in**. The Zircaloy card value
+   `2.82e-24 Pa^-n s^-1` is the prefactor that belongs with `creep_Q = 1.2e5`;
+   used with `creep_Q = 0` it runs the cladding ~1e10 times too fast, and
    nothing in the output says so. `clad.yaml` therefore carries the re-based
-   value `A0 = 2.82e-24 · exp(-1.2e5/(R·600 K)) = 1.0083e-34 Pa⁻ⁿ s⁻¹`, which
-   is the same `A(T)` that `verification/fuel/creep` reports at 600 K.
-   `case_params.check_consistency()` now flags an un-folded prefactor.
+   `A0 = 2.82e-24 * exp(-1.2e5/(R*600 K)) = 1.0083e-34 Pa^-n s^-1`, the same
+   `A(T)` that `verification/fuel/creep` reports at 600 K.
 
-   Still to confirm from a run: 600 K is a round stand-in for the clad mean
-   temperature. A hand estimate at LHR = 20 kW/m (`h_conv = 3.5e4`,
-   `T_ext = 580 K`) puts the clad between ~597 K outer and ~628 K inner, so
-   ~610 K mean. Re-derive `A0` from the computed clad mean temperature before
-   blessing a gold; `A` enters φ linearly, so a 10 K error is a few percent
-   on the relaxation rate.
+4. **`fissile: false`, and cracking off.** Eq. (21) is integrated under a
+   *fixed* interference assembled once and left to relax. A fissile pellet grows
+   the interference through the swelling eigenstrain and the contact pressure
+   rises instead of relaxing (see the table above). Zero burnup switches off both
+   the swelling and the densification terms, so the interference changes only by
+   creep; the eigenstrain entry stays in the card, inert. Cracking would degrade
+   the pellet to `E_iso/E = 0.112` while the analytical overlay uses the card's
+   nominal `E = 200 GPa`, and it fires on the nominal LHR even with
+   `fissile: false`, i.e. on power that is never deposited. Esposito's shaft is
+   an elastic solid.
 
-4. ~~**The interference is not fixed: burnup swelling drives it up.**~~
-   Fixed: `fuel.yaml` carries `fissile: false`. With `fissile: true` the run
-   reached 70.8 MWd/kgU at 20 kW/m over 2500 days, the swelling eigenstrain
-   `materials.fuel_swelling.solid_gas_densification` kept growing the pellet,
-   and the contact pressure climbed to ~160 MPa instead of relaxing —
-   Esposito eq. (21) is integrated under a *fixed* interference Δ assembled
-   once and left to relax, so the two loadings were not the same problem.
-   This was the mismatch flagged in the supervisor's 2026-07-10 e-mail ("the
-   interference is not fixed and your P_k rises"). Burnup now stays at zero,
-   which switches off both the swelling and the densification terms, and Δ is
-   changed only by creep. The eigenstrain entry is left in the card, inert.
+5. **Clad outer surface traction-free.** `outer_2` carries no restraint in
+   `boundary_conditions.yaml`, which is Esposito's hub boundary condition
+   `sigma_r(c) = 0`. Under `u_r = 0` at `r = c` creep can only redistribute
+   stress until the deviatoric part vanishes and then stops, freezing the
+   contact pressure at a plateau instead of decaying as a power law.
 
-   Cracking was switched off in the same pass: inherited from `pwr_rod_2D`,
-   it degraded the pellet to `E_iso/E = 0.112` while the analytical overlay
-   was fed the card's nominal `E = 200 GPa`, and it fired on the nominal LHR
-   even with `fissile: false`, i.e. on power that is never deposited.
-   Esposito's shaft is an elastic solid.
+## Open point
 
-5. ~~**Clad outer surface radially restrained.**~~ Fixed: `outer_2` is
-   traction-free in `boundary_conditions.yaml`, which is Esposito's hub
-   boundary condition σ_r(c) = 0. The previous `Clamp_x` (u_r = 0) held the
-   outer radius fixed, so creep could only redistribute stress until the
-   deviatoric part vanished and then stopped, freezing the contact pressure
-   at a residual plateau instead of decaying as a power law. The commented
-   block in the BC file records this.
+`A0` is re-based at a round 600 K stand-in for the clad mean temperature. A hand
+estimate at LHR = 20 kW/m (`h_conv = 3.5e4`, `T_ext = 580 K`) puts the clad
+between ~597 K outer and ~628 K inner, so ~610 K mean. `A` enters phi linearly,
+so a 10 K error is a few percent on the relaxation rate: re-derive `A0` from the
+computed clad mean temperature and re-bless the gold.
 
-The one substantive item left is the `A0` re-basing temperature in point 3.
-Once that is settled, `non-regression.py` should gate on the analytical Pk(t)
-including the (2/√3)^n Tresca bias (a real verification), not only on a gold
-snapshot.
+### Elastic point at t = 0
 
-## What was deliberately NOT carried over
+`contact_pressure_elastic_MPa` is asserted against eq. (4) with the joint and
+the penalty contact treated as springs in series, within a 5 % band:
 
-- The `core/solver.py` edit from `15b4b4e`. It re-computes the `_mech_cache`
-  rebuild condition ~20 lines above the existing block in
-  `_mechanical_step`, which then overwrites it — so the added
-  `_force_creep_rebuild` term never reaches the assembly decision and the
-  change is a no-op. It also moves the `nonlinear_constitutive` assignment
-  into an `else` branch, leaving it conditionally unbound. Dropping it does
-  not change any result.
-- The `__main__.py` edit casting `time` / `lhr` to float arrays. Harmless but
-  unnecessary; both are only forwarded to `generate_power_history`.
-- The `coaxial_contact` rework from `15b4b4e` (mesh, BCs, geometry,
-  `non-regression.py`, **and its gold**) — that case has since been renamed
-  `shrink_fit`. It is a separate piece of work on an existing verification
-  case and needs its own review — it must not ride in on this branch.
+    p = Delta / (1/f + 1/K_PEN)     25.47 MPa predicted, 24.70 MPa simulated, +3.0 %
+
+Nothing on the right-hand side is read back from the solver: `f` comes from the
+geometry and the moduli, `K_PEN` from `input.yaml`, `Delta` from the material
+cards and the run temperature. The measured split at t = 0 is 7.23 um across
+the joint and 7.06 um of penalty penetration, which sum to `Delta`.
+
+`Delta` is the interference of the assembled joint **at temperature**, not the
+cold 10 um of `models.contact.initial_gap`. At 580 K the pellet outgrows the
+cladding by 4.73 um (`r*alpha*(T - T_ref)` on each body, exact here because the
+field is uniform), so the assembled interference is 14.73 um. Using the cold
+value instead predicts 17.29 MPa and reads as a 43 % error — a variant of the
+same trap as the table above.
+
+The case tolerance is 5e-2, set by this
+metric; the burnup assertions are unaffected, they compare against exactly zero.
+
+The relaxation *trend* is likewise gold-only. Gating on the full Pk(t) would mean
+asserting the (2/√3)^n Tresca bias itself, which is a claim about the two
+equivalent-stress criteria rather than about this solver.
 
 ## Run
 
     conda activate z3st
-    ./Allrun      # gmsh → z3st → non-regression → plots → pressure_creep_analysis
+    ./Allrun      # gmsh → z3st → non-regression → plots
     ./Allclean

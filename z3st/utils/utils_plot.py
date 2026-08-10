@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 # --.. ..- .-.. .-.. --- Z3ST utility module --.. ..- .-.. .-.. ---
@@ -38,18 +38,12 @@ def plot_field_along_r_xyz(
     label_ref=None,
     average=True,
     decimals=5,
-    n_bins=100,
 ):
     """
     Plot a scalar field along the spherical radius :math:`r = \\sqrt{x^2 + y^2 + z^2}`.
 
-    The function supports different radial averaging modes:
-
-    - ``average = "round"`` → group by rounded radius values.
-    - ``average = "bins"`` → uniform radial bins.
-    - ``average = "weighted"`` → :math:`r^2`-weighted bins.
-    - ``average = "kernel"`` → Gaussian smoothing.
-    - ``average = False`` → no averaging.
+    With ``average = "round"`` the points are grouped by rounded radius value;
+    anything else plots them unaveraged.
 
     Parameters
     ----------
@@ -68,11 +62,9 @@ def plot_field_along_r_xyz(
     label_ref : str, optional
         Label for the reference curve.
     average : str or bool, optional
-        Averaging mode: ``"round"``, ``"bins"``, ``"weighted"``, ``"kernel"`` or ``False``.
+        Averaging mode: ``"round"`` or ``False``.
     decimals : int, optional
         Number of decimals when rounding radii (default: 5).
-    n_bins : int, optional
-        Number of bins for histogram averaging (default: 100).
 
     Returns
     -------
@@ -95,13 +87,7 @@ def plot_field_along_r_xyz(
     field_line = field
 
     # --- Select averaging mode ---
-    if average == "bins":
-        r_line, field_line = radial_average_uniform_bins(x, y, z, field, n_bins=n_bins)
-    elif average == "weighted":
-        r_line, field_line = radial_average_weighted(x, y, z, field, n_bins=n_bins)
-    elif average == "kernel":
-        r_line, field_line = radial_average_kernel(x, y, z, field)
-    elif average == "round":
+    if average == "round":
         r_line, field_line = radial_average_round(x, y, z, field_name, field, decimals=decimals)
     else:
         r_line = r
@@ -140,48 +126,6 @@ def plot_field_along_r_xyz(
         r_line,
         field_line,
     )
-
-
-def radial_average_uniform_bins(x, y, z, field, n_bins=100):
-    r = np.sqrt(x**2 + y**2 + z**2)
-    bins = np.linspace(r.min(), r.max(), n_bins + 1)
-    r_centers = 0.5 * (bins[:-1] + bins[1:])
-    field_avg = np.full_like(r_centers, np.nan)
-
-    for i in range(n_bins):
-        mask = (r >= bins[i]) & (r < bins[i + 1])
-        if np.any(mask):
-            field_avg[i] = np.mean(field[mask])
-    return r_centers, field_avg
-
-
-def radial_average_weighted(x, y, z, field, n_bins=100):
-    r = np.sqrt(x**2 + y**2 + z**2)
-    bins = np.linspace(r.min(), r.max(), n_bins + 1)
-    r_centers = 0.5 * (bins[:-1] + bins[1:])
-    field_avg = np.full_like(r_centers, np.nan)
-
-    for i in range(n_bins):
-        mask = (r >= bins[i]) & (r < bins[i + 1])
-        if np.any(mask):
-            weights = r[mask] ** 2
-            field_avg[i] = np.average(field[mask], weights=weights)
-    return r_centers, field_avg
-
-
-def radial_average_kernel(x, y, z, field, r_points=None, bandwidth=0.0005):
-    from scipy.stats import norm
-
-    r = np.sqrt(x**2 + y**2 + z**2)
-    if r_points is None:
-        r_points = np.linspace(r.min(), r.max(), 200)
-    field_avg = np.full_like(r_points, np.nan)
-
-    for i, rp in enumerate(r_points):
-        weights = norm.pdf(r, loc=rp, scale=bandwidth)
-        if np.sum(weights) > 0:
-            field_avg[i] = np.average(field, weights=weights)
-    return r_points, field_avg
 
 
 def radial_average_round(x, y, z, field_name, field, decimals=4):

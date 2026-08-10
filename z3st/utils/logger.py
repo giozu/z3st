@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 """Framework-wide logger.
@@ -41,10 +41,9 @@ class _RankFilter(logging.Filter):
     """Chatter from rank 0 only; warnings and errors from every rank.
 
     Under MPI every rank runs the same code, so an unguarded INFO line appears
-    once per process. Warnings and errors are let through on every rank.
+    once per process.
 
-    Kept even though ``__main__``'s stdout wrapper gates the same way: this is the
-    only gate when z3st is imported as a library, without going through
+    The only gate when z3st is imported as a library, without going through
     ``python -m z3st``.
     """
 
@@ -65,6 +64,6 @@ if not log.handlers:
     _handler.addFilter(_RankFilter())
     log.addHandler(_handler)
 
-# Own handler only: propagating would also hit the root logger and duplicate every
-# line. It also keeps z3st from configuring logging for third-party libraries.
+# Own handler only, no propagation to the root logger: no duplicated lines, and
+# z3st does not configure logging for third-party libraries.
 log.propagate = False

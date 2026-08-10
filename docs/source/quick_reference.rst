@@ -71,8 +71,13 @@ input.yaml
    models:
      thermal: true
      mechanical: true
-     damage: false
-     cluster_dynamics: false
+     damage: false          # phase-field fracture
+     plasticity: false
+     contact: false         # penalty contact between disjoint bodies
+     porosity: false        # thermal-gradient-driven pore migration
+     cluster: false         # 1D cluster dynamics
+     fission_gas:           # SCIANTIX coupling (needs SCIANTIX_LIB)
+       enabled: false
 
    # Thermal solver
    thermal:

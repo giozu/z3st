@@ -4,8 +4,9 @@
 ![static](https://github.com/giozu/z3st/actions/workflows/static.yml/badge.svg)
 <!-- ![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg) -->
 
-**Z3ST** is an open-source finite-element framework for thermo-mechanical material analysis.
-Developed in **Python**, it leverages **FEniCSx** and provides a modular environment to couple heat conduction and linear elasticity in multi-material domains under stationary or transient conditions, with user-defined boundary conditions.
+**Z3ST** is an open-source finite-element framework for thermo-mechanical material analysis, with nuclear fuel as its driving application.
+Developed in **Python** on **FEniCSx**, it couples heat conduction, small- and finite-strain mechanics, plasticity, creep, variational phase-field fracture, gap conductance and penalty contact in multi-material domains, under stationary or transient conditions and in 1D, 2D, 3D or axisymmetry.
+Materials live outside the numerical core: any property can be an importable Python callable that enters the weak form symbolically, so its consistent tangent follows by automatic differentiation.
 
 ---
 
@@ -92,10 +93,14 @@ These cases serve both as:
 * **Hot-reloadable parameters** — an allow-listed subset of `input.yaml` (tolerances, relaxation factors, `max_iters`) can be edited mid-run and is picked up at the next step boundary, for steering long simulations without restarting
 * **Multi-regime kinematics** — `1d`, `2d` plane strain, `3d` and `axisymmetric` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
 * **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
-* **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral or Amor volumetric/deviatoric energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
+* **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral, Amor volumetric/deviatoric or star-convex energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
+* **Penalty contact** — between disjoint bodies, coupled to the gap conductance so contact is felt thermally as well as mechanically; verified against the analytical Lamé interference fit and against Esposito's creep-relaxing shrink fit
+* **Porosity migration** — thermal-gradient-driven pore advection feeding back on the thermal problem through a porosity-dependent conductivity and a rescaled volumetric source; streamline-upwind (default), SUPG, or DG-1 upwind + SIPG with SSP-RK3 and a vertex limiter
+* **Data-driven material laws** — thermal conductivity supplied as a trained model rather than a correlation: the Magni MA-MOX correlation, a Gaussian-process correction on its logarithmic residual, and a PyTorch neural network. Any object with a `(k, dk/dT)` two-method contract qualifies, run either as a lagged Picard iteration or fully coupled through a `dolfinx-external-operator` Newton scheme evaluating the model at quadrature points
+* **SCIANTIX coupling** — mesoscale fission-gas behaviour driven per fuel point through the same eigenstrain and source channels the internal models use, returning gaseous swelling and fission gas release (requires a compiled SCIANTIX shared library; see [`z3st/coupling/sciantix/`](z3st/coupling/sciantix/README.md))
 * **Creep** — implicit Norton + Arrhenius via the incremental variational principle (radial return condensed onto the displacement space, exact consistent tangent by automatic differentiation), with an optional flux-driven irradiation-creep term for in-pile cladding
 * **Fuel cracking** — Isotropic softening: the number of macro-cracks follows the rod-average linear heat rate and rescales the fuel elastic constants, irreversibly
-* **Engineering fuel behaviour** — burnup-driven solid and gaseous swelling with early-life densification (eigenstrain bus), Fink UO₂ k(T), rim-peaking radial and chopped-cosine/tabulated axial power profiles
+* **Engineering fuel behaviour** — burnup-driven solid and gaseous swelling with early-life densification (eigenstrain bus), UO₂ k(T) in the modified-NFI form adopted by FRAPCON-3 at zero burnup (burnup degradation not included), rim-peaking radial and chopped-cosine/tabulated axial power profiles
 * **Multi-material domains** — independent thermal, mechanical, and damage properties per material; per-cell-tag integration measures handle interfaces naturally
 * **Volumetric heating** — fissile (LHR/area), analytic γ-heating decay in rectangular / cylindrical / spherical geometry, or arbitrary user-defined `q'''(x)`
 * **Flexible boundary conditions** — thermal (Dirichlet / Neumann / Robin with convective or gap-coupled mode), mechanical (Dirichlet vector / per-component / Neumann / Clamp / Slip), damage (Dirichlet); step-dependent value histories on mechanical BCs
@@ -116,7 +121,7 @@ These cases serve both as:
 
 ```bash
 z3st/                                # repository root
-├── LICENSE                          # Apache 2.0
+├── LICENSE.txt                      # Apache 2.0
 ├── README.md
 ├── CITATION.cff
 ├── pyproject.toml                   # installable package (PEP 621)
@@ -329,6 +334,26 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 * Advanced cluster dynamics (1D, nucleation)
 * Coupling with rate-theory codes
 
+## Reproducing the figures in the Z3ST paper
+
+Each figure in the SoftwareX article is produced by a case directory in this repository.
+Run `./Allrun` in the directory, then `python3 non-regression.py`.
+
+| Figure | Content | Case directory |
+|---|---|---|
+| 2 | MPI timings | `z3st/cases/benchmarks/damage/pellet_quench_2D_xy` |
+| 3 | Integral fuel rod, gap closure and contact pressure | `z3st/cases/regression/pwr_rod_2D` |
+| 3 | Same rod with the SCIANTIX coupling active | `z3st/cases/regression/fg_test_2D` |
+| 4 | Phase-field damage after a cold-bath quench | `z3st/cases/benchmarks/damage/pellet_quench_2D_xy` |
+| 5 | Radial porosity profile after restructuring | `z3st/cases/verification/fuel/porosity_migration` |
+| 6 | Penalty contact vs. the analytical Lame interference fit | `z3st/cases/verification/fuel/shrink_fit` |
+
+Figure 1 is a schematic and has no case.
+The machine-learned conductivity checks of Section 2.3 are run by
+`z3st/cases/studies/magni_gpr_conductivity/verify_machinery.py`.
+
+---
+
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
@@ -455,11 +480,11 @@ If you use Z3ST in your research, please cite it.
   title        = {Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis},
   year         = {2026},
   howpublished = {\url{https://github.com/giozu/z3st}},
-  note         = {Version 0.2.0}
+  note         = {Version 0.3.0}
 }
 ```
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
-* **Version:** 0.2.0 (2026)
+* **Version:** 0.3.0 (2026)
 * **License:** Apache 2.0

@@ -1,7 +1,7 @@
 <!-- # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- -->
 
 # Starting point for working on Z3ST with an agent
@@ -22,7 +22,7 @@ All paths in this file are relative to the repository root (this file lives in
 Z3ST is a FEniCSx (dolfinx) finite-element framework for coupled
 thermo-mechanical material analysis, written in Python. It couples heat
 conduction and elasticity in multi-material domains, with a focus on nuclear
-fuel mechanics. Apache 2.0, version 0.2.0.
+fuel mechanics. Apache 2.0, version 0.3.0.
 
 ## What NOT to do (read this before you touch anything)
 
@@ -44,6 +44,8 @@ explained in its section below.
   background run or a temporary copy. See *Running a case*.
 - **Do not trust an incremental Sphinx build's warning count** — always
   `make clean` first. See *Docs*.
+- **Do not leave `audit_checks` red.** It gates the pre-commit hook and CI. See
+  *Static checks*.
 - **Do not invent file paths, models, or APIs.** If you are unsure how a piece
   works, read `z3st/ai/CONTEXT.md` or the actual source before changing it.
 
@@ -63,8 +65,8 @@ explained in its section below.
 
 ## Environment — which Python
 
-Use the project conda env interpreter directly. As of 2026-06-15 the project
-targets **dolfinx 0.11.0**, in the `z3st` env. Find your own interpreter path —
+Use the project conda env interpreter directly. The project targets
+**dolfinx 0.11.0**, in the `z3st` env. Find your own interpreter path —
 it depends on where your conda lives:
 
 ```
@@ -103,12 +105,31 @@ the background or in a temporary copy.
 - Local suite: `z3st/cases/non-regression_local.sh` (discovery-based: any dir
   with `Allrun` **and** a blessed `output/non-regression_gold.json`; `sandbox/`
   is never scanned; exclusions in `cases/suite_exclude.txt`).
-- CI subset: `cases/cases_ci.txt` (a performance budget, not full coverage).
+- CI subset: `cases/cases_ci.txt`, a hand-maintained list — 22 cases chosen for
+  model coverage against a measured time budget, not the full local suite. Its
+  header states the membership rule; the `ci` audit check verifies every entry
+  still resolves to a case with an `Allrun` and a gold.
 - Bless a gold: `cp output/non-regression.json output/non-regression_gold.json`
   after sanity-checking the run.
 - `non-regression.json` carries two verdicts: `summary` (analytic tolerance) and
   `regression` (vs gold). Use `pass_fail_check` + `regression_check` from
   `z3st.utils.utils_verification` (see any verification case for the pattern).
+
+## Static checks — run these before you hand anything back
+
+```
+python -m z3st.utils.audit_checks            # 14 checks, ~2.4 s, no simulation
+python -m z3st.utils.audit_checks --list     # names only
+python -m z3st.utils.audit_checks schema     # one check
+```
+
+Exits non-zero on any finding. `.githooks/pre-commit` runs the same suite and
+refuses the commit; enable it once per clone with
+`git config core.hooksPath .githooks`.
+
+A green run means no known static defect. It does not run a case, judge whether a
+gold is physically right, or know whether the solver converges — those need the
+suite.
 
 ## Docs (Sphinx)
 

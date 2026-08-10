@@ -7,7 +7,7 @@
 Single source of truth for the post-processing scripts of this case.
 
 Every geometric, material and solver constant used by ``plots.py`` and
-``pressure_creep_analysis.py`` is read here from the case's own YAML files.
+``non-regression.py`` is read here from the case's own YAML files.
 The only literal below is the universal gas constant.
 """
 
@@ -54,6 +54,7 @@ NB_STEPS = int(sum(int(n) for n in _n_steps))
 E_CLAD = float(_clad["E"])                          # (Pa)
 NU_CLAD = float(_clad["nu"])                        # (-)
 ALPHA_CLAD = float(_clad["alpha"])                  # (1/K)
+T_REF_CLAD = float(_clad["T_ref"])                  # (K) stress-free temperature
 G = E_CLAD / (2.0 * (1.0 + NU_CLAD))                # shear modulus (Pa)
 
 CREEP_A0 = float(_clad["creep_A0"])                 # (Pa^-n s^-1)
@@ -67,8 +68,10 @@ FAST_FLUX = float(_clad.get("fast_flux", 0.0))
 # --- Pellet (Esposito's shaft) ----------------------------------------------
 E_FUEL = float(_fuel["E"])                          # (Pa)
 NU_FUEL = float(_fuel["nu"])                        # (-)
+ALPHA_FUEL = float(_fuel["alpha"])                  # (1/K)
+T_REF_FUEL = float(_fuel["T_ref"])                  # (K) stress-free temperature
 
-# --- Backwards-compatible aliases used by the scripts -----------------------
+# --- Aliases used by the scripts --------------------------------------------
 E_EL = E_CLAD
 NU = NU_CLAD
 ALPHA = ALPHA_CLAD
@@ -81,17 +84,14 @@ SIGMA0 = E_CLAD * 5.0e-5 / (R_CLAD_I - R_CLAD_O)
 def check_consistency():
     """Fail loudly on the inconsistencies that silently invalidate the overlay.
 
-    Returns the list of problems found (empty when the case is coherent) so a
-    caller can warn rather than abort if that is more useful.
+    Returns the list of problems found (empty when the case is coherent).
     """
     problems = []
 
     # A conforming mesh has to keep the two bodies disjoint, so the geometry can
     # only ever carry a positive clearance; the interference is expressed by a
     # negative models.contact.initial_gap, which ContactModel uses verbatim in
-    # place of the mesh-derived value. What must agree is therefore the
-    # magnitude - the distance the mesh puts between the surfaces against the
-    # distance the solver applies - not the signed value.
+    # place of the mesh-derived value. Only the magnitudes have to agree.
     if abs(abs(G0) - abs(INITIAL_GAP)) > 1e-12:
         problems.append(
             f"cold gap from geometry.yaml ({G0:.3e} m) and "
@@ -150,6 +150,32 @@ def report():
     else:
         print("[case_params] consistency check: OK")
     return problems
+
+
+def hot_interference(T):
+    """Esposito's Delta at the operating temperature T, in metres.
+
+    Delta is the shrink-fit interference of the assembled joint, and the case
+    assembles it cold: models.contact.initial_gap is the room-temperature value.
+    Under a uniform T each body expands freely by r*alpha*(T - T_ref), and the
+    mismatch of the two free radii adds to it. Valid only while the field is
+    uniform, which this case enforces (creep_Q = 0, isothermal).
+    """
+    dr_fuel = R_PELLET * ALPHA_FUEL * (T - T_REF_FUEL)
+    dr_clad = R_CLAD_I * ALPHA_CLAD * (T - T_REF_CLAD)
+    return abs(INITIAL_GAP) + dr_fuel - dr_clad
+
+
+def elastic_factor(a, b, c, E1, nu1, E2, nu2):
+    """Esposito eq. (4): Pk = f * Delta_u_el, the elastic stiffness of the joint.
+
+    Shaft a..b (a = 0 for a solid shaft), hub b..c. Purely elastic Lame, with no
+    creep and no equivalent-stress criterion, so it carries none of the
+    Tresca/von Mises bias that separates eq. (21) from a J2 solver.
+    """
+    denom = ((b / E1) * ((a**2 + b**2) / (b**2 - a**2) + nu1)
+             + (b / E2) * ((c**2 + b**2) / (c**2 - b**2) - nu2))
+    return 1.0 / denom
 
 
 if __name__ == "__main__":

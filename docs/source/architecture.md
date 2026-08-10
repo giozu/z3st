@@ -165,7 +165,7 @@ flowchart TD
   models --> nn[models/nn_conductivity.py]
 ```
 
-Note the arrow running from the models back to the solver. Since 2026-08-09 each
+Note the arrow running from the models back to the solver. Each
 physics mixin owns its own staggered step — `_thermal_step`, `_mechanical_step`,
 `_damage_step`, `_cluster_step`, `_porosity_step` — and consumes the solver as a
 provider of services rather than being called into by it. `core/solver.py` went from
@@ -184,9 +184,7 @@ and the three rigid-body nullspace builders.
   carry distinctive names (`creep_stress`, `sigma_plastic`), never generic ones
   (`stress`, `update`). Zero collisions across the 13 mixins today (85 methods),
   and `python -m z3st.utils.audit_checks mro` re-derives that in a second, so the
-  claim is reproducible rather than a note about a check someone once ran. Worth
-  knowing when reading it: the surface widened on 2026-08-09, when five physics
-  steps moved from `core/solver.py` into their models.
+  claim is reproducible rather than a note about a check someone once ran.
 * **Rank-symmetric Python state** — dolfinx's PETSc wrappers do collective work in
   `__del__`, so if one MPI rank holds a different set of live Python objects the
   collector orders those destructors differently and the run deadlocks at exit.

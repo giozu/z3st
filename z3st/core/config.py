@@ -2,8 +2,12 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+
+MODEL_NAMES = ("thermal", "mechanical", "damage", "cluster",
+               "plasticity", "contact", "porosity")
 
 
 class Config:
@@ -32,16 +36,9 @@ class Config:
         self.input_file = input_file
 
         # --. Active models --..
+        # A switch may be a bool or a configuration block; a non-empty block is on.
         models = self.input_file.get("models", {})
-        self.on = {
-            "thermal": models.get("thermal", False),
-            "mechanical": models.get("mechanical", False),
-            "damage": models.get("damage", False),
-            "cluster": models.get("cluster", False),
-            "plasticity": models.get("plasticity", False),
-            "contact": bool(models.get("contact", False)),
-            "porosity": models.get("porosity", False),
-        }
+        self.on = {name: bool(models.get(name, False)) for name in MODEL_NAMES}
 
         # --. Fission-gas behaviour via SCIANTIX coupling (default OFF) --..
         # ``models.fission_gas`` may be a bool or a block:
@@ -58,7 +55,9 @@ class Config:
             fg = {"enabled": bool(fg)}         # any other scalar (False/0/None)
         self.on["fission_gas"] = bool(fg.get("enabled", False))
         self.sciantix_lib = fg.get("lib", None)
-        self.sciantix_ic = fg.get("initial_conditions", "input_initial_conditions.txt")
+        # A path, or false to skip the seeding (SciantixField takes None for that).
+        _ic = fg.get("initial_conditions", "input_initial_conditions.txt")
+        self.sciantix_ic = None if _ic in (False, None) else str(_ic)
         self.sciantix_energy_per_fission = float(fg.get("energy_per_fission", 3.2e-11))
 
         gap_config = self.input_file.get("models", {}).get("gap_conductance", {})
@@ -76,9 +75,7 @@ class Config:
         self.gap_contact_thickness = float(cc.get("gas_thickness", 4.0e-6))  # m (roughness-based gas space on contact)
 
         # Under-relaxation of the gap conductance between staggered iterations
-        # (h ← ω·h_new + (1−ω)·h_prev). The contact-pressure → conductance →
-        # temperature → expansion → pressure feedback is the loop that chatters
-        # on gap closure; damping h attacks it at the source. 1.0 = off.
+        # (h ← ω·h_new + (1−ω)·h_prev). 1.0 = off.
         self.gap_relax = float(gap_config.get("relax", 1.0))
         
         # --. Paths --..
@@ -86,8 +83,8 @@ class Config:
         self.mesh_path = self.input_file.get("mesh_path", None)
         self.boundary_conditions_path = self.input_file.get("boundary_conditions_path", None)
         self.n_steps = self.input_file.get("n_steps", 10)
-        # Normalised to lowercase ("2D" → "2d"); downstream regime branches
-        # assume one of these five values, so reject anything else up front.
+        # Normalised to lowercase ("2D" → "2d"). Downstream regime branches
+        # assume one of these four values.
         self.regime = self.input_file.get("regime", "2d").lower()
         valid_regimes = {"1d", "2d", "3d", "axisymmetric"}
         if self.regime not in valid_regimes:

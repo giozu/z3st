@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 mesh_path: mesh.msh
@@ -67,8 +67,8 @@ time:
 - 6.048e+7     # 700 days
 - 2.16e+8    # 2500 days
 n_steps:
-- 14
-- 20
+- 56
+- 80
 
 time_adaptivity:
   enabled: true

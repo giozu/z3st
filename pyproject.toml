@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.2.0 (2026)
+# Version: 0.3.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 [build-system]
@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "z3st"
-version = "0.2.0"
+version = "0.3.0"
 description = "Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis"
 authors = [
   {name = "Giovanni Zullo", email = "giovanni.zullo@polimi.it"}
@@ -39,12 +39,6 @@ Homepage = "https://github.com/giozu/z3st"
 # script (cases/studies/attenuation_map/plot_map.py), which iterates over groups with
 # df.groupby() and sorts on two columns -- ~15 clear lines that numpy would turn into
 # ~40 of structured arrays. The library itself is pandas-free.
-#
-# h5py was here until 2026-08-09 and it was a mistake: utils/utils_extract_xdmf.py is
-# library code, so "not needed to run a case" was false -- it is needed to *check* one,
-# and Allrun does both. Six CI cases died on ModuleNotFoundError. It went unnoticed
-# locally because the conda dolfinx stack pulls h5py in transitively, so no local run
-# can reveal an undeclared dependency.
 post = [
     "pandas",
 ]

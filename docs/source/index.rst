@@ -1,12 +1,17 @@
 Z3ST
 ====
 
-**Z3ST** is an open-source finite-element framework built on **FEniCSx** for coupled thermo-mechanical analysis and multiphysics simulations.
+**Z3ST** (pronounced *zest*) is an open-source finite-element framework built on **FEniCSx** for coupled thermo-mechanical analysis and multiphysics simulations, with nuclear fuel as its driving application.
 
 Designed for scientific research, engineering applications, and educational purposes, Z3ST provides a clean, modular interface for:
 
-- **Coupled thermo-mechanical simulations** with staggered solution schemes
-- **Phase-field fracture mechanics** (AT1/AT2 models)
+- **Coupled thermo-mechanical simulations** with staggered solution schemes, in 1D, 2D, 3D and axisymmetry
+- **Phase-field fracture mechanics** (AT1/AT2, with Miehe spectral, Amor or star-convex energy splits)
+- **Plasticity and creep**, including implicit Norton creep with an exact consistent tangent by automatic differentiation
+- **Gap conductance and penalty contact**, coupled so that contact is felt thermally as well as mechanically
+- **Fuel behaviour** — burnup, swelling, densification, cracking, and thermal-gradient-driven porosity migration
+- **Data-driven material laws** — neural-network, Magni MA-MOX and Gaussian-process-corrected thermal conductivity, run through a lagged Picard iteration or a fully coupled external-operator Newton scheme
+- **External-code coupling** — SCIANTIX for mesoscale fission-gas behaviour
 - **Cluster dynamics** for defect evolution in irradiated materials
 - **Multi-material domains** with complex geometries
 - **Automatic differentiation** for inverse problems and optimization
@@ -54,9 +59,9 @@ If you use **Z3ST** in your research, please cite it as:
 
 .. code-block:: text
 
-   Giovanni Zullo (2025).
+   Giovanni Zullo (2026).
    Z3ST: an open-source FEniCSx framework for thermo-mechanical analysis.
-   https://doi.org/10.5281/zenodo.17748028
+   Version 0.3.0. https://doi.org/10.5281/zenodo.17748028
 
 Documentation Contents
 ----------------------
