@@ -86,8 +86,19 @@ Implemented in :class:`z3st.models.thermal_model.ThermalModel`.
 
 .. _nn-material-laws:
 
-Neural-Network Material Laws
-----------------------------
+Data-Driven Material Laws
+-------------------------
+
+A material property can be supplied as a **trained model** rather than a constant
+or a symbolic ``k(T)`` Python function. Three hooks ship for the thermal
+conductivity -- a neural network, the Magni MA-MOX correlation, and a
+Gaussian-process correction on top of it. All three satisfy the same two-method
+contract, one method returning :math:`k` and one returning
+:math:`(k, \mathrm{d}k/\mathrm{d}T)`, and all three are driven through the same
+two solver routes described below.
+
+Neural network
+^^^^^^^^^^^^^^
 
 A material property can be supplied as a trained **neural network** rather than a
 constant or a symbolic ``k(T)`` Python function -- useful when the constitutive
@@ -134,6 +145,163 @@ The external-operator route builds on the open-source ``dolfinx-external-operato
 package by Latyshev, Bleyer, Maurini and Hale (*J. Theor. Comput. Appl. Mech.*,
 2025, https://doi.org/10.46298/jtcam.14449,
 https://github.com/a-latyshev/dolfinx-external-operator), gratefully acknowledged.
+
+Magni MA-MOX correlation
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The correlation of Magni et al. (2021) for minor-actinide-bearing mixed-oxide fuel
+is available as a card type. It depends on temperature and on the local
+composition -- plutonium, americium and neptunium contents, deviation from
+stoichiometry, porosity and burnup -- rather than on temperature alone:
+
+.. code-block:: yaml
+
+   k:
+     type: magni
+   Pu: 0.20
+   Am: 0.00
+   x: 0.02
+   p: 0.05
+
+The composition entries are read from the same card and may be uniform or
+supplied as fields, which is what lets the Olander plutonium-redistribution study
+vary ``Pu`` across the pellet radius. Implemented in
+:mod:`z3st.models.magni_conductivity`.
+
+Gaussian-process correction
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Rather than replace a validated correlation with a black box, a Gaussian process
+can be fitted to its **logarithmic residual**,
+
+.. math::
+
+   r = \ln\!\left(k_\mathrm{data} / k_\mathrm{Magni}\right),
+   \qquad
+   k = k_\mathrm{Magni}\, e^{\bar r}.
+
+.. code-block:: yaml
+
+   k:
+     type: gpr
+     model: output/magni_gpr_model.npz
+     mode: mean          # or: affine, with xi = number of standard deviations
+
+Three consequences of this construction are worth stating:
+
+- the correction is multiplicative on a logarithmic target, so :math:`k` stays
+  **positive by construction**;
+- the prior is zero-mean on the *standardised* residual with an anisotropic
+  squared-exponential kernel, so where the data are silent the posterior mean
+  relaxes to the mean training residual: extrapolation outside the training
+  envelope degrades to the published correlation scaled by a constant, not to an
+  arbitrary regression;
+- the posterior standard deviation is retained, so ``mode: affine`` with a chosen
+  ``xi`` runs a scenario solve at a prescribed number of standard deviations.
+
+The checkpoint is a NumPy ``.npz`` produced by
+``cases/studies/magni_gpr_conductivity/fit_gpr.py``. Verifying a data-driven law
+raises a question of its own -- how to check an implementation whose reference is
+a dataset rather than a formula -- and the answer used here is a residual
+prescribed in closed form, whose value and temperature derivative are known
+exactly. ``verify_machinery.py`` in the same directory checks the fitted hook
+against it over 600--1900 K, cross-checks the two contract methods by finite
+differences, and requires the fit to stay flat in the variables the residual does
+not depend on, so it is not rewarded for inventing structure.
+
+.. note::
+
+   What is verified is the **machinery**. Assimilating measured MA-MOX data is
+   implemented, but no such dataset ships with the repository.
+
+Implemented in :mod:`z3st.models.gpr_conductivity`.
+
+Porosity Migration
+------------------
+
+Under the steep radial gradient of a high-rated rod, lenticular pores migrate up
+the gradient by vaporisation on their hot face and condensation on their cold
+face, leaving a restructured low-porosity columnar zone and accumulating as a
+central void. Z3ST solves the pore-advection equation on the same mesh as the
+thermal problem, with the pore velocity following Sens:
+
+.. math::
+
+   |\mathbf{v}| = c_0\left(c_1 + c_2 T + c_3 T^2 + c_4 T^3\right)
+   \Delta H_s P_{0.5}\,
+   \exp\!\left(-\frac{\Delta H_s}{RT}\right) T^{-2.5}\,|\nabla T|.
+
+The coupling runs both ways: porosity rescales the volumetric source and enters a
+porosity-dependent conductivity (the Kato correlation with a Maxwell--Eucken
+porosity correction, via ``thermal_conductivity_model: kato_porosity``), so the
+migration is **self-limiting** -- as porosity accumulates at the centre the local
+conductivity falls, the gradient flattens and the pore velocity vanishes. The
+transport and thermal blocks are coupled by the usual staggered fixed-point loop,
+with Aitken acceleration available.
+
+Two discretisations of the same equation are provided, selected under
+``porosity:`` in ``input.yaml``.
+
+**Continuous Galerkin (default).** Streamline-upwind artificial diffusion
+(``stabilisation: su``) or streamline-upwind Petrov--Galerkin
+(``stabilisation: supg``). This path reproduces Barani et al. (2022):
+
+.. code-block:: yaml
+
+   porosity:
+     stabilisation: supg
+     linear_solver: direct_mumps
+     aitken: true
+
+**Discontinuous Galerkin.** A DG-1 upwind facet flux with an optional SIPG
+diffusion block, SSP-RK3 in time with automatic sub-stepping to the advective
+CFL, and a Kuzmin vertex limiter enforcing the discrete maximum principle after
+*every* stage, plus a conservative saturation cap:
+
+.. code-block:: yaml
+
+   porosity:
+     discretisation: dg
+     dg_integrator: ssprk3
+     dg_limiter: vertex
+     saturation_cap: true
+
+The DG path is the one to use when the restructuring front is sharp, since the
+limiter bounds the porosity in :math:`[0, 1]` without the artificial diffusion
+the CG path relies on.
+
+Reference cases: ``cases/verification/fuel/porosity_migration`` (CG) and
+``cases/verification/fuel/porosity_migration_dg`` (DG). Implemented in
+:mod:`z3st.models.porosity_migration_model`.
+
+SCIANTIX Coupling (Fission-Gas Behaviour)
+-----------------------------------------
+
+Mesoscale fission-gas behaviour is not reimplemented in Python. Z3ST drives
+**SCIANTIX** per fuel point through its existing C-linkage coupling entry, and
+receives back gaseous swelling and fission gas release. The swelling enters
+through the same **eigenstrain bus** the internal models use, so the coupling is
+a bounded task of the same kind as adding a model rather than a special case in
+the solver.
+
+.. code-block:: yaml
+
+   models:
+     fission_gas:
+       enabled: true
+       initial_conditions: input_initial_conditions.txt
+       energy_per_fission: 3.2e-11
+
+This requires a compiled SCIANTIX **shared** library, pointed to by the
+``SCIANTIX_LIB`` environment variable. The build recipe is not the one SCIANTIX's
+own CMake produces by default, which is a static archive; see
+``z3st/coupling/sciantix/README.md`` for the exact command.
+
+Reference cases: ``cases/regression/fg_test_2D`` and
+``cases/regression/fg_test_fuel``. The former is the integral rod of
+``cases/regression/pwr_rod_2D`` with the coupling switched on and nothing else
+changed, which makes the two directly comparable. Implemented in
+:mod:`z3st.coupling.sciantix.sciantix_binding`.
 
 Power Shaping (Radial and Axial Form Factors)
 ---------------------------------------------
