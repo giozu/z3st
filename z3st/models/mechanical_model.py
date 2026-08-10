@@ -301,8 +301,7 @@ class MechanicalModel:
         axis_names = ("u_x", "u_y", "u_z")
         free_axis = {"Slip_x": 0, "Slip_y": 1, "Slip_z": 2}[bc_type]
         if free_axis >= self.tdim:
-            # Mirror the Clamp_z guard: Slip_z on a 2-D mesh would silently
-            # block both in-plane components (a full clamp), not slip.
+            # Mirrors the Clamp_z guard.
             raise ValueError(
                 f"\n[ERROR] Boundary condition '{bc_type}' is not valid on a "
                 f"{self.tdim}D mesh: the free axis does not exist, so every "
@@ -667,7 +666,6 @@ class MechanicalModel:
         # Eigenstress ℂ : ε*. For the engineering 1D bar the stiffness is E
         # (uniaxial); otherwise the isotropic Lamé contraction λ tr(ε*) I + 2G ε*
         # — which for ε* = αΔT I recovers exactly the (3λ + 2G) αΔT thermal form.
-        # λ is regime-consistent (λ_ps in plane stress, mirroring sigma_mech).
         if self.regime == "1d":
             sigma_eig = material["E"] * eps_star
         else:
@@ -714,9 +712,8 @@ class MechanicalModel:
                 # stress), the z-component is suppressed because eps_zz is
                 # geometrically constrained / sigma_zz is zero -- including
                 # eth_zz would produce a spurious bulk psi_el. See the
-                # docstring of DamageModel._thermal_eigenstrain for the full
-                # rationale; the logic is duplicated here so MechanicalModel
-                # need not import DamageModel.
+                # docstring of DamageModel._thermal_eigenstrain, which carries
+                # the same logic.
                 factor = material["alpha"] * (T - material["T_ref"])
                 dim = eps.ufl_shape[0]
                 regime = str(getattr(self, "regime", "3d")).lower()
@@ -743,12 +740,9 @@ class MechanicalModel:
                     material["lmbda"] * ufl.tr(eps_el) ** 2
                     + 2.0 * material["G"] * ufl.inner(eps_el, eps_el)
                 )
-            # Damage degradation: mirrors sigma_mech / sigma_th. Cells under a
-            # prescribed D=1 BC otherwise absorb the displacement-controlled BC
-            # into huge strain while carrying near-zero stress, inflating the
-            # E_el diagnostic. (Simple g(D)*psi rather than
-            # g(D)*psi+ + psi-: small overcount in compression cells, but
-            # those don't carry significant D under the hybrid constraint.)
+            # Damage degradation: mirrors sigma_mech / sigma_th. Simple
+            # g(D)*psi, not g(D)*psi+ + psi-: a small overcount in compression
+            # cells, which carry little D under the hybrid constraint.
             if self.on.get("damage", False):
                 psi_el = self.degradation_function(self.D) * psi_el
             return psi_el
@@ -771,9 +765,7 @@ class MechanicalModel:
 
         # Creep, or a plasticity / hyperelastic constitutive mode, makes σ(u)
         # nonlinear in u, so the step must go through the SNES path regardless
-        # of the configured solver (the "linear" branch would otherwise assemble
-        # a non-bilinear form as if it were bilinear). Guards against a
-        # solver: linear misconfiguration.
+        # of the configured solver.
         creep_present = any(self.creep_active(m) for m in self.materials.values())
         nonlinear_constitutive = any(
             m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
@@ -785,9 +777,8 @@ class MechanicalModel:
             and not nonlinear_constitutive
         )
 
-        # Creep predictor at the current iterate, befire assembling: a
-        # stale predictor can zero the symbolic correction (base clamp) and
-        # let |Δu| pass spuriously. Its change feeds the convergence test.
+        # Creep predictor at the current iterate, before assembling. Its
+        # change feeds the convergence test.
         creep_pred_change = 0.0
         if creep_present:
             creep_pred_change = self.update_creep_predictor(u_new, T_current)
@@ -935,10 +926,10 @@ class MechanicalModel:
                     )
 
                 # Opt-in: project the floating rigid-body modes out of the solve
-                # for a body the BCs leave rigid-singular. KSP then removes the kernel from RHS and
-                # solution -> unique minimal-norm displacement, fewer
-                # staggered iterations. Default off; the standard BC-pinned case
-                # has no nullspace and must not get one.
+                # for a body the BCs leave rigid-singular. KSP removes the
+                # kernel from RHS and solution -> unique minimal-norm
+                # displacement. Default off; the standard BC-pinned case has no
+                # nullspace and must not get one.
                 if as_bool(self.mech_cfg.get("remove_rigid_nullspace", False)):
                     ns = build_constrained_rigid_nullspace(
                         self.V_m, bcs_mech, regime=self.regime
@@ -998,10 +989,8 @@ class MechanicalModel:
         dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
         problem_m.solve()
 
-        # Penalty contact: measure the gap from the raw solve and set the pressure used by the next solve.
-        # On exact samples the secant update in ContactModel pins the
-        # consistent pressure within a couple of iterations, independent of
-        # the relaxation factor.
+        # Penalty contact: measure the gap from the raw solve and set the
+        # pressure used by the next solve.
         if self.on.get("contact", False):
             self.update_contact_pressure(u_new)
 

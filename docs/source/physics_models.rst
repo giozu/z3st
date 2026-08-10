@@ -217,9 +217,8 @@ with body force :math:`\boldsymbol{f}` (e.g. gravity along the regime's vertical
 axis) and the small-strain tensor
 :math:`\boldsymbol{\varepsilon} = \tfrac{1}{2}(\nabla \boldsymbol{u} + \nabla \boldsymbol{u}^\top)`.
 The out-of-plane components follow the active regime: retained (plane strain),
-reconstructed from the in-plane solution (plane stress), solved as part of
-:math:`\boldsymbol{u}` (3D), or expressed in cylindrical components
-(axisymmetric).
+solved as part of :math:`\boldsymbol{u}` (3D), or expressed in cylindrical
+components (axisymmetric).
 
 **Weak form.** Find :math:`\boldsymbol{u} \in V_u` such that for all
 :math:`\boldsymbol{v} \in V_u`
@@ -318,7 +317,7 @@ along the facet normal. Any value may be supplied as a list of length
 ``n_steps`` for step-wise loading.
 
 Implemented in :class:`z3st.models.mechanical_model.MechanicalModel`; supports
-2D (plane stress / plane strain), 3D, and axisymmetric regimes.
+1D, 2D (plane strain), 3D, and axisymmetric regimes.
 
 .. figure:: images/cylindrical_shell/stress_comparison.png
    :width: 75%
@@ -761,11 +760,13 @@ form, with :math:`b` the interface radius, :math:`c` the clad outer radius):
 
 The analytical formula and the simulation are matched in **regime**: the pellet
 top is left axially free, so the bulk stress state is plane stress -- confirmed
-in the output (:math:`\sigma_{zz}\approx 3\%` of the in-plane stress) -- exactly
-the condition under which the formula above is derived. With this consistency,
-the Z3ST penalty pressure reproduces the analytical line to a **mean error of
-3.5 %** over the contact range, the small residual being the finite penalty
-stiffness (and a slight departure from ideal plane stress near the clamped end).
+in the output (:math:`\sigma_{zz}` below :math:`10^{-5}` of the in-plane stress)
+-- exactly the condition under which the formula above is derived. With this
+consistency, the Z3ST penalty pressure reproduces the analytical line to within
+**1.0 %** at worst and **0.5 %** on average over the closed-gap steps, measured
+against the peak contact pressure of 75 MPa; the residual is the finite penalty
+stiffness. The deviation is normalised by that characteristic pressure rather
+than by the local analytical value, which vanishes at contact onset.
 The contact pressure is therefore a verified quantity, not merely a qualitatively
 reasonable one. The ``non-regression.py`` of that case regenerates the comparison
 plot and prints the error metric.

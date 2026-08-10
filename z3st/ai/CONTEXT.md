@@ -43,7 +43,7 @@ The code is a single installable package `z3st/` exposed as a CLI (`python -m z3
 
 ```
 z3st/
-├── LICENSE                           Apache 2.0
+├── LICENSE.txt                       Apache 2.0
 ├── README.md
 ├── CITATION.cff
 ├── GIT-COMMANDS.md                   internal git cheat-sheet
@@ -780,7 +780,7 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Crystal plasticity                | experimental — via `custom` constitutive hook (`verification/plasticity/crystal_single_grain`) |
 | Gap conductance                   | ✓ Fixed or Gas (k_gas = f(T_gap), gap_size from facet centroids)    |
 | Cluster dynamics (1D)             | ✓ DG upwind + SIPG, mass-conservation renormalisation                |
-| Axisymmetric / 2D / 3D / plane-stress regimes | ✓ all consistent with the integration weight `w`      |
+| Axisymmetric / 1D / 2D / 3D regimes | ✓ all consistent with the integration weight `w`      |
 | Volumetric heating                | ✓ fissile (LHR/area), γ-heating (rect / cyl / sphere analytic decay), user `q'''` |
 | Burnup accumulation               | ✓ per-fissile-material `burnup` field via `update_state(dt)` (state bus)            |
 | Radial power shaping              | ✓ `radial_profile` form factor `f(r, bu)` (source bus); built-in rim-peaking        |

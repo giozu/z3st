@@ -97,8 +97,7 @@ expression — so it rides the **state bus**, exactly like burnup/creep. Default
    swelling laws). A fuel card opts in with
    `eigenstrain: materials.sciantix_swelling.gaseous_swelling`.
 
-No solver change was needed (the eigenstrain/state buses already existed). The
-field also has `snapshot()`/`restore()` for adaptive-timestep rollback, hooked into
+The field also has `snapshot()`/`restore()` for adaptive-timestep rollback, hooked into
 `spine.snapshot_state`/`restore_state`. Config:
 
 ```yaml
@@ -141,9 +140,8 @@ Binding written against SCIANTIX 2.2.1; array map verified against that source
 and **validated end to end**.
 
 Build the shared lib exactly as in §1 — same `-DCOUPLING_TU`, same persistent
-path. (Earlier revisions of this section showed the build without the macro and
-into `/tmp`; both were wrong. Without `-DCOUPLING_TU` the library still loads
-and still runs, so the mistake shows up only as wrong numbers.) Then validate
+path. Without `-DCOUPLING_TU` the library still loads and still runs, so the
+omission shows up only as wrong numbers. Then validate
 against SCIANTIX's own Baker regression gold:
 ```bash
 cd <sciantix>/regression/baker/test_Baker1977__1273K

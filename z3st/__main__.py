@@ -18,9 +18,8 @@ from mpi4py import MPI
 # The rank gate is unconditional; the markdown transform is disabled with
 # Z3ST_PLAIN_LOG=1 or when stdout is a terminal.
 def _install_stdout_filters():
-    # Every rank runs the same code, so an N-process run would repeat all ~260
-    # diagnostic prints N times. Exceptions go to stderr, which is untouched, and
-    # log.warning/error reach stdout from every rank (see utils/logger.py).
+    # Exceptions go to stderr, which is untouched, and log.warning/error reach
+    # stdout from every rank (see utils/logger.py).
     # The wrapper is installed unconditionally, on every rank, and decides per
     # write what to do. Two constraints on that:
     #  * rank symmetry. dolfinx's PETSc wrappers do collective work in __del__, so
@@ -84,8 +83,7 @@ def _install_stdout_filters():
         def write(self, s):
             if not s:
                 return 0
-            # Rank gate: ~260 diagnostic prints would otherwise repeat once per
-            # process. WARNING and ERROR lines pass from every rank.
+            # Rank gate. WARNING and ERROR lines pass from every rank.
             if not self._emit and not _WARN_OR_ERROR.search(s):
                 return len(s)
             if not self._markdown:
@@ -371,9 +369,8 @@ if __name__ == "__main__":
     output_format = output_cfg.get("format", "vtu").lower()
     output_filename = output_cfg.get("filename")  # None → writer picks per-format default
 
-    # Rank-0 only: a per-rank check-then-remove races in parallel (two ranks
-    # pass exists(), the slower remove raises FileNotFoundError). The later
-    # append is rank-0 only as well.
+    # Rank-0 only, check-then-remove races in parallel. The later append is
+    # rank-0 only as well.
     if MPI.COMM_WORLD.rank == 0 and os.path.exists('energies.txt'):
         os.remove('energies.txt')
 

@@ -24,6 +24,14 @@ import os
 import numpy as np
 from mpi4py import MPI
 
+from case_params import check_consistency
+
+# At import, i.e. before step 0. SystemExit is not an Exception, so __main__'s
+# loader does not downgrade it to a warning.
+if _problems := check_consistency():
+    raise SystemExit("[diagnostics] configuration is incoherent with Esposito "
+                     "eq. (21):\n  - " + "\n  - ".join(_problems))
+
 _CSV = os.path.join(os.path.dirname(__file__), "output", "history.csv")
 _HEADER = ("step,time_s,time_days,burnup_avg_MWdkgU,burnup_max_MWdkgU,"
            "gap_um,contact_pressure_MPa,T_max_K,T_min_K\n")

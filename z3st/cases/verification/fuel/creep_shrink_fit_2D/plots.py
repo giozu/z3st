@@ -37,7 +37,8 @@ HISTORY_CSV = os.path.join(OUT, "history.csv")
 # See case_params.py.
 from case_params import (
     R_GAS, R_PELLET, R_CLAD_I, R_CLAD_O, E_EL, NU, E_FUEL, NU_FUEL,
-    CREEP_A0, CREEP_N, CREEP_Q, elastic_factor, report,
+    CREEP_A0, CREEP_N, CREEP_Q, elastic_factor, hot_interference, report,
+    K_PEN,
 )
 
 
@@ -312,7 +313,7 @@ def load_history_interference():
     # The history is aligned against the XDMF step count below instead.
     return time_h, time_days, gap_um, interference_um, pressure
 
-def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
+def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T, k_pen=None):
     """
     Contact pressure Pk(t) of a shrink-fit joint under creep.
 
@@ -330,6 +331,10 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
         Young's modulus and Poisson's ratio of the hub.
     A, n : float
         Norton-law parameters (hub).
+    k_pen : float, optional
+        Penalty stiffness [Pa/m]. The penalty contact is a spring in series
+        with the joint, so f is replaced by 1/(1/f + 1/k_pen). Here the two are
+        within 3 % of each other.
 
     Returns
     -------
@@ -340,8 +345,7 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
     """
     t = np.asarray(t, dtype=float)
     Delta = np.asarray(Delta, dtype=float)
-    # Ensure Young moduli are in MPa for the formula (E may be defined in Pa)
-    E1 = float(E1) 
+    E1 = float(E1)
     E2 = float(E2) 
     Delta_arr = np.full_like(t, float(Delta[0]), dtype=float) if Delta.ndim == 0 else np.broadcast_to(Delta, t.shape).astype(float)
     Delta_safe = np.maximum(Delta_arr, 0)
@@ -349,6 +353,8 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T):
     # --- Step 1: elastic factor f (eq. 4-5) ---
     # Pk = Delta_u_el / [ b/E1*((a^2+b^2)/(b^2-a^2)+nu1) + b/E2*((c^2+b^2)/(c^2-b^2)-nu2) ]
     f = elastic_factor(a, b, c, E1, nu1, E2, nu2)  # [MPa/mm]
+    if k_pen is not None:
+        f = 1.0 / (1.0 / f + 1.0 / k_pen)
 
     # --- Step 2: k1, shaft creep contribution (eq. 16) ---
     # k1 = 0 for a solid shaft (a = 0): near-hydrostatic compression
@@ -414,8 +420,8 @@ def plot_contact_pressure_evolution():
     c = R_CLAD_O     # hub outer radius
 
     # --- Elastic properties ---
-    E1, nu1 = E_FUEL, NU_FUEL   # shaft  [MPa, -]
-    E2, nu2 = E_EL, NU   # hub  [MPa, -]
+    E1, nu1 = E_FUEL, NU_FUEL   # shaft  [Pa, -]
+    E2, nu2 = E_EL, NU   # hub  [Pa, -]
 
     # --- Creep properties (Norton law: eps_eq_dot = A * sigma_eq^n) ---
     # Hub properties (A2, n2). For a solid shaft (a = 0) k1 = 0 and the shaft
@@ -429,7 +435,12 @@ def plot_contact_pressure_evolution():
 
 
     t_array, time_days, gap_um, interference_um, pressure = load_history_interference()
-    Delta = np.maximum(interference_um * 1e-6, 0.0)  # [mm] : 1 µm = 1e-6 m
+
+    # Delta is the interference of the assembled joint, held fixed: eq. (21)
+    # relaxes it itself. Feeding the per-step -gap_um applies the relaxation
+    # twice. The assembly is cold but the joint runs hot, so the differential
+    # expansion belongs in Delta.
+    Delta = np.full_like(t_array, hot_interference(float(history()["T_max_K"][0])))
 
     t_array=t_array*3600
     # =====================================================================
@@ -450,12 +461,13 @@ def plot_contact_pressure_evolution():
     Temp = history()["T_max_K"]
 
     Pk, f, k1, k2, phi = contact_pressure(
-        t_array, Delta, a, b, c, E1, nu1, E2, nu2, A, n, Temp
+        t_array, Delta, a, b, c, E1, nu1, E2, nu2, A, n, Temp, k_pen=K_PEN
     )
 
 
 
-    print(f"Elastic factor f     = {f:.5f} MPa/m")
+    print(f"Joint + penalty f    = {f:.5e} Pa/m (joint and penalty in series)")
+    print(f"Interference Delta   = {Delta[0]*1e6:.4f} um (assembled, at temperature)")
     print(f"k1                   = {k1:.5e}")
     print(f"k2                   = {k2:.5e}")
     print()

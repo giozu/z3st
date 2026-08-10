@@ -329,7 +329,7 @@ class DamageModel:
         split_choice = self.dmg_cfg.get("split")
 
         if split_choice is None:
-            # Historical default: split inferred from damage type.
+            # Default: split inferred from damage type.
             damage_type = self.dmg_cfg["type"]
             if damage_type == "AT2":
                 return self.psi_miehe_spectral(u, material, T=T)
@@ -588,18 +588,13 @@ class DamageModel:
                 # i.e. sigma > sigma_c.
                 #
                 # Irreversibility (D_n+1 >= D_n) is enforced after the
-                # linear solve via np.maximum(D_new, D_old).
-                # A symmetric
-                # (D - D_old)^2 penalty in the weak form would freeze
-                # D ~= D_old whenever the penalty coefficient dominates the
-                # driving force 2H, which is the typical regime in
-                # thermal-shock cases where 2H is small. The post-solve
-                # max-projection is the correct one-sided enforcement.
+                # linear solve via np.maximum(D_new, D_old), a one-sided
+                # max-projection rather than a symmetric penalty term.
                 #
                 # A small Tikhonov shift (diag_shift) stabilises the linear
-                # system in cells where H = 0 (otherwise the LHS bilinear
-                # form would be just the Laplacian, which is positive
-                # semi-definite with a constant nullspace under natural BCs).
+                # system in cells where H = 0, where the LHS bilinear form
+                # reduces to the Laplacian: positive semi-definite with a
+                # constant nullspace under natural BCs.
                 cw = 8.0 / 3.0
                 pref = Gc / cw                       # = 3*Gc/8  (surface density coeff)
                 grad_coeff = 2.0 * pref * lc         # = 3*Gc*lc/4 (bilinear form coeff)
@@ -607,9 +602,8 @@ class DamageModel:
 
                 # Gc and sigma_c may be UFL expressions (when the material's
                 # Gc comes from a Python callable on the mesh, e.g.
-                # materials/oxide.py::Gc). The {:.2e} format then raises
-                # TypeError. Format scalars normally; show a type tag for
-                # non-scalars.
+                # materials/oxide.py::Gc), which {:.2e} cannot format. Scalars
+                # printed normally, non-scalars as a type tag.
                 Gc_str = f"{Gc:.2e}" if isinstance(Gc, (int, float, np.floating, np.integer)) else f"<{type(Gc).__name__}>"
                 sc_str = f"{sigma_c:.2e}" if isinstance(sigma_c, (int, float, np.floating, np.integer)) else f"<{type(sigma_c).__name__}>"
                 print(f"  - Material '{label}': AT1 solve. Gc={Gc_str}, sigma_c={sc_str}")
@@ -640,10 +634,9 @@ class DamageModel:
             D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
-        # Irreversibility against the last CONVERGED step (anchor captured in
-        # solve_staggered), not the previous staggered iterate: an overshooting
-        # early iterate must remain retractable within the step, while D can
-        # never drop below its converged history.
+        # Irreversibility against the last converged step (anchor captured in
+        # solve_staggered), not the previous staggered iterate: D stays
+        # retractable within the step, never below its converged history.
         D_floor = getattr(self, "_D_step_start", None)
         D_new.x.array[:] = np.maximum(
             D_new.x.array, D_floor if D_floor is not None else D_old.x.array

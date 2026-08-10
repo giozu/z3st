@@ -36,8 +36,6 @@ The checks
 Where a check is a heuristic that might misfire, it says so in its own output.
 
 Not covered here, because it needs to run something: an `mpirun -n 2` smoke test.
-Rank-asymmetric Python state deadlocks at exit — dolfinx's PETSc wrappers do
-collective work in __del__ — and only an actual parallel run finds it.
 """
 
 import argparse
@@ -52,19 +50,18 @@ import sys
 
 import yaml
 
+from z3st.core.config import MODEL_NAMES
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 CASES = ROOT / "z3st" / "cases"
 
-# Physics switches as Config reads them (core/config.py::Config.on)
-MODEL_SWITCHES = [
-    ("thermal", "models/thermal_model.py"),
-    ("mechanical", "models/mechanical_model.py"),
-    ("damage", "models/damage_model.py"),
-    ("cluster", "models/cluster_dynamic_model.py"),
-    ("plasticity", "models/plasticity_model.py"),
-    ("contact", "models/contact_model.py"),
-    ("porosity", "models/porosity_migration_model.py"),
-]
+# Physics switches, taken from Config itself so that a model added there cannot
+# go unaudited here. Only the two module names that do not follow <name>_model.py
+# are spelled out.
+_MODEL_MODULES = {"cluster": "cluster_dynamic_model.py",
+                  "porosity": "porosity_migration_model.py"}
+MODEL_SWITCHES = [(name, "models/" + _MODEL_MODULES.get(name, name + "_model.py"))
+                  for name in MODEL_NAMES]
 
 
 def _yaml(path):
@@ -92,8 +89,7 @@ def check_models():
     """Which cases reach each physics model, using bool() on the switch.
 
     A model switch may be a boolean *or* a configuration block: Config stores
-    ``bool(models.get(name, False))``, and a non-empty dict is True. Grepping for
-    ``name: true`` therefore finds none of the block-configured cases.
+    ``bool(models.get(name, False))``, and a non-empty dict is True.
     """
     findings = []
     reached = {name: [] for name, _ in MODEL_SWITCHES}
@@ -148,9 +144,6 @@ def check_assertions():
             try:
                 num, ref, rel = float(num), float(ref), float(rel)
             except (TypeError, ValueError):
-                # Reported, not skipped: an entry this check cannot read is one it
-                # cannot vouch for, and a silent continue makes that look identical
-                # to a clean one.
                 findings.append(
                     f"{g.parent.parent.relative_to(CASES)} :: {key}: metric fields are "
                     f"not numeric (numerical={num!r}, reference={ref!r}, rel_error={rel!r}) "
@@ -171,8 +164,7 @@ def check_schema():
     """Verdict files the suite drivers can actually read.
 
     Both drivers grep ``output/non-regression.json`` for a top-level ``"summary"``
-    and ``"regression"``. A bare ``json.dump(errors)`` produces a file that parses
-    fine and yields no verdict.
+    and ``"regression"``.
 
     The *gold* is deliberately not checked for a wrapper: regression_check reads it
     as ``gold_data.get("results", gold_data)``, so a bare metric dict is valid there.
@@ -196,11 +188,7 @@ def check_schema():
 
 # --.. ..- .-.. .-.. --- 4. metrics that are not finite --.. ..- .-.. .-.. ---
 def check_finite():
-    """NaN or inf anywhere in a blessed gold.
-
-    A guard like ``if field_name in mesh.point_data:`` that never matches leaves the
-    quantity as NaN and the script still saves its figure. Nothing raises.
-    """
+    """NaN or inf anywhere in a blessed gold."""
     findings = []
     for g in _golds():
         try:
@@ -223,8 +211,7 @@ def check_finite():
 def check_names():
     """Syntax errors and undefined names across the package and the cases.
 
-    ``py_compile`` catches only the first of those two. Unused imports are not
-    reported: they are noise here, and several predate this check.
+    Unused imports are not reported.
     """
     try:
         from pyflakes.api import check as pyflakes_check
@@ -247,9 +234,8 @@ def check_names():
         for line in (out.getvalue() + err.getvalue()).splitlines():
             # A star import switches pyflakes' undefined-name analysis off for the
             # whole file, so the loop below can only report "no findings" there.
-            # Reported, not skipped: an unchecked file that reads as a checked one
-            # is the failure this suite exists to prevent. Opt out on the import
-            # line with `# noqa: F403` when the namespace is genuinely external.
+            # Opt out on the import line with a "noqa: F403" directive when the
+            # namespace is external.
             if "unable to detect" in line:
                 star = next((l for l in src.splitlines()
                              if re.match(r"\s*from\s+\S+\s+import\s+\*", l)), "")
@@ -269,9 +255,7 @@ def check_names():
 def check_coverage():
     """Cases the driver cannot protect, and exclusions with no recorded reason.
 
-    A case is discovered only with both an Allrun and a gold. Anything else runs
-    without a net, and an exclusion whose reason was never written down is a
-    decision nobody can revisit.
+    A case is discovered only with both an Allrun and a gold.
     """
     findings = []
     verdict_call = re.compile(r"(^|[^_a-zA-Z])(pass_fail_check|finish)\s*\(", re.M)
@@ -298,9 +282,8 @@ def check_coverage():
         elif not gold.exists():
             findings.append(f"{rel}: writes a verdict but has no gold — not discovered")
 
-    # regression_check reads output/non-regression_gold.json and nothing else, so a
-    # gold anywhere else is read by no one: re-blessing the real one leaves the stray
-    # copy behind as a second, silently wrong reference.
+    # regression_check reads output/non-regression_gold.json and nothing else,
+    # so a gold anywhere else is read by no one.
     for stray in sorted(CASES.rglob("*gold*.json")):
         if stray.parent.name != "output":
             findings.append(
@@ -326,8 +309,7 @@ def check_docs():
 
     Deliberately narrow: case paths that no longer exist, dependencies the docs tell
     users to install that the package does not declare, and regime values outside
-    Config's whitelist. Broader keyword sweeps produce false positives on prose and
-    on dated changelog entries.
+    Config's whitelist.
     """
     findings = []
     docs = [p for p in list(ROOT.glob("*.md")) + list(ROOT.glob("docs/**/*.rst"))
@@ -347,8 +329,7 @@ def check_docs():
                 continue
             findings.append(f"{p.relative_to(ROOT)}: cites a case that does not exist: {match}")
 
-    # b) no dependency cross-check: auditing what the docs tell users to install
-    # needs a curated list of removed names, not a regex over "pip install" tokens.
+    # b) no dependency cross-check
 
     # c) regime values
     config = (ROOT / "z3st" / "core" / "config.py").read_text()
@@ -378,10 +359,9 @@ def check_mro():
 
     ``Spine`` multiply-inherits 13 classes into one flat namespace, so two mixins
     defining the same method name do not conflict -- the MRO silently picks one and
-    the other is never called. Nothing raises, nothing warns, and the case still
-    passes if the surviving implementation happens to be close enough.
+    the other is never called.
 
-    Parsed with ast rather than by importing Spine, which pulls in dolfinx and PETSc.
+    Parsed with ast, not by importing Spine.
     """
     spine = ROOT / "z3st" / "core" / "spine.py"
     tree = ast.parse(spine.read_text())
@@ -442,16 +422,14 @@ _DIST_ALIASES = {"yaml": "pyyaml", "PIL": "pillow", "sklearn": "scikit-learn"}
 def check_deps():
     """Third-party modules imported by library code must be declared somewhere.
 
-    The rule follows *when* the import runs, which is what decides the blast radius:
+    The rule follows *when* the import runs:
 
-      * **module level, unguarded** -> must be in ``[project] dependencies``. It runs on
-        import, so a missing one breaks every user of the module.
+      * **module level, unguarded** -> must be in ``[project] dependencies``.
       * **inside a function, or guarded by try/except ImportError** -> any group will do
-        (an extra is the right home). Only the feature breaks, and the code that wrote
-        the guard clearly meant it to be optional.
+        (an extra is the right home).
 
     A local run cannot reveal an undeclared dependency: the conda dolfinx stack pulls
-    several in transitively. Only a fresh environment can, or this check.
+    several in transitively.
 
     Scope is library code: z3st/ minus cases/ and conference/, which are leaf scripts.
     """
@@ -466,9 +444,9 @@ def check_deps():
         return name.lower().replace("_", "-")
 
     hard = {_norm(m.group(1)) for m in re.finditer(r'"([A-Za-z0-9_.-]+)', block.group(1))}
-    # Any name quoted anywhere in pyproject counts as "declared somewhere": that covers
-    # every current and future extra without hard-coding their names.
-    # Leading name only: a version spec ("numpy>=2") must still match the module name.
+    # Any name quoted anywhere in pyproject counts as "declared somewhere",
+    # extras included. Leading name only: a version spec ("numpy>=2") must
+    # still match the module name.
     anywhere = {_norm(m.group(1)) for m in re.finditer(r'"([A-Za-z0-9_.-]+)', pyproject)}
 
     findings = []
@@ -535,9 +513,6 @@ def check_deps():
 def check_scripts():
     """Literal paths in the shell drivers must resolve.
 
-    A path built on ROOT_DIR that names no existing file makes the driver report FAIL,
-    which is indistinguishable from a check that ran and failed.
-
     Only paths whose remainder is a literal are checked; anything with a second variable
     in it (``"$ROOT_DIR/cases/$case_name"``) is built at run time and skipped.
     """
@@ -547,13 +522,11 @@ def check_scripts():
         text = sh.read_text()
         # ROOT_DIR does not mean the same directory in every script: the local driver
         # sets it to its own directory (cases/), the CI driver to the parent (the
-        # package). Resolve each script's declaration rather than assuming one.
+        # package).
         uses = re.findall(r'"\$\{?ROOT_DIR\}?/([^"$]+)"', text)
         decl = re.search(r'ROOT_DIR="\$\(\s*cd\s+"\$\(\s*dirname\s+"\$\{BASH_SOURCE\[0\]\}"'
                          r'\s*\)((?:/\.\.)*)"\s*&&', text)
         if not decl:
-            # Never skip silently: an unparsed declaration means the paths below went
-            # unchecked, which looks exactly like paths that are all fine.
             if uses:
                 findings.append(
                     f"{sh.relative_to(ROOT)}: uses $ROOT_DIR but its declaration could "
@@ -576,9 +549,8 @@ def check_scripts():
 def check_shell():
     """Every shell script parses, and every stub finds the shared runner.
 
-    Most shell in this repo is per-case Allrun/Allclean stubs. A syntax error in one
-    is invisible until that case runs, and a stub whose sourced path is wrong fails
-    at the same moment. Both are checked with ``bash -n``.
+    Most shell in this repo is per-case Allrun/Allclean stubs. Syntax is checked
+    with ``bash -n``.
     """
     findings = []
     targets = [f for f in ROOT.rglob("*")
@@ -630,9 +602,7 @@ def check_ci():
     """The hand-written CI case list against the tree it names.
 
     non-regression_local.sh discovers its cases (Allrun + gold, sandbox pruned);
-    non-regression_github.sh instead reads cases_ci.txt, maintained by hand. Renaming
-    or dropping a case therefore keeps the local suite correct and leaves the CI list
-    pointing at nothing.
+    non-regression_github.sh instead reads cases_ci.txt, maintained by hand.
 
     Not flagged: cases absent from cases_ci.txt. The short list is a documented
     choice (a per-commit gate under a measured time budget), so 'missing from CI' is
@@ -674,11 +644,7 @@ def check_env():
 
     `pip install -e .` resolves `[project] dependencies`, but the documented way to
     build a working environment is `conda env create -f z3st_env.yml`, which reads
-    only its own lists. A package present in one and absent from the other installs
-    for whoever runs pip and is missing for whoever follows the README.
-
-    A locally-complete env hides this: the dolfinx conda stack pulls several of these
-    in transitively, so an import succeeds whether or not the file declares it.
+    only its own lists.
 
     Only the runtime set is compared. Extras are installed by name
     (`pip install -e '.[dev]'`), so their absence from the env file is correct.

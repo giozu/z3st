@@ -116,7 +116,7 @@ These cases serve both as:
 
 ```bash
 z3st/                                # repository root
-├── LICENSE                          # Apache 2.0
+├── LICENSE.txt                      # Apache 2.0
 ├── README.md
 ├── CITATION.cff
 ├── pyproject.toml                   # installable package (PEP 621)

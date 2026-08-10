@@ -176,8 +176,7 @@ class CreepModel:
         started numpy Newton per cell. Called before every mechanical solve;
         the staggered loop drives (u, Δγ₀) to joint consistency, and the
         returned max relative predictor change feeds the staggered convergence
-        test (``|Δu|`` alone can pass spuriously when a stale predictor zeroes the
-        increment through the base ≥ 0 clamp)."""
+        test, which ``|Δu|`` alone does not cover."""
         dt = getattr(self, "dt", 0.0)
         max_change = 0.0
         for name, material in self.materials.items():
@@ -227,10 +226,9 @@ class CreepModel:
                 g = x - Adt * base**n - Cdt * base
                 gp = 1.0 + 3.0 * G * (n * Adt * np.maximum(base, 1.0) ** (n - 1.0) + Cdt)
                 x = np.clip(x - g / gp, 0.0, sig / (3.0 * G) * (1 - 1e-12))
-            # Loud check that the fixed-iteration Newton actually converged: a
-            # high Norton exponent with Δt·A·σⁿ ≫ σ/3G can need more than
-            # _PRED_NEWTON_ITS contractions, and a silently unconverged root
-            # would be treated as exact by the symbolic Newton step.
+            # Convergence check on the fixed-iteration Newton: a high Norton
+            # exponent with Δt·A·σⁿ ≫ σ/3G needs more than _PRED_NEWTON_ITS
+            # contractions.
             base = np.maximum(sig - 3.0 * G * x, 0.0)
             g_res = x - Adt * base**n - Cdt * base
             res_scale = np.maximum(np.abs(x), 1e-30)

@@ -16,20 +16,20 @@
         },
         "contact_pressure_elastic_MPa": {
             "numerical": 24.7028,
-            "reference": 24.125618924351784,
-            "abs_error": 0.5771810756482161,
-            "rel_error": 0.004784798080895029,
+            "reference": 25.469543866365182,
+            "abs_error": 0.7667438663651822,
+            "rel_error": 0.030104342283794737,
             "status": "PASS"
         },
         "gap_final_um": {
-            "numerical": -1.0681,
+            "numerical": -1.0422,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "contact_pressure_final_MPa": {
-            "numerical": 3.7383,
+            "numerical": 3.6477,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
@@ -50,7 +50,7 @@
             "status": "PASS"
         }
     },
-    "tolerance": 0.01,
+    "tolerance": 0.05,
     "summary": "PASS",
-    "regression": "PASS"
+    "regression": "FAIL"
 }

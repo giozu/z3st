@@ -136,8 +136,7 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         try:
             num_now = errors[key]["numerical"]
         except (KeyError, TypeError):
-            # A malformed entry must count as a regression, not raise after the
-            # summary was already written (which would leave no verdict at all).
+            # A malformed entry counts as a regression, and does not raise.
             print(f"  {key:18s} → malformed entry (no 'numerical') → REGRESSION")
             reg_pass = False
             continue
@@ -169,17 +168,16 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         # Fields whose analytical reference is exactly zero are 'should-be-zero'
         # residuals: their numerical value is floating-point noise that varies
         # between build/BLAS environments (e.g. the conda env vs the CI docker
-        # image), so any value-vs-gold comparison (relative or absolute) is
-        # ill-defined. It is a regression only if the residual is no longer
-        # acceptably small, i.e. its analytical status is not PASS.
+        # image), and no value-vs-gold comparison applies. It is a regression
+        # only if the analytical status is not PASS.
         ref_val = gold_results.get(key, {}).get("reference", errors[key].get("reference"))
         near_zero_ref = ref_val is not None and np.all(
             np.abs(np.atleast_1d(np.asarray(ref_val, dtype=float))) <= 0.0
         )
         if near_zero_ref:
-            # Conservative default: an entry with no analytical status must not
-            # pass unconditionally (pass_fail_check always sets one; a missing
-            # status means this was called on raw data).
+            # Default FAIL for an entry with no analytical status
+            # (pass_fail_check always sets one; a missing status means this was
+            # called on raw data).
             passed = str(errors[key].get("status", "FAIL")).upper() == "PASS"
         else:
             passed = bool(np.all(rel_diff_arr < regression_tol))
