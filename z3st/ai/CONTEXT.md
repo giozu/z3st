@@ -1,6 +1,6 @@
 # Z3ST — Repository Context
 
-**Z3ST** is an open-source **FEniCSx-based finite-element framework** for coupled thermo-mechanical material analysis, written in Python. It is developed by **Giovanni Zullo** (Politecnico di Milano), licensed under **Apache 2.0**, version **0.3.0 (2026)**.
+**Z3ST** is an open-source **FEniCSx-based finite-element framework** for coupled thermo-mechanical material analysis, written in Python. It is developed by **Giovanni Zullo** (Politecnico di Milano), licensed under **Apache 2.0**, version **0.3.1 (2026)**.
 
 - **Repository:** https://github.com/giozu/z3st
 - **DOI:** 10.5281/zenodo.17748028
@@ -956,7 +956,7 @@ garbage residuals against the seven-order-of-magnitude heterogeneous SPD that AT
 
 ---
 
-*Z3ST v0.3.0 — repository context.*
+*Z3ST v0.3.1 — repository context.*
 
 *This file describes the code as it stands, not how it got there. Keep it in step
 in the same commit as the change, and keep it that way by **replacing and

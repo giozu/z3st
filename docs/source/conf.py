@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.0 (2026)
+# Version: 0.3.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 # ============================================================================
@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.abspath("../../utils"))
 project = "Z3ST"
 copyright = "2025, Giovanni Zullo"
 author = "Giovanni Zullo"
-release = "0.3.0"
+release = "0.3.1"
 
 # ============================================================================
 # GENERAL CONFIGURATION

@@ -363,6 +363,13 @@ See main Z3ST repository for license information.
 
 ---
 
-**Last Updated:** June 2026
-**Z3ST Version:** 0.3.0
-**FEniCSx Version:** 0.10.0
+**Last verified:** August 2026, by re-running the case against its blessed gold
+**Z3ST Version:** 0.3.1
+**FEniCSx Version:** 0.11.0
+
+This directory duplicates
+[`z3st/cases/verification/plasticity/crystal_single_grain`](../../../../z3st/cases/verification/plasticity/crystal_single_grain)
+so that the documentation build has the figure locally. It carries no `Allrun`;
+build the mesh with `gmsh -3 mesh.geo -format msh2`, then `python3 -m z3st`,
+then `python3 non-regression.py`. Being a copy, it drifts: prefer the case
+above, which the suite exercises.

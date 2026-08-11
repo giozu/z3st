@@ -34,6 +34,9 @@ conductivity_impact.json
 comparison_summary.json
 fit_metrics.json
 z3st/cases/**/log_*.md
+# The docs carry a copy of one case for its figure; its run logs are just
+# as transient as a case's, but the rule above is scoped to z3st/cases.
+docs/source/images/**/log_*.md
 !z3st/cases/verification/mechanics/uniaxial_tension/log_*.md
 input_check.txt
 

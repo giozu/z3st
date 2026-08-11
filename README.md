@@ -490,5 +490,5 @@ name it once it is published.
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
-* **Version:** 0.3.0 (2026)
+* **Version:** 0.3.1 (2026)
 * **License:** Apache 2.0

@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.0 (2026)
+# Version: 0.3.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import dolfinx
@@ -159,6 +159,11 @@ class MeshManager:
         log.info(f"  Topology dim: {self.tdim}")
         log.info(f"  Facet dim: {self.fdim}")
         log.info(f"  Num cells: {self.mesh.topology.index_map(self.tdim).size_global}")
-        log.info(f"  Cell tags: {set(self.cell_tags.values)}")
-        log.info(f"  Facet tags: {set(self.facet_tags.values)}")
+        # A mesh may legitimately carry no tags of one kind: a .geo that declares
+        # Physical Surfaces but no Physical Curves loads fine and runs fine, and
+        # only the summary touched them unguarded, so the run died at startup on
+        # an AttributeError instead of reporting what it had.
+        for name, tags in (("Cell", self.cell_tags), ("Facet", self.facet_tags)):
+            log.info(f"  {name} tags: "
+                     f"{set(tags.values) if tags is not None else 'none'}")
         log.info(f"  Geometry type: {self.geometry.get('geometry_type', 'Not specified')}")
