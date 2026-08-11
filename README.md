@@ -334,23 +334,18 @@ These extensions aim to connect Z3ST to multi-scale modelling pipelines involvin
 * Advanced cluster dynamics (1D, nucleation)
 * Coupling with rate-theory codes
 
-## Reproducing the figures in the Z3ST paper
+## Reproducing the results
 
-Each figure in the SoftwareX article is produced by a case directory in this repository.
+THe main results comes from a case that ships here.
 Run `./Allrun` in the directory, then `python3 non-regression.py`.
 
-| Figure | Content | Case directory |
-|---|---|---|
-| 2 | MPI timings | `z3st/cases/benchmarks/damage/pellet_quench_2D_xy` |
-| 3 | Integral fuel rod, gap closure and contact pressure | `z3st/cases/regression/pwr_rod_2D` |
-| 3 | Same rod with the SCIANTIX coupling active | `z3st/cases/regression/fg_test_2D` |
-| 4 | Phase-field damage after a cold-bath quench | `z3st/cases/benchmarks/damage/pellet_quench_2D_xy` |
-| 5 | Radial porosity profile after restructuring | `z3st/cases/verification/fuel/porosity_migration` |
-| 6 | Penalty contact vs. the analytical Lame interference fit | `z3st/cases/verification/fuel/shrink_fit` |
-
-Figure 1 is a schematic and has no case.
-The machine-learned conductivity checks of Section 2.3 are run by
-`z3st/cases/studies/magni_gpr_conductivity/verify_machinery.py`.
+| Result | Case directory |
+|---|---|
+| Integral fuel rod: gap closure, PCMI, temperature | `z3st/cases/regression/pwr_rod_2D` |
+| The same rod with the SCIANTIX coupling active | `z3st/cases/regression/fg_test_2D` |
+| Phase-field damage after a cold-bath quench | `z3st/cases/benchmarks/damage/pellet_quench_2D_xy` |
+| Radial porosity profile, CG and DG discretisations | `z3st/cases/verification/fuel/porosity_migration_dg` |
+| Penalty contact vs. the analytical Lame interference fit | `z3st/cases/verification/fuel/shrink_fit` |
 
 ---
 
