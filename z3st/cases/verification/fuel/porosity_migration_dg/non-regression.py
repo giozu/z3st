@@ -167,6 +167,7 @@ try:
     plt.grid(True, ls=":", alpha=0.6)
     plt.legend()
     plt.tight_layout()
+    np.savez(os.path.join(OUT, "porosity_radial_profile.npz"), r=r_bin, p=p_bin)
     plt.savefig(os.path.join(OUT, "porosity_radial_profile.png"), dpi=150)
     print("[INFO] porosity_radial_profile.png saved")
 except Exception as e:
@@ -204,16 +205,16 @@ try:
             "rim_fabricated_porosity", "center_temperature"]
 
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.plot(r_bin, p_bin, "r-", lw=2.5, label="DG-1 upwind + SIPG (this case)")
+    ax.plot(r_bin, p_bin, "r-", lw=2.5, label="DG-1 upwind + SIPG")
     cg_prof = os.path.join(CASE_DIR, "..", "porosity_migration",
                            "output", "porosity_radial_profile.npz")
     if os.path.exists(cg_prof):
         d = np.load(cg_prof)
-        ax.plot(d["r"], d["p"], "b--", lw=2.0, label="CG + SU/SUPG (sibling case)")
+        ax.plot(d["r"], d["p"], "b--", lw=2.0, label="CG + SU/SUPG (agent-contributed model)")
     ax.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="void radius 0.2")
     ax.set_xlabel("Relative radius r / Ro (-)")
     ax.set_ylabel("Porosity (-)")
-    ax.set_title("Discretisation independence: CG/SUPG vs DG upwind")
+    ax.set_title("Same transport equation, two discretisations")
     ax.grid(True, ls=":", alpha=0.6)
     ax.legend()
     fig.tight_layout()
