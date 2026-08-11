@@ -222,9 +222,10 @@ try:
     print("[INFO] porosity_cg_vs_dg.png saved")
 
     print("\n[INFO] CG vs DG on the gold-tracked quantities:")
+    dg_all = {**errors, **temperature_info}
     for k in keys:
-        if k in errors and k in cg:
-            dg_v, cg_v = errors[k]["numerical"], cg[k]["numerical"]
+        if k in dg_all and k in cg:
+            dg_v, cg_v = dg_all[k]["numerical"], cg[k]["numerical"]
             rel = abs(dg_v - cg_v) / abs(cg_v) if cg_v else float("nan")
             print(f"  {k:26s} DG={dg_v:<12.6g} CG={cg_v:<12.6g} rel diff={rel:.2e}")
 except FileNotFoundError:
