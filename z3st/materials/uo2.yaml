@@ -1,7 +1,7 @@
 name: UO2
 
-E: 358.0e9          # (Pa) - Young's modulus
-nu: 0.23            # (-)  - Poisson's ratio
+E: 205.0e9          # (Pa) - Young's modulus
+nu: 0.32            # (-)  - Poisson's ratio
 
 k: 5.0              # (W/(m·K)) - Thermal conductivity
 cp: 280.0           # (J/(kg·K)) - Specific heat capacity

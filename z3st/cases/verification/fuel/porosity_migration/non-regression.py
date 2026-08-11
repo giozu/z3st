@@ -13,8 +13,9 @@ forming a central void surrounded by a restructured (columnar) low-porosity zone
 The absolute checks are anchored to quantities the paper actually reports, not to
 values produced by this run:
   1. A central void forms: p(r=0) ~ 1.0.
-  2. The central void extends to ~0.2 of the relative radius (Barani Fig. 4: the
-     thermal gradient and pore velocity vanish inside ~0.2 r/Ro because p = 1).
+  2. The central void extends to 0.2 of the relative radius. Barani et al. state
+     this in the text of section 4.4, describing their Fig. 4: the thermal gradient
+     and pore velocity vanish inside 0.2 r/Ro because p = 1.
   3. The outer rim keeps its fabrication porosity p ~ 0.15 (no Dirichlet inflow
      is imposed; the rim stays at 0.15 because the pore velocity there is
      negligible).
@@ -132,12 +133,12 @@ print(f"[INFO] Centre temperature   : {T_center:.2f} K")
 print(f"[INFO] Outer rim temperature: {T_rim:.2f} K")
 print(f"[INFO] Centre porosity      : {p_center:.4f} (expected ~ 1.0)")
 print(f"[INFO] Minimum porosity     : {p_min:.4f} (restructured zone)")
-print(f"[INFO] Central void radius  : {void_radius_rel:.4f} r/Ro (Barani ~ 0.20)")
+print(f"[INFO] Central void radius  : {void_radius_rel:.4f} r/Ro (Barani 0.20)")
 print(f"[INFO] Columnar zone edge   : {columnar_outer_rel:.4f} r/Ro")
 print(f"[INFO] Rim porosity         : {p_rim:.4f} (expected ~ 0.15)")
 
 # --. Paper-anchored absolute checks --..
-VOID_RADIUS_REF = 0.20  # Barani Fig. 4: gradient/velocity null inside ~0.2 r/Ro
+VOID_RADIUS_REF = 0.20  # Barani sec. 4.4 (text): gradient/velocity null inside 0.2 r/Ro
 errors = {
     "center_void_porosity": metric(p_center, 1.0),
     "void_radius_relative": metric(void_radius_rel, VOID_RADIUS_REF),
@@ -160,13 +161,14 @@ try:
     plt.scatter(r_rel, p_sorted, s=6, color="r", alpha=0.18, label="nodes (all angles)")
     plt.plot(r_bin, p_bin, "r-", lw=2.5, label="Z3ST porosity (radial mean)")
     plt.axhline(0.15, color="gray", ls="--", label="initial porosity (0.15)")
-    plt.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="Barani void radius ~0.2")
+    plt.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="void radius 0.2")
     plt.xlabel("Relative radius r / Ro (-)")
     plt.ylabel("Porosity (-)")
     plt.title("Radial porosity profile at t = 10,000 s")
     plt.grid(True, ls=":", alpha=0.6)
     plt.legend()
     plt.tight_layout()
+    np.savez(os.path.join(OUT, "porosity_radial_profile.npz"), r=r_bin, p=p_bin)
     plt.savefig(os.path.join(OUT, "porosity_radial_profile.png"), dpi=150)
     print("[INFO] porosity_radial_profile.png saved")
 except Exception as e:

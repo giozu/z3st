@@ -71,8 +71,10 @@ class DamageModel:
           eth_zz = alpha*(T-T_ref) would create eps_el_zz = -alpha*(T-T_ref),
           whose deviatoric component injects a spurious psi_pos
           (= (2/3) * G * alpha^2 * dT^2) throughout the bulk -- about
-          5.6 MJ/m^3 for UO2 at dT = 760 K, right at the AT1 threshold for
-          sigma_c = 2 GPa. This is a 2D-approximation artifact (the
+          3.0 MJ/m^3 for UO2 at dT = 760 K, which sits above the AT1 threshold
+          psi_c = sigma_c^2/(2E) = 2.4 MJ/m^3 at sigma_c = 1 GPa and
+          E = 205 GPa, so the artifact alone would nucleate damage in the bulk.
+          This is a 2D-approximation artifact (the
           uniform sigma_zz from blocked z-thermal-expansion is a real
           stress in an infinite cylinder but cannot drive radial cracks).
           We therefore zero out the z-component of eth in plane strain.
