@@ -467,17 +467,26 @@ acknowledged:
 
 ## License & author
 
-If you use Z3ST in your research, please cite it.
+If you use Z3ST in your research, please cite the archived software:
 
 ```bibtex
-@misc{Z3ST2026,
-  author       = {Giovanni Zullo},
-  title        = {Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis},
-  year         = {2026},
-  howpublished = {\url{https://github.com/giozu/z3st}},
-  note         = {Version 0.3.0}
+@software{Z3ST,
+  author    = {Giovanni Zullo},
+  title     = {Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.17748028},
+  url       = {https://github.com/giozu/z3st}
 }
 ```
+
+That DOI is the concept DOI: it covers every release and always resolves to the
+most recent one, so it stays correct as the code moves. Cite it when you mean
+"Z3ST". If you need to pin the exact code behind a result, take the version DOI
+from the Zenodo page of the release you used instead, and give the version
+number with it.
+
+A software paper describing the framework is in preparation; this section will
+name it once it is published.
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
