@@ -370,6 +370,6 @@ See main Z3ST repository for license information.
 
 ---
 
-**Last Updated:** June 2026
-**Z3ST Version:** 0.3.0
-**FEniCSx Version:** 0.10.0
+**Last verified:** August 2026, by re-running `./Allrun` against the blessed gold
+**Z3ST Version:** 0.3.1
+**FEniCSx Version:** 0.11.0
