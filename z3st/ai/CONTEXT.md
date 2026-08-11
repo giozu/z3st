@@ -534,7 +534,7 @@ Materials are plain YAML cards. Common fields:
 |---------------------|------------|--------------------------------------------------------|
 | `name`              | —          | Human-readable name                                    |
 | `E`, `nu`           | Pa, —      | Young's modulus, Poisson's ratio                        |
-| `k`                 | W/(m·K) or `"mod.func"` | Thermal conductivity (scalar OR symbolic; `materials.fuel_thermal.k` = Fink 2000 UO2 k(T), 95 % TD) |
+| `k`                 | W/(m·K) or `"mod.func"` | Thermal conductivity (scalar OR symbolic; `materials.fuel_thermal.k` = modified-NFI UO2 k(T) as adopted by FRAPCON-3, 95 % TD, zero burnup) |
 | `cp`, `rho`         | J/(kg·K), kg/m³ | Specific heat, density                             |
 | `alpha`             | 1/K        | Thermal expansion coefficient                          |
 | `T_ref`             | K          | Stress-free / reference temperature                    |
@@ -567,7 +567,7 @@ The framework auto-fills `lmbda`, `G`, `bulk_modulus` from `(E, ν)` at material
 Available cards (non-exhaustive):
 
 - **Steels:** `steel.yaml`, `austenitic_steel.yaml`, `martensitic_steel.yaml`, `high_carbon_steel.yaml`, `T91.yaml`, `15_15Ti.yaml`, `vessel_steel.yaml`, `vessel_steel_0.yaml`
-- **Materials:** `uo2.yaml` (E = 358 GPa, k = 5 W/mK, α = 1e-5/K, Gc = 15 kJ/m², T_initial = 1023 K), `zircaloy.yaml` (Zircaloy-4)
+- **Materials:** `uo2.yaml` (E = 205 GPa, ν = 0.32, k = 5 W/mK, α = 1e-5/K, σ_c = 1 GPa, T_initial = 1023 K), `zircaloy.yaml` (Zircaloy-4)
 - **Ceramics / oxides:** `ceramic.yaml` (+ Python `ceramic.py::k(T)`), `oxide.yaml` (+ Python `oxide.py::k(T), Gc(mesh)` with grain-boundary heterogeneity via `tanh(|y|/half_width)`)
 - **Other:** `plastic.yaml`, `lead.yaml`, `h2o.yaml`
 - **Fuel-behaviour callables:** `fuel_profiles.py::rim_peaking` (radial power form factor `f(r, bu)` — source bus), `fuel_swelling.py::solid_swelling` (burnup-driven swelling eigenstrain — eigenstrain bus). These realise the *"fuel is a material"* design: state-dependent fuel physics (radial power, swelling; later densification, fuel-k(bu), creep) live in the material and travel with its region, rather than as global solver toggles.
@@ -657,7 +657,7 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-reg
 - `verification/fuel/shrink_fit` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit. The drive is a uniform Dirichlet ramp (300 → 1500 K, lhr = 0): a uniform pellet temperature expands stress-free, so the Lamé reference is exact rather than approximate. Siblings `shrink_fit_disk` (2D plane strain) and `shrink_fit_disk_3d`.
 
 **U_* — Extended / demo cases**
-- `regression/pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm cold gap, Zircaloy clad), the framework's integral fuel-performance case. Physics: Fink (2000) UO2 k(T) (`materials/fuel_thermal.py`), Robin coolant film (h = 3.5e4 W/(m²·K), T = 580 K), burnup + rim-peaking radial power, solid + gaseous swelling with early-life densification (`fuel_swelling.solid_gas_densification`), Barani isotropic-softening fuel cracking (§4.9: n ≈ 6.6 at power, E_iso/E ≈ 0.11), Zircaloy thermal Norton + irradiation creep (§4.6), gas gap conductance with contact coupling (+ relax 0.5 damping), penalty contact, 15.5 MPa coolant and 2 MPa He fill-gas pressures. History: ramp to 20 kW/m in 20 d, 1800 d hold; weighted time grid `n_steps: [8, 60, 40]` — fine through the gap-closure window at ~330 d, strided across the creep plateau. Solver: MUMPS both blocks, Aitken Δ² relaxation, mech stag_tol 5e-4. Gold state: T_max peaks at 1210.8 K at day 65, PCMI onset at day 315 / 9.95 MWd/kgU average burnup, the contact-conductance feedback cools the pellet to 1149.7 K (−61 K on closure), contact pressure plateaus at 22.35 MPa; end of life at 1800 d with 58.23 MWd/kgU average (139.1 peak rim) and gap −0.45 µm. Mean burnup matches the closed form to machine precision. Wall-clock ~105 min for 109 steps. Gold-protected (end-state PCMI scalars from `output/history.csv`, mean burnup against the closed form), excluded from the routine local suite via `cases/suite_exclude.txt`; not in CI.
+- `regression/pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm cold gap, Zircaloy clad), the framework's integral fuel-performance case. Physics: modified-NFI UO2 k(T), FRAPCON-3 form at zero burnup (`materials/fuel_thermal.py`), Robin coolant film (h = 3.5e4 W/(m²·K), T = 580 K), burnup + rim-peaking radial power, solid + gaseous swelling with early-life densification (`fuel_swelling.solid_gas_densification`), Barani isotropic-softening fuel cracking (§4.9: n ≈ 6.6 at power, E_iso/E ≈ 0.11), Zircaloy thermal Norton + irradiation creep (§4.6), gas gap conductance with contact coupling (+ relax 0.5 damping), penalty contact, 15.5 MPa coolant and 2 MPa He fill-gas pressures. History: ramp to 20 kW/m in 20 d, 1800 d hold; weighted time grid `n_steps: [10, 14, 14]`. Solver: MUMPS both blocks, Aitken Δ² relaxation, mech stag_tol 5e-4. Gold state: T_max peaks at 1126.22 K at day 68.6, PCMI onset at day 651 / 20.90 MWd/kgU average burnup, the contact-conductance feedback cools the pellet to 975.79 K by end of life, contact pressure reaches 24.63 MPa; end of life at 1800 d with 58.28 MWd/kgU average (139.25 peak rim) and gap −0.49 µm. Mean burnup matches the closed form to machine precision. Wall-clock 215 s for 39 steps. Gold-protected (end-state PCMI scalars from `output/history.csv`, mean burnup against the closed form), excluded from the routine local suite via `cases/suite_exclude.txt`; not in CI.
 - `verification/thermal/spherical_shell` — gold-protected (semi-analytic checks).
 - `U_pressure_vessel_2D` (`cases/sandbox/`): its `non-regression.py` only extracts CSV/plots (no asserts, never writes `non-regression.json`), and the `non-regression_gold.json` on disk is orphaned — it holds Lamé-style L2 errors the current script cannot produce (likely inherited from a deleted case).
 - `U_cluster_dynamics_test`, `U_quarter_block` — unvalidated sandboxes under `cases/sandbox/`.
@@ -892,8 +892,9 @@ case-14 chapter. Plane strain carries the 60 degree azimuthal contact wedge that
 axisymmetric idealisation cannot represent.
 
 **Calibration (`uo2.yaml`).** The card sets `sigma_c: 1.0e+9` Pa; `Gc` is derived
-in `spine.py` (AT1: `Gc = (8/3)*lc*sigma_c^2/E ~ 372 J/m2` at `lc = 5e-5 m`). The
-AT1 elastic threshold is `psi_c = sigma_c^2/(2E) = 3*Gc/(16*lc) ~ 1.4 MJ/m3`, below
+in `spine.py` (AT1: `Gc = (8/3)*lc*sigma_c^2/E ~ 650 J/m2` at `lc = 5e-5 m` and
+`E = 205 GPa`). The
+AT1 elastic threshold is `psi_c = sigma_c^2/(2E) = 3*Gc/(16*lc) ~ 2.4 MJ/m3`, below
 the cold-rim tensile-hoop driving energy (4-5 MJ/m3 at the peak rim hoop stress),
 so damage initiates and propagates along the contact arc.
 

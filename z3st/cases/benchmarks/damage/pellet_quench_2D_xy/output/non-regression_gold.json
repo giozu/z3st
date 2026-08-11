@@ -15,8 +15,8 @@
             "status": "PASS"
         },
         "crack_count_above_0p5": {
-            "numerical": 5.0,
-            "reference": 5.0,
+            "numerical": 4.0,
+            "reference": 4.0,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"

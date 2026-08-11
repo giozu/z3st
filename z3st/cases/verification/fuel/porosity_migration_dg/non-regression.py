@@ -137,7 +137,7 @@ print(f"[INFO] Columnar zone edge   : {columnar_outer_rel:.4f} r/Ro")
 print(f"[INFO] Rim porosity         : {p_rim:.4f} (expected ~ 0.15)")
 
 # --. Paper-anchored absolute checks --..
-VOID_RADIUS_REF = 0.20  # Barani Fig. 4: gradient/velocity null inside ~0.2 r/Ro
+VOID_RADIUS_REF = 0.20  # Barani sec. 4.4 (text): gradient/velocity null inside 0.2 r/Ro
 errors = {
     "center_void_porosity": metric(p_center, 1.0),
     "void_radius_relative": metric(void_radius_rel, VOID_RADIUS_REF),
@@ -160,7 +160,7 @@ try:
     plt.scatter(r_rel, p_sorted, s=6, color="r", alpha=0.18, label="nodes (all angles)")
     plt.plot(r_bin, p_bin, "r-", lw=2.5, label="Z3ST porosity (radial mean)")
     plt.axhline(0.15, color="gray", ls="--", label="initial porosity (0.15)")
-    plt.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="Barani void radius ~0.2")
+    plt.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="void radius 0.2")
     plt.xlabel("Relative radius r / Ro (-)")
     plt.ylabel("Porosity (-)")
     plt.title("Radial porosity profile at t = 10,000 s")
@@ -187,6 +187,50 @@ try:
     print("[INFO] temperature_radial_profile.png saved")
 except Exception as e:
     print(f"[WARNING] temperature plot skipped: {e}")
+
+# --. Plot 3: CG vs DG cross-check --..
+# The sibling case porosity_migration solves the SAME transport equation with a
+# continuous-Galerkin SU/SUPG discretisation. The two schemes share no numerics:
+# CG leans on artificial diffusion, DG on an upwind facet flux with a vertex
+# limiter. Landing on the same profile is therefore evidence of discretisation
+# independence, which neither gold can give on its own. This plot is diagnostic;
+# it does not vote on the verdict.
+try:
+    import json
+    cg_json = os.path.join(CASE_DIR, "..", "porosity_migration",
+                           "output", "non-regression.json")
+    cg = json.load(open(cg_json))["results"]
+    keys = ["center_void_porosity", "void_radius_relative",
+            "rim_fabricated_porosity", "center_temperature"]
+
+    fig, ax = plt.subplots(figsize=(7, 5))
+    ax.plot(r_bin, p_bin, "r-", lw=2.5, label="DG-1 upwind + SIPG (this case)")
+    cg_prof = os.path.join(CASE_DIR, "..", "porosity_migration",
+                           "output", "porosity_radial_profile.npz")
+    if os.path.exists(cg_prof):
+        d = np.load(cg_prof)
+        ax.plot(d["r"], d["p"], "b--", lw=2.0, label="CG + SU/SUPG (sibling case)")
+    ax.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="void radius 0.2")
+    ax.set_xlabel("Relative radius r / Ro (-)")
+    ax.set_ylabel("Porosity (-)")
+    ax.set_title("Discretisation independence: CG/SUPG vs DG upwind")
+    ax.grid(True, ls=":", alpha=0.6)
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "porosity_cg_vs_dg.png"), dpi=150)
+    plt.close(fig)
+    print("[INFO] porosity_cg_vs_dg.png saved")
+
+    print("\n[INFO] CG vs DG on the gold-tracked quantities:")
+    for k in keys:
+        if k in errors and k in cg:
+            dg_v, cg_v = errors[k]["numerical"], cg[k]["numerical"]
+            rel = abs(dg_v - cg_v) / abs(cg_v) if cg_v else float("nan")
+            print(f"  {k:26s} DG={dg_v:<12.6g} CG={cg_v:<12.6g} rel diff={rel:.2e}")
+except FileNotFoundError:
+    print("[INFO] CG sibling has not been run; skipping the CG/DG cross-check.")
+except Exception as e:
+    print(f"[WARNING] CG/DG cross-check skipped: {e}")
 
 # --. Verdicts --..
 # Tolerance is intentionally loose: the central-void radius depends on the pore

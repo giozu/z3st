@@ -1,8 +1,8 @@
 name: UO2_fuel
 fissile: true
 
-E: 358.0e9          # (Pa)
-nu: 0.23            # (-)
+E: 205.0e9          # (Pa)
+nu: 0.32            # (-)
 
 k: 5.0              # (W/(m·K))
 cp: 280.0           # (J/(kg·K))

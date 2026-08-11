@@ -52,7 +52,7 @@ y-translation and rotation around z). A small 50-um pin segment near
 |---|---|
 | Pellet radius `R` | 10 mm |
 | Domain | upper half-disc (y >= 0); contact arc 0 to +30 deg in the upper half (= 60 deg full) |
-| Material | UO2 from `materials/uo2.yaml`: E = 358 GPa, nu = 0.23, alpha = 1e-5 /K, sigma_c = 2 GPa |
+| Material | UO2 from `materials/uo2.yaml`: E = 205 GPa, nu = 0.32, alpha = 1e-5 /K, sigma_c = 1 GPa |
 | `T_initial` | 1023.15 K (= 750 deg C), uniform |
 | `T_quench` | 263.15 K (= -10 deg C), Dirichlet on the 60-deg contact arc |
 | Insulated rest of perimeter | natural Neumann (zero heat flux) |
@@ -61,12 +61,14 @@ y-translation and rotation around z). A small 50-um pin segment near
 | Damage | AT1, Ambati hybrid, Amor split, `lc = 50 um`, hybrid_constraint = true |
 | Time window | 0.0001 to 0.1 s, n_steps = 100, dt = 1 ms |
 
-`sigma_c = 2 GPa` is calibrated above the bulk-artifact threshold of
-plane strain (about 5.6 MJ/m^3 from the blocked z-thermal-expansion,
-suppressed by the regime-aware eigenstrain fix in `damage_model.py`)
-and below the peak surface tensile-strain energy at the rim, so that
-damage initiates only along the cold contact arc. The corresponding
-`Gc` is auto-derived in `spine.py` (Gc = (8/3) lc sigma_c^2 / E ~ 1490 J/m^2).
+`sigma_c = 1 GPa` (from `materials/uo2.yaml`) is calibrated above the
+bulk-artifact threshold of plane strain (about 3.0 MJ/m^3 from the blocked
+z-thermal-expansion, suppressed by the regime-aware eigenstrain fix in
+`damage_model.py`) and below
+the peak surface tensile-strain energy at the rim, so that damage initiates
+only along the cold contact arc. The corresponding `Gc` is auto-derived in
+`spine.py`: Gc = (8/3) lc sigma_c^2 / E = 650 J/m^2 at E = 205 GPa, as printed
+by the run log.
 
 ### Phase-field formulation
 

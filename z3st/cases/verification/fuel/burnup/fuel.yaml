@@ -10,8 +10,8 @@ radial_profile: materials.fuel_profiles.rim_peaking
 radial_peak_amplitude: 3.0      # A — rim peak height above the core (f(Ro)/f(0) = 1 + A)
 radial_peak_exponent: 8.0       # p — how tightly peaked at the rim
 
-E: 358.0e9                      # (Pa) (only the thermal-stress output field needs these;
-nu: 0.23                        # (-)  mechanical is off)
+E: 205.0e9                      # (Pa) (only the thermal-stress output field needs these;
+nu: 0.32                        # (-)  mechanical is off)
 
 k: 5.0                          # (W/(m·K)) thermal conductivity
 cp: 280.0                       # (J/(kg·K)) specific heat
