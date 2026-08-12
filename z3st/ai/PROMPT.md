@@ -1,7 +1,7 @@
 <!-- # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.1 (2026)
+# Version: 0.3.2 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- -->
 
 # Starting point for working on Z3ST with an agent
@@ -22,7 +22,7 @@ All paths in this file are relative to the repository root (this file lives in
 Z3ST is a FEniCSx (dolfinx) finite-element framework for coupled
 thermo-mechanical material analysis, written in Python. It couples heat
 conduction and elasticity in multi-material domains, with a focus on nuclear
-fuel mechanics. Apache 2.0, version 0.3.1.
+fuel mechanics. Apache 2.0, version 0.3.2.
 
 ## What NOT to do (read this before you touch anything)
 
