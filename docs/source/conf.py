@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.abspath("../../utils"))
 # ============================================================================
 
 project = "Z3ST"
-copyright = "2025, Giovanni Zullo"
+copyright = "2025-2026, Giovanni Zullo, Politecnico di Milano"
 author = "Giovanni Zullo"
 release = "0.3.1"
 
