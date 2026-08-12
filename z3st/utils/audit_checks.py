@@ -32,6 +32,7 @@ The checks
   docs          case paths, dependencies and regime values in the prose
   ci            cases_ci.txt against the tree it names
   env           pyproject runtime deps are installed by z3st_env.yml
+  version       every version declaration agrees with pyproject
 
 Where a check is a heuristic that might misfire, it says so in its own output.
 
@@ -686,6 +687,23 @@ def check_env():
     return findings
 
 
+def check_version():
+    """Every version declaration must name the version in pyproject.toml.
+
+    The repository repeats its version in ~130 files, so a release can be tagged
+    while the tree still names the previous one. Cited versions in prose are left
+    alone; only declarations are compared. `python -m z3st.utils.bump X.Y.Z` fixes it.
+    """
+    from z3st.utils.bump import current_version, disagreements
+
+    version = current_version()
+    return [
+        f"{path.relative_to(ROOT)}:{line} declares {found}, but pyproject.toml "
+        f"says {version} — run `python -m z3st.utils.bump {version}`"
+        for path, line, found in disagreements(version)
+    ]
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -701,6 +719,7 @@ CHECKS = {
     "workflow": check_workflow,
     "ci": check_ci,
     "env": check_env,
+    "version": check_version,
 }
 
 

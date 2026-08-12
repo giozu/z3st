@@ -188,6 +188,13 @@ git fetch -p
 # Delete all local branches that no longer exist on remote
 git fetch -p
 git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -D
+
+# Create a new release
+gh release create X.X.X --title "vX.X.X" --notes-file /path/to/file.md
+
+# Show the last 5 releases
+gh release list -L 5
+
 ```
 
 ---
