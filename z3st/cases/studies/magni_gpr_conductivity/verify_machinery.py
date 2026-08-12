@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: verify the GPR conductivity machinery against a known residual
 # Author: Giovanni Zullo
-# Version: 0.3.1 (2026)
+# Version: 0.3.2 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """Check that the GPR conductivity hook reproduces a residual it was fitted to.
 

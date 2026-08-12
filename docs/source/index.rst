@@ -61,7 +61,7 @@ If you use **Z3ST** in your research, please cite it as:
 
    Giovanni Zullo (2026).
    Z3ST: an open-source FEniCSx framework for thermo-mechanical analysis.
-   Version 0.3.1. https://doi.org/10.5281/zenodo.17748028
+   Version 0.3.2. https://doi.org/10.5281/zenodo.17748028
 
 Documentation Contents
 ----------------------

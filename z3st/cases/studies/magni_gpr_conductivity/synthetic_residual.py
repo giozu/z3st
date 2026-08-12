@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: analytic residual used to verify the GPR conductivity machinery
 # Author: Giovanni Zullo
-# Version: 0.3.1 (2026)
+# Version: 0.3.2 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """Known-truth log residual for the synthetic GPR verification.
 

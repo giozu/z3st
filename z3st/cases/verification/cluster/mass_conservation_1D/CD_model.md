@@ -171,4 +171,4 @@ Boundary conditions in $n$-space carry a direct physical meaning:
 
 ---
 *Author: Giovanni Zullo*
-*Version: 0.3.1 (2026)*
+*Version: 0.3.2 (2026)*
