@@ -50,6 +50,9 @@ git commit -m "Commit message"
 # Amend the last commit message
 git commit --amend -m "New message"
 
+# Stage all and commit
+git commit -am "Commit message"
+
 # Show unstaged differences
 git diff
 
@@ -88,6 +91,9 @@ git branch -D <branch_name>
 
 # Merge a branch into the current one
 git merge <branch_name>
+
+# Merge the develop branch into the main one
+git merge --no-ff develop -m "commit message"
 
 # Rebase current branch on another
 git rebase <base_branch>
@@ -169,6 +175,9 @@ git push <remote> <tag_name>
 
 # Push all tags
 git push <remote> --tags
+
+# Push all tags and follow
+git push <remote> --follow-tags
 
 # Prune unreachable objects (cleanup dangling commits/objects)
 git prune
