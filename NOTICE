@@ -1,6 +1,6 @@
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 
-Copyright 2025 Giovanni Zullo, Politecnico di Milano
+Copyright 2025-2026 Giovanni Zullo, Politecnico di Milano
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,5 +30,8 @@ Description:
     Python-based post-processing tools.
 
 This software is distributed under the Apache License 2.0. You are free to use,
-modify, and distribute it for academic, research, or commercial purposes,
-provided that proper credit is given to the author and this notice is retained.
+modify, and distribute it for academic, research, or commercial purposes, under
+the terms of that license.
+
+If you use Z3ST in published research, please cite it (see CITATION.cff). This
+is a request following scholarly practice, not a condition of the license.
