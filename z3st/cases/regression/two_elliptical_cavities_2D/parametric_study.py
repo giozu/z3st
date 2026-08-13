@@ -156,7 +156,7 @@ def reference_map(gc_values=GC_VALUES, fc=np.linspace(0.02, 0.9, 200), ax_plot=N
     ax_plot.set_ylabel("critical bubble pressure  p_crit  (MPa)")
     ax_plot.set_title(f"GB fracture map — SIF (Chakraborty 2014) vs strength\n"
                       f"Kt={K_t:.2f}, lc={lc} µm, E={E/1e3:.0f} GPa, nu={NU}, R=ax={ax} µm")
-    ax_plot.grid(True, ls=":"); ax_plot.legend(fontsize=8)
+    ax_plot.grid(True, ls=":"); ax_plot.legend(fontsize=10)
     if own:
         os.makedirs(OUT, exist_ok=True)
         path = os.path.join(OUT, "pcrit_vs_Fc_reference.png")
@@ -307,7 +307,7 @@ if __name__ == "__main__":
             fc, pc = zip(*ok)
             ax_plot.plot(fc, pc, "ks-", ms=9, label="phase-field $p_{crit}$ (percolation)")
             ax_plot.set_ylim(0, 1.1 * max(pc))
-            ax_plot.legend(fontsize=8)
+            ax_plot.legend(fontsize=10)
             plt.tight_layout()
             plt.savefig(os.path.join(OUT, "pcrit_vs_Fc_sweep.png"), dpi=200)
             print(f"[INFO] overlaid {len(ok)} FEM point(s) -> pcrit_vs_Fc_sweep.png")

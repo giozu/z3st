@@ -241,7 +241,7 @@ def plot_field_2d(triang, field, output_path, *,
     if contact_R is not None and contact_half_angle_deg is not None:
         theta_contact = np.linspace(0.0, np.deg2rad(contact_half_angle_deg), 60)
         ax.plot(contact_R * np.cos(theta_contact), contact_R * np.sin(theta_contact),
-                color="cyan", linewidth=2.5,
+                color="#56B4E9", linewidth=2.5,
                 label=f"Cold contact arc (0-{contact_half_angle_deg:.0f} deg)")
         ax.legend(loc="upper left", fontsize=11)
     fig.colorbar(cf, ax=ax, label=cbar_label)
@@ -409,7 +409,7 @@ try:
         ax5.plot(theta_mid, best_prof, "k-", linewidth=1.0)
         ax5.fill_between(theta_mid, 0, best_prof, alpha=0.3)
         ax5.axhline(0.5, color="grey", lw=0.8, ls=":")
-        ax5.axvspan(0, CONTACT_HALF_ANGLE_DEG, color="red", alpha=0.10,
+        ax5.axvspan(0, CONTACT_HALF_ANGLE_DEG, color="#D55E00", alpha=0.10,
                     label=f"Cold contact arc (0-{CONTACT_HALF_ANGLE_DEG:.0f} deg, upper half)")
         ax5.set_xlabel("Angle theta (deg)  [upper half only]")
         ax5.set_ylabel(f"D_max ({best_band[0]:.2f} < r/Ro < {best_band[1]:.2f})")
@@ -418,7 +418,7 @@ try:
             f"counted at the best-separated shell; fingers fuse nearer the rim"
         )
         ax5.grid(True, alpha=0.3)
-        ax5.legend(fontsize=8)
+        ax5.legend(fontsize=10)
         ax5.set_xlim(0, 180)
         ax5.set_ylim(0, 1.05)
         plt.tight_layout()

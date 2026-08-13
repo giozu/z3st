@@ -12,6 +12,9 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
 import pandas as pd
 import yaml
 

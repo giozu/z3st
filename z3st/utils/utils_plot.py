@@ -23,6 +23,9 @@ import os
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
 import numpy as np
 
 def plot_field_along_r_xyz(
@@ -32,7 +35,7 @@ def plot_field_along_r_xyz(
     field,
     field_name,
     case_dir,
-    color="tab:blue",
+    color="#0072B2",
     r_ref=None,
     f_ref=None,
     label_ref=None,
@@ -101,7 +104,7 @@ def plot_field_along_r_xyz(
 
     if r_ref is not None and f_ref is not None:
         label_ref = label_ref or "Analytical"
-        plt.plot(r_ref, f_ref, "r--", lw=2, label=label_ref)
+        plt.plot(r_ref, f_ref, "--", color="#D55E00", lw=2, label=label_ref)
 
     plt.xlabel("r (m)")
     plt.ylabel(field_name)
@@ -158,7 +161,7 @@ def plotter_sigma_temperature_cylinder(
     sigma_zz_ref=None,
 ):
 
-    plt.rcParams.update({"font.size": 8})
+    plt.rcParams.update({"font.size": 12})
     _, ax1 = plt.subplots(figsize=(7, 5))
 
     if sigma_rr is not None:
@@ -194,19 +197,19 @@ def plotter_sigma_temperature_cylinder(
 
     if sigma_rr_ref is not None:
         ax1.plot(
-            r_s, sigma_rr_ref / 1e6, color="C0", linestyle="-", label=r"Analytical $\sigma_{rr}$"
+            r_s, sigma_rr_ref / 1e6, color="#0072B2", linestyle="-", label=r"Analytical $\sigma_{rr}$"
         )
     if sigma_tt_ref is not None:
         ax1.plot(
             r_s,
             sigma_tt_ref / 1e6,
-            color="C1",
+            color="#E69F00",
             linestyle="-",
             label=r"Analytical $\sigma_{\theta\theta}$",
         )
     if sigma_zz_ref is not None:
         ax1.plot(
-            r_s, sigma_zz_ref / 1e6, color="C2", linestyle="-.", label=r"Analytical $\sigma_{zz}$"
+            r_s, sigma_zz_ref / 1e6, color="#009E73", linestyle="-.", label=r"Analytical $\sigma_{zz}$"
         )
 
     if sigma_th_ref is not None and r_T is not None:
@@ -215,7 +218,7 @@ def plotter_sigma_temperature_cylinder(
             sigma_th_ref / 1e6,
             lw=2,
             linestyle=":",
-            color="red",
+            color="#D55E00",
             label=r"$\sigma_{\mathrm{th}}$ (formula)",
         )
 
@@ -228,7 +231,7 @@ def plotter_sigma_temperature_cylinder(
     ax2 = ax1.twinx()
     if r_T is not None:
         if T_ref is not None:
-            ax2.plot(r_T, (T_ref - 273.15), lw=2, linestyle="--", color="C4", label=label_T)
+            ax2.plot(r_T, (T_ref - 273.15), lw=2, linestyle="--", color="#CC79A7", label=label_T)
         ax2.scatter(
             r_T, (T - 273.15), s=18, color="black", marker="o", label="Temperature (numerical)"
         )
@@ -271,12 +274,12 @@ def plotter_sigma_temperature_cylinder(
 def plotter_sigma_temperature_slab(
     x_s, sigma, x_s_ref, sigma_ref, x_T, T, max_sigma_T, T_ref, Ti, To, CASE_DIR
 ):
-    plt.rcParams.update({"font.size": 11})
+    plt.rcParams.update({"font.size": 13})
     _, ax1 = plt.subplots(figsize=(7, 5))
 
     if sigma_ref is not None:
         ax1.plot(
-            x_s_ref, sigma_ref / 1e6, lw=2, color="C1", label=r"$\sigma_{\mathrm{th}}$ (analytical)"
+            x_s_ref, sigma_ref / 1e6, lw=2, color="#E69F00", label=r"$\sigma_{\mathrm{th}}$ (analytical)"
         )
     ax1.scatter(
         x_s,
@@ -295,9 +298,9 @@ def plotter_sigma_temperature_slab(
     ax2 = ax1.twinx()
     if T_ref is not None:
         ax2.plot(
-            x_T, T_ref - 273.15, lw=2, linestyle="--", color="C2", label="Temperature (analytical)"
+            x_T, T_ref - 273.15, lw=2, linestyle="--", color="#009E73", label="Temperature (analytical)"
         )
-    ax2.scatter(x_T, T - 273.15, s=18, color="C3", marker="x", label="Temperature (numerical)")
+    ax2.scatter(x_T, T - 273.15, s=18, color="#D55E00", marker="x", label="Temperature (numerical)")
     ax2.set_ylabel("Temperature (°C)")
 
     plt.gca().yaxis.set_major_formatter(plt.FormatStrFormatter("%.2f"))
@@ -388,8 +391,8 @@ def plotter_sigma_cylinder(
     plt.scatter(r_s, sigma_zz, s=12, c="green", label=r"Numerical $\sigma_{zz}$")
     plt.scatter(r_s, sigma_rr, s=12, c="blue", label=r"Numerical $\sigma_{rr}$")
 
-    plt.plot(r_s, sigma_vonMises, color="red", lw=2, label=r"$\sigma_{\mathrm{vM}}$")
-    plt.plot(r_s, sigma_Tresca, color="brown", lw=2, label=r"$\sigma_{\mathrm{Tresca}}$")
+    plt.plot(r_s, sigma_vonMises, color="#D55E00", lw=2, label=r"$\sigma_{\mathrm{vM}}$")
+    plt.plot(r_s, sigma_Tresca, color="#D55E00", lw=2, label=r"$\sigma_{\mathrm{Tresca}}$")
 
     if sigma_tt_ana_M is not None:
         plt.plot(
@@ -425,7 +428,7 @@ def plotter_sigma_cylinder(
         plt.plot(
             r_s,
             sigma_tt_avg * np.ones_like(r_s),
-            color="tab:orange",
+            color="#E69F00",
             lw=2,
             linestyle=":",
             label=r"$\langle\sigma_1\rangle$",
@@ -435,7 +438,7 @@ def plotter_sigma_cylinder(
         plt.plot(
             r_s,
             sigma_zz_avg * np.ones_like(r_s),
-            color="tab:green",
+            color="#009E73",
             lw=2,
             linestyle=":",
             label=r"$\langle\sigma_2\rangle$",
@@ -445,7 +448,7 @@ def plotter_sigma_cylinder(
         plt.plot(
             r_s,
             sigma_rr_avg * np.ones_like(r_s),
-            color="tab:blue",
+            color="#0072B2",
             lw=2,
             linestyle=":",
             label=r"$\langle\sigma_3\rangle$",

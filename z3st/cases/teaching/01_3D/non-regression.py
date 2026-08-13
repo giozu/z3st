@@ -146,9 +146,9 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 # The transverse and shear stresses (sigma_yy, sigma_zz, sigma_xy) are all ~0
 # (free Poisson contraction -> uniaxial stress) and overlap, so plot a single
 # representative series to avoid clutter.
-ax1.plot(x_s, sigma_xx * Pa_to_MPa, "bo-", label=r"FE $\sigma_{xx}$",
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, "o-", color="#0072B2", label=r"FE $\sigma_{xx}$",
          markersize=6, alpha=0.8)
-ax1.plot(x_s, sigma_yy * Pa_to_MPa, "rs-",
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, "s-", color="#D55E00",
          label=r"FE $\sigma_{yy}=\sigma_{zz}=\sigma_{xy}$",
          markersize=5, alpha=0.8)
 ax1.axhline(P * Pa_to_MPa, color="k", linestyle="--", linewidth=1.2,
@@ -158,10 +158,10 @@ ax1.axhline(0.0, color="grey", linestyle=":", linewidth=0.9,
 ax1.set_xlabel("x (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
 ax1.set_title("Stress along the bar axis (y=Ly/2, z=Lz/2)", fontsize=12)
-ax1.legend(loc="best", fontsize=9)
+ax1.legend(loc="best", fontsize=10)
 ax1.grid(True, linestyle="--", alpha=0.6)
 
-ax2.plot(x_n_axis, u_x_axis * 1e3, "bo", label=r"FE $u_x$", markersize=7)
+ax2.plot(x_n_axis, u_x_axis * 1e3, "o", color="#0072B2", label=r"FE $u_x$", markersize=7)
 x_dense = np.linspace(0.0, Lx, 200)
 ax2.plot(x_dense, eps_xx_ref * x_dense * 1e3, "k--", linewidth=1.5,
          label=r"Analytic $u_x = P\,x/E$")

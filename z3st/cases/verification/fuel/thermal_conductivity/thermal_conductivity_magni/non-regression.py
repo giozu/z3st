@@ -150,7 +150,7 @@ errors = {
 
 plt.figure(figsize=(7, 5))
 plt.plot(r * 1e3, T_ref, "k-", lw=2.0, label="Kirchhoff reference")
-plt.plot(r * 1e3, T_num, "ro", ms=4, fillstyle="none", label="Z3ST")
+plt.plot(r * 1e3, T_num, "o", color="#D55E00", ms=4, fillstyle="none", label="Z3ST")
 plt.xlabel("radius r (mm)")
 plt.ylabel("Temperature (K)")
 plt.title(f"{k_label}: radial pellet temperature at z={z_mid*1e3:.1f} mm")

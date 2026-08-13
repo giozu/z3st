@@ -102,7 +102,7 @@ rr, TT = plot_field_along_r_xyz(
     T,
     f"Temperature (K), R/t = {slenderness:.2f}",
     CASE_DIR,
-    color="tab:blue",
+    color="#0072B2",
     average="round",  # "round" or False
     decimals=2,
     r_ref=r_ref,
@@ -120,12 +120,12 @@ r, _, _, sigma1, sigma2, sigma3 = extract_principal_stresses(
 # --.. ..- .-.. .-.. --- analytical comparison --.. ..- .-.. .-.. ---
 plt.figure()
 
-plt.plot(r, sigma1, "r-", lw=2, label=r"$\sigma_1$")
-plt.plot(r, sigma2, "g-", lw=2, label=r"$\sigma_2$")
-plt.plot(r, sigma3, "b-", lw=2, label=r"$\sigma_3$")
+plt.plot(r, sigma1, "-", color="#D55E00", lw=2, label=r"$\sigma_1$")
+plt.plot(r, sigma2, "-", color="#009E73", lw=2, label=r"$\sigma_2$")
+plt.plot(r, sigma3, "-", color="#0072B2", lw=2, label=r"$\sigma_3$")
 
 # thermal_stress = sigma_th(rr, TT)
-# plt.plot(rr, thermal_stress, color="tab:pink", lw=2, label=r"$\sigma_{th}$")
+# plt.plot(rr, thermal_stress, color="#CC79A7", lw=2, label=r"$\sigma_{th}$")
 
 plt.xlabel("r (m)")
 plt.ylabel("Stress (Pa)")

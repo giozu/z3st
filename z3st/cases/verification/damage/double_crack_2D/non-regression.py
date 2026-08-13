@@ -168,8 +168,8 @@ if os.path.exists(energy_file):
     data = np.genfromtxt(energy_file, names=True, skip_header=0)
     
     plt.figure(figsize=(8, 5))
-    plt.plot(data['Step'], data['E_el'], 'b-o', label='Elastic Energy ($E_{el}$)')
-    plt.plot(data['Step'], data['E_frac'], 'r-s', label='Fracture Energy ($E_{frac}$)')
+    plt.plot(data['Step'], data['E_el'], "-o", color="#0072B2", label='Elastic Energy ($E_{el}$)')
+    plt.plot(data['Step'], data['E_frac'], "-s", color="#D55E00", label='Fracture Energy ($E_{frac}$)')
     plt.plot(data['Step'], data['E_tot'], 'k--', label='Total Energy ($E_{tot}$)')
     
     plt.xlabel('Step')
@@ -200,17 +200,17 @@ steps = np.arange(len(VTU_FILES))
 fig, ax1 = plt.subplots(figsize=(9, 6))
 
 ax1.set_xlabel('Step')
-ax1.set_ylabel('Damage $D$ / History $H$', color='tab:red')
-lns1 = ax1.plot(steps, d_max_list, 'r-o', lw=2, label='Max Damage $D$')
+ax1.set_ylabel('Damage $D$ / History $H$', color="#D55E00")
+lns1 = ax1.plot(steps, d_max_list, "-o", color="#D55E00", lw=2, label='Max Damage $D$')
 lns2 = ax1.plot(steps, h_max_list / np.max(h_max_list) if np.max(h_max_list)>0 else h_max_list, 
-                'g--', lw=1.5, label='Normalized $H$')
+                "--", color="#009E73", lw=1.5, label='Normalized $H$')
 ax1.set_ylim(-0.05, 1.1)
 ax1.tick_params(axis='y', labelcolor='tab:red')
 ax1.grid(True, ls=':', alpha=0.6)
 
 ax2 = ax1.twinx()
-ax2.set_ylabel(r'Stress $\sigma_{yy}$ (MPa)', color='tab:blue')
-lns3 = ax2.plot(steps, np.array(stresses)*1e-6, 'b-s', lw=2, label=r'$\sigma_{yy}$ Mean at Tip')
+ax2.set_ylabel(r'Stress $\sigma_{yy}$ (MPa)', color="#0072B2")
+lns3 = ax2.plot(steps, np.array(stresses)*1e-6, "-s", color="#0072B2", lw=2, label=r'$\sigma_{yy}$ Mean at Tip')
 ax2.axhline(sigma_c * 1e-6, color='black', ls=':', alpha=0.4, label=r'Critical $\sigma_c$')
 ax2.tick_params(axis='y', labelcolor='tab:blue')
 

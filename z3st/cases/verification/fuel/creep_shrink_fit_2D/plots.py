@@ -139,7 +139,7 @@ def plot_radial_profile():
     ax.set_ylabel("radial displacement u_r (um)")
     ax.set_title("Radial displacement profile (mid-height)\n"
                  "clad creeps under the shrink-fit interference, contact pressure relaxes")
-    ax.legend(title="time", fontsize=8, ncol=2)
+    ax.legend(title="time", fontsize=10, ncol=2)
     ax.grid(alpha=0.3)
     ax.text(0.97, 0.06, "fresh (0 MWd/kgU) curve is non-zero: thermal\n"
             "expansion from T_ref (293 K) to 580 K coolant",
@@ -194,9 +194,9 @@ def plot_stress_profile():
     for lo, hi in [(0.0, R_PELLET + 1e-9), (R_CLAD_I - 1e-9, R_CLAD_O + 1e-9)]:
         sel = (r >= lo) & (r <= hi)
         o = np.argsort(r[sel])
-        ax.plot(r[sel][o] * 1e3, s_rr[sel][o], "o-", color="#4C72B0", ms=3,
+        ax.plot(r[sel][o] * 1e3, s_rr[sel][o], "o-", color="#0072B2", ms=3,
                 lw=1.8, label=r"$\sigma_{rr}$ (radial)" if first else None)
-        ax.plot(r[sel][o] * 1e3, s_tt[sel][o], "s-", color="#C44E52", ms=3,
+        ax.plot(r[sel][o] * 1e3, s_tt[sel][o], "s-", color="#D55E00", ms=3,
                 lw=1.8, label=r"$\sigma_{\theta\theta}$ (hoop)" if first else None)
         first = False
 
@@ -485,7 +485,7 @@ def plot_contact_pressure_evolution():
 
     # --- Figure: Pk = f(t) ---
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.plot(time_days, Pk, "-", color="#4C72B0", lw=1.8,
+    ax.plot(time_days, Pk, "-", color="#0072B2", lw=1.8,
             label=f"Esposito eq. (21) — Tresca hub, n = {n:g}")
     ax.plot(time_days, pressure, "o", ms=5, mfc="none", mec="#C44E52", mew=1.6,
             label="Z3ST — J2 (von Mises), penalty contact")
@@ -519,7 +519,7 @@ def plot_interference_pressure():
     fig, ax2 = plt.subplots(figsize=(6.4, 4.6))
     
     # Middle plot: Contact pressure vs interference
-    ax2.plot(interference * 1e6, pressure_mpa, "b-s", lw=2, ms=4, label="p vs interference")
+    ax2.plot(interference * 1e6, pressure_mpa, "-s", color="#0072B2", lw=2, ms=4, label="p vs interference")
     ax2.set_xlabel("Interference (μm)")
     ax2.set_ylabel("Contact pressure (MPa)")
     ax2.set_title("Contact pressure as function of interference")

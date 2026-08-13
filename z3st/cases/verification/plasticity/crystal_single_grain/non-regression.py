@@ -158,14 +158,14 @@ fig, ax = plt.subplots(figsize=(10, 7))
 
 # Plot stress-strain curves
 ax.plot(strains_np * 100, stresses_np * Pa_to_MPa, 'o-',
-        label='Z3ST (Crystal Plasticity)', color='#E63946',
+        label='Z3ST (Crystal Plasticity)', color="#D55E00",
         linewidth=2.5, markersize=6, alpha=0.8)
 ax.plot(strains_np * 100, elastic_stresses_np * Pa_to_MPa, '--',
-        label='Elastic Reference', color='#1D3557',
+        label='Elastic Reference', color="#0072B2",
         linewidth=2, alpha=0.7)
 
 # Analytical saturation stress (horizontal asymptote)
-ax.axhline(y=sigma_sat_analytical * Pa_to_MPa, color='#2A9D8F', linestyle='-.',
+ax.axhline(y=sigma_sat_analytical * Pa_to_MPa, color="#009E73", linestyle='-.',
            linewidth=2.5, label=f'Analytical Saturation σ_sat = {sigma_sat_analytical*Pa_to_MPa:.1f} MPa',
            alpha=0.8)
 

@@ -121,7 +121,7 @@ try:
     plt.figure(figsize=(7, 5))
     plt.plot(t_line / 86400.0, sigma_exact(t_line) / 1e6, "k-", lw=2.5, alpha=0.7,
              label="Exact  [σ₀^{1−n} + (n−1)EAt]^{−1/(n−1)}")
-    plt.plot(times / 86400.0, SIGMA_BE / 1e6, "s--", ms=5, color="tab:blue",
+    plt.plot(times / 86400.0, SIGMA_BE / 1e6, "s--", ms=5, color="#0072B2",
              alpha=0.7, label=f"scalar backward Euler ({n_steps} steps)")
     if len(sig_steps) == len(times):
         plt.plot(times / 86400.0, np.array(sig_steps) / 1e6, "o", ms=8, mfc="none",

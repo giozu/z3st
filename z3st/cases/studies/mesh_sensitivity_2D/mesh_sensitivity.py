@@ -90,12 +90,12 @@ for nx in nx_values:
     results.append([current_h, l2_err_T, l2_err_S])
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(8, 10))
-    ax1.plot(xn_p, Tn_p, "ro", label="Numerical T")
+    ax1.plot(xn_p, Tn_p, "o", color="#D55E00", label="Numerical T")
     ax1.plot(xn_p, T_ref, "k--", label="Analytical T")
     ax1.set_ylabel("Temperature (K)")
     ax1.legend()
 
-    ax2.plot(xc_p, Sn_p / 1e6, "bo", label="Numerical sigma_yy")
+    ax2.plot(xc_p, Sn_p / 1e6, "o", color="#0072B2", label="Numerical sigma_yy")
     ax2.plot(xc_p, S_ref / 1e6, "k--", label="Analytical sigma_yy")
     ax2.set_ylabel("Stress (MPa)")
     ax2.set_xlabel("x (m)")
@@ -108,8 +108,8 @@ res = np.array(results)
 h, eT, eS = res[:, 0], res[:, 1], res[:, 2]
 
 plt.figure(figsize=(10, 8))
-plt.loglog(h, eT, "bo-", label=r"Error $L_2$ Temperature", linewidth=2)
-plt.loglog(h, eS, "ro-", label=r"Error $L_2$ Stress ($\sigma_{yy}$)", linewidth=2)
+plt.loglog(h, eT, "o-", color="#0072B2", label=r"Error $L_2$ Temperature", linewidth=2)
+plt.loglog(h, eS, "o-", color="#D55E00", label=r"Error $L_2$ Stress ($\sigma_{yy}$)", linewidth=2)
 
 plt.loglog(h, h**2 * (eT[0] / h[0] ** 2), "k--", alpha=0.5, label="Slope 2 (Theoretical T)")
 plt.loglog(h, h * (eS[0] / h[0]), "k:", alpha=0.5, label=r"Slope 1 (Theoretical $\sigma$)")

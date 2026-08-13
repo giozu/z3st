@@ -231,7 +231,7 @@ def plot_stress_profiles():
     axp.set_title("pellet: thermal + contact stress")
     axp.set_xlabel("radius r (mm)")
     axp.set_ylabel("stress (MPa)")
-    axp.legend(fontsize=8)
+    axp.legend(fontsize=10)
     axp.grid(alpha=0.3)
 
     # right: cladding - Z3ST (markers) vs Lame tube (dashed), own scale
@@ -244,7 +244,7 @@ def plot_stress_profiles():
     axc.axhline(0, color="grey", lw=0.8, ls=":")
     axc.set_title("cladding vs Lamé")
     axc.set_xlabel("radius r (mm)")
-    axc.legend(fontsize=7.5)
+    axc.legend(fontsize=10)
     axc.grid(alpha=0.3)
 
     fig.suptitle(f"Radial and hoop stress at mid-height (p = {p:.1f} MPa)")

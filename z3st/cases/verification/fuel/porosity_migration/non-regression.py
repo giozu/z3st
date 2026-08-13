@@ -158,8 +158,8 @@ temperature_info = {
 # --. Plot 1: porosity radial profile --..
 try:
     plt.figure(figsize=(7, 5))
-    plt.scatter(r_rel, p_sorted, s=6, color="r", alpha=0.18, label="nodes (all angles)")
-    plt.plot(r_bin, p_bin, "r-", lw=2.5, label="Z3ST porosity (radial mean)")
+    plt.scatter(r_rel, p_sorted, s=6, color="#D55E00", alpha=0.18, label="nodes (all angles)")
+    plt.plot(r_bin, p_bin, "-", color="#D55E00", lw=2.5, label="Z3ST porosity (radial mean)")
     plt.axhline(0.15, color="gray", ls="--", label="initial porosity (0.15)")
     plt.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="void radius 0.2")
     plt.xlabel("Relative radius r / Ro (-)")
@@ -177,8 +177,8 @@ except Exception as e:
 # --. Plot 2: temperature radial profile --..
 try:
     plt.figure(figsize=(7, 5))
-    plt.scatter(r_rel, T_sorted, s=6, color="b", alpha=0.18, label="nodes (all angles)")
-    plt.plot(r_bin, T_bin, "b-", lw=2.5, label="Z3ST temperature (radial mean)")
+    plt.scatter(r_rel, T_sorted, s=6, color="#0072B2", alpha=0.18, label="nodes (all angles)")
+    plt.plot(r_bin, T_bin, "-", color="#0072B2", lw=2.5, label="Z3ST temperature (radial mean)")
     plt.xlabel("Relative radius r / Ro (-)")
     plt.ylabel("Temperature (K)")
     plt.title("Radial temperature profile at t = 10,000 s")

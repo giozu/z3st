@@ -150,15 +150,15 @@ plt.figure(figsize=(10, 7))
 # Stress
 ax1 = plt.gca()
 ax1.plot(
-    r_s, sigma_rr * Pa_to_MPa, "ro", label=r"Num. $\sigma_{rr}$ (Radial)", markersize=4, alpha=0.6
+    r_s, sigma_rr * Pa_to_MPa, "o", color="#D55E00", label=r"Num. $\sigma_{rr}$ (Radial)", markersize=4, alpha=0.6
 )
 ax1.plot(
-    r_s, sigma_rr_ana_th * Pa_to_MPa, "r-", label=r"Ana. $\sigma_{rr}$ (Radial)", linewidth=1.5
+    r_s, sigma_rr_ana_th * Pa_to_MPa, "-", color="#D55E00", label=r"Ana. $\sigma_{rr}$ (Radial)", linewidth=1.5
 )
 ax1.plot(
     r_s,
     sigma_tt * Pa_to_MPa,
-    "go",
+    "o", color="#009E73",
     label=r"Num. $\sigma_{\theta\theta}$ (Hoop)",
     markersize=4,
     alpha=0.6,
@@ -166,18 +166,18 @@ ax1.plot(
 ax1.plot(
     r_s,
     sigma_tt_ana_th * Pa_to_MPa,
-    "g-",
+    "-", color="#009E73",
     label=r"Ana. $\sigma_{\theta\theta}$ (Hoop)",
     linewidth=1.5,
 )
 ax1.plot(
-    r_s, sigma_zz * Pa_to_MPa, "bo", label=r"Num. $\sigma_{zz}$ (Axial)", markersize=4, alpha=0.6
+    r_s, sigma_zz * Pa_to_MPa, "o", color="#0072B2", label=r"Num. $\sigma_{zz}$ (Axial)", markersize=4, alpha=0.6
 )
-ax1.plot(r_s, sigma_zz_ana_th * Pa_to_MPa, "b-", label=r"Ana. $\sigma_{zz}$ (Axial)", linewidth=1.5)
+ax1.plot(r_s, sigma_zz_ana_th * Pa_to_MPa, "-", color="#0072B2", label=r"Ana. $\sigma_{zz}$ (Axial)", linewidth=1.5)
 ax1.plot(
     r_T,
     sigma_th_ref * Pa_to_MPa,
-    "m--",
+    "--", color="#CC79A7",
     label=r"Approx. $\sigma_{th}$ (ref)",
     linewidth=2.0,
     alpha=0.7,

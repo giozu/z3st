@@ -30,9 +30,11 @@ import re
 import sys
 
 import matplotlib.pyplot as plt
+
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
 import numpy as np
 import yaml
-
 
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -89,8 +91,8 @@ E_frac_notch  = Gc * Dn
 E_frac_target = Gc * (Dn + ambati_arc)
 
 plt.figure(figsize=(8, 5))
-plt.plot(data["Step"], data["E_el"],   "b-o", markersize=3, label=r"Elastic $E_{el}$")
-plt.plot(data["Step"], data["E_frac"], "r-s", markersize=3, label=r"Fracture $E_{frac}$")
+plt.plot(data["Step"], data["E_el"],   "-o", color="#0072B2", markersize=3, label=r"Elastic $E_{el}$")
+plt.plot(data["Step"], data["E_frac"], "-s", color="#D55E00", markersize=3, label=r"Fracture $E_{frac}$")
 plt.plot(data["Step"], data["E_tot"],  "k--", lw=1.5,        label=r"Total $E_{tot}$")
 plt.axhline(E_frac_notch, color="gray", ls="--", alpha=0.5,
             label=rf"$G_c \cdot D_n = {E_frac_notch:.2f}$ J (notch baseline, step 0)")

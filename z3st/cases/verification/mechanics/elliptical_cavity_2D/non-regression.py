@@ -84,9 +84,9 @@ sigma_yy_line = sigma[mask, 4][idx_line]
 # --.. ..- .-.. .-.. --- plot --.. ..- .-.. .-.. ---
 plt.figure(figsize=(10, 6))
 
-plt.plot(x_line, sigma_yy_line, 'b-o', markersize=4, label=r"$\sigma_{yy}$")
-plt.axvline(X_tip, color='r', linestyle='--', label="Bubble tip")
-plt.axvline(-X_tip, color='r', linestyle='--', label="Bubble tip")
+plt.plot(x_line, sigma_yy_line, "-o", color="#0072B2", markersize=4, label=r"$\sigma_{yy}$")
+plt.axvline(X_tip, color="#D55E00", linestyle='--', label="Bubble tip")
+plt.axvline(-X_tip, color="#D55E00", linestyle='--', label="Bubble tip")
 
 plt.xlabel(r"Distance $x$ ($\mu$m)")
 plt.ylabel(r"Stress (MPa)")

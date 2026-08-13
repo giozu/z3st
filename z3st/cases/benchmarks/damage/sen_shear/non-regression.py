@@ -104,7 +104,7 @@ def _build_triangulation(pv_mesh):
 
 
 def _draw_notch(ax):
-    ax.plot([0.0, Dn], [Ly / 2.0, Ly / 2.0], color="cyan", linewidth=2.5,
+    ax.plot([0.0, Dn], [Ly / 2.0, Ly / 2.0], color="#56B4E9", linewidth=2.5,
             label=f"Pre-crack slit (0 -- {Dn*1e3:.2f} mm at y = Ly/2)")
 
 
@@ -114,7 +114,7 @@ def plot_field(triang, field, *, output_path, title, cbar_label, cmap, vmin, vma
     cf = ax.tricontourf(triang, field, levels=levels, cmap=cmap, vmin=vmin, vmax=vmax, extend="both")
     ax.triplot(triang, color="black", linewidth=0.05, alpha=0.3)
     _draw_notch(ax)
-    ax.legend(loc="upper right", fontsize=8)
+    ax.legend(loc="upper right", fontsize=10)
     fig.colorbar(cf, ax=ax, label=cbar_label)
     ax.set_xlabel("x (m)")
     ax.set_ylabel("y (m)")
@@ -203,8 +203,8 @@ if os.path.exists(energy_file):
     E_frac_notch     = Gc * Dn
     E_frac_target    = Gc * ambati_total_len
     plt.figure(figsize=(8, 5))
-    plt.plot(data["Step"], data["E_el"],   "b-o", markersize=3, label=r"Elastic $E_{el}$")
-    plt.plot(data["Step"], data["E_frac"], "r-s", markersize=3, label=r"Fracture $E_{frac}$")
+    plt.plot(data["Step"], data["E_el"],   "-o", color="#0072B2", markersize=3, label=r"Elastic $E_{el}$")
+    plt.plot(data["Step"], data["E_frac"], "-s", color="#D55E00", markersize=3, label=r"Fracture $E_{frac}$")
     plt.plot(data["Step"], data["E_tot"],  "k--", lw=1.5, label=r"Total $E_{tot}$")
     plt.axhline(E_frac_notch, color="gray", ls="--", alpha=0.5,
                 label=rf"Gc * Dn = {E_frac_notch:.2f} J (notch baseline, step 0)")

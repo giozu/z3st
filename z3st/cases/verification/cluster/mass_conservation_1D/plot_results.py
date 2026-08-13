@@ -10,6 +10,9 @@ import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
+
 # HDF5 file
 h5_file = 'output/results.h5'
 
@@ -44,7 +47,6 @@ with h5py.File(h5_file, 'r') as f:
         x_coords = x_coords_raw[sort_idx]
         
         # Matplotlib style improvements
-        plt.style.use('seaborn-v0_8-muted') # or 'ggplot'
         fig, ax = plt.subplots(figsize=(10, 6), dpi=120)
         
         frames = []
@@ -58,7 +60,7 @@ with h5py.File(h5_file, 'r') as f:
             time_val = get_time(time_key)
             
             # Use a slightly more "premium" look
-            line, = ax.plot(x_coords, c_values, color='#0077CC', lw=2.5, alpha=0.9)
+            line, = ax.plot(x_coords, c_values, color="#0072B2", lw=2.5, alpha=0.9)
             
             # Title as a centered artist
             title = ax.text(0.5, 1.05, f'Z3ST, cluster dynamics | Time: {time_val:.2f} s', 
@@ -67,7 +69,7 @@ with h5py.File(h5_file, 'r') as f:
             
             frames.append([line, title])
 
-        ax.set_xlabel('Cluster size n', fontsize=11)
+        ax.set_xlabel('Cluster size n', fontsize=12)
         ax.set_ylabel('Density c(n)', fontsize=11)
         ax.set_ylim([0, all_max * 1.1])
         ax.grid(True, alpha=0.3, linestyle='--')

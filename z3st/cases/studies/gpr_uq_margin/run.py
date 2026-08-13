@@ -24,6 +24,9 @@ import sys
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
 import numpy as np
 import pyvista as pv
 import yaml
