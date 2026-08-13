@@ -161,30 +161,38 @@ def _pcmi_from_csv():
     tmax = np.atleast_1d(d["T_max_K"])
     tmin = np.atleast_1d(d["T_min_K"])
 
-    fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
+    # Okabe-Ito palette (colour-vision safe); series also differ by marker and
+    # linestyle, so colour is never the only cue. 
+    BLUE, ORANGE, VERM, SKY = "#0072B2", "#E69F00", "#D55E00", "#56B4E9"
+    with plt.rc_context({"font.size": 13, "axes.labelsize": 14,
+                         "xtick.labelsize": 12, "ytick.labelsize": 12,
+                         "legend.fontsize": 12}):
+        fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
 
-    ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
-    ax1.plot(bu, gaps, "o-", color="#4C72B0", label="gap")
-    ax1.axhline(0, color="grey", lw=0.8, ls=":")
-    ax1.set_xlabel("fuel-average burnup (MWd/kgU)")
-    ax1.set_ylabel("gap (um)", color="#4C72B0")
-    ax1.tick_params(axis="y", labelcolor="#4C72B0")
-    ax2 = ax1.twinx()
-    ax2.plot(bu, pres, "s--", color="#C44E52", label="contact pressure")
-    ax2.set_ylabel("contact pressure (MPa)", color="#C44E52")
-    ax2.tick_params(axis="y", labelcolor="#C44E52")
+        ax1.plot(bu, gaps, "o-", color=BLUE, label="gap")
+        ax1.axhline(0, color="grey", lw=0.8, ls=":")
+        ax1.set_xlabel("fuel-average burnup (MWd/kgU)")
+        ax1.set_ylabel(r"gap ($\mu$m)", color=BLUE)
+        ax1.tick_params(axis="y", labelcolor=BLUE)
+        ax2 = ax1.twinx()
+        ax2.plot(bu, pres, "s--", color=ORANGE, label="contact pressure")
+        ax2.set_ylabel("contact pressure (MPa)", color=ORANGE)
+        ax2.tick_params(axis="y", labelcolor=ORANGE)
 
-    ax3.set_title("Operating history")
-    ax3.plot(days, bu, "o-", color="#55A868", label="fuel-avg burnup")
-    ax3.set_xlabel("time (days)")
-    ax3.set_ylabel("burnup (MWd/kgU)", color="#55A868")
-    ax3.tick_params(axis="y", labelcolor="#55A868")
-    ax4 = ax3.twinx()
-    ax4.plot(days, tmax, "^--", color="#911B1F", label="max temperature")
-    ax4.plot(days, tmin, "^--", color="#BE7375", label="min temperature")
-    ax4.set_ylabel("temperature (K)", color="#C44E52")
-    ax4.tick_params(axis="y", labelcolor="#C44E52")
-    ax3.grid(alpha=0.3)
+        ax3.plot(days, bu, "o-", color=BLUE, label="fuel-avg burnup")
+        ax3.set_xlabel("time (days)")
+        ax3.set_ylabel("burnup (MWd/kgU)", color=BLUE)
+        ax3.tick_params(axis="y", labelcolor=BLUE)
+        ax4 = ax3.twinx()
+        ax4.plot(days, tmax, "^--", color=VERM, label="max temperature")
+        ax4.plot(days, tmin, "v:", color=SKY, label="min temperature")
+        ax4.set_ylabel("temperature (K)", color=VERM)
+        ax4.tick_params(axis="y", labelcolor=VERM)
+        ax3.grid(alpha=0.3)
+
+        for ax, tag in ((ax1, "(a)"), (ax3, "(b)")):
+            ax.text(0.0, 1.02, tag, transform=ax.transAxes,
+                    fontsize=14, fontweight="bold", va="bottom")
 
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "pcmi_curves.png"), dpi=150)

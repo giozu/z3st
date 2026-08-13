@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+cd "${0%/*}" || exit 1
+python3 ../magni_gpr_conductivity/make_synthetic_gpr.py
+gmsh mesh.geo -2 -o mesh.msh > log_mesh.md
+python3 run.py

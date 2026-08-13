@@ -204,17 +204,20 @@ try:
     keys = ["center_void_porosity", "void_radius_relative",
             "rim_fabricated_porosity", "center_temperature"]
 
+    plt.rcParams.update({"font.size": 13, "axes.labelsize": 14,
+                         "xtick.labelsize": 12, "ytick.labelsize": 12,
+                         "legend.fontsize": 11})
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.plot(r_bin, p_bin, "r-", lw=2.5, label="DG-1 upwind + SIPG")
+    # Okabe-Ito colours, distinct linestyles: no red/green pairing
+    ax.plot(r_bin, p_bin, "-", color="#D55E00", lw=2.5, label="DG-1 upwind + SIPG")
     cg_prof = os.path.join(CASE_DIR, "..", "porosity_migration",
                            "output", "porosity_radial_profile.npz")
     if os.path.exists(cg_prof):
         d = np.load(cg_prof)
-        ax.plot(d["r"], d["p"], "b--", lw=2.0, label="CG + SU/SUPG (agent-contributed model)")
+        ax.plot(d["r"], d["p"], "--", color="#0072B2", lw=2.0, label="CG + SU/SUPG (agent-contributed model)")
     ax.axvline(VOID_RADIUS_REF, color="k", ls=":", alpha=0.7, label="void radius 0.2")
     ax.set_xlabel("Relative radius r / Ro (-)")
     ax.set_ylabel("Porosity (-)")
-    ax.set_title("Same transport equation, two discretisations")
     ax.grid(True, ls=":", alpha=0.6)
     ax.legend()
     fig.tight_layout()

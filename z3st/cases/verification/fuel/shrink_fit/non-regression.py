@@ -126,12 +126,14 @@ for f in files:
 T_pellet, p_z3st, p_lame, gap_z3st, gap_free = map(
     np.array, (T_pellet, p_z3st, p_lame, gap_z3st, gap_free))
 
+plt.rcParams.update({"font.size": 13, "axes.labelsize": 14,
+                     "xtick.labelsize": 12, "ytick.labelsize": 12,
+                     "legend.fontsize": 11})
 plt.figure(figsize=(7, 5))
-plt.plot(T_pellet, p_lame, "k--", lw=1.5, label="Analytical Lame interference (exact)")
-plt.plot(T_pellet, p_z3st, "r-o", lw=2, label="Z3ST penalty contact")
+plt.plot(T_pellet, p_lame, "k--", lw=1.5, label="Analytical Lamé interference (exact)")
+plt.plot(T_pellet, p_z3st, "-o", color="#0072B2", lw=2, label="Z3ST penalty contact")
 plt.xlabel("pellet temperature (K)")
 plt.ylabel("contact pressure (MPa)")
-plt.title("Contact pressure verification: Z3ST vs Lame (uniform ΔT)")
 plt.grid(True, ls=":", alpha=0.6)
 plt.legend()
 plt.tight_layout()

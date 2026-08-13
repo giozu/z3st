@@ -230,6 +230,9 @@ def plot_field_2d(triang, field, output_path, *,
                   show_mesh=True, levels=40):
     """ParaView-like 2D field plot: filled contours + optional mesh overlay + contact-arc marker."""
     levels_arr = np.linspace(vmin, vmax, levels + 1)
+    
+    plt.rcParams.update({"font.size": 13, "axes.labelsize": 14,
+                         "xtick.labelsize": 12, "ytick.labelsize": 12})
     fig, ax = plt.subplots(figsize=(9, 6))
     cf = ax.tricontourf(triang, field, levels=levels_arr, cmap=cmap,
                         vmin=vmin, vmax=vmax, extend="both")
@@ -240,12 +243,13 @@ def plot_field_2d(triang, field, output_path, *,
         ax.plot(contact_R * np.cos(theta_contact), contact_R * np.sin(theta_contact),
                 color="cyan", linewidth=2.5,
                 label=f"Cold contact arc (0-{contact_half_angle_deg:.0f} deg)")
-        ax.legend(loc="upper left", fontsize=8)
+        ax.legend(loc="upper left", fontsize=11)
     fig.colorbar(cf, ax=ax, label=cbar_label)
     ax.set_xlabel("x (m)")
     ax.set_ylabel("y (m)")
     ax.set_aspect("equal")
-    ax.set_title(title)
+    if title:
+        ax.set_title(title)
     ax.set_xlim(-Ro * 1.05, Ro * 1.05)
     ax.set_ylim(-0.05 * Ro, Ro * 1.05)
     plt.tight_layout()
@@ -280,7 +284,7 @@ try:
         plot_field_2d(
             triang, D_field,
             output_path=os.path.join(OUT_DIR, "damage_field.png"),
-            title=f"Damage field D at t = {last_t:.3e} s",
+            title=None,
             cbar_label="Damage D", cmap="hot_r", vmin=0.0, vmax=1.0,
             contact_R=Ro, contact_half_angle_deg=CONTACT_HALF_ANGLE_DEG,
         )

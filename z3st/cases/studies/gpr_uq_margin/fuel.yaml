@@ -1,0 +1,22 @@
+name: MA-MOX-GPR-verification
+fissile: true
+k:
+  type: gpr
+  model: ../magni_gpr_conductivity/output/magni_gpr_model.npz
+  mode: affine
+  xi: 2.0
+Pu: 0.2
+Am: 0.0
+Np: 0.0
+x: 0.02
+p: 0.05
+E: 170e+9
+nu: 0.29
+cp: 330.0
+alpha: 1.45e-05
+T_ref: 650.0
+T_initial: 650.0
+rho: 11000.0
+heavy_metal_fraction: 0.88
+mu_gamma: 0.0
+gamma_heating: 0.0
