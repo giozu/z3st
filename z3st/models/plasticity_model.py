@@ -55,6 +55,11 @@ class PlasticityModel:
         
         lmbda = material["lmbda"]
         mu = material["G"]
+        # Ensure lmbda and mu are UFL constants for proper operations
+        if not isinstance(lmbda, (int, float, dolfinx.fem.Constant)):
+            lmbda = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(lmbda))
+        if not isinstance(mu, (int, float, dolfinx.fem.Constant)):
+            mu = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(mu))
         
         # Sigma trial
         dim = eps.ufl_shape[0]
@@ -73,6 +78,11 @@ class PlasticityModel:
         # sigma_y = sigma_0 + H * p # Linearly plastic J2, yield strength increases with plastic strain
         sigma_y = material["yield_strength"]
         H = material["hardening_modulus"]
+        # Ensure H and sigma_y are UFL constants for proper operations
+        if not isinstance(H, (int, float, dolfinx.fem.Constant)):
+            H = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(H))
+        if not isinstance(sigma_y, (int, float, dolfinx.fem.Constant)):
+            sigma_y = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(sigma_y))
         sigma_y_n = sigma_y + H * self.p_n
 
         # Check yield condition: f = sigma_eq_tr - sigma_y(p_n) <= 0
@@ -126,6 +136,11 @@ class PlasticityModel:
 
         lmbda = material["lmbda"]
         mu = material["G"]
+        # Ensure lmbda and mu are UFL constants for proper operations
+        if not isinstance(lmbda, (int, float, dolfinx.fem.Constant)):
+            lmbda = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(lmbda))
+        if not isinstance(mu, (int, float, dolfinx.fem.Constant)):
+            mu = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(mu))
 
         dim = eps.ufl_shape[0]
         I = ufl.Identity(dim)
@@ -136,6 +151,11 @@ class PlasticityModel:
 
         sigma_y = material["yield_strength"]
         H = material["hardening_modulus"]
+        # Ensure H and sigma_y are UFL constants for proper operations
+        if not isinstance(H, (int, float, dolfinx.fem.Constant)):
+            H = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(H))
+        if not isinstance(sigma_y, (int, float, dolfinx.fem.Constant)):
+            sigma_y = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(sigma_y))
 
         sigma_y_n = sigma_y + H * self.p_n
         f_val = sigma_eq_tr - sigma_y_n

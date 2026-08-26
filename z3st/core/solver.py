@@ -672,32 +672,25 @@ class Solver:
         # a non-bilinear form as if it were bilinear). Guards against a
         # solver: linear misconfiguration.
         creep_present = any(self.creep_active(m) for m in self.materials.values())
+        nonlinear_constitutive = any(
+            m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
+            for m in self.materials.values()
+        )
 
-        cache = getattr(self, "_mech_cache", None)
-        rebuild = (
-            cache is None
-            or cache["step"] != self.current_step
-            or cache["u_new"] is not u_new
-            or cache["T"] is not T_current
-            or (creep_present and getattr(self, "_force_creep_rebuild", False))  # ← Ajoutez cette ligne
-            )
-
-        # Au début de solve_staggered, demandez au solver de forcer la reconstruction:
+        # Force cache rebuild when creep is present with contact to ensure
+        # proper handling of the contact-creep interaction
         if creep_present and self.on.get("contact", False):
             self._force_creep_rebuild = True
         else:
             self._force_creep_rebuild = False
-            nonlinear_constitutive = any(
-                m.get("constitutive_mode", "lame") in ("plasticity", "hyperelastic")
-                for m in self.materials.values()
-                )
+
         linear = (
             self.mech_cfg["solver"] == "linear"
             and not creep_present
             and not nonlinear_constitutive
         )
 
-        # Creep predictor at the current iterate, befire assembling: a
+        # Creep predictor at the current iterate, before assembling: a
         # stale predictor can zero the symbolic correction (base clamp) and
         # let |Δu| pass spuriously. Its change feeds the convergence test.
         creep_pred_change = 0.0
@@ -713,6 +706,7 @@ class Solver:
             or cache["step"] != self.current_step
             or cache["u_new"] is not u_new
             or cache["T"] is not T_current
+            or (creep_present and getattr(self, "_force_creep_rebuild", False))
         )
 
         bcs_mech = self._bc_objects(self.dirichlet_mechanical)
