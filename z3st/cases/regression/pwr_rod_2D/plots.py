@@ -185,10 +185,17 @@ def _pcmi_from_csv():
         ax3.tick_params(axis="y", labelcolor=BLUE)
         ax4 = ax3.twinx()
         ax4.plot(days, tmax, "^--", color=VERM, label="max temperature")
-        ax4.plot(days, tmin, "v:", color=SKY, label="min temperature")
+        ax4.plot(days, tmin, "v:", color=SKY, label="min temperature (clad outer)")
         ax4.set_ylabel("temperature (K)", color=VERM)
         ax4.tick_params(axis="y", labelcolor=VERM)
         ax3.grid(alpha=0.3)
+
+        # Twinned axes carry their own handles, so each legend is built by hand.
+        for host, twin, loc in ((ax1, ax2, "center right"),
+                                (ax3, ax4, "upper center")):
+            h, l = host.get_legend_handles_labels()
+            h2, l2 = twin.get_legend_handles_labels()
+            host.legend(h + h2, l + l2, loc=loc, framealpha=0.9)
 
         for ax, tag in ((ax1, "(a)"), (ax3, "(b)")):
             ax.text(0.0, 1.02, tag, transform=ax.transAxes,
