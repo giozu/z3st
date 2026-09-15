@@ -444,7 +444,7 @@ Two modes (selected via `models.gap_conductance.type`):
 - **Fixed** — constant `h_gap` (W/m²K) read from `value:`.
 - **Gas** — `k_gas = value · 1e-4 · T_gap^0.79`, then `h_gap = k_gas / gap_size` where `gap_size` is computed as the mean distance between two paired labelled facet groups (via SciPy cKDTree on facet centroids), and `T_gap = ½ (T_inner + T_outer)`.
 
-Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to another subdomain.
+Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to another subdomain. `h_gap` is referred to `gap_conductance.surface_a` (pellet outer by default, the lower tag of the pair if `surface_a` is not in it). The other surface uses `h_gap·|Γ_a|_w/|Γ_b|_w` (`_gap_area_ratio`, weighted areas ∫w ds, r_f/r_c in axisymmetric), so the gap coupling conserves energy.
 
 **Contact-coupled conductance.** When `gap_conductance.contact_coupling.enabled` is set, a solid-contact term is added on gap closure (Todreas & Kazimi, *Nuclear Systems I*, 3rd ed., Eqs. 8.141/8.142): the emergent contact pressure (from `contact_model`) raises `h_gap` above the open-gap gas value, so closing the gap cools the fuel. Parameters: `meyer_hardness` (Pa), `gas_thickness` (m, roughness-based residual gas space). The Ross-Stoute harmonic mean accepts symbolic k(T) cards by evaluating them at the current mean gap temperature (`_k_at_gap`; UFL folds constants, so `k_func(float)` is a plain number). A symbolic fuel conductivity would otherwise zero `h_contact` and disable the contact-cooling feedback.
 

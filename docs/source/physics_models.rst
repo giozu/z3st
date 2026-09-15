@@ -859,6 +859,12 @@ The model follows Todreas and Kazimi, *Nuclear Systems Volume I*, 3rd ed.,
    q''_{g} = h_{g}\,(T_{fo} - T_{ci}), \qquad
    h_{g} = h_{g,\text{open}} + h_{contact}.
 
+:math:`h_g` is referred to the reference surface of the pair,
+``gap_conductance.surface_a`` (the pellet outer surface by default). On the other
+surface the Robin coefficient is :math:`h_g\,|\Gamma_a|_w/|\Gamma_b|_w`, the ratio of
+the weighted areas :math:`\int w\,\mathrm{d}s` (:math:`r_{fo}/r_{ci}` for coaxial
+cylinders), so the heat leaving one body equals the heat entering the other.
+
 **Open gap.** The open-gap conductance is gas conduction across the effective
 gap width (a fixed user value or a gas-conduction correlation),
 

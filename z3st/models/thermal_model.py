@@ -339,9 +339,15 @@ class ThermalModel:
                         self._refresh_gap_pair(aux, T_new)
                         gap_aux.append(aux)
 
-                        a_t += w * h_gap * u_t * v_t * ds_robin
-                        L_t += w * h_gap * T_other * v_t * ds_robin
-                        print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'")
+                        # h_gap is referred to the reference surface of the
+                        # pair; the other side scales it by the weighted-area
+                        # ratio so the heat crossing the gap balances.
+                        ratio = self._gap_area_ratio(region_id, self.label_map[pair_region])
+                        h_here = h_gap if ratio is None else h_gap * ratio
+                        a_t += w * h_here * u_t * v_t * ds_robin
+                        L_t += w * h_here * T_other * v_t * ds_robin
+                        print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'"
+                              + ("" if ratio is None else f", h scaled by |Γ_ref|/|Γ| = {ratio:.6f}"))
 
                     else:
                         # Convective mode: fixed h_conv and T_ext
@@ -604,6 +610,38 @@ class ThermalModel:
             T_new, T_old, self.th_cfg, stag_tol_th, "T")
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
     
+    def _gap_area_ratio(self, id_here, id_other):
+        """Conservative scaling of h_gap on one surface of a gap pair.
+
+        h_gap is defined per unit area of the reference surface Γ_ref, which is
+        ``models.gap_conductance.surface_a`` (pellet outer by default) when it
+        belongs to the pair, otherwise the pair surface with the lower tag. The
+        reference side returns None (h_gap used as is). The other side returns
+        |Γ_ref|_w / |Γ_here|_w, the ratio of weighted areas ∫ w ds (w = 2πr in
+        axisymmetric), so that ∫ w h ΔT ds is the same on both sides for a
+        uniform ΔT: r_f/r_c for coaxial cylinders, 1 for equal areas. Computed
+        once per surface pair and MPI-summed.
+        """
+        ref = self.label_map.get(getattr(self, "gap_surface_a", None))
+        if ref not in (id_here, id_other):
+            ref = min(id_here, id_other)
+        if id_here == ref:
+            return None
+        cache = self.__dict__.setdefault("_gap_area_ratios", {})
+        if (id_here, ref) not in cache:
+            one = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(1.0))
+            comm = self.mesh.comm
+
+            def area(tag):
+                form = dolfinx.fem.form(self.weight * one * self.ds_tags[tag])
+                return comm.allreduce(dolfinx.fem.assemble_scalar(form), op=MPI.SUM)
+
+            a_here = area(id_here)
+            if a_here <= 0.0:
+                raise RuntimeError(f"Gap pair: surface id {id_here} has zero area.")
+            cache[(id_here, ref)] = area(ref) / a_here
+        return cache[(id_here, ref)]
+
     def _build_gap_pair_aux(self, fn, dofs_here, dofs_other):
         """Geometric matching between two paired gap surfaces (built once per
         step alongside the cached thermal form).
