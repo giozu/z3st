@@ -49,30 +49,6 @@ Case: verification/cluster/mass_conservation_1D [OK]
   Gold regression : PASS
   Time            : 8s
 
-Case: verification/damage/box_crack_2D [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 37s
-
-Case: verification/damage/box_notch_2D [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 49s
-
-Case: verification/damage/double_crack_2D [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 159s
-
-Case: verification/damage/notched_plate_2D [OK]
-  Run             : OK
-  Non-regression  : PASS
-  Gold regression : PASS
-  Time            : 223s
-
 Case: verification/fuel/axial_power [OK]
   Run             : OK
   Non-regression  : PASS

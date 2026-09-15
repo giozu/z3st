@@ -404,7 +404,7 @@ BC types (`set_mechanical_boundary_conditions`): `Dirichlet`, `Dirichlet_x/y/z`,
 
 For a purely thermal eigenstrain this reduces exactly to `σ_th = −(3λ + 2G) α (T − T_ref) I`. Because ε* is a UFL tensor the Newton tangent stays automatic, and fuel swelling/creep need no change to the momentum balance — *"fuel is a material"*: each region's inelastic behaviour travels with its own material, applied wherever the material's thermal block or own eigenstrain is active.
 
-Damage coupling: when damage is active, `σ ← g(D) σ` with `g(D) = (1−D)² + K` (K = 1e-6 regularization). The eigenstress is degraded by the same `g(D)` so a fully-damaged cell recovers the traction-free crack-face limit. `g(D)` reads `self.D`, which is the damage iterate itself, so every mechanical solve of a step sees the current damage (fully coupled staggered scheme, the only one). The price is more staggered iterations while a crack grows, and no equilibrium at all past the peak under traction control: the `verification/damage` cases are loaded by prescribed displacement.
+Damage coupling: when damage is active, `σ ← g(D) σ` with `g(D) = (1−D)² + K` (K = 1e-6 regularization). The eigenstress is degraded by the same `g(D)` so a fully-damaged cell recovers the traction-free crack-face limit. `g(D)` reads `self.D`, which is the damage iterate itself, so every mechanical solve of a step sees the current damage (fully coupled staggered scheme, the only one). The price is more staggered iterations while a crack grows, and no equilibrium at all past the peak under traction control, so a fracture case that goes past the peak must be loaded by prescribed displacement (as `benchmarks/damage/sen_tension` and `sen_shear` are).
 
 ### 4.3 Damage (`damage_model.py`)
 
@@ -591,7 +591,7 @@ Each case folder is self-contained:
 └── output/                   auto-generated VTU/XDMF + plots
 ```
 
-The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. The local suite is discovery-based: every directory under `cases/` with both an `Allrun` and a blessed `output/non-regression_gold.json` is a member (`sandbox/` is never scanned); exceptions live in `cases/suite_exclude.txt` with a reason per line, and `--list` prints the discovered set. A case is protected if and only if it has a gold. The CI list is curated separately in `cases/cases_ci.txt`, which `non-regression_github.sh` reads. The is chosen for **coverage** against a stated time budget (22 cases, 14 min 47 s, from measured per-case times) rather than purely for speed; its header records the two models no case reaches at all, so nobody looks for them there. Each case's `non-regression.json` carries two verdicts: `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL.
+The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. The local suite is discovery-based: every directory under `cases/` with both an `Allrun` and a blessed `output/non-regression_gold.json` is a member (`sandbox/` is never scanned); exceptions live in `cases/suite_exclude.txt` with a reason per line, and `--list` prints the discovered set. A case is protected if and only if it has a gold. The CI list is curated separately in `cases/cases_ci.txt`, which `non-regression_github.sh` reads. The is chosen for **coverage** against a stated time budget (20 cases, 13 min 21 s, from measured per-case times) rather than purely for speed; its header records the two models no case reaches at all, so nobody looks for them there. Each case's `non-regression.json` carries two verdicts: `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL.
 
 ### 6.1 Catalogue of cases
 
@@ -629,10 +629,9 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-reg
 
 **17 — Stress–strain curves**
 - `verification/mechanics/stress_strain_displacement`, `verification/mechanics/stress_strain_stress`
-- `verification/damage/double_crack_2D`, `verification/damage/notched_plate_2D`
 
 **18 — 2D fracture benchmarks**
-- `verification/damage/box_crack_2D`, `verification/damage/box_notch_2D`
+- Removed on 2026-09-16 (`box_crack_2D`, `box_notch_2D`, `double_crack_2D`, `notched_plate_2D`): no analytical or published reference, and each needed about an hour once damage was coupled within the step. The phase field is covered by §19 and by `pellet_quench_2D_xy`, `plate_thermal_shock_2D` and `two_elliptical_cavities_2D`.
 
 **19 — Single-edge notched (classical phase-field benchmarks)**
 - `benchmarks/damage/sen_shear`

@@ -126,22 +126,6 @@ def line(vtu, field, component=None, **planes):
     return coords[along][mask][order], values[mask][order]
 
 
-def edge_force(vtu, axis, position, tol):
-    """Resultant per unit depth (N/m) of the normal stress on a straight edge.
-
-    The edge is the set of points whose ``axis`` coordinate ("x" or "y") is
-    within ``tol`` of ``position``. The normal stress sigma_xx (edge x = const)
-    or sigma_yy (edge y = const) of the projected "Stress (points)" field is
-    integrated with the trapezoidal rule along the other coordinate. On a loaded
-    boundary under prescribed displacement this is the reaction force.
-    """
-    x, y, _, S = extract_field(vtu, field_name="Stress (points)")
-    fixed, along, comp = (x, y, 0) if axis == "x" else (y, x, 4)
-    mask = np.abs(fixed - position) < tol
-    order = np.argsort(along[mask])
-    return float(np.trapezoid(S[mask, comp][order], along[mask][order]))
-
-
 def finish(errors, tolerance, out_json, case_dir):
     """Run the pass/fail check and the gold regression check, then report."""
     pass_fail_check(errors, tolerance, out_json, case_dir)
