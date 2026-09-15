@@ -649,6 +649,8 @@ class DamageModel:
         D_new.x.array[:] = np.clip(np.maximum(D_solve, D_floor), 0.0, 1.0)
         conv_damage, norm_dD, rel_norm_dD, res_curr = self._stagger_residual(
             D_new, D_old, self.dmg_cfg, stag_tol_dmg, "D")
+        # L_inf of the same unrelaxed, projected update (log only).
+        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
 
         D_new.x.array[:] = self.relax_D * D_solve + (1 - self.relax_D) * D_old.x.array
         D_new.x.array[:] = np.maximum(D_new.x.array, D_floor)
@@ -657,8 +659,6 @@ class DamageModel:
         if self.relax_adaptive:
             prev_res_D = self._adapt_relax("D", res_curr, prev_res_D)
 
-        # Residual in L_inf norm
-        res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
         print(f"  |ΔD|_∞ = {res_D_inf:.3e}")
 
         return conv_damage, norm_dD, rel_norm_dD, prev_res_D
