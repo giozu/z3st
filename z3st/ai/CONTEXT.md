@@ -262,7 +262,7 @@ site is unchanged and `self._thermal_step(...)` still resolves.
 out the same staggered bookkeeping:
 - `_stagger_residual(new, old, cfg, tol, label)` — scatter both, `copy`, `axpy(-1)`,
   the two norms, the guarded division, and the verdict. Returns
-  `(converged, norm_d, rel_norm_d, residual)`. **The printed strings are parsed by
+  `(converged, norm_d, rel_norm_d, residual)`. Every caller passes the unrelaxed solve output as `new`, before relaxation. **The printed strings are parsed by
   `utils/plot_convergence.py`**, which greps the solver log for exactly
   `||ΔX||/||X|| = <float>`: changing the label or the spacing empties every
   convergence plot, with nothing to catch it.
@@ -302,8 +302,8 @@ L_t(v)   = ∫ w q''' v dx
          + ∫ w h T_ext v ds            (Robin)
 ```
 - Supports `dt = 0`: preserves IC, only applies BCs.
-- Post-solve relaxation: `T ← α_T · T_new + (1 − α_T) · T_old`.
-- Convergence on `‖ΔT‖` or `‖ΔT‖/‖T‖` (L2) depending on `thermal.convergence`.
+- Convergence on `‖ΔT‖` or `‖ΔT‖/‖T‖` (L2) depending on `thermal.convergence`, measured on the **unrelaxed** update `T_solve − T_old` (likewise u, D and porosity), so `stag_tol` does not scale with the relaxation factor. The EMA controller is fed the same unrelaxed residual.
+- Post-solve relaxation, after the test: `T ← α_T · T_new + (1 − α_T) · T_old`.
 - Adaptive relaxation (EMA residual) scales `α_T` between `relax_min` and `relax_max`.
 
 **`_mechanical_step`** (linear or SNES Newton for non-linear/hyperelastic):

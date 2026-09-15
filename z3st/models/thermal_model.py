@@ -405,12 +405,13 @@ class ThermalModel:
         if transient:
             print(f"  T^n (self.T): min={self.T.x.array.min():.2f} K, max={self.T.x.array.max():.2f} K")
 
-        # Relax
-        T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
-        dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
-
+        # Convergence on the unrelaxed update T_solve - T^{k-1}, so stag_tol
+        # does not scale with relax_T. Then relax.
         conv_th, norm_dT, rel_norm_dT, res_curr = self._stagger_residual(
             T_new, T_old, self.th_cfg, stag_tol_th, "T")
+
+        T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
+        dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
 
         if self.relax_adaptive:
             prev_res_T = self._adapt_relax("T", res_curr, prev_res_T)

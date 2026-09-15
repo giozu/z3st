@@ -311,6 +311,10 @@ class Solver:
     def _stagger_residual(self, new, old, cfg, tol, label):
         """Staggered increment of one field: convergence verdict plus both norms.
 
+        Callers pass the unrelaxed solve output as ``new`` and the previous
+        iterate as ``old``, and relax afterwards, so the test measures
+        ||X_solve - X^{k-1}|| and ``stag_tol`` is independent of relax_X.
+
         Returns
         ``(converged, norm_d, rel_norm_d, residual)``, where ``residual`` is
         whichever norm ``cfg["convergence"]`` selects: it is what the adaptive

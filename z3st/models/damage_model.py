@@ -635,18 +635,24 @@ class DamageModel:
             # Clipping:
             D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
-        D_new.x.array[:] = self.relax_D * D_new.x.array + (1 - self.relax_D) * D_old.x.array
         # Irreversibility against the last converged step (anchor captured in
         # solve_staggered), not the previous staggered iterate: D stays
         # retractable within the step, never below its converged history.
         D_floor = getattr(self, "_D_step_start", None)
-        D_new.x.array[:] = np.maximum(
-            D_new.x.array, D_floor if D_floor is not None else D_old.x.array
-        )
-        D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
+        if D_floor is None:
+            D_floor = D_old.x.array.copy()
 
+        # Convergence on the unrelaxed, projected update, so stag_tol does not
+        # scale with relax_D: residual of max(D_solve, D^n) clipped to [0, 1]
+        # against D^{k-1}. The relaxed iterate is then built as before.
+        D_solve = D_new.x.array.copy()
+        D_new.x.array[:] = np.clip(np.maximum(D_solve, D_floor), 0.0, 1.0)
         conv_damage, norm_dD, rel_norm_dD, res_curr = self._stagger_residual(
             D_new, D_old, self.dmg_cfg, stag_tol_dmg, "D")
+
+        D_new.x.array[:] = self.relax_D * D_solve + (1 - self.relax_D) * D_old.x.array
+        D_new.x.array[:] = np.maximum(D_new.x.array, D_floor)
+        D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 
         if self.relax_adaptive:
             prev_res_D = self._adapt_relax("D", res_curr, prev_res_D)
