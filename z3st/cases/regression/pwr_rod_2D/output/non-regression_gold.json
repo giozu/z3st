@@ -8,42 +8,42 @@
             "status": "PASS"
         },
         "burnup_max_final": {
-            "numerical": 139.2528,
+            "numerical": 124.5256,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "gap_final_um": {
-            "numerical": -0.4927,
+            "numerical": -0.4701,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "contact_pressure_final_MPa": {
-            "numerical": 24.6349,
+            "numerical": 23.5024,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "T_max_final_K": {
-            "numerical": 975.79,
+            "numerical": 925.28,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "T_max_peak_K": {
-            "numerical": 1126.22,
+            "numerical": 1064.49,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "burnup_at_gap_closure_MWdkgU": {
-            "numerical": 20.90485,
+            "numerical": 22.48538,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,

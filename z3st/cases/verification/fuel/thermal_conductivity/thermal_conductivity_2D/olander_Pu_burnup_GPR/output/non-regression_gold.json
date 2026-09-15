@@ -8,35 +8,35 @@
             "status": "PASS"
         },
         "integrated_power": {
-            "numerical": 587.1654,
+            "numerical": 600.0,
             "reference": 600.0,
-            "abs_error": 12.834600000000023,
-            "rel_error": 0.02139100000000004,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
             "status": "PASS"
         },
         "T_max_K": {
-            "numerical": 1383.5876654145948,
+            "numerical": 1405.476124361424,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "T_center_midplane_K": {
-            "numerical": 1383.5876654145736,
+            "numerical": 1405.4761243613991,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "Pu_max_line": {
-            "numerical": 0.29407057896985905,
+            "numerical": 0.29416941284607584,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "burnup_max_MWd_kgHM": {
-            "numerical": 79.29825892938642,
+            "numerical": 80.41558249504573,
             "reference": null,
             "abs_error": 0.0,
             "rel_error": 0.0,
@@ -44,5 +44,6 @@
         }
     },
     "tolerance": 0.03,
-    "summary": "PASS"
+    "summary": "PASS",
+    "regression": "PASS"
 }
