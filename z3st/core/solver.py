@@ -420,7 +420,13 @@ class Solver:
                     self._coh_D_old = dolfinx.fem.Function(self.V_d)
                 D_new, D_old = self._coh_D_new, self._coh_D_old
             else:
-                D_new = dolfinx.fem.Function(self.V_d)
+                # The damage iterate is self.D itself: the mechanical forms
+                # (g(D) on the stress and the eigenstress, cached per step) hold
+                # it by reference, so every mechanical solve sees the current
+                # damage and u and D are coupled within the step. At step start
+                # it still holds D^n, so the first solve sees D^n. The step-start
+                # value survives in _D_step_start below for irreversibility.
+                D_new = self.D
                 D_old = dolfinx.fem.Function(self.V_d)
             D_new.x.array[:] = self.D.x.array
             # Irreversibility anchors: D and H ratchet against the last

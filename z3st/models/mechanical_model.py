@@ -491,6 +491,8 @@ class MechanicalModel:
                     material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim) + 2.0 * material["G"] * eps
                 )
 
+        # self.D is the damage iterate inside the staggered loop
+        # (solve_staggered), the converged damage outside it.
         if self.on.get("damage", False):
             g_d = self.degradation_function(self.D)
             sigma = g_d * sigma

@@ -338,7 +338,7 @@ with upwind interior-facet flux for advection, SIPG for diffusion, and a **mass-
 
 **`solve_staggered(max_iter, dt, rtol_*, stag_tol_*)`** — outer loop:
 1. `_build_measures`
-2. allocate local copies `T_new/old`, `u_new/old`, `D_new/old`, `c_new` if the corresponding model is active.
+2. allocate local copies `T_new/old`, `u_new/old`, `D_old`, `c_new` if the corresponding model is active. In the phase-field damage route the damage iterate `D_new` is `self.D` itself, so the cached mechanical forms (g(D) on stress and eigenstress) see the current damage every staggered iteration. `_D_step_start` keeps D^n for irreversibility.
 3. for each iteration: thermal → mechanical → (`update_history(u)` →) damage → cluster
 4. check `conv_th ∧ conv_mech ∧ conv_damage`; on success push local solutions back into `self.T, self.u, self.D, self.c` and trigger `update_plastic_history(u)` when plasticity is active.
 5. if `max_iter` exceeded, keep last iterate and warn.
