@@ -7,18 +7,34 @@ Z3ST case: box_crack_2D
 non-regression script
 ---------------------
 
+Edge pre-crack (D = 1 on 0 < x < Dn, y = Ly/2) opened by a prescribed
+displacement ramp u_y on the top edge (bottom Clamp_y, right edge Clamp_x).
+The ramp passes the peak load, so the reaction force F_y(u_y) traces the
+softening branch. Checks, all from the per-step VTUs:
+  - max_damage          D = 1 on the pre-crack
+  - max_stress_yy       the largest sigma_yy over the whole history is capped by
+                        the AT2 strength sigma_c = sqrt(27 E Gc / (256 lc))
+  - E_frac_initial      AT2 energy of the prescribed crack against Gc * Dn
+  - crack_path_offset   the grown crack stays on y = Ly/2 (max |y - Ly/2| of
+                        the D > 0.9 nodes ahead of the pre-crack, over Ly)
+  - localisation_length, peak_force, u_at_peak, force_ratio_final,
+    crack_tip_x_final   tracked by the gold
 """
 
 import os, re
+from glob import glob
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-from z3st.utils.non_regression import case_paths, finish, tracked
+from z3st.utils.non_regression import case_paths, edge_force, error_metric, finish, metric, tracked
 from z3st.utils.utils_extract_vtu import extract_field, list_fields
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR, VTU_FILE, OUT_JSON = case_paths(__file__)
+CASE_DIR, _, OUT_JSON = case_paths(__file__)
+VTU_FILES = sorted(glob(os.path.join(CASE_DIR, "output", "fields_*.vtu")))
+VTU_FILE = VTU_FILES[-1]   # final state of the displacement ramp
+BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
 MATERIAL_FILE = os.path.join(CASE_DIR, "../../../../materials/high_carbon_steel.yaml")
 GEOMETRY_FILE = os.path.join(CASE_DIR, "geometry.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
@@ -59,13 +75,35 @@ TOLERANCE = 7e-2
 # --.. ..- .-.. .-.. --- Data --.. ..- .-.. .-.. ---
 list_fields(VTU_FILE)
 
-# Damage
+# Load history: prescribed u_y and reaction F_y on the top edge (N/m)
+with open(BC_FILE, 'r') as f:
+    bc_data = yaml.safe_load(f)
+u_ramp = next(bc["displacement"] for bc in bc_data["mechanical"]["steel"] if bc["type"] == "Dirichlet_y")
+u_steps = np.array(u_ramp[:len(VTU_FILES)], dtype=float)
+F_steps = np.array([edge_force(v, "y", Ly, Ly / 2000) for v in VTU_FILES])
+sigma_yy_hist = np.array([np.max(extract_field(v, field_name="Stress (cells)")[3][:, 4]) for v in VTU_FILES])
+i_peak = int(np.argmax(F_steps))
+F_peak, u_peak = F_steps[i_peak], u_steps[i_peak]
+print(f"[INFO] Peak reaction {F_peak*1e-6:.3f} MN/m at u_y = {u_peak*1e6:.1f} um (step {i_peak}), "
+      f"final {F_steps[-1]*1e-6:.3f} MN/m ({F_steps[-1]/F_peak:.3f} of peak)")
+
+energies = np.genfromtxt(os.path.join(CASE_DIR, "energies.txt"), names=True)
+E_frac_0 = float(np.atleast_1d(energies["E_frac"])[0])
+
+# Damage (final state)
 x_d, y_d, _, D_all = extract_field(VTU_FILE, field_name="Damage")
 d_max = np.max(D_all)
 
-# Stress
+# Stress (final state)
 x_s, y_s, _, S_all = extract_field(VTU_FILE, field_name="Stress (cells)")
-sigma_yy_max = np.max(S_all[:, 4]) 
+sigma_yy_max = np.max(sigma_yy_hist)
+
+# Crack path ahead of the pre-crack
+ahead = (D_all > 0.9) & (x_d > X_tip + 2 * lc)
+crack_offset = float(np.max(np.abs(y_d[ahead] - y_target))) if np.any(ahead) else 0.0
+crack_tip_x = float(np.max(x_d[D_all > 0.9]))
+print(f"[INFO] Crack tip at x = {crack_tip_x:.4f} m (pre-crack tip {X_tip} m), "
+      f"max offset from y = Ly/2: {crack_offset*1e3:.2f} mm")
 
 mask_horiz = np.abs(y_d - y_target) < (Ly/1500)
 idx_h = np.argsort(x_d[mask_horiz])
@@ -148,6 +186,17 @@ plt.tight_layout()
 plt.savefig(os.path.join(CASE_DIR, "output", "damage_stress_profile.png"), dpi=300)
 print(f"[INFO] Detailed profiles saved in: output/damage_stress_profile.png")
 
+# PLOT 3: reaction force against prescribed displacement
+plt.figure(figsize=(7, 5))
+plt.plot(u_steps * 1e6, F_steps * 1e-6, "-o", color="#0072B2", lw=2, markersize=4)
+plt.plot(u_peak * 1e6, F_peak * 1e-6, "s", color="#D55E00", label="Peak")
+plt.xlabel(r"Prescribed displacement $u_y$ ($\mu$m)")
+plt.ylabel(r"Reaction force $F_y$ (MN/m)")
+plt.grid(True, ls=":", alpha=0.6)
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(CASE_DIR, "output", "force_displacement.png"), dpi=300)
+
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
 errors = {
     "max_damage": {
@@ -160,6 +209,12 @@ errors = {
         "reference": sigma_c,
         "rel_error": float(abs(sigma_yy_max - sigma_c)/sigma_c)
     },
+    "E_frac_initial": metric(E_frac_0, Gc * X_tip),
+    "crack_path_offset": error_metric(crack_offset, crack_offset / Ly),
+    "peak_force": tracked(F_peak),
+    "u_at_peak": tracked(u_peak),
+    "force_ratio_final": tracked(F_steps[-1] / F_peak),
+    "crack_tip_x_final": tracked(crack_tip_x),
     # tracked, not compared against lc: the measured length sits ~11 % above lc
     # (2.227 mm vs 2.000 mm), and the half-width at D = 0.5 agrees at +10 %
     # against lc*ln2. The offset is physical -- finite domain, residual elastic
@@ -170,6 +225,6 @@ errors = {
 finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
 
 print(f"\n[INFO] Max damage: {d_max:.4f}")
-print(f"[INFO] Max sigma_yy: {sigma_yy_max*1e-6:.2f} MPa")
+print(f"[INFO] Max sigma_yy over the history: {sigma_yy_max*1e-6:.2f} MPa")
 
 print("[INFO] non-regression completed.\n")

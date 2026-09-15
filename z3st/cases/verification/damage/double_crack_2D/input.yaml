@@ -14,10 +14,10 @@ materials:
 regime: 2d
 
 solver_settings:
-  max_iters: 200
+  max_iters: 2000
   relax_T: 0.9
   relax_u: 1.0
-  relax_D: 0.8
+  relax_D: 1.0
   relax_adaptive: false
   relax_growth: 1.2
   relax_shrink: 0.8
@@ -58,4 +58,4 @@ lhr:
 time:
 - 0.0
 - 3600.0
-n_steps: 5
+n_steps: 19

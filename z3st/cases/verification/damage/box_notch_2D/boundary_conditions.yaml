@@ -6,9 +6,10 @@ mechanical:
   - type: Clamp_y
     region: ymin
 
-  - type: Neumann
+  - type: Dirichlet_x
     region: xmax
-    traction: 1.8e+8 # (Pa)
+    # prescribed displacement ramp (m), one value per step
+    displacement: [0.00e+00, 5.00e-05, 1.00e-04, 1.50e-04, 2.00e-04, 2.50e-04, 3.00e-04, 4.00e-04, 6.00e-04, 8.00e-04]
 
 thermal:
   steel:

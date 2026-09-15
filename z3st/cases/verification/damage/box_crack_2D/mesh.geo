@@ -48,3 +48,16 @@ Physical Surface("steel") = {1};
 
 // Mesh 2;
 // Save "mesh.msh";
+
+// crack-path band ahead of the pre-crack: elements below lc so the crack can propagate
+h_path = lc_damage / 2.5;
+w_path = 2 * lc_damage;
+Field[1] = Box;
+Field[1].VIn = h_path;
+Field[1].VOut = h_coarse;
+Field[1].XMin = Dn;
+Field[1].XMax = Lx;
+Field[1].YMin = Ly/2 - w_path;
+Field[1].YMax = Ly/2 + w_path;
+Field[1].Thickness = 0.05;
+Background Field = 1;

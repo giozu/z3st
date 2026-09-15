@@ -14,11 +14,11 @@ materials:
 regime: 2d
 
 solver_settings:
-  max_iters: 100
+  max_iters: 2000
   relax_T: 0.9
-  relax_u: 0.8
-  relax_D: 0.6
-  relax_adaptive: true
+  relax_u: 1.0
+  relax_D: 1.0
+  relax_adaptive: false
   relax_growth: 1.2
   relax_shrink: 0.8
   relax_min: 0.05
@@ -52,8 +52,10 @@ damage:
   convergence: rel_norm # rel_norm | norm
   lc: 0.002
 
-lhr: 
+lhr:
 - 0.0
-time: 
 - 0.0
-n_steps: 1
+time:
+- 0.0
+- 3600.0
+n_steps: 17

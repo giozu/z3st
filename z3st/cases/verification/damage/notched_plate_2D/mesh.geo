@@ -49,7 +49,20 @@ Field[2].LcMin = lc_fine;
 Field[2].LcMax = lc_coarse;
 Field[2].DistMin = 0.02;
 Field[2].DistMax = 0.2;
-Background Field = 2;
+// crack-path band below the notch tip: elements below lc so the crack can propagate
+lc_damage = 0.002;
+w_path = 2 * lc_damage;
+Field[3] = Box;
+Field[3].VIn = lc_damage / 2.5;
+Field[3].VOut = lc_coarse;
+Field[3].XMin = Lx/2 - w_path;
+Field[3].XMax = Lx/2 + w_path;
+Field[3].YMin = 0;
+Field[3].YMax = Y_tip;
+Field[3].Thickness = 0.05;
+Field[4] = Min;
+Field[4].FieldsList = {2, 3};
+Background Field = 4;
 
 Physical Curve("ymin") = {1};
 Physical Curve("xmax") = {2};

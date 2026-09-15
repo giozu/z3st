@@ -2,24 +2,32 @@
 # SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: stress_strain_curve_knotch
+Z3ST case: notched_plate_2D
 
 non-regression script
 ---------------------
 
-This script processes multiple VTU files (fields_0000.vtu, ...),
-extracts σ_xx and ε_xx for each step, and reconstructs the stress-strain curve.
+V-notch at mid-span of the top edge, loaded by a prescribed displacement ramp
+u_x on the right edge (left Clamp_x, bottom Clamp_y). The ramp passes the peak
+load, so the reaction force F_x(u_x) on the right edge traces the softening
+branch while the crack runs from the notch tip towards the bottom edge.
+
+Checks (per-step VTUs and energies.txt):
+  - crack_path_offset  the crack grows on x = Lx/2: max |x - Lx/2| of the D > 0.9
+                       nodes below the notch tip, over Lx
+  - peak_force, u_at_peak, force_ratio_final, crack_depth_final, E_frac_final
+                       no closed form, tracked by the gold
 """
 
 import os, yaml, re
 import numpy as np
 from glob import glob
 import matplotlib.pyplot as plt
-from z3st.utils.non_regression import finish, tracked
+from z3st.utils.non_regression import edge_force, error_metric, finish, tracked
 from z3st.utils.utils_extract_vtu import extract_field
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(__file__)
+CASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(CASE_DIR, "output", "non-regression.json")
 VTU_FILES = sorted(glob(os.path.join(OUTPUT_DIR, "fields_*.vtu")))
@@ -29,13 +37,9 @@ BC_FILE = os.path.join(CASE_DIR, "boundary_conditions.yaml")
 MESH_GEO_FILE = os.path.join(CASE_DIR, "mesh.geo")
 INPUT_FILE = os.path.join(CASE_DIR, "input.yaml")
 
-# Phase-field / damage
 with open(INPUT_FILE, 'r') as f:
-    input_data = yaml.safe_load(f)
-dmg_cfg = input_data.get("damage", {})
-lc = float(dmg_cfg["lc"])
+    lc = float(yaml.safe_load(f)["damage"]["lc"])
 
-# Geometry, material, boundary conditions:
 with open(GEOMETRY_FILE, 'r') as f:
     geom_data = yaml.safe_load(f)
 Lx = float(geom_data.get('Lx'))
@@ -43,132 +47,81 @@ Ly = float(geom_data.get('Ly'))
 
 with open(MATERIAL_FILE, 'r') as f:
     mat_data = yaml.safe_load(f)
-E  = float(mat_data.get('E'))
-nu = float(mat_data.get('nu'))
+E = float(mat_data.get('E'))
 Gc = float(mat_data.get('Gc'))
 sigma_c = ((27 * E * Gc) / (256 * lc))**0.5
 
 with open(MESH_GEO_FILE, 'r') as f:
-    content = f.read()
-W_notch = float(re.search(rf'W_notch\s*=\s*([\d\.]+);', content).group(1))
-D_notch = float(re.search(rf'D_notch\s*=\s*([\d\.]+);', content).group(1))
+    D_notch = float(re.search(r'D_notch\s*=\s*([\d\.]+);', f.read()).group(1))
+Y_tip = Ly - D_notch
 
-print(f"[INFO] Geometry loaded: Lx = {Lx} m, Ly = {Ly} m")
-print(f"[INFO] Material loaded: E = {E:.2e} Pa, nu = {nu}")
-print(f"[INFO]                : sigma_c = {sigma_c:.2e} Pa")
-print(f"[INFO] W_notch loaded: W_notch = {W_notch}")
+with open(BC_FILE, 'r') as f:
+    bc_data = yaml.safe_load(f)
+u_ramp = next(bc["displacement"] for bc in bc_data["mechanical"]["steel"] if bc["type"] == "Dirichlet_x")
 
-y_target, mask_tol = (Ly - D_notch, 1 / (2 * 40)) # m, m, m (extraction line selection and tolerance)
-
-# --.. ..- .-.. .-.. --- analytic functions  --.. ..- .-.. .-.. ---
-STRESSES_REF = [0.0, 1.0e6, 1.0e7, 1.0e8, 2.0e8, 3.0e8]             # (Pa)
-# Imposed stress: (1 - nu**2) accounts for the 2D plane-strain condition (epsilon_zz = 0)
-STRAINS_REF = [(1 - nu**2) / E * sigma for sigma in STRESSES_REF]   # (/)
-U_X_REF = [eps * Lx for eps in STRAINS_REF]                         # (m)
+print(f"[INFO] Geometry: Lx = {Lx} m, Ly = {Ly} m, notch tip at y = {Y_tip} m")
+print(f"[INFO] Material: E = {E:.2e} Pa, Gc = {Gc} J/m2, sigma_c (AT2) = {sigma_c:.3e} Pa")
 
 TOLERANCE = 1e-2            # relative tolerance for pass/fail
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-print(f"[INFO] Target y-plane for extraction: y = {y_target:.4e} m")
+u_steps = np.array(u_ramp[:len(VTU_FILES)], dtype=float)
+F_steps = np.array([edge_force(v, "x", Lx, Lx / 2000) for v in VTU_FILES])
+i_peak = int(np.argmax(F_steps))
+F_peak, u_peak = F_steps[i_peak], u_steps[i_peak]
+print(f"[INFO] Peak reaction {F_peak*1e-6:.3f} MN/m at u_x = {u_peak*1e6:.1f} um (step {i_peak}), "
+      f"final {F_steps[-1]*1e-6:.3f} MN/m ({F_steps[-1]/F_peak:.3f} of peak)")
 
-strains = []
-stresses = []
-displacements = []
-d_max_list = []
-h_max_list = []
+energies = np.genfromtxt(os.path.join(CASE_DIR, "energies.txt"), names=True)
+E_frac = np.atleast_1d(energies["E_frac"])
 
-for step, vtufile in enumerate(VTU_FILES):
-    print(f"\n[STEP {step}] Processing {os.path.basename(vtufile)}")
-
-    # Stress extraction
-    x_S, y_S, z_S, S_all = extract_field(vtufile, field_name="Stress (cells)")
-    mask = np.abs(y_S - y_target) < mask_tol
-    stresses.append(float(np.mean(S_all[mask, 0])))
-
-    # Displacement extraction
-    x_u_all, y_u_all, z_u_all, u_all = extract_field(vtufile, field_name="Displacement")
-    mask_u = np.abs(y_u_all - y_target) < mask_tol
-    u_max = np.max(u_all[mask_u, 0])
-    displacements.append(u_max)
-
-    # Strain extraction
-    x_eps_all, y_eps_all, z_eps_all, E_all = extract_field(vtufile, field_name="Strain (cells)")
-    mask_e = np.abs(y_eps_all - y_target) < mask_tol
-    eps_eng = float(np.mean(E_all[mask_e, 0]))
-    strains.append(eps_eng)
-
-    # Damage
-    x_d, y_d, _, D_all = extract_field(vtufile, field_name="Damage")
-    d_max_list.append(np.max(D_all))
-
-    # Crack driving force
-    _, _, _, H_all = extract_field(vtufile, field_name="CrackDrivingForce")
-    h_max_list.append(np.max(H_all))
-
-# Stress–strain curve output
-strain_ref_np = np.array(STRAINS_REF, dtype=float)
-stresses_ref_np = np.array(STRESSES_REF, dtype=float)
-displ_x_ref_np = np.array(U_X_REF, dtype=float)
-
-strains_np = np.array(strains, dtype=float)
-stresses_np = np.array(stresses, dtype=float)
-displ_x_np = np.array(displacements, dtype=float)
-
-print("\n--. stress-strain-displacement values --..")
-for e, s, u in zip(strains, stresses, displacements):
-    print(f"ε_xx = {e:.3e}\tσ_xx = {s:.3e}\tu_x = {u:.3e}")
+x_d, y_d, _, D_final = extract_field(VTU_FILES[-1], field_name="Damage")
+below = (D_final > 0.9) & (y_d < Y_tip - 2 * lc)
+crack_offset = float(np.max(np.abs(x_d[below] - Lx / 2))) if np.any(below) else 0.0
+crack_depth = float(Ly - np.min(y_d[D_final > 0.9])) if np.any(D_final > 0.9) else 0.0
+print(f"[INFO] Crack depth from the top edge: {crack_depth*1e3:.1f} mm (notch {D_notch*1e3:.0f} mm), "
+      f"max offset from x = Lx/2: {crack_offset*1e3:.2f} mm")
 
 # --.. ..- .-.. .-.. --- plotting --.. ..- .-.. .-.. ---
-# Sigma-epsilon
 plt.figure(figsize=(7, 5))
-plt.plot(strains, stresses, "--o", lw=2, label="Numerical")
-plt.plot(strain_ref_np, stresses_ref_np, "-", lw=2, label="Analytical")
-plt.xlabel(r"strain $\epsilon_{xx}$ (/)")
-plt.ylabel(r"stress $\sigma_{xx}$ (Pa)")
-plt.grid(True)
-plt.title("Stress-strain curve")
-plt.yscale("linear")
+plt.plot(u_steps * 1e6, F_steps * 1e-6, "-o", color="#0072B2", lw=2, markersize=4)
+plt.plot(u_peak * 1e6, F_peak * 1e-6, "s", color="#D55E00", label="Peak")
+plt.xlabel(r"Prescribed displacement $u_x$ ($\mu$m)")
+plt.ylabel(r"Reaction force $F_x$ (MN/m)")
+plt.grid(True, ls=":", alpha=0.6)
 plt.legend()
 plt.tight_layout()
-plt.savefig(os.path.join(OUTPUT_DIR, "stress_strain_curve.png"))
-print("[INFO] stress_strain_curve.png saved\n")
+plt.savefig(os.path.join(OUTPUT_DIR, "force_displacement.png"))
 
-# Damage
-steps = np.arange(len(VTU_FILES))
-fig, ax1 = plt.subplots(figsize=(9, 6))
+plt.figure(figsize=(8, 5))
+plt.plot(energies['Step'], energies['E_el'], "-o", color="#0072B2", label='Elastic Energy ($E_{el}$)')
+plt.plot(energies['Step'], energies['E_frac'], "-s", color="#D55E00", label='Fracture Energy ($E_{frac}$)')
+plt.plot(energies['Step'], energies['E_tot'], 'k--', label='Total Energy ($E_{tot}$)')
+plt.xlabel('Step')
+plt.ylabel('Energy (J)')
+plt.grid(True, ls=':', alpha=0.6)
+plt.legend()
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_DIR, "energy_balance.png"))
 
-ax1.set_xlabel('Step')
-ax1.set_ylabel('Damage $D$ / History $H$', color="#D55E00")
-lns1 = ax1.plot(steps, d_max_list, "-o", color="#D55E00", lw=2, label='Max Damage $D$')
-lns2 = ax1.plot(steps, h_max_list / np.max(h_max_list) if np.max(h_max_list)>0 else h_max_list, 
-                "--", color="#009E73", lw=1.5, label='Normalized $H$')
-ax1.set_ylim(-0.05, 1.1)
-ax1.tick_params(axis='y', labelcolor='tab:red')
-ax1.grid(True, ls=':', alpha=0.6)
-
-ax2 = ax1.twinx()
-ax2.set_ylabel(r'Stress $\sigma_{xx}$ (MPa)', color="#0072B2")
-lns3 = ax2.plot(steps, np.array(stresses)*1e-6, "-s", color="#0072B2", lw=2, label=r'$\sigma_{xx}$ Mean at Tip')
-ax2.axhline(sigma_c * 1e-6, color='black', ls=':', alpha=0.4, label=r'Critical $\sigma_c$')
-ax2.tick_params(axis='y', labelcolor='tab:blue')
-
-lns = lns1 + lns2 + lns3
-labs = [l.get_label() for l in lns]
-ax1.legend(lns, labs, loc='center left', frameon=True, shadow=True)
-
-plt.title(f"Z3ST: Crack initiation & softening\nNotch tip evolution (y={y_target:.3f}m)")
-fig.tight_layout()
-plt.savefig(os.path.join(OUTPUT_DIR, "damage_evolution.png"), dpi=300)
-
+plt.figure(figsize=(10, 5))
+sc = plt.scatter(x_d, y_d, c=D_final, cmap='jet', s=1)
+plt.colorbar(sc, label="Damage $D$")
+plt.xlabel("x (m)")
+plt.ylabel("y (m)")
+plt.title(f"Final damage, u_x = {u_steps[-1]*1e6:.0f} um")
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_DIR, "damage_final.png"), dpi=200)
+print("[INFO] plots saved in output/")
 
 # --.. ..- .-.. .-.. --- non-regression metrics --.. ..- .-.. .-.. ---
-# This benchmark carries no closed-form reference, so every metric is tracked():
-# recorded in the gold and guarded against regression, without a pass/fail
-# criterion.
 errors = {
-    "u_max_final": tracked(displacements[-1]),
-    "sigma_final": tracked(stresses[-1]),
-    "eps_final": tracked(strains[-1]),
+    "crack_path_offset": error_metric(crack_offset, crack_offset / Lx),
+    "peak_force": tracked(F_peak),
+    "u_at_peak": tracked(u_peak),
+    "force_ratio_final": tracked(F_steps[-1] / F_peak),
+    "crack_depth_final": tracked(crack_depth),
+    "E_frac_final": tracked(E_frac[-1]),
 }
 
-finish(errors, 1e-2, OUT_JSON, CASE_DIR)
+finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
