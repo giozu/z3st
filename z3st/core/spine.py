@@ -428,6 +428,13 @@ class Spine(
                 print(f"    Set {len(dofs)} DOFs to {T_init:.2f} K")
 
             self.T.x.scatter_forward()
+            # Staggered temperature iterate T^k, persistent across steps. Symbolic
+            # k(T), E(T), nu(T) below are built on it, so the thermal solve is a
+            # Picard iteration within the step and mechanics sees the properties
+            # at the current temperature. self.T stays T^n (backward Euler).
+            # Outside the staggered loop the two hold the same values.
+            self.T_iter = self.T.copy()
+            self.T_iter.name = "Temperature_iterate"
             T_vals = self.T.x.array
             print(
                 f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K"
@@ -493,7 +500,7 @@ class Spine(
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
                 k_func = mat["_k_func"]
-                mat["k"] = self.call_material_function(k_func, self.T, mat)
+                mat["k"] = self.call_material_function(k_func, self.T_iter, mat)
                 print("\nk expression for", name, "→", mat["k"])
 
             # Data-driven conductivity
@@ -512,17 +519,17 @@ class Spine(
                 print(f"\nInitialized porosity-dependent thermal conductivity field for {name}")
 
             # Temperature-dependent elastic constants: build lmbda/G/bulk_modulus
-            # as UFL expressions in the live T field, so the per-iteration T
-            # propagates by reference into both the mechanical form and the
-            # (pre-compiled) output-writer stress expression.
+            # as UFL expressions in the staggered iterate T_iter, so the
+            # per-iteration T propagates by reference into both the mechanical
+            # form and the (pre-compiled) output-writer stress expression.
             if "_E_func" in mat or "_nu_func" in mat:
                 if getattr(self, "T", None) is None:
                     raise ValueError(
                         f"Material '{name}': temperature-dependent E/nu requires an "
                         f"active thermal field (set models.thermal: true)."
                     )
-                E_T = mat["_E_func"](self.T) if "_E_func" in mat else mat["E"]
-                nu_T = mat["_nu_func"](self.T) if "_nu_func" in mat else mat["nu"]
+                E_T = mat["_E_func"](self.T_iter) if "_E_func" in mat else mat["E"]
+                nu_T = mat["_nu_func"](self.T_iter) if "_nu_func" in mat else mat["nu"]
                 mat["lmbda"] = E_T * nu_T / ((1 + nu_T) * (1 - 2 * nu_T))
                 mat["G"] = E_T / (2 * (1 + nu_T))
                 mat["bulk_modulus"] = E_T / (3 * (1 - 2 * nu_T))

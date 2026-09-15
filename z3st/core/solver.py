@@ -390,7 +390,9 @@ class Solver:
 
         # Allocate local fields
         if self.on.get("thermal", False):
-            T_new = dolfinx.fem.Function(self.V_t)
+            # Persistent iterate (spine.initialize_fields): symbolic k(T), E(T),
+            # nu(T) are UFL expressions in it, so they follow T^k by reference.
+            T_new = self.T_iter
             T_new.x.array[:] = self.T.x.array
             T_old = dolfinx.fem.Function(self.V_t)
 
