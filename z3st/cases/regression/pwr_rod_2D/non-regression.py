@@ -12,11 +12,12 @@ check is independent of the output format (the run writes a single XDMF).
 
 One metric has a closed form and is checked analytically:
 
-  * ``burnup_avg_final`` — the nodal-mean burnup over the fuel equals the flat
-    closed form  bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10), because the
-    radial form factor is area-normalised to mean 1 (the source bus preserves
-    the rating) and ``update_state`` accumulates with the right-endpoint rule
-    over the generated power history.
+  * ``burnup_avg_final`` — the 2πr-weighted FE mean burnup over the fuel
+    equals the flat closed form  bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10),
+    because set_power divides the radial form factor by its weighted mean (the
+    source bus preserves the rating for any profile) and ``update_state``
+    accumulates with the right-endpoint rule over the generated power history.
+    A nodal mean would not match: it under-weights the peaked rim.
 
 The PCMI end-state scalars (gap, contact pressure, temperatures) have no
 closed form — they are recorded with ``rel_error = 0`` so the analytic

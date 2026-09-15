@@ -9,7 +9,8 @@ Five closed-form checks, independent of each other:
 
   source bus
   1. accumulation magnitude : bu_mean = q_avg * t_total / (rho * HM * 8.64e10),
-     q_avg = lhr/area (the mean-1 normalisation preserves the average rating).
+     q_avg = lhr/area, bu_mean the weighted FE mean from the solver log (the
+     weighted mean-1 normalisation preserves the rating).
   2. axial peaking factor   : bu_peak/bu_mean = 1 / [(2 L'/pi L) sin(pi L/2 L')].
   3. end/peak shape         : bu(0)/bu(z_mid) = cos(pi L / 2 L').
   thermal
@@ -70,10 +71,20 @@ UZ_TOP_REF = alpha * lhr * L / (8.0 * np.pi * k)             # 5
 P_REF = lhr * L
 
 # --. numerical results --..
+def _log_mean_burnup(case_dir):
+    """Last weighted FE mean burnup printed by spine.update_state."""
+    log = os.path.join(case_dir, "log_z3st.md")
+    if not os.path.exists(log):
+        return float("nan")
+    with open(log) as f:
+        hits = re.findall(r"Mean burnup in \S+:\s*([0-9.eE+\-]+)", f.read())
+    return float(hits[-1]) if hits else float("nan")
+
+
 xr, yz, _, bu = extract_field(VTU_FILE, field_name="Burnup")
 z = np.asarray(yz)                              # axisymmetric (r-z) mesh: y = z
 bu = np.asarray(bu)
-bu_mean = float(np.mean(bu))
+bu_mean = _log_mean_burnup(CASE_DIR)
 bu_peak = float(bu[np.argmin(np.abs(z - 0.5 * L))])   # node at z_mid
 bu_end = float(bu[np.argmin(z)])                       # node at z = 0
 peak_ratio = bu_peak / max(bu_mean, 1e-12)

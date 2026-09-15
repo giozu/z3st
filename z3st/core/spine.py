@@ -549,12 +549,41 @@ class Spine(
             self.update_porosity_dependent_properties(self.T, self.porosity)
 
 
+    def material_mean(self, fn, name, integral=False):
+        """Weighted FE mean of ``fn`` over material ``name``,
+
+            ∫_Ωm w fn dx / ∫_Ωm w dx,   w = 2πr (axisymmetric) or 1,
+
+        or the integral ∫_Ωm w fn dx itself when ``integral`` is set. Global
+        over ranks (``assemble_scalar`` is rank-local, hence the allreduce).
+        The forms are compiled once per (Function, material) and consume
+        ``fn`` by reference, so a Function updated in place needs no rebuild.
+        """
+        cache = self.__dict__.setdefault("_material_mean_forms", {})
+        key = (id(fn), name)
+        if key not in cache:
+            x_sc = ufl.SpatialCoordinate(self.mesh)
+            w = 2.0 * ufl.pi * x_sc[0] if self.regime == "axisymmetric" else 1.0
+            dx_m = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.cell_tags,
+                               subdomain_id=self.label_map[name])
+            one = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(1.0))
+            vol = self.mesh.comm.allreduce(
+                dolfinx.fem.assemble_scalar(dolfinx.fem.form(w * one * dx_m)), op=MPI.SUM)
+            cache[key] = (dolfinx.fem.form(w * fn * dx_m), vol)
+        form, vol = cache[key]
+        val = self.mesh.comm.allreduce(dolfinx.fem.assemble_scalar(form), op=MPI.SUM)
+        if integral:
+            return val
+        return val / vol if vol > 0 else 0.0
+
     def set_power(self):
         if self.q_third is None:
             return
 
         print(f"[UPDATING q_third]")
         self.q_third.x.array[:] = 0.0
+        if not hasattr(self, "_scratch_shape"):
+            self._scratch_shape = dolfinx.fem.Function(self.V_t)
 
         for name, mat in self.materials.items():
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
@@ -566,11 +595,15 @@ class Spine(
                 # Power form factors. A fissile material may shape its own
                 # volumetric source through the callables ``radial_profile``
                 # f(r, bu) and/or ``axial_profile`` f(z) (e.g. the chopped
-                # cosine). Each callable
-                # receives the dof coordinates and the current local burnup. The
-                # composite f_r·f_z is normalised once to nodal mean 1, so the
-                # shaping redistributes the linear heat rate without changing its
-                # integral. Default (no callables): f ≡ 1, the flat source.
+                # cosine). Each callable receives the dof coordinates and the
+                # current local burnup. The composite f = f_r·f_z is divided by
+                # its weighted FE mean over the material,
+                #     mean = ∫_Ωm w f dx / ∫_Ωm w dx,
+                # so ∫_Ωm w q''' dx = (LHR/A)·∫_Ωm w dx for any profile: the
+                # shaping redistributes the linear heat rate without changing
+                # its integral. A nodal mean would not (a rim-peaked profile on a
+                # uniform radial grid under-weights the rim and over-generates).
+                # Default (no callables): f ≡ 1, the flat source, untouched.
                 shape = np.ones(len(dofs))
                 rprof = mat.get("_radial_profile_func")
                 zprof = mat.get("_axial_profile_func")
@@ -585,17 +618,11 @@ class Spine(
                         shape = shape * np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
                     if zprof is not None:
                         shape = shape * np.asarray(zprof(coords, bu_vals, mat, model=self), dtype=float)
-                    # Nodal-mean normalisation. The mean is global over owned
-                    # dofs — a rank-local mean would normalise each partition
-                    # independently and make q''' partition-dependent.
-                    n_owned = self.V_t.dofmap.index_map.size_local
-                    dofs_arr = np.asarray(dofs)
-                    owned = dofs_arr < n_owned
-                    s_loc = float(shape[owned].sum()) if owned.any() else 0.0
-                    n_loc = int(np.count_nonzero(owned))
-                    s_glob = self.mesh.comm.allreduce(s_loc, op=MPI.SUM)
-                    n_glob = self.mesh.comm.allreduce(n_loc, op=MPI.SUM)
-                    mean = s_glob / n_glob if n_glob > 0 else 0.0
+                    shape_fn = self._scratch_shape
+                    shape_fn.x.array[:] = 0.0
+                    shape_fn.x.array[dofs] = shape
+                    shape_fn.x.scatter_forward()
+                    mean = self.material_mean(shape_fn, name)
                     if mean > 0:
                         shape = shape / mean
                     else:
@@ -606,28 +633,13 @@ class Spine(
                 # Accumulate: multiple sources on the same material (e.g.
                 # fissile + gamma_heating below) add.
                 self.q_third.x.array[dofs] += q_val * shape
-                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)")
+                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu)·f(z) (fissile, weighted mean f = 1)")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
 
                 # Integrated-power diagnostic: the exact FE integral of the
-                # fissile source over this material, with the regime weight
-                # (2πr in axisymmetric). For a rod this tracks LHR·Lz; a radially
-                # peaked profile deviates slightly, the mean-1 normalisation
-                # being nodal rather than area-weighted. The form is compiled
-                # once and cached; q_third updates in place.
-                if not hasattr(self, "_power_forms"):
-                    self._power_forms = {}
-                if name not in self._power_forms:
-                    x_sc = ufl.SpatialCoordinate(self.mesh)
-                    w_int = 2.0 * ufl.pi * x_sc[0] if self.regime == "axisymmetric" else 1.0
-                    dx_mat = ufl.Measure(
-                        "dx", domain=self.mesh,
-                        subdomain_data=self.cell_tags,
-                        subdomain_id=self.label_map[name],
-                    )
-                    self._power_forms[name] = dolfinx.fem.form(w_int * self.q_third * dx_mat)
-                P_int = dolfinx.fem.assemble_scalar(self._power_forms[name])
-                P_int = self.mesh.comm.allreduce(P_int, op=MPI.SUM)
+                # source over this material, with the regime weight. For a rod
+                # it equals LHR·Lz to round-off for any profile.
+                P_int = self.material_mean(self.q_third, name, integral=True)
                 unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
                         "1d": "W/m²"}.get(self.regime, "W")
                 print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
@@ -692,7 +704,8 @@ class Spine(
 
     def update_state(self, dt):
         """Advance each material's own history over a step of ``dt`` seconds.
-        Called once per step, *after* the solve.
+        Called once per step, after ``set_power`` and *before* the solve, so the
+        step sees bu^{n+1} = bu^n + q'''^{n+1}·dt (right-endpoint rule).
 
         Burnup: a fissile material accumulates its local burnup from the deposited
         fission power. The volumetric source ``q_third`` [W/m³] is the energy
@@ -730,6 +743,13 @@ class Spine(
             self.burnup.x.array[dofs] += q * dt / (float(rho) * hm * SECONDS_PER_MWD)
 
         self.burnup.x.scatter_forward()
+        # Weighted FE mean per fissile material. With the weighted power
+        # normalisation of set_power it equals the flat closed form
+        # Σ LHR·dt / (A·ρ·HM·8.64e10) for any power profile.
+        for name, mat in self.materials.items():
+            if mat.get("fissile", False) and mat.get("rho") is not None:
+                print(f"  [INFO] Mean burnup in {name}: "
+                      f"{self.material_mean(self.burnup, name):.6e} MWd/kgU")
         print(f"[update_state] burnup max = {self.burnup.x.array.max():.4e} MWd/kgU")
 
         # --. SCIANTIX gaseous swelling (opt-in; rides the eigenstrain bus) --..
