@@ -311,14 +311,19 @@ multiplicative form factors that leave its integral -- the prescribed linear
 heat rate -- unchanged. A material card names them via ``radial_profile`` and/or
 ``axial_profile`` (resolved like the symbolic ``k(T)`` hook); ``set_power``
 evaluates them on the fuel degrees of freedom, multiplies them together,
-normalises the composite to mean 1, and scales the source:
+normalises the composite to weighted mean 1, and scales the source:
 
 .. math::
 
    q'''(\boldsymbol{x}) = \frac{\mathrm{LHR}}{A}\;
    \frac{f_r(r, bu)\, f_z(z)}{\langle f_r f_z \rangle},
+   \qquad
+   \langle f \rangle = \frac{\int_{\Omega_m} w\, f \,\mathrm{d}x}{\int_{\Omega_m} w \,\mathrm{d}x},
 
-so only the *distribution* changes, never the total power. Implemented in
+with :math:`w = 2\pi r` in axisymmetric and :math:`w = 1` otherwise, evaluated as
+finite-element integrals over the material, so only the *distribution* changes,
+never the total power: :math:`\int_{\Omega_m} w\, q''' \,\mathrm{d}x` equals the
+nominal power to round-off for any profile. Implemented in
 ``materials/fuel_profiles.py``.
 
 Radial profile
