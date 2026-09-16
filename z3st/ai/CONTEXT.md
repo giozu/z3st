@@ -883,6 +883,8 @@ a grep for a syntactic form answers a different question.
 
 ---
 
+- **Faster coupled damage iterations (future work, recorded 2026-09-16)** — since damage is coupled within the staggered step, alternate minimisation converges linearly and needs many iterations while a crack grows (pellet_quench_2D_xy 342 s → 2757 s with unchanged results, sen_tension 25–144 iterations per step during growth). Only consistent block tolerances are applied so far. Candidate improvements, cheapest first: (1) adaptive time stepping driven by damage growth, smaller steps where the crack jumps; (2) Aitken or Anderson acceleration of the damage iterate, which today is applied to the displacement only; (3) a monolithic or quasi-Newton u–d solve (e.g. line-search monolithic of Gerasimov and De Lorenzis 2016).
+
 ## 11. Case 14 — thermal-shock fracture (UO2)
 
 `benchmarks/damage/pellet_quench_2D_xy` is the plane-strain reproducer of
