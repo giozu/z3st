@@ -4,6 +4,31 @@ Reproduces the **Ambati et al. 2015** (Comput Mech 55:383–405) §4.1 SENT-tens
 benchmark using the AT2 hybrid phase-field formulation (their Eq. 27). Companion
 to `benchmarks/sen_shear/` (same plate and notch, different BC).
 
+## Convergence with the coupled damage scheme (run of 2026-09-19)
+
+Since the damage iterate enters the mechanical solve within the staggered step,
+this case needs `max_iters: 500` (it was 200). With the old limit 33 of the 701
+steps stopped at the cap, with 500 only three do (539, 573, 650). The results
+are the same to better than 1 % either way, so the cap was costing little
+accuracy, but the run now reports what it actually did.
+
+Statistics of the accepted run: 698 of 701 steps converged, 20 650 staggered
+iterations in total, median 7 per step, 90th percentile 80, maximum 399, wall
+time 9 h 09 min. Thirty steps need more than 200 iterations and all of them lie
+in the crack-growth phase.
+
+The three failing steps coincide with the largest jumps of fracture energy. In
+them the residuals fall for tens of iterations, then rise to a plateau and stay
+there: the alternate minimisation advances the crack tip by a fixed amount per
+iteration instead of converging, and the step ends at the cap with that state
+accepted. The following step converges normally (step 651 takes 167 iterations
+with monotonically falling residuals), so the crack advance completes over the
+next steps and the end state is unaffected within the tolerances of the checks.
+This case has no time adaptivity, so a non-converging step is accepted rather
+than bisected. Splitting the load increment there, accelerating the damage
+iterate or loosening `stag_tol` from 1e-5 towards the 1e-4 of Gerasimov and De
+Lorenzis (2016) would each address it. See `z3st/ai/CONTEXT.md` section 10.
+
 ## Geometry & loading
 
 - 1 mm × 1 mm square plate, 2D plane strain.

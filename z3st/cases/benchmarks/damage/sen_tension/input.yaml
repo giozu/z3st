@@ -14,7 +14,7 @@ materials:
 regime: 2d
 
 solver_settings:
-  max_iters: 200
+  max_iters: 500
   relax_u: 1.0
   relax_D: 0.8
   relax_adaptive: false
