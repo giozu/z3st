@@ -93,15 +93,21 @@ class ThermalModel:
                     # a time-varying Dirichlet temperature. The Constant is updated per step by the
                     # solver; a scalar is broadcast to every step.
                     if isinstance(temperature, list):
-                        # Step index is capped at the last entry by the solver,
-                        # so a length mismatch with n_steps is tolerated (the
-                        # final value simply holds). Warn if they differ.
+                        # The list is indexed by step, not interpolated on the
+                        # `time` breakpoints the way `lhr` is. A short list used
+                        # to be tolerated with its last entry holding, which
+                        # silently turned an intended ramp over the whole
+                        # transient into one that finished in the first few
+                        # steps and then sat at its final value. It is an error.
                         if len(temperature) != self.n_steps:
                             print(
-                                f"  [WARNING] Thermal Dirichlet list on '{label}' region "
+                                f"  [ERROR] Thermal Dirichlet list on '{label}' region "
                                 f"'{region_name}' has length {len(temperature)} != n_steps "
-                                f"{self.n_steps}; the last value will hold for extra steps."
+                                f"{self.n_steps}. The list is indexed by step, so it must "
+                                f"carry one value per step. To ramp over the transient, "
+                                f"expand it to {self.n_steps} values."
                             )
+                            sys.exit(1)
                         raw_value = [float(t) for t in temperature]
                     else:
                         raw_value = [float(temperature)] * self.n_steps

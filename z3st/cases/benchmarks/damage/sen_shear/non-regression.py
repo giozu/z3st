@@ -151,7 +151,7 @@ if D_field is not None:
     plot_field(triang, D_field.reshape(-1),
                output_path=os.path.join(OUTPUT_DIR, "damage_field.png"),
                title=f"Damage field D (Ambati Fig. 12 hybrid reproducer)  -- {src}",
-               cbar_label="Damage D", cmap="hot_r", vmin=0.0, vmax=1.0)
+               cbar_label="Phase field $d$", cmap="hot_r", vmin=0.0, vmax=1.0)
     print("[INFO] damage_field.png saved")
     print(f"          max D = {float(np.max(D_field)):.4f}")
     metrics["D_max"] = tracked(np.max(D_field))

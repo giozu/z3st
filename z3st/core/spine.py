@@ -280,6 +280,19 @@ class Spine(
                 constitutive_mode = "plasticity"
                 print(f"  → constitutive model promoted to: plasticity (yield_strength present)")
 
+            # Plasticity and damage are not supported together. The J2 stress is
+            # degraded by g(d), but the plastic work does not enter the crack
+            # driving force psi+, and the return map does not subtract the
+            # eigenstrain. The combination therefore runs without being a
+            # ductile-fracture model, which is worse than refusing it. Mirrors
+            # the creep guard below.
+            if constitutive_mode == "plasticity" and self.on.get("damage", False):
+                raise ValueError(
+                    f"Material '{name}': plasticity cannot be combined with damage. "
+                    f"The plastic work does not drive the phase field, so the "
+                    f"combination is not a ductile-fracture model. Switch one off."
+                )
+
             # Material inelastic eigenstrain
             # A material card may expose an ``eigenstrain`` callable "module.func"
             # It is resolved here and consumed by MechanicalModel.eigenstrain

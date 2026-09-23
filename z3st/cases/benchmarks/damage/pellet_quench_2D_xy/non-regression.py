@@ -285,7 +285,7 @@ try:
             triang, D_field,
             output_path=os.path.join(OUT_DIR, "damage_field.png"),
             title=None,
-            cbar_label="Damage D", cmap="hot_r", vmin=0.0, vmax=1.0,
+            cbar_label="Phase field $d$", cmap="hot_r", vmin=0.0, vmax=1.0,
             contact_R=Ro, contact_half_angle_deg=CONTACT_HALF_ANGLE_DEG,
         )
         print(f"[INFO] Damage field plot saved: {os.path.join(OUT_DIR, 'damage_field.png')}")
