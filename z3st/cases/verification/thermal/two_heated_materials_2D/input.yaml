@@ -1,0 +1,38 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.3.2 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  # Two materials, identical: the same file under two names.
+  steel_in: ../../../../materials/vessel_steel.yaml
+  steel_out: ../../../../materials/vessel_steel.yaml
+
+regime: axisymmetric
+
+solver_settings:
+  max_iters: 100
+  relax_T: 1.0
+  relax_adaptive: false
+
+models:
+  thermal: true
+  mechanical: false
+
+thermal:
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-10
+  stag_tol: 1.0e-10
+  convergence: rel_norm
+
+lhr:
+- 0.0
+time:
+- 0.0
+n_steps: 1

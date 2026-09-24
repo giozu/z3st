@@ -1,0 +1,14 @@
+name: cylindrical_wall
+geometry_type: cyl
+
+Ri: 2.000 # inner radius (m), also the gamma reference surface
+Ro: 2.400 # outer radius (m)
+Lz: 0.200 # height (m)
+
+labels:
+  inner_radius: 1
+  outer_radius: 2
+  bottom: 3
+  top: 4
+  steel_in: 10
+  steel_out: 11
