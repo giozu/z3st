@@ -1,0 +1,12 @@
+#!/bin/bash
+# Two runs on one node set (see non-regression.py): single/ meshes the wall as
+# ONE material, this folder splits it into two identical heated materials.
+# Not the shared allrun.sh, which runs one input.yaml per folder.
+set -e
+cd "${0%/*}" || exit 1
+
+gmsh mesh.geo -2 -setnumber split 0 -o single/mesh.msh > log_mesh.md
+gmsh mesh.geo -2 -setnumber split 1 -o mesh.msh >> log_mesh.md
+(cd single && python3 -m z3st > log_z3st.md)
+python3 -m z3st > log_z3st.md
+python3 non-regression.py
