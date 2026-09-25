@@ -311,6 +311,10 @@ class Solver:
     def _stagger_residual(self, new, old, cfg, tol, label):
         """Staggered increment of one field: convergence verdict plus both norms.
 
+        Callers pass the unrelaxed solve output as ``new`` and the previous
+        iterate as ``old``, and relax afterwards, so the test measures
+        ||X_solve - X^{k-1}|| and ``stag_tol`` is independent of relax_X.
+
         Returns
         ``(converged, norm_d, rel_norm_d, residual)``, where ``residual`` is
         whichever norm ``cfg["convergence"]`` selects: it is what the adaptive
@@ -390,7 +394,9 @@ class Solver:
 
         # Allocate local fields
         if self.on.get("thermal", False):
-            T_new = dolfinx.fem.Function(self.V_t)
+            # Persistent iterate (spine.initialize_fields): symbolic k(T), E(T),
+            # nu(T) are UFL expressions in it, so they follow T^k by reference.
+            T_new = self.T_iter
             T_new.x.array[:] = self.T.x.array
             T_old = dolfinx.fem.Function(self.V_t)
 
@@ -420,7 +426,13 @@ class Solver:
                     self._coh_D_old = dolfinx.fem.Function(self.V_d)
                 D_new, D_old = self._coh_D_new, self._coh_D_old
             else:
-                D_new = dolfinx.fem.Function(self.V_d)
+                # The damage iterate is self.D itself: the mechanical forms
+                # (g(D) on the stress and the eigenstress, cached per step) hold
+                # it by reference, so every mechanical solve sees the current
+                # damage and u and D are coupled within the step. At step start
+                # it still holds D^n, so the first solve sees D^n. The step-start
+                # value survives in _D_step_start below for irreversibility.
+                D_new = self.D
                 D_old = dolfinx.fem.Function(self.V_d)
             D_new.x.array[:] = self.D.x.array
             # Irreversibility anchors: D and H ratchet against the last

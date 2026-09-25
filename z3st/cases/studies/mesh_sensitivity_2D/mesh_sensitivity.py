@@ -107,6 +107,12 @@ for nx in nx_values:
 res = np.array(results)
 h, eT, eS = res[:, 0], res[:, 1], res[:, 2]
 
+# The data file is written here so that it always matches the run that
+# produced the figure. A hand-maintained copy went stale and was quoted in a
+# draft with mesh sizes an order of magnitude too large.
+np.savetxt("convergence_data.txt", res,
+           header="h [m]   rel L2 error temperature   rel L2 error sigma_yy")
+
 plt.figure(figsize=(10, 8))
 plt.loglog(h, eT, "o-", color="#0072B2", label=r"Error $L_2$ Temperature", linewidth=2)
 plt.loglog(h, eS, "o-", color="#D55E00", label=r"Error $L_2$ Stress ($\sigma_{yy}$)", linewidth=2)

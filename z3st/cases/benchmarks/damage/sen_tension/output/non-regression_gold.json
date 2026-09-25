@@ -8,34 +8,35 @@
             "status": "PASS"
         },
         "sigma_vm_max_MPa": {
-            "numerical": 3694.177697973872,
-            "reference": 3694.177697973872,
+            "numerical": 3212.1770891950946,
+            "reference": 3212.1770891950946,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "E_el_final": {
-            "numerical": 2.549864,
-            "reference": 2.549864,
+            "numerical": 1.942907,
+            "reference": 1.942907,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "E_frac_final": {
-            "numerical": 2.029547,
-            "reference": 2.029547,
+            "numerical": 2.521177,
+            "reference": 2.521177,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "E_tot_final": {
-            "numerical": 4.579411,
-            "reference": 4.579411,
+            "numerical": 4.464084,
+            "reference": 4.464084,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         }
     },
     "tolerance": 0.01,
-    "summary": "PASS"
+    "summary": "PASS",
+    "regression": "FAIL"
 }

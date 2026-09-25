@@ -142,9 +142,9 @@ Key responsibilities:
    - **AT2:** `Gc = (256/27) · lc · σ_c² / E`
    - **AT1:** `Gc = (8/3) · lc · σ_c² / E`
    Also recognises `k` or `Gc` given as **symbolic Python callables** (`module.function`) and resolves them via `importlib`.
-4. `initialize_fields()` — instantiate `T`, `u`, `D`, `H`, `c`, … with initial conditions from material cards.
+4. `initialize_fields()` — instantiate `T`, `u`, `D`, `H`, `c`, … with initial conditions from material cards, plus the persistent temperature iterate `T_iter` (a copy of `T`) on which symbolic `k(T)`, `E(T)`, `ν(T)` are built (§3.3).
 5. `set_boundary_conditions()` — read `boundary_conditions.yaml` and dispatch to thermal/mechanical/damage BC setters.
-6. `set_power()` — build `q_third` (W/m³) per material: fissile (LHR/area), γ-heating with exponential decay in rect geometry or `K₀(μr)/K₀(μRᵢ)` in cylindrical geometry, spherical decay, etc. The cylindrical/spherical γ-attenuation profile is normalised at a **per-material reference surface** `gamma_inner_radius` (defaults to the geometry `inner_radius`, so existing cases are unchanged); a layer that sits inboard of the geometry reference — e.g. a thermal shield ahead of the vessel — sets it so its `K₀` profile is normalised at its own inner surface rather than the vessel's. **Radial power form factor (source bus):** a fissile material may carry a `radial_profile` callable (resolved like `k`/`Gc`), evaluated on the fuel dofs and area-normalised to mean 1, so the volumetric source is shaped `q''' = (LHR/area)·f(r, bu)` while preserving the integral. A built-in rim-peaking profile lives in `materials/fuel_profiles.py`; a mechanistic TUBRNP-style profile drops in behind the same hook.
+6. `set_power()` — build `q_third` (W/m³) per material: fissile (LHR/area), γ-heating with exponential decay in rect geometry or `K₀(μr)/K₀(μRᵢ)` in cylindrical geometry, spherical decay, etc. The cylindrical/spherical γ-attenuation profile is normalised at a **per-material reference surface** `gamma_inner_radius` (defaults to the geometry `inner_radius`, so existing cases are unchanged); a layer that sits inboard of the geometry reference — e.g. a thermal shield ahead of the vessel — sets it so its `K₀` profile is normalised at its own inner surface rather than the vessel's. **Radial power form factor (source bus):** a fissile material may carry a `radial_profile` callable (resolved like `k`/`Gc`), evaluated on the fuel dofs and divided by its weighted FE mean over the material (`Spine.material_mean`, ∫w f dx/∫w dx, w = 2πr in axisymmetric), so the volumetric source is shaped `q''' = (LHR/area)·f(r, bu)` while preserving the integral. A built-in rim-peaking profile lives in `materials/fuel_profiles.py`; a mechanistic TUBRNP-style profile drops in behind the same hook.
 7. `update_state(dt)` — advance each material's own history once per step (**state bus**, the `material.update_state(dt, fields)` channel). Currently: a fissile material accumulates its local **burnup** into the `self.burnup` field (MWd/kgU) from the deposited power, `Δbu = q_third·dt/(ρ·HM_frac·8.64e10)` (`heavy_metal_fraction` from the card). Called *before* the solve so fields at `t_k` are consistent with the state at `t_k` (behaviours that consume burnup — swelling, fuel-k — see the end-of-step value).
 8. `solve(dt, max_iters)` — dispatch to `solve_staggered`.
 9. `get_results()` — build symbolic UFL strain / stress / stress_mech / stress_th / energy_density dictionaries per material. The eigenstress `stress_th = −ℂ:ε*` carries the **total inelastic eigenstrain** ε* (thermal + material-carried swelling/creep — see §4.2), so fuel swelling enters equilibrium through the same channel as thermal expansion.
@@ -262,7 +262,7 @@ site is unchanged and `self._thermal_step(...)` still resolves.
 out the same staggered bookkeeping:
 - `_stagger_residual(new, old, cfg, tol, label)` — scatter both, `copy`, `axpy(-1)`,
   the two norms, the guarded division, and the verdict. Returns
-  `(converged, norm_d, rel_norm_d, residual)`. **The printed strings are parsed by
+  `(converged, norm_d, rel_norm_d, residual)`. Every caller passes the unrelaxed solve output as `new`, before relaxation. **The printed strings are parsed by
   `utils/plot_convergence.py`**, which greps the solver log for exactly
   `||ΔX||/||X|| = <float>`: changing the label or the spacing empties every
   convergence plot, with nothing to catch it.
@@ -302,8 +302,8 @@ L_t(v)   = ∫ w q''' v dx
          + ∫ w h T_ext v ds            (Robin)
 ```
 - Supports `dt = 0`: preserves IC, only applies BCs.
-- Post-solve relaxation: `T ← α_T · T_new + (1 − α_T) · T_old`.
-- Convergence on `‖ΔT‖` or `‖ΔT‖/‖T‖` (L2) depending on `thermal.convergence`.
+- Convergence on `‖ΔT‖` or `‖ΔT‖/‖T‖` (L2) depending on `thermal.convergence`, measured on the **unrelaxed** update `T_solve − T_old` (likewise u, D and porosity), so `stag_tol` does not scale with the relaxation factor. The EMA controller is fed the same unrelaxed residual.
+- Post-solve relaxation, after the test: `T ← α_T · T_new + (1 − α_T) · T_old`.
 - Adaptive relaxation (EMA residual) scales `α_T` between `relax_min` and `relax_max`.
 
 **`_mechanical_step`** (linear or SNES Newton for non-linear/hyperelastic):
@@ -325,8 +325,8 @@ L_t(v)   = ∫ w q''' v dx
   `L = (2 H − 3 Gc/(8 lc)) v w dx`.
   Produces the sharp elastic threshold (`σ > σ_c`) and requires a post-solve clipping `D ∈ [0,1]`.
 
-In both cases, post-solve **irreversibility** is enforced pointwise:
-`D_new ← max(D_new, D_old)` and clipped to `[0,1]`.
+In both cases, post-solve **irreversibility** is enforced pointwise against the last converged step, not the previous iterate:
+`D ← clip(max(D_solve, Dⁿ), 0, 1)` with `Dⁿ = _D_step_start`. The convergence test and the logged `|ΔD|_∞` are taken on this projected, unrelaxed candidate against `D^{k−1}`; relaxation (`relax_D`) and the same projection follow.
 
 **`_cluster_step`** (DG upwind + SIPG):
 
@@ -338,7 +338,7 @@ with upwind interior-facet flux for advection, SIPG for diffusion, and a **mass-
 
 **`solve_staggered(max_iter, dt, rtol_*, stag_tol_*)`** — outer loop:
 1. `_build_measures`
-2. allocate local copies `T_new/old`, `u_new/old`, `D_new/old`, `c_new` if the corresponding model is active.
+2. set up the iterates of the active models. The temperature iterate `T_new` is the persistent `self.T_iter`, reset to Tⁿ at step start: the symbolic `k(T)`, `E(T)`, `ν(T)` built on it in `initialize_fields` follow the staggered iterate (a Picard iteration within the step, not a one-step lag), while `self.T` stays Tⁿ for the backward-Euler term. `T_old`, `u_new/old`, `D_old` and `c_new` are local copies. In the phase-field damage route the damage iterate `D_new` is `self.D` itself, so the cached mechanical forms (g(D) on stress and eigenstress) see the current damage every staggered iteration. `_D_step_start` keeps D^n for irreversibility.
 3. for each iteration: thermal → mechanical → (`update_history(u)` →) damage → cluster
 4. check `conv_th ∧ conv_mech ∧ conv_damage`; on success push local solutions back into `self.T, self.u, self.D, self.c` and trigger `update_plastic_history(u)` when plasticity is active.
 5. if `max_iter` exceeded, keep last iterate and warn.
@@ -404,7 +404,7 @@ BC types (`set_mechanical_boundary_conditions`): `Dirichlet`, `Dirichlet_x/y/z`,
 
 For a purely thermal eigenstrain this reduces exactly to `σ_th = −(3λ + 2G) α (T − T_ref) I`. Because ε* is a UFL tensor the Newton tangent stays automatic, and fuel swelling/creep need no change to the momentum balance — *"fuel is a material"*: each region's inelastic behaviour travels with its own material, applied wherever the material's thermal block or own eigenstrain is active.
 
-Damage coupling: when damage is active, `σ ← g(D) σ` with `g(D) = (1−D)² + K` (K = 1e-6 regularization). The eigenstress is degraded by the same `g(D)` so a fully-damaged cell recovers the traction-free crack-face limit.
+Damage coupling: when damage is active, `σ ← g(D) σ` with `g(D) = (1−D)² + K` (K = 1e-6 regularization). The eigenstress is degraded by the same `g(D)` so a fully-damaged cell recovers the traction-free crack-face limit. `g(D)` reads `self.D`, which is the damage iterate itself, so every mechanical solve of a step sees the current damage (fully coupled staggered scheme, the only one). The price is more staggered iterations while a crack grows, and no equilibrium at all past the peak under traction control, so a fracture case that goes past the peak must be loaded by prescribed displacement (as `benchmarks/damage/sen_tension` and `sen_shear` are).
 
 ### 4.3 Damage (`damage_model.py`)
 
@@ -444,7 +444,7 @@ Two modes (selected via `models.gap_conductance.type`):
 - **Fixed** — constant `h_gap` (W/m²K) read from `value:`.
 - **Gas** — `k_gas = value · 1e-4 · T_gap^0.79`, then `h_gap = k_gas / gap_size` where `gap_size` is computed as the mean distance between two paired labelled facet groups (via SciPy cKDTree on facet centroids), and `T_gap = ½ (T_inner + T_outer)`.
 
-Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to another subdomain.
+Invoked inside `_thermal_step` when a Robin BC is defined with `pair:` to another subdomain. `h_gap` is referred to `gap_conductance.surface_a` (pellet outer by default, the lower tag of the pair if `surface_a` is not in it). The other surface uses `h_gap·|Γ_a|_w/|Γ_b|_w` (`_gap_area_ratio`, weighted areas ∫w ds, r_f/r_c in axisymmetric), so the gap coupling conserves energy.
 
 **Contact-coupled conductance.** When `gap_conductance.contact_coupling.enabled` is set, a solid-contact term is added on gap closure (Todreas & Kazimi, *Nuclear Systems I*, 3rd ed., Eqs. 8.141/8.142): the emergent contact pressure (from `contact_model`) raises `h_gap` above the open-gap gas value, so closing the gap cools the fuel. Parameters: `meyer_hardness` (Pa), `gas_thickness` (m, roughness-based residual gas space). The Ross-Stoute harmonic mean accepts symbolic k(T) cards by evaluating them at the current mean gap temperature (`_k_at_gap`; UFL folds constants, so `k_func(float)` is a plain number). A symbolic fuel conductivity would otherwise zero `h_contact` and disable the contact-cooling feedback.
 
@@ -591,7 +591,7 @@ Each case folder is self-contained:
 └── output/                   auto-generated VTU/XDMF + plots
 ```
 
-The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. The local suite is discovery-based: every directory under `cases/` with both an `Allrun` and a blessed `output/non-regression_gold.json` is a member (`sandbox/` is never scanned); exceptions live in `cases/suite_exclude.txt` with a reason per line, and `--list` prints the discovered set. A case is protected if and only if it has a gold. The CI list is curated separately in `cases/cases_ci.txt`, which `non-regression_github.sh` reads. The is chosen for **coverage** against a stated time budget (22 cases, 14 min 47 s, from measured per-case times) rather than purely for speed; its header records the two models no case reaches at all, so nobody looks for them there. Each case's `non-regression.json` carries two verdicts: `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL.
+The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-regression_github.sh` (CI) and summarised in `non-regression_summary.txt`. The local suite is discovery-based: every directory under `cases/` with both an `Allrun` and a blessed `output/non-regression_gold.json` is a member (`sandbox/` is never scanned); exceptions live in `cases/suite_exclude.txt` with a reason per line, and `--list` prints the discovered set. A case is protected if and only if it has a gold. The CI list is curated separately in `cases/cases_ci.txt`, which `non-regression_github.sh` reads. The is chosen for **coverage** against a stated time budget (20 cases, 13 min 21 s, from measured per-case times) rather than purely for speed; its header records the two models no case reaches at all, so nobody looks for them there. Each case's `non-regression.json` carries two verdicts: `"summary"` (analytic-tolerance check) and `"regression"` (vs the blessed `non-regression_gold.json`); the local summary reports both per case, and CI fails when either is FAIL.
 
 ### 6.1 Catalogue of cases
 
@@ -629,10 +629,9 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-reg
 
 **17 — Stress–strain curves**
 - `verification/mechanics/stress_strain_displacement`, `verification/mechanics/stress_strain_stress`
-- `verification/damage/double_crack_2D`, `verification/damage/notched_plate_2D`
 
 **18 — 2D fracture benchmarks**
-- `verification/damage/box_crack_2D`, `verification/damage/box_notch_2D`
+- Removed on 2026-09-16 (`box_crack_2D`, `box_notch_2D`, `double_crack_2D`, `notched_plate_2D`): no analytical or published reference, and each needed about an hour once damage was coupled within the step. The phase field is covered by §19 and by `pellet_quench_2D_xy`, `plate_thermal_shock_2D` and `two_elliptical_cavities_2D`.
 
 **19 — Single-edge notched (classical phase-field benchmarks)**
 - `benchmarks/damage/sen_shear`
@@ -657,7 +656,7 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-reg
 - `verification/fuel/shrink_fit` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit. The drive is a uniform Dirichlet ramp (300 → 1500 K, lhr = 0): a uniform pellet temperature expands stress-free, so the Lamé reference is exact rather than approximate. Siblings `shrink_fit_disk` (2D plane strain) and `shrink_fit_disk_3d`.
 
 **U_* — Extended / demo cases**
-- `regression/pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm cold gap, Zircaloy clad), the framework's integral fuel-performance case. Physics: modified-NFI UO2 k(T), FRAPCON-3 form at zero burnup (`materials/fuel_thermal.py`), Robin coolant film (h = 3.5e4 W/(m²·K), T = 580 K), burnup + rim-peaking radial power, solid + gaseous swelling with early-life densification (`fuel_swelling.solid_gas_densification`), Barani isotropic-softening fuel cracking (§4.9: n ≈ 6.6 at power, E_iso/E ≈ 0.11), Zircaloy thermal Norton + irradiation creep (§4.6), gas gap conductance with contact coupling (+ relax 0.5 damping), penalty contact, 15.5 MPa coolant and 2 MPa He fill-gas pressures. History: ramp to 20 kW/m in 20 d, 1800 d hold; weighted time grid `n_steps: [10, 14, 14]`. Solver: MUMPS both blocks, Aitken Δ² relaxation, mech stag_tol 5e-4. Gold state: T_max peaks at 1126.22 K at day 68.6, PCMI onset at day 651 / 20.90 MWd/kgU average burnup, the contact-conductance feedback cools the pellet to 975.79 K by end of life, contact pressure reaches 24.63 MPa; end of life at 1800 d with 58.28 MWd/kgU average (139.25 peak rim) and gap −0.49 µm. Mean burnup matches the closed form to machine precision. Wall-clock 215 s for 39 steps. Gold-protected (end-state PCMI scalars from `output/history.csv`, mean burnup against the closed form), excluded from the routine local suite via `cases/suite_exclude.txt`; not in CI.
+- `regression/pwr_rod_2D` — generic-PWR fuel-rod segment (4.5 mm pellet, 65 µm cold gap, Zircaloy clad), the framework's integral fuel-performance case. Physics: modified-NFI UO2 k(T), FRAPCON-3 form at zero burnup (`materials/fuel_thermal.py`), Robin coolant film (h = 3.5e4 W/(m²·K), T = 580 K), burnup + rim-peaking radial power, solid + gaseous swelling with early-life densification (`fuel_swelling.solid_gas_densification`), Barani isotropic-softening fuel cracking (§4.9: n ≈ 6.6 at power, E_iso/E ≈ 0.11), Zircaloy thermal Norton + irradiation creep (§4.6), gas gap conductance with contact coupling (+ relax 0.5 damping), penalty contact, 15.5 MPa coolant and 2 MPa He fill-gas pressures. History: ramp to 20 kW/m in 20 d, 1800 d hold; weighted time grid `n_steps: [10, 14, 14]`. Solver: MUMPS both blocks, Aitken Δ² relaxation, stag_tol 1e-4 (mechanical) and 1e-5 (thermal). The fissile source integrates to the nominal LHR·Lz = 200 W and the gap pair conserves energy (coolant outflow 200.02 W at 1800 d). Gold state (blessed 2026-09-15): T_max peaks at 1064.49 K at day 68.6, PCMI onset at day 700 / 22.49 MWd/kgU average burnup, the contact-conductance feedback cools the pellet to 925.28 K by end of life, contact pressure reaches 23.50 MPa; end of life at 1800 d with 58.28 MWd/kgU average (124.53 peak rim) and gap −0.47 µm. The 2πr-weighted mean burnup matches the closed form to machine precision. Wall-clock 142 s for 39 steps (984 staggered iterations). Gold-protected (end-state PCMI scalars from `output/history.csv`, mean burnup against the closed form), excluded from the routine local suite via `cases/suite_exclude.txt`; not in CI.
 - `verification/thermal/spherical_shell` — gold-protected (semi-analytic checks).
 - `U_pressure_vessel_2D` (`cases/sandbox/`): its `non-regression.py` only extracts CSV/plots (no asserts, never writes `non-regression.json`), and the `non-regression_gold.json` on disk is orphaned — it holds Lamé-style L2 errors the current script cannot produce (likely inherited from a deleted case).
 - `U_cluster_dynamics_test`, `U_quarter_block` — unvalidated sandboxes under `cases/sandbox/`.
@@ -784,11 +783,11 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Volumetric heating                | ✓ fissile (LHR/area), γ-heating (rect / cyl / sphere analytic decay), user `q'''` |
 | Burnup accumulation               | ✓ per-fissile-material `burnup` field via `update_state(dt)` (state bus)            |
 | Radial power shaping              | ✓ `radial_profile` form factor `f(r, bu)` (source bus); built-in rim-peaking        |
-| Axial power shaping               | ✓ `axial_profile` form factor `f(z)` (source bus, composed `f_r·f_z`, single mean-1 normalisation); built-ins: chopped cosine (T&K), tabulated (node-wise peaking factors) |
+| Axial power shaping               | ✓ `axial_profile` form factor `f(z)` (source bus, composed `f_r·f_z`, single weighted mean-1 normalisation); built-ins: chopped cosine (T&K), tabulated (node-wise peaking factors) |
 | Cladding creep (implicit, AD)     | ✓ Norton + Arrhenius via the incremental variational principle (`models/creep_model.py`): condensed radial return on the displacement space, DG0 predictor + one symbolic Newton step → exact IFT consistent tangent by `ufl.derivative`; per-material `ε_cr` DG0 state; card keys `creep: norton`, `creep_A0/n/Q`; optional irradiation creep ε̇ = B·φ·σ in the same radial return (`creep_irr_B` + `fast_flux`); verified to 1e-14 (constant stress) and 4e-15 vs the BE recursion (relaxation) |
 | Fuel cracking (isotropic softening) | ✓ Barani et al. (2019) model (`models/cracking_model.py`): n(LHR_max) macro-cracks rescale E and ν from the virgin constants; irreversible; card `cracking: isotropic` (§4.9) |
 | Constitutive-law identification   | ✓ EUCLID-style sparse mechanism selection from simulation data (`cases/verification/fuel/creep_law_discovery/discover.py`): candidate-library fit via self-contained forward-mode AD (dual numbers) through the implicit BE integrator, Gauss-Newton + backward elimination + one-SE rule; cubic Norton recovered 10/10 noise seeds; independent of the GPL-3.0 EUCLID codes |
-| Integrated-power diagnostic       | ✓ `set_power` prints the exact FE integral of the fissile source per material per step (regime-weighted, MPI-reduced); note the mean-1 normalisation is *nodal*, so a radially peaked profile integrates to LHR·Lz·⟨f⟩_area/⟨f⟩_nodal (= 1.2·LHR·Lz for rim-peaking A=3, p=8) — pinned by the `total_power` checks in the burnup-family `V_` cases |
+| Integrated-power diagnostic       | ✓ `set_power` prints the exact FE integral of the fissile source per material per step (regime-weighted, MPI-reduced); the normalisation is the weighted FE mean, so it equals LHR·Lz to round-off for any profile — pinned by the `total_power` checks in the burnup-family `V_` cases; `update_state` also prints the weighted mean burnup, which the burnup checks compare with the flat closed form |
 | Fuel swelling                     | ✓ constant ΔV/V or burnup-driven eigenstrain (eigenstrain bus); `solid_gas_densification` adds T-activated gaseous swelling + early-life densification |
 | Time stepping                     | ✓ piecewise-linear power history; `n_steps` as an int (duration-proportional) or per-segment interval list (decouples resolution from segment length) |
 | Pellet-clad contact (PCMI)        | ✓ penalty contact + contact-coupled gap conductance (verified vs analytical Lamé)   |
@@ -883,6 +882,8 @@ cases reach a model, parse the yaml and evaluate the switch the way `Config` doe
 a grep for a syntactic form answers a different question.
 
 ---
+
+- **Faster coupled damage iterations (future work, recorded 2026-09-16)** — since damage is coupled within the staggered step, alternate minimisation converges linearly and needs many iterations while a crack grows (pellet_quench_2D_xy 342 s → 2757 s with unchanged results, sen_tension 25–144 iterations per step during growth). Only consistent block tolerances are applied so far. Candidate improvements, cheapest first: (1) adaptive time stepping driven by damage growth, smaller steps where the crack jumps; (2) Aitken or Anderson acceleration of the damage iterate, which today is applied to the displacement only; (3) a monolithic or quasi-Newton u–d solve (e.g. line-search monolithic of Gerasimov and De Lorenzis 2016).
 
 ## 11. Case 14 — thermal-shock fracture (UO2)
 

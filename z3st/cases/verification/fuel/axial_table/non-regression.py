@@ -12,9 +12,9 @@ material card.
 Burnup accumulates as bu(z) = q(z)·t/(rho·HM·8.64e10), so the final burnup
 field is the normalised profile. Three closed-form checks:
 
-  1. accumulation magnitude — nodal-mean burnup = flat closed form
-         bu_mean = q_avg * t_total / (rho * HM * 8.64e10)
-     (the mean-1 normalisation preserves the average rating);
+  1. accumulation magnitude — weighted FE mean burnup (solver log) = flat
+     closed form  bu_mean = q_avg * t_total / (rho * HM * 8.64e10)
+     (the weighted mean-1 normalisation preserves the rating);
   2. table-node ratio — bu(z_k)/bu(z_j) = f_k/f_j at two table nodes,
      normalisation-independent and interpolation-exact where mesh nodes
      coincide with table nodes;
@@ -76,17 +76,27 @@ NODE_RATIO_REF = float(f_tab[2] / f_tab[0])
 TOLERANCE = 1e-2
 
 # --. numerical results --..
+def _log_mean_burnup(case_dir):
+    """Last weighted FE mean burnup printed by spine.update_state."""
+    log = os.path.join(case_dir, "log_z3st.md")
+    if not os.path.exists(log):
+        return float("nan")
+    with open(log) as f:
+        hits = re.findall(r"Mean burnup in \S+:\s*([0-9.eE+\-]+)", f.read())
+    return float(hits[-1]) if hits else float("nan")
+
+
 xr, yz, _, bu = extract_field(VTU_FILE, field_name="Burnup")
 z = np.asarray(yz)
 bu = np.asarray(bu)
 
-bu_mean = float(np.mean(bu))
+bu_mean = _log_mean_burnup(CASE_DIR)
 bu_at = lambda z0: float(bu[np.argmin(np.abs(z - z0))])
 node_ratio = bu_at(z_tab[2]) / max(bu_at(z_tab[0]), 1e-12)
 peak_ratio = float(bu.max()) / max(bu_mean, 1e-12)
 
 print(f"[INFO] q_avg = lhr/area = {q_avg:.4e} W/m^3 over t = {t_total:.3e} s")
-print(f"[INFO] nodal-mean burnup : numerical = {bu_mean:.6e}, "
+print(f"[INFO] mean burnup       : numerical = {bu_mean:.6e}, "
       f"analytical = {BU_MEAN_REF:.6e} MWd/kgU")
 print(f"[INFO] node ratio f3/f1  : numerical = {node_ratio:.4f}, "
       f"table = {NODE_RATIO_REF:.4f}")

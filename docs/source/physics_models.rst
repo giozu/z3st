@@ -311,14 +311,19 @@ multiplicative form factors that leave its integral -- the prescribed linear
 heat rate -- unchanged. A material card names them via ``radial_profile`` and/or
 ``axial_profile`` (resolved like the symbolic ``k(T)`` hook); ``set_power``
 evaluates them on the fuel degrees of freedom, multiplies them together,
-normalises the composite to mean 1, and scales the source:
+normalises the composite to weighted mean 1, and scales the source:
 
 .. math::
 
    q'''(\boldsymbol{x}) = \frac{\mathrm{LHR}}{A}\;
    \frac{f_r(r, bu)\, f_z(z)}{\langle f_r f_z \rangle},
+   \qquad
+   \langle f \rangle = \frac{\int_{\Omega_m} w\, f \,\mathrm{d}x}{\int_{\Omega_m} w \,\mathrm{d}x},
 
-so only the *distribution* changes, never the total power. Implemented in
+with :math:`w = 2\pi r` in axisymmetric and :math:`w = 1` otherwise, evaluated as
+finite-element integrals over the material, so only the *distribution* changes,
+never the total power: :math:`\int_{\Omega_m} w\, q''' \,\mathrm{d}x` equals the
+nominal power to round-off for any profile. Implemented in
 ``materials/fuel_profiles.py``.
 
 Radial profile
@@ -853,6 +858,12 @@ The model follows Todreas and Kazimi, *Nuclear Systems Volume I*, 3rd ed.,
 
    q''_{g} = h_{g}\,(T_{fo} - T_{ci}), \qquad
    h_{g} = h_{g,\text{open}} + h_{contact}.
+
+:math:`h_g` is referred to the reference surface of the pair,
+``gap_conductance.surface_a`` (the pellet outer surface by default). On the other
+surface the Robin coefficient is :math:`h_g\,|\Gamma_a|_w/|\Gamma_b|_w`, the ratio of
+the weighted areas :math:`\int w\,\mathrm{d}s` (:math:`r_{fo}/r_{ci}` for coaxial
+cylinders), so the heat leaving one body equals the heat entering the other.
 
 **Open gap.** The open-gap conductance is gas conduction across the effective
 gap width (a fixed user value or a gas-conduction correlation),
