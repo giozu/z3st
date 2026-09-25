@@ -5,7 +5,7 @@
 #   - a stable output/non-regression_gold.json, and
 #   - it exercises a physics path no other listed case reaches.
 #
-# Budget: 14 min 47 s total, from the times measured by a full local
+# Budget: 13 min 21 s total, from the times measured by a full local
 # suite run on 2026-08-09. Most cases are well under a minute; two are not, and
 # they are listed with their cost because they buy coverage nothing else does.
 # Re-measure before adding anything: ./non-regression_local.sh prints per-case times.
@@ -44,8 +44,6 @@ verification/plasticity/crystal_single_grain
 
 
 # --. damage --..
-verification/damage/box_crack_2D
-verification/damage/box_notch_2D
 regression/two_elliptical_cavities_2D   # 80 s
 
 

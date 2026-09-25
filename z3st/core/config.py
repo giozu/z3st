@@ -7,7 +7,13 @@
 
 
 MODEL_NAMES = ("thermal", "mechanical", "damage", "cluster",
-               "plasticity", "contact", "porosity")
+               "plasticity", "contact", "porosity", "cohesive")
+
+# Constitutive routes that cannot share a mechanical solve with the cohesive
+# phase-field model: it owns its own mixed (u, eigenstrain) unknown and its own
+# variational step, so there is no displacement-only solve left for them to
+# augment. "damage" additionally competes for the same phase field.
+_COHESIVE_CONFLICTS = ("damage", "plasticity")
 
 
 class Config:
@@ -39,6 +45,20 @@ class Config:
         # A switch may be a bool or a configuration block; a non-empty block is on.
         models = self.input_file.get("models", {})
         self.on = {name: bool(models.get(name, False)) for name in MODEL_NAMES}
+
+        if self.on["cohesive"]:
+            if not self.on["mechanical"]:
+                raise ValueError(
+                    "models.cohesive requires models.mechanical: true "
+                    "(the cohesive model is a mechanical constitutive route)."
+                )
+            clash = [n for n in _COHESIVE_CONFLICTS if self.on[n]]
+            if clash:
+                raise ValueError(
+                    f"models.cohesive cannot be combined with {clash}. "
+                    f"The cohesive phase-field model replaces the displacement-only "
+                    f"mechanical step and owns the phase field itself."
+                )
 
         # --. Fission-gas behaviour via SCIANTIX coupling (default OFF) --..
         # ``models.fission_gas`` may be a bool or a block:

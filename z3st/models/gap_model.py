@@ -88,7 +88,9 @@ class GapModel:
         self._h_gap_prev = h_gap_value
 
         # Persistent Constant so the cached thermal form sees the update in
-        # place (no form rebuild needed between staggered iterations).
+        # place (no form rebuild needed between staggered iterations). The value
+        # is per unit area of surface_a. The thermal step scales it on the other
+        # surface of the pair (ThermalModel._gap_area_ratio).
         if not hasattr(self, "_h_gap_const"):
             self._h_gap_const = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(h_gap_value))
         else:

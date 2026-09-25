@@ -491,6 +491,8 @@ class MechanicalModel:
                     material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim) + 2.0 * material["G"] * eps
                 )
 
+        # self.D is the damage iterate inside the staggered loop
+        # (solve_staggered), the converged damage outside it.
         if self.on.get("damage", False):
             g_d = self.degradation_function(self.D)
             sigma = g_d * sigma
@@ -1012,11 +1014,13 @@ class MechanicalModel:
             self.relax_u = omega
             print(f"  [aitken] relax_u={omega:.3f}")
 
-        u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
-        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
-
+        # Convergence on the unrelaxed update u_solve - u^{k-1} (the Aitken
+        # residual R above), so stag_tol does not scale with relax_u.
         conv_mech, norm_du, rel_norm_du, res_curr = self._stagger_residual(
             u_new, u_old, self.mech_cfg, stag_tol_mech, "u")
+
+        u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
+        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
 
         # The creep predictor must be consistent with u as well — |Δu| alone
         # can pass on the first iteration of a step while Δγ₀ is still moving.

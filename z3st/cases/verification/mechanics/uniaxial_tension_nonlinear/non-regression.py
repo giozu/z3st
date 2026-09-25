@@ -57,8 +57,8 @@ ux_line = u_all[mask_u, 0][sort_idx_u]
 
 # Plot displacement along X
 plt.figure(figsize=(10, 5))
-plt.plot(x_u_line, ux_line * 1e3, "go-", label="Z3ST (ux)", markersize=4)
-plt.scatter([0, Lx], [0, UX_REF*1e3], color="r", label="Analytical Ref")
+plt.plot(x_u_line, ux_line * 1e3, "o-", color="#009E73", label="Z3ST (ux)", markersize=4)
+plt.scatter([0, Lx], [0, UX_REF*1e3], color="#D55E00", label="Analytical Ref")
 plt.title(f"Displacement u_x profile (y={y_target}, z={z_target})")
 plt.xlabel("x-coordinate (m)")
 plt.ylabel("u_x (mm)")
@@ -69,8 +69,8 @@ plt.savefig(os.path.join(CASE_DIR, "output", "plot_ux.png"))
 
 # Plot stresses along X
 plt.figure(figsize=(10, 5))
-plt.plot(x_s_line, sigma_xx * 1e-6, "s-", color="tab:orange", label="Sigma XX", markersize=4)
-plt.plot(x_s_line, sigma_vm_line * 1e-6, "d-", color="tab:red", label="Von Mises ", markersize=4)
+plt.plot(x_s_line, sigma_xx * 1e-6, "s-", color="#E69F00", label="Sigma XX", markersize=4)
+plt.plot(x_s_line, sigma_vm_line * 1e-6, "d-", color="#D55E00", label="Von Mises ", markersize=4)
 plt.axhline(y=SIGMA_REF * 1e-6, color="k", linestyle=":", label="Analytical Ref")
 plt.title(f"Stress profiles (y={y_target}, z={z_target})")
 plt.xlabel("x-coordinate (m)")

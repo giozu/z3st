@@ -506,8 +506,11 @@ if __name__ == "__main__":
             problem.heat_flux(problem.T)
 
         # Writing energies.txt
-        if problem.on.get("damage"):
-            E_el, E_frac = problem.compute_energy_balance(problem.u)
+        if problem.on.get("damage") or problem.on.get("cohesive"):
+            if problem.on.get("cohesive"):
+                E_el, E_frac = problem.compute_cohesive_energy_balance(problem.w, problem.D)
+            else:
+                E_el, E_frac = problem.compute_energy_balance(problem.u)
             E_tot = E_el + E_frac
             print(f"  → Elastic energy  : {E_el:.4e} J")
             print(f"  → Fracture energy : {E_frac:.4e} J")

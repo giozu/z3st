@@ -11,9 +11,10 @@ bus + SCIANTIX swelling eigenstrain bus). All metrics are read from
 
 Analytic check (closed form):
 
-  * ``burnup_avg_final`` — nodal-mean fuel burnup equals
-    bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10) (radial form factor area-normalised
-    to mean 1; ``update_state`` uses the right-endpoint rule).
+  * ``burnup_avg_final`` — 2πr-weighted FE mean fuel burnup equals
+    bu = Σ_k lhr_k·Δt_k / (area·ρ·HM·8.64e10) (set_power divides the radial
+    form factor by its weighted mean; ``update_state`` uses the right-endpoint
+    rule).
 
 The other scalars (peak burnup, temperatures, gas release) have no closed form:
 recorded with ``rel_error = 0`` so the analytic gate ignores them, protected by

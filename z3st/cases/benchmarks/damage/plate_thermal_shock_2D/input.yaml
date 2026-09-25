@@ -16,16 +16,11 @@ output:
   format: xdmf
 
 solver_settings:
-  max_iters: 200
+  max_iters: 500
   relax_T: 0.8
-  relax_u: 0.6
-  relax_D: 0.5
-
-  relax_adaptive: true
-  relax_growth: 1.1
-  relax_shrink: 0.95
-  relax_min: 0.05
-  relax_max: 0.95
+  relax_u: 1.0
+  relax_D: 1.0
+  relax_adaptive: false
 
 models:
   thermal: true
@@ -36,7 +31,7 @@ mechanical:
   solver: linear
   linear_solver: direct_mumps
   rtol: 1.0e-6
-  stag_tol: 1.0e-6
+  stag_tol: 1.0e-4
   convergence: rel_norm
 
 thermal:
@@ -50,7 +45,7 @@ thermal:
 damage:
   type: AT1                 # elastic threshold -> physical nucleation strength
   solver: linear
-  linear_solver: direct_mumps
+  linear_solver: iterative_hypre
   rtol: 1.0e-6
   stag_tol: 1.0e-3
   convergence: rel_norm

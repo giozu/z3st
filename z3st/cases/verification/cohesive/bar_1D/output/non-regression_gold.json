@@ -1,0 +1,62 @@
+{
+    "results": {
+        "peak_stress_Pa": {
+            "numerical": 5000000.0,
+            "reference": 5000000.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "softening_branch_U_rel_L2": {
+            "numerical": 0.001492421276328223,
+            "reference": 0.0,
+            "abs_error": 0.001492421276328223,
+            "rel_error": 0.001492421276328223,
+            "status": "PASS"
+        },
+        "softening_branch_U_rel_max": {
+            "numerical": 0.0014990205169359539,
+            "reference": 0.0,
+            "abs_error": 0.0014990205169359539,
+            "rel_error": 0.0014990205169359539,
+            "status": "PASS"
+        },
+        "alpha_from_stress": {
+            "numerical": 0.9577977592263159,
+            "reference": 0.95779775923,
+            "abs_error": 3.684053062613657e-12,
+            "rel_error": 3.846378869768257e-12,
+            "status": "PASS"
+        },
+        "discretization_bias_vs_eq149": {
+            "numerical": 0.10061994945363613,
+            "reference": 0.09950248756218906,
+            "abs_error": 0.001117461891447069,
+            "rel_error": 0.011230492009043044,
+            "status": "PASS"
+        },
+        "alpha_max_final": {
+            "numerical": 0.95779775923,
+            "reference": 0.95779775923,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "fracture_energy_final_J": {
+            "numerical": 1.0101703344,
+            "reference": 1.0101703344,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "stress_final_Pa": {
+            "numerical": 8905.1456316,
+            "reference": 8905.1456316,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.02,
+    "summary": "PASS"
+}

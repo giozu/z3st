@@ -14,6 +14,12 @@ try:
 except metadata.PackageNotFoundError:
     __version__ = "0.3.2"
 
+try:
+    from .utils import plotstyle as _plotstyle
+    _plotstyle.apply()
+except Exception:
+    pass
+
 def __getattr__(name):
     """Lazy import of heavy modules (dolfinx-dependent) to allow
     lightweight utilities (e.g., utils_extract_vtu) to be imported

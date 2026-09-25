@@ -51,6 +51,24 @@ longer ones (Kamagate Fig. 2d).
   ~`2e-5` (`lc/4.5`) once nucleation is confirmed, for crack counts that
   no longer move with refinement.
 
+### Comparison with Kamagate et al. (run of 2026-09-16)
+
+With the damage iterate coupled into the mechanical solve, the run gives 13
+cracks on each quenched edge, spacing about 1.9 mm, penetrating 0.2 to 1.6 mm
+(mean 0.87 mm), alternating deep and shallow. The pattern of Fig. 2d is
+reproduced. Two differences with the reference remain:
+
+- **Time.** The gold state is at `t = 5 ms`, while Kamagate Fig. 2 and 3 are at
+  `t = 10 us`. The first time step of this case is already 100 us, so there is
+  no snapshot at the reference time. Comparing at 10 us needs a finer early
+  grid.
+- **Crack count.** Counted from Fig. 2d the paper has roughly 20 to 25 cracks
+  per edge, about twice as many as here. `lc_fine` is `lc/3`, and the count is
+  expected to rise towards the reference on the `lc/4.5` mesh mentioned above.
+  This has not been run.
+
+The `dT = 580 K` trend run (more and deeper cracks) has not been run either.
+
 ### Caveats
 
 - The **number** of cracks is sensitive to mesh / `lc` / heterogeneity —

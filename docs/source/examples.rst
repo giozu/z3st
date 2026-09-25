@@ -252,53 +252,6 @@ This example generates stress-strain curves under **displacement-controlled** lo
 Phase-Field Fracture
 --------------------
 
-Box with Initial Crack (2D)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Case Directory:** ``cases/regression/box_crack_2D``
-
-This example demonstrates **phase-field fracture** using the AT2 model. The simulation captures:
-
-- Crack initiation from pre-existing defect
-- Crack propagation under tension
-- Damage evolution and stress redistribution
-
-**Model:**
-
-- AT2 phase-field model
-- Characteristic length: :math:`\ell_c = 0.002\,\mathrm{m}`
-- Critical energy release rate: :math:`G_c`
-- Degradation function: :math:`g(D) = (1-D)^2 + k_{res}`
-
-**Results:**
-
-.. figure:: images/box_crack_2D/damage_check.png
-   :width: 70%
-   :align: center
-
-   Damage field evolution showing crack propagation (:math:`D = 0`: intact, :math:`D = 1`: fully damaged).
-
-.. figure:: images/box_crack_2D/damage_stress_profile.png
-   :width: 85%
-   :align: center
-
-   Damage and stress profiles along crack path showing stress concentration and release.
-
-**Physical Behavior:**
-
-1. **Initial state**: Pre-cracked geometry with :math:`D = 1` in notch
-2. **Loading**: Tensile displacement applied incrementally
-3. **Crack growth**: Damage field D evolves from crack tip
-4. **Stress release**: Stresses drop behind advancing crack front
-5. **Energy balance**: Elastic energy → surface energy conversion
-
-**Key Features:**
-
-**No remeshing required**: Phase-field regularizes sharp crack
-**Complex crack paths**: Handles branching and merging
-**Thermodynamically consistent**: Variational formulation
-**Irreversibility**: Damage can only increase
-
 Single-Edge-Notched Shear Test (Miehe 2010 benchmark)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

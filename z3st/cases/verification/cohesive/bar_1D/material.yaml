@@ -1,0 +1,11 @@
+# Cohesive 1D bar, Vicentini et al. (2026) Sec. 5.2, converted to SI.
+# Paper: L = 1 mm, E = 1e4 MPa, Gc = 1e-3 N/mm, ell = 0.05 mm, sigma_c = 5 MPa.
+name: bar
+
+E: 1.0e+10            # Young's modulus (Pa)
+nu: 0.3               # Poisson's ratio (-), unused in 1D
+rho: 1.0              # Density (kg/m^3); gravity is off
+T_ref: 300.0          # Reference temperature (K)
+
+Gc: 1.0               # Fracture toughness (J/m^2)
+p_c: 5.0e+6           # Critical stress sigma_c (Pa); in 1D tau_c is unused

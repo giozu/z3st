@@ -11,6 +11,9 @@ import re
 import yaml
 import numpy as np
 import matplotlib.pyplot as plt
+
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
 import subprocess
 import json
 
@@ -145,8 +148,8 @@ def main():
     ref_vals = [r["reference"] for r in results]
     
     plt.figure(figsize=(8, 6))
-    plt.plot(t_vals, num_vals, 'bo-', label="Numerical (z3st)")
-    plt.plot(t_vals, ref_vals, 'r--', label="Analytical")
+    plt.plot(t_vals, num_vals, "o-", color="#0072B2", label="Numerical (z3st)")
+    plt.plot(t_vals, ref_vals, "--", color="#D55E00", label="Analytical")
     plt.xlabel(r"Angle $\theta$ (degrees)")
     plt.ylabel(r"Max $\sigma_{yy}$ (MPa)")
     plt.legend()

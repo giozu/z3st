@@ -70,9 +70,9 @@ def plot_history():
 
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     ax.plot(np.array(t_points) * tscale, np.array(lhr_points) / 1e3, "-",
-            color="#C44E52", lw=1.5, alpha=0.6, label="imposed ramp")
+            color="#D55E00", lw=1.5, alpha=0.6, label="imposed ramp")
     ax.plot(np.array(times) * tscale, np.array(lhrs) / 1e3, "o",
-            color="#C44E52", ms=6, label="solve steps")
+            color="#D55E00", ms=6, label="solve steps")
     ax.set_xlabel(f"time ({tunit})")
     ax.set_ylabel("linear heat rate (kW/m)")
     ax.set_title("Imposed power history (transient)")
@@ -99,14 +99,14 @@ def plot_operating_history():
 
     fig, ax = plt.subplots(figsize=(7.2, 4.6))
     ax.set_title("Operating history")
-    ax.plot(days, bu, "o-", color="#55A868", label="fuel-avg burnup")
+    ax.plot(days, bu, "o-", color="#009E73", label="fuel-avg burnup")
     ax.set_xlabel("time (days)")
-    ax.set_ylabel("burnup (MWd/kgU)", color="#55A868")
+    ax.set_ylabel("burnup (MWd/kgU)", color="#009E73")
     ax.tick_params(axis="y", labelcolor="#55A868")
     ax2 = ax.twinx()
-    ax2.plot(days, tmax, "^--", color="#911B1F", label="max temperature")
-    ax2.plot(days, tmin, "^--", color="#BE7375", label="min temperature")
-    ax2.set_ylabel("temperature (K)", color="#C44E52")
+    ax2.plot(days, tmax, "^--", color="#D55E00", label="max temperature")
+    ax2.plot(days, tmin, "^--", color="#D55E00", label="min temperature")
+    ax2.set_ylabel("temperature (K)", color="#D55E00")
     ax2.tick_params(axis="y", labelcolor="#C44E52")
     ax.grid(alpha=0.3)
 
@@ -160,9 +160,9 @@ def plot_stress_profile():
     fig, ax = plt.subplots(figsize=(7.2, 4.8))
     sel = r <= R_PELLET + 1e-9
     o = np.argsort(r[sel])
-    ax.plot(r[sel][o] * 1e3, s_rr[sel][o], "o-", color="#4C72B0", ms=3,
+    ax.plot(r[sel][o] * 1e3, s_rr[sel][o], "o-", color="#0072B2", ms=3,
             lw=1.8, label=r"$\sigma_{rr}$ (radial)")
-    ax.plot(r[sel][o] * 1e3, s_tt[sel][o], "s-", color="#C44E52", ms=3,
+    ax.plot(r[sel][o] * 1e3, s_tt[sel][o], "s-", color="#D55E00", ms=3,
             lw=1.8, label=r"$\sigma_{\theta\theta}$ (hoop)")
 
     ax.axhline(0, color="grey", lw=0.8, ls=":")
@@ -309,7 +309,7 @@ def plot_fg_axial():
         ax.set_title(f"{rname}  (r = {r_near * 1e3:.2f} mm)")
         ax.grid(alpha=0.3)
     axes[0].set_ylabel("fission gas Xe+Kr (at/m³)")
-    axes[0].legend(fontsize=8)
+    axes[0].legend(fontsize=10)
     fig.suptitle("Axial fission-gas profile (last step) — "
                  "near-flat under the uniform axial power")
     fig.savefig(os.path.join(OUT, "fg_axial_profile.png"), dpi=150)
@@ -345,7 +345,7 @@ def plot_fg_average():
     ax1.legend()
     ax1.grid(alpha=0.3)
 
-    ax2.plot(bu, fgr, "o-", color="#8172B3", ms=3)
+    ax2.plot(bu, fgr, "o-", color="#CC79A7", ms=3)
     ax2.set_xlabel("fuel-average burnup (MWd/kgU)")
     ax2.set_ylabel("fractional fission-gas release (%)")
     ax2.set_title("Fractional fission-gas release vs burnup")

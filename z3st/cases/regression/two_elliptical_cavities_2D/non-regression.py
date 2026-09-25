@@ -117,9 +117,9 @@ plt.figure(figsize=(10, 5))
 for xb in (-Lx / 4, +Lx / 4):                        # cavity footprints + tips
     plt.axvspan(xb - ax, xb + ax, color="0.92", zorder=0)
     for s in (-1, +1):
-        plt.axvline(xb + s * ax, color="r", ls="--", lw=0.8, alpha=0.6)
+        plt.axvline(xb + s * ax, color="#D55E00", ls="--", lw=0.8, alpha=0.6)
 plt.scatter(x_line, sigma_yy_line, s=4, c="0.7", alpha=0.4, label="band samples")
-plt.plot(xc, syy_mean, "b-", lw=2, label=r"$\sigma_{yy}$ (mean along $y\approx0$)")
+plt.plot(xc, syy_mean, "-", color="#0072B2", lw=2, label=r"$\sigma_{yy}$ (mean along $y\approx0$)")
 plt.xlabel(r"x along grain boundary ($\mu$m)")
 plt.ylabel(r"$\sigma_{yy}$ (MPa)")
 plt.title("GB stress profile — bubble tips (red dashed) concentrate the stress")
@@ -138,7 +138,7 @@ sigma_c = ((27 * E * gc_line) / (256 * lc))**0.5
 
 plt.figure(figsize=(8, 5))
 # gc_line is in pJ/µm², which equals J/m² numerically in this unit system.
-plt.plot(y_line * 1000, gc_line, 'g-', label="$G_c$ profile (GB zone)")
+plt.plot(y_line * 1000, gc_line, "-", color="#009E73", label="$G_c$ profile (GB zone)")
 plt.xlabel(r"Distance $y$ (nm)")
 plt.ylabel("$G_c$ ($J/m^2$)")
 plt.grid(True, ls=':')

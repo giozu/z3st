@@ -100,9 +100,9 @@ def plot_history():
 
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     ax.plot(np.array(t_points) * tscale, np.array(lhr_points) / 1e3, "-",
-            color="#C44E52", lw=1.5, alpha=0.6, label="imposed ramp")
+            color="#D55E00", lw=1.5, alpha=0.6, label="imposed ramp")
     ax.plot(np.array(times) * tscale, np.array(lhrs) / 1e3, "o",
-            color="#C44E52", ms=6, label="solve steps")
+            color="#D55E00", ms=6, label="solve steps")
     ax.set_xlabel(f"time ({tunit})")
     ax.set_ylabel("linear heat rate (kW/m)")
     ax.set_title("Imposed power history (transient)")
@@ -161,30 +161,45 @@ def _pcmi_from_csv():
     tmax = np.atleast_1d(d["T_max_K"])
     tmin = np.atleast_1d(d["T_min_K"])
 
-    fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
+    # Okabe-Ito palette (colour-vision safe); series also differ by marker and
+    # linestyle, so colour is never the only cue. 
+    BLUE, ORANGE, VERM, SKY = "#0072B2", "#E69F00", "#D55E00", "#56B4E9"
+    with plt.rc_context({"font.size": 13, "axes.labelsize": 14,
+                         "xtick.labelsize": 12, "ytick.labelsize": 12,
+                         "legend.fontsize": 12}):
+        fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
 
-    ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
-    ax1.plot(bu, gaps, "o-", color="#4C72B0", label="gap")
-    ax1.axhline(0, color="grey", lw=0.8, ls=":")
-    ax1.set_xlabel("fuel-average burnup (MWd/kgU)")
-    ax1.set_ylabel("gap (um)", color="#4C72B0")
-    ax1.tick_params(axis="y", labelcolor="#4C72B0")
-    ax2 = ax1.twinx()
-    ax2.plot(bu, pres, "s--", color="#C44E52", label="contact pressure")
-    ax2.set_ylabel("contact pressure (MPa)", color="#C44E52")
-    ax2.tick_params(axis="y", labelcolor="#C44E52")
+        ax1.plot(bu, gaps, "o-", color=BLUE, label="gap")
+        ax1.axhline(0, color="grey", lw=0.8, ls=":")
+        ax1.set_xlabel("fuel-average burnup (MWd/kgU)")
+        ax1.set_ylabel(r"gap ($\mu$m)", color=BLUE)
+        ax1.tick_params(axis="y", labelcolor=BLUE)
+        ax2 = ax1.twinx()
+        ax2.plot(bu, pres, "s--", color=ORANGE, label="contact pressure")
+        ax2.set_ylabel("contact pressure (MPa)", color=ORANGE)
+        ax2.tick_params(axis="y", labelcolor=ORANGE)
 
-    ax3.set_title("Operating history")
-    ax3.plot(days, bu, "o-", color="#55A868", label="fuel-avg burnup")
-    ax3.set_xlabel("time (days)")
-    ax3.set_ylabel("burnup (MWd/kgU)", color="#55A868")
-    ax3.tick_params(axis="y", labelcolor="#55A868")
-    ax4 = ax3.twinx()
-    ax4.plot(days, tmax, "^--", color="#911B1F", label="max temperature")
-    ax4.plot(days, tmin, "^--", color="#BE7375", label="min temperature")
-    ax4.set_ylabel("temperature (K)", color="#C44E52")
-    ax4.tick_params(axis="y", labelcolor="#C44E52")
-    ax3.grid(alpha=0.3)
+        ax3.plot(days, bu, "o-", color=BLUE, label="fuel-avg burnup")
+        ax3.set_xlabel("time (days)")
+        ax3.set_ylabel("burnup (MWd/kgU)", color=BLUE)
+        ax3.tick_params(axis="y", labelcolor=BLUE)
+        ax4 = ax3.twinx()
+        ax4.plot(days, tmax, "^--", color=VERM, label="max temperature")
+        ax4.plot(days, tmin, "v:", color=SKY, label="min temperature (clad outer)")
+        ax4.set_ylabel("temperature (K)", color=VERM)
+        ax4.tick_params(axis="y", labelcolor=VERM)
+        ax3.grid(alpha=0.3)
+
+        # Twinned axes carry their own handles, so each legend is built by hand.
+        for host, twin, loc in ((ax1, ax2, "center right"),
+                                (ax3, ax4, "upper center")):
+            h, l = host.get_legend_handles_labels()
+            h2, l2 = twin.get_legend_handles_labels()
+            host.legend(h + h2, l + l2, loc=loc, framealpha=0.9)
+
+        for ax, tag in ((ax1, "(a)"), (ax3, "(b)")):
+            ax.text(0.0, 1.02, tag, transform=ax.transAxes,
+                    fontsize=14, fontweight="bold", va="bottom")
 
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "pcmi_curves.png"), dpi=150)
@@ -215,20 +230,20 @@ def _pcmi_from_vtu():
     fig, (ax1, ax3) = plt.subplots(1, 2, figsize=(12, 4.6))
 
     # left: gap closure + contact pressure vs burnup
-    ax1.plot(bu, gaps, "o-", color="#4C72B0", label="gap")
+    ax1.plot(bu, gaps, "o-", color="#0072B2", label="gap")
     ax1.axhline(0, color="grey", lw=0.8, ls=":")
     ax1.set_xlabel("rod-average burnup (MWd/kgU)")
-    ax1.set_ylabel("gap (um)", color="#4C72B0")
+    ax1.set_ylabel("gap (um)", color="#0072B2")
     ax1.tick_params(axis="y", labelcolor="#4C72B0")
     ax2 = ax1.twinx()
-    ax2.plot(bu, pres, "s--", color="#C44E52", label="contact pressure")
-    ax2.set_ylabel("contact pressure (MPa)", color="#C44E52")
+    ax2.plot(bu, pres, "s--", color="#D55E00", label="contact pressure")
+    ax2.set_ylabel("contact pressure (MPa)", color="#D55E00")
     ax2.tick_params(axis="y", labelcolor="#C44E52")
     ax1.set_title("Burnup-driven gap closure and PCMI contact pressure")
 
     # right: load transfer (radial displacement of the two surfaces) vs burnup
-    ax3.plot(bu, ur_p, "o-", color="#4C72B0", label="pellet outer (swelling + thermal)")
-    ax3.plot(bu, ur_c, "s-", color="#DD8452", label="clad inner (pushed out on contact)")
+    ax3.plot(bu, ur_p, "o-", color="#0072B2", label="pellet outer (swelling + thermal)")
+    ax3.plot(bu, ur_c, "s-", color="#E69F00", label="clad inner (pushed out on contact)")
     ax3.set_xlabel("rod-average burnup (MWd/kgU)")
     ax3.set_ylabel("radial displacement (um)")
     ax3.set_title("Load transfer (clad pushed out on contact)")
@@ -283,7 +298,7 @@ def plot_radial_profile():
     ax.set_ylabel("radial displacement u_r (um)")
     ax.set_title("Radial displacement profile (mid-height)\n"
                  "pellet swells with burnup, gap closes, clad pushed out")
-    ax.legend(title="burnup", fontsize=8, ncol=2)
+    ax.legend(title="burnup", fontsize=10, ncol=2)
     ax.grid(alpha=0.3)
     ax.text(0.97, 0.06, "fresh (0 MWd/kgU) curve is non-zero: thermal\n"
             "expansion from T_ref (293 K) to 580 K coolant",
@@ -340,9 +355,9 @@ def plot_stress_profile():
     for lo, hi in [(0.0, R_PELLET + 1e-9), (R_CLAD_I - 1e-9, R_CLAD_O + 1e-9)]:
         sel = (r >= lo) & (r <= hi)
         o = np.argsort(r[sel])
-        ax.plot(r[sel][o] * 1e3, s_rr[sel][o], "o-", color="#4C72B0", ms=3,
+        ax.plot(r[sel][o] * 1e3, s_rr[sel][o], "o-", color="#0072B2", ms=3,
                 lw=1.8, label=r"$\sigma_{rr}$ (radial)" if first else None)
-        ax.plot(r[sel][o] * 1e3, s_tt[sel][o], "s-", color="#C44E52", ms=3,
+        ax.plot(r[sel][o] * 1e3, s_tt[sel][o], "s-", color="#D55E00", ms=3,
                 lw=1.8, label=r"$\sigma_{\theta\theta}$ (hoop)" if first else None)
         first = False
 

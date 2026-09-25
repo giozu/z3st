@@ -256,7 +256,7 @@ class OutputWriter:
                 ))
 
         # Damage + crack-driving-force, cell projections
-        if on.get("damage", False) and getattr(problem, "D", None) is not None:
+        if (on.get("damage", False) or on.get("cohesive", False)) and getattr(problem, "D", None) is not None:
             self._D_cell_fn = dolfinx.fem.Function(self.V_scalar_cells, name="Damage")
             self._D_cell_expr = self._make_interp_or_proj(problem.D, self.V_scalar_cells)
             if getattr(problem, "H", None) is not None:
@@ -455,7 +455,7 @@ class OutputWriter:
             write(self._heatflux_fn, t)
         if self._contact_pressure_fn is not None:
             write(self._contact_pressure_fn, t)
-        if on.get("damage", False) and p.D is not None:
+        if (on.get("damage", False) or on.get("cohesive", False)) and p.D is not None:
             write(p.D, t)
         if self._c_cg_fn is not None:
             write(self._c_cg_fn, t)
@@ -546,7 +546,7 @@ class OutputWriter:
                 grid.point_data[fn.name] = fn.x.array
 
         # Damage + crack-driving-force
-        if on.get("damage", False) and p.D is not None:
+        if (on.get("damage", False) or on.get("cohesive", False)) and p.D is not None:
             grid.point_data["Damage"] = p.D.x.array.copy()
             if self._D_cell_fn is not None:
                 grid.cell_data["Damage"] = self._D_cell_fn.x.array.copy()

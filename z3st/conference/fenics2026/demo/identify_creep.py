@@ -35,6 +35,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_PNG = os.path.join(HERE, "baked", "creep_identification.png")
 
@@ -233,7 +236,7 @@ ax1.plot(t_line / days, sigma_exact(t_line) / 1e6, "k-", lw=2.5, alpha=0.65,
 ax1.plot(t_line / days, sigma_exact(t_line, A_init, THETA_INIT[1]) / 1e6,
          "--", color="grey", lw=1.8,
          label=f"coarse-scan seed  (n = {THETA_INIT[1]:.1f})")
-ax1.plot(t_line / days, sigma_exact(t_line, A_id, n_id) / 1e6, "r-.", lw=2.2,
+ax1.plot(t_line / days, sigma_exact(t_line, A_id, n_id) / 1e6, "-.", color="#D55E00", lw=2.2,
          label=f"identified  (n = {n_id:.2f})")
 ax1.plot(t_data / days, sigma_data / 1e6, "o", ms=7, mfc="none", mec="tab:blue",
          mew=1.8, label="noisy data (2%)")
@@ -244,7 +247,7 @@ ax1.grid(True, ls=":", alpha=0.6)
 ax1.legend()
 
 losses = [h[1] for h in history]
-ax2.semilogy(range(len(losses)), losses, "o-", color="tab:red")
+ax2.semilogy(range(len(losses)), losses, "o-", color="#D55E00")
 ax2.set_xlabel("Gauss-Newton iteration")
 ax2.set_ylabel("least-squares loss  ½‖r‖²  (MPa²)")
 ax2.set_title("Convergence — gradients by forward-mode AD\n"

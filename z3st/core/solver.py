@@ -311,6 +311,10 @@ class Solver:
     def _stagger_residual(self, new, old, cfg, tol, label):
         """Staggered increment of one field: convergence verdict plus both norms.
 
+        Callers pass the unrelaxed solve output as ``new`` and the previous
+        iterate as ``old``, and relax afterwards, so the test measures
+        ||X_solve - X^{k-1}|| and ``stag_tol`` is independent of relax_X.
+
         Returns
         ``(converged, norm_d, rel_norm_d, residual)``, where ``residual`` is
         whichever norm ``cfg["convergence"]`` selects: it is what the adaptive
@@ -390,7 +394,9 @@ class Solver:
 
         # Allocate local fields
         if self.on.get("thermal", False):
-            T_new = dolfinx.fem.Function(self.V_t)
+            # Persistent iterate (spine.initialize_fields): symbolic k(T), E(T),
+            # nu(T) are UFL expressions in it, so they follow T^k by reference.
+            T_new = self.T_iter
             T_new.x.array[:] = self.T.x.array
             T_old = dolfinx.fem.Function(self.V_t)
 
@@ -411,17 +417,44 @@ class Solver:
             u_new = u_old = None
             bcs_m = []
 
-        if self.on.get("damage", False):
-            D_new = dolfinx.fem.Function(self.V_d)
+        if self.on.get("damage", False) or self.on.get("cohesive", False):
+            if self.on.get("cohesive", False):
+                # Reused across steps, as w_new below: the cohesive energy
+                # functional is assembled on these Functions.
+                if getattr(self, "_coh_D_new", None) is None:
+                    self._coh_D_new = dolfinx.fem.Function(self.V_d)
+                    self._coh_D_old = dolfinx.fem.Function(self.V_d)
+                D_new, D_old = self._coh_D_new, self._coh_D_old
+            else:
+                # The damage iterate is self.D itself: the mechanical forms
+                # (g(D) on the stress and the eigenstress, cached per step) hold
+                # it by reference, so every mechanical solve sees the current
+                # damage and u and D are coupled within the step. At step start
+                # it still holds D^n, so the first solve sees D^n. The step-start
+                # value survives in _D_step_start below for irreversibility.
+                D_new = self.D
+                D_old = dolfinx.fem.Function(self.V_d)
             D_new.x.array[:] = self.D.x.array
-            D_old = dolfinx.fem.Function(self.V_d)
             # Irreversibility anchors: D and H ratchet against the last
             # converged step, not against intermediate staggered iterates.
+            # The cohesive route feeds _D_step_start to the VI lower bound.
             self._D_step_start = self.D.x.array.copy()
             if getattr(self, "H", None) is not None:
                 self._H_step_start = self.H.x.array.copy()
         else:
             D_new = D_old = None
+
+        if self.on.get("cohesive", False):
+            # Allocated once and reused across steps: the cohesive forms are
+            # built on these Functions and are otherwise step-invariant, so
+            # keeping their identity keeps the assembled problem cached.
+            if getattr(self, "_coh_w_new", None) is None:
+                self._coh_w_new = dolfinx.fem.Function(self.W)
+                self._coh_w_old = dolfinx.fem.Function(self.W)
+            w_new, w_old = self._coh_w_new, self._coh_w_old
+            w_new.x.array[:] = self.w.x.array
+        else:
+            w_new = w_old = None
 
         if self.on.get("cluster", False):            
             c_new = dolfinx.fem.Function(self.V_c)
@@ -478,7 +511,16 @@ class Solver:
                 )
 
             # --. MECHANICAL STEP --..
-            if self.on.get("mechanical", False):
+            # The cohesive route replaces both the displacement-only mechanical
+            # solve and the damage solve with one alternate-minimization sweep
+            # over the mixed (u, eigenstrain) state and the phase field.
+            if self.on.get("cohesive", False):
+                # No relaxation to tune, so no residual history to carry: both
+                # sub-problems are solved to their own tolerance.
+                conv_mech, _, _, _ = self._cohesive_step(
+                    w_new, w_old, D_new, D_old, stag_tol_mech
+                )
+            elif self.on.get("mechanical", False):
                 conv_mech, _, _, prev_res_u = self._mechanical_step(
                     u_new, u_old, bcs_m, rtol_mech, stag_tol_mech, prev_res_u, T_current=T_new
                 )
@@ -514,12 +556,15 @@ class Solver:
                 if self.on.get("thermal", False):
                     self.T.x.array[:] = T_new.x.array
 
-                if self.on.get("mechanical", False):
+                if self.on.get("cohesive", False):
+                    self.w.x.array[:] = w_new.x.array
+                    self.sync_displacement(self.w)
+                elif self.on.get("mechanical", False):
                     self.u.x.array[:] = u_new.x.array
 
-                if self.on.get("damage", False):
+                if self.on.get("damage", False) or self.on.get("cohesive", False):
                     self.D.x.array[:] = D_new.x.array
-                
+
                 if self.on.get("cluster", False):
                     self.c.x.array[:] = c_new.x.array
 
@@ -541,9 +586,12 @@ class Solver:
 
         if self.on.get("thermal", False):
             self.T.x.array[:] = T_new.x.array
-        if self.on.get("mechanical", False):
+        if self.on.get("cohesive", False):
+            self.w.x.array[:] = w_new.x.array
+            self.sync_displacement(self.w)
+        elif self.on.get("mechanical", False):
             self.u.x.array[:] = u_new.x.array
-        if self.on.get("damage", False):
+        if self.on.get("damage", False) or self.on.get("cohesive", False):
             self.D.x.array[:] = D_new.x.array
         if self.on.get("cluster", False):
             self.c.x.array[:] = c_new.x.array

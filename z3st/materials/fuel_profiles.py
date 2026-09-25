@@ -9,8 +9,8 @@ These are *multiplicative* shaping factors that modulate the linear heat rate di
 
 A material card may name these via ``radial_profile: materials.fuel_profiles.<name>`` and/or ``axial_profile: materials.fuel_profiles.<name>``;
 ``spine.set_power`` resolves them, evaluates them on the fuel dofs, multiplies
-them together, normalises the composite to mean 1 and multiplies the volumetric
-source by it.
+them together, divides the composite by its weighted FE mean over the material
+(weight 2πr in axisymmetric) and multiplies the volumetric source by it.
 
 Signature::
 
@@ -74,8 +74,8 @@ def chopped_cosine(coords, burnup, material, model=None):
 
         axial_extrapolated_length  L'  (default 1.1 * L)
 
-    set_power normalises the composite form factor to mean 1, so the prescribed
-    LHR stays the segment average and the axial peaking factor emerges as
+    set_power normalises the composite form factor to weighted mean 1, so the
+    prescribed LHR stays the segment average and the axial peaking factor emerges as
 
         max f_norm = 1 / [ (2 L' / pi L) sin(pi L / 2 L') ].
 
@@ -99,8 +99,8 @@ def tabulated_axial(coords, burnup, material, model=None):
         axial_table_f: [f1, f2, ...]   # (-) relative power at each elevation
 
     Outside the table range the end values are held (``np.interp`` clamping).
-    set_power normalises the composite form factor to mean 1, so only the shape
-    of the table matters, not its absolute scale.
+    set_power normalises the composite form factor to weighted mean 1, so only
+    the shape of the table matters, not its absolute scale.
     """
     z = _axial_coord(coords, model)
     z_tab = np.asarray(material["axial_table_z"], dtype=float)
@@ -127,7 +127,8 @@ def rim_peaking(coords, burnup, material, model=None):
         radial_peak_amplitude  A  (default 3.0) — rim peak height above the core
         radial_peak_exponent   p  (default 8.0) — how tightly peaked at the rim
 
-    set_power normalises f to mean 1; the area-average rating is unchanged.
+    set_power normalises f to 2πr-weighted mean 1, so the area-average rating
+    is unchanged.
     """
     r = _radius(coords, model)
     _, r_max = _global_min_max(r, model)

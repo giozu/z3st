@@ -34,10 +34,29 @@ class FiniteElementSetup:
         print("Mechanical function space (V_m):", self.V_m)
         
         # --. Damage --..
-        if self.on.get("damage", False):
+        # The cohesive model carries its phase field in the same space and the
+        # same Function (self.D), so V_d is needed for either route.
+        if self.on.get("damage", False) or self.on.get("cohesive", False):
             self.V_d = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
             print("Scalar function space (V_d):", self.V_d)
-        
+
+        # --. Cohesive fracture: mixed (u, eigenstrain) space --..
+        # The eigenstrain is piecewise constant, matching the constant strain
+        # within a linear element; in the multi-axial case it needs only its
+        # trace and its deviatoric norm (Vicentini et al. 2026, Sec. 5.1).
+        if self.on.get("cohesive", False):
+            cell = self.mesh.basix_cell()
+            u_el = basix.ufl.element(
+                "Lagrange", cell, mech_degree, shape=(self.mesh.topology.dim,)
+            )
+            eta_el = basix.ufl.element("DG", cell, 0)
+            n_eta = 1 if self.mesh.topology.dim == 1 else 2
+            self.W = dolfinx.fem.functionspace(
+                self.mesh, basix.ufl.mixed_element([u_el] + [eta_el] * n_eta)
+            )
+            print(f"Cohesive mixed function space (W): {self.W} [1 + {n_eta} blocks]")
+
+
         # --. Scalar field --..
         self.Q = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
         print("Scalar function space (Q):", self.Q)

@@ -1,47 +1,49 @@
 {
     "results": {
         "burnup_mean_closed_form": {
-            "numerical": 27.19699824399601,
-            "reference": 27.196998243996006,
-            "abs_error": 3.552713678800501e-15,
-            "rel_error": 1.306288895166876e-16,
+            "numerical": 27.22181,
+            "reference": 27.221813023415713,
+            "abs_error": 3.023415711567168e-06,
+            "rel_error": 1.1106592014890705e-07,
             "status": "PASS"
         },
         "axial_peaking_factor": {
-            "numerical": 1.3262074673259312,
+            "numerical": 1.3213337153770408,
             "reference": 1.3213063996776495,
-            "abs_error": 0.004901067648281687,
-            "rel_error": 0.003709258995095588,
+            "abs_error": 2.7315699391294856e-05,
+            "rel_error": 2.0673251410845274e-05,
             "status": "PASS"
         },
         "end_peak_ratio": {
-            "numerical": 0.30901699437494745,
+            "numerical": 0.3090169943749475,
             "reference": 0.30901699437494745,
-            "abs_error": 0.0,
-            "rel_error": 0.0,
+            "abs_error": 5.551115123125783e-17,
+            "rel_error": 1.7963785889362146e-16,
             "status": "PASS"
         },
         "dT_centre_mid": {
-            "numerical": 530.7853608629125,
+            "numerical": 528.8346901374296,
             "reference": 525.7311121191335,
-            "abs_error": 5.054248743778999,
-            "rel_error": 0.009613752405495224,
+            "abs_error": 3.103578018296048,
+            "rel_error": 0.005903356196261713,
             "status": "PASS"
         },
         "elongation_u_top": {
-            "numerical": 0.0008782059789048599,
+            "numerical": 0.0008749785148099696,
             "reference": 0.0008753521870054244,
-            "abs_error": 2.8537918994354927e-06,
-            "rel_error": 0.0032601642422329475,
+            "abs_error": 3.736721954548071e-07,
+            "rel_error": 0.0004268821178514877,
             "status": "PASS"
         },
         "total_power": {
-            "numerical": 8029.509,
+            "numerical": 8000.0,
             "reference": 8000.0,
-            "abs_error": 29.509000000000015,
-            "rel_error": 0.003688625000000002,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
             "status": "PASS"
         }
     },
-    "tolerance": 0.03
+    "tolerance": 0.03,
+    "summary": "PASS",
+    "regression": "PASS"
 }
