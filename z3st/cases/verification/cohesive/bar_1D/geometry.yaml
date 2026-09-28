@@ -1,0 +1,10 @@
+name: cohesive_bar_1d
+geometry_type: rect
+
+Lx: 2.0e-3  # bar length 2L (m)
+Ly: 0.0     # placeholder, unused in 1D
+
+labels:
+  xmin: 1
+  xmax: 2
+  bar: 3

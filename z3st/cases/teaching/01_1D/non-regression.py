@@ -158,9 +158,9 @@ fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
 # sigma_yy and sigma_zz are identically zero in regime: 1d (uniaxial stress)
 # and overlap exactly, so plot them as a single series to avoid clutter.
-ax1.plot(x_s, sigma_xx * Pa_to_MPa, "bo-", label=r"FE $\sigma_{xx}$",
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, "o-", color="#0072B2", label=r"FE $\sigma_{xx}$",
          markersize=6, alpha=0.8)
-ax1.plot(x_s, sigma_yy * Pa_to_MPa, "rs-", label=r"FE $\sigma_{yy}=\sigma_{zz}$",
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, "s-", color="#D55E00", label=r"FE $\sigma_{yy}=\sigma_{zz}$",
          markersize=5, alpha=0.8)
 ax1.axhline(P * Pa_to_MPa, color="k", linestyle="--", linewidth=1.2,
             label=rf"Analytic $\sigma_{{xx}} = P = {P*Pa_to_MPa:.0f}$ MPa")
@@ -170,10 +170,10 @@ ax1.set_xlabel("x (m)", fontsize=12)
 ax1.set_ylabel("Stress (MPa)", fontsize=12)
 ax1.set_title(r"Stress along the bar — uniaxial stress ($\sigma_{xx}=E\,\varepsilon_{xx}$)",
               fontsize=12)
-ax1.legend(loc="best", fontsize=9)
+ax1.legend(loc="best", fontsize=10)
 ax1.grid(True, linestyle="--", alpha=0.6)
 
-ax2.plot(x_n_sorted, u_x_sorted * 1e3, "bo", label=r"FE $u_x$", markersize=7)
+ax2.plot(x_n_sorted, u_x_sorted * 1e3, "o", color="#0072B2", label=r"FE $u_x$", markersize=7)
 x_dense = np.linspace(0.0, Lx, 200)
 ax2.plot(x_dense, eps_xx_ref * x_dense * 1e3, "k--", linewidth=1.5,
          label=r"Analytic $u_x = P\,x/E$")
@@ -461,7 +461,7 @@ ax.plot(xs_sample, u_reconstructed * 1e3, "k-", linewidth=2.5,
         label=r"$u_x(x) = \sum_i u_i\, N_i(x)$  (sum)")
 
 # Analytical reference (engineering-bar PL/E * x)
-ax.plot(xs_sample, eps_xx_ref * xs_sample * 1e3, "r--", linewidth=1.5,
+ax.plot(xs_sample, eps_xx_ref * xs_sample * 1e3, "--", color="#D55E00", linewidth=1.5,
         alpha=0.8, label=r"Analytical  $u_x = P\,x/E$")
 
 # Mark nodes
@@ -475,7 +475,7 @@ ax.set_title(f"Galerkin reconstruction: $u_x(x) = \\sum_i u_i\\,N_i(x)$ "
              f"({n_dofs} dofs, {n_elements} element"
              f"{'s' if n_elements > 1 else ''})", fontsize=12)
 ax.axhline(0.0, color="grey", linestyle=":", linewidth=0.6)
-ax.legend(loc="upper left", fontsize=9, frameon=True)
+ax.legend(loc="upper left", fontsize=10, frameon=True)
 ax.grid(True, linestyle="--", alpha=0.5)
 plt.tight_layout()
 

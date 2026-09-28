@@ -122,21 +122,21 @@ sigma_vm_ref = sigma_vm_an(r)
 
 plt.figure(figsize=(6, 4))
 
-plt.plot(r, sigma_rr_num, "b.", lw=1.5, label=r"$\sigma_{rr}$ (num)")
-plt.plot(r, sigma_tt_num, "r.", lw=1.5, label=r"$\sigma_{\theta\theta}$ (num)")
+plt.plot(r, sigma_rr_num, ".", color="#0072B2", lw=1.5, label=r"$\sigma_{rr}$ (num)")
+plt.plot(r, sigma_tt_num, ".", color="#D55E00", lw=1.5, label=r"$\sigma_{\theta\theta}$ (num)")
 plt.plot(r, sigma_vm_num, "k.", lw=1.5, label=r"$\sigma_\mathrm{vm}$ (num)")
-plt.plot(r, sigma_rr_ref, "b--", lw=1.2, label=r"$\sigma_{rr}$ (ana)")
-plt.plot(r, sigma_tt_ref, "r--", lw=1.2, label=r"$\sigma_{\theta\theta}$ (ana)")
+plt.plot(r, sigma_rr_ref, "--", color="#0072B2", lw=1.2, label=r"$\sigma_{rr}$ (ana)")
+plt.plot(r, sigma_tt_ref, "--", color="#D55E00", lw=1.2, label=r"$\sigma_{\theta\theta}$ (ana)")
 plt.plot(r, sigma_vm_ref, "k--", lw=1.2, label=r"$\sigma_\mathrm{vm}$ (ana)")
 
-plt.axvline(R, color="blue", lw=0.8, ls=":", label="Cavity radius")
-plt.axvline(L * 0.5, color="red", lw=0.8, ls="--", label="Box edge")
+plt.axvline(R, color="#0072B2", lw=0.8, ls=":", label="Cavity radius")
+plt.axvline(L * 0.5, color="#D55E00", lw=0.8, ls="--", label="Box edge")
 
 plt.xlabel("r (m)")
 plt.ylabel("Stress (Pa)")
 plt.title("Stress comparison", fontsize=10)
 plt.grid(True, which="both", ls=":", lw=0.5)
-plt.legend(fontsize=8, frameon=False, loc="upper right")
+plt.legend(fontsize=10, frameon=False, loc="upper right")
 plt.tight_layout(rect=[0, 0, 1, 1])
 plt.savefig(
     os.path.join(OUT_DIR, "stress_comparison.png"), dpi=300, bbox_inches="tight", transparent=False

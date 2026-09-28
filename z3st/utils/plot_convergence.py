@@ -28,6 +28,9 @@ import sys
 import os
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
 import yaml
 import numpy as np
 
@@ -147,15 +150,15 @@ def plot_convergence(steps_data, save_path="convergence.png"):
         ax.semilogy(all_it, _series(all_dT), "s--", label="residuals(T)", markersize=4, alpha=0.7)
     if any(v is not None for v in all_dcreep):
         ax.semilogy(all_it, _series(all_dcreep), "^-", label="residuals(creep)",
-                    color="darkorange", markersize=4, alpha=0.8)
+                    color="#E69F00", markersize=4, alpha=0.8)
     if any(v is not None for v in all_dD):
-        ax.semilogy(all_it, _series(all_dD), "d:", label="residuals(D)", color="crimson", markersize=4, lw=1.5)
+        ax.semilogy(all_it, _series(all_dD), "d:", label="residuals(D)", color="#D55E00", markersize=4, lw=1.5)
 
     if os.path.exists("input.yaml"):
         with open("input.yaml", "r") as f:
             config = yaml.safe_load(f)
-        ax.axhline(float(config.get("mechanical", {}).get("stag_tol", 1e-8)), color="blue", ls="--", alpha=0.3, label="tol u")
-        ax.axhline(float(config.get("damage", {}).get("stag_tol", 1e-4)), color="red", ls="-", alpha=0.3, label="tol D")
+        ax.axhline(float(config.get("mechanical", {}).get("stag_tol", 1e-8)), color="#0072B2", ls="--", alpha=0.3, label="tol u")
+        ax.axhline(float(config.get("damage", {}).get("stag_tol", 1e-4)), color="#D55E00", ls="-", alpha=0.3, label="tol D")
 
     ax.set_ylabel("Residuals")
     ax.set_title("Z3ST convergence history", pad=18)
@@ -165,16 +168,16 @@ def plot_convergence(steps_data, save_path="convergence.png"):
     ax2 = None
     if any(v is not None for v in all_hgap):
         ax2 = ax.twinx()
-        ax2.plot(all_it, _series(all_hgap), ".-", color="seagreen", alpha=0.5,
+        ax2.plot(all_it, _series(all_hgap), ".-", color="#009E73", alpha=0.5,
                  markersize=3, lw=1, label="h_gap")
-        ax2.set_ylabel("h_gap [W/m²K]", color="seagreen")
+        ax2.set_ylabel("h_gap [W/m²K]", color="#009E73")
         ax2.tick_params(axis="y", labelcolor="seagreen")
 
     handles, labels = ax.get_legend_handles_labels()
     if ax2 is not None:
         h2, l2 = ax2.get_legend_handles_labels(); handles += h2; labels += l2
     if substep_boundaries:
-        handles.append(Line2D([0], [0], color="darkorange", ls=(0, (1, 1)), lw=1.4))
+        handles.append(Line2D([0], [0], color="#E69F00", ls=(0, (1, 1)), lw=1.4))
         labels.append(f"substep dt-cut (×{len(substep_boundaries)})")
     ax.legend(handles, labels, loc="lower left", fontsize="small", ncol=3)
 
@@ -187,15 +190,15 @@ def plot_convergence(steps_data, save_path="convergence.png"):
 
     # --- bottom panel: contact state (gap left, pressure right) ---
     if ax_b is not None:
-        ax_b.plot(all_it, _series(all_gap), "-", color="navy", lw=1.3, label="gap [µm]")
-        ax_b.axhline(0.0, color="navy", ls=":", alpha=0.4)
-        ax_b.set_ylabel("gap [µm]", color="navy")
+        ax_b.plot(all_it, _series(all_gap), "-", color="#0072B2", lw=1.3, label="gap [µm]")
+        ax_b.axhline(0.0, color="#0072B2", ls=":", alpha=0.4)
+        ax_b.set_ylabel("gap [µm]", color="#0072B2")
         ax_b.tick_params(axis="y", labelcolor="navy")
         ax_b.grid(True, ls=":", alpha=0.4)
 
         ax_bp = ax_b.twinx()
-        ax_bp.plot(all_it, _series(all_p), "-", color="firebrick", lw=1.3, label="contact p [MPa]")
-        ax_bp.set_ylabel("contact p [MPa]", color="firebrick")
+        ax_bp.plot(all_it, _series(all_p), "-", color="#D55E00", lw=1.3, label="contact p [MPa]")
+        ax_bp.set_ylabel("contact p [MPa]", color="#D55E00")
         ax_bp.tick_params(axis="y", labelcolor="firebrick")
 
         hb, lb = ax_b.get_legend_handles_labels()
@@ -211,7 +214,7 @@ def plot_convergence(steps_data, save_path="convergence.png"):
         for boundary in step_boundaries[:-1]:
             panel.axvline(boundary, color="gray", linestyle="--", alpha=0.4, lw=0.8)
         for b in substep_boundaries:
-            panel.axvline(b, color="darkorange", linestyle=(0, (1, 1)), alpha=0.85, lw=1.1)
+            panel.axvline(b, color="#E69F00", linestyle=(0, (1, 1)), alpha=0.85, lw=1.1)
 
     fig.tight_layout()
     fig.savefig(save_path, dpi=200)

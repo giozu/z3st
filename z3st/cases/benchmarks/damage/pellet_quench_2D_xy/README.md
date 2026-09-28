@@ -59,7 +59,7 @@ y-translation and rotation around z). A small 50-um pin segment near
 | Symmetry plane y = 0 | `Clamp_y` (mirror BC) |
 | Pin segment at (-R, 0) | `Clamp_x` (50 um, removes rigid x-translation) |
 | Damage | AT1, Ambati hybrid, Amor split, `lc = 50 um`, hybrid_constraint = true |
-| Time window | 0.0001 to 0.1 s, n_steps = 100, dt = 1 ms |
+| Time window | 0.0001 to 0.1 s, n_steps = 100. The 99 intervals are uniform at dt = 1.01 ms, the first step is 0.1 ms |
 
 `sigma_c = 1 GPa` (from `materials/uo2.yaml`) is calibrated above the
 bulk-artifact threshold of plane strain (about 3.0 MJ/m^3 from the blocked

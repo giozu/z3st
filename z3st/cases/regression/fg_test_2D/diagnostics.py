@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 Diagnostics for regression/fg_test_2D.
@@ -86,17 +86,14 @@ def per_step(problem, step, t):
     bu_avg = bu_max = 0.0
     bu_fn = getattr(problem, "burnup", None)
     if bu_fn is not None:
+        # Weighted FE mean (2πr) over the fissile material, the quantity the
+        # closed form of non-regression.py describes. Collective.
+        fuel = next(n for n, m in problem.materials.items() if m.get("fissile", False))
+        bu_avg = problem.material_mean(bu_fn, fuel)
         bu = _owned(bu_fn)
-        pos = bu[bu > 0]
-        bu_sum, bu_cnt = float(pos.sum()), int(pos.size)
-        bu_peak = float(bu.max()) if bu.size else 0.0
+        bu_max = float(bu.max()) if bu.size else 0.0
         if parallel:
-            bu_sum = comm.allreduce(bu_sum, op=MPI.SUM)
-            bu_cnt = comm.allreduce(bu_cnt, op=MPI.SUM)
-            bu_peak = comm.allreduce(bu_peak, op=MPI.MAX)
-        if bu_cnt:
-            bu_avg = bu_sum / bu_cnt
-            bu_max = bu_peak
+            bu_max = comm.allreduce(bu_max, op=MPI.MAX)
 
     # Both are single global scalars maintained by the contact model, so they
     # need no reduction.

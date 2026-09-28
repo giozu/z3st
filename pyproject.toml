@@ -1,7 +1,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.0 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 [build-system]
@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "z3st"
-version = "0.3.2"
+version = "0.4.0"
 description = "Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis"
 authors = [
   {name = "Giovanni Zullo", email = "giovanni.zullo@polimi.it"}
@@ -78,3 +78,7 @@ profile = "black"
 line_length = 100
 multi_line_output = 3
 include_trailing_comma = true
+
+[tool.codespell]
+skip = "*.xdmf,*.h5,*.msh,*.vtu,*.pvd,*.pt,*.ipynb,third_party,build,_build,log_z3st.md"
+ignore-words-list = "bu,mater,numer,fo,ned,nd,te,ser,ans,commun,vermillion,re-used,unparseable"

@@ -7,9 +7,10 @@
 UO2 thermal conductivity as a symbolic k(T) material card.
 
 A fuel card opts in via ``k: materials.fuel_thermal.k`` — spine resolves the
-function and substitutes k(T) into the thermal weak form (the conductivity is
-lagged at the previous staggered iterate, so the linear thermal solve becomes
-a Picard iteration that converges with the staggered loop).
+function and substitutes k(T) into the thermal weak form, built on the staggered
+temperature iterate (``spine.T_iter``). The conductivity is thus lagged at the
+previous staggered iterate, so the linear thermal solve becomes a Picard
+iteration that converges with the staggered loop within the time step.
 
 The correlation is the phonon + electronic form of the modified NFI model
 (Ohira & Itagaki 1997, as adopted in FRAPCON-3 by Lanning & Beyer) at zero

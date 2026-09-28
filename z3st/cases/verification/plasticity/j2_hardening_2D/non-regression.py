@@ -139,7 +139,7 @@ for e, s, sr, u, p in zip(strains, stresses, stresses_analytic_np, displacements
 # Plotting
 plt.figure(figsize=(8, 6))
 plt.plot(strain_ref_np, stresses_analytic_np, "k--", lw=1.5, label="Analytical (2D plane strain)")
-plt.plot(strains_np, stresses_np, "r-o", lw=2, label="Numerical (Z3ST)")
+plt.plot(strains_np, stresses_np, "-o", color="#D55E00", lw=2, label="Numerical (Z3ST)")
 
 # Mark yield point
 E_eff = E / (1 - nu**2)

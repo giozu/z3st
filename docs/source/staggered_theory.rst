@@ -151,6 +151,18 @@ in [Almi2020]_ and shown to converge to the correct evolution. The staggered
 scheme is therefore not a mere numerical expedient: its converged result is a
 provably sound approximation of the underlying brittle-fracture evolution.
 
+The cohesive route (:ref:`cohesive-fracture`) uses the same alternate
+minimization, but discharges both constraints onto the solver rather than onto a
+post-solve truncation. Each of its two sub-problems is a bound-constrained
+minimization solved as a variational inequality: the eigenstrain scalars are
+constrained non-negative, and irreversibility enters as the bound
+:math:`\alpha \ge \alpha_p` on the phase-field solve. The truncation argument
+of [Almi2020]_ is then not needed, because the iterate never leaves the
+admissible set in the first place. Since both sub-problems remain separately
+convex --- which is what the strain-hardening condition
+:math:`\ell \le \ell_{ch}/4` buys --- the energy-descent argument of this page
+carries over unchanged.
+
 
 Equivalence with a monolithic solve, at convergence
 ----------------------------------------------------

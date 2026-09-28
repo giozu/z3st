@@ -50,6 +50,11 @@ Physics Models
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: z3st.models.cohesive_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. automodule:: z3st.models.gap_model
    :members:
    :undoc-members:

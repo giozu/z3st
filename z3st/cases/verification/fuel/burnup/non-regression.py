@@ -10,7 +10,7 @@ bus (radial_profile -> set_power f(r,bu)) in a single axisymmetric pellet run.
 A solid pellet is held at a constant linear heat rate with a rim-peaking radial
 form factor f(r) = 1 + A (r/Ro)^p. The deposited volumetric power is
 q(r) = q_avg * f_norm(r), with q_avg = lhr / area, area = pi*Ro^2, and f_norm the
-profile normalised to mean 1 (set_power preserves the average rating). Burnup
+profile divided by its 2πr-weighted mean (set_power preserves the rating). Burnup
 accumulates as
 
     bu(r) = q(r) * t / (rho * HM * 8.64e10)   [MWd/kgU],
@@ -18,9 +18,10 @@ accumulates as
 8.64e10 = 86400 s/day * 1e6 W/MW. Two closed-form checks, independent of each
 other:
 
-  1. accumulation magnitude — the nodal-mean burnup equals the flat closed form
+  1. accumulation magnitude — the weighted FE mean burnup (``Mean burnup``
+     line of the solver log) equals the flat closed form
          bu_mean = q_avg * t_total / (rho * HM * 8.64e10),
-     because the nodal mean of f_norm is 1 by construction. This checks the
+     because the weighted mean of f_norm is 1 by construction. This checks the
      accumulation arithmetic, the unit conversion, and power preservation.
   2. radial shape — the rim/core burnup ratio equals 1 + A = f(Ro)/f(0),
      the *un-normalised* peak factor, independent of the normalisation. This
@@ -31,6 +32,7 @@ vs analytical), and a pyvista render of the (r, z) burnup field.
 """
 
 import os
+import re
 import glob
 import yaml
 import numpy as np
@@ -84,13 +86,20 @@ x, y, z, bu = extract_field(VTU_FILE, field_name="Burnup")
 r = np.asarray(x)                              # axisymmetric mesh: x[0] = r
 bu = np.asarray(bu)
 
-bu_mean = float(np.mean(bu))
+bu_mean = float("nan")
+_hits = []
+LOG = os.path.join(CASE_DIR, "log_z3st.md")
+if os.path.exists(LOG):
+    with open(LOG) as f:
+        _hits = re.findall(r"Mean burnup in \S+:\s*([0-9.eE+\-]+)", f.read())
+    if _hits:
+        bu_mean = float(_hits[-1])
 bu_core = float(bu[np.argmin(r)])              # r -> 0
 bu_rim = float(bu[np.argmax(r)])               # r = Ro
 ratio = bu_rim / max(bu_core, 1e-12)
 
 print(f"[INFO] q_avg = lhr/area = {q_avg:.4e} W/m^3 over t = {t_total:.3e} s")
-print(f"[INFO] nodal-mean burnup: numerical = {bu_mean:.6e}, "
+print(f"[INFO] weighted mean burnup: numerical = {bu_mean:.6e}, "
       f"analytical = {BU_MEAN_REF:.6e} MWd/kgU")
 print(f"[INFO] burnup core = {bu_core:.2f}, rim = {bu_rim:.2f} MWd/kgU")
 print(f"[INFO] rim/core ratio: numerical = {ratio:.4f}, analytical (1+A) = {RATIO_REF:.4f}")
@@ -101,30 +110,17 @@ errors = {
 }
 
 # --. integrated power (parsed from the solver log) --..
-# set_power prints the exact FE integral of the fissile source. For a radially
-# peaked profile the integral does not equal LHR·Lz: the mean-1 normalisation
-# is nodal (uniform in r), while the integral carries the 2πr area weight, so
-#
-#   P / (LHR·Lz) = <f>_area / <f>_nodal = [1 + 2A/(p+2)] / [1 + A/(p+1)]
-#
-# = 1.6/(4/3) = 1.2 for A = 3, p = 8 (see spine.set_power).
-import re
-LOG = os.path.join(CASE_DIR, "log_z3st.md")
-F_AREA = 1.0 + 2.0 * A / (p_exp + 2.0)              # continuum area-weighted mean
-F_NODAL_CONT = 1.0 + A / (p_exp + 1.0)              # continuum nodal (line) mean
-# Normalise by the discrete nodal mean over the actual fuel dofs, O(1/N) above
-# the continuum value.
-_coords = np.column_stack([np.asarray(x), np.asarray(y), np.asarray(z)])
-F_NODAL = float(np.mean(rim_peaking(_coords, np.zeros(len(_coords)), mat, model=None)))
-P_REF = lhr * Lz * F_AREA / F_NODAL
+# set_power prints the exact FE integral of the fissile source. The profile is
+# divided by its 2πr-weighted FE mean, so the integral equals LHR·Lz to
+# round-off for any radial shape (see spine.set_power).
+P_REF = lhr * Lz
 if os.path.exists(LOG):
     with open(LOG) as f:
         hits = re.findall(r"Integrated fissile power in \S+:\s*([0-9.eE+\-]+)", f.read())
     if hits:
         P_int = float(hits[-1])
         print(f"[INFO] integrated power: numerical = {P_int:.6e} W, "
-              f"analytical LHR·Lz·<f>_area/<f>_nodal = {P_REF:.6e} W "
-              f"(continuum ratio to LHR·Lz = {F_AREA / F_NODAL_CONT:.4f})")
+              f"analytical LHR·Lz = {P_REF:.6e} W")
         errors["total_power"] = {
             "numerical": P_int,
             "reference": P_REF,
@@ -141,9 +137,8 @@ try:
     times, _, _ = generate_power_history(
         inp["time"], inp["lhr"], n_steps=int(inp["n_steps"]) - 1, filename=None
     )
-    bu_step_mean = np.array(
-        [float(np.mean(extract_field(f, field_name="Burnup")[3])) for f in _steps]
-    )
+    # weighted mean per step from the log (t = 0 has dt = 0 and prints none)
+    bu_step_mean = np.array([0.0] + [float(h) for h in _hits])
     if len(bu_step_mean) == len(times):
         t_line = np.linspace(0.0, t_total, 100)
         bu_line = q_avg * t_line / (rho * hm * SECONDS_PER_MWD)
@@ -167,7 +162,7 @@ except Exception as e:
 try:
     coords = np.column_stack([r, y, z])
     f_raw = rim_peaking(coords, np.zeros_like(r), mat, model=None)
-    f_norm = f_raw / f_raw.mean()             # set_power normalises to mean 1
+    f_norm = f_raw / (1.0 + 2.0 * A / (p_exp + 2.0))   # continuum 2πr-weighted mean
     bu_profile = q_avg * f_norm * t_total / (rho * hm * SECONDS_PER_MWD)
     order = np.argsort(r)
     plt.figure(figsize=(7, 5))
