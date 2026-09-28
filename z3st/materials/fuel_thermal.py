@@ -33,3 +33,7 @@ def k(T):
     lattice = 1.0 / (0.0452 + 2.46e-4 * T)
     electronic = 3.5e9 / (T * T) * ufl.exp(-16361.0 / T)
     return lattice + electronic
+
+def k_UZrH(T):
+    """ueueue."""
+    return 18.0 + 0.0085 * (T - 273.15)

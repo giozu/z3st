@@ -33,9 +33,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "output")
 
 # parameters
-R_PELLET = 0.0045
-R_CLAD_I = 0.004565
-R_CLAD_O = 0.005315
+R_PELLET = 0.017910
+R_CLAD_I = 0.017915
+R_CLAD_O = 0.018800
 G0 = R_CLAD_I - R_PELLET
 K_PEN = 5.0e13
 

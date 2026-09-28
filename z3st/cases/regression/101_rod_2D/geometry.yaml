@@ -2,10 +2,10 @@ name: fuel_rod_segment
 geometry_type: cyl-cyl
 
 inner_radius_1: 0.0       # (m)
-outer_radius_1: 0.0045    # (m)
-inner_radius_2: 0.004565  # (m)
-outer_radius_2: 0.005315  # (m)
-Lz: 0.010                 # (m)
+outer_radius_1: 0.017910    # (m)
+inner_radius_2: 0.017915  # (m)
+outer_radius_2: 0.018800  # (m)
+Lz: 0.356                 # (m)
 
 labels:
   bottom_1: 1

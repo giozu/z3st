@@ -29,10 +29,9 @@ thermal:
     region: inner_2
     pair: lateral_1
 
-  - type: Robin
+  - type: Dirichlet
     region: outer_2
-    h_conv: 3.5e4        # (W/(m²K))
-    T_ext: 580.0         # (K)
+    temperature: 300.0         # (K)
 
 mechanical:
   fuel:
@@ -44,11 +43,11 @@ mechanical:
 
   - type: Neumann
     region: lateral_1
-    traction: -2.0e+6     # (Pa)
+    traction: -1.0e+5     # (Pa)
 
   - type: Neumann
     region: top_1
-    traction: -2.0e+6     # (Pa)
+    traction: -1.0e+5     # (Pa)
     
   clad:
   - type: Clamp_y
@@ -56,8 +55,8 @@ mechanical:
 
   - type: Neumann
     region: outer_2
-    traction: -15.5e+6    # (Pa)
+    traction: -1.e+5    # (Pa)
 
   - type: Neumann
     region: inner_2
-    traction: -2.0e+6     # (Pa)
+    traction: -1.0e+5     # (Pa)
