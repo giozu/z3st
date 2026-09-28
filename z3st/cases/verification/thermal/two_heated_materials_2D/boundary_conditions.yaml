@@ -1,0 +1,10 @@
+# Each BC under the material that owns the face; top and bottom are adiabatic.
+thermal:
+  steel_in:
+  - type: Dirichlet
+    region: inner_radius
+    temperature: 490.0   # (K)
+  steel_out:
+  - type: Dirichlet
+    region: outer_radius
+    temperature: 500.0   # (K)

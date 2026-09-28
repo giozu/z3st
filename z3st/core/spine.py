@@ -605,8 +605,20 @@ class Spine(
         if not hasattr(self, "_scratch_shape"):
             self._scratch_shape = dolfinx.fem.Function(self.V_t)
 
+        # Sources add WITHIN a material (fissile + gamma_heating) but not ACROSS
+        # materials. q_third is nodal (CG1), and a node on the interface between
+        # two materials belongs to both dof sets: a plain += gave it both
+        # materials' sources, i.e. twice the value when they agree (liner bonded
+        # to a gamma-heated wall: +2-3 % of the deposited power). Such a node now
+        # takes the mean over the HEATED materials touching it; a node between a
+        # heated and an unheated material keeps the heated value, as before.
+        q_sum = np.zeros_like(self.q_third.x.array)
+        n_src = np.zeros_like(self.q_third.x.array)
+        fissile_names = []
+
         for name, mat in self.materials.items():
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+            q_mat = np.zeros(len(dofs))
 
             if mat.get("fissile", False):
                 print("Fissile material")
@@ -652,17 +664,12 @@ class Spine(
 
                 # Accumulate: multiple sources on the same material (e.g.
                 # fissile + gamma_heating below) add.
-                self.q_third.x.array[dofs] += q_val * shape
+                q_mat += q_val * shape
                 print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu)·f(z) (fissile, weighted mean f = 1)")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
-
-                # Integrated-power diagnostic: the exact FE integral of the
-                # source over this material, with the regime weight. For a rod
-                # it equals LHR·Lz to round-off for any profile.
-                P_int = self.material_mean(self.q_third, name, integral=True)
-                unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
-                        "1d": "W/m²"}.get(self.regime, "W")
-                print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
+                # The integrated-power diagnostic needs the final q_third, so
+                # it is assembled after the loop over materials.
+                fissile_names.append(name)
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
                 # Cylindrical and spherical gamma-decay correlations use
@@ -718,9 +725,24 @@ class Spine(
                 f_func = dolfinx.fem.Function(self.V_t)
                 f_func.interpolate(f)
                 # Accumulate: fissile + gamma_heating on the same material combine.
-                self.q_third.x.array[dofs] += f_func.x.array[dofs]
+                q_mat += f_func.x.array[dofs]
 
+            if np.any(q_mat != 0.0):
+                q_sum[dofs] += q_mat
+                n_src[dofs] += 1.0
+
+        self.q_third.x.array[:] = q_sum / np.maximum(n_src, 1.0)
         self.q_third.x.scatter_forward()
+
+        unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
+                "1d": "W/m²"}.get(self.regime, "W")
+        
+        # Integrated-power diagnostic: the exact FE integral of the source over
+        # each fissile material, with the regime weight. For a rod it equals
+        # LHR·Lz to round-off for any profile.
+        for name in fissile_names:
+            P_int = self.material_mean(self.q_third, name, integral=True)
+            print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
 
     def update_state(self, dt):
         """Advance each material's own history over a step of ``dt`` seconds.

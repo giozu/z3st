@@ -1,0 +1,20 @@
+{
+    "results": {
+        "Linf_T_split_vs_single": {
+            "numerical": 3.410605131648481e-13,
+            "reference": 0.0,
+            "abs_error": 3.410605131648481e-13,
+            "rel_error": 6.855399136223833e-15,
+            "status": "PASS"
+        },
+        "T_max": {
+            "numerical": 539.75064272519,
+            "reference": 539.75064272519,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 1e-06,
+    "summary": "PASS"
+}
