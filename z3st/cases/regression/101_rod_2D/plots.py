@@ -71,6 +71,12 @@ LHR = _imposed_lhr_kwm()
 TOL = 2.0e-5
 
 
+def mid_band(z):
+    """Mask of the node (or cell-centre) layer nearest the rod mid-height."""
+    z_near = z[np.argmin(np.abs(z - 0.5 * (z.min() + z.max())))]
+    return np.abs(z - z_near) < 1e-6
+
+
 def surface_mean_ur(grid, r_target):
     r = grid.points[:, 0]
     ur = grid.point_data["Displacement"][:, 0]
@@ -252,9 +258,6 @@ def _pcmi_from_vtu():
 # ----------------------------------------------------------------------
 def plot_radial_profile():
     files = sorted(glob.glob(os.path.join(OUT, "*.vtu")))
-    z_mid = 0.005          # mid-height (m)
-    dz = 3.0e-4            # band half-width to pick a horizontal cut
-
     bu = burnup_per_step(files)        # MWd/kgU per step, for the legend
     n = len(files)
     label_every = max(1, n // 6)       # 6 labelled curves, rest unlabelled
@@ -265,7 +268,7 @@ def plot_radial_profile():
         r = g.points[:, 0]
         z = g.points[:, 1]
         ur = g.point_data["Displacement"][:, 0] * 1e6  # um
-        band = np.abs(z - z_mid) < dz
+        band = mid_band(z)
         rb, ub = r[band], ur[band]
         color = cmap(i / (len(files) - 1))
         for lo, hi in [(0.0, R_PELLET + 1e-9), (R_CLAD_I - 1e-9, R_CLAD_O + 1e-9)]:
@@ -306,7 +309,6 @@ def _stress_profile_data():
     stored in cylindrical order (r, theta, z), so in the flattened
     9-component array column 0 is sigma_rr and column 4 is sigma_theta.
     """
-    z_mid, dz = 0.005, 3.0e-4
     files = sorted(glob.glob(os.path.join(OUT, "*.vtu")))
     if files:
         g = pv.read(files[-1])
@@ -324,7 +326,7 @@ def _stress_profile_data():
             return None
         r, z, _, s = extract_field_xdmf(xdmf, "Stress", step_index=-1)
         s = np.asarray(s).reshape(len(r), 9)
-    band = np.abs(z - z_mid) < dz
+    band = mid_band(z)
     return r[band], s[band, 0] / 1e6, s[band, 4] / 1e6
 
 
@@ -362,7 +364,9 @@ def plot_stress_profile():
 
     # console summary at the four radii of interest
     def at(rt):
-        i = np.argmin(np.abs(r - rt))
+        # nearest sample within the body rt belongs to (pellet or clad)
+        body = (r <= R_PELLET + 1e-9) if rt <= R_PELLET else (r >= R_CLAD_I - 1e-9)
+        i = np.flatnonzero(body)[np.argmin(np.abs(r[body] - rt))]
         return s_rr[i], s_tt[i]
     print("    mid-height stresses (MPa):")
     for name, rt in [("fuel centre", 0.0), ("fuel surface", R_PELLET),
