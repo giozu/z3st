@@ -43,7 +43,7 @@ or:
 All Pull Requests are automatically verified via **GitHub Actions** inside the
 official ``dolfinx/dolfinx:stable`` container.
 
-Additional verification tests are defined in the ``cases/`` directory and
+Additional verification tests are defined in the ``z3st/cases/`` directory and
 can be run using:
 
 .. code-block:: bash

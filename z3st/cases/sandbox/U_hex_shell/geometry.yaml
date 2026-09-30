@@ -1,0 +1,13 @@
+name: hex_shell_3d # new name for the geometry
+
+D: 0.200    # outer circumscribed diameter (m)
+H: 1.000    # height (m)
+t: 0.0045   # wall thickness (m)
+Lz: 1.000   # height (m)
+
+labels: #consistent with the Builtin mesh.geo
+  steel: 1
+  bottom: 10
+  top: 11
+  inner: 12
+  outer: 13

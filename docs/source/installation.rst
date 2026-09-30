@@ -119,7 +119,7 @@ To build the **Sphinx** documentation, install the additional dependencies:
 
 .. code-block:: bash
 
-   pip install sphinx sphinx-book-theme myst-parser sphinx-autodoc-typehints
+   pip install -r docs/requirements.txt
 
 Then, from the project root directory:
 
@@ -132,13 +132,13 @@ The generated HTML documentation will be available at:
 
 .. code-block:: bash
 
-   _build/html/index.html
+   docs/build/html/index.html
 
 
 Verification and non-regression tests
 -------------------------------------
 
-Z3ST includes a suite of verification and non-regression cases located in the ``cases`` directory.
+Z3ST includes a suite of verification and non-regression cases located in the ``z3st/cases`` directory.
 Each case reproduces a reference simulation to ensure numerical consistency across
 different versions of the code.
 
@@ -146,7 +146,7 @@ To automatically execute all available verification and non-regression tests, ru
 
 .. code-block:: bash
 
-   cd cases
+   cd z3st/cases
    ./non-regression_local.sh
 
 This script sequentially executes all predefined test cases and compares the obtained results
@@ -160,11 +160,11 @@ A summary of the execution status is saved in ``non-regression_summary.txt``.
    description of the discrepancy.
 
 
-The ``cases`` folder groups benchmark setups by the kind of guarantee they provide:
+The ``z3st/cases`` folder groups benchmark setups by the kind of guarantee they provide:
 
 .. code-block:: text
 
-   cases/
+   z3st/cases/
    ├── verification/          # analytic closed-form checks
    │   ├── thermal/
    │   ├── mechanics/

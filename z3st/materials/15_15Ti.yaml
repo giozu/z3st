@@ -3,12 +3,13 @@ name: 15-15 Ti
 # Mechanical properties
 E: 1.7e11         # Young's modulus (Pa)
 nu: 0.3           # Poisson's ratio (-)
+alpha: 1.2e-5     # Thermal expansion coefficient (1/K)
+T_ref: 300.0      # Reference temperature (K) 
 
 # Thermal properties
 k: 10             # Constant thermal conductivity (W/m·K)
 cp: 200           # Specific heat capacity (J/kg·K)
-alpha: 1.2e-5     # Thermal expansion coefficient (1/K)
-
+T_initial:  300.0    # Initial temperature (K):
 # Physical properties
 rho: 7750         # Density (kg/m³)
 

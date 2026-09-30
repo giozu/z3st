@@ -139,7 +139,7 @@ cd docs && make clean html      # build → docs/build/html/index.html
 
 Always `make clean` for an honest warning count (incremental builds only
 reprocess changed files and hide warnings in untouched ones). Deps:
-`sphinx sphinx_rtd_theme sphinx-autodoc-typehints myst-parser sphinx-book-theme`.
+`pip install -r docs/requirements.txt`.
 The live site (giozu.github.io/z3st) auto-deploys on **push to `main`** via
 `.github/workflows/static.yml` — a local build is preview only. RST docstring
 gotchas: `|x|` reads as a substitution (wrap math in literal blocks `::` or

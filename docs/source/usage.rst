@@ -6,7 +6,7 @@ This section describes how to configure and run a Z3ST simulation using the refe
 Input files
 -----------
 
-A minimal demonstration case is provided in ``cases/verification/mechanics/uniaxial_tension``.
+A minimal demonstration case is provided in ``z3st/cases/verification/mechanics/uniaxial_tension``.
 It illustrates the complete workflow of a thermo-mechanical simulation:
 - YAML-based configuration input;
 - mesh generation and region tagging;
@@ -16,7 +16,7 @@ To run the example:
 
 .. code-block:: bash
 
-   cd cases/verification/mechanics/uniaxial_tension
+   cd z3st/cases/verification/mechanics/uniaxial_tension
    python3 -m z3st
 
 Optional flags:
@@ -614,7 +614,7 @@ To create a custom material:
 Verification cases
 ------------------
 
-The ``cases/`` directory contains a collection of verification and benchmark problems
+The ``z3st/cases/`` directory contains a collection of verification and benchmark problems
 used to validate the numerical formulation and solver performance.
 
 Each case reproduces a reference simulation and compares the computed results
@@ -624,7 +624,7 @@ To run a verification case:
 
 .. code-block:: bash
 
-   cd cases/verification/thermal/thin_slab_neumann_3D
+   cd z3st/cases/verification/thermal/thin_slab_neumann_3D
    ./Allrun
 
 Each verification folder contains:
@@ -643,7 +643,7 @@ Run all tests with:
 
 .. code-block:: bash
 
-   cd cases
+   cd z3st/cases
    ./non-regression_local.sh
 
 This script executes verification tests, compares each new result with its reference,

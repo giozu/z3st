@@ -137,7 +137,7 @@ Both routes produce the same temperature field; Newton converges in far fewer
 iterations. They require the optional dependencies ``torch`` and
 ``dolfinx-external-operator`` (the ``nn`` extra -- see :doc:`installation`); the
 rest of Z3ST imports without them. The reference case
-``cases/verification/thermal/nn_conductivity_slab_2D`` trains a network on a known
+``z3st/cases/verification/thermal/nn_conductivity_slab_2D`` trains a network on a known
 :math:`k(T)` law and verifies the solve against the closed-form analytic profile.
 Implemented in :mod:`z3st.models.nn_conductivity`.
 
@@ -200,7 +200,7 @@ Three consequences of this construction are worth stating:
   ``xi`` runs a scenario solve at a prescribed number of standard deviations.
 
 The checkpoint is a NumPy ``.npz`` produced by
-``cases/studies/magni_gpr_conductivity/fit_gpr.py``. Verifying a data-driven law
+``z3st/cases/studies/magni_gpr_conductivity/fit_gpr.py``. Verifying a data-driven law
 raises a question of its own -- how to check an implementation whose reference is
 a dataset rather than a formula -- and the answer used here is a residual
 prescribed in closed form, whose value and temperature derivative are known
@@ -270,8 +270,8 @@ The DG path is the one to use when the restructuring front is sharp, since the
 limiter bounds the porosity in :math:`[0, 1]` without the artificial diffusion
 the CG path relies on.
 
-Reference cases: ``cases/verification/fuel/porosity_migration`` (CG) and
-``cases/verification/fuel/porosity_migration_dg`` (DG). Implemented in
+Reference cases: ``z3st/cases/verification/fuel/porosity_migration`` (CG) and
+``z3st/cases/verification/fuel/porosity_migration_dg`` (DG). Implemented in
 :mod:`z3st.models.porosity_migration_model`.
 
 SCIANTIX Coupling (Fission-Gas Behaviour)
@@ -297,9 +297,9 @@ This requires a compiled SCIANTIX **shared** library, pointed to by the
 own CMake produces by default, which is a static archive; see
 ``z3st/coupling/sciantix/README.md`` for the exact command.
 
-Reference cases: ``cases/regression/fg_test_2D`` and
-``cases/regression/fg_test_fuel``. The former is the integral rod of
-``cases/regression/pwr_rod_2D`` with the coupling switched on and nothing else
+Reference cases: ``z3st/cases/regression/fg_test_2D`` and
+``z3st/cases/regression/fg_test_fuel``. The former is the integral rod of
+``z3st/cases/regression/pwr_rod_2D`` with the coupling switched on and nothing else
 changed, which makes the two directly comparable. Implemented in
 :mod:`z3st.coupling.sciantix.sciantix_binding`.
 
