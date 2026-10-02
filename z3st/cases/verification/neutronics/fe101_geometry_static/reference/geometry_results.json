@@ -1,0 +1,155 @@
+{
+  "source": "Completed static runs; exported from existing results.json and manifests, not rerun",
+  "nuclear_data": "ENDF/B-VIII.0",
+  "cases": [
+    {
+      "statistics": "preliminary",
+      "case": "A",
+      "batches": 30,
+      "inactive": 10,
+      "particles": 5000,
+      "seed": 1,
+      "fuel_outer_cm": 1.791,
+      "clad_inner_cm": 1.791,
+      "fuel_density_g_cm3": 6.3,
+      "keff": 1.0249205003400594,
+      "keff_std_dev": 0.0023753528430899445,
+      "fission_per_s_at_250kW": 178638985213566.5,
+      "relative_to_FE_mean": [
+        0.8665903353284071,
+        0.914344670104327,
+        1.0067715138361188,
+        1.0726352374742685,
+        1.1396582432568756
+      ],
+      "ring_sum_over_integrated": 0.9999999999999997
+    },
+    {
+      "statistics": "preliminary",
+      "case": "B",
+      "batches": 30,
+      "inactive": 10,
+      "particles": 5000,
+      "seed": 1,
+      "fuel_outer_cm": 1.791,
+      "clad_inner_cm": 1.804,
+      "fuel_density_g_cm3": 6.3,
+      "keff": 1.019920725438894,
+      "keff_std_dev": 0.002765036501870053,
+      "fission_per_s_at_250kW": 173798383200296.28,
+      "relative_to_FE_mean": [
+        0.831257528891314,
+        0.9321134970894638,
+        1.0073151416491786,
+        1.0571104081781806,
+        1.1722034241918602
+      ],
+      "ring_sum_over_integrated": 0.9999999999999992
+    },
+    {
+      "statistics": "high_statistics",
+      "case": "A",
+      "batches": 220,
+      "inactive": 20,
+      "particles": 5000,
+      "seed": 101,
+      "fuel_outer_cm": 1.791,
+      "clad_inner_cm": 1.791,
+      "fuel_density_g_cm3": 6.3,
+      "keff": 1.0186646292407158,
+      "keff_std_dev": 0.0009436528850078897,
+      "fission_per_s_at_250kW": 172972662420368.4,
+      "relative_to_FE_mean": [
+        0.8510994742807987,
+        0.9208322495930513,
+        0.9935754639727202,
+        1.070518522159464,
+        1.1639742899939642
+      ],
+      "ring_sum_over_integrated": 0.9999999999999998
+    },
+    {
+      "statistics": "high_statistics",
+      "case": "B",
+      "batches": 220,
+      "inactive": 20,
+      "particles": 5000,
+      "seed": 202,
+      "fuel_outer_cm": 1.791,
+      "clad_inner_cm": 1.804,
+      "fuel_density_g_cm3": 6.3,
+      "keff": 1.0175345620067469,
+      "keff_std_dev": 0.0009781369606962236,
+      "fission_per_s_at_250kW": 173380355050683.12,
+      "relative_to_FE_mean": [
+        0.8764455659963056,
+        0.921887885885203,
+        0.9961792755357791,
+        1.0575409979164059,
+        1.1479462746663067
+      ],
+      "ring_sum_over_integrated": 1.0000000000000002
+    },
+    {
+      "statistics": "high_statistics",
+      "case": "C",
+      "batches": 220,
+      "inactive": 20,
+      "particles": 5000,
+      "seed": 303,
+      "fuel_outer_cm": 1.7975,
+      "clad_inner_cm": 1.804,
+      "fuel_density_g_cm3": 6.254519099119661,
+      "keff": 1.0191999444255102,
+      "keff_std_dev": 0.0010246104496619568,
+      "fission_per_s_at_250kW": 173529389548668.03,
+      "relative_to_FE_mean": [
+        0.8646387308001249,
+        0.9141889070452036,
+        0.9770282758164227,
+        1.0689728107819063,
+        1.175171275556341
+      ],
+      "ring_sum_over_integrated": 0.9999999999999998
+    },
+    {
+      "statistics": "high_statistics",
+      "case": "D",
+      "batches": 220,
+      "inactive": 20,
+      "particles": 5000,
+      "seed": 404,
+      "fuel_outer_cm": 1.804,
+      "clad_inner_cm": 1.804,
+      "fuel_density_g_cm3": 6.209528929307131,
+      "keff": 1.0196292475604145,
+      "keff_std_dev": 0.0010603875768739007,
+      "fission_per_s_at_250kW": 174595642050549.47,
+      "relative_to_FE_mean": [
+        0.871170902668498,
+        0.9192558445217666,
+        0.9894441758723868,
+        1.0645479706741865,
+        1.1555811062631585
+      ],
+      "ring_sum_over_integrated": 0.9999999999999992
+    }
+  ],
+  "high_statistics_keff_comparisons": {
+    "A-B": {
+      "delta_keff_pcm": 113.00672339689122,
+      "sigma_keff_pcm": 135.91293835627863,
+      "abs_delta_keff_over_sigma": 0.8314640590041423
+    },
+    "C-B": {
+      "delta_keff_pcm": 166.53824187633504,
+      "sigma_keff_pcm": 141.65374994812257,
+      "abs_delta_keff_over_sigma": 1.175671254289603
+    },
+    "D-B": {
+      "delta_keff_pcm": 209.46855536676523,
+      "sigma_keff_pcm": 144.26273694438729,
+      "abs_delta_keff_over_sigma": 1.4519934932852032
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "notebook": "triga_single_FE101_B1_1965_2026_CLEAN.ipynb",
+  "sha256": "7375bb5f97235160327ae10c227f1c2241ea603abbe1f6379a35eb5c0bc122a7",
+  "selected_cells_zero_based": [
+    1,
+    3,
+    5,
+    6,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    31,
+    33,
+    34
+  ],
+  "changes": [
+    "inline_plot=False; plotting and depletion cells excluded"
+  ],
+  "original_source_model_sha256": "2d4bd0ccb9e8c3da66e6e3262952817d30904dcf6a37dff187830976d4cedc83",
+  "source_model_sha256": "8a1a343837f6dc416c7ca96c2ac1d0a645b03e86fd5af0b55825080954ff0d78",
+  "portability_changes": [
+    "Nuclear-data paths supplied via OPENMC_CROSS_SECTIONS and OPENMC_CHAIN_FILE; physical definitions unchanged"
+  ]
+}

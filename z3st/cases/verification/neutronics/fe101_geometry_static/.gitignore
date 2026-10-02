@@ -1,0 +1,11 @@
+# Reproducible generated inputs and run artifacts; reference/ is intentional.
+case_A/
+case_B/
+case_C/
+case_D/
+high_statistics/case_A/
+high_statistics/case_B/
+high_statistics/case_C/
+high_statistics/case_D/
+high_statistics/comparison.json
+*.log

@@ -1,0 +1,7 @@
+# Reproducible generated inputs and run artifacts; reference/ is intentional.
+run_preliminary/
+initialization_failed*
+manifest.json
+summary.json
+execution_status.json
+*.log

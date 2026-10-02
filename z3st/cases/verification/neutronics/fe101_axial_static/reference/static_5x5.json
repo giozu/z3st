@@ -1,0 +1,172 @@
+{
+  "keff": {
+    "mean": 1.020777865861803,
+    "std_dev": 0.0032408217945307724
+  },
+  "power_normalization_W": 250000.0,
+  "FE_volume_cm3": 358.3461944192939,
+  "zone_volume_cm3": 71.66923888385881,
+  "bin_volume_cm3": 14.333847776771762,
+  "FE_fission_rate_per_s": 175929486564775.16,
+  "FE_deposited_power_W": 5467.263528892981,
+  "axial_sum_relative_errors_fission_heating": [
+    -1.8456522054115883e-16,
+    -2.554281545340613e-16
+  ],
+  "grid_sum_relative_errors_fission_heating": [
+    -1.8456522054115883e-16,
+    -2.554281545340613e-16
+  ],
+  "axial_fission_max_min_ratio": 1.92258881053363,
+  "center_above_mean_end_fission_percent": 76.55743919892089,
+  "axial_rows": [
+    {
+      "axial_zone": 1,
+      "z_low_cm": 10.2,
+      "z_high_cm": 17.312,
+      "volume_cm3": 71.66923888385881,
+      "fission_tally_per_source": 0.001249674128061345,
+      "heating_local_eV_per_source": 242554.68940441796,
+      "fission_density_per_s_cm3": 326379018290.18933,
+      "power_density_W_cm3": 10.149520432438104,
+      "fission/fission_mean": 0.6647929316813666,
+      "power/power_mean": 0.6652399327239844,
+      "outer_ring/inner_ring": 1.57927623099396
+    },
+    {
+      "axial_zone": 2,
+      "z_low_cm": 17.312,
+      "z_high_cm": 24.424,
+      "volume_cm3": 71.66923888385877,
+      "fission_tally_per_source": 0.0021805830271106473,
+      "heating_local_eV_per_source": 423091.72853661445,
+      "fission_density_per_s_cm3": 569505706893.9227,
+      "power_density_W_cm3": 17.703958452100373,
+      "fission/fission_mean": 1.1600113588143004,
+      "power/power_mean": 1.1603878437431079,
+      "outer_ring/inner_ring": 1.2400381987685767
+    },
+    {
+      "axial_zone": 3,
+      "z_low_cm": 24.424,
+      "z_high_cm": 31.536,
+      "volume_cm3": 71.66923888385881,
+      "fission_tally_per_source": 0.0024026094954241123,
+      "heating_local_eV_per_source": 465909.1555776583,
+      "fission_density_per_s_cm3": 627492648557.669,
+      "power_density_W_cm3": 19.49562181546219,
+      "fission/fission_mean": 1.2781234517724434,
+      "power/power_mean": 1.2778205858357834,
+      "outer_ring/inner_ring": 1.3803068261919633
+    },
+    {
+      "axial_zone": 4,
+      "z_low_cm": 31.536,
+      "z_high_cm": 38.648,
+      "volume_cm3": 71.66923888385881,
+      "fission_tally_per_source": 0.0020941622449864358,
+      "heating_local_eV_per_source": 406150.81720344245,
+      "fission_density_per_s_cm3": 546935078762.78937,
+      "power_density_W_cm3": 16.995078627338586,
+      "fission/fission_mean": 1.1140378335436134,
+      "power/power_mean": 1.1139250408872454,
+      "outer_ring/inner_ring": 1.3301837932629148
+    },
+    {
+      "axial_zone": 5,
+      "z_low_cm": 38.648,
+      "z_high_cm": 45.76,
+      "volume_cm3": 71.66923888385874,
+      "fission_tally_per_source": 0.0014719438409410012,
+      "heating_local_eV_per_source": 285355.3158355254,
+      "fission_density_per_s_cm3": 384429488453.8349,
+      "power_density_W_cm3": 11.940480786782693,
+      "fission/fission_mean": 0.7830344241882753,
+      "power/power_mean": 0.7826265968098773,
+      "outer_ring/inner_ring": 1.3960922378538634
+    }
+  ],
+  "matrix_normalized_to_FE_mean": [
+    [
+      0.5102030426258447,
+      1.0455108492882743,
+      1.0995137563779946,
+      0.9685620510694898,
+      0.6549824161711973
+    ],
+    [
+      0.6364112796472113,
+      1.034131801439394,
+      1.1105641463854747,
+      1.0287928470209045,
+      0.6776224923656777
+    ],
+    [
+      0.6727696118665988,
+      1.161154667534473,
+      1.252388425694069,
+      1.0684061170745809,
+      0.8027591454935633
+    ],
+    [
+      0.6988291860673831,
+      1.2627860854649227,
+      1.4104845869841638,
+      1.2160626094509683,
+      0.8653921997635609
+    ],
+    [
+      0.8057515381997948,
+      1.2964733903444365,
+      1.5176663434205133,
+      1.288365543102123,
+      0.9144158671473774
+    ]
+  ],
+  "matrix_power_normalized_to_FE_mean": [
+    [
+      0.5129475189805226,
+      1.0489652633890785,
+      1.101702830934468,
+      0.9717731742792204,
+      0.6593025505463346
+    ],
+    [
+      0.6375575906587246,
+      1.036915590218258,
+      1.114060367051777,
+      1.0300865263600956,
+      0.6781607145176979
+    ],
+    [
+      0.672855442566178,
+      1.160680159133702,
+      1.2521574492903766,
+      1.0679847855507807,
+      0.80110215555935
+    ],
+    [
+      0.6988302545194447,
+      1.2609177490165968,
+      1.4076278302416676,
+      1.2135785764385942,
+      0.8639395530469751
+    ],
+    [
+      0.8040088568950544,
+      1.2944604569579055,
+      1.5135544516606325,
+      1.2862021418075376,
+      0.910628010379028
+    ]
+  ],
+  "statistics": {
+    "particles": 5000,
+    "batches": 30,
+    "inactive": 10
+  },
+  "transport_runtime_s": 19.098139409994474,
+  "exit_code": 0,
+  "source": "Completed axial static run; compact extraction, no HDF5 needed for benchmarks",
+  "uncertainty_note": "No covariance between tally bins or global normalization propagated; normalized-profile significance is not a formal hypothesis test."
+}
