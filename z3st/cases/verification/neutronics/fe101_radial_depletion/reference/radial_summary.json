@@ -1,0 +1,21 @@
+{
+  "keff": {
+    "0": {
+      "mean": 1.0246623335112481,
+      "std_dev": 0.0031825930900849318
+    },
+    "20": {
+      "mean": 1.0123766465783417,
+      "std_dev": 0.0030413151733984043
+    }
+  },
+  "FIMA_mean": 0.00015249777751893693,
+  "FIMA_percent_mean": 0.015249777751893692,
+  "BU_mean_MWd_kgU": 4.260562380553411,
+  "relative_FIMA_reconstruction_error": -2.4208276719670304e-13,
+  "relative_BU_reconstruction_error": -6.253951992962664e-16,
+  "zest_FIMA_validated_rows": 105,
+  "radial_peak_to_peak_over_mean": 0.3168235327770618,
+  "exit_code": 0,
+  "runtime_total_s": 911.1824028491974
+}
