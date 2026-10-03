@@ -1,0 +1,6 @@
+# spherical_shell mesh refinement series, written by mesh_convergence.py
+# errors relative to the exact solution, as defined in non-regression.py
+# Na Nr q cells T_max L2_error_T Linf_error_T L2_error_sigma_rr L2_error_sigma_tt L2_error_u_r
+4 10 1.300000 480 2.577692e-03 1.973221e-03 3.464585e-02 1.628130e-02 2.158661e-02 1.824710e-03
+8 20 1.140175 3840 6.042504e-04 5.102848e-04 8.779527e-03 4.247126e-03 5.979863e-03 4.139754e-04
+16 40 1.067790 30720 1.891253e-04 1.294490e-04 3.102590e-03 1.133254e-03 1.610344e-03 9.517569e-05

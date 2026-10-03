@@ -14,11 +14,15 @@ R = 10.0e-3;                          // radius (m) = 10 mm
 half_contact_deg = 30.0;
 half_contact = half_contact_deg * Pi / 180.0;
 
-// Pre-crack: radial slit at theta = 15 deg (middle of upper-half contact arc)
+// Refinement line at theta = 15 deg (middle of the upper-half contact arc).
+// It is NOT a pre-crack: its nodes are shared with the surrounding mesh, so it
+// carries no displacement discontinuity, and no damage is imposed on it (the
+// D = 1 condition in boundary_conditions.yaml is commented out). The phase field
+// starts at zero everywhere and all cracks nucleate from the undamaged state.
 crack_theta_deg  = 15.0;
 crack_theta      = crack_theta_deg * Pi / 180.0;
-crack_length     = 2.5e-4;            // 250 um = 5 * lc;
-crack_R_inner    = R - crack_length;  // r-coordinate of the crack tip
+crack_length     = 2.5e-4;            // 250 um = 5 * lc, length of the refinement line
+crack_R_inner    = R - crack_length;  // r-coordinate of the inner end of the line
 
 // Mesh sizing
 lc_outer  = 1.25e-5;                  // 12.5 um (lc/4 with phase-field lc = 50 um)
@@ -52,7 +56,7 @@ Physical Curve("contact_wall", 20)   = {1, 2};     // both halves of the cold co
 Physical Curve("insulated_wall", 21) = {3};        // remaining 5/6 of the perimeter
 Physical Curve("pin", 30)            = {4};        // 50-um Clamp_x segment
 Physical Curve("symmetry", 40)       = {5, 6};     // y=0 mirror symmetry plane (Clamp_y)
-Physical Curve("crack_seed", 50)     = {7};        // pre-crack slit; Dirichlet D = 1 applied here
+Physical Curve("crack_seed", 50)     = {7};        // refinement line; tagged so a D = 1 seed can be switched on in boundary_conditions.yaml (off by default)
 
 // Refinement field
 Field[1] = Distance;

@@ -17,3 +17,13 @@ mechanical:
   - type: Dirichlet
     region: outer
     displacement: [0.0, 0.0, 0.0]
+
+  # octant symmetry: zero normal displacement on the three coordinate planes
+  - type: Clamp_x
+    region: xmin
+
+  - type: Clamp_y
+    region: ymin
+
+  - type: Clamp_z
+    region: zmin

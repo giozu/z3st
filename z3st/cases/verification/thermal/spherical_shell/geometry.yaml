@@ -8,3 +8,6 @@ labels:
   outer: 1
   inner: 2
   mat0: 3
+  xmin: 4    # x = 0 symmetry plane (octant)
+  ymin: 5    # y = 0 symmetry plane
+  zmin: 6    # z = 0 symmetry plane
