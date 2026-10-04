@@ -45,11 +45,13 @@ post = [
 ]
 
 # Optional dependencies for docs
-docs = [
+docs = [   # keep in step with docs/requirements.txt, which the Pages workflow uses
     "sphinx",
     "myst-parser",
     "sphinx-autodoc-typehints",
     "sphinx-book-theme",
+    "sphinx-rtd-theme",
+    "sphinxcontrib-mermaid",
 ]
 
 # Optional developer tools

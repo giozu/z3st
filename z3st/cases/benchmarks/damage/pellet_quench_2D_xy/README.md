@@ -1,14 +1,16 @@
 # UO2 pellet thermal-shock fracture - 2D transverse cross-section
-## z3st application case (McClenny Fig. 8 reproducer)
+## z3st test case, configured after McClenny et al. (2022)
 
 ### Role
 
-This case is the **2D Cartesian (x, y) reproducer** of the McClenny
-et al. (JNM 565, 2022) UO2 pellet thermal-shock experiment, modeled as
-a transverse cross-section under plane strain. It is the natural 2D
-analogue of the McClenny Fig. 8 (top row) result: a circular pellet
-with a 60-deg cold-contact arc on its perimeter, producing discrete
-radial cracks.
+This case is a **test case** of the phase-field module on a thermal
+transient. Its configuration follows the UO2 pellet thermal-shock study of
+McClenny et al. (JNM 565, 2022): a transverse cross-section under plane
+strain, a circular pellet with a 60-deg cold-contact arc on its perimeter,
+producing discrete radial cracks. It is neither a verification nor a
+validation, and it does not reproduce their experiment (see Section 3.2 of
+the SoftwareX paper): formulation, discretisation, regularisation length and
+initial temperature differ from theirs.
 
 Unlike an axisymmetric (r-z) idealization
 (which can only produce an unphysical annular damage band), this case
@@ -85,8 +87,8 @@ geometrically-blocked thermal expansion in z; see `damage_model.py::
 _thermal_eigenstrain` docstring).
 
 McClenny instead uses the Miehe anisotropic formulation with viscous
-Allen-Cahn evolution; reproducing their crack pattern with the hybrid
-formulation is the methodological contribution of this case.
+Allen-Cahn evolution; this case uses the hybrid formulation instead, so
+agreement with their pattern would not be a code-to-code verification.
 
 ### Expected results
 
@@ -118,8 +120,8 @@ cd benchmarks/pellet_quench_2D_xy/
 ### Outputs (in `output/`)
 
 - `damage_field.png` -- ParaView-style 2D colormap of `D` on the half-disc,
-  with the cold contact arc highlighted; the McClenny Fig. 8 (top, right)
-  reproduction.
+  with the cold contact arc highlighted (compare, qualitatively only,
+  McClenny Fig. 8, top right).
 - `temperature_field.png` -- same paraview-like rendering of `T` at the
   final time.
 - `stress_vm_field.png` -- von-Mises equivalent stress at the final time

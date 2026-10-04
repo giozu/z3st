@@ -67,7 +67,7 @@ approximation with eq. (21). The remaining deviation is the time-step error of
 the case: doubling `n_steps` takes the 2500-day value from 3.648 to 3.633 MPa,
 towards 3.605.
 
-Esposito eq. (21) relaxes about 5 % faster than both, the direction its
+Esposito eq. (21) falls about 3 % below reference_1d (4-5 % below Z3ST), the direction its
 authors report: their hub uses the Tresca criterion, which overestimates the
 von Mises equivalent stress, so the closed form overestimates the decrease of
 Pk. It is plotted by `plots.py` and not asserted.

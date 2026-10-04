@@ -35,12 +35,13 @@ engineering outputs match the standalone gold to ~1e-7 relative error.
 
 Two non-obvious facts, both handled in ``load_initial_conditions`` /
 ``_apply_initialization``:
+
   1. In coupling mode SCIANTIX does NOT read input_initial_conditions.txt (that is
      standalone-only, file_manager/InputReading.C) — the host must seed
      ``variables[]`` first (grain radius, fuel density, U content, ...).
   2. The standalone's one-time ``Initialization()`` (file_manager/Initialization.C),
      also skipped by the coupling entry, sets grain-boundary defaults absent from
-     the IC file (``variables[25]``=2e13, ``[35]``=0.5, ``[37]``=1.0) and converts
+     the IC file (``variables[25] = 2e13``, ``[35] = 0.5``, ``[37] = 1.0``) and converts
      U% -> at/m3 using density. Without the grain-boundary defaults the
      intergranular model returns nan and releases nothing.
 
@@ -264,8 +265,7 @@ class SciantixSolver:
         fission_rate  : volumetric fission rate (fiss / m^3 s); held over the step
         hydro_stress  : hydrostatic stress (MPa), optional
         steam_pressure: steam pressure (atm), optional
-        burnup_old,
-        burnup_new    : host-computed burnup (MWd/kgUO2) at the start/end of the
+        burnup_old, burnup_new : host-computed burnup (MWd/kgUO2) at the start/end of the
                         step. REQUIRED for a -DCOUPLING_TU build, where SCIANTIX does
                         not compute burnup and reads it from history[7]/[8] (the
                         intended design: Z3ST's RADAR model owns burnup). Leave None

@@ -71,6 +71,11 @@ autodoc_mock_imports = [
     "pyvista",
     "h5py",
     "gmsh",
+    "scipy",
+    "torch",
+    "shapely",
+    "meshio",
+    "dolfinx_external_operator",
 ]
 autodoc_default_options = {
     "members": True,

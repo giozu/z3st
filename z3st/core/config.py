@@ -22,10 +22,11 @@ class Config:
 
     Parses the user input YAML and initializes the global configuration used by
     the other modules. Loads:
-      * active physical models (thermal, mechanical, gap conductance)
-      * solver settings (linear/non-linear, tolerances, coupling scheme)
-      * paths for geometry, mesh, and boundary conditions
-      * number of time steps
+
+    * active physical models (thermal, mechanical, gap conductance)
+    * solver settings (linear/non-linear, tolerances, coupling scheme)
+    * paths for geometry, mesh, and boundary conditions
+    * number of time steps
     """
 
     def __init__(self, input_file):

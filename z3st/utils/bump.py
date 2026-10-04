@@ -86,6 +86,7 @@ DECLARATIONS = re.compile(
         | version:\s*                    # CITATION.cff
         | release\s*=\s*"                # Sphinx conf.py
         | __version__\s*=\s*"            # package fallback
+        | Version\s+(?=\d+\.\d+\.\d+\.?\s+https?://)  # citation block in docs
     )(\d+\.\d+\.\d+)""",
     re.M | re.X,
 )
@@ -179,6 +180,11 @@ def demo():
     assert len(occurrences("10.5281/zenodo.17748028", "0.4.0")) == 0
     assert len(occurrences("v0.4.0 and 0.4.0", "0.4.0")) == 2
     assert len(occurrences("", "0.4.0")) == 0
+    # declarations: header banner and the citation line of the docs, not prose
+    assert DECLARATIONS.search("# Version: 0.4.0 (2026)").group(1) == "0.4.0"
+    # split literal, so this line is not itself a declaration of an old version
+    assert DECLARATIONS.search("   Version " + "0.3.2. https://doi.org/10.5281/x").group(1) == "0.3.2"
+    assert DECLARATIONS.search("Version 0.3.2 introduced the gap model") is None
     print("bump: self-check ok")
 
 

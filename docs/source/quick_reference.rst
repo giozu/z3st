@@ -1,433 +1,212 @@
 Quick Reference
 ===============
 
-This page provides a quick reference for common Z3ST operations and configuration options.
+A one-page summary of :doc:`usage`. Defaults and the full key lists are there.
 
----
-
-Running Simulations
--------------------
-
-**Basic execution**:
+Commands
+--------
 
 .. code-block:: bash
 
-   cd z3st/cases/your_case/
-   python3 -m z3st
+   ./Allrun                                   # mesh, solve, check, plot
+   gmsh mesh.geo -3                           # mesh only (-2 in 2D, -1 in 1D)
+   python3 -m z3st > log_z3st.md              # solve only, in the case directory
+   python3 -m z3st --mesh_plot                # show the mesh and facet tags first
+   python3 -m z3st --debug                    # dump material cards, print heat fluxes
+   python3 -m z3st.utils.plot_convergence log_z3st.md    # writes convergence.png
 
-**With mesh preview**:
+   export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+   mpirun -n 4 python3 -m z3st > log_z3st.md  # parallel, one thread per rank
 
-.. code-block:: bash
-
-   python3 -m z3st --mesh_plot
-
-**Generate mesh first**:
-
-.. code-block:: bash
-
-   gmsh -3 mesh.geo
-   python3 -m z3st
-
-**Run all steps (with Allrun script)**:
-
-.. code-block:: bash
-
-   ./Allrun
-
----
-
-YAML Configuration Cheat Sheet
--------------------------------
+   cd z3st/cases && ./non-regression_local.sh --list     # local suite, list only
+   python -m z3st.utils.audit_checks                     # static checks
 
 input.yaml
-^^^^^^^^^^
+----------
 
 .. code-block:: yaml
 
-   # File paths
-   mesh_path: mesh.msh
-   geometry_path: geometry.yaml
-   boundary_conditions_path: boundary_conditions.yaml
+   mesh_path: mesh.msh                          # required
+   geometry_path: geometry.yaml                 # required
+   boundary_conditions_path: boundary_conditions.yaml   # required
 
-   # Materials
-   materials:
-     steel: ../../materials/steel.yaml
+   materials:                                   # path relative to the case directory
+     steel: ../../../../materials/steel.yaml
 
-   # Regime: 2D | 3D | axisymmetric
-   regime: 3D
+   regime: 3d                     # 1d | 2d | 3d | axisymmetric   (default 2d)
 
-   # Solver settings
-   solver_settings:
-     max_iters: 100
-     relax_T: 0.9                # Thermal relaxation
-     relax_u: 0.7                # Mechanical relaxation
-     relax_adaptive: true        # Enable adaptive relaxation
-     relax_growth: 1.2           # Growth factor
-     relax_shrink: 0.8           # Shrink factor
-     relax_min: 0.05             # Min relaxation
-     relax_max: 0.95             # Max relaxation
+   solver_settings: {}            # empty block = all defaults:
+                                  # max_iters 100, relax_T 0.9, relax_u 0.4, relax_D 0.4,
+                                  # relax_adaptive false, relax_aitken false,
+                                  # relax_growth 1.2, relax_shrink 0.5,
+                                  # relax_min 0.05, relax_max 1.0
 
-   # Enable physics models
    models:
      thermal: true
      mechanical: true
-     damage: false          # phase-field fracture
+     damage: false                # needs the damage block
      plasticity: false
-     contact: false         # penalty contact between disjoint bodies
-     porosity: false        # thermal-gradient-driven pore migration
-     cluster: false         # 1D cluster dynamics
-     fission_gas:           # SCIANTIX coupling (needs SCIANTIX_LIB)
-       enabled: false
+     porosity: false
+     cluster: false
+     # contact must be a block, never "contact: true":
+     # contact: {surface_a: lateral_1, surface_b: inner_2,
+     #           penalty_stiffness: 5.0e13, initial_gap: 65.0e-6}
+     # gap_conductance: {type: Fixed, value: 5000.0}   # or type: Gas
 
-   # Thermal solver
    thermal:
-     solver: linear
-     linear_solver: iterative_amg    # direct_mumps | iterative_amg | iterative_hypre
-     rtol: 1.0e-6                    # Relative tolerance
-     stag_tol: 1.0e-6                # Stagnation tolerance
-     convergence: rel_norm           # rel_norm | norm
+     analysis: stationary         # stationary | transient (backward Euler)
+     linear_solver: iterative_hypre   # iterative_hypre | iterative_amg | direct_mumps
+     rtol: 1.0e-6                 # linear-solver tolerance
+     stag_tol: 1.0e-4             # staggered tolerance
+     convergence: rel_norm        # REQUIRED: rel_norm | norm
 
-   # Mechanical solver
    mechanical:
-     solver: linear
-     linear_solver: iterative_amg
-     rtol: 1.0e-6
-     stag_tol: 1.0e-6
-     convergence: rel_norm
-
-   # Damage model (if enabled)
-   damage:
-     type: AT2                       # AT1 | AT2
-     solver: linear
+     solver: linear               # REQUIRED: linear | nonlinear (SNES)
      linear_solver: iterative_hypre
      rtol: 1.0e-6
-     stag_tol: 1.0e-6
-     lc: 0.002                       # Characteristic length (m)
+     stag_tol: 1.0e-4
+     convergence: rel_norm        # REQUIRED
 
-   # Time and loading
-   lhr: [0, 1e6, 2e6]                # Volumetric heating (W/m³)
-   time: [0, 100, 200]               # Time points (s)
-   n_steps: 3                        # Number of steps
+   damage:                        # only when models.damage is on
+     type: AT2                    # REQUIRED: AT1 | AT2
+     lc: 2.0e-3                   # REQUIRED: regularisation length (m)
+     convergence: rel_norm        # REQUIRED
+     stag_tol: 1.0e-4
+     rtol: 1.0e-6
+
+   time: [0.0, 100.0, 200.0]      # REQUIRED: breakpoints (s)
+   lhr:  [0.0, 2.0e4, 2.0e4]      # REQUIRED: linear heat rate (W/m), fissile materials only
+   n_steps: 10                    # total time points, or a list of intervals per segment
+
+   output:
+     format: vtu                  # vtu | xdmf   (vtu becomes xdmf under MPI)
+
+   # time_adaptivity: {enabled: true, dt_min: 1.0e3, max_cuts: 6}
+
+The numbers shown for ``rtol``, ``stag_tol``, ``linear_solver`` and ``analysis``
+are the defaults.
 
 geometry.yaml
-^^^^^^^^^^^^^
+-------------
 
 .. code-block:: yaml
 
    name: box
-   geometry_type: rect
-
-   # Dimensions (m)
-   Lx: 0.100
-   Ly: 2.000
-   Lz: 2.000
-
-   # Region labels (must match mesh Physical Groups)
-   labels:
-     xmin: 1
-     xmax: 2
-     ymin: 3
+   geometry_type: rect      # rect | cyl | cyl-cyl | sphere | other (with area, perimeter)
+   Lx: 0.100                # (m)
+   Ly: 0.100                # (m)
+   Lz: 0.004                # (m)
+   labels:                  # name -> Gmsh physical-group tag
+     zmin: 1
+     ymin: 2
+     xmax: 3
      ymax: 4
-     zmin: 5
+     xmin: 5
      zmax: 6
-     steel: 7
+     steel: 7               # volume tag, same name as in materials
+
+Gmsh numbers groups without an explicit tag in the order of definition. Check
+the tags in the ``$PhysicalNames`` section of ``mesh.msh``.
 
 boundary_conditions.yaml
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Thermal boundary conditions**:
+------------------------
 
 .. code-block:: yaml
 
    thermal:
      steel:
-       - type: Dirichlet
-         region: xmin
-         temperature: 500.0        # (K)
-
-       - type: Neumann
-         region: xmax
-         flux: 5000.0              # (W/m²) positive = outward
-
-       - type: Robin
-         region: ymin
-         h: 100.0                  # (W/m²·K) heat transfer coefficient
-         T_inf: 300.0              # (K) ambient temperature
-
-**Mechanical boundary conditions**:
-
-.. code-block:: yaml
+     - {type: Dirichlet, region: xmin, temperature: 500.0}   # (K), scalar or n_steps list
+     - {type: Neumann,   region: xmax, flux: 5000.0}         # (W/m²), positive leaves the body
+     - {type: Robin,     region: ymin, h_conv: 3.5e4, T_ext: 580.0}   # convection
+     - {type: Robin,     region: lateral_1, pair: inner_2}   # gap, h from gap_conductance
 
    mechanical:
      steel:
-       # Fixed displacement
-       - type: Dirichlet
-         region: xmin
-         displacement: [0.0, 0.0, 0.0]    # (m)
-
-       # Pressure/traction
-       - type: Neumann
-         region: inner
-         traction: 1.0e6                   # (Pa) pressure
-
-       # Clamp (fix one direction)
-       - type: Clamp_x
-         region: xmin
-
-       - type: Clamp_y
-         region: ymin
-
-       - type: Clamp_z
-         region: zmin
-
-       # Slip (allow sliding in one direction)
-       - type: Slip_x
-         region: xmin
-
-**Damage boundary conditions**:
-
-.. code-block:: yaml
+     - {type: Dirichlet, region: xmin, displacement: [0.0, 0.0, 0.0]}   # (m)
+     - {type: Clamp_x,   region: xmin}            # u_x = 0 on the whole face
+     - {type: Clamp_y,   region: top, value: -1.0e-6}   # prescribed u_y (m)
+     - {type: Slip_x,    region: xmin}            # u_x free, u_y = u_z = 0
+     - {type: Neumann,   region: inner, traction: -1.0e6}   # (Pa) t = value * n
 
    damage:
      steel:
-       - type: Dirichlet
-         region: crack
-         value: 1.0              # Fully damaged
+     - {type: Dirichlet, region: crack, value: 1.0}
 
----
+Traction sign: ``traction`` multiplies the outward normal. Positive is tension,
+a pressure :math:`p` is ``traction: -p``.
 
-Material Properties
--------------------
-
-**Standard material file** (``materials/my_material.yaml``):
+Material card
+-------------
 
 .. code-block:: yaml
 
    name: my_material
+   E: 2.0e11              # (Pa)
+   nu: 0.3
+   k: 50.0                # (W/(m·K)), or a dotted path: k: materials.fuel_thermal.k
+   cp: 450.0              # (J/(kg·K))
+   rho: 7850.0            # (kg/m³)
+   alpha: 1.2e-5          # (1/K)
+   T_ref: 300.0           # (K)
+   # fissile: true        # heated by lhr
 
-   # Mechanical (SI units)
-   E: 2.10e+11           # Young's modulus (Pa)
-   nu: 0.30              # Poisson's ratio (-)
-   alpha: 1.2e-5         # Thermal expansion (1/K)
-   rho: 7850.0           # Density (kg/m³)
-   T_ref: 300.0          # Reference temperature (K)
+The cards in ``z3st/materials`` hold representative values for the demonstration
+and verification cases, not qualified design data.
 
-   # Thermal
-   k: 45.0               # Thermal conductivity (W/m·K)
-   cp: 450.0             # Specific heat (J/kg·K)
+Output
+------
 
----
-
-Common Solver Options
----------------------
-
-**Linear solver types**:
-
-- ``direct_mumps`` — Direct sparse solver (robust, memory-intensive)
-- ``iterative_amg`` — Algebraic multigrid (fast for large problems)
-- ``iterative_hypre`` — Hypre BoomerAMG (alternative to GAMG)
-
-**Convergence modes**:
-
-- ``rel_norm`` — Relative norm of residual
-- ``norm`` — Absolute norm of residual
-
-**Relaxation strategies**:
-
-.. code-block:: yaml
-
-   # Fixed relaxation
-   relax_T: 0.9
-   relax_u: 0.7
-   relax_adaptive: false
-
-   # Adaptive relaxation (recommended)
-   relax_T: 0.9
-   relax_u: 0.7
-   relax_adaptive: true
-   relax_growth: 1.2        # Increase if converging well
-   relax_shrink: 0.5        # Decrease if diverging
-   relax_min: 0.05          # Never go below this
-   relax_max: 0.95          # Never exceed this
-
----
-
-Post-Processing
----------------
-
-**Export to VTU** (automatic):
-
-Results are saved in ``output/`` directory as ``.vtu`` files.
-
-**View in ParaView**:
-
-.. code-block:: bash
-
-   paraview output/result_000000.vtu
-
-**Python post-processing**:
+- One step: ``output/fields.vtu``. Several steps: ``output/fields_0000.vtu``,
+  ``output/fields_0001.vtu``, ... XDMF: ``output/fields.xdmf`` and ``fields.h5``.
+- Point fields: ``Temperature``, ``Displacement``, ``Stress (points)``,
+  ``VonMises (points)``, ``Hydrostatic (points)``, ``Strain (points)``,
+  ``StrainEnergyDensity (points)``, and when active ``Damage``, ``Burnup``,
+  ``Porosity``, ``ClusterDensity``.
+- Cell fields: ``MaterialID``, ``Stress (cells)``, ``VonMises (cells)``,
+  ``HeatFlux (cells)``, and when active ``ContactPressure``,
+  ``CrackDrivingForce``, ``CumulativePlasticStrain``.
 
 .. code-block:: python
 
    import pyvista as pv
-   import numpy as np
+   mesh = pv.read("output/fields.vtu")
+   T = mesh.point_data["Temperature"]
+   u = mesh.point_data["Displacement"]
 
-   # Load results
-   mesh = pv.read("output/result_000000.vtu")
+Solver options
+--------------
 
-   # Available fields
-   print("Point data:", mesh.point_data.keys())
+- ``linear_solver``: ``iterative_hypre`` (default: CG for thermal and damage,
+  GMRES for mechanics, BoomerAMG preconditioner), ``iterative_amg`` (same Krylov
+  methods with GAMG), ``direct_mumps`` (LU with MUMPS, the default for porosity).
+- ``convergence``: ``rel_norm`` tests :math:`\|X^k - X^{k-1}\|/\|X^k\|`, ``norm``
+  tests :math:`\|X^k - X^{k-1}\|`, both on the unrelaxed update, against the
+  staggered tolerance ``stag_tol``.
+- ``relax_adaptive: false`` (default) keeps ``relax_T``, ``relax_u``, ``relax_D``
+  fixed. ``true`` adapts them within ``[relax_min, relax_max]``.
+  ``relax_aitken: true`` uses Aitken relaxation for the displacement.
+- A step that reaches ``max_iters`` is accepted with
+  ``[WARNING] Staggered solver did not converge``, unless ``time_adaptivity`` is
+  enabled, which bisects it.
 
-   # Extract field
-   T = mesh.point_data["T"]          # Temperature
-   u = mesh.point_data["u"]          # Displacement
-
-   # Statistics
-   print(f"Max temperature: {T.max():.2f} K")
-   print(f"Max displacement: {np.linalg.norm(u, axis=1).max():.2e} m")
-
-   # Plot
-   mesh.plot(scalars="T", cmap="coolwarm")
-
-**Plot convergence**:
-
-.. code-block:: bash
-
-   python3 ../../utils/plot_convergence.py
-
----
-
-Mesh Generation (Gmsh)
------------------------
-
-**Generate from .geo file**:
-
-.. code-block:: bash
-
-   gmsh -3 mesh.geo                  # 3D mesh
-   gmsh -2 mesh.geo                  # 2D mesh
-   gmsh mesh.geo                     # Open GUI
-
-**Python API** (example):
-
-.. code-block:: python
-
-   import gmsh
-
-   gmsh.initialize()
-   gmsh.model.add("box")
-
-   # Create geometry
-   lc = 0.1
-   p1 = gmsh.model.geo.addPoint(0, 0, 0, lc)
-   # ... add more points, lines, surfaces, volumes
-
-   # Add physical groups (required!)
-   gmsh.model.addPhysicalGroup(2, [surf_id], 1, "xmin")
-   gmsh.model.addPhysicalGroup(3, [vol_id], 7, "steel")
-
-   gmsh.model.geo.synchronize()
-   gmsh.model.mesh.generate(3)
-   gmsh.write("mesh.msh")
-   gmsh.finalize()
-
-**Important**: Always define **Physical Groups** in Gmsh! These map to ``labels`` in ``geometry.yaml``.
-
----
-
-Common Workflows
-----------------
-
-**1. Pure thermal analysis**:
+Common set-ups
+--------------
 
 .. code-block:: yaml
 
-   models:
-     thermal: true
-     mechanical: false
+   # transient heat conduction
+   models: {thermal: true}
+   thermal: {analysis: transient, convergence: rel_norm}
+   time: [0.0, 10.0, 20.0]
+   lhr: [0.0, 1.0e4, 1.0e4]
 
-**2. Pure mechanical analysis**:
+   # phase-field fracture
+   models: {mechanical: true, damage: true}
+   mechanical: {solver: linear, convergence: rel_norm}
+   damage: {type: AT2, lc: 2.0e-3, convergence: rel_norm}
 
-.. code-block:: yaml
+Each fragment shows only the keys that differ from the full ``input.yaml`` above.
+Without ``analysis: transient`` the thermal problem is solved as stationary at
+every time point.
 
-   models:
-     thermal: false
-     mechanical: true
-
-**3. Coupled thermo-mechanical**:
-
-.. code-block:: yaml
-
-   models:
-     thermal: true
-     mechanical: true
-
-   solver_settings:
-
-**4. Phase-field fracture**:
-
-.. code-block:: yaml
-
-   models:
-     mechanical: true
-     damage: true
-
-   damage:
-     type: AT2
-     lc: 0.002              # Mesh size should be ~lc/2
-
-**5. Transient analysis**:
-
-.. code-block:: yaml
-
-   time: [0, 10, 20, 30]         # Time points (s)
-   lhr: [0, 1e6, 5e6, 2e6]       # Heat source at each time
-   n_steps: 4
-
----
-
-Troubleshooting Quick Fixes
-----------------------------
-
-**Solver not converging**:
-
-.. code-block:: yaml
-
-   solver_settings:
-     relax_adaptive: true
-     relax_shrink: 0.5
-     max_iters: 200
-
-**Memory issues**:
-
-.. code-block:: yaml
-
-   thermal:
-     linear_solver: iterative_amg    # Instead of direct_mumps
-   mechanical:
-     linear_solver: iterative_amg
-
-**Mesh not found**:
-
-.. code-block:: bash
-
-   gmsh -3 mesh.geo
-
-**WSL GUI issues**:
-
-.. code-block:: bash
-
-   sudo apt install libxft2
-   wsl --update
-
----
-
-Further Reading
----------------
-
-- **Full documentation**: See :doc:`index`
-- **Installation**: :doc:`installation`
-- **Getting started**: :doc:`getting_started`
-- **Examples**: :doc:`examples`
-- **Physics models**: :doc:`physics_models`
-- **Troubleshooting**: :doc:`troubleshooting`
+See also :doc:`getting_started`, :doc:`usage` and :doc:`troubleshooting`.
