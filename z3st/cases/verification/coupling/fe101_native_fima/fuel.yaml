@@ -1,0 +1,14 @@
+name: UZrH
+fissile: true
+E: 93.0e9
+nu: 0.3
+k: materials.fuel_thermal.k_UZrH
+cp: materials.fuel_thermal.cp_UZrH10
+rho: 6300
+heavy_metal_fraction: 0.08
+hydrogen_zirconium_ratio: 1.0
+alpha: 7.0e-06
+eigenstrain: materials.fuel_swelling.uzrh_fission_product_swelling
+T_ref: 293.15
+T_initial: 300.0
+fima_source: native_openmc

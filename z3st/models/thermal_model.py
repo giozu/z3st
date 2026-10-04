@@ -306,7 +306,7 @@ class ThermalModel:
                     a_t += w * rho_cp_dt * u_t * v_t * dx
                     L_t += w * rho_cp_dt * self.T * v_t * dx
 
-                dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.V_t)
+                dofs = self.mgr.locate_domain_dofs(label=self.label_map[label], V=self.q_third.function_space)
                 q_vals = self.q_third.x.array[dofs]
                 # under MPI a rank may hold no cells of this material -> empty slice
                 if q_vals.size:

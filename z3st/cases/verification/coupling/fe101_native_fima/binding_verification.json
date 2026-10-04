@@ -1,0 +1,16 @@
+{
+  "PASS": true,
+  "solve_executed": false,
+  "rollback_time_and_coefficients": true,
+  "native_source_independent_of_internal_BU": true,
+  "thermal_source_unchanged": true,
+  "isotropic_diagonal_equals_imported_FIMA": true,
+  "offdiagonal_zero": true,
+  "cladding_imported_FIMA_zero": true,
+  "missing_native_field_raises": true,
+  "legacy_burnup_mode_preserved": true,
+  "out_of_range_rejected_without_state_change": true,
+  "XDMF_native_fields_exported_as_cell_data": true,
+  "off_grid_time_s": 233100.0,
+  "MPI_processes": 1
+}

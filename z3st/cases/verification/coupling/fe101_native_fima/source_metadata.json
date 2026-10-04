@@ -1,0 +1,12 @@
+{
+  "source": "/home/simone/z3st/z3st/cases/verification/neutronics/fe101_10x10_depletion/preparation/high_statistics_40000_40_15/run_3500h_ED/postprocessing/zest_FIMA_2D_10x10.csv",
+  "sha256": "a64c75523a71e64a3d62ca6eff0e61613ec3555c6b43de92317a0feeb9000c55",
+  "records": 2100,
+  "coordinate_transform": "r_FE_m=r_OpenMC_cm/100; z_FE_m=(z_OpenMC_cm-10.20)/100",
+  "old_regression_length_m": 0.356,
+  "new_verification_length_m": 0.3556,
+  "axial_stretch": false,
+  "baseline_LHR_W_m": 8780,
+  "power_coupled": false,
+  "history_end_h": 3500
+}

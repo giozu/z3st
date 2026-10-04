@@ -1,0 +1,332 @@
+{
+  "PASS": true,
+  "source": "Stress (cells) and VonMises (cells) in saved fields_0020.vtu; no interpolation from nodal stress",
+  "results": [
+    {
+      "s": 0.0,
+      "VM_min_MPa": 1.9439704153997885,
+      "VM_volume_mean_MPa": 13.939570475080915,
+      "VM_max_MPa": 30.885223566503896,
+      "maximum_cell_id": 615,
+      "maximum_position_local_r_z_cm": [
+        1.7536875,
+        19.557999999999986
+      ],
+      "maximum_position_OpenMC_r_z_cm": [
+        1.7536875,
+        29.757999999999985
+      ],
+      "maximum_cell_bounds_m": [
+        0.01716375,
+        0.01791,
+        0.1896533333333332,
+        0.2015066666666665
+      ],
+      "sigma_rr_MPa": -0.6624613058394789,
+      "sigma_theta_theta_MPa": 30.416136009771257,
+      "sigma_zz_MPa": 30.025570086381556,
+      "sigma_rz_MPa": 0.03426837587690681,
+      "mean_normal_stress_at_max_MPa": 19.926414930104446,
+      "deviatoric_principal_components_at_max_MPa": [
+        -20.588876235943925,
+        10.489721079666811,
+        10.09915515627711
+      ],
+      "radial_distance_to_surface_cm": 0.037312499999999846,
+      "distance_to_nearest_axial_end_cm": 16.002000000000017,
+      "qmax_cell_centres_local_cm": [
+        [
+          1.7536875,
+          14.816666666666666
+        ],
+        [
+          1.7536875,
+          16.001999999999995
+        ],
+        [
+          1.7536875,
+          17.187333333333328
+        ]
+      ],
+      "FIMAmax_cell_centres_local_cm": [
+        [
+          1.7536875,
+          18.372666666666657
+        ],
+        [
+          1.7536875,
+          19.557999999999986
+        ],
+        [
+          1.7536875,
+          20.743333333333318
+        ]
+      ],
+      "power_W": 5265.814463925392,
+      "fuel_ur_max_um": 20.02856427343749,
+      "gap_min_um": 113.00208982627124,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "clad_VM_max_MPa": 0.5543705837744803,
+      "contact": false,
+      "cell_values_finite": true,
+      "axis_points_count": 31,
+      "max_VM_reconstruction_abs_error_Pa": 7.450580596923828e-09,
+      "fuel_cells": 720
+    },
+    {
+      "s": 1.0,
+      "VM_min_MPa": 1.6748868627692621,
+      "VM_volume_mean_MPa": 12.077572867869899,
+      "VM_max_MPa": 26.054379877811346,
+      "maximum_cell_id": 600,
+      "maximum_position_local_r_z_cm": [
+        1.7536875,
+        18.372666666666657
+      ],
+      "maximum_position_OpenMC_r_z_cm": [
+        1.7536875,
+        28.572666666666656
+      ],
+      "maximum_cell_bounds_m": [
+        0.01716375,
+        0.01791,
+        0.1777999999999999,
+        0.1896533333333332
+      ],
+      "sigma_rr_MPa": -0.6997298032129406,
+      "sigma_theta_theta_MPa": 25.533272929184555,
+      "sigma_zz_MPa": 25.172273943327248,
+      "sigma_rz_MPa": -0.003897602846216081,
+      "mean_normal_stress_at_max_MPa": 16.668605689766288,
+      "deviatoric_principal_components_at_max_MPa": [
+        -17.368335492979227,
+        8.864667239418267,
+        8.50366825356096
+      ],
+      "radial_distance_to_surface_cm": 0.037312499999999846,
+      "distance_to_nearest_axial_end_cm": 17.187333333333346,
+      "qmax_cell_centres_local_cm": [
+        [
+          1.7536875,
+          14.816666666666666
+        ],
+        [
+          1.7536875,
+          16.001999999999995
+        ],
+        [
+          1.7536875,
+          17.187333333333328
+        ]
+      ],
+      "FIMAmax_cell_centres_local_cm": [
+        [
+          1.7536875,
+          18.372666666666657
+        ],
+        [
+          1.7536875,
+          19.557999999999986
+        ],
+        [
+          1.7536875,
+          20.743333333333318
+        ]
+      ],
+      "power_W": 5265.814463925392,
+      "fuel_ur_max_um": 23.118605488888416,
+      "gap_min_um": 109.91206345256421,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "clad_VM_max_MPa": 0.5544368311442668,
+      "contact": false,
+      "cell_values_finite": true,
+      "axis_points_count": 31,
+      "max_VM_reconstruction_abs_error_Pa": 3.725290298461914e-09,
+      "fuel_cells": 720
+    },
+    {
+      "s": 2.0,
+      "VM_min_MPa": 1.4062960693166324,
+      "VM_volume_mean_MPa": 10.244363022010425,
+      "VM_max_MPa": 21.393611945760235,
+      "maximum_cell_id": 567,
+      "maximum_position_local_r_z_cm": [
+        1.7536875,
+        16.001999999999995
+      ],
+      "maximum_position_OpenMC_r_z_cm": [
+        1.7536875,
+        26.201999999999995
+      ],
+      "maximum_cell_bounds_m": [
+        0.01716375,
+        0.01791,
+        0.1540933333333333,
+        0.1659466666666666
+      ],
+      "sigma_rr_MPa": -0.3742046444302201,
+      "sigma_theta_theta_MPa": 20.99922406971979,
+      "sigma_zz_MPa": 21.034365711954177,
+      "sigma_rz_MPa": -0.19221929031626056,
+      "mean_normal_stress_at_max_MPa": 13.886461712414581,
+      "deviatoric_principal_components_at_max_MPa": [
+        -14.260666356844801,
+        7.1127623573052094,
+        7.147903999539595
+      ],
+      "radial_distance_to_surface_cm": 0.037312499999999846,
+      "distance_to_nearest_axial_end_cm": 16.001999999999995,
+      "qmax_cell_centres_local_cm": [
+        [
+          1.7536875,
+          14.816666666666666
+        ],
+        [
+          1.7536875,
+          16.001999999999995
+        ],
+        [
+          1.7536875,
+          17.187333333333328
+        ]
+      ],
+      "FIMAmax_cell_centres_local_cm": [
+        [
+          1.7536875,
+          18.372666666666657
+        ],
+        [
+          1.7536875,
+          19.557999999999986
+        ],
+        [
+          1.7536875,
+          20.743333333333318
+        ]
+      ],
+      "power_W": 5265.814463925392,
+      "fuel_ur_max_um": 26.207483310134062,
+      "gap_min_um": 106.82319992241405,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "clad_VM_max_MPa": 0.5545009287826159,
+      "contact": false,
+      "cell_values_finite": true,
+      "axis_points_count": 31,
+      "max_VM_reconstruction_abs_error_Pa": 3.725290298461914e-09,
+      "fuel_cells": 720
+    }
+  ],
+  "fixed_region_components": [
+    {
+      "anchor_maximum_of_s": 0.0,
+      "cell_id": 615,
+      "s": 0.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 19.557999999999986,
+      "VM_MPa": 30.885223566503896,
+      "sigma_rr_MPa": -0.6624613058394789,
+      "sigma_theta_theta_MPa": 30.416136009771257,
+      "sigma_zz_MPa": 30.025570086381556,
+      "sigma_rz_MPa": 0.03426837587690681
+    },
+    {
+      "anchor_maximum_of_s": 0.0,
+      "cell_id": 615,
+      "s": 1.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 19.557999999999986,
+      "VM_MPa": 26.001729576527893,
+      "sigma_rr_MPa": -0.47157321635681393,
+      "sigma_theta_theta_MPa": 25.656635133008002,
+      "sigma_zz_MPa": 25.401025413971723,
+      "sigma_rz_MPa": 0.08156202078767934
+    },
+    {
+      "anchor_maximum_of_s": 0.0,
+      "cell_id": 615,
+      "s": 2.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 19.557999999999986,
+      "VM_MPa": 21.11917301171304,
+      "sigma_rr_MPa": -0.2816035304619074,
+      "sigma_theta_theta_MPa": 20.896457643249512,
+      "sigma_zz_MPa": 20.77580569657278,
+      "sigma_rz_MPa": 0.1288552630095856
+    },
+    {
+      "anchor_maximum_of_s": 1.0,
+      "cell_id": 600,
+      "s": 0.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 18.372666666666657,
+      "VM_MPa": 30.875252793649828,
+      "sigma_rr_MPa": -0.7027815906727314,
+      "sigma_theta_theta_MPa": 30.42185684332308,
+      "sigma_zz_MPa": 29.916883010406494,
+      "sigma_rz_MPa": 0.009070483994213117
+    },
+    {
+      "anchor_maximum_of_s": 1.0,
+      "cell_id": 600,
+      "s": 1.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 18.372666666666657,
+      "VM_MPa": 26.054379877811346,
+      "sigma_rr_MPa": -0.6997298032129406,
+      "sigma_theta_theta_MPa": 25.533272929184555,
+      "sigma_zz_MPa": 25.172273943327248,
+      "sigma_rz_MPa": -0.003897602846216081
+    },
+    {
+      "anchor_maximum_of_s": 1.0,
+      "cell_id": 600,
+      "s": 2.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 18.372666666666657,
+      "VM_MPa": 21.23396316803295,
+      "sigma_rr_MPa": -0.69749527422297,
+      "sigma_theta_theta_MPa": 20.64413000992477,
+      "sigma_zz_MPa": 20.42710190375662,
+      "sigma_rz_MPa": -0.01686585809524817
+    },
+    {
+      "anchor_maximum_of_s": 2.0,
+      "cell_id": 567,
+      "s": 0.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 16.001999999999995,
+      "VM_MPa": 30.60030137589723,
+      "sigma_rr_MPa": -0.6318389666940272,
+      "sigma_theta_theta_MPa": 30.104605250492543,
+      "sigma_zz_MPa": 29.830100655701816,
+      "sigma_rz_MPa": -0.061599708066620316
+    },
+    {
+      "anchor_maximum_of_s": 2.0,
+      "cell_id": 567,
+      "s": 1.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 16.001999999999995,
+      "VM_MPa": 25.99607116870944,
+      "sigma_rr_MPa": -0.5027043269975185,
+      "sigma_theta_theta_MPa": 25.55205134656474,
+      "sigma_zz_MPa": 25.43241046061036,
+      "sigma_rz_MPa": -0.12691612729099488
+    },
+    {
+      "anchor_maximum_of_s": 2.0,
+      "cell_id": 567,
+      "s": 2.0,
+      "r_cm": 1.7536875,
+      "z_local_cm": 16.001999999999995,
+      "VM_MPa": 21.393611945760235,
+      "sigma_rr_MPa": -0.3742046444302201,
+      "sigma_theta_theta_MPa": 20.99922406971979,
+      "sigma_zz_MPa": 21.034365711954177,
+      "sigma_rz_MPa": -0.19221929031626056
+    }
+  ],
+  "protected_files_unchanged": 330,
+  "cell_VM_reconstructed_from_tensor_PASS": true,
+  "conclusion": "swelling coupling + ablation + sensitivity block closed"
+}

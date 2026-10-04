@@ -1,0 +1,13 @@
+{
+  "source": "/home/simone/z3st/z3st/cases/verification/neutronics/fe101_10x10_depletion/preparation/high_statistics_40000_40_15/run_3500h_ED/postprocessing/zest_FIMA_2D_10x10.csv",
+  "sha256": "a64c75523a71e64a3d62ca6eff0e61613ec3555c6b43de92317a0feeb9000c55",
+  "tally": "FE101 B1 domain energy deposition",
+  "score": "heating-local",
+  "native_unit": "eV/source particle",
+  "normalization_tally": "factor-for-normalization",
+  "normalization": "P_i[W]=250000*H_i/H_core; saved deposited_power_W",
+  "SI_conversion": "q_i[W/m3]=deposited_power_W/(volume_cm3*1e-6)",
+  "interpolation": "linear instantaneous power, same physical time as linear cumulative FIMA; no extrapolation; different from BOS cumulative-energy integration",
+  "start_fuel_power_W": 5387.6150851948605,
+  "final_fuel_power_W": 5265.8144639253405
+}

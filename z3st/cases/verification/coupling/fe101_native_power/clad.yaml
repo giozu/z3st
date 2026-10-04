@@ -1,0 +1,10 @@
+name: aluminum-1100
+E: 69.0e9
+nu: 0.33
+k: 220.0
+alpha: 2.36e-05
+cp: 904.0
+T_ref: 293.15
+T_initial: 293.15
+rho: 2710.0
+melting_temperature: 916.0

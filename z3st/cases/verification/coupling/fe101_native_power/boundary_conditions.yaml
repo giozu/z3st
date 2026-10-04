@@ -1,0 +1,48 @@
+thermal:
+  fuel:
+  - type: Neumann
+    region: bottom_1
+    flux: 0.0
+  - type: Neumann
+    region: top_1
+    flux: 0.0
+  - type: Neumann
+    region: axis_1
+    flux: 0.0
+  - type: Robin
+    region: lateral_1
+    pair: inner_2
+  clad:
+  - type: Neumann
+    region: bottom_2
+    flux: 0.0
+  - type: Neumann
+    region: top_2
+    flux: 0.0
+  - type: Robin
+    region: inner_2
+    pair: lateral_1
+  - type: Dirichlet
+    region: outer_2
+    temperature: 300.0
+mechanical:
+  fuel:
+  - type: Clamp_x
+    region: axis_1
+  - type: Clamp_y
+    region: bottom_1
+  - type: Neumann
+    region: lateral_1
+    traction: 0.0
+  - type: Neumann
+    region: top_1
+    traction: 0.0
+  clad:
+  - type: Clamp_y
+    region: bottom_2
+  - type: Neumann
+    region: outer_2
+    traction: 0.0
+  - type: Neumann
+    region: inner_2
+    traction: 0.0

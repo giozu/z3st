@@ -66,38 +66,71 @@ def solid_gas_densification(T, material, model=None, dim=3):
     return ((dv_solid + dv_gas + dv_dens) / 3.0) * I
 
 
-def uzrh_fission_product_swelling(T, material, model=None, dim=3):
-    """Fission-product swelling of U-ZrH (TRIGA) fuel.
+def uzrh_isotropic_fission_product_eigenstrain(fima, dim=3):
+    """Existing U-ZrH correlation, independent of FIMA provenance.
 
-        ΔV/V = rate · bu
-        ε*   = (ΔV/V) / 3 · I
-
-    Card ``swelling_rate`` in 1/(MWd/kgU), default 2.0e-3 from Simnad &
-    Konings, Comprehensive Nuclear Materials vol. 3, §3.12.3.3: hydride fuel
-    swells at 3 % per %FIMA, which the same section converts to ΔV/V = 0.2 %
-    per MWd/kg equivalent-oxide burnup — three times the 0.07 % of UO2.
-
-    One rate covers all of it. The 3 %/%FIMA is the *total* measured swelling:
-    solid fission products, agglomeration of fission gases, and the saturable
-    nucleation of irradiation vacancies into voids. Splitting it into a solid
-    and a gaseous term the way :func:`solid_gas_densification` does for oxide
-    would double-count, and the gaseous sigmoid would be wrong here anyway:
-    below ~750 °C the volatiles stay in the hydride (§3.12.3.4), and above it
-    the release mechanisms are not those of UO2.
-
-    Two effects are deliberately absent:
-
-    - the offset swelling that precedes the constant-rate regime — the rate is
-      the slope *after* it, so this overestimates at very low burnup;
-    - the hydride expansion (ΔL/L)_H/Zr = 0.027 (H/Zr − 1.6) of Table 3, which
-      needs a spatially varying H/Zr, i.e. a hydrogen field. With a uniform
-      H/Zr it is a fabrication strain, not an irradiation eigenstrain. It
-      belongs here once a hydrogen-redistribution model provides the field.
+    DeltaV/V = 3*FIMA; infinitesimal isotropic eigenstrain = FIMA*I.
     """
+    return fima * ufl.Identity(dim)
+
+
+def uzrh_fission_product_swelling(T, material, model=None, dim=3):
+    """SNAP/Olander literature correlation for U-ZrH fission-product swelling.
+
+    Read ``model.burnup`` in real MWd/kgU and convert to the dimensionless
+    fraction FIMA = fissions / (initial U + Zr atoms), excluding hydrogen::
+
+        r = N_U / N_Zr = w_U * (M_Zr + x*M_H) / ((1 - w_U)*M_U)
+        FIMA = bu * 8.64e10 * M_U / (N_A * E_f) * r / (1 + r)
+        DeltaV/V = 3 * FIMA
+        epsilon_sw = FIMA * I
+
+    Required cards: ``heavy_metal_fraction`` is kgU/kg total U-ZrH fuel;
+    ``hydrogen_zirconium_ratio`` is the atomic ratio x = H/Zr. Assume a
+    mixture of U and ZrH_x, with M_U = 0.238 kg/mol (isotopic approximation).
+    ``swelling_energy_per_fission_MeV`` defaults to 200 MeV of deposited
+    thermal energy per fission. Density cancels in this conversion.
+
+    The approximately 3% volumetric swelling per %FIMA slope comes from
+    U-ZrH/SNAP data discussed by Olander et al., "Uranium-zirconium hydride
+    fuel properties" (2009). Its use for H/Zr = 1.0 is an approximation to
+    verify against specific irradiation data, not a correlation validated
+    specifically for TRIGA FE101.
+
+    This represents the linear contribution after offset swelling; no offset
+    or onset threshold is modeled. Hydrogen-redistribution expansion is also
+    absent. The former ``swelling_rate = 2.0e-3`` used an equivalent-oxide
+    burnup basis and is not directly compatible with real MWd/kgU; this
+    function no longer reads that card.
+    """
+    # Explicit native ownership: never silently fall back to the BU estimate.
+    source = material.get("fima_source", "legacy_burnup")
+    if source == "native_openmc":
+        fima = getattr(model, "fima_native", None)
+        if fima is None:
+            raise ValueError("native_openmc FIMA field is unavailable")
+        return uzrh_isotropic_fission_product_eigenstrain(fima, dim)
+    if source != "legacy_burnup":
+        raise ValueError(f"Unknown FIMA source: {source}")
     I = ufl.Identity(dim)
     bu = getattr(model, "burnup", None)
     if bu is None:
         return 0.0 * I
 
-    rate = float(material.get("swelling_rate", 2.0e-3))
-    return (rate * bu / 3.0) * I
+    w_u = float(material["heavy_metal_fraction"])
+    h_zr = float(material["hydrogen_zirconium_ratio"])
+    energy_mev = float(material.get("swelling_energy_per_fission_MeV", 200.0))
+    if not 0.0 < w_u < 1.0:
+        raise ValueError("U-ZrH swelling requires 0 < heavy_metal_fraction < 1")
+    if not h_zr >= 0.0 or not energy_mev > 0.0:
+        raise ValueError("Invalid H/Zr ratio or energy per fission")
+
+    M_U = 0.238       # kg/mol
+    M_ZR = 0.091224   # kg/mol
+    M_H = 0.001008    # kg/mol
+    N_A = 6.02214076e23  # atoms/mol
+    energy_j = energy_mev * 1.602176634e-13  # J/fission
+
+    u_zr = w_u * (M_ZR + h_zr * M_H) / ((1.0 - w_u) * M_U)
+    fima = bu * 8.64e10 * M_U / (N_A * energy_j) * u_zr / (1.0 + u_zr)
+    return uzrh_isotropic_fission_product_eigenstrain(fima, dim)

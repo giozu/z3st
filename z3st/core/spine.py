@@ -400,6 +400,7 @@ class Spine(
         print(f"[spine.initialize_fields]")
 
         self.q_third = None
+        self._power_coupling = None
         self.burnup = None
         self.gas_swelling = None      # SCIANTIX total gaseous swelling ΔV/V (eigenstrain bus)
         self.fg_fields = None         # dict of per-dof FG concentration Functions (at/m^3, output)
@@ -509,6 +510,18 @@ class Spine(
             print("\nSetting porosity initial conditions...")
             self.set_porosity_initial_conditions()
 
+        # Native FIMA is independent of internal burnup and the thermal source.
+        self._fima_coupling = None
+        if self.native_fima_config.get("enabled", False):
+            from z3st.coupling.openmc.conservative_transfer import NativeFIMACoupling
+            self._fima_coupling = NativeFIMACoupling(self, self.native_fima_config)
+        elif any(m.get("fima_source") == "native_openmc" for m in self.materials.values()):
+            raise ValueError("native_openmc swelling requires enabled native_fima coupling")
+
+        if self.native_power_config.get("enabled", False):
+            from z3st.coupling.openmc.conservative_transfer import NativePowerCoupling
+            self._power_coupling = NativePowerCoupling(self, self.native_power_config)
+
         # Material properties
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
@@ -569,6 +582,15 @@ class Spine(
             self.update_porosity_dependent_properties(self.T, self.porosity)
 
 
+    def set_coupling_time(self, time_s):
+        """Update only externally owned cumulative FIMA at physical time."""
+        provider = getattr(self, "_fima_coupling", None)
+        if provider is not None:
+            provider.update(time_s)
+        power = getattr(self, "_power_coupling", None)
+        if power is not None:
+            power.update(time_s)
+
     def material_mean(self, fn, name, integral=False):
         """Weighted FE mean of ``fn`` over material ``name``,
 
@@ -597,6 +619,9 @@ class Spine(
         return val / vol if vol > 0 else 0.0
 
     def set_power(self):
+        if getattr(self, "_power_coupling", None) is not None:
+            # DG0 coefficient already updated at the same physical time as FIMA.
+            return
         if self.q_third is None:
             return
 
@@ -759,7 +784,8 @@ class Spine(
                 continue
             hm = float(mat.get("heavy_metal_fraction", 0.8815))
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
-            q = self.q_third.x.array[dofs]
+            power = getattr(self, "_power_coupling", None)
+            q = (power.burnup_source_nodal if power is not None else self.q_third).x.array[dofs]
             self.burnup.x.array[dofs] += q * dt / (float(rho) * hm * SECONDS_PER_MWD)
 
         self.burnup.x.scatter_forward()
@@ -867,6 +893,9 @@ class Spine(
         "T", "u", "w", "D", "H", "burnup", "gas_swelling", "c", "c_n",
         "p", "ep", "p_n", "ep_n",
         "porosity", "porosity_n",
+        "fima_native", "swelling_eigenstrain_native",
+        "cumulative_fission_density_native",
+        "qdot_native",
     )  # dolfinx Functions
     _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
     _SNAPSHOT_MATERIAL_KEYS = ("E", "nu", "bulk_modulus", "_lhr_max")
@@ -898,6 +927,10 @@ class Spine(
         """
         # Heterogeneous by design: the SCIANTIX entry below is a list, not a dict.
         snap: dict[str, Any] = {"fields": {}, "dicts": {}, "materials": {}}
+        if getattr(self, "_fima_coupling", None) is not None:
+            snap["native_fima_time_s"] = self._fima_coupling.time_s
+        if getattr(self, "_power_coupling", None) is not None:
+            snap["native_power_time_s"] = self._power_coupling.time_s
         for name in self._SNAPSHOT_FIELDS:
             fn = getattr(self, name, None)
             if isinstance(fn, dolfinx.fem.Function):
@@ -927,6 +960,10 @@ class Spine(
         """Inverse of :meth:`snapshot_state`: write every captured field, dict
         and material scalar back in place. scatter_forward keeps ghost dofs
         consistent after the in-place array overwrite."""
+        if "native_fima_time_s" in snap:
+            self._fima_coupling.time_s = snap["native_fima_time_s"]
+        if "native_power_time_s" in snap:
+            self._power_coupling.update(snap["native_power_time_s"])
         for name, arr in snap.get("fields", {}).items():
             fn = getattr(self, name)
             fn.x.array[:] = arr
@@ -1020,4 +1057,3 @@ class Spine(
                 sigma_cr, eps_el_cr = self.creep_output_stress(self.u, mat, T_field)
                 self.stress[name] = sigma_cr
                 self.energy_density[name] = 0.5 * ufl.inner(sigma_cr, eps_el_cr)
-

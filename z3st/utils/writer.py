@@ -461,6 +461,10 @@ class OutputWriter:
             write(self._c_cg_fn, t)
         if getattr(p, "burnup", None) is not None:
             write(p.burnup, t)
+        for name in ("fima_native", "swelling_eigenstrain_native", "qdot_native"):
+            fn = getattr(p, name, None)
+            if fn is not None:
+                write(fn, t)
         # SCIANTIX coupling fields (only present when models.fission_gas is on)
         if getattr(p, "gas_swelling", None) is not None:
             write(p.gas_swelling, t)
@@ -536,6 +540,14 @@ class OutputWriter:
         # Burnup (nodal fuel state, MWd/kgU)
         if getattr(p, "burnup", None) is not None:
             grid.point_data["Burnup"] = p.burnup.x.array
+        for name in ("fima_native", "swelling_eigenstrain_native", "qdot_native"):
+            fn = getattr(p, name, None)
+            if fn is not None:
+                # DG0 coefficients are cell data, not interpolated nodal data.
+                grid.cell_data[fn.name] = np.array([
+                    fn.x.array[fn.function_space.dofmap.cell_dofs(c)[0]]
+                    for c in range(len(cell_types))
+                ])
 
         # SCIANTIX coupling fields (only present when models.fission_gas is on):
         # total gaseous swelling ΔV/V and the Xe+Kr concentrations (at/m^3).

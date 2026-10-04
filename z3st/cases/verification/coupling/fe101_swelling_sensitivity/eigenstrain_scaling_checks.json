@@ -1,0 +1,22 @@
+{
+  "0.0": {
+    "bitwise_equal_to_s_times_FIMA_all_21_times": true,
+    "maximum_absolute_error": 0.0
+  },
+  "0.5": {
+    "bitwise_equal_to_s_times_FIMA_all_21_times": true,
+    "maximum_absolute_error": 0.0
+  },
+  "1.0": {
+    "bitwise_equal_to_s_times_FIMA_all_21_times": true,
+    "maximum_absolute_error": 0.0
+  },
+  "1.5": {
+    "bitwise_equal_to_s_times_FIMA_all_21_times": true,
+    "maximum_absolute_error": 0.0
+  },
+  "2.0": {
+    "bitwise_equal_to_s_times_FIMA_all_21_times": true,
+    "maximum_absolute_error": 0.0
+  }
+}

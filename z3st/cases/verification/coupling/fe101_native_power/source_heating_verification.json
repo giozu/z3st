@@ -1,0 +1,9 @@
+{
+  "PASS": true,
+  "statepoints_verified": 21,
+  "score": "heating-local",
+  "power_column": "deposited_power_W",
+  "native_units": "eV/source",
+  "normalization": "250000 W * H_domain/H_core",
+  "max_saved_power_vs_HDF5_abs_error_W": 0.0
+}

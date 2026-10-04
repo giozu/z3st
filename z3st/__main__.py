@@ -284,6 +284,7 @@ def _solve_interval(problem, t0, t1, lhr0, lhr1, step_idx, n_grid, max_iters, ad
     snap = problem.snapshot_state()
 
     problem.current_step = step_idx
+    problem.set_coupling_time(t1)
     problem.parameters(lhr=lhr1)
     problem.set_power()
 
@@ -481,6 +482,7 @@ if __name__ == "__main__":
                 )
             else:
                 # Fixed-grid path
+                problem.set_coupling_time(t)
                 problem.parameters(lhr=lhr)
                 problem.set_power()
                 problem.update_state(dt)

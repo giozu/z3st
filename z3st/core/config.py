@@ -106,6 +106,22 @@ class Config:
         # Normalised to lowercase ("2D" → "2d"). Downstream regime branches
         # assume one of these four values.
         self.regime = self.input_file.get("regime", "2d").lower()
+        # Optional phase-1 coupling: native cumulative FIMA only, never power.
+        self.native_fima_config = self.input_file.get("coupling", {}).get("native_fima", {})
+        self.native_power_config = self.input_file.get("coupling", {}).get("native_power", {})
+        if not isinstance(self.native_power_config, dict):
+            raise ValueError("coupling.native_power must be a block")
+        if self.native_power_config.get("enabled", False):
+            if not {"history_path", "material", "axial_origin_cm"}.issubset(self.native_power_config):
+                raise ValueError("native_power requires history_path, material, axial_origin_cm")
+        if not isinstance(self.native_fima_config, dict):
+            raise ValueError("coupling.native_fima must be a configuration block")
+        if self.native_fima_config.get("enabled", False):
+            required = {"history_path", "material", "axial_origin_cm"}
+            if not required.issubset(self.native_fima_config):
+                raise ValueError(f"native_fima requires {sorted(required)}")
+            if self.regime != "axisymmetric":
+                raise ValueError("native_fima requires axisymmetric r-z geometry")
         valid_regimes = {"1d", "2d", "3d", "axisymmetric"}
         if self.regime not in valid_regimes:
             raise ValueError(

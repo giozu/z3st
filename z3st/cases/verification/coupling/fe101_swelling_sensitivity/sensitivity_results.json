@@ -1,0 +1,504 @@
+{
+  "PASS": true,
+  "protected_files_unchanged": 1722,
+  "qdot_FIMA_exact_identical_all_times": true,
+  "power_exact_identical_all_times": true,
+  "material_BC_mesh_identical": true,
+  "eigenstrain_pointwise_linear_in_s": true,
+  "FIMA_eigenstrain_monotonic_in_time": true,
+  "endpoint_regressions": {
+    "0.0": {
+      "PASS": true,
+      "max_temperature_difference_K": 1.3073986337985843e-11,
+      "max_displacement_difference_m": 2.710505431213761e-18,
+      "reference": "/home/simone/z3st/z3st/cases/verification/coupling/fe101_swelling_ablation/runs/swelling_off"
+    },
+    "1.0": {
+      "PASS": true,
+      "max_temperature_difference_K": 1.1596057447604835e-11,
+      "max_displacement_difference_m": 5.5294310796760726e-18,
+      "reference": "/home/simone/z3st/z3st/cases/verification/coupling/fe101_native_power/runs/full_native"
+    }
+  },
+  "final": [
+    {
+      "s": 0.0,
+      "Tmax_K": 486.0636085576486,
+      "fuel_surface_T_min_K": 368.62480237127136,
+      "fuel_surface_T_mean_K": 395.80952585649237,
+      "fuel_surface_T_max_K": 417.9057695611715,
+      "gap_min_um": 113.00208982627124,
+      "gap_mean_um": 116.51527865437576,
+      "gap_max_um": 120.96962290268287,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "fuel_max_radial_displacement_um": 20.02856427343749,
+      "clad_inner_ur_mean_um": 3.009240677988748,
+      "fuel_von_mises_max_MPa": 30.885223566503896,
+      "clad_von_mises_max_MPa": 0.5543705837744803,
+      "swelling_eigenstrain_max": 0.0,
+      "fuel_power_W": 5265.814463925392,
+      "contact": false
+    },
+    {
+      "s": 0.5,
+      "Tmax_K": 484.96418390800306,
+      "fuel_surface_T_min_K": 367.9478440003687,
+      "fuel_surface_T_mean_K": 394.88100240048675,
+      "fuel_surface_T_max_K": 416.76867493209295,
+      "gap_min_um": 111.4569500314714,
+      "gap_mean_um": 115.25950530022544,
+      "gap_max_um": 120.07028338253389,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "fuel_max_radial_displacement_um": 21.573711467986126,
+      "clad_inner_ur_mean_um": 3.0092419297475375,
+      "fuel_von_mises_max_MPa": 28.464776954025567,
+      "clad_von_mises_max_MPa": 0.5544036285526657,
+      "swelling_eigenstrain_max": 0.00011199855363770513,
+      "fuel_power_W": 5265.814463925392,
+      "contact": false
+    },
+    {
+      "s": 1.0,
+      "Tmax_K": 483.8627871788779,
+      "fuel_surface_T_min_K": 367.26998418598544,
+      "fuel_surface_T_mean_K": 393.95089285142643,
+      "fuel_surface_T_max_K": 415.6295104402693,
+      "gap_min_um": 109.91206345256421,
+      "gap_mean_um": 114.00392692146018,
+      "gap_max_um": 119.17105659413609,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "fuel_max_radial_displacement_um": 23.118605488888416,
+      "clad_inner_ur_mean_um": 3.0092432175022186,
+      "fuel_von_mises_max_MPa": 26.054379877811346,
+      "clad_von_mises_max_MPa": 0.5544368311442668,
+      "swelling_eigenstrain_max": 0.00022399710727541027,
+      "fuel_power_W": 5265.814463925392,
+      "contact": false
+    },
+    {
+      "s": 1.5,
+      "Tmax_K": 482.7578145333967,
+      "fuel_surface_T_min_K": 366.5902856102,
+      "fuel_surface_T_mean_K": 393.01781436369157,
+      "fuel_surface_T_max_K": 414.486546429404,
+      "gap_min_um": 108.36769054993854,
+      "gap_mean_um": 112.74873830576658,
+      "gap_max_um": 118.2720590759631,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "fuel_max_radial_displacement_um": 24.662982581142558,
+      "clad_inner_ur_mean_um": 3.0092429618970176,
+      "fuel_von_mises_max_MPa": 23.694629722970205,
+      "clad_von_mises_max_MPa": 0.5544548892318891,
+      "swelling_eigenstrain_max": 0.0003359956609131154,
+      "fuel_power_W": 5265.814463925392,
+      "contact": false
+    },
+    {
+      "s": 2.0,
+      "Tmax_K": 481.65336402403943,
+      "fuel_surface_T_min_K": 365.91121396081354,
+      "fuel_surface_T_mean_K": 392.08533750688827,
+      "fuel_surface_T_max_K": 413.3442265137981,
+      "gap_min_um": 106.82319992241405,
+      "gap_mean_um": 111.49344657935167,
+      "gap_max_um": 117.3729612969133,
+      "gap_min_position_local_z_cm": 18.965333333333323,
+      "fuel_max_radial_displacement_um": 26.207483310134062,
+      "clad_inner_ur_mean_um": 3.0092464916526285,
+      "fuel_von_mises_max_MPa": 21.393611945760235,
+      "clad_von_mises_max_MPa": 0.5545009287826159,
+      "swelling_eigenstrain_max": 0.00044799421455082053,
+      "fuel_power_W": 5265.814463925392,
+      "contact": false
+    }
+  ],
+  "slopes": [
+    {
+      "quantity": "gap_min_m",
+      "unit": "um",
+      "dY_ds_centered_at_1": -3.0892594815328493,
+      "second_difference_per_s2": 0.002054705126056433,
+      "max_deviation_from_nominal_tangent": 0.0007668921741839085,
+      "range_0_to_2": 6.178889903857197,
+      "range_percent_of_nominal": 5.621666730443905
+    },
+    {
+      "quantity": "fuel_max_radial_displacement_m",
+      "unit": "um",
+      "dY_ds_centered_at_1": 3.089271113156432,
+      "second_difference_per_s2": -0.0020677145925986906,
+      "max_deviation_from_nominal_tangent": 0.0007701022944957003,
+      "range_0_to_2": 6.178919036696573,
+      "range_percent_of_nominal": 26.72704043358658
+    },
+    {
+      "quantity": "Tmax_K",
+      "unit": "K",
+      "dY_ds_centered_at_1": -2.2063693746063677,
+      "second_difference_per_s2": -0.014303665424222345,
+      "max_deviation_from_nominal_tangent": 0.005547995835684105,
+      "range_0_to_2": 4.410244533609159,
+      "range_percent_of_nominal": 0.9114659466421723
+    },
+    {
+      "quantity": "fuel_von_mises_max_Pa",
+      "unit": "MPa",
+      "dY_ds_centered_at_1": -4.770147231055361,
+      "second_difference_per_s2": 0.20258768549231831,
+      "max_deviation_from_nominal_tangent": 0.10937929900424948,
+      "range_0_to_2": 9.491611620743662,
+      "range_percent_of_nominal": 36.430003958094545
+    }
+  ],
+  "contact_events": [],
+  "resource_and_runtime": {
+    "completed": true,
+    "solves": {
+      "0.0": {
+        "runtime_s": 5.087801275978563,
+        "exit_code": 0,
+        "resources": {
+          "commands": [
+            {
+              "command": [
+                "free",
+                "-h"
+              ],
+              "exit_code": 0,
+              "stdout": "               total        used        free      shared  buff/cache   available\nMem:           9.7Gi       1.4Gi       5.7Gi       3.6Mi       2.7Gi       8.3Gi\nSwap:          6.0Gi       708Mi       5.3Gi\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sdd       1007G   33G  923G   4% /\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/mnt/c"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\nC:\\             953G  215G  738G  23% /mnt/c\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "nproc"
+              ],
+              "exit_code": 0,
+              "stdout": "8\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "vmstat",
+                "1",
+                "3"
+              ],
+              "exit_code": 0,
+              "stdout": "procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu\n 2  0 725264 6028460   8860 2861932    1    3   306    73  803    1  6  1 93  0  0  0\n 0  0 725264 6028352   8868 2862012    0    0     0   132 1892 2555  1  1 98  0  0  0\n 0  0 725264 6029072   8872 2862012    0    0     4   792 1146 1169  1  0 99  0  0  0\n",
+              "stderr": ""
+            }
+          ],
+          "RAM_available_bytes": 8900247552,
+          "RAM_available_GiB": 8.28900146484375,
+          "swap_used_bytes": 742670336,
+          "swap_total_bytes": 6442450944,
+          "disk_free_bytes": 991059656704,
+          "disk_free_GiB": 922.9962310791016,
+          "mnt_c_free_bytes": 792381652992,
+          "logical_CPUs": 8,
+          "gate_pass": true,
+          "OMP_NUM_THREADS": 2,
+          "MPI_processes": 1,
+          "BLAS_NumExpr_threads": 1,
+          "gate": "RAM and disk >=2GiB; swap_used<=max(1GiB,50% total); no sustained vmstat si/so >1024KiB/s"
+        },
+        "PASS": true
+      },
+      "0.5": {
+        "runtime_s": 6.776942655997118,
+        "exit_code": 0,
+        "resources": {
+          "commands": [
+            {
+              "command": [
+                "free",
+                "-h"
+              ],
+              "exit_code": 0,
+              "stdout": "               total        used        free      shared  buff/cache   available\nMem:           9.7Gi       1.5Gi       5.7Gi       3.6Mi       2.7Gi       8.2Gi\nSwap:          6.0Gi       708Mi       5.3Gi\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sdd       1007G   33G  923G   4% /\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/mnt/c"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\nC:\\             953G  215G  738G  23% /mnt/c\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "nproc"
+              ],
+              "exit_code": 0,
+              "stdout": "8\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "vmstat",
+                "1",
+                "3"
+              ],
+              "exit_code": 0,
+              "stdout": "procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu\n 1  0 725264 5970012   9020 2869328    1    3   306    73  803    1  6  1 93  0  0  0\n 0  0 725264 5970172   9020 2869496    0    0     0     0 1605 1854  1  1 98  0  0  0\n 1  0 725264 5975384   9020 2869496    0    0     0     0 2013 2428  1  1 98  0  0  0\n",
+              "stderr": ""
+            }
+          ],
+          "RAM_available_bytes": 8858271744,
+          "RAM_available_GiB": 8.249908447265625,
+          "swap_used_bytes": 742670336,
+          "swap_total_bytes": 6442450944,
+          "disk_free_bytes": 991052124160,
+          "disk_free_GiB": 922.9892158508301,
+          "mnt_c_free_bytes": 792381579264,
+          "logical_CPUs": 8,
+          "gate_pass": true,
+          "OMP_NUM_THREADS": 2,
+          "MPI_processes": 1,
+          "BLAS_NumExpr_threads": 1,
+          "gate": "RAM and disk >=2GiB; swap_used<=max(1GiB,50% total); no sustained vmstat si/so >1024KiB/s"
+        },
+        "PASS": true
+      },
+      "1.0": {
+        "runtime_s": 7.436025148985209,
+        "exit_code": 0,
+        "resources": {
+          "commands": [
+            {
+              "command": [
+                "free",
+                "-h"
+              ],
+              "exit_code": 0,
+              "stdout": "               total        used        free      shared  buff/cache   available\nMem:           9.7Gi       1.5Gi       5.7Gi       3.6Mi       2.8Gi       8.2Gi\nSwap:          6.0Gi       708Mi       5.3Gi\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sdd       1007G   33G  923G   4% /\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/mnt/c"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\nC:\\             953G  215G  738G  23% /mnt/c\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "nproc"
+              ],
+              "exit_code": 0,
+              "stdout": "8\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "vmstat",
+                "1",
+                "3"
+              ],
+              "exit_code": 0,
+              "stdout": "procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu\n 0  0 724992 5966620   9040 2877528    1    3   306    73  803    1  6  1 93  0  0  0\n 0  0 724992 5972424   9052 2877532    0    0     0   144 1221 1328  1  0 98  0  0  0\n 2  0 724992 5979256   9060 2877532    0    0     0    24 1376 1669  1  1 98  0  0  0\n",
+              "stderr": ""
+            }
+          ],
+          "RAM_available_bytes": 8865312768,
+          "RAM_available_GiB": 8.256465911865234,
+          "swap_used_bytes": 742391808,
+          "swap_total_bytes": 6442450944,
+          "disk_free_bytes": 991044063232,
+          "disk_free_GiB": 922.9817085266113,
+          "mnt_c_free_bytes": 792382443520,
+          "logical_CPUs": 8,
+          "gate_pass": true,
+          "OMP_NUM_THREADS": 2,
+          "MPI_processes": 1,
+          "BLAS_NumExpr_threads": 1,
+          "gate": "RAM and disk >=2GiB; swap_used<=max(1GiB,50% total); no sustained vmstat si/so >1024KiB/s"
+        },
+        "PASS": true
+      },
+      "1.5": {
+        "runtime_s": 7.442915356019512,
+        "exit_code": 0,
+        "resources": {
+          "commands": [
+            {
+              "command": [
+                "free",
+                "-h"
+              ],
+              "exit_code": 0,
+              "stdout": "               total        used        free      shared  buff/cache   available\nMem:           9.7Gi       1.5Gi       5.7Gi       3.6Mi       2.8Gi       8.2Gi\nSwap:          6.0Gi       708Mi       5.3Gi\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sdd       1007G   33G  923G   4% /\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/mnt/c"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\nC:\\             953G  215G  738G  23% /mnt/c\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "nproc"
+              ],
+              "exit_code": 0,
+              "stdout": "8\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "vmstat",
+                "1",
+                "3"
+              ],
+              "exit_code": 0,
+              "stdout": "procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu\n 0  0 724992 5962776   9076 2885376    1    3   306    74  803    1  6  1 93  0  0  0\n 0  0 724992 5959184   9076 2885728    0    0     0     0 2641 4097  1  2 97  0  0  0\n 0  0 724992 5961024   9076 2885728    0    0     0     0 1149 1236  1  1 98  0  0  0\n",
+              "stderr": ""
+            }
+          ],
+          "RAM_available_bytes": 8855568384,
+          "RAM_available_GiB": 8.247390747070312,
+          "swap_used_bytes": 742391808,
+          "swap_total_bytes": 6442450944,
+          "disk_free_bytes": 991035895808,
+          "disk_free_GiB": 922.9741020202637,
+          "mnt_c_free_bytes": 792382259200,
+          "logical_CPUs": 8,
+          "gate_pass": true,
+          "OMP_NUM_THREADS": 2,
+          "MPI_processes": 1,
+          "BLAS_NumExpr_threads": 1,
+          "gate": "RAM and disk >=2GiB; swap_used<=max(1GiB,50% total); no sustained vmstat si/so >1024KiB/s"
+        },
+        "PASS": true
+      },
+      "2.0": {
+        "runtime_s": 7.8917052680044435,
+        "exit_code": 0,
+        "resources": {
+          "commands": [
+            {
+              "command": [
+                "free",
+                "-h"
+              ],
+              "exit_code": 0,
+              "stdout": "               total        used        free      shared  buff/cache   available\nMem:           9.7Gi       1.5Gi       5.7Gi       3.6Mi       2.8Gi       8.2Gi\nSwap:          6.0Gi       708Mi       5.3Gi\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\n/dev/sdd       1007G   33G  923G   4% /\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "df",
+                "-h",
+                "/mnt/c"
+              ],
+              "exit_code": 0,
+              "stdout": "Filesystem      Size  Used Avail Use% Mounted on\nC:\\             953G  215G  738G  23% /mnt/c\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "nproc"
+              ],
+              "exit_code": 0,
+              "stdout": "8\n",
+              "stderr": ""
+            },
+            {
+              "command": [
+                "vmstat",
+                "1",
+                "3"
+              ],
+              "exit_code": 0,
+              "stdout": "procs -----------memory---------- ---swap-- -----io---- -system-- -------cpu-------\n r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st gu\n 0  0 724992 5938616   9100 2893644    1    3   306    74  803    1  6  1 93  0  0  0\n 0  0 724992 5948248   9108 2893756    0    0     0    92 1369 1476  1  0 99  0  0  0\n 0  0 724992 5950460   9108 2893756    0    0     0     0 1073 1086  1  0 99  0  0  0\n",
+              "stderr": ""
+            }
+          ],
+          "RAM_available_bytes": 8852525056,
+          "RAM_available_GiB": 8.244556427001953,
+          "swap_used_bytes": 742391808,
+          "swap_total_bytes": 6442450944,
+          "disk_free_bytes": 991027814400,
+          "disk_free_GiB": 922.9665756225586,
+          "mnt_c_free_bytes": 792382222336,
+          "logical_CPUs": 8,
+          "gate_pass": true,
+          "OMP_NUM_THREADS": 2,
+          "MPI_processes": 1,
+          "BLAS_NumExpr_threads": 1,
+          "gate": "RAM and disk >=2GiB; swap_used<=max(1GiB,50% total); no sustained vmstat si/so >1024KiB/s"
+        },
+        "PASS": true
+      }
+    }
+  }
+}

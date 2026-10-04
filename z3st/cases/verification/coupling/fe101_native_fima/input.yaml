@@ -1,0 +1,66 @@
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+materials:
+  fuel: fuel.yaml
+  clad: clad.yaml
+regime: axisymmetric
+solver_settings:
+  max_iters: 60
+  relax_T: 0.9
+  relax_u: 0.3
+  relax_adaptive: true
+  relax_aitken: true
+  relax_growth: 1.1
+  relax_shrink: 0.6
+  relax_min: 0.03
+  relax_max: 0.9
+models:
+  thermal: true
+  mechanical: true
+  gap_conductance:
+    type: Gas
+    value: 15.8
+    relax: 0.5
+    contact_coupling:
+      enabled: false
+      meyer_hardness: 9.65e8
+      gas_thickness: 4.0e-06
+  contact:
+    surface_a: lateral_1
+    surface_b: inner_2
+    penalty_stiffness: 5.0e13
+    initial_gap: 0.00013
+mechanical:
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 0.0001
+  stag_tol: 0.0001
+  convergence: rel_norm
+thermal:
+  solver: linear
+  linear_solver: direct_mumps
+  rtol: 1.0e-05
+  stag_tol: 1.0e-05
+  convergence: rel_norm
+  analysis: stationary
+lhr:
+- 8780.0
+- 8780.0
+time:
+- 0.0
+- 12600000.0
+n_steps:
+- 20
+time_adaptivity:
+  enabled: true
+  dt_min: 10000.0
+  max_cuts: 8
+output:
+  format: vtu
+coupling:
+  native_fima:
+    enabled: true
+    material: fuel
+    axial_origin_cm: 10.2
+    history_path: ../../neutronics/fe101_10x10_depletion/preparation/high_statistics_40000_40_15/run_3500h_ED/postprocessing/zest_FIMA_2D_10x10.csv

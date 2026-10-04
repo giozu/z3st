@@ -1,0 +1,12 @@
+{
+  "PASS": true,
+  "no_solve": true,
+  "absolute_power_ownership": true,
+  "baseline_not_used": true,
+  "simultaneous_time": true,
+  "two_field_rollback": true,
+  "no_extrapolation": true,
+  "positive_conservative_nodal_BU_projection": true,
+  "projection_power_error_W": 5.729816621169448e-11,
+  "XDMF_DG0_export": true
+}
