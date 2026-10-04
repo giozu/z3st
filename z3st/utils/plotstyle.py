@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: shared matplotlib style for every figure the cases produce
 # Author: Giovanni Zullo
-# Version: 0.4.0 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """One house style for every plot in the repository.
 

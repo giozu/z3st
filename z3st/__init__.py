@@ -3,7 +3,7 @@
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
-Version: 0.4.0 (2026)
+Version: 0.4.1 (2026)
 --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 
@@ -12,7 +12,7 @@ from importlib import metadata
 try:
     __version__ = metadata.version("z3st")
 except metadata.PackageNotFoundError:
-    __version__ = "0.4.0"
+    __version__ = "0.4.1"
 
 try:
     from .utils import plotstyle as _plotstyle
