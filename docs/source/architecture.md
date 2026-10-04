@@ -7,9 +7,9 @@ contributes methods that read and write the shared state living on `Spine`
 (`u`, `T`, `D`, `porosity`, `burnup`, ...). None of the model classes is usable
 on its own.
 
-The diagrams below render natively on GitHub (Mermaid). They were extracted
-from the source with `pyreverse` and curated for readability — see
-[Regenerating](#regenerating) at the bottom.
+The diagrams below are Mermaid and render on GitHub. They are extracted from
+the source with `pyreverse` and reduced by hand (see
+[Regenerating](#regenerating)).
 
 ## Class diagram
 
@@ -90,6 +90,13 @@ classDiagram
     +cracking_active(material)
     +update_cracking()
   }
+  class CohesiveModel {
+    +coh_cfg
+    +_cohesive_step(...)
+    +strength_potential(p, q, material)
+    +sigma_cohesive(u, p, q, material)
+    +cohesive_bounds()
+  }
 
   class Config {
     +input_file, mesh_path, n_steps
@@ -124,6 +131,19 @@ classDiagram
   class NNConductivity {
     +value_and_grad(T_array)
   }
+  class GPRConductivity {
+    +value_and_grad(T_array, ...)
+  }
+  class MagniConductivity {
+    +value_and_grad(T_array, ...)
+  }
+  class make_external_operator {
+    <<function>>
+  }
+  class main {
+    <<module __main__>>
+    +main()
+  }
 
   Spine --|> ThermalModel
   Spine --|> MechanicalModel
@@ -135,17 +155,33 @@ classDiagram
   Spine --|> PorosityMigrationModel
   Spine --|> ClusterDynamicsModel
   Spine --|> CrackingModel
+  Spine --|> CohesiveModel
   Spine --|> Config
   Spine --|> FiniteElementSetup
   Spine --|> Solver
 
   Spine *-- MeshManager : mgr
-  MeshManager ..> load_mesh
-  MeshManager ..> MeshPlotter
-  Solver ..> NNConductivity
+  Spine ..> load_mesh
+  main ..> Spine
+  main ..> MeshPlotter : --mesh_plot
+  Spine ..> NNConductivity : load_from_card
+  Spine ..> GPRConductivity : load_from_card
+  Spine ..> MagniConductivity : load_from_card
+  ThermalModel ..> make_external_operator
+  GPRConductivity ..> MagniConductivity
 ```
 
 Legend: `--|>` inheritance (mixin), `*--` composition, `..>` uses.
+
+`Spine` has 14 parent classes: `Config`, `FiniteElementSetup`, `Solver` and 11
+physics models (`ThermalModel`, `MechanicalModel`, `GapModel`, `ContactModel`,
+`DamageModel`, `CohesiveModel`, `ClusterDynamicsModel`, `PlasticityModel`,
+`CreepModel`, `CrackingModel`, `PorosityMigrationModel`). The conductivity
+models are not parents: `Spine.load_materials` builds one from a material card
+whose `k` entry has `type: neural_network`, `gpr` or `magni`, and
+`ThermalModel` wraps it with `make_external_operator`
+(`models/nn_conductivity.py`) when `thermal.solver` is not `linear` (the cases use `newton`).
+`CohesiveModel` is described in the page on models under development.
 
 ## Module dependencies
 
@@ -155,50 +191,47 @@ flowchart TD
   spine --> fes[core/finite_element_setup.py]
   spine --> solver["core/solver.py<br/>loop + services"]
   spine --> manager[core/mesh/manager.py]
-  spine --> models["models/*.py<br/>10 physics mixins<br/>each owns its step"]
-  manager --> reader[core/mesh/reader.py]
-  manager --> plotter[core/mesh/plotter.py]
+  spine --> reader[core/mesh/reader.py]
+  spine --> models["models/*.py<br/>11 physics mixins<br/>each owns its step"]
+  main["__main__.py"] --> spine
+  main --> plotter[core/mesh/plotter.py]
   manager --> logger[utils/logger.py]
   reader --> logger
   plotter --> logger
   models -->|"_stagger_residual, _adapt_relax,<br/>get_solver_options, aitken_omega"| solver
-  models --> nn[models/nn_conductivity.py]
+  models --> nn["models/nn_conductivity.py<br/>gpr_conductivity.py<br/>magni_conductivity.py"]
 ```
 
-Note the arrow running from the models back to the solver. Each
-physics mixin owns its own staggered step — `_thermal_step`, `_mechanical_step`,
-`_damage_step`, `_cluster_step`, `_porosity_step` — and consumes the solver as a
-provider of services rather than being called into by it. `core/solver.py` went from
-1579 lines to 577 in that move; what remains is `solve_staggered` plus
+The models import helpers from the solver. Each physics mixin owns its
+staggered step (`_thermal_step`, `_mechanical_step`, `_damage_step`,
+`_cohesive_step`, `_cluster_step`, `_porosity_step`) and calls the solver's
+helpers. `core/solver.py` holds `solve_staggered` plus
 `get_solver_options`, `_stagger_residual`, `_adapt_relax`, `_bc_objects`,
 `_value_at_step`, `_build_measures`, and the module-level `as_bool`, `aitken_omega`
 and the three rigid-body nullspace builders.
 
 ## Design notes
 
-* **Composition root** — `Spine.solve()` drives the staggered coupling loop
-  provided by the `Solver` mixin; the physics mixins supply the residuals and
-  state updates it orchestrates, each in its own `_<physics>_step`.
-* **One flat namespace** — with 13 parent classes, a method-name collision
-  between two mixins resolves silently by MRO order. New model methods should
-  carry distinctive names (`creep_stress`, `sigma_plastic`), never generic ones
-  (`stress`, `update`). Zero collisions across the 13 mixins today (85 methods),
-  and `python -m z3st.utils.audit_checks mro` re-derives that in a second, so the
-  claim is reproducible rather than a note about a check someone once ran.
-* **Rank-symmetric Python state** — dolfinx's PETSc wrappers do collective work in
-  `__del__`, so if one MPI rank holds a different set of live Python objects the
-  collector orders those destructors differently and the run deadlocks at exit.
-  Anything installed per rank — an output filter, a cache, a debug hook — must be
-  the *same object shape* everywhere, differing only by a flag. See
-  `__main__.py::_install_stdout_filters`, which learned this the hard way.
-* **One output channel** — `print` and `log.*` both reach stdout, through the
-  markdown filter `__main__` installs, into `log_z3st.md`. `plot_convergence.py`
-  parses that file and CI dumps its tail on failure, so the filter's markers
-  (`## Step`, `#### Iteration`) and the residual strings `||ΔX||/||X|| = <float>`
-  are load-bearing, not cosmetic.
-* **The only composition** — `MeshManager` is held as `Spine.mgr` rather than
-  inherited, since mesh handling has a life of its own (readers, plotter,
-  diagnostics).
+* **Composition root.** `Spine.solve()` runs the staggered loop of the `Solver`
+  mixin. Each physics mixin supplies its residual and state update in its own
+  `_<physics>_step`.
+* **One flat namespace.** With 14 parent classes, a method-name collision
+  between two mixins is resolved by MRO order without a message. Model methods
+  carry distinctive names (`creep_stress`, `sigma_plastic`).
+  `python -m z3st.utils.audit_checks mro` lists any collision.
+* **Rank-symmetric Python state.** The PETSc wrappers of dolfinx do collective
+  work in `__del__`. If one MPI rank holds a different set of live Python
+  objects, the destructors run in a different order and the run deadlocks at
+  exit. An object installed per rank (output filter, cache, debug hook) has the
+  same type on every rank and differs only by a flag. See
+  `__main__.py::_install_stdout_filters`.
+* **One output channel.** `print` and `log.*` both reach stdout, through the
+  Markdown filter installed by `__main__`, into `log_z3st.md`.
+  `plot_convergence.py` parses that file, and CI prints its tail on failure. Both
+  parse the markers `## Step` and `#### Iteration` and the residual strings
+  `||ΔX||/||X|| = <float>`.
+* **The only composition.** `MeshManager` is held as `Spine.mgr`, not
+  inherited.
 
 ## Regenerating
 
@@ -212,7 +245,6 @@ pyreverse -o mmd -p z3st z3st.models z3st.core      # Mermaid text
 pyreverse -o html -p z3st z3st.models z3st.core     # standalone interactive page
 ```
 
-This produces `classes_z3st.mmd` / `packages_z3st.mmd`; paste the relevant
-parts into the fenced `mermaid` blocks above (the raw output is complete but
-noisy — the diagrams here are curated). Widen the scope with `z3st.coupling`
-or `z3st.materials` if needed.
+This writes `classes_z3st.mmd` and `packages_z3st.mmd`. The diagrams above are
+a hand-picked subset of them. Add `z3st.coupling` or `z3st.materials` to the
+command to include those packages.

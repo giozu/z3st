@@ -5,15 +5,15 @@
 <!-- ![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg) -->
 
 **Z3ST** is an open-source finite-element framework for thermo-mechanical material analysis, with nuclear fuel as its driving application.
-Developed in **Python** on **FEniCSx**, it couples heat conduction, small- and finite-strain mechanics, plasticity, creep, variational phase-field fracture, gap conductance and penalty contact in multi-material domains, under stationary or transient conditions and in 1D, 2D, 3D or axisymmetry.
-Materials live outside the numerical core: any property can be an importable Python callable that enters the weak form symbolically, so its consistent tangent follows by automatic differentiation.
+Written in Python on FEniCSx, it couples heat conduction, small- and finite-strain mechanics, plasticity, creep, hybrid phase-field fracture, gap conductance and penalty contact in multi-material domains, under stationary or transient conditions and in 1D, 2D, 3D or axisymmetry.
+Materials live outside the numerical core. The card keys `k`, `E`, `nu`, `Gc`, `eigenstrain`, `radial_profile`, `axial_profile` and `stress_function` accept the dotted path of an importable Python function. A function that returns a UFL expression enters the weak form symbolically, and its consistent tangent follows by automatic differentiation.
 
 ---
 
 ## Overview
 
-Z3ST supports coupled staggered thermo-mechanical analysis, handling arbitrary geometries, materials, and time-dependent power histories.
-It is designed to be **modular and extensible**, enabling rapid model development, integration with advanced solvers, and **easy coupling with external codes**.
+Z3ST solves coupled thermo-mechanical problems with a staggered scheme on Gmsh meshes, with one material card per region and a piecewise-linear power history.
+Each physics model is a mixin of the `Spine` class (see [`docs/source/architecture.md`](docs/source/architecture.md)). External codes are coupled through the same eigenstrain and source terms the internal models use (SCIANTIX, [`z3st/coupling/sciantix/`](z3st/coupling/sciantix/README.md)).
 
 ---
 
@@ -24,7 +24,7 @@ Clone the repository:
   git clone https://github.com/giozu/z3st.git
   ```
 
-Z3ST requires a working installation of FEniCSx (dolfinx), that is not installed via pip and must be obtained via Conda (or Docker).
+Z3ST requires FEniCSx (dolfinx), which is not installed by pip. Install it with Conda or use a Docker image.
 To install miniconda:
   ```bash
   mkdir -p ~/miniconda3
@@ -35,19 +35,19 @@ To install miniconda:
   conda init --all
   ```
 
-Create and activate the Conda environment (optional but recommended)
+Create and activate the Conda environment:
   ```bash
   cd z3st
   conda env create -f z3st_env.yml
   conda activate z3st
   ```
 
-Install in editable/development mode
+Install in editable mode:
   ```bash
   pip install -e .
   ```
 
-Then, it is possible to execute in each case folder, for instance:
+Run a case from its directory, for instance:
   ```bash
   cd ~/z3st/z3st/cases/verification/mechanics/uniaxial_tension/
   gmsh mesh.geo -3 > log_mesh.md
@@ -56,7 +56,7 @@ Then, it is possible to execute in each case folder, for instance:
   python3 ../../../../utils/plot_convergence.py
   ```
 
-Or, with less instructions:
+`./Allrun` runs the same commands:
   ```bash
   cd ~/z3st/z3st/cases/verification/mechanics/uniaxial_tension/
   ./Allrun
@@ -64,56 +64,54 @@ Or, with less instructions:
 
 Optional flags:
 
-* `python3 -m z3st --mesh_plot` → preview surface tags using PyVista
+* `python3 -m z3st --mesh_plot` opens a PyVista window with the mesh and its facet tags before solving
+* `python3 -m z3st --debug` prints every key of every material card after loading
 
 ---
 
 # Simulation Cases
 
-This directory contains example simulation setups (*cases*) used for verification, validation,
-and demonstration of the Z3ST thermo-mechanical solver.
+`z3st/cases` holds the simulation setups (*cases*) used for verification and demonstration.
 
-Each subfolder is a simulation case, including:
+Each case directory contains:
 - YAML input configuration (`input.yaml`)
 - Geometry and meshing definitions (`geometry.yaml`, `mesh.geo`)
 - Boundary conditions (`boundary_conditions.yaml`)
 - A non-regression test script (`non-regression.py`)
 - Reference results in `output/non-regression_gold.json`
 
-These cases serve both as:
-- regression tests,
-- and examples for new users.
+The cases are the regression tests and the worked examples.
 
 ---
 
 ## Key features
 
-* **Coupled thermo-mechanical solver** — heat conduction (stationary or transient, backward Euler) and mechanics with staggered coupling; adaptive or Aitken Δ² dynamic relaxation, per-step form caching, optional gap-conductance damping
-* **Adaptive time-stepping** — optional, off by default; when a step stalls under strongly coupled non-linear physics the solver snapshots the converged state, bisects `dt`, and re-solves the step as internal sub-steps (output stays on the original grid), aborting only if it cannot converge at `dt_min`
-* **Hot-reloadable parameters** — an allow-listed subset of `input.yaml` (tolerances, relaxation factors, `max_iters`) can be edited mid-run and is picked up at the next step boundary, for steering long simulations without restarting
-* **Multi-regime kinematics** — `1d`, `2d` plane strain, `3d` and `axisymmetric` available through a single configuration entry (the axisymmetric weight `w = 2πr` and cylindrical strain components are handled internally)
-* **Constitutive laws** — small-strain isotropic Lamé, anisotropic Voigt (user-supplied 6×6 stiffness), Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for user-supplied UFL stress functions (used by the crystal-plasticity demo)
-* **Phase-field fracture** — variational AT1 and AT2 models with Miehe spectral, Amor volumetric/deviatoric or star-convex energy splits, irreversibility enforcement, and the Ambati-Gerasimov-De Lorenzis hybrid constraint
-* **Penalty contact** — between disjoint bodies, coupled to the gap conductance so contact is felt thermally as well as mechanically; verified against the analytical Lamé interference fit and against Esposito's creep-relaxing shrink fit
-* **Porosity migration** — thermal-gradient-driven pore advection feeding back on the thermal problem through a porosity-dependent conductivity and a rescaled volumetric source; streamline-upwind (default), SUPG, or DG-1 upwind + SIPG with SSP-RK3 and a vertex limiter
-* **Data-driven material laws** — thermal conductivity supplied as a trained model rather than a correlation: the Magni MA-MOX correlation, a Gaussian-process correction on its logarithmic residual, and a PyTorch neural network. Any object with a `(k, dk/dT)` two-method contract qualifies, run either as a lagged Picard iteration or fully coupled through a `dolfinx-external-operator` Newton scheme evaluating the model at quadrature points
-* **SCIANTIX coupling** — mesoscale fission-gas behaviour driven per fuel point through the same eigenstrain and source channels the internal models use, returning gaseous swelling and fission gas release (requires a compiled SCIANTIX shared library; see [`z3st/coupling/sciantix/`](z3st/coupling/sciantix/README.md))
-* **Creep** — implicit Norton + Arrhenius via the incremental variational principle (radial return condensed onto the displacement space, exact consistent tangent by automatic differentiation), with an optional flux-driven irradiation-creep term for in-pile cladding
-* **Fuel cracking** — Isotropic softening: the number of macro-cracks follows the rod-average linear heat rate and rescales the fuel elastic constants, irreversibly
-* **Engineering fuel behaviour** — burnup-driven solid and gaseous swelling with early-life densification (eigenstrain bus), UO₂ k(T) in the modified-NFI form adopted by FRAPCON-3 at zero burnup (burnup degradation not included), rim-peaking radial and chopped-cosine/tabulated axial power profiles
-* **Multi-material domains** — independent thermal, mechanical, and damage properties per material; per-cell-tag integration measures handle interfaces naturally
-* **Volumetric heating** — fissile (LHR/area), analytic γ-heating decay in rectangular / cylindrical / spherical geometry, or arbitrary user-defined `q'''(x)`
-* **Flexible boundary conditions** — thermal (Dirichlet / Neumann / Robin with convective or gap-coupled mode), mechanical (Dirichlet vector / per-component / Neumann / Clamp / Slip), damage (Dirichlet); step-dependent value histories on mechanical BCs
-* **Gap conductance model** — `Fixed` or `Gas` (`k_gas = c·10⁻⁴·T_gap^0.79`); paired facet groups, mean centroid gap-size computed once via SciPy cKDTree
-* **1D cluster dynamics** — defect-cluster size-distribution solver: implicit-Euler DG1 with upwind interior-facet flux and SIPG diffusion, with mass-conservation rescaling
-* **Python material modules** — temperature-dependent `k(T)`, spatially-graded `Gc(x)`, user-supplied stress functions, all loaded via `importlib` at runtime
-* **Material database** — YAML-based cards (`materials/`): UO₂, multiple steel families (austenitic, martensitic, high-carbon, T91, 15-15Ti, vessel), Zircaloy, ceramics, oxides, plastic, lead, H₂O
-* **Mesh input** — Gmsh `.msh` files or YAML-driven mesh builder; reusable Gmsh templates under `utils/geo_files/`
-* **YAML-driven configuration** — three plain-text files per case (`input.yaml`, `geometry.yaml`, `boundary_conditions.yaml`); reproducible, diffable, version-controllable
-* **Parallel performance** — PETSc with MUMPS / GAMG / HYPRE BoomerAMG, MPI via `MPI.COMM_WORLD`. Cases run under `mpirun` and are checked by hand; note that **neither suite exercises this** — every case in `non-regression_local.sh` and in `cases_ci.txt` runs serially, so a parallel-only regression would not be caught automatically
-* **Post-processing ecosystem** — VTU and XDMF time-series output through a unified writer that pre-compiles all interpolation expressions once at setup; ParaView- and PyVista-compatible
-* **Continuous integration** — per-case `non-regression.py` vs. version-controlled gold JSON, summarised on every commit via GitHub Actions
-* **Documented API** — Sphinx sources under `docs/source/`, built by GitHub Actions; UML class diagram in [`docs/source/architecture.md`](docs/source/architecture.md)
+* **Coupled thermo-mechanical solver.** Heat conduction (stationary, or transient with backward Euler) and mechanics, coupled by a staggered scheme. Adaptive or Aitken Δ² relaxation, per-step form caching, optional gap-conductance damping.
+* **Adaptive time-stepping.** Off by default. A step that does not converge is rolled back to the last converged state, its `dt` is halved, and it is solved as sub-steps. Output stays on the original grid. The run stops if a step fails at `dt_min`.
+* **Hot-reloadable parameters.** Tolerances, relaxation factors and `max_iters` in `input.yaml` are re-read at the start of every step.
+* **Regimes.** `1d`, `2d` plane strain, `3d` and `axisymmetric`, selected by one key. The axisymmetric weight `w = 2πr` and the hoop strain are built in.
+* **Constitutive laws.** Small-strain isotropic Lamé, Neo-Hookean hyperelasticity (SNES Newton with line search), J2 plasticity with linear isotropic hardening, and a `custom` hook for a user UFL stress function (used by the crystal-plasticity demo).
+* **Phase-field fracture.** AT1 and AT2 in the hybrid formulation of Ambati et al. (2015). The stress is fully degraded and the positive part of the energy drives the crack. Miehe spectral, Amor volumetric/deviatoric or star-convex split, irreversibility through a history field, and the hybrid constraint against damage in compression.
+* **Penalty contact.** Between two concentric bodies separated by a uniform gap. One contact pressure per surface pair, from the surface-averaged gap, coupled to the gap conductance. Verified against the Lamé interference fit and, for creep relaxation, against an independent radial J2 solution (`reference_1d.py` in `z3st/cases/verification/fuel/creep_shrink_fit_2D`).
+* **Porosity migration.** Temperature-gradient-driven pore advection. The porosity enters the thermal problem through a porosity-dependent conductivity and a rescaled volumetric source. Streamline-upwind (default), SUPG, or upwind DG-1 with SSP-RK3 and a vertex limiter. An SIPG diffusion block is optional and off by default.
+* **Data-driven conductivity.** The Magni MA-MOX correlation, a Gaussian-process correction on its logarithmic residual, and a PyTorch neural network. Any object with the two-method `(k, dk/dT)` interface can be used, either in a lagged Picard iteration or in a Newton scheme through `dolfinx-external-operator`, evaluated at quadrature points.
+* **SCIANTIX coupling.** Fission-gas behaviour computed per fuel point by SCIANTIX through the eigenstrain and source terms the internal models use. It returns gaseous swelling and fission gas release. Requires a compiled SCIANTIX shared library, see [`z3st/coupling/sciantix/`](z3st/coupling/sciantix/README.md).
+* **Creep.** Implicit Norton creep with Arrhenius temperature dependence, through the incremental variational principle (radial return condensed onto the displacement space, consistent tangent by automatic differentiation). Optional flux-driven irradiation creep.
+* **Fuel cracking.** Isotropic softening. The number of radial cracks follows the rod-average linear heat rate and rescales the fuel elastic constants, without recovery.
+* **Fuel behaviour.** Burnup-driven solid and gaseous swelling with early-life densification as an eigenstrain. UO₂ k(T) in the modified NFI form of FRAPCON-3 at zero burnup (no burnup degradation). Rim-peaking radial and chopped-cosine or tabulated axial power profiles.
+* **Multi-material domains.** Thermal, mechanical and damage properties per material, integrated with one measure per cell tag.
+* **Volumetric heating.** Fissile materials receive LHR/area, optionally shaped by radial and axial profiles. Gamma heating with exponential decay in rectangular, cylindrical or spherical geometry.
+* **Boundary conditions.** Thermal: Dirichlet, Neumann, Robin (convective or gap pair). Mechanical: Dirichlet (vector or one component), Neumann, Clamp, Slip. Damage: Dirichlet. Thermal Dirichlet and mechanical values can be lists with one value per time point.
+* **Gap conductance.** `Fixed` or `Gas` (`k_gas = c·10⁻⁴·T_gap^0.79`) between paired facet groups. The gap width is the contact model's current gap when contact is on, otherwise the mean distance between the two surfaces from a SciPy cKDTree, recomputed at every call.
+* **1D cluster dynamics.** Cluster size-distribution solver: implicit-Euler DG1 with upwind interior-facet flux and SIPG diffusion, with a rescaling that conserves the total cluster mass.
+* **Python material functions.** Temperature-dependent `k(T)`, spatially graded `Gc(x)`, eigenstrains, power profiles and stress functions, imported with `importlib` at start-up.
+* **Material cards.** YAML cards in `z3st/materials`: UO₂, MA-MOX, steels (austenitic, martensitic, high-carbon, T91, 15-15Ti, vessel), Zircaloy-4, ceramic, oxide, plastic, lead, H₂O. The values are representative, chosen for the demonstration and verification cases, and are not qualified design data. See [`z3st/materials/README.md`](z3st/materials/README.md).
+* **Mesh input.** Gmsh `.msh` files. Gmsh templates under `z3st/utils/geo_files/`.
+* **Configuration.** Three YAML files per case: `input.yaml`, `geometry.yaml`, `boundary_conditions.yaml`.
+* **Parallel runs.** PETSc with MUMPS, GAMG or HYPRE BoomerAMG, MPI over `MPI.COMM_WORLD`. Neither test suite runs a case under MPI: every case in `non-regression_local.sh` and in `cases_ci.txt` runs on one rank, so a regression specific to parallel runs is not detected.
+* **Output.** VTU or XDMF time series through one writer that compiles its interpolation expressions at setup. Readable by ParaView and PyVista.
+* **Continuous integration.** GitHub Actions runs the cases listed in `cases_ci.txt` on every push to `main`, `develop` and `development/*` and on every pull request. Each case's `non-regression.py` compares its metrics with a version-controlled gold JSON.
+* **Documentation.** Sphinx sources under `docs/source/`, built by GitHub Actions. UML class diagram in [`docs/source/architecture.md`](docs/source/architecture.md).
 
 ---
 
@@ -147,14 +145,19 @@ z3st/                                # repository root
     │       └── plotter.py
     ├── models/                      # physics mixins plugged into Spine
     │   ├── thermal_model.py
-    │   ├── mechanical_model.py      # lame / voigt / hyperelastic / plasticity / custom
-    │   ├── damage_model.py          # AT1 / AT2, Miehe / Amor splits, hybrid constraint
+    │   ├── mechanical_model.py      # lame / hyperelastic / plasticity / custom
+    │   ├── damage_model.py          # AT1 / AT2, Miehe / Amor / star-convex splits, hybrid constraint
+    │   ├── cohesive_model.py        # cohesive phase-field fracture (under development)
     │   ├── plasticity_model.py      # J2 + custom CP hook
     │   ├── creep_model.py           # implicit Norton + irradiation creep, AD tangent
-    │   ├── cracking_model.py        # Isotropic-softening fuel cracking
+    │   ├── cracking_model.py        # isotropic-softening fuel cracking
     │   ├── contact_model.py         # penalty pellet-clad contact (PCMI)
     │   ├── gap_model.py             # Fixed / Gas gap conductance + contact coupling
-    │   └── cluster_dynamic_model.py # 1D advection–diffusion (DG + SIPG + upwind)
+    │   ├── porosity_migration_model.py  # pore migration, CG (SU / SUPG) or DG + SSP-RK3
+    │   ├── cluster_dynamic_model.py # 1D advection-diffusion (DG + SIPG + upwind)
+    │   ├── nn_conductivity.py       # neural-network k(T), external operator
+    │   ├── gpr_conductivity.py      # Gaussian-process correction of the Magni k
+    │   └── magni_conductivity.py    # Magni MA-MOX k
     ├── coupling/                    # external-code coupling (e.g. SCIANTIX fission gas)
     ├── materials/                   # YAML cards + Python callables
     │   ├── steel.yaml, austenitic_steel.yaml, ..., vessel_steel.yaml
@@ -174,17 +177,17 @@ z3st/                                # repository root
     ├── ai/                          # agent onboarding (PROMPT.md, CONTEXT.md)
     ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
     ├── examples/                    # minimal didactic setups
-    └── cases/                       # 73 cases carrying a non-regression gold
+    └── cases/                       # 70 cases carrying a gold, 65 in the local suite
         ├── verification/            # single-effect checks against a closed-form solution
         │   ├── thermal/             #   slabs, shells, heated box
         │   ├── mechanics/           #   Lamé, GPS, Mariotte, cylinders, cavities
         │   ├── plasticity/          #   J2 hardening, crystal-plasticity demo
         │   └── fuel/                #   swelling, burnup, creep, conductivity, law discovery
         ├── benchmarks/              # literature reproducers (Ambati SENT/SENS, McClenny
-        │   └── damage/              #   pellet quench, Kamagate plate) — all damage ones here
-        ├── regression/              # integrated multi-physics configurations with no single
-        │                            # closed-form answer; some do carry partial analytic
-        │                            # references, all are guarded by a blessed gold
+        │   └── damage/              #   pellet quench, Kamagate plate), all damage cases
+        ├── regression/              # multi-physics configurations without a closed-form
+        │                            # solution; some carry partial analytical references,
+        │                            # all carry a gold
         ├── studies/                 # parametric sweeps (mesh sensitivity, attenuation map)
         ├── sandbox/                 # work in progress (never in the suite)
         ├── teaching/
@@ -248,7 +251,6 @@ thermal:
 
 # damage:                          # uncomment when damage is on
 #   type: AT2                      # AT1 | AT2
-#   solver: linear
 #   linear_solver: iterative_hypre
 #   rtol: 1.0e-6
 #   stag_tol: 1.0e-3
@@ -275,123 +277,99 @@ output:
 
 ---
 
-## Post-processing and visualization
+## Post-processing and visualisation
 
-Z3ST provides a flexible, Python-based post-processing environment that can be used directly or extended by the user.
-Displacement, temperature, and stress fields can be extracted, analyzed, and visualized through built-in utilities or custom scripts.
-Full compatibility with **ParaView** and **PyVista** enables both automated and interactive visualization workflows.
+The output files open in ParaView and PyVista. The Python utilities below extract fields from them for scripted analysis.
 
 | Tool                   | Description                                                                             |
 | ---------------------- | --------------------------------------------------------------------------------------- |
 | `writer.py`            | Unified `OutputWriter`: per-step VTU files or single-file XDMF time series              |
 | `utils_extract_vtu.py` | Extracts scalar/vector fields and stress components from VTU outputs                    |
-| `utils_plot.py`        | Generates 1D and radial plots (e.g. T(r), σ<sub>rr</sub>(r)) and can be easily extended |
+| `utils_plot.py`        | Generates 1D and radial plots (e.g. T(r), σ<sub>rr</sub>(r))                            |
 | ...                    | ...                                                                                     |
 
 
-These tools, together with other Python utilities, provide a complete post-processing ecosystem for field analysis and visualization.
-
 ---
 
-## Capabilities beyond YAML
+## Python material functions
 
-While Z3ST supports full configuration through YAML files for reproducibility and ease of use, the framework is deliberately designed to extend far beyond YAML-based inputs.
+A material card can give a property as the dotted path of a Python function in place of a number (see [`z3st/materials/README.md`](z3st/materials/README.md) and the Usage page of the documentation). The function receives the current fields, for example the temperature, and returns a UFL expression that enters the weak form. Examples in the repository:
 
-### External Python material models
-Material behaviour does not need to be hard-coded or restricted to values inside YAML files.
-Z3ST natively supports **Python-based material modules**, allowing users to implement:
+- temperature-dependent conductivity (`materials/fuel_thermal.py`, `materials/magni_mox_thermal.py`)
+- a spatially graded fracture energy (`materials/oxide.py`)
+- burnup-driven swelling eigenstrains (`materials/fuel_swelling.py`, `materials/sciantix_swelling.py`)
+- a crystal-plasticity stress function in a case directory (`verification/plasticity/crystal_single_grain`)
+- trained conductivity models (`type: neural_network` or `gpr` in the `k` block)
 
-- temperature-dependent constitutive laws
-- empirical or semi-empirical correlations
-- nonlinear stress–strain behaviour
-- surrogate models and neural networks
-- models depending on local fields (e.g., temperature, gradients)
+## Development roadmap
 
-These Python modules are automatically loaded and integrated into the finite-element formulation at runtime.
-
-### Integration with FEniCSx ecosystem
-Z3ST is designed to interoperate with the wider FEniCSx ecosystem, with planned integration of:
-
-- **`dolfinx_mpc`** for multi-point constraints and advanced boundary-condition enforcement
-- **`dolfinx_materials`** for standardised material libraries and automatically tabulated thermal/mechanical properties
-
-This allows the framework to grow toward more general multiphysics and nonlinear-modelling workflows.
-
-### Microstructure and multi-scale workflows
-Z3ST is also envisaged to integrate with external tools for:
-
-- synthetic microstructure generation (e.g., **Merope**)
-- **rate-theory solvers** for irradiation-driven defect evolution
-- **Monte Carlo workflows** for stochastic microstructural processes
-
-These extensions aim to connect Z3ST to multi-scale modelling pipelines involving microstructure → mesoscale → continuum thermo-mechanics.
-
-### Development roadmap
-
-* Frictional and mortar contact (current contact is penalty, uniform-pressure)
-* Monolithic phase-field Newton for spontaneous crack nucleation
+* Frictional and mortar contact (the current contact is penalty with a uniform pressure)
+* Monolithic phase-field Newton solver for crack nucleation
+* Multi-point constraints with `dolfinx_mpc`
+* Material libraries through `dolfinx_materials`
 * Coupling with microstructure generators (Mérope)
-* Advanced cluster dynamics (1D, nucleation)
-* Coupling with rate-theory codes
+* Cluster dynamics with nucleation
+* Coupling with rate-theory codes and Monte Carlo workflows
 
 ## Reproducing the results
 
-THe main results comes from a case that ships here.
-Run `./Allrun` in the directory, then `python3 non-regression.py`.
+The main results come from cases in this repository. Run `./Allrun` in the case directory. It meshes the case, runs Z3ST and then `non-regression.py`.
 
 | Result | Case directory |
 |---|---|
 | Integral fuel rod: gap closure, PCMI, temperature | `z3st/cases/regression/pwr_rod_2D` |
 | The same rod with the SCIANTIX coupling active | `z3st/cases/regression/fg_test_2D` |
 | Phase-field damage after a cold-bath quench | `z3st/cases/benchmarks/damage/pellet_quench_2D_xy` |
-| Radial porosity profile, CG and DG discretisations | `z3st/cases/verification/fuel/porosity_migration_dg` |
+| Radial porosity profile, CG and DG discretisations | `z3st/cases/verification/fuel/porosity_migration` (CG), `z3st/cases/verification/fuel/porosity_migration_dg` (DG) |
 | Penalty contact vs. the analytical Lame interference fit | `z3st/cases/verification/fuel/shrink_fit` |
+| Three-dimensional contact vs. the Lamé interference pressure | `z3st/cases/verification/fuel/shrink_fit_disk_3d` |
+| Contact-pressure relaxation by creep vs. an independent radial J2 solution | `z3st/cases/verification/fuel/creep_shrink_fit_2D` |
+| Three-dimensional gamma-heated spherical shell, mesh convergence | `z3st/cases/verification/thermal/spherical_shell` (`mesh_convergence.py`) |
+| Two-dimensional mesh convergence of temperature and stress | `z3st/cases/studies/mesh_sensitivity_2D` |
+| Gaussian-process posterior propagated to the melting margin | `z3st/cases/studies/gpr_uq_margin` (`run.py`) |
 
 ---
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
-Before committing, run the static checks — twelve of them, 2.4 s, no simulation:
+Before committing, run the fifteen static checks. They take a few seconds and run no simulation:
 
 ```bash
 python -m z3st.utils.audit_checks          # all; --list explains each one
 python -m z3st.utils.audit_checks deps     # or one by name
 ```
 
-They cover the things that are true of the tree itself and would otherwise surface
-minutes later on CI: a model no gold-carrying case reaches, a disabled or tautological
+They check the tree itself: a model no gold-carrying case reaches, a disabled or tautological
 verdict, a case that writes a verdict with no gold, a NaN in a gold, an undefined name, a
 dependency imported by library code but not declared, a method name colliding across
-`Spine`'s 13 mixins, a stale case path in the docs, a broken path in a driver, a shell
-syntax error in any of the 166 shell files, and a script the CI workflow invokes but that
-does not exist. None of them runs anything in parallel.
+`Spine`'s 14 parent classes, a stale case path in the docs, a broken path in a driver, a shell
+syntax error in any shell file, and a script the CI workflow invokes that does not exist.
 
-To have git refuse a commit they reject, once per clone:
+To make git refuse a commit the checks reject (once per clone):
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-A green run means "no known static defect". It does **not** mean the code works: no case
-is run, no gold is judged, no convergence is checked. That is what
-`z3st/cases/non-regression_local.sh` is for.
+A pass means that no static defect was found. The checks run no case, compare no gold and
+check no convergence. `z3st/cases/non-regression_local.sh` runs the cases.
 
 ## Contributor acknowledgements
 
 Beyond the author, the following people have contributed to Z3ST:
 
-* **Romain Turgis** (ENSTA Paris) — the `verification/fuel/creep_shrink_fit_2D`
-  case and its analysis scripts, verifying the relaxation of the pellet–cladding
-  contact pressure by Norton creep against the closed form of Esposito et al.,
+* **Romain Turgis** (ENSTA Paris): the `verification/fuel/creep_shrink_fit_2D`
+  case and its analysis scripts, on the relaxation of the pellet–cladding
+  contact pressure by Norton creep, with the closed form of Esposito et al.,
   *Int. J. Pressure Vessels and Piping* **185** (2020) 104126.
-  Internship at Politecnico di Milano, 2026-05-25 → 2026-07-31.
+  Internship at Politecnico di Milano, 2026-05-25 to 2026-07-31.
 
 ---
 
 ## FEniCSx project acknowledgement
 
-Z3ST is built on the **FEniCSx** ecosystem. Recommended citations include:
+Z3ST is built on the FEniCSx ecosystem. Recommended citations include:
 
 ### DOLFINX
 
@@ -445,9 +423,8 @@ Z3ST is built on the **FEniCSx** ecosystem. Recommended citations include:
 
 ### External operators (optional, neural-network material laws)
 
-The neural-network material-law feature builds on **dolfinx-external-operator**
-(LGPL-3.0, https://github.com/a-latyshev/dolfinx-external-operator), gratefully
-acknowledged:
+The Newton route for data-driven conductivity builds on **dolfinx-external-operator**
+(LGPL-3.0, https://github.com/a-latyshev/dolfinx-external-operator):
 
 ```bibtex
 @article{latyshev2025externaloperators,
@@ -479,14 +456,11 @@ If you use Z3ST in your research, please cite the archived software:
 }
 ```
 
-That DOI is the concept DOI: it covers every release and always resolves to the
-most recent one, so it stays correct as the code moves. Cite it when you mean
-"Z3ST". If you need to pin the exact code behind a result, take the version DOI
-from the Zenodo page of the release you used instead, and give the version
-number with it.
+This is the concept DOI. It covers every release and resolves to the most recent
+one. To cite the exact code behind a result, use the version DOI from the Zenodo
+page of the release you used, and give the version number.
 
-A software paper describing the framework is in preparation; this section will
-name it once it is published.
+A software paper describing the framework is in preparation.
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano

@@ -23,7 +23,7 @@ Checked against references:
   * ``burnup_avg_final`` and ``burnup_max_final``, below.
 
 Esposito eq. (21) is evaluated by plots.py and printed here, not asserted.
-With the Tresca criterion of its hub it relaxes about 5 % faster than the J2
+With the Tresca criterion of its hub it falls about 3 % below the J2
 solution, the conservative direction its authors report.
 
 

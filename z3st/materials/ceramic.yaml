@@ -1,7 +1,7 @@
 name: ceramic
 fissile: true
 
-E: 170e+9        # (GPa)
+E: 170e+9        # (Pa)
 nu: 0.29         # -
 k: materials.ceramic.k # (W/m-K)
 cp: 330.0        # (J/kg-K)

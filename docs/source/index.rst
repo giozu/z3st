@@ -1,69 +1,102 @@
 Z3ST
 ====
 
-**Z3ST** (pronounced *zest*) is an open-source finite-element framework built on **FEniCSx** for coupled thermo-mechanical analysis and multiphysics simulations, with nuclear fuel as its driving application.
-
-Designed for scientific research, engineering applications, and educational purposes, Z3ST provides a clean, modular interface for:
-
-- **Coupled thermo-mechanical simulations** with staggered solution schemes, in 1D, 2D, 3D and axisymmetry
-- **Phase-field fracture mechanics** (AT1/AT2, with Miehe spectral, Amor or star-convex energy splits)
-- **Plasticity and creep**, including implicit Norton creep with an exact consistent tangent by automatic differentiation
-- **Gap conductance and penalty contact**, coupled so that contact is felt thermally as well as mechanically
-- **Fuel behaviour** — burnup, swelling, densification, cracking, and thermal-gradient-driven porosity migration
-- **Data-driven material laws** — neural-network, Magni MA-MOX and Gaussian-process-corrected thermal conductivity, run through a lagged Picard iteration or a fully coupled external-operator Newton scheme
-- **External-code coupling** — SCIANTIX for mesoscale fission-gas behaviour
-- **Cluster dynamics** for defect evolution in irradiated materials
-- **Multi-material domains** with complex geometries
-- **Automatic differentiation** for inverse problems and optimization
-
-Key Features
-^^^^^^^^^^^^
-
-Z3ST is designed with a strong focus on:
-
-- **Ease of use** — Full YAML-based configuration, no code modification needed
-- **Numerical reproducibility** — Comprehensive non-regression testing suite
-- **Extensibility** — Clean Python API for custom models and workflows
-- **Interoperability** — Uses standard tools (Gmsh, ParaView, FEniCSx)
-- **Scientific transparency** — Open-source with complete documentation
-
-What Makes Z3ST Different?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-1. **Zero-boilerplate simulations**: Configure everything via YAML files
-2. **Built-in material database**: Pre-defined properties for common materials
-3. **Verification-first approach**: Every feature has benchmark cases
-4. **Graduate student friendly**: Extensive documentation and examples
-5. **Research-ready**: Differentiable formulations for inverse problems
+**Z3ST** (pronounced *zest*) is an open-source finite-element framework for
+coupled thermo-mechanical and fracture analysis of nuclear materials, written
+in Python on FEniCSx (dolfinx 0.11.0). This documentation describes version
+0.4.1.
 
 Overview
 --------
 
-Z3ST integrates the following main modules:
+A simulation is a case directory of plain-text files: ``input.yaml`` (active
+models, regime, solver settings, power history), ``geometry.yaml``,
+``boundary_conditions.yaml``, one YAML card per material and a Gmsh
+``mesh.geo``. A material property can be a number or the dotted path of a
+Python function, which is imported at load time and returns a UFL expression
+that enters the weak form.
 
-- :mod:`z3st.core.solver` - FEM solver interface for thermal and mechanical problems
-- :mod:`z3st.models` - physics models (mechanical, thermal, phase-field fracture, cluster dynamics, etc.)
-- :mod:`z3st.core.mesh.manager` - geometry and mesh generation utilities
-- :mod:`z3st.core.config` - YAML-based parameter management
-- :mod:`z3st.utils.writer` - unified VTU / XDMF output writer and post-processing tools
-- :mod:`z3st.utils.utils_load` - I/O helpers for simulation data
+The same driver runs 1D, 2D plane-strain, 2D axisymmetric and 3D problems,
+selected by the ``regime`` entry. The models available are:
 
-The framework supports both steady-state and transient analyses,
-and includes a collection of benchmark problems to ensure
-consistency across versions.
+- steady and transient heat conduction with Dirichlet, Neumann and Robin
+  conditions, and gap conductance between paired surfaces;
+- small-strain isotropic elasticity, Neo-Hookean hyperelasticity, J2
+  plasticity with linear isotropic hardening, Norton thermal creep and
+  irradiation creep, and user-supplied stress functions;
+- phase-field fracture in AT1 and AT2 forms, in the hybrid formulation of
+  Ambati et al., with the volumetric-deviatoric, spectral or star-convex split
+  of the crack driving energy;
+- fuel models: burnup accumulation, solid and gaseous swelling, densification,
+  UO\ :sub:`2` conductivity in the modified NFI form at zero burnup,
+  isotropic-softening pellet cracking and porosity migration driven by the
+  temperature gradient;
+- penalty contact between two concentric bodies separated by a uniform gap,
+  with the contact pressure entering the gap conductance;
+- 1D cluster dynamics, with the distribution rescaled after each step to
+  conserve the total cluster mass;
+- thermal conductivity from a neural network or a Gaussian-process correction
+  of the Magni MA-MOX correlation, and fission gas behaviour from SCIANTIX
+  through an eigenstrain.
+
+The fields are solved in a staggered loop within each time step, in the order
+temperature, displacement, damage, cluster, porosity. Section
+:doc:`verification` lists the verification cases and their errors, and
+:doc:`in_development` the models that are in the code but not described in the
+software paper.
+
+Scope and limitations
+---------------------
+
+Z3ST 0.4.1 is verified against analytical solutions and compared with
+TRANSURANUS and OFFBEAT for one fuel rod segment. It has not been validated
+against integral irradiation experiments. The following are not available:
+
+- burnup degradation of the UO\ :sub:`2` thermal conductivity;
+- a coupling between damage and thermal conductivity;
+- plastic work as a fracture driving force (plasticity and damage cannot be
+  combined in one run, and neither can creep and damage or creep and
+  plasticity);
+- cohesive-zone fracture;
+- anisotropic elasticity;
+- periodic boundary conditions;
+- frictional contact.
+
+Contact is limited to concentric bodies with a uniform gap: the contact
+pressure is one scalar per surface pair, computed from the surface-averaged gap.
+J2 plasticity is limited to materials without eigenstrain.
+
+Main modules
+------------
+
+- :mod:`z3st.core.spine` - the ``Spine`` driver, which inherits the solver and
+  every physics model
+- :mod:`z3st.core.solver` - staggered loop, relaxation and solver options
+- ``z3st.models`` - one module per physics model
+- :mod:`z3st.core.mesh.manager` - holds the loaded mesh with its cell and facet
+  tags and resolves tag labels (meshes are read by :mod:`z3st.core.mesh.reader`)
+- :mod:`z3st.core.config` - reads ``input.yaml``
+- :mod:`z3st.utils.writer` - VTU and XDMF output
+- :mod:`z3st.utils.utils_load` - YAML loading and power-history helpers
 
 Citing Z3ST
 -----------
 
-If you use **Z3ST** in your research, please cite it as:
+If you use Z3ST, cite the archived software:
 
 .. code-block:: text
 
    Giovanni Zullo (2026).
-   Z3ST: an open-source FEniCSx framework for thermo-mechanical analysis.
-   Version 0.3.2. https://doi.org/10.5281/zenodo.17748028
+   Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis.
+   Version 0.4.1. https://doi.org/10.5281/zenodo.17748028
 
-Documentation Contents
+The concept DOI 10.5281/zenodo.17748028 covers every release and resolves to
+the most recent one. Each release also has its own version DOI, listed on that
+Zenodo record (release 0.4.0: 10.5281/zenodo.23023124). The git tags ``course-2627.0`` and ``course-2627.1`` mark the
+releases used in the course Nuclear Design and Technology at Politecnico di
+Milano, academic year 2026-27.
+
+Documentation contents
 ----------------------
 
 .. toctree::
@@ -84,12 +117,14 @@ Documentation Contents
    physics_models
    staggered_theory
    examples
+   verification
 
 .. toctree::
    :maxdepth: 2
    :caption: Advanced Features
 
    differentiable_features
+   in_development
    api
 
 .. toctree::
@@ -102,10 +137,6 @@ Documentation Contents
 Support and contact
 -------------------
 
-If you encounter issues, please open a GitHub issue:
+Issues: https://github.com/giozu/z3st/issues
 
-   https://github.com/giozu/z3st/issues
-
-For academic or collaborative inquiries, contact:
-
-   **Giovanni Zullo** — <mailto:giovanni.zullo@polimi.it>
+Contact: Giovanni Zullo, giovanni.zullo@polimi.it

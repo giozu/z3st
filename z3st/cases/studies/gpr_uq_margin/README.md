@@ -7,8 +7,11 @@ The same high-rated MA-MOX pin (45 kW/m, surface held at 650 K) is solved at
 `k = k_Magni * exp(mean + xi * sigma)`. `run.py` reports the centre temperature
 and the margin to the MOX solidus (Adamson et al., JNM 130 (1985) 349).
 
-The width of the spread is set by the posterior of the *synthetic* fit shipped
-with `studies/magni_gpr_conductivity`, not by measured MA-MOX data: what is
-demonstrated is the propagation, not the uncertainty of any real correlation.
+The card uses `mode: affine`. The width of the spread is set by the posterior of
+the synthetic fit built by `studies/magni_gpr_conductivity/make_synthetic_gpr.py`
+(called by `Allrun`). No measured MA-MOX data enter. The case shows the
+propagation of a posterior, not the uncertainty of a real correlation.
+
+Not in the suite (no gold). Outputs: `output/uq_margin.png`, `output/uq_margin.npz`.
 
 Run: `./Allrun`
