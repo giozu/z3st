@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.4.0 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 """Static consistency checks over the repository. Runs in seconds, solves nothing.
@@ -318,7 +318,8 @@ def check_docs():
             if ".git" not in str(p)]
 
     # a) case paths cited in prose
-    cited = re.compile(r"`((?:verification|regression|benchmarks|studies|teaching|sandbox)/[\w/]+)`")
+    # with or without a leading cases/ or z3st/cases/
+    cited = re.compile(r"`(?:z3st/)?(?:cases/)?((?:verification|regression|benchmarks|studies|teaching|sandbox)/[\w/]+)`")
     for p in docs:
         text = p.read_text()
         for match in set(cited.findall(text)):
@@ -358,7 +359,7 @@ def check_docs():
 def check_mro():
     """Method-name collisions between Spine's parent classes.
 
-    ``Spine`` multiply-inherits 13 classes into one flat namespace, so two mixins
+    ``Spine`` multiply-inherits 14 classes into one flat namespace, so two mixins
     defining the same method name do not conflict -- the MRO silently picks one and
     the other is never called.
 

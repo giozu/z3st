@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: regression/pwr_rod_2D
+Z3ST case: regression/fg_test_2D
 
 PCMI coupling chain (thermal + mechanical + Gas gap
 conductance + penalty contact + burnup state bus + swelling eigenstrain bus).

@@ -1,0 +1,16 @@
+name: plate_with_hole_2d
+geometry_type: rect
+
+Lx: 0.200   # half-width of the plate (m), 20 hole radii
+Ly: 0.200   # half-height of the plate (m)
+a: 0.010    # hole radius (m)
+
+# A quarter of the plate, hole centred at the origin: x = 0 and y = 0 are
+# symmetry planes.
+labels:
+  plate: 1
+  hole: 2
+  xmin: 3
+  xmax: 4
+  ymin: 5
+  ymax: 6

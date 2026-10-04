@@ -10,7 +10,22 @@ All metrics are read from ``output/history.csv`` — the
 per-step trajectory streamed by the case-local ``diagnostics.py`` — so the
 check is independent of the output format (the run writes a single XDMF).
 
-One metric is checked analytically, and it asserts the absence of burnup:
+Checked against references:
+
+  * ``contact_pressure_elastic_MPa`` — the elastic point at t = 0 against the
+    Lame interference pressure of the joint with the penalty spring in series
+    (case_params.elastic_factor, Esposito eq. 4 with the signs of nu
+    corrected).
+  * ``contact_pressure_<d>d_MPa`` at 600, 1240 and 2500 days — the relaxation
+    by Norton creep against reference_1d.py, an independent radial solution of
+    the same joint with a J2 hub. The remaining deviation, 1.2 to 1.9 %, is the
+    time-step error of the case and falls when n_steps is doubled.
+  * ``burnup_avg_final`` and ``burnup_max_final``, below.
+
+Esposito eq. (21) is evaluated by plots.py and printed here, not asserted.
+With the Tresca criterion of its hub it falls about 3 % below the J2
+solution, the conservative direction its authors report.
+
 
   * ``burnup_avg_final`` — the pellet is ``fissile: false`` on purpose, so the
     accumulated burnup must stay identically zero. Esposito eq. (21) relaxes a
@@ -46,8 +61,8 @@ OUT = os.path.join(CASE_DIR, "output")
 OUT_JSON = os.path.join(OUT, "non-regression.json")
 HISTORY = os.path.join(OUT, "history.csv")
 
-# Set by the elastic point below, whose deviation is 3.0 %.
-TOLERANCE = 5e-2
+# Set by the relaxation, whose time-step error is 1.9 % at 600 days.
+TOLERANCE = 3e-2
 
 # --. trajectory from the case-local diagnostics CSV --..
 with open(HISTORY) as f:
@@ -125,10 +140,26 @@ print(f"[INFO] interference t=0  : {_delta_hot_m*1e6:.4f} um hot "
       f"({abs(INITIAL_GAP)*1e6:.4f} um cold + {(_delta_hot_m - abs(INITIAL_GAP))*1e6:.4f} um "
       f"differential expansion at {_T0:.1f} K)")
 print(f"[INFO] elastic point t=0 : z3st = {p_initial_mpa:.4f} MPa, "
-      f"eq. (4) in series = {p_series_mpa:.4f} MPa, "
+      f"Lame in series = {p_series_mpa:.4f} MPa, "
       f"deviation = {100*_elastic_dev:+.2f} %")
 print(f"[INFO] split t=0         : {p_initial_mpa*1e6/_f_joint*1e6:.4f} um joint + "
       f"{_penetration_um:.4f} um penalty penetration")
+
+
+# --. relaxation against the radial reference --..
+from reference_1d import pressure_history
+
+RELAX_DAYS = [600.0, 1240.0, 2500.0]
+_p_ref = pressure_history(RELAX_DAYS) / 1e6
+_relax = {}
+for d, pr in zip(RELAX_DAYS, _p_ref):
+    row = min(rows, key=lambda r: abs(float(r["time_days"]) - d))
+    if abs(float(row["time_days"]) - d) > 1e-6:
+        raise SystemExit(f"[non-regression] no output step at {d} days")
+    pz = float(row["contact_pressure_MPa"])
+    _relax[d] = (pz, pr)
+    print(f"[INFO] relaxation {d:6.0f} d: z3st = {pz:.4f} MPa, "
+          f"reference_1d = {pr:.4f} MPa, deviation = {100*(pz - pr)/pr:+.2f} %")
 
 
 def _regression_only(value):
@@ -154,6 +185,15 @@ errors = {
         "reference": p_series_mpa,
         "abs_error": float(abs(p_initial_mpa - p_series_mpa)),
         "rel_error": float(_elastic_dev),
+    },
+    **{
+        f"contact_pressure_{int(d)}d_MPa": {
+            "numerical": pz,
+            "reference": float(pr),
+            "abs_error": float(abs(pz - pr)),
+            "rel_error": float(abs(pz - pr) / pr),
+        }
+        for d, (pz, pr) in _relax.items()
     },
     "gap_final_um": _regression_only(gap_um),
     "contact_pressure_final_MPa": _regression_only(p_mpa),

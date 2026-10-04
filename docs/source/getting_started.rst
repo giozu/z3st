@@ -1,447 +1,143 @@
 Getting Started
 ===============
 
-This guide will help you get up and running with Z3ST, from installation to running your first simulation.
+This page runs one verification case end to end: a steel plate in uniaxial tension,
+``z3st/cases/verification/mechanics/uniaxial_tension``. It solves mechanics only, on
+a 3D mesh of 729 nodes, and runs in a few seconds. Install Z3ST first
+(:doc:`installation`), including ``pip install -e .``.
 
----
+Every file shown below is included from the repository, so it is the file the case
+actually runs.
 
-Prerequisites
--------------
-
-Before installing Z3ST, ensure you have the following:
-
-**Required:**
-
-- **Python 3.10+**
-- **FEniCSx (DOLFINx)** - The finite element backend
-- **Gmsh** - For mesh generation
-- **NumPy, SciPy** - Scientific computing libraries
-
-**Recommended:**
-
-- **ParaView** or **PyVista** - For visualization
-- **Miniconda/Anaconda** - For environment management
-- **Git** - For cloning the repository
-
----
-
-Installation
+Run the case
 ------------
 
-Step 1: Install Miniconda (if not already installed)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 .. code-block:: bash
 
-   mkdir -p ~/miniconda3
-   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-   bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-   rm ~/miniconda3/miniconda.sh
-   source ~/miniconda3/bin/activate
-   conda init --all
-
-Step 2: Clone the Z3ST Repository
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   git clone https://github.com/giozu/z3st.git
-   cd z3st
-
-Step 3: Create and Activate the Conda Environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Option A: Using the provided environment file** (recommended):
-
-.. code-block:: bash
-
-   conda env create -f z3st_env.yml
    conda activate z3st
-
-**Option B: Manual installation**:
-
-.. code-block:: bash
-
-   conda create -n z3st python=3.12 -y
-   conda activate z3st
-   conda install -c conda-forge fenics-dolfinx pyvista matplotlib numpy ipywidgets jupyterlab pyqt pyyaml scipy h5py pandas -y
-   pip install gmsh
-
-Step 4: Install Z3ST in Editable Mode
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   pip install -e .
-
-This installs Z3ST and its utilities in development mode, allowing you to modify the source code and see changes immediately.
-
-Step 5: Verify the Installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   python -c "import dolfinx, gmsh; print('dolfinx', dolfinx.__version__, '| gmsh', gmsh.__version__)"
-
-You should see output similar to:
-
-.. code-block:: text
-
-   dolfinx 0.11.0 | gmsh 4.15.2
-
----
-
-Your First Simulation
----------------------
-
-Let's run the basic example case to verify everything is working.
-
-Step 1: Navigate to the Example Directory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
    cd z3st/cases/verification/mechanics/uniaxial_tension
+   ./Allrun
 
-Step 2: Generate the Mesh
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+``Allrun`` sets the mesh dimension and sources the shared runner:
 
-.. code-block:: bash
+.. literalinclude:: ../../z3st/cases/verification/mechanics/uniaxial_tension/Allrun
+   :language: bash
 
-   gmsh -3 mesh.geo
+The shared runner ``z3st/utils/allrun.sh`` then executes four commands:
 
-This creates a `mesh.msh` file from the geometry definition.
+.. literalinclude:: ../../z3st/utils/allrun.sh
+   :language: bash
+   :start-at: gmsh mesh.geo
 
-Step 3: Run the Simulation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In order: Gmsh writes ``mesh.msh`` from ``mesh.geo``; ``python3 -m z3st`` reads
+``input.yaml`` from the current directory and solves, with its log redirected to
+``log_z3st.md``; ``non-regression.py`` compares the result with the analytical
+solution and with the stored gold; ``plot_convergence`` writes ``convergence.png``.
+To run the solver alone, call ``python3 -m z3st`` in the case directory after
+meshing.
 
-.. code-block:: bash
+The case passes when the analyser prints ``[SUMMARY] PASS`` twice, once against
+the analytical reference and once against ``output/non-regression_gold.json``.
 
-   python3 -m z3st
+The input files
+---------------
 
-You should see output showing:
-
-- Configuration loading
-- Mesh reading
-- Solver initialization
-- Convergence information
-- Results saved to `output/`
-
-**Optional: Preview the mesh before solving**:
-
-.. code-block:: bash
-
-   python3 -m z3st --mesh_plot
-
-Step 4: View the Results
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Results are saved in the `output/` directory as VTU files. You can visualize them with:
-
-**Using ParaView** (GUI):
-
-.. code-block:: bash
-
-   paraview output/result_000000.vtu
-
-**Using Python (PyVista)**:
-
-.. code-block:: python
-
-   import pyvista as pv
-
-   mesh = pv.read("output/result_000000.vtu")
-   mesh.plot(scalars="T", cmap="coolwarm")  # Temperature field
-
----
-
-Understanding the Input Files
-------------------------------
-
-Each Z3ST simulation requires three YAML configuration files:
-
-1. **input.yaml** - Main configuration
-2. **geometry.yaml** - Geometry and mesh labels
-3. **boundary_conditions.yaml** - Boundary conditions
-
-Let's examine each one:
+A case is defined by three YAML files and a Gmsh geometry.
 
 input.yaml
 ^^^^^^^^^^
 
-This file controls the solver, physics models, and time stepping:
+.. literalinclude:: ../../z3st/cases/verification/mechanics/uniaxial_tension/input.yaml
+   :language: yaml
 
-.. code-block:: yaml
-
-   # Mesh and configuration paths
-   mesh_path: mesh.msh
-   geometry_path: geometry.yaml
-   boundary_conditions_path: boundary_conditions.yaml
-
-   # Material database
-   materials:
-     steel: ../../materials/steel.yaml
-
-   # Simulation regime: 2D | 3D | axisymmetric
-   regime: 2D
-
-   # Solver settings
-   solver_settings:
-     max_iters: 100
-     relax_T: 0.9
-     relax_u: 0.7
-     relax_adaptive: true
-
-   # Physics models to enable
-   models:
-     thermal: true
-     mechanical: true
-     damage: false
-     cluster_dynamics: false
-
-   # Thermal solver configuration
-   thermal:
-     solver: linear
-     linear_solver: iterative_amg
-     rtol: 1.0e-6
-
-   # Mechanical solver configuration
-   mechanical:
-     solver: linear
-     linear_solver: iterative_amg
-     rtol: 1.0e-6
-
-   # Time and loading
-   lhr: [0]      # Volumetric heat source (W/m³)
-   time: [0]     # Time points (s)
-   n_steps: 1    # Number of time steps
+- ``materials`` maps a material name to a card. The path is relative to the case
+  directory. The name (``steel``) must also appear in ``labels`` of
+  ``geometry.yaml``, where it gives the volume tag of that material.
+- ``models`` switches physics on. Only ``mechanical`` is on here, so the
+  ``thermal`` block is not read.
+- ``mechanical.convergence`` and ``mechanical.solver`` have no default: a missing
+  key stops the run with a ``KeyError``. The full list of keys and defaults is in
+  :doc:`usage`.
+- ``time``, ``lhr`` and ``n_steps`` define a single static step at ``t = 0``.
+  ``lhr`` is a linear heat rate in W/m and heats only materials marked
+  ``fissile``, so it plays no role here.
 
 geometry.yaml
 ^^^^^^^^^^^^^
 
-This file defines the geometry and labels:
+.. literalinclude:: ../../z3st/cases/verification/mechanics/uniaxial_tension/geometry.yaml
+   :language: yaml
 
-.. code-block:: yaml
+``labels`` maps each name used in ``input.yaml`` and
+``boundary_conditions.yaml`` to the integer tag of a Gmsh physical group. Gmsh
+numbers physical groups in the order the ``.geo`` file defines them:
 
-   name: box
-   geometry_type: rect
+.. literalinclude:: ../../z3st/cases/verification/mechanics/uniaxial_tension/mesh.geo
+   :language: c
+   :start-after: // Define physical groups for boundary conditions
+   :end-before: // Generate structured mesh
 
-   # Dimensions
-   Lx: 0.100   # (m)
-   Ly: 2.000   # (m)
-   Lz: 2.000   # (m)
-
-   # Labels (must match Physical Groups in mesh.msh)
-   labels:
-     zmin: 1
-     zmax: 2
-     ymin: 3
-     xmax: 4
-     ymax: 5
-     xmin: 6
-     steel: 7
+``zmin`` is defined first and gets tag 1, ``steel`` is defined seventh and gets tag
+7, which is what ``geometry.yaml`` states.
 
 boundary_conditions.yaml
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-This file specifies boundary conditions:
-
-.. code-block:: yaml
-
-   thermal:
-     steel:
-       - type: Dirichlet
-         region: xmin
-         temperature: 490.0   # (K)
-
-   mechanical:
-     steel:
-       - type: Clamp_x
-         region: xmin
-       - type: Clamp_y
-         region: ymin
-       - type: Clamp_z
-         region: zmin
-
----
-
-Common Workflows
-----------------
-
-Running a Single Case
-^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   cd z3st/cases/verification/thermal/thin_slab_neumann_3D
-   ./Allrun
-
-This script:
-
-1. Generates the mesh
-2. Runs the simulation
-3. Performs non-regression checks
-4. (Optional) Generates plots
-
-Running All Verification Cases
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   cd z3st/cases
-   ./non-regression_local.sh
-
-This executes all test cases and generates a summary report.
-
-Post-Processing Results
-^^^^^^^^^^^^^^^^^^^^^^^
-
-Output fields are written by the unified ``OutputWriter`` (``z3st/utils/writer.py``)
-during the run: set ``output: format: vtu`` for per-step ``fields_NNNN.vtu`` files or
-``output: format: xdmf`` for a single time-series file, both directly readable in ParaView.
-
-**Plot convergence history**:
-
-.. code-block:: bash
-
-   python3 ../../utils/plot_convergence.py
-
-**Custom analysis** (Python):
-
-.. code-block:: python
-
-   import numpy as np
-   import pyvista as pv
-
-   # Load results
-   mesh = pv.read("output/result_000000.vtu")
-
-   # Extract temperature field
-   T = mesh.point_data["T"]
-   print(f"Max temperature: {T.max():.2f} K")
-   print(f"Min temperature: {T.min():.2f} K")
-
-   # Plot
-   mesh.plot(scalars="T", cmap="coolwarm", show_edges=True)
-
----
-
-Creating Your Own Simulation
------------------------------
-
-Step 1: Create a New Case Directory
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   mkdir -p z3st/cases/my_simulation
-   cd z3st/cases/my_simulation
-
-Step 2: Create Geometry and Mesh
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**Option A: Use Gmsh GUI**:
-
-.. code-block:: bash
-
-   gmsh
-
-Then save the geometry as `mesh.geo` and mesh it.
-
-**Option B: Use Gmsh Python API**:
-
-.. code-block:: python
-
-   import gmsh
-
-   gmsh.initialize()
-   gmsh.model.add("my_model")
-
-   # Create geometry
-   lc = 0.1
-   p1 = gmsh.model.geo.addPoint(0, 0, 0, lc)
-   p2 = gmsh.model.geo.addPoint(1, 0, 0, lc)
-   # ... define geometry ...
-
-   gmsh.model.geo.synchronize()
-   gmsh.model.mesh.generate(3)
-   gmsh.write("mesh.msh")
-   gmsh.finalize()
-
-Step 3: Define Configuration Files
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Create `input.yaml`, `geometry.yaml`, and `boundary_conditions.yaml` following the templates above.
-
-Step 4: Run the Simulation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: bash
-
-   python3 -m z3st > log.z3st
-
-Step 5: Analyze Results
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Results are in `output/`. Use ParaView, PyVista, or custom Python scripts.
+.. literalinclude:: ../../z3st/cases/verification/mechanics/uniaxial_tension/boundary_conditions.yaml
+   :language: yaml
 
----
+- ``Neumann`` with a scalar ``traction`` applies :math:`\mathbf{t} = t\,\mathbf{n}`
+  with :math:`\mathbf{n}` the outward normal. The positive value pulls the
+  ``xmax`` face outward, a tension of 125 MPa.
+- ``Clamp_x``, ``Clamp_y`` and ``Clamp_z`` set one displacement component to zero
+  on a whole face. The three faces ``xmin``, ``ymin``, ``zmin`` act as symmetry
+  planes, which removes the rigid-body modes and leaves the lateral contraction
+  free.
+- The ``thermal`` block is ignored because the thermal model is off.
 
-Troubleshooting
----------------
+Output
+------
 
-**Issue: "Module 'dolfinx' not found"**
+The run writes ``output/fields.vtu``. A run with one time step writes one file
+named after ``output.filename`` (default ``fields``). A run with several steps
+writes ``output/fields_0000.vtu``, ``output/fields_0001.vtu``, and so on. With
+``output.format: xdmf``, or under MPI, it writes a single ``output/fields.xdmf``
+with its ``.h5`` data file.
 
-**Solution**: Ensure the conda environment is activated:
+For this case the file holds the point fields ``Displacement``,
+``Strain (points)``, ``Stress (points)``, ``VonMises (points)``,
+``Hydrostatic (points)`` and ``StrainEnergyDensity (points)``, and the cell fields
+``MaterialID``, ``Strain (cells)``, ``Stress (cells)``, ``VonMises (cells)``,
+``Hydrostatic (cells)`` and ``StrainEnergyDensity (cells)``. A case with the
+thermal model on adds ``Temperature`` and ``HeatFlux (cells)``.
+
+Open it in ParaView, or read it with PyVista:
+
+.. code-block:: python
+
+   import pyvista as pv
+
+   mesh = pv.read("output/fields.vtu")
+   print(mesh.point_data.keys())
+
+   ux = mesh.point_data["Displacement"][:, 0]
+   print(f"max u_x = {ux.max():.3e} m")   # 6.250e-05 m = 125 MPa x 0.1 m / 200 GPa
+
+   mesh.plot(scalars="VonMises (cells)")
+
+The staggered iteration history is in ``log_z3st.md``. ``convergence.png`` is
+drawn from it by
 
 .. code-block:: bash
 
-   conda activate z3st
+   python3 -m z3st.utils.plot_convergence log_z3st.md
 
-**Issue: "Gmsh GUI not opening in WSL"**
-
-**Solution**: Install X11 dependencies:
-
-.. code-block:: bash
-
-   sudo apt install libxft2
-   wsl --update
-
-**Issue: "Solver not converging"**
-
-**Solution**: Adjust relaxation factors in `input.yaml`:
-
-.. code-block:: yaml
-
-   solver_settings:
-     relax_adaptive: true
-     relax_shrink: 0.5
-     max_iters: 200
-
-**Issue: "Mesh file not found"**
-
-**Solution**: Verify the mesh was generated:
-
-.. code-block:: bash
-
-   ls -lh mesh.msh
-
-If missing, regenerate:
-
-.. code-block:: bash
-
-   gmsh -3 mesh.geo
-
----
-
-Next Steps
+Next steps
 ----------
 
-Now that you have Z3ST running, explore:
-
-- **Examples**: :doc:`examples` - Learn from benchmark cases
-- **Physics Models**: :doc:`physics_models` - Understand the formulations
-- **Configuration**: :doc:`usage` - Detailed configuration options
-- **Advanced Topics**: :doc:`api` - Dive into the source code
-
-**Happy simulating!**
+- :doc:`usage` lists every ``input.yaml`` key with its default, the boundary
+  conditions, the material cards and parallel runs.
+- :doc:`quick_reference` condenses the same information on one page.
+- :doc:`troubleshooting` lists the common errors and warnings.
+- :doc:`examples` and :doc:`physics_models` describe the cases and the
+  formulations.

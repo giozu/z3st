@@ -209,7 +209,7 @@ try:
                          "legend.fontsize": 11})
     fig, ax = plt.subplots(figsize=(7, 5))
     # Okabe-Ito colours, distinct linestyles: no red/green pairing
-    ax.plot(r_bin, p_bin, "-", color="#D55E00", lw=2.5, label="DG-1 upwind + SIPG")
+    ax.plot(r_bin, p_bin, "-", color="#D55E00", lw=2.5, label="DG-1 upwind")
     cg_prof = os.path.join(CASE_DIR, "..", "porosity_migration",
                            "output", "porosity_radial_profile.npz")
     if os.path.exists(cg_prof):

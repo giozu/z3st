@@ -1,13 +1,13 @@
 # Z3ST ↔ SCIANTIX coupling (prototype)
 
-Drive SCIANTIX (mesoscale fission-gas behaviour) from Z3ST to compute **gaseous
-swelling** (→ the eigenstrain bus) and **fission gas release** per fuel point.
-The binding wraps SCIANTIX's existing C-linkage coupling entry — **no SCIANTIX
-physics is reimplemented in Python**.
+Drives SCIANTIX (mesoscale fission-gas behaviour) from Z3ST to compute gaseous
+swelling (→ the eigenstrain bus) and fission gas release per fuel point.
+The binding wraps the C-linkage coupling entry of SCIANTIX. No SCIANTIX
+physics is reimplemented in Python.
 
 ## 1. Build SCIANTIX as a shared library
 
-This is the **only** supported recipe. Run it from the SCIANTIX repo root:
+This is the only supported recipe. Run it from the SCIANTIX repository root:
 
 ```bash
 cd <sciantix>
@@ -17,87 +17,87 @@ g++ -O2 -std=c++17 -DCOUPLING_TU -fPIC -shared $(find include -type d | sed 's/^
 export SCIANTIX_LIB=$PWD/build/libsciantix_tu.so   # add this line to ~/.bashrc
 ```
 
-Three things about that command are load-bearing:
+### `Allmake.sh` and CMake do not produce this library
 
-**`Allmake.sh` / CMake cannot produce this artifact.** SCIANTIX's
-`CMakeLists.txt` builds an executable by default and, under `COUPLING_TU`, a
-*static* library — `add_library(sciantix STATIC ${SOURCES})` with
-`CMAKE_STATIC_LIBRARY_SUFFIX ".a"`. The binding `ctypes`-loads a `.so`, so a
-`.a` is useless to it. Do not run `./Allmake.sh` expecting to get a shared
-library out of it; use the `g++` line above.
+The SCIANTIX `CMakeLists.txt` builds an executable by default and, under `COUPLING_TU`, a
+static library (`add_library(sciantix STATIC ${SOURCES})` with
+`CMAKE_STATIC_LIBRARY_SUFFIX ".a"`). The binding loads a `.so` through `ctypes`
+and cannot use a `.a`. Use the `g++` line above.
 
-**`-DCOUPLING_TU` is required for correctness, not for linking.** The
-`extern "C"` entry points live in `src/coupling/TUSrcCoupling.C` and are
-exported unconditionally, so a library built *without* the macro loads fine
-and every call succeeds — it is simply running different physics. The macro
-makes `Simulation::execute()` skip `Burnup()` / `EffectiveBurnup()` /
-`Densification()` (Z3ST owns those) and makes `SetVariables.C` take burnup
-from `Sciantix_history[7]/[8]`, i.e. from Z3ST. Omit it and SCIANTIX computes
-its own burnup and silently ignores the value Z3ST passes in. Check a build
-you are unsure about with:
+### `-DCOUPLING_TU` sets the physics
+
+The `extern "C"` entry points live in `src/coupling/TUSrcCoupling.C` and are
+exported unconditionally. A library built without the macro loads and every
+call returns, with different physics. With the macro:
+- `Simulation::execute()` skips `Burnup()`, `EffectiveBurnup()` and
+  `Densification()` (Z3ST owns those).
+- `SetVariables.C` takes burnup from `Sciantix_history[7]/[8]`, i.e. from Z3ST.
+
+Without it, SCIANTIX computes its own burnup and ignores the value Z3ST passes in.
+This command confirms the exported symbols (it does not detect the macro):
 ```bash
 nm -D --defined-only build/libsciantix_tu.so | grep -E 'callSciantix|getSciantixOptions'
 ```
-(that confirms the symbols, *not* the macro — for the macro, rebuild.)
 
-**Use a persistent path, not `/tmp`.** `/tmp` is wiped on reboot and the next
-run then fails with a bare `OSError: cannot open shared object file`. Put the
-`export` in `~/.bashrc` so the binding finds the library across sessions;
+### Library path
+
 `SCIANTIX_LIB` is read by `sciantix_binding.py` and nothing else resolves it.
+A library under `/tmp` is removed on reboot and the next run fails with
+`OSError: cannot open shared object file`. Put the library on a persistent path
+and the `export` in `~/.bashrc`.
 
 ## 2. Validate the binding (standalone)
 
 ```bash
 python3 smoke_test.py     # ramps T at fixed fission rate, prints swelling/bu/FGR
 ```
-Diff the output against a SCIANTIX **standalone** run with the same
-`input_history.txt` (same T, fission rate, dt) — they must match. That closes the
-binding correctness gap before any Z3ST integration.
+Compare the output with a SCIANTIX standalone run using the same
+`input_history.txt` (same T, fission rate, dt). The two must match.
 
 ## 3. Array layout (verified against the SCIANTIX v2.2.1 source)
 
 `include/MainVariables.h`: `options[40]`, `history[20]`, `variables[300]`,
 `scaling_factors[20]`, `diffusion_modes[720]` (= 18 mode blocks × 40 modes).
 
-| host writes — `history[]` | idx | reads — `variables[]` | idx |
+| host writes: `history[]` | idx | reads: `variables[]` | idx |
 |---|---|---|---|
 | Temperature old/new (K) | 0,1 | Xe produced (at/m³) | 1 |
 | Fission rate old/new (fiss/m³s) | 2,3 | Xe released (at/m³) | 6 |
 | Hydrostatic stress old/new (MPa) | 4,5 | intragranular gas swelling (/) | 24 |
-| time step Δt (s) | 6 | **intergranular gas swelling (/)** | **36** |
+| time step Δt (s) | 6 | intergranular gas swelling (/) | 36 |
 | steam pressure old/new (atm) | 9,10 | Burnup (MWd/kgUO₂) | 38 |
 
-Sources: `src/operations/SetVariablesFunctions.C` (history + variable slots),
+Sources: `src/operations/SetVariablesFunctions.C` (history and variable slots),
 `src/operations/SetVariables.C:47` (`history[6]` → `physics_variable["Time step"]`,
-seconds). The time step at `history[6]` is what the models integrate on.
+seconds). The models integrate on the time step at `history[6]`.
 
-**Burnup ownership (`history[7]`/`[8]`).** In a plain build these two slots are
-Time (h) / step-number and are output-only. In a **`-DCOUPLING_TU`** build SCIANTIX
-skips its own `Burnup()`/`EffectiveBurnup()`/`Densification()` (`Simulation.C:43`)
-and instead **reads burnup from `history[7]` (old) / `history[8]` (new)**
-(`SetVariables.C:74`). So the host owns burnup — Z3ST computes it with its RADAR
-model and feeds it in. `advance(..., burnup_old=, burnup_new=)` writes those slots;
-Z3ST's `spine.update_state` passes the per-dof burnup pair automatically.
+### Burnup ownership (`history[7]`/`[8]`)
 
-## 4. Z3ST integration — IMPLEMENTED (the eigenstrain bus)
+In a plain build these two slots hold time (h) and step number and are output only.
+In a `-DCOUPLING_TU` build SCIANTIX skips its own `Burnup()`, `EffectiveBurnup()` and
+`Densification()` (`Simulation.C:43`) and reads burnup from `history[7]` (old) and
+`history[8]` (new) (`SetVariables.C:74`). Z3ST computes burnup with its RADAR
+model and feeds it in. `advance(..., burnup_old=, burnup_new=)` writes those slots.
+`spine.update_state` passes the per-dof burnup pair, converted from MWd/kgU to MWd/kgUO₂.
 
-SCIANTIX gaseous swelling is a **numerical, stateful per-point field**, not a UFL
-expression — so it rides the **state bus**, exactly like burnup/creep. Default OFF:
+## 4. Z3ST integration (the eigenstrain bus)
+
+SCIANTIX gaseous swelling is a numerical, stateful per-point field, not a UFL
+expression. It is carried on the state bus, like burnup and creep. Default off.
 
 1. `SciantixField` (in `sciantix_binding.py`) holds one SCIANTIX point per `V_t`
-   dof of the fissile region; the library + model settings are read once and shared.
+   dof of the fissile region. The library and model settings are read once and shared.
 2. `spine.initialize_fields` builds the field (when `models.fission_gas.enabled`)
-   and a `gas_swelling` Function on `V_t`; `spine.update_state(dt)` calls
-   `field.step(dt, T, fission_rate, burnup_old, burnup_new)` with `T` from the
+   and a `gas_swelling` Function on `V_t`. `spine.update_state(dt)` calls
+   `field.step(dt, T, fission_rate, burnup_old=..., burnup_new=...)` with `T` from the
    temperature field, `fission_rate = q''' / E_fission`, and the host burnup pair
-   (Z3ST's RADAR model owns burnup; SCIANTIX consumes it — §3). The returned ΔV/V
+   (§3). The hydrostatic stress argument of `step` is not passed. The returned ΔV/V
    is written into `gas_swelling`.
-3. `materials/sciantix_swelling.py::gaseous_swelling` is the eigenstrain callable —
-   returns `(gas_swelling/3)·I` reading that field (same pattern as the burnup-fed
-   swelling laws). A fuel card opts in with
+3. `materials/sciantix_swelling.py::gaseous_swelling` is the eigenstrain callable.
+   It returns `(gas_swelling/3)·I` from that field. A fuel card opts in with
    `eigenstrain: materials.sciantix_swelling.gaseous_swelling`.
 
-The field also has `snapshot()`/`restore()` for adaptive-timestep rollback, hooked into
+The field has `snapshot()`/`restore()` for adaptive-timestep rollback, called from
 `spine.snapshot_state`/`restore_state`. Config:
 
 ```yaml
@@ -108,67 +108,50 @@ models:
     initial_conditions: input_initial_conditions.txt
     energy_per_fission: 3.2e-11          # J/fission (≈ 200 MeV)
 ```
-The run directory needs `input_settings.txt` + `input_initial_conditions.txt` (same
-files a SCIANTIX standalone run uses). Current scope: fresh fuel, one point per dof.
+The run directory needs `input_settings.txt` and `input_initial_conditions.txt` (the
+files a SCIANTIX standalone run uses).
 
-## 5. Effective burnup for HBS — optional SCIANTIX patch
+## 5. Initial conditions in coupling mode
 
-A `-DCOUPLING_TU` build skips `Burnup()`, `EffectiveBurnup()` and `Densification()`
-(`Simulation.C:43`). Z3ST owns total burnup (fed in, §3) and densification (it is a
-mechanical eigenstrain), so those two are correctly SCIANTIX-off. But **effective
-burnup** is a SCIANTIX-internal HBS input (Khvostov, temperature-gated) with no Z3ST
-equivalent — and the coupling does not transfer it, so in a stock `-DCOUPLING_TU`
-build it stays frozen at 0 and HBS would be silently wrong.
+Both handled in `load_initial_conditions`:
+1. In coupling mode SCIANTIX does not read `input_initial_conditions.txt`
+   (standalone only, `file_manager/InputReading.C`). The host seeds `variables[]`.
+2. The standalone one-time `Initialization()` (`file_manager/Initialization.C`),
+   skipped by the coupling entry, sets grain-boundary defaults absent from the
+   IC file (`variables[25]`=2e13, `[35]`=0.5, `[37]`=1.0) and converts U% → at/m³.
+   Without the grain-boundary defaults the intergranular model returns `nan` and
+   releases nothing.
 
-Fix (SCIANTIX-side, in `effective_burnup_coupling.patch`): take `EffectiveBurnup()`
-out of the guard and have it accumulate the temperature-gated **burnup increment**
-(`Burnup.getIncrement()`) instead of `Specific power / 86400`. This needs no Specific
-power (which the coupling build does not compute), keeps `dBu_eff ≤ dBu`, and is
-numerically identical in a standalone build. Apply with:
-```bash
-cd <sciantix> && patch -p1 < <z3st>/z3st/coupling/sciantix/effective_burnup_coupling.patch
-```
-Verified: applies cleanly; builds standalone + `-DCOUPLING_TU`; the standalone HBS
-regression `test_UO2HBS` reproduces effective burnup / restructured fraction / HBS
-porosity exactly (rel err 0). Only needed if HBS (`iHighBurnupStructureFormation=1`)
-is used; not required for the Baker validation. Note: `Irradiation time` and `FIMA`
-remain uncomputed in a coupling build (also inside the skipped `Burnup()`); they have
-no Z3ST consumer yet, but a model needing them would face the same gap.
+## 6. Validation against the SCIANTIX Baker gold
 
-## Status
-Binding written against SCIANTIX 2.2.1; array map verified against that source
-and **validated end to end**.
-
-Build the shared lib exactly as in §1 — same `-DCOUPLING_TU`, same persistent
-path. Without `-DCOUPLING_TU` the library still loads and still runs, so the
-omission shows up only as wrong numbers. Then validate
-against SCIANTIX's own Baker regression gold:
+Binding written against SCIANTIX 2.2.1. Build the library as in §1, then run:
 ```bash
 cd <sciantix>/regression/baker/test_Baker1977__1273K
 SCIANTIX_LIB=<sciantix>/build/libsciantix_tu.so \
   PYTHONPATH=<z3st>/z3st/coupling/sciantix python3 \
   <z3st>/z3st/coupling/sciantix/validate_baker.py
 ```
-Result: all four engineering outputs match the standalone gold to
-~1e-7 relative error — FGR 0.132097, intragranular swelling 3.07e-4, intergranular
-swelling 0.0417, burnup 6.719. **[VALIDATION] PASS.**
+The four engineering outputs match the standalone gold to about 1e-7 relative error:
+FGR 0.132097, intragranular swelling 3.07e-4, intergranular swelling 0.0417,
+burnup 6.719.
 
-Two non-obvious facts this surfaced (both handled in `load_initial_conditions`):
-1. In coupling mode SCIANTIX does **not** read `input_initial_conditions.txt`
-   (standalone-only, `file_manager/InputReading.C`) — the host seeds `variables[]`.
-2. The standalone's one-time `Initialization()` (`file_manager/Initialization.C`),
-   also skipped by the coupling entry, sets grain-boundary defaults absent from the
-   IC file (`variables[25]`=2e13, `[35]`=0.5, `[37]`=1.0) and converts U% → at/m³.
-   Without the grain-boundary defaults the intergranular model returns `nan` and
-   releases nothing.
+`validate_baker.py` feeds the gold burnup trajectory through `history[7]/[8]`. It passes
+against both a plain and a `-DCOUPLING_TU` build. With the coupling build the gas
+outputs match to about 1e-7 and burnup matches exactly.
 
-Coupling-build check: with a `-DCOUPLING_TU` lib SCIANTIX skips its own
-burnup and consumes Z3ST's (fed via `history[7]/[8]`); driving the gold burnup
-trajectory reproduces the same gas outputs (~1e-7) and burnup matches exactly — so
-the host-owns-burnup design is verified. `validate_baker.py` feeds the burnup
-trajectory and passes against both a plain and a `-DCOUPLING_TU` build.
+## 7. Case in the suite
 
-Z3ST integration (§4) is DONE and exercised by the `SciantixField` unit checks.
-Remaining: fresh-fuel only (no diffusion-mode projection for a pre-irradiated
-restart); a full pwr-rod case run with `models.fission_gas.enabled` + a
-`-DCOUPLING_TU` lib is the next end-to-end step.
+`z3st/cases/regression/fg_test_2D` is the PWR rod run with `models.fission_gas.enabled`.
+It needs `SCIANTIX_LIB` built as in §1. It carries a gold (`output/non-regression_gold.json`)
+and is in the local suite. There are no unit tests of `SciantixField`.
+
+## Limits
+
+- Fresh fuel only: no diffusion-mode projection for a pre-irradiated restart.
+- One SCIANTIX point per dof.
+- Effective burnup (the SCIANTIX high-burnup-structure input, Khvostov,
+  temperature-gated) is computed inside the skipped `EffectiveBurnup()` and is not
+  transferred by the coupling. In a `-DCOUPLING_TU` build it stays at 0, so the
+  high-burnup-structure model (`iHighBurnupStructureFormation=1`) is not supported.
+- `Irradiation time` and `FIMA` are also computed inside the skipped `Burnup()` and
+  stay uncomputed in a coupling build. No Z3ST model reads them.

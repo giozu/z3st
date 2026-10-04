@@ -167,14 +167,21 @@ def hot_interference(T):
 
 
 def elastic_factor(a, b, c, E1, nu1, E2, nu2):
-    """Esposito eq. (4): Pk = f * Delta_u_el, the elastic stiffness of the joint.
+    """Pk = f * Delta_u_el, the elastic stiffness of the joint (Esposito eq. 4).
 
-    Shaft a..b (a = 0 for a solid shaft), hub b..c. Purely elastic Lame, with no
-    creep and no equivalent-stress criterion, so it carries none of the
-    Tresca/von Mises bias that separates eq. (21) from a J2 solver.
+    Shaft a..b (a = 0 for a solid shaft), hub b..c, both axially free, which is
+    the Lame solution in plane stress. Purely elastic, with no creep and no
+    equivalent-stress criterion.
+
+    The signs of nu are those of the Lame interference fit: the pressure on the
+    shaft surface shrinks it by (b/E1)(... - nu1) and expands the hub bore by
+    (b/E2)(... + nu2). Eq. (4) as printed in Esposito et al. (2020) has +nu1
+    and -nu2, which gives the same f only for equal materials. For this pellet
+    and cladding the printed signs raise f by 3 %. reference_1d.py uses the
+    signs used here.
     """
-    denom = ((b / E1) * ((a**2 + b**2) / (b**2 - a**2) + nu1)
-             + (b / E2) * ((c**2 + b**2) / (c**2 - b**2) - nu2))
+    denom = ((b / E1) * ((a**2 + b**2) / (b**2 - a**2) - nu1)
+             + (b / E2) * ((c**2 + b**2) / (c**2 - b**2) + nu2))
     return 1.0 / denom
 
 

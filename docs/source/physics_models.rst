@@ -1,79 +1,141 @@
 Physics Models
 ==============
 
-Z3ST provides a set of physical models for multiphysics thermo-mechanical
-analysis:
+This page states the equations that Z3ST solves, as implemented in
+``z3st.models``, ``z3st.core`` and ``z3st.materials``, with the
+``input.yaml`` and material-card keys that control them. Defaults are the
+values read in the code when a key is absent.
 
-- **Thermal conduction** with volumetric heating, temperature-dependent
-  properties, and gap conductance between bodies
-- **Mechanical equilibrium** with five constitutive routes: isotropic
-  (Lamé) and anisotropic (Voigt) linear elasticity, Neo-Hookean
-  hyperelasticity, J2 plasticity, and a custom Python route
-- **J2 and crystal plasticity** for the inelastic response
-- **Phase-field fracture** (AT1 / AT2) for crack initiation and propagation
-- **Gap conductance** for heat transfer across the interface between
-  separate bodies
-- **Penalty contact** for mechanical pellet-clad interaction (gap closure
-  and load transfer across the interface)
-- **Cluster dynamics** for defect-cluster evolution in size space
+The models are:
 
-All models are written as FEniCSx (UFL) variational forms. A central feature
-is that the constitutive physics is expressed symbolically and differentiated
-**automatically**: the first Piola--Kirchhoff stress is obtained as
-:math:`\boldsymbol{P} = \partial \psi / \partial \boldsymbol{F}` and the
-consistent Newton tangent as the UFL derivative of the residual, so no
-constitutive Jacobian is hand-coded. The models are modular and coupled
-through a staggered solution scheme with adaptive relaxation.
+- **Heat conduction**, stationary or transient, with Dirichlet, Neumann and
+  Robin conditions and gap heat transfer between paired surfaces.
+- **Mechanical equilibrium** with small strains and four constitutive routes:
+  isotropic linear elasticity (``lame``), Neo-Hookean hyperelasticity
+  (``hyperelastic``), J2 plasticity with linear isotropic hardening
+  (``plasticity``) and a user stress function (``custom``). Norton thermal
+  creep with an irradiation-creep term acts on the ``lame`` route.
+- **Phase-field fracture**, AT1 and AT2, in the hybrid formulation of Ambati
+  et al. (2015).
+- **Fuel models**: burnup accumulation, solid and gaseous swelling with
+  densification, radial and axial power shapes, the modified NFI UO\
+  :sub:`2` conductivity, isotropic-softening pellet cracking, porosity
+  migration and the SCIANTIX fission-gas coupling.
+- **Gap conductance** and **penalty contact** between two concentric bodies.
+- **Cluster dynamics**, an advection-diffusion equation in the cluster-size
+  coordinate.
+
+Anisotropic elasticity is not implemented. Every route above uses an isotropic
+stiffness tensor built from :math:`E` and :math:`\nu`.
+
+.. note::
+
+   The material cards in ``z3st/materials`` hold representative values chosen
+   for the demonstration and verification cases. They are not qualified design
+   data. A card cites the source of a correlation where it has one.
 
 .. contents:: On this page
    :local:
    :depth: 1
 
+
+Conventions
+-----------
+
+- **Regimes.** ``regime`` in ``input.yaml`` is ``1d``, ``2d``, ``3d`` or
+  ``axisymmetric`` (default ``2d``). ``2d`` is plane strain,
+  :math:`\varepsilon_{zz} = 0`. In ``axisymmetric`` the coordinates are
+  :math:`(r, z)`, the hoop strain :math:`\varepsilon_{\theta\theta} = u_r/r` is
+  part of the strain tensor, and the volume and surface integrals carry the
+  weight :math:`w = 2\pi r`. In the other regimes :math:`w = 1`. The porosity
+  transport forms (CG and DG) use unweighted measures in every regime, so in
+  ``axisymmetric`` they carry no cylindrical weight. The regime is not refused
+  with porosity on. Both porosity cases run in ``2d``. The ``1d``
+  regime is a bar in uniaxial stress, :math:`\sigma = E\varepsilon`.
+- **Strain tensor.** In the ``2d``, ``3d`` and ``axisymmetric`` regimes the
+  strain is stored as a :math:`3\times 3` tensor (``MechanicalModel.epsilon``),
+  so eigenstrains act on all three diagonal components.
+- **Elements.** Temperature, phase field and (on the default CG path) porosity
+  use first-order Lagrange elements: P1 on triangles and tetrahedra, Q1 on
+  quadrilaterals and hexahedra. The displacement order is ``mechanical.order``
+  (default 1). History fields use DG0 (crack driving force, creep strain) or
+  quadrature spaces (plastic strain).
+- **Notation.** :math:`d \in [0, 1]` is the phase field (the code field is
+  named ``Damage``) and :math:`\ell` the phase-field length, read from
+  ``damage.lc``. Superscript :math:`n` denotes the last converged time step and
+  :math:`k` the staggered iteration.
+
+
 Thermal Model
 -------------
 
-The thermal model solves the heat-conduction equation
+The temperature :math:`T` satisfies
 
 .. math::
 
-   \rho C_p \frac{\partial T}{\partial t} - \nabla \cdot (k \nabla T) = q''',
+   \rho c_p \frac{\partial T}{\partial t} - \nabla \cdot (k \nabla T) = q''' ,
 
-in steady-state or transient mode (selected by configuration), with backward
-Euler time integration in the transient case.
+with the time derivative omitted when ``thermal.analysis: stationary``
+(default) and discretised by backward Euler when
+``thermal.analysis: transient``. The card keys are ``rho`` (kg/m³), ``cp``
+(J/(kg·K)) and ``k`` (W/(m·K)).
 
-- :math:`T` -- temperature (K)
-- :math:`\rho` -- density (kg/m³), :math:`C_p` -- specific heat (J/(kg·K))
-- :math:`k` -- thermal conductivity (W/(m·K)), constant or a user-supplied
-  Python function of temperature
-- :math:`q'''` -- volumetric heat source (W/m³)
+**Boundary conditions** (``thermal:`` block of ``boundary_conditions.yaml``):
 
-**Boundary conditions** are applied on a disjoint partition
-:math:`\partial\Omega = \partial\Omega_T \cup \partial\Omega_q \cup \partial\Omega_R`:
+- ``Dirichlet``: :math:`T = T_d`, key ``temperature``, a scalar or a list with
+  one value per generated time point (the sum of the intervals plus one).
+- ``Neumann``: :math:`-k\nabla T\cdot\boldsymbol n = q_N`, key ``flux``
+  (W/m²). A positive ``flux`` removes heat from the body.
+- ``Robin``, convective: :math:`-k\nabla T\cdot\boldsymbol n = h(T - T_\mathrm{ext})`,
+  keys ``h_conv`` and ``T_ext``.
+- ``Robin``, gap: the same form with :math:`h = h_\mathrm{gap}` from the
+  :ref:`gap-conductance model <gap-conductance>` and
+  :math:`T_\mathrm{ext} = T_\mathrm{other}`, the temperature at the nearest
+  degree of freedom of the paired surface named by the key ``pair``.
 
-- Dirichlet: :math:`T = T_d`
-- Neumann: :math:`-k \nabla T \cdot \boldsymbol{n} = q_n`
-- Robin: :math:`-k \nabla T \cdot \boldsymbol{n} = h\,(T - T_{ext})`, in either a
-  convective variant (user film coefficient :math:`h`) or a gap-coupled
-  variant in which :math:`h` comes from the :ref:`gap-conductance model
-  <gap-conductance>`.
-
-**Volumetric source** ``q'''`` supports a fissile mode
-(:math:`q''' = \mathrm{LHR}/A`, linear heat rate divided by the pellet area),
-an exponential :math:`\gamma`-heating decay :math:`q''' = q_0 \exp(-\mu_\gamma r)`
-in rectangular geometry, a modified-Bessel decay
-:math:`K_0(\mu_\gamma r)/K_0(\mu_\gamma R_i)` in cylindrical geometry, and a
-spherical decay.
-
-**Weak form.** Find :math:`T \in V_T` such that for all :math:`v \in V_T`
+**Weak form.** Find :math:`T` such that, for every test function :math:`v`,
 
 .. math::
 
-   \int_\Omega \rho C_p \frac{\partial T}{\partial t} v \, \mathrm{d}\Omega
-   + \int_\Omega k \nabla T \cdot \nabla v \, \mathrm{d}\Omega
-   + \int_{\Gamma_R} h\, T v \, \mathrm{d}s
-   = \int_\Omega q''' v \, \mathrm{d}\Omega
-   + \int_{\Gamma_N} q_n v \, \mathrm{d}s
-   + \int_{\Gamma_R} h\, T_{ext}\, v \, \mathrm{d}s .
+   \sum_m \int_{\Omega_m} w \left( k \nabla T \cdot \nabla v
+   + \frac{\rho c_p}{\Delta t}\, T v \right) \mathrm{d}x
+   + \sum_{\Gamma_R} \int_{\Gamma_R} w\, h\, T v \,\mathrm{d}s
+   = \sum_m \int_{\Omega_m} w \left( q''' + \frac{\rho c_p}{\Delta t}\, T^n \right) v \,\mathrm{d}x
+   - \sum_{\Gamma_N} \int_{\Gamma_N} w\, q_N v \,\mathrm{d}s
+   + \sum_{\Gamma_R} \int_{\Gamma_R} w\, h\, T_\mathrm{ext}\, v \,\mathrm{d}s ,
+
+where the terms in :math:`\Delta t` are present only in transient analyses
+(``ThermalModel._thermal_step``).
+
+**Conductivity.** ``k`` on a card is one of
+
+- a constant,
+- the dotted path of a Python function of :math:`T` returning a UFL
+  expression, e.g. ``k: materials.fuel_thermal.k``. It is built on the
+  staggered temperature iterate, so it is re-evaluated at every staggered
+  iteration (Picard iteration within the step),
+- a data-driven model (``type: neural_network``, ``magni`` or ``gpr``, see
+  :ref:`nn-material-laws`),
+- the porosity-dependent Kato correlation with ``thermal_conductivity_model:
+  kato_porosity`` (see :ref:`porosity-migration`).
+
+Damage and the mechanical state do not enter the conductivity.
+
+**Volumetric source.** A material with ``fissile: true`` receives
+:math:`q''' = (\mathrm{LHR}/A)\, f_r f_z / \overline{f_r f_z}`, with LHR from
+the ``lhr`` history of ``input.yaml``, :math:`A` the fuel cross-section, and
+:math:`f_r`, :math:`f_z` the optional :ref:`power shapes <power-shapes>`.
+``gamma_heating`` (:math:`q_0`, W/m³) with ``mu_gamma`` (:math:`\mu_\gamma`,
+1/m) adds a gamma-heating source: :math:`q_0 e^{-\mu_\gamma x}` for
+``geometry_type: rect``, :math:`q_0 K_0(\mu_\gamma r)/K_0(\mu_\gamma R_i)`
+for cylinders and :math:`q_0 (R_i/r)\, e^{-\mu_\gamma (r - R_i)}` for spheres,
+with :math:`R_i` the geometry ``inner_radius`` or the card key
+``gamma_inner_radius``. Both sources may act on the same material and add.
+
+**Solver keys** (``thermal:`` block): ``solver`` (``linear``, default, or
+``newton`` for a data-driven :math:`k`), ``linear_solver`` (default
+``iterative_hypre``), ``rtol`` (1e-6), ``stag_tol`` (1e-4) and ``convergence``
+(``rel_norm`` or ``norm``, required). See :ref:`coupled-scheme`.
 
 Implemented in :class:`z3st.models.thermal_model.ThermalModel`.
 
@@ -89,26 +151,37 @@ Implemented in :class:`z3st.models.thermal_model.ThermalModel`.
 Data-Driven Material Laws
 -------------------------
 
-A material property can be supplied as a **trained model** rather than a constant
-or a symbolic ``k(T)`` Python function. Three hooks ship for the thermal
-conductivity -- a neural network, the Magni MA-MOX correlation, and a
-Gaussian-process correction on top of it. All three satisfy the same two-method
-contract, one method returning :math:`k` and one returning
-:math:`(k, \mathrm{d}k/\mathrm{d}T)`, and all three are driven through the same
-two solver routes described below.
+The thermal conductivity can be supplied as a trained model. Any Python object
+with two methods can be used: one returns :math:`k` and the other returns
+:math:`(k, \mathrm{d}k/\mathrm{d}T)`. Three such models ship with the code: a
+neural network, the Magni MA-MOX correlation and a Gaussian-process correction
+of that correlation.
+
+**Two solver routes**, selected by ``thermal.solver``:
+
+- ``solver: linear`` (Picard). The model is evaluated at the current
+  temperature iterate, interpolated into a P1/Q1 coefficient field and used in
+  the linear thermal form. The staggered loop iterates the non-linearity.
+- ``solver: newton``. The model is wrapped as a ``FEMExternalOperator`` of
+  ``dolfinx-external-operator`` (Latyshev et al., 2025), evaluated at the
+  quadrature points (degree ``thermal.quadrature_degree``, default 2), and
+  :math:`\mathrm{d}k/\mathrm{d}T` enters the Newton tangent. Arguments other
+  than :math:`T` (composition, burnup) are held fixed in the linearisation.
+
+The Newton route raises ``NotImplementedError`` for a transient analysis, for
+any Robin or gap condition, and when any material lacks a data-driven ``k``
+(``ThermalModel._thermal_step_nonlinear``). The neural network needs
+``torch`` and the Newton route needs ``dolfinx-external-operator``. The Magni
+and Gaussian-process models on the Picard route need neither (see
+:doc:`installation`).
 
 Neural network
 ^^^^^^^^^^^^^^
 
-A material property can be supplied as a trained **neural network** rather than a
-constant or a symbolic ``k(T)`` Python function -- useful when the constitutive
-law is learned from data (or from a reference correlation) instead of written in
-closed form. The current hook is the thermal conductivity
-:math:`k = \mathrm{NN}(T)`, a small smooth MLP (``tanh``/``softplus`` activations,
-so :math:`\mathrm{d}k/\mathrm{d}T` is continuous) trained offline and stored as a
-checkpoint.
-
-**Material card.** The ``k`` entry becomes a mapping instead of a scalar:
+A small multilayer perceptron :math:`k = \mathrm{NN}(T)` with one activation
+for all hidden layers, ``tanh`` (default) or ``softplus``, stored in the
+checkpoint. :math:`\mathrm{d}k/\mathrm{d}T` is continuous and is obtained by
+automatic differentiation of the network:
 
 .. code-block:: yaml
 
@@ -116,43 +189,22 @@ checkpoint.
      type: neural_network
      weights: knet.pt        # checkpoint, resolved relative to the case directory
 
-The checkpoint stores the weights, the architecture and the input normalisation,
-and is produced by an offline training script (see the reference case below).
-
-**Two solver routes** select how the resulting non-linearity is handled, through
-``thermal.solver`` in ``input.yaml``:
-
-- ``solver: linear`` -- *lagged / Picard*. The network is evaluated at the current
-  temperature, interpolated into a coefficient field, and reused in the existing
-  linear thermal form; the outer staggered loop absorbs the non-linearity. No
-  tangent is needed.
-- ``solver: newton`` -- *external operator + Newton*. The network is wrapped as a
-  ``FEMExternalOperator`` so it behaves as a symbolic UFL coefficient: the form
-  can be differentiated and the exact tangent :math:`\mathrm{d}k/\mathrm{d}T` is
-  supplied by automatic differentiation of the network. This yields quadratic
-  Newton convergence and follows the external-operator framework of Latyshev et
-  al. (2025).
-
-Both routes produce the same temperature field; Newton converges in far fewer
-iterations. They require the optional dependencies ``torch`` and
-``dolfinx-external-operator`` (the ``nn`` extra -- see :doc:`installation`); the
-rest of Z3ST imports without them. The reference case
-``cases/verification/thermal/nn_conductivity_slab_2D`` trains a network on a known
-:math:`k(T)` law and verifies the solve against the closed-form analytic profile.
-Implemented in :mod:`z3st.models.nn_conductivity`.
-
-The external-operator route builds on the open-source ``dolfinx-external-operator``
-package by Latyshev, Bleyer, Maurini and Hale (*J. Theor. Comput. Appl. Mech.*,
-2025, https://doi.org/10.46298/jtcam.14449,
-https://github.com/a-latyshev/dolfinx-external-operator), gratefully acknowledged.
+The checkpoint stores the weights, the architecture and the input
+normalisation. At evaluation, :math:`T` is clamped to the training range
+stored in the checkpoint (default: four normalisation scales around the
+normalisation centre), with a warning printed once, and :math:`k` is floored at ``k_floor``
+(default :math:`10^{-3}` W/(m·K)). The tangent is zero where either guard is
+active. The case ``cases/verification/thermal/nn_conductivity_slab_2D``
+trains the network on the closed-form law :math:`k = 1/(a + bT)`
+(``train_knet.py``), solves with ``solver: newton`` and compares the profile
+with the analytical one. Implemented in :mod:`z3st.models.nn_conductivity`.
 
 Magni MA-MOX correlation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-The correlation of Magni et al. (2021) for minor-actinide-bearing mixed-oxide fuel
-is available as a card type. It depends on temperature and on the local
-composition -- plutonium, americium and neptunium contents, deviation from
-stoichiometry, porosity and burnup -- rather than on temperature alone:
+The correlation of Magni et al. (2021) for minor-actinide-bearing MOX depends
+on temperature, the Pu, Am and Np contents, the deviation from stoichiometry
+``x`` (or ``OM``), the porosity ``p`` and the burnup:
 
 .. code-block:: yaml
 
@@ -163,22 +215,24 @@ stoichiometry, porosity and burnup -- rather than on temperature alone:
    x: 0.02
    p: 0.05
 
-The composition entries are read from the same card and may be uniform or
-supplied as fields, which is what lets the Olander plutonium-redistribution study
-vary ``Pu`` across the pellet radius. Implemented in
-:mod:`z3st.models.magni_conductivity`.
+The composition keys are read from the ``k`` block or from the card. On the
+Newton route, ``Pu_profile: olander`` makes the Pu content a field of radius
+and burnup and ``k.use_burnup_field: true`` passes the burnup field to the
+model. Implemented in :mod:`z3st.models.magni_conductivity`.
 
 Gaussian-process correction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Rather than replace a validated correlation with a black box, a Gaussian process
-can be fitted to its **logarithmic residual**,
+A Gaussian process is fitted to the logarithmic residual of the Magni
+correlation,
 
 .. math::
 
    r = \ln\!\left(k_\mathrm{data} / k_\mathrm{Magni}\right),
    \qquad
-   k = k_\mathrm{Magni}\, e^{\bar r}.
+   k = k_\mathrm{Magni}\, e^{\bar r + \xi s},
+
+with :math:`\bar r` and :math:`s` the posterior mean and standard deviation:
 
 .. code-block:: yaml
 
@@ -187,102 +241,231 @@ can be fitted to its **logarithmic residual**,
      model: output/magni_gpr_model.npz
      mode: mean          # or: affine, with xi = number of standard deviations
 
-Three consequences of this construction are worth stating:
+- The correction multiplies :math:`k_\mathrm{Magni}` by a positive factor, so
+  :math:`k > 0`.
+- The kernel is a squared exponential with homoscedastic noise and a
+  zero-mean prior on standardised variables. The shipped fits use one
+  lengthscale for all inputs. Far from the training data
+  the posterior mean tends to the mean training residual, so :math:`k` tends to
+  the Magni correlation times a constant.
+- ``mode: affine`` with ``xi`` (default 0) solves at :math:`\xi` posterior
+  standard deviations.
 
-- the correction is multiplicative on a logarithmic target, so :math:`k` stays
-  **positive by construction**;
-- the prior is zero-mean on the *standardised* residual with an anisotropic
-  squared-exponential kernel, so where the data are silent the posterior mean
-  relaxes to the mean training residual: extrapolation outside the training
-  envelope degrades to the published correlation scaled by a constant, not to an
-  arbitrary regression;
-- the posterior standard deviation is retained, so ``mode: affine`` with a chosen
-  ``xi`` runs a scenario solve at a prescribed number of standard deviations.
+The ``.npz`` checkpoint is produced by
+``cases/studies/magni_gpr_conductivity/make_synthetic_gpr.py``, trained on a
+residual prescribed in closed form. Each GPR case's ``Allrun`` calls it.
+``fit_gpr.py`` in the same directory fits a measured dataset passed with
+``--csv``, which is not distributed with the repository. ``verify_machinery.py`` in the same directory
+compares the fitted value and temperature derivative with the prescribed ones
+over 600 to 1900 K, checks the two methods against a finite difference, and
+checks that the fit is flat in the variables the residual does not depend on.
+No measured MA-MOX dataset ships with the repository. Implemented in
+:mod:`z3st.models.gpr_conductivity`.
 
-The checkpoint is a NumPy ``.npz`` produced by
-``cases/studies/magni_gpr_conductivity/fit_gpr.py``. Verifying a data-driven law
-raises a question of its own -- how to check an implementation whose reference is
-a dataset rather than a formula -- and the answer used here is a residual
-prescribed in closed form, whose value and temperature derivative are known
-exactly. ``verify_machinery.py`` in the same directory checks the fitted hook
-against it over 600--1900 K, cross-checks the two contract methods by finite
-differences, and requires the fit to stay flat in the variables the residual does
-not depend on, so it is not rewarded for inventing structure.
 
-.. note::
+Fuel Models
+-----------
 
-   What is verified is the **machinery**. Assimilating measured MA-MOX data is
-   implemented, but no such dataset ships with the repository.
+These models act on materials that opt in on their card.
 
-Implemented in :mod:`z3st.models.gpr_conductivity`.
+Burnup
+^^^^^^
 
-Porosity Migration
-------------------
-
-Under the steep radial gradient of a high-rated rod, lenticular pores migrate up
-the gradient by vaporisation on their hot face and condensation on their cold
-face, leaving a restructured low-porosity columnar zone and accumulating as a
-central void. Z3ST solves the pore-advection equation on the same mesh as the
-thermal problem, with the pore velocity following Sens:
+A ``fissile`` material accumulates a nodal burnup field (MWd/kgU) once per
+time step, before the solve, from the source of the new step
+(``Spine.update_state``):
 
 .. math::
 
-   |\mathbf{v}| = c_0\left(c_1 + c_2 T + c_3 T^2 + c_4 T^3\right)
-   \Delta H_s P_{0.5}\,
-   \exp\!\left(-\frac{\Delta H_s}{RT}\right) T^{-2.5}\,|\nabla T|.
+   \mathrm{bu}^{n+1} = \mathrm{bu}^{n}
+   + \frac{q'''\,\Delta t}{\rho\, f_{HM}\; 8.64\times 10^{10}} ,
 
-The coupling runs both ways: porosity rescales the volumetric source and enters a
-porosity-dependent conductivity (the Kato correlation with a Maxwell--Eucken
-porosity correction, via ``thermal_conductivity_model: kato_porosity``), so the
-migration is **self-limiting** -- as porosity accumulates at the centre the local
-conductivity falls, the gradient flattens and the pore velocity vanishes. The
-transport and thermal blocks are coupled by the usual staggered fixed-point loop,
-with Aitken acceleration available.
+with ``rho`` from the card and :math:`f_{HM}` = ``heavy_metal_fraction``
+(default 0.8815, the U/UO\ :sub:`2` mass ratio). A fissile card without
+``rho`` skips the accumulation.
 
-Two discretisations of the same equation are provided, selected under
-``porosity:`` in ``input.yaml``.
+Swelling and densification
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Continuous Galerkin (default).** Streamline-upwind artificial diffusion
-(``stabilisation: su``) or streamline-upwind Petrov--Galerkin
-(``stabilisation: supg``). This path reproduces Barani et al. (2022):
+``eigenstrain: materials.fuel_swelling.solid_gas_densification`` adds the
+isotropic eigenstrain :math:`\boldsymbol\varepsilon^* = (\Delta V/V)/3\,\boldsymbol I` with
+
+.. math::
+
+   \frac{\Delta V}{V} = r_s\,\mathrm{bu} + r_g\,\mathrm{bu}\,S(T)
+   - d_0\left(1 - e^{-\mathrm{bu}/\mathrm{bu}_d}\right), \qquad
+   S(T) = \left[1 + e^{-(T - T_\mathrm{on})/w_T}\right]^{-1} ,
+
+solid swelling, gaseous swelling and densification. Card keys and defaults
+(``z3st.materials.fuel_swelling``):
+
+.. list-table::
+   :header-rows: 1
+
+   * - Symbol
+     - Key
+     - Default
+   * - :math:`r_s`
+     - ``swelling_rate``
+     - 7.0e-4 (1/(MWd/kgU))
+   * - :math:`r_g`
+     - ``gas_swelling_rate``
+     - 4.0e-4 (1/(MWd/kgU))
+   * - :math:`T_\mathrm{on}`
+     - ``gas_T_onset``
+     - 1200 K
+   * - :math:`w_T`
+     - ``gas_T_width``
+     - 150 K
+   * - :math:`d_0`
+     - ``densification_dv``
+     - 0.010
+   * - :math:`\mathrm{bu}_d`
+     - ``densification_bu``
+     - 2.0 MWd/kgU
+
+A constant ``swelling: <ΔV/V>`` on a card adds :math:`(\Delta V/V)/3\,\boldsymbol I`
+instead.
+
+UO\ :sub:`2` conductivity
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``k: materials.fuel_thermal.k`` is the modified NFI correlation of FRAPCON-3
+(Lanning et al., 2005) at zero burnup for 95 % TD UO\ :sub:`2`,
+
+.. math::
+
+   k(T) = \frac{1}{0.0452 + 2.46\times 10^{-4}\, T}
+   + \frac{3.5\times 10^{9}}{T^2}\, e^{-16361/T}
+   \quad \mathrm{W/(m\,K)} .
+
+Burnup degradation is not included.
+
+.. _power-shapes:
+
+Power shapes
+^^^^^^^^^^^^
+
+A fissile card may name a radial shape ``radial_profile`` and an axial shape
+``axial_profile`` (dotted paths). ``Spine.set_power`` evaluates them on the
+fuel degrees of freedom, multiplies them, and divides by the weighted mean
+:math:`\overline{f_r f_z} = \int_{\Omega_m} w f_r f_z\,\mathrm{d}x / \int_{\Omega_m} w\,\mathrm{d}x`,
+so :math:`\int_{\Omega_m} w\, q'''\,\mathrm{d}x` equals the nominal power for
+any shape. The built-in shapes are in ``z3st.materials.fuel_profiles``:
+
+- ``rim_peaking``: :math:`f_r = 1 + A (r/R)^p`, with :math:`R` the largest fuel
+  radius, ``radial_peak_amplitude`` :math:`A` (default 3.0) and
+  ``radial_peak_exponent`` :math:`p` (default 8.0). It stands in for the
+  Pu-239 build-up at the pellet rim.
+- ``chopped_cosine``: :math:`f_z = \max\!\big(0, \cos(\pi (z - z_\mathrm{mid})/L')\big)`,
+  with :math:`L'` = ``axial_extrapolated_length`` (default :math:`1.1\,L`, with
+  :math:`L` the fuel height).
+- ``tabulated_axial``: piecewise-linear interpolation of ``axial_table_z`` and
+  ``axial_table_f``, with the end values held outside the table.
 
 .. code-block:: yaml
 
-   porosity:
-     stabilisation: supg
-     linear_solver: direct_mumps
-     aitken: true
+   fissile: true
+   radial_profile: materials.fuel_profiles.rim_peaking
+   axial_profile: materials.fuel_profiles.chopped_cosine
+   axial_extrapolated_length: 0.5   # (m)
 
-**Discontinuous Galerkin.** A DG-1 upwind facet flux with an optional SIPG
-diffusion block, SSP-RK3 in time with automatic sub-stepping to the advective
-CFL, and a Kuzmin vertex limiter enforcing the discrete maximum principle after
-*every* stage, plus a conservative saturation cap:
+The axial shape acts on the heat source only. An axial variation of the
+coolant temperature is imposed separately, through the Robin condition.
 
-.. code-block:: yaml
+Pellet cracking (isotropic softening)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   porosity:
-     discretisation: dg
-     dg_integrator: ssprk3
-     dg_limiter: vertex
-     saturation_cap: true
+``cracking: isotropic`` applies the model of Barani et al., *Nucl. Eng. Des.*
+342 (2019): the elastic constants are rescaled from the virgin values as a
+function of the number of radial cracks :math:`n`,
 
-The DG path is the one to use when the restructuring front is sharp, since the
-limiter bounds the porosity in :math:`[0, 1]` without the artificial diffusion
-the CG path relies on.
+.. math::
+
+   E_{iso} = f(\nu)^n E, \qquad
+   \nu_{iso} = \frac{\nu}{2^n + (2^n - 1)\nu}, \qquad
+   f(\nu) = \frac{2}{3}\,\frac{2-\nu}{2+\nu}\,\frac{1}{1-\nu},
+
+.. math::
+
+   n = n_0 + (n_\infty - n_0)\left[1 - e^{-(\mathrm{LHR}_{max} - \mathrm{LHR}_0)/\tau}\right]
+   \quad (\mathrm{LHR}_{max} \ge \mathrm{LHR}_0), \qquad n = 0 \text{ otherwise},
+
+with :math:`\mathrm{LHR}_{max}` the largest rod-average linear heat rate of
+the history, so the softening does not recover. Keys and defaults:
+``cracking_lhr0`` (5.0e3 W/m), ``cracking_n0`` (1), ``cracking_n_inf`` (12),
+``cracking_tau`` (21.0e3 W/m). The rescale is applied once per time step,
+before the solve (:class:`z3st.models.cracking_model.CrackingModel`).
+
+.. _porosity-migration:
+
+Porosity migration
+^^^^^^^^^^^^^^^^^^
+
+The porosity :math:`p` is transported by
+
+.. math::
+
+   \frac{\partial p}{\partial t} + \nabla\cdot(\boldsymbol v\, p) = 0, \qquad
+   \boldsymbol v = v_0\,(c_1 + c_2T + c_3T^2 + c_4T^3)\,T^{-2.5}
+   \exp\!\left(-\frac{H_s}{RT}\right)\nabla T ,
+
+the pore velocity of Sens (1972) as used by Barani et al. (2022). Keys in the
+``porosity:`` block and defaults: ``v0`` (1.303427e8), ``c1`` (0.988), ``c2``
+(6.395e-6), ``c3`` (3.543e-9), ``c4`` (3.0e-12), ``Hs`` (5.98e5 J/mol). The
+initial value is the card key ``initial_porosity`` (default 0).
+
+The coupling to the thermal problem runs both ways. The heat source of a
+material is scaled by :math:`(1-p)/(1-p_0)`, with :math:`p_0` its
+``initial_porosity``. With ``thermal_conductivity_model: kato_porosity`` the
+conductivity is the Kato correlation for the dense matrix (card key
+``stoichiometry_deviation``, default 0.025) with a Maxwell-Eucken correction
+for pores filled with a gas of conductivity ``helium_conductivity`` (default
+0.69 W/(m·K)).
+
+Two discretisations are selected by ``porosity.discretisation``:
+
+- ``cg`` (default): P1/Q1, backward Euler, with streamline-upwind artificial
+  diffusion (``stabilisation: su``, default) or SUPG (``stabilisation:
+  supg``, :math:`\tau = [(2/\Delta t)^2 + (2|\boldsymbol v|/h)^2]^{-1/2}`). The
+  solution is clipped to :math:`[0, 1]` after each solve.
+- ``dg``: DG1 with an upwind facet flux, integrated by SSP-RK3
+  (``dg_integrator: ssprk3``, default) with sub-steps set by the advective CFL
+  limit, or by backward Euler (``dg_integrator: be``). The vertex limiter of
+  Kuzmin (2010) is applied after every stage (``dg_limiter: vertex``, default,
+  or ``clamp`` or ``none``). It preserves cell means and keeps the field in
+  :math:`[0, 1]`. The limiter and the saturation cap assume a simplex mesh.
+
+DG keys and defaults: ``dg_cfl`` (1/3), ``dg_cfl_safety`` (0.8),
+``dg_max_substeps`` (5000), ``diffusion`` (0, the optional SIPG diffusion is
+off), ``sipg_penalty`` (10), ``saturation_cap`` (false: when on, cell means
+above 1 are redistributed to neighbours, conserving :math:`\int p`),
+``saturation_sweeps`` (200). ``rim_inflow_porosity`` imposes a porosity on
+inflow boundaries. When it is unset, the DG inflow value is :math:`p^n` and the
+CG path drops the boundary term. On the CG path the boundary is the facet tag
+``rim_label`` (default ``outer``).
+
+Common keys: ``linear_solver`` (``direct_mumps``), ``rtol`` (1e-8), ``relax``
+(1.0), ``aitken`` (false) with ``aitken_omega0`` (0.5), and the convergence
+test ``conv_metric`` (``max_dof``, with ``stag_tol_rel`` 1e-6 and
+``stag_tol_abs`` 1e-8, or ``integral``, the relative change of
+:math:`\int p` below ``conv_integral_tol``, 1e-4).
 
 Reference cases: ``cases/verification/fuel/porosity_migration`` (CG) and
 ``cases/verification/fuel/porosity_migration_dg`` (DG). Implemented in
 :mod:`z3st.models.porosity_migration_model`.
 
-SCIANTIX Coupling (Fission-Gas Behaviour)
------------------------------------------
+SCIANTIX coupling (fission gas)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Mesoscale fission-gas behaviour is not reimplemented in Python. Z3ST drives
-**SCIANTIX** per fuel point through its existing C-linkage coupling entry, and
-receives back gaseous swelling and fission gas release. The swelling enters
-through the same **eigenstrain bus** the internal models use, so the coupling is
-a bounded task of the same kind as adding a model rather than a special case in
-the solver.
+With ``models.fission_gas.enabled: true``, Z3ST runs SCIANTIX at every
+temperature degree of freedom of the fissile materials, once per time step,
+with the local temperature, the fission rate :math:`q'''/E_f`
+(``energy_per_fission``, default 3.2e-11 J) and the burnup pair of the step.
+The gaseous swelling it returns enters the mechanics through the card key
+``eigenstrain: materials.sciantix_swelling.gaseous_swelling`` (or
+``with_solid``, ``with_solid_densification`` to add the solid swelling and
+densification of ``z3st.materials.fuel_swelling``).
 
 .. code-block:: yaml
 
@@ -292,205 +475,90 @@ the solver.
        initial_conditions: input_initial_conditions.txt
        energy_per_fission: 3.2e-11
 
-This requires a compiled SCIANTIX **shared** library, pointed to by the
-``SCIANTIX_LIB`` environment variable. The build recipe is not the one SCIANTIX's
-own CMake produces by default, which is a static archive; see
-``z3st/coupling/sciantix/README.md`` for the exact command.
-
-Reference cases: ``cases/regression/fg_test_2D`` and
-``cases/regression/fg_test_fuel``. The former is the integral rod of
-``cases/regression/pwr_rod_2D`` with the coupling switched on and nothing else
-changed, which makes the two directly comparable. Implemented in
+SCIANTIX must be compiled as a shared library and located through
+``models.fission_gas.lib`` or the ``SCIANTIX_LIB`` environment variable (see
+``z3st/coupling/sciantix/README.md``). Reference cases:
+``cases/regression/fg_test_2D`` (the rod of ``cases/regression/pwr_rod_2D``
+with the coupling on) and ``cases/regression/fg_test_fuel``. Implemented in
 :mod:`z3st.coupling.sciantix.sciantix_binding`.
 
-Power Shaping (Radial and Axial Form Factors)
----------------------------------------------
-
-The volumetric source ``q'''`` of a fissile region can be *redistributed* by
-multiplicative form factors that leave its integral -- the prescribed linear
-heat rate -- unchanged. A material card names them via ``radial_profile`` and/or
-``axial_profile`` (resolved like the symbolic ``k(T)`` hook); ``set_power``
-evaluates them on the fuel degrees of freedom, multiplies them together,
-normalises the composite to weighted mean 1, and scales the source:
-
-.. math::
-
-   q'''(\boldsymbol{x}) = \frac{\mathrm{LHR}}{A}\;
-   \frac{f_r(r, bu)\, f_z(z)}{\langle f_r f_z \rangle},
-   \qquad
-   \langle f \rangle = \frac{\int_{\Omega_m} w\, f \,\mathrm{d}x}{\int_{\Omega_m} w \,\mathrm{d}x},
-
-with :math:`w = 2\pi r` in axisymmetric and :math:`w = 1` otherwise, evaluated as
-finite-element integrals over the material, so only the *distribution* changes,
-never the total power: :math:`\int_{\Omega_m} w\, q''' \,\mathrm{d}x` equals the
-nominal power to round-off for any profile. Implemented in
-``materials/fuel_profiles.py``.
-
-Radial profile
-^^^^^^^^^^^^^^
-
-The built-in ``rim_peaking`` factor
-
-.. math::
-
-   f_r(r) = 1 + A \left(\frac{r}{R}\right)^p
-
-is flat through the pellet interior and rises steeply at the surface -- a
-parametric stand-in for the Pu-239 rim build-up (resonance capture in U-238
-breeds plutonium at the surface, so the local rating peaks: the "rim effect").
-``R`` is the pellet outer radius; the card sets ``radial_peak_amplitude`` (:math:`A`,
-default 3) and ``radial_peak_exponent`` (:math:`p`, default 8). A mechanistic
-TUBRNP profile drops in behind the same interface.
-
-.. code-block:: yaml
-
-   radial_profile: materials.fuel_profiles.rim_peaking
-   radial_peak_amplitude: 2.0
-   radial_peak_exponent: 8.0
-
-Axial profile
-^^^^^^^^^^^^^
-
-The axial factor shapes the source along the rod axis, representing the axial
-neutron-flux / power shape. Two built-ins:
-
-- ``chopped_cosine`` -- :math:`f_z(z) = \cos\!\big(\pi (z - z_\mathrm{mid})/L'\big)`,
-  with the extrapolated length :math:`L' \ge L` from ``axial_extrapolated_length``
-  (default :math:`1.1\,L`); the classic 1-D axial reactor profile (Todreas & Kazimi).
-- ``tabulated_axial`` -- piecewise-linear interpolation of user points
-  ``axial_table_z`` / ``axial_table_f`` (e.g. node-wise peaking factors from a
-  core-physics calculation).
-
-.. code-block:: yaml
-
-   axial_profile: materials.fuel_profiles.chopped_cosine
-   axial_extrapolated_length: 0.5   # (m)
-
-.. note::
-
-   The axial *power* profile shapes the heat *source*; it is **not** the coolant
-   temperature. The coolant enthalpy rise up the channel (a higher bulk coolant
-   temperature toward the outlet) is a distinct effect, applied through an
-   axially varying Robin condition :math:`T_\mathrm{ext}(z)` on the clad outer
-   surface -- part of the coolant heat-transfer model, not the power form factor.
-   An axial profile is only meaningful on a tall / full-height rod; on a short
-   r--z segment (e.g. ``regression/pwr_rod_2D``, ~1 cm) the source is essentially
-   flat over the segment height.
 
 Mechanical Model
 ----------------
 
-Quasi-static mechanical equilibrium is the linear-momentum balance
+The displacement :math:`\boldsymbol u` satisfies quasi-static equilibrium with
+small strains,
 
 .. math::
 
-   -\nabla \cdot \boldsymbol{\sigma} = \boldsymbol{f},
+   \nabla\cdot\boldsymbol\sigma + \boldsymbol b = \boldsymbol 0, \qquad
+   \boldsymbol\varepsilon = \mathrm{sym}\nabla\boldsymbol u, \qquad
+   \boldsymbol\varepsilon_{el} = \boldsymbol\varepsilon - \boldsymbol\varepsilon^*
+   - \boldsymbol\varepsilon_{cr} - \boldsymbol\varepsilon_p ,
 
-with body force :math:`\boldsymbol{f}` (e.g. gravity along the regime's vertical
-axis) and the small-strain tensor
-:math:`\boldsymbol{\varepsilon} = \tfrac{1}{2}(\nabla \boldsymbol{u} + \nabla \boldsymbol{u}^\top)`.
-The out-of-plane components follow the active regime: retained (plane strain),
-solved as part of :math:`\boldsymbol{u}` (3D), or expressed in cylindrical
-components (axisymmetric).
-
-**Weak form.** Find :math:`\boldsymbol{u} \in V_u` such that for all
-:math:`\boldsymbol{v} \in V_u`
+with the body force :math:`\boldsymbol b = -\rho g\,\boldsymbol e_\mathrm{vertical}`
+from ``mechanical.gravity`` (default 0). The eigenstrain is isotropic,
 
 .. math::
 
-   \int_\Omega \boldsymbol{\sigma}(\boldsymbol{u}) : \nabla \boldsymbol{v} \, \mathrm{d}\Omega
-   = \int_\Omega \boldsymbol{f} \cdot \boldsymbol{v} \, \mathrm{d}\Omega
-   + \int_{\Gamma_N} \boldsymbol{t}_0 \cdot \boldsymbol{v} \, \mathrm{d}s .
+   \boldsymbol\varepsilon^* = \left[\alpha (T - T_\mathrm{ref}) + \frac{\Delta V}{3V}\right]\boldsymbol I ,
 
-Five constitutive routes are selected by the ``constitutive`` field of each
-material card.
+from the card keys ``alpha`` and ``T_ref`` (thermal part, when the thermal
+model is on), ``swelling`` (constant :math:`\Delta V/V`) and ``eigenstrain``
+(a callable such as the fuel swelling above).
 
-Isotropic linear elasticity (Lamé)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**Boundary conditions** (``mechanical:`` block of ``boundary_conditions.yaml``):
+``Dirichlet`` (full vector ``displacement``), ``Dirichlet_x/y/z`` (one
+component), ``Clamp_x/y/z`` (one component set to zero), ``Slip_x/y/z`` (the
+named component free, the others zero) and ``Neumann`` (key ``traction``, a
+normal traction :math:`t_N\boldsymbol n`). Values may be lists with one entry
+per generated time point (the sum of the intervals plus one).
 
-The default route is
-
-.. math::
-
-   \boldsymbol{\sigma} = \mathbb{C} : \big( \boldsymbol{\varepsilon} - \alpha (T - T_{ref}) \boldsymbol{I} \big),
-
-with :math:`\mathbb{C}` built from the Lamé parameters :math:`\lambda, G`. The
-thermal-stress contribution
-:math:`\boldsymbol{\sigma}_{th} = -(3\lambda + 2G)\,\alpha (T - T_{ref})\,\boldsymbol{I}`
-is moved to the right-hand side of the momentum balance.
-
-.. note::
-
-   **Consistent damage degradation of the thermal stress.** When the phase-field
-   damage block is active, *both* the elastic and the thermal-stress
-   contributions are weighted by the same degradation function :math:`g(D)`, so
-   the effective stress driving equilibrium is
-
-   .. math::
-
-      \boldsymbol{\sigma}_{eff} = g(D)\, \mathbb{C} : \big( \boldsymbol{\varepsilon} - \alpha (T - T_{ref}) \boldsymbol{I} \big).
-
-   A fully damaged cell (:math:`D \to 1`, :math:`g \to K`) then recovers the
-   traction-free crack-face limit for both driving forces. Degrading only the
-   elastic term while leaving :math:`\boldsymbol{\sigma}_{th}` at full magnitude
-   would force cracked cells to carry an unopposed thermal body force against a
-   stiffness reduced to :math:`g(D)\to K=10^{-6}`, producing strains that grow as
-   :math:`1/K` and a catastrophic loss of energy conservation. The consistent
-   :math:`g(D)` weighting of both contributions is therefore essential to any
-   thermo-mechanical-fracture problem in which a real crack opens.
-
-Anisotropic elasticity (Voigt)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-A user-supplied :math:`6\times 6` elasticity matrix in Voigt form,
-:math:`\boldsymbol{\sigma} = \mathbb{C}_{\text{Voigt}} : \boldsymbol{\varepsilon}`,
-makes anisotropic elasticity available without changing the assembly code.
-
-Neo-Hookean hyperelasticity
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. note::
-
-   This route is **implemented and verified** (case
-   ``verification/mechanics/uniaxial_tension_nonlinear``), not planned.
-
-Compressible Neo-Hookean hyperelasticity uses the strain-energy density
+**Weak form** (linear elastic path):
 
 .. math::
 
-   \psi(\boldsymbol{F}) = \frac{\mu}{2}(I_C - 3) - \mu \ln J + \frac{\lambda}{2} (\ln J)^2,
+   \sum_m \int_{\Omega_m} w\, g(d)\, \mathbb C : \boldsymbol\varepsilon(\boldsymbol u) : \boldsymbol\varepsilon(\boldsymbol v)\,\mathrm{d}x
+   = \sum_m \int_{\Omega_m} w\, \boldsymbol b \cdot \boldsymbol v \,\mathrm{d}x
+   + \sum_m \int_{\Omega_m} w\, g(d)\, \mathbb C : \boldsymbol\varepsilon^* : \boldsymbol\varepsilon(\boldsymbol v)\,\mathrm{d}x
+   + \sum_{\Gamma_N} \int_{\Gamma_N} w\, t_N\, \boldsymbol n \cdot \boldsymbol v \,\mathrm{d}s
+   - \sum_{\Gamma_c} \int_{\Gamma_c} w\, P_c\, \boldsymbol n \cdot \boldsymbol v \,\mathrm{d}s ,
 
-with :math:`\boldsymbol{C} = \boldsymbol{F}^\top \boldsymbol{F}`,
-:math:`I_C = \mathrm{tr}\,\boldsymbol{C}`, :math:`J = \det \boldsymbol{F}`, and
-:math:`\boldsymbol{F} = \boldsymbol{I} + \nabla \boldsymbol{u}`. The first
-Piola--Kirchhoff and Cauchy stresses are obtained by **automatic
-differentiation** of the energy,
+with :math:`g(d) = 1` when damage is off and :math:`P_c` the
+:ref:`contact pressure <penalty-contact>`. When damage is on, the elastic
+stress and the eigenstress are both multiplied by :math:`g(d)`, so a cell with
+:math:`d \to 1` carries neither.
 
-.. math::
+**Solution path.** The step is solved as a linear problem when
+``mechanical.solver: linear`` and no material creeps, is plastic or is
+hyperelastic. Otherwise the residual
+:math:`F(\boldsymbol u; \boldsymbol v) = \int w\, \boldsymbol\sigma(\boldsymbol u):\boldsymbol\varepsilon(\boldsymbol v)\,\mathrm{d}x - (\text{right-hand side})`
+is solved by Newton's method in PETSc SNES with the Jacobian from
+``ufl.derivative`` (see :ref:`coupled-scheme` for the solver options).
+``mechanical.solver`` is a required key.
 
-   \boldsymbol{P} = \frac{\partial \psi}{\partial \boldsymbol{F}}, \qquad
-   \boldsymbol{\sigma} = J^{-1} \boldsymbol{P} \boldsymbol{F}^\top ,
+Constitutive routes
+^^^^^^^^^^^^^^^^^^^
 
-so a single line, ``P = ufl.diff(psi, F)``, replaces a hand-derived stress
-tensor; the consistent tangent is the UFL derivative of the residual. The
-problem is solved with the PETSc SNES Newton driver and a configurable line
-search.
+The route is the card key ``constitutive`` (default ``lame``):
 
-Custom constitutive route
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+- ``lame``: :math:`\boldsymbol\sigma = \lambda\,\mathrm{tr}(\boldsymbol\varepsilon)\boldsymbol I + 2\mu\boldsymbol\varepsilon`
+  minus the eigenstress, from ``E`` and ``nu``. ``E`` and ``nu`` may be dotted
+  paths of functions of :math:`T`.
+- ``hyperelastic``: compressible Neo-Hookean,
+  :math:`\psi(\boldsymbol F) = \tfrac{\mu}{2}(\mathrm{tr}\,\boldsymbol C - 3) - \mu\ln J + \tfrac{\lambda}{2}(\ln J)^2`,
+  with :math:`\boldsymbol F = \boldsymbol I + \nabla\boldsymbol u`,
+  :math:`\boldsymbol C = \boldsymbol F^\top\boldsymbol F`,
+  :math:`J = \det\boldsymbol F`. The first Piola-Kirchhoff stress is
+  ``P = ufl.diff(psi, F)`` and the Cauchy stress
+  :math:`J^{-1}\boldsymbol P\boldsymbol F^\top`. Verified by
+  ``cases/verification/mechanics/uniaxial_tension_nonlinear``.
+- ``plasticity``: J2, below. A ``lame`` card that has ``yield_strength`` is
+  promoted to this route when ``models.plasticity`` is on.
+- ``custom``: ``stress_function`` names a Python function
+  ``f(u, T, material, model=...)`` that returns the stress as a UFL tensor.
 
-A user-supplied stress function loaded from an arbitrary Python module gives an
-explicit extension point for arbitrary constitutive laws; this is the route used
-by the crystal-plasticity demonstration below.
-
-**Boundary conditions.** Vector and per-component Dirichlet conditions
-(:math:`u_x = u_x^d`, ...), :math:`\mathrm{Clamp}_i` and :math:`\mathrm{Slip}_i`
-variants that constrain a single component to zero, and scalar Neumann tractions
-along the facet normal. Any value may be supplied as a list of length
-``n_steps`` for step-wise loading.
-
-Implemented in :class:`z3st.models.mechanical_model.MechanicalModel`; supports
-1D, 2D (plane strain), 3D, and axisymmetric regimes.
+Implemented in :class:`z3st.models.mechanical_model.MechanicalModel`.
 
 .. figure:: images/cylindrical_shell/stress_comparison.png
    :width: 75%
@@ -499,215 +567,230 @@ Implemented in :class:`z3st.models.mechanical_model.MechanicalModel`; supports
    Linear elasticity: radial and hoop stress in a thick cylindrical shell,
    numerical against the analytical Lamé solution.
 
-J2 plasticity (von Mises)
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+J2 plasticity
+^^^^^^^^^^^^^
 
-A small-strain J2 model with linear isotropic hardening, integrated by a
-return-mapping update at quadrature points. The yield function is
-
-.. math::
-
-   f(\boldsymbol{\sigma}, p) = \sigma_{eq} - \sigma_y(p), \qquad
-   \sigma_y(p) = \sigma_0 + H p,
-
-with the von Mises equivalent stress
-:math:`\sigma_{eq} = \sqrt{\tfrac{3}{2}\,\boldsymbol{s}:\boldsymbol{s}}`,
-deviatoric stress :math:`\boldsymbol{s}`, hardening modulus :math:`H`, and
-cumulative plastic strain :math:`p`. An elastic predictor is computed each
-increment; if the yield surface is violated, a radial-return correction is
-applied,
+Small-strain von Mises plasticity with linear isotropic hardening, card keys
+``yield_strength`` (:math:`\sigma_y`) and ``hardening_modulus`` (:math:`H`).
+The return map is written in UFL (``PlasticityModel._j2_return_map``):
 
 .. math::
 
-   \Delta p = \frac{\langle f_{trial} \rangle_+}{3G + H}, \qquad
-   \boldsymbol{\sigma} = \boldsymbol{\sigma}_{trial} - 3G \Delta p\, \boldsymbol{n}, \qquad
-   \boldsymbol{n} = \frac{\boldsymbol{s}_{trial}}{\sigma_{eq,\,trial}} .
+   \boldsymbol\sigma^{tr} = \mathbb C : (\boldsymbol\varepsilon - \boldsymbol\varepsilon_p^n), \qquad
+   f = \sigma_{eq}^{tr} - (\sigma_y + H p^n), \qquad
+   \Delta p = \frac{\langle f \rangle_+}{3\mu + H},
 
-The plastic-strain tensor and :math:`p` live on quadrature spaces and are
-updated at the end of each converged staggered iteration. Implemented in
-:class:`z3st.models.plasticity_model`.
+.. math::
+
+   \boldsymbol\sigma = \boldsymbol\sigma^{tr} - 3\mu\,\Delta p\,\boldsymbol n, \qquad
+   \boldsymbol n = \frac{\boldsymbol s^{tr}}{\sigma_{eq}^{tr}}, \qquad
+   \Delta\boldsymbol\varepsilon_p = \tfrac32\,\Delta p\,\boldsymbol n ,
+
+with :math:`\sigma_{eq} = \sqrt{\tfrac32\,\boldsymbol s:\boldsymbol s}`. The
+plastic strain tensor and the cumulative plastic strain :math:`p` live on
+quadrature spaces of degree :math:`2k+1`, with :math:`k` the displacement
+order, and the volume integrals use the same degree. The history is updated
+once per time step, after the staggered loop ends (``Solver.solve_staggered``).
+
+The trial elastic strain is the total strain minus the plastic strain only.
+The thermal and swelling eigenstress is assembled in the residual, but the
+yield check does not subtract the eigenstrain. J2 plasticity should therefore
+be used only where no thermal or swelling eigenstrain is present. Verified by
+``cases/verification/plasticity/j2_hardening_2D``.
 
 .. figure:: images/plasticity_2D/output/stress_strain_curve.png
    :width: 65%
    :align: center
 
-   J2 plasticity: stress-strain response (numerical vs analytical, plane strain),
-   recovering the elastic slope and the linear hardening branch.
+   J2 plasticity: stress-strain response, numerical against analytical (plane
+   strain), with the elastic slope and the linear hardening branch.
 
-Crystal plasticity (single grain)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Crystal plasticity (custom route)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ``plasticity.mode: custom`` hook replaces the J2 update with a user-supplied
-routine. The demonstration case ``verification/plasticity/crystal_single_grain`` implements
-rate-dependent single-crystal plasticity on one 3D grain. The stress follows the
-elastic law on the plastic-corrected strain,
-
-.. math::
-
-   \boldsymbol{\sigma} = \mathbb{C} : (\boldsymbol{\varepsilon} - \boldsymbol{\varepsilon}^p),
-
-with the plastic strain accumulated over the active slip systems through the
-Schmid tensor and a power-law slip rate,
+``plasticity.mode: custom`` replaces the J2 history update with the function
+``get_cp_internal_variables`` of the module that holds ``stress_function``.
+The case ``cases/verification/plasticity/crystal_single_grain`` uses it for
+rate-dependent plasticity of one FCC grain with the single slip system
+:math:`(111)[01\bar{1}]`:
 
 .. math::
 
-   \dot{\boldsymbol{\varepsilon}}^p = \sum_s \dot{\gamma}^s\, \boldsymbol{P}^s, \qquad
-   \boldsymbol{P}^s = \tfrac{1}{2}\big(\boldsymbol{m}^s \otimes \boldsymbol{n}^s + \boldsymbol{n}^s \otimes \boldsymbol{m}^s\big),
+   \boldsymbol\sigma = \mathbb C : (\boldsymbol\varepsilon - \boldsymbol\varepsilon^p), \qquad
+   \dot{\boldsymbol\varepsilon}^p = \dot\gamma\,\boldsymbol P, \qquad
+   \boldsymbol P = \tfrac12(\boldsymbol m\otimes\boldsymbol n + \boldsymbol n\otimes\boldsymbol m), \qquad
+   \dot\gamma = \dot\gamma_0 \left|\frac{\tau}{g_0}\right|^{n}\mathrm{sign}(\tau), \qquad
+   \tau = \boldsymbol\sigma:\boldsymbol P ,
 
-.. math::
-
-   \dot{\gamma}^s = \dot{\gamma}_0 \left| \frac{\tau^s}{g_0} \right|^{n} \operatorname{sign}(\tau^s), \qquad
-   \tau^s = \boldsymbol{\sigma} : \boldsymbol{P}^s ,
-
-where :math:`\boldsymbol{m}^s` and :math:`\boldsymbol{n}^s` are the slip
-direction and slip-plane normal, :math:`\tau^s` is the resolved shear stress,
-:math:`g_0` is the slip resistance (CRSS), :math:`\dot{\gamma}_0` is the
-reference slip rate, and :math:`n` is the power-law exponent. Time integration is
-backward Euler,
-:math:`\boldsymbol{\varepsilon}^p_{n+1} = \boldsymbol{\varepsilon}^p_{n} + \Delta t\, \dot{\boldsymbol{\varepsilon}}^p_{n+1}`,
-with the plastic strain stored as a history variable. The demo uses an FCC
-system :math:`(111)[01\bar{1}]` (Schmid factor :math:`\approx 0.408`) and obtains
-the **exact Jacobian by automatic differentiation** -- precisely the case that is
-painful to differentiate by hand. The result is verified against saturation-stress
-theory.
+integrated by backward Euler, with the Newton tangent from ``ufl.derivative``.
 
 .. figure:: images/demo_CP_single_grain/output/stress_strain_curve.png
    :width: 65%
    :align: center
 
-   Crystal plasticity (single grain): the Z3ST response saturates towards the
-   analytical saturation stress :math:`\sigma_{sat}`.
+   Crystal plasticity (single grain): the response approaches the analytical
+   saturation stress :math:`\sigma_{sat}`.
 
-Creep Model
------------
+Creep
+^^^^^
 
-Implicit creep for a material carrying ``creep: norton`` on its card, built on
-the incremental variational principle (Ortiz and Stainier): the backward-Euler
-step minimises the incremental potential, and the cell-local minimisation over
-the creep-strain increment condenses to the classical viscoplastic radial
-return, one scalar equation per point,
+A card with ``creep: norton`` and the keys ``creep_A0`` (Pa\ :sup:`-n`/s),
+``creep_n`` and ``creep_Q`` (J/mol) follows
 
 .. math::
 
-   g(\Delta\gamma) = \Delta\gamma - \Delta t \left[ A(T)\,
-   (\sigma_{eq}^{tr} - 3G\Delta\gamma)^{n_{cr}}
-   + B\,\phi\,(\sigma_{eq}^{tr} - 3G\Delta\gamma) \right] = 0,
+   \dot\varepsilon^{cr}_{eq} = A_0\, e^{-Q/RT}\,\sigma_{eq}^{\,n} + B\phi\,\sigma_{eq},
+   \qquad
+   \dot{\boldsymbol\varepsilon}_{cr} = \dot\varepsilon^{cr}_{eq}\,\tfrac32\,\frac{\boldsymbol s}{\sigma_{eq}} ,
 
-with the Norton-Arrhenius prefactor :math:`A(T) = A_0 \exp(-Q/RT)` (card keys
-``creep_A0``, ``creep_n``, ``creep_Q``) and an optional irradiation-creep term
-linear in stress, :math:`\dot\varepsilon_{irr} = B\phi\sigma_{eq}` (card keys
-``creep_irr_B`` and ``fast_flux``, both required together; without them the
-law reduces exactly to thermal Norton). Both terms preserve the monotone and
-concave structure of :math:`g`, so the scalar Newton iteration converges
-unconditionally.
-
-The exact root is maintained in a DG0 predictor field by a vectorised NumPy
-Newton refreshed before every mechanical solve; the UFL stress expression
-carries a single symbolic Newton step from the predictor, so
-``ufl.derivative`` recovers exactly the implicit-function-theorem consistent
-tangent without symbolic nesting. The accumulated creep strain is a
-per-material DG0 tensor state, deviatoric by construction. Verified against
-closed-form solutions by ``verification/fuel/creep`` (constant stress,
-backward Euler exact) and ``verification/fuel/creep_relaxation`` (stress
-relaxation vs the scalar recursion).
-
-Fuel Cracking (Isotropic Softening)
------------------------------------
-
-The temperature gradient across an oxide fuel pellet cracks it as soon as the
-thermal tensile stress exceeds the fracture stress. Following Barani et al.,
-*Nucl. Eng. Des.* 342 (2019), the cracked pellet is represented as an
-isotropically softened solid: the elastic constants are rescaled as a function
-of the number of macroscopic cracks :math:`n`, conserving principal strains,
+thermal Norton creep plus an irradiation-creep term that is present only when
+both ``creep_irr_B`` (:math:`B`) and ``fast_flux`` (:math:`\phi`) are on the
+card. Backward Euler with a radial return gives one scalar equation per point
+for the increment :math:`\Delta\gamma`,
 
 .. math::
 
-   E_{iso}(n) = f(\nu)^n E, \qquad
-   \nu_{iso}(n) = \frac{\nu}{2^n + (2^n - 1)\nu}, \qquad
-   f(\nu) = \frac{2}{3}\,\frac{2-\nu}{2+\nu}\,\frac{1}{1-\nu},
+   \Delta\gamma - \Delta t\, A(T)\, b^n - \Delta t\, B\phi\, b = 0, \qquad
+   b = \sigma_{eq}^{tr} - 3\mu\,\Delta\gamma ,
 
-applied from the virgin constants. The number of cracks follows the paper's
-empirical correlation on the rod-average linear heat rate,
+where the trial stress uses
+:math:`\boldsymbol\varepsilon - \boldsymbol\varepsilon^* - \boldsymbol\varepsilon_{cr}^n`.
+A vectorised NumPy Newton solves this equation on a DG0 predictor field
+before every mechanical solve, and the UFL stress carries one further Newton
+correction from that predictor, so ``ufl.derivative`` gives the consistent
+tangent (:mod:`z3st.models.creep_model`). The relative change of the predictor
+enters the staggered convergence test of the mechanical block. The creep strain
+is stored on a DG0 tensor field per material and updated once per time step.
+Creep forces the SNES path. Without the thermal model, :math:`A(T)` is
+evaluated at the card ``T_initial``. Verified by
+``cases/verification/fuel/creep``, ``creep_irradiation`` and
+``creep_relaxation``.
 
-.. math::
+.. _model-restrictions:
 
-   n = n_0 + (n_\infty - n_0)\left[1 - e^{-(LHR - LHR_0)/\tau}\right]
-   \quad (LHR \geq LHR_0),
+Combinations refused at load
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-with the fitted constants :math:`LHR_0 = 5` kW/m, :math:`n_0 = 1`,
-:math:`n_\infty = 12`, :math:`\tau = 21` kW/m. Cracking is irreversible: the
-correlation is driven by the maximum LHR seen in the power history (no
-healing). Activation is per material card with ``cracking: isotropic``; the
-constants can be overridden via ``cracking_lhr0``, ``cracking_n0``,
-``cracking_n_inf``, ``cracking_tau``. The rescaled constants are applied once
-per time step, before the solve.
+``Spine.load_materials`` and :class:`z3st.core.config.Config` raise an
+error for:
 
-Phase-Field Damage (Fracture Mechanics)
----------------------------------------
+- creep with damage, plasticity or the cohesive model in the same run,
+- creep on any route other than ``lame``,
+- a plastic material (``constitutive_mode`` ``plasticity``) with damage. The
+  plastic work does not enter the crack driving force, so the combination
+  would not be a ductile-fracture model,
+- the cohesive model without ``models.mechanical``, or with damage or
+  plasticity,
+- an irradiation-creep card with only one of ``creep_irr_B`` and ``fast_flux``.
 
-Brittle fracture is modelled with the variational phase-field approach, in which
-the sharp crack is regularised by a continuous damage field
-:math:`D \in [0, 1]`. The total energy is
 
-.. math::
+Phase-Field Fracture
+--------------------
 
-   E_{tot}(\boldsymbol{u}, D) = \int_\Omega g(D)\, \psi^+(\boldsymbol{\varepsilon}) \, \mathrm{d}\Omega
-   + \int_\Omega \psi^-(\boldsymbol{\varepsilon}) \, \mathrm{d}\Omega
-   + G_c \int_\Omega \gamma(D, \nabla D) \, \mathrm{d}\Omega,
-
-with the quadratic degradation function :math:`g(D) = (1-D)^2 + K` and
-regularisation :math:`K = 10^{-6}`. Two crack-density functionals are supported,
-
-.. math::
-
-   \gamma_{AT2} = \frac{1}{2}\left( \frac{D^2}{\ell_c} + \ell_c\, |\nabla D|^2 \right), \qquad
-   \gamma_{AT1} = \frac{3}{8}\left( \frac{D}{\ell_c} + \ell_c\, |\nabla D|^2 \right),
-
-where :math:`\ell_c` is the regularisation length. AT1 has an analytical elastic
-threshold below which damage cannot grow; AT2 has none.
-
-**Energy splits.** Two splits define the crack-driving force :math:`\psi^+`: the
-Miehe spectral split (positive principal strains drive cracking) and the Amor
-volumetric/deviatoric split,
+The phase field follows the hybrid formulation of Ambati et al. (2015, their
+Eq. 27). The whole stress is degraded,
 
 .. math::
 
-   \psi^+ = \tfrac{1}{2}\lambda \langle \mathrm{tr}\,\boldsymbol{\varepsilon} \rangle_+^2
-   + G\, \mathrm{dev}(\boldsymbol{\varepsilon}) : \mathrm{dev}(\boldsymbol{\varepsilon}),
+   \boldsymbol\sigma = g(d)\, \mathbb C : \boldsymbol\varepsilon_{el}, \qquad
+   g(d) = (1-d)^2 + K, \qquad K = 10^{-6},
 
-which is cheaper and well suited to AT1.
+so the momentum balance keeps the form of the undamaged model, while only the
+tensile part :math:`\psi^+` of the elastic energy drives the crack through the
+history field :math:`\mathcal H`. The coupled system does not derive from an
+energy functional. For the consequences on the staggered solver see
+:ref:`staggered-theory`.
 
-**Staggered governing equations.** With fixed :math:`D`, solve mechanics with the
-degraded stress; with fixed :math:`\boldsymbol{u}`, solve the damage sub-problem
-driven by the history field :math:`H`. The history is stored cell-by-cell on the
-:math:`DG_0` space: non-dimensional for AT2 (:math:`H = (2\ell_c/G_c)\,\psi^+`)
-and as the physical positive elastic energy density for AT1.
-
-**Irreversibility** is enforced point-wise after every staggered iteration,
+**AT2** (``damage.type: AT2``):
 
 .. math::
 
-   D^{n+1} = \min\!\big(1, \max(D^{n+1}, D^{n})\big).
+   -\ell^2\Delta d + (1 + \mathcal H)\,d = \mathcal H, \qquad
+   \mathcal H = \max_{\tau\le t}\frac{2\ell}{G_c}\,\psi^+(\boldsymbol\varepsilon_{el}) .
 
-**Hybrid constraint (optional).** The Ambati-Gerasimov-De Lorenzis hybrid
-constraint sets the :math:`\psi^+` contribution to zero in cells where
-:math:`\psi^- > \psi^+` (predominantly compression), suppressing spurious crack
-growth while preserving the energy that resists fracture.
+**AT1** (``damage.type: AT1``, Pham et al. 2011):
 
-**Thermo-mechanical coupling.** When thermal, mechanical, and damage blocks are
-all active, :math:`\psi^+` is evaluated on the **elastic** strain
-:math:`\boldsymbol{\varepsilon}_{el} = \boldsymbol{\varepsilon} - \alpha(T - T_{ref})\boldsymbol{I}`,
-so that unconstrained uniform thermal expansion produces zero releasable energy
-and zero crack-driving force. In ``regime: 2d`` plane strain, the z-component of
-the thermal eigenstrain is suppressed in the damage driver only (the geometrically
-blocked z-expansion would otherwise drive damage everywhere through the deviatoric
-channel); the mechanical equilibrium still uses the full plane-strain thermal
-stress.
+.. math::
 
-**Pre-crack seeding.** Damage Dirichlet conditions :math:`D = D_d` fix healthy
-regions; imposing :math:`D = 1` on a thin internal slit seeds a pre-crack and lets
-the staggered scheme propagate damage from a known position rather than relying on
-spontaneous nucleation.
+   -\tfrac34 G_c\ell\,\Delta d + 2\mathcal H d = 2\mathcal H - \tfrac{3G_c}{8\ell},
+   \qquad \mathcal H = \psi^+ ,
+
+solved with a diagonal shift :math:`10^{-8} G_c/\ell` on the left-hand side.
+The constant term gives AT1 an elastic threshold, :math:`d` stays zero until
+:math:`2\mathcal H > 3G_c/(8\ell)`. The weak forms are those of
+``DamageModel._damage_step``, with the weight :math:`w`.
+
+**Crack driving force.** :math:`\psi^+` is evaluated on
+:math:`\boldsymbol\varepsilon_{el} = \boldsymbol\varepsilon - \alpha(T - T_\mathrm{ref})\boldsymbol I`.
+The swelling and callable eigenstrains are not subtracted. In the ``2d``
+regime the :math:`zz` component of the thermal eigenstrain is omitted from the
+driving force and from ``MechanicalModel.elastic_energy_density``, which gives
+the ``StrainEnergyDensity`` output and the ``E_el`` column of ``energies.txt``.
+The equilibrium keeps it. In plane strain the axial expansion is blocked, and
+keeping the :math:`zz` term would drive damage through the deviatoric part. With :math:`\langle x\rangle_\pm = (x\pm|x|)/2` and
+:math:`K_n = \lambda + 2\mu/n_d`, where :math:`n_d` is the dimension of the
+strain tensor (3 in the ``2d``, ``3d`` and ``axisymmetric`` regimes, so
+:math:`K_n` is the bulk modulus), the splits selected by ``damage.split`` are
+
+- ``amor``, volumetric-deviatoric (Amor et al. 2009):
+  :math:`\psi^+ = \tfrac{K_n}{2}\langle\mathrm{tr}\,\boldsymbol\varepsilon_{el}\rangle_+^2 + \mu\,\mathrm{dev}\,\boldsymbol\varepsilon_{el}:\mathrm{dev}\,\boldsymbol\varepsilon_{el}`,
+- ``miehe``, spectral (Miehe et al. 2010):
+  :math:`\psi^+ = \tfrac{\lambda}{2}\langle\mathrm{tr}\,\boldsymbol\varepsilon_{el}\rangle_+^2 + \mu\sum_i\langle\varepsilon_i\rangle_+^2`,
+  with the principal strains from Cardano's formula,
+- ``star_convex`` (Vicentini et al. 2024):
+  :math:`\psi^+ = \mu|\mathrm{dev}\,\boldsymbol\varepsilon_{el}|^2 + \tfrac{K_n}{2}\big(\langle\mathrm{tr}\,\boldsymbol\varepsilon_{el}\rangle_+^2 - \gamma^*\langle\mathrm{tr}\,\boldsymbol\varepsilon_{el}\rangle_-^2\big)`,
+  with :math:`\gamma^*` = ``damage.gamma_star`` (default 0, which reduces to
+  ``amor``).
+
+Without ``split`` the default is ``miehe`` for AT2 and ``amor`` for AT1
+(``DamageModel.psi_split``).
+
+**Hybrid constraint.** With ``damage.hybrid_constraint: true`` (default), the
+new contribution to :math:`\mathcal H` is set to zero in every cell where
+:math:`\psi^- > \psi^+`, so damage does not grow under compression.
+
+**Irreversibility.** :math:`\mathcal H` is stored on DG0 cells. AT2 takes
+:math:`\mathcal H^{n+1} = \max(\mathcal H^n, \mathcal H)` against the value of
+the last converged step. AT1 stores the current :math:`\mathcal H` and relies
+on the projection of :math:`d`. After each damage solve the field is projected,
+:math:`d \leftarrow \min(1, \max(d, d^n))`, with :math:`d^n` the value at the
+start of the step (for AT1 the solution is also clipped to :math:`[0, 1]`
+before relaxation).
+
+**Material data.** Every material of the domain takes part in the damage
+problem and needs ``E`` and ``Gc`` or ``sigma_c`` (:math:`\sigma_c`). With
+``damage.lc`` set, the missing one is derived at load
+(``Spine.load_materials``):
+
+.. math::
+
+   \text{AT1: } G_c = \frac{8}{3}\,\frac{\ell\,\sigma_c^2}{E}, \qquad
+   \text{AT2: } G_c = \frac{256}{27}\,\frac{\ell\,\sigma_c^2}{E} .
+
+When both are on the card, ``sigma_c`` sets ``Gc``. Without ``lc`` both must
+be given. ``Gc`` may be the dotted
+path of a function of the mesh, which gives a spatially varying
+:math:`G_c(\boldsymbol x)`.
+
+**Scope.** Damage does not modify the thermal conductivity, and the plastic
+strain does not enter :math:`\psi^+`.
+
+**Pre-cracks.** A ``Dirichlet`` entry with ``value`` in the ``damage:`` block of
+``boundary_conditions.yaml`` fixes :math:`d` on a tagged facet set, e.g.
+:math:`d = 1` on an internal line.
+
+**Keys** (``damage:`` block, required when ``models.damage`` is on): ``type``
+(``AT1`` or ``AT2``, required), ``lc``, ``split``, ``gamma_star`` (0),
+``hybrid_constraint`` (true), ``linear_solver`` (``iterative_hypre``),
+``rtol`` (1e-6), ``stag_tol`` (1e-4), ``convergence`` (required).
+
+**Monitoring.** For damage runs the elastic energy
+:math:`\int w\, g(d)\,\psi(\boldsymbol\varepsilon_{el})\,\mathrm{d}x` and the
+fracture energy
+:math:`\int w\, \tfrac{G_c}{c_w}\big(\omega(d)/\ell + \ell|\nabla d|^2\big)\mathrm{d}x`
+(:math:`c_w = 2`, :math:`\omega = d^2` for AT2, :math:`c_w = 8/3`,
+:math:`\omega = d` for AT1) are written to ``energies.txt`` at every step.
+Their sum is not a conserved quantity of the hybrid formulation.
 
 Implemented in :class:`z3st.models.damage_model.DamageModel`.
 
@@ -715,443 +798,231 @@ Implemented in :class:`z3st.models.damage_model.DamageModel`.
    :width: 55%
    :align: center
 
-   Single-edge-notched shear test (steel): the curved crack path reproduces the
-   benchmark of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199 (2010).
+   Single-edge-notched shear test (``cases/benchmarks/damage/sen_shear``),
+   the benchmark of Miehe et al., *Comput. Methods Appl. Mech. Engrg.* 199
+   (2010).
 
-.. _cohesive-fracture:
+A cohesive phase-field model with a prescribed strength surface (``models.cohesive``)
+is under development and is described in :doc:`in_development`.
 
-Cohesive Phase-Field Fracture (Tunable Strength Surface)
---------------------------------------------------------
-
-The brittle model above approximates Griffith's theory, which carries no
-strength criterion: the material strength is recovered only indirectly, through
-the regularisation length, and the shape of the resulting multiaxial strength
-surface is whatever the chosen energy split happens to give. The cohesive model
-of Vicentini et al. (2026) removes both limitations. It keeps the variational
-structure but replaces the energy decomposition with a reversible **eigenstrain**
-:math:`\boldsymbol{\eta}`, promoted to a primary unknown, and degrades a
-**strength potential** instead of the elastic energy:
-
-.. math::
-
-   W_\ell(\boldsymbol{\varepsilon}, \boldsymbol{\eta}, \alpha, \nabla\alpha)
-   = \psi_e(\boldsymbol{\varepsilon} - \boldsymbol{\eta})
-   + a(\alpha)\, \pi_0(\boldsymbol{\eta})
-   + \frac{G_c}{c_w}\left( \frac{w(\alpha)}{\ell} + \ell\, |\nabla\alpha|^2 \right).
-
-Here :math:`\pi_0` is the support function of the initial elastic domain
-:math:`S_0`, so prescribing :math:`\pi_0` *is* prescribing the strength surface
-:math:`\partial S_0`. Z3ST implements AT2, :math:`a(\alpha) = (1-\alpha)^2`,
-:math:`w(\alpha) = \alpha^2`, :math:`c_w = 2`.
-
-Three properties follow, and they are what distinguish this route from the
-brittle one:
-
-* **Non-interpenetration is automatic.** :math:`\pi_0` is finite only for
-  :math:`\mathrm{tr}\,\boldsymbol{\eta} \ge 0`, which forces
-  :math:`[\![\boldsymbol{u}]\!]\cdot\boldsymbol{n} \ge 0` on the crack set. No
-  energy split is needed, and the residual stress at :math:`\alpha = 1` is
-  crack-like, :math:`\boldsymbol{\sigma}_R = \kappa \langle \mathrm{tr}\,
-  \boldsymbol{\varepsilon}\rangle_- \boldsymbol{I}`.
-* **The elastic energy is not degraded.** The degradation acts on
-  :math:`\pi_0` alone, so the stress is
-  :math:`\boldsymbol{\sigma} = \partial\psi_e/\partial\boldsymbol{\varepsilon}`
-  evaluated on the elastic strain.
-* **The strength is decoupled from** :math:`\ell`. Nucleation occurs at the
-  prescribed strength regardless of the regularisation length; the cohesive law
-  and the surface energy density are :math:`\ell`-insensitive.
-
-**Volumetric--deviatoric form.** In the isotropic case the eigenstrain enters
-only through two scalars, its trace and the norm of its deviator, so the state
-is :math:`(\boldsymbol{u}, \mathrm{tr}\,\boldsymbol{\eta},
-\|\boldsymbol{\eta}_{dev}\|)`:
-
-.. math::
-
-   \psi_e = \frac{\kappa}{2}\big(\mathrm{tr}\,\boldsymbol{\varepsilon}
-   - \mathrm{tr}\,\boldsymbol{\eta}\big)^2
-   + \mu \big( \|\boldsymbol{\varepsilon}_{dev}\| - \|\boldsymbol{\eta}_{dev}\| \big)^2 .
-
-**Strength surface.** The strength potential is the :math:`r`-norm family,
-selected by ``models.cohesive.r_norm``:
-
-.. math::
-
-   \phi_r\big(\mathrm{tr}\,\boldsymbol{\eta}, \|\boldsymbol{\eta}_{dev}\|\big)
-   = \Big( p_c^{\,r}\, \mathrm{tr}^{\,r}\boldsymbol{\eta}
-   + \tau_c^{\,r}\, \|\boldsymbol{\eta}_{dev}\|^{\,r} \Big)^{1/r},
-
-with :math:`p_c` the critical pressure and :math:`\tau_c` the shear strength.
-For :math:`p \ge 0` the resulting surface is a rectangle for :math:`r = 1`, the
-ellipse :math:`(p/p_c)^2 + (\tau/\tau_c)^2 = 1` for :math:`r = 2`, and the
-Drucker--Prager line :math:`p/p_c + \tau/\tau_c = 1` for :math:`r = \infty`; in
-principal stress space these are a cylinder, an ellipsoid and a cone, each
-unbounded along the negative hydrostatic axis. :math:`\phi_2` and
-:math:`\phi_\infty` are not differentiable at the origin and are regularised
-there by a small constant under the square root, as in the reference
-implementation.
-
-**Strain hardening.** The formulation is well posed only if
-:math:`\ell \le \ell_{ch}/4`, where the characteristic cohesive length is
-:math:`\ell_{ch} = \min_{\sigma \in \partial S_0} G_c / (\mathbb{S}\sigma\cdot\sigma)`.
-Z3ST evaluates :math:`\ell_{ch}` in closed form per :math:`r` and **raises** if
-the condition is violated, rather than solving a problem with no unique
-sub-problem solution. The ratio must not be made arbitrarily small either: a
-homogeneous state is unstable, and cracks therefore nucleate, only when
-:math:`\ell/\ell_{ch}` is large enough.
-
-**Discretisation and solution.** The displacement and the phase field are
-linear Lagrange; both eigenstrain scalars are :math:`DG_0`, one degree of
-freedom per element, matching the constant strain within a linear element. The
-displacement and the eigenstrain share one mixed space and are solved together.
-Each staggered iteration is one alternate-minimisation sweep: minimise with
-respect to :math:`(\boldsymbol{u}, \boldsymbol{\eta})` at fixed :math:`\alpha`,
-then with respect to :math:`\alpha` at fixed :math:`(\boldsymbol{u},
-\boldsymbol{\eta})`. Both sub-problems are convex, so the sweep is an energy
-descent. Both are **bound-constrained**, and are solved as variational
-inequalities with the PETSc ``vinewtonrsls`` solver:
-:math:`\mathrm{tr}\,\boldsymbol{\eta} \ge 0` and
-:math:`\|\boldsymbol{\eta}_{dev}\| \ge 0` for the first,
-:math:`\alpha \ge \alpha_p` --- irreversibility --- for the second. Unlike the
-brittle route, irreversibility is thus a genuine constraint on the solve rather
-than a clamp applied after it. The line search is PETSc's ``bisection``
-algorithm (PETSc :math:`\ge` 3.23), which exploits the convexity; a plain
-Newton line search stalls on the :math:`r = \infty` potential.
-
-**Configuration.** The cohesive route requires ``models.mechanical: true`` and
-replaces the displacement-only mechanical step; it cannot be combined with
-``damage``, ``plasticity`` or ``creep``. Card keys are ``Gc``, ``p_c`` and
-``tau_c``; note that ``p_c`` and ``tau_c`` are read directly and are *not*
-derived from :math:`\ell` through the :math:`G_c \leftrightarrow \sigma_c`
-identities the brittle model uses.
-
-.. code-block:: yaml
-
-   models:
-     mechanical: true
-     cohesive:
-       ell: 2.5e-5        # regularisation length (m)
-       r_norm: "2"        # "1", "2" or "inf"; ignored in 1D
-
-The phase field is stored in the same ``Damage`` field as the brittle model, so
-output, damage Dirichlet conditions and the adaptive-time-step snapshot apply
-unchanged.
-
-Implemented in :class:`z3st.models.cohesive_model.CohesiveModel`.
-
-Reference case: ``cases/verification/cohesive/bar_1D``.
 
 .. _gap-conductance:
 
-Gap Conductance Model
----------------------
+Gap Conductance
+---------------
 
-Heat transfer between two paired bodies separated by a small gap is a Robin
-coupling with an effective film coefficient :math:`h_{gap}`, applied through the
-``pair`` field of a Robin boundary condition in ``boundary_conditions.yaml``; no
-specialised contact element is required. This is the capability that makes Z3ST
-**multi-body** -- for example, heat transfer from a fuel pellet to its cladding.
-The model follows Todreas and Kazimi, *Nuclear Systems Volume I*, 3rd ed.,
-§8.7.1, with an open-gap term and, on gap closure, an added solid-contact term:
+Heat transfer across the gap between two bodies is a Robin condition on each
+of the two surfaces, :math:`-k\nabla T\cdot\boldsymbol n = h_\mathrm{gap}(T - T_\mathrm{other})`,
+declared with a ``pair`` entry in ``boundary_conditions.yaml``. The
+conductance (``GapModel.set_gap_conductance``) is
 
 .. math::
 
-   q''_{g} = h_{g}\,(T_{fo} - T_{ci}), \qquad
-   h_{g} = h_{g,\text{open}} + h_{contact}.
+   h_\mathrm{gap} = \frac{k_\mathrm{gas}(\bar T_\mathrm{gap})}{\delta}
+   + C\,\frac{2k_fk_c}{k_f+k_c}\,\frac{P_c}{H_M\sqrt{\delta_g}} ,
 
-:math:`h_g` is referred to the reference surface of the pair,
-``gap_conductance.surface_a`` (the pellet outer surface by default). On the other
-surface the Robin coefficient is :math:`h_g\,|\Gamma_a|_w/|\Gamma_b|_w`, the ratio of
-the weighted areas :math:`\int w\,\mathrm{d}s` (:math:`r_{fo}/r_{ci}` for coaxial
-cylinders), so the heat leaving one body equals the heat entering the other.
+with the keys of the ``models.gap_conductance`` block:
 
-**Open gap.** The open-gap conductance is gas conduction across the effective
-gap width (a fixed user value or a gas-conduction correlation),
+- ``type: Fixed``: :math:`h_\mathrm{gap}` = ``value`` (W/(m²·K)).
+- ``type: Gas``: :math:`k_\mathrm{gas} = a\cdot 10^{-4}\,\bar T_\mathrm{gap}^{0.79}`
+  W/(m·K) with :math:`a` = ``value`` (Todreas and Kazimi, Eq. 8.140, where
+  :math:`a` = 15.8 for helium, 1.97 argon, 1.15 krypton, 0.72 xenon).
+  :math:`\bar T_\mathrm{gap}` is the average of the two surface means of the
+  nodal temperature. :math:`\delta` is the mean distance from each facet centroid of
+  ``surface_a`` (default ``lateral_1``) to the nearest facet centroid of
+  ``surface_b`` (default ``inner_2``). When the contact model is on, :math:`\delta`
+  is instead the gap measured by the contact model, floored at
+  ``contact_coupling.gas_thickness``.
 
-.. math::
+No temperature-jump distances and no radiative term are included.
 
-   h_{g,\text{open}} = \frac{k_{gas}}{\delta_{eff}}, \qquad
-   k_{gas} = c \cdot 10^{-4}\, T_{gap}^{0.79},
+The second term is the Ross-Stoute solid-contact conductance (Todreas and
+Kazimi, Eq. 8.141). It is added only when the contact model is on and
+``contact_coupling.enabled: true`` (default false), and only while
+:math:`P_c > 0`. :math:`C = 18.11` m\ :sup:`-1/2`, :math:`H_M` =
+``contact_coupling.meyer_hardness`` (default 9.65e8 Pa),
+:math:`\delta_g` = ``contact_coupling.gas_thickness`` (default 4.0e-6 m),
+and :math:`k_f`, :math:`k_c` are the conductivities of the two paired
+materials (a function :math:`k(T)` is evaluated at :math:`\bar T_\mathrm{gap}`).
 
-where :math:`T_{gap} = \tfrac{1}{2}(T_{inner} + T_{outer})` is the mean surface
-temperature and :math:`\delta_{eff}` the mean centroid-to-centroid distance
-between the two paired facet groups, computed with a SciPy cKDTree query. The
-correlation is the Todreas--Kazimi Eq. 8.140, :math:`k = A\cdot 10^{-6} T^{0.79}`
-W/(cm·K) converted to SI, with the user prefactor :math:`c` playing the role of
-the gas constant :math:`A` (:math:`A = 15.8` helium, :math:`1.97` argon,
-:math:`1.15` krypton, :math:`0.72` xenon). The effective gap width exceeds the
-geometric one by the temperature-jump distances
-:math:`\delta_{eff} = \delta_g + \delta_{jump,1} + \delta_{jump,2}`
-(Eq. 8.138; :math:`\delta_{jump}\sim 10\,\mu\text{m}` in helium,
-:math:`1\,\mu\text{m}` in xenon). A radiative contribution
-(Eq. 8.137a) may be added in series but is small at LWR temperatures.
+:math:`h_\mathrm{gap}` is referred to ``surface_a``. On the other surface it is
+multiplied by :math:`\int_{\Gamma_a} w\,\mathrm{d}s / \int_{\Gamma_b} w\,\mathrm{d}s`
+(:math:`r_a/r_b` for coaxial cylinders), so the heat leaving one body equals
+the heat entering the other for a uniform temperature jump. The conductance is
+updated at every staggered iteration and may be under-relaxed with ``relax``
+(default 1.0, no relaxation). The contact pressure used is the one of the
+previous mechanical solve. Implemented in :class:`z3st.models.gap_model.GapModel`.
 
-.. _contact-coupled-conductance:
-
-**Gap closure (contact-coupled conductance).** When the pellet expands enough to
-close the gap and contact the cladding (see the :ref:`penalty contact model
-<penalty-contact>`), a solid-contact term is added, Todreas--Kazimi Eq. 8.141
-(Ross--Stoute form),
-
-.. math::
-
-   h_{contact} = C\,\frac{2\,k_f k_c}{k_f + k_c}\,\frac{P_i}{H\,\sqrt{\delta_g}},
-
-where :math:`P_i` is the **pellet-clad contact pressure supplied by the penalty
-contact model**, :math:`k_f, k_c` are the fuel and cladding conductivities,
-:math:`H` is the Meyer hardness of the softer solid (Zircaloy
-:math:`\approx 14\times 10^4` psi), and :math:`\delta_g` the roughness-based mean
-gas-space thickness in contact. The empirical constant :math:`C = 10\,\text{ft}^{-1/2}`
-is expressed in SI as :math:`C_{SI} = 18.11\,\text{m}^{-1/2}` so that, with
-:math:`k` in W/(m·K), :math:`\delta_g` in m and the dimensionless ratio
-:math:`P_i/H`, the result is W/(m²·K).
-
-This couples the :ref:`thermal gap model <gap-conductance>` to the
-:ref:`mechanical contact model <penalty-contact>`: the contact pressure that the
-penalty model computes on closure raises the gap conductance, which in turn cools
-the pellet -- the physically observed effect that pellet--clad contact improves
-heat transfer and lowers fuel temperature. In the demonstration case
-``regression/pwr_rod_2D`` the fuel centreline temperature drops once contact
-engages. The coupling is explicit within the staggered loop (the thermal step
-uses the contact pressure from the previous mechanical step) and is enabled by
-``gap_conductance.contact_coupling`` in ``input.yaml``. Implemented in
-:class:`z3st.models.gap_model.GapModel`. The Ross-Stoute harmonic mean of the
-solid conductivities accepts both numeric and symbolic :math:`k(T)` material
-cards (the latter evaluated at the current mean gap temperature). For strongly
-coupled contact problems the conductance can be under-relaxed between
-staggered iterations via ``gap_conductance.relax`` (default 1.0, i.e. off),
-damping the contact-pressure / conductance / temperature feedback loop.
 
 .. _penalty-contact:
 
-Penalty Contact Model (Pellet--Clad Mechanical Interaction)
------------------------------------------------------------
+Penalty Contact
+---------------
 
-Where the :ref:`gap-conductance model <gap-conductance>` couples two bodies
-*thermally* across a gap, the penalty contact model couples them
-*mechanically*: when a heated pellet expands enough to close its clearance to
-the cladding, the two bodies come into contact and transmit a normal pressure.
-This is the essence of pellet--clad mechanical interaction (PCMI).
-
-**Geometry and the gap function.** Two bodies :math:`\Omega_1` (inner, e.g. the
-fuel pellet) and :math:`\Omega_2` (outer, e.g. the cladding) face each other
-across an initial radial clearance :math:`g_0 = R_{2,\mathrm{in}} - R_{1,\mathrm{out}}`
-on the surface pair :math:`\Gamma_a` (pellet outer) and :math:`\Gamma_b` (clad
-inner). The current normal gap, measured from the radial displacement
-:math:`u_r = u_{(0)}`, is
+Contact between two concentric bodies separated by a uniform gap, such as
+pellet and cladding, is enforced by a penalty on the mean gap
+(:class:`z3st.models.contact_model.ContactModel`). With
+:math:`\bar u_a` and :math:`\bar u_b` the mean normal displacements of the two
+facing surfaces,
 
 .. math::
 
-   g(\boldsymbol{u}) = g_0 + \langle u_r \rangle_{\Gamma_b} - \langle u_r \rangle_{\Gamma_a},
+   \bar u_\Gamma = \frac{\int_\Gamma \boldsymbol u\cdot\boldsymbol n_\Gamma\,\mathrm{d}s}{\int_\Gamma\mathrm{d}s},
+   \qquad
+   g = g_0 + \bar u_b - \bar u_a, \qquad
+   P_c = k_\mathrm{pen}\max(0, -g),
 
-so :math:`g > 0` is an open gap and :math:`g < 0` an interpenetration.
-
-**Unilateral contact (Signorini) conditions.** Physical contact obeys the
-Karush--Kuhn--Tucker complementarity conditions on the interface,
-
-.. math::
-
-   g \ge 0, \qquad p \ge 0, \qquad p\, g = 0,
-
-i.e. the surfaces cannot interpenetrate (:math:`g \ge 0`), the contact pressure
-is compressive only -- no adhesion (:math:`p \ge 0`), and pressure is non-zero
-only when the gap is closed (:math:`p\,g = 0`).
-
-**Penalty regularisation.** The hard constraint is regularised by penalising
-penetration with a stiffness :math:`k_{pen}` (Pa/m),
+with the sign of :math:`\bar u_b` taken along the outward normal of the inner
+body. :math:`P_c` is applied as the uniform traction :math:`-P_c\boldsymbol n`
+on both surfaces and is updated after every mechanical solve. Once two
+(pressure, gap) samples of the same time step are available, the pressure is
+set by a secant step on the affine relation :math:`g(P) = g_\mathrm{free} + C P`,
 
 .. math::
 
-   p = k_{pen}\,\langle -g \rangle_+ = k_{pen}\,\max(0,\,-g),
+   C = \frac{g_1 - g_0}{P_1 - P_0}, \qquad
+   P^* = \frac{C P_1 - g_1}{C + 1/k_\mathrm{pen}} ,
 
-where :math:`\langle \cdot \rangle_+` is the Macaulay bracket. As
-:math:`k_{pen} \to \infty` the admissible penetration :math:`-g = p/k_{pen} \to 0`
-and the exact Signorini solution is recovered; at finite :math:`k_{pen}` a small
-penetration of order :math:`p/k_{pen}` persists.
+and falls back to the explicit update when the two pressures are too close or
+:math:`C \le 0`. The history is reset at every step.
 
-**Contact traction.** The pressure acts as a compressive normal traction on
-*both* facing surfaces, each with its own outward facet normal
-:math:`\boldsymbol{n}` (:math:`\boldsymbol{n}_a \approx +\boldsymbol{e}_r`,
-:math:`\boldsymbol{n}_b \approx -\boldsymbol{e}_r`), so that penetration pushes
-the bodies apart,
+The contact pressure is one scalar per surface pair. The method is not a
+pointwise contact constraint, it carries no friction, and a finite
+:math:`k_\mathrm{pen}` leaves a penetration of order :math:`P_c/k_\mathrm{pen}`.
 
-.. math::
+**Keys** (``models.contact`` block): ``surface_a`` (default ``lateral_1``),
+``surface_b`` (default ``inner_2``), ``penalty_stiffness``
+(:math:`k_\mathrm{pen}`, default 5.0e13 Pa/m) and ``initial_gap``
+(:math:`g_0`, default ``inner_radius_2 - outer_radius_1`` from the geometry
+file). A negative ``initial_gap`` is an interference.
 
-   \boldsymbol{t}_{\Gamma} = -p\,\boldsymbol{n}_{\Gamma}, \qquad \Gamma \in \{\Gamma_a, \Gamma_b\}.
-
-**Weak form contribution.** The contact traction is added to the mechanical
-weak form as an interface load,
-
-.. math::
-
-   \sum_{\Gamma \in \{\Gamma_a, \Gamma_b\}} \int_{\Gamma} w\,(-p\,\boldsymbol{n}_\Gamma)\cdot\boldsymbol{v}\,\mathrm{d}s,
-
-with the regime weight :math:`w = 2\pi r` (axisymmetric). Because the pellet and
-cladding meshes share no nodes across the (unmeshed) gap, the surfaces are free
-to separate and to close -- the prerequisite for genuine contact, as opposed to
-a bonded interface.
-
-**Explicit (fixed-point) solution.** The pressure :math:`p` is evaluated from the
-previous displacement iterate inside the staggered loop, so it enters the linear
-momentum balance as a known interface load that is refreshed every iteration; the
-staggered under-relaxation (see :ref:`coupled scheme <coupled-scheme>`) drives the
-contact fixed point to consistency. No contact Jacobian is assembled. This is the
-explicit counterpart of constraint-based (Lagrange-multiplier) contact: cheaper
-and robust, at the cost of a fixed-point rather than a monolithic Newton
-convergence.
-
-**Gap measure.** The representative gap uses the boundary-integral mean radial
-displacement on each surface,
+**Verification.** ``cases/verification/fuel/shrink_fit`` heats the pellet
+uniformly against a cladding held at its reference temperature, so the radial
+interference is :math:`\delta = \alpha_f (T - T_\mathrm{ref})\, b - g_0`, and
+compares :math:`P_c` with the plane-stress Lamé interference pressure
 
 .. math::
 
-   \langle u_r \rangle_{\Gamma} = \frac{\int_{\Gamma} u_r\,\mathrm{d}s}{\int_{\Gamma}\mathrm{d}s},
+   p_{\mathrm{Lame}} = \frac{\delta}{\,b\left[\dfrac{1}{E_c}\!\left(\dfrac{c^2+b^2}{c^2-b^2}+\nu_c\right) + \dfrac{1}{E_f}\left(1-\nu_f\right)\right]},
 
-which is unambiguous under blocked vector spaces and MPI-parallel. A single scalar
-pressure is then applied uniformly over the interface.
+with :math:`b` the interface radius and :math:`c` the cladding outer radius.
+Over the closed-gap steps the deviation, normalised by the peak pressure of
+75 MPa, is 1.0 % at most and 0.5 % on average (``non-regression.py`` of the
+case). The other shrink-fit cases (``shrink_fit_disk``,
+``shrink_fit_disk_3d``, ``creep_shrink_fit_2D``) are listed in
+:doc:`examples`.
 
-.. note::
+``cases/regression/pwr_rod_2D`` uses the contact model with the
+contact-coupled gap conductance on an axisymmetric UO\ :sub:`2` and Zircaloy
+rod with a 65 µm gap.
 
-   **Modelling scope and limitations (current implementation).**
 
-   - *Uniform (average-gap) pressure.* One scalar :math:`p` is applied over the
-     whole interface. This is exact when the gap is axially uniform; under an
-     axially varying expansion (the pellet "wheatsheaf" / hourglass shape,
-     hotter and freer at one end) the contact is genuinely non-uniform. The
-     consistent extension is a *per-facet* local gap :math:`g(z)` and pressure
-     :math:`p(z)`, which also resolves axial ridging.
-   - *Penalty vs constraint.* A finite :math:`k_{pen}` admits a small penetration
-     :math:`p/k_{pen}`; the contact pressure approaches the physical value only as
-     :math:`k_{pen}\to\infty`, and in the explicit fixed point it may oscillate
-     within the displacement convergence tolerance. The reported pressure is
-     therefore accurate in magnitude but not to high precision.
-   - *Frictionless and normal-only.* Only the normal interaction is modelled; no
-     tangential (friction) traction is included yet. The *thermal* consequence of
-     closure -- the rise in gap conductance with contact pressure -- **is**
-     modelled, through the :ref:`contact-coupled conductance
-     <contact-coupled-conductance>` (Todreas--Kazimi Eq. 8.141).
+Cluster Dynamics
+----------------
 
-   Made implicit, the penalty tangent is available exactly as the UFL derivative
-   of the residual, consistent with the automatic-differentiation philosophy used
-   elsewhere in Z3ST.
-
-The model is exercised by the demonstration case ``regression/pwr_rod_2D``: a 2D
-axisymmetric UO\ :sub:`2` pellet and Zircaloy cladding separated by a 65 µm gap.
-As the linear heat rate is ramped, the pellet heats and expands, the gap closes
-progressively, contact engages, an emergent (not prescribed) contact pressure
-builds, and the cladding is driven outward -- the load transfer that is the
-signature of PCMI. Implemented in
-:class:`z3st.models.contact_model.ContactModel`.
-
-**Verification.** The penalty contact pressure is verified against the analytical
-**Lamé interference-fit** solution in case ``verification/fuel/shrink_fit``. The
-pellet is heated *uniformly* (a ramped Dirichlet temperature) while the cladding
-is held at its reference temperature, so the radial interference is known in
-closed form,
-
-.. math::
-
-   \delta(\Delta T) = \alpha_f\,(T - T_{ref})\,b - g_0,
-
-and the shrink-fit pressure of a solid cylinder in a tube follows (plane-stress
-form, with :math:`b` the interface radius, :math:`c` the clad outer radius):
-
-.. math::
-
-   p_{\mathrm{Lame}} = \frac{\delta}{\,b\left[\dfrac{1}{E_c}\!\left(\dfrac{c^2+b^2}{c^2-b^2}+\nu_c\right) + \dfrac{1}{E_f}\left(1-\nu_f\right)\right]}.
-
-The analytical formula and the simulation are matched in **regime**: the pellet
-top is left axially free, so the bulk stress state is plane stress -- confirmed
-in the output (:math:`\sigma_{zz}` below :math:`10^{-5}` of the in-plane stress)
--- exactly the condition under which the formula above is derived. With this
-consistency, the Z3ST penalty pressure reproduces the analytical line to within
-**1.0 %** at worst and **0.5 %** on average over the closed-gap steps, measured
-against the peak contact pressure of 75 MPa; the residual is the finite penalty
-stiffness. The deviation is normalised by that characteristic pressure rather
-than by the local analytical value, which vanishes at contact onset.
-The contact pressure is therefore a verified quantity, not merely a qualitatively
-reasonable one. The ``non-regression.py`` of that case regenerates the comparison
-plot and prints the error metric.
-
-Cluster Dynamics Model
-----------------------
-
-A standalone one-dimensional advection-diffusion solver in cluster-size space
-:math:`n` for defect-cluster size distributions :math:`c(n, t)`,
+:class:`z3st.models.cluster_dynamic_model.ClusterDynamicsModel` solves, on a
+one-dimensional mesh whose coordinate is the cluster size :math:`n`,
 
 .. math::
 
    \frac{\partial c}{\partial t} + v\, \frac{\partial c}{\partial n} - D\, \frac{\partial^2 c}{\partial n^2} = 0,
 
-with user-selectable initial conditions (constant on a labelled region, or a
-Gaussian of prescribed mean, width, and amplitude). The discretisation uses a
-:math:`DG_1` space with an upwind interior-facet flux for the advective term and
-a symmetric interior-penalty Galerkin (SIPG) treatment of the diffusive term;
-time integration is implicit Euler. The total cluster mass
-:math:`\int c\, n \, \mathrm{d}n` is rescaled to its initial value at every step
-to enforce conservation, and the local Péclet number is logged for diagnostics.
+with ``cluster.advection_velocity`` :math:`v` (default 1.0) and
+``cluster.diffusion_coefficient`` :math:`D` (default 0.5). The discretisation
+is DG1 with an upwind flux for advection and symmetric interior penalty for
+diffusion (penalty 10), with backward Euler in time. The initial condition
+(``cluster.initial_condition``) is ``constant`` (``value`` on ``region``,
+optional ``total_mass``) or ``gaussian`` (``mean`` 5.0, ``std_dev`` 1.0,
+``amplitude`` 1000 as the total mass). After every solve the distribution is
+rescaled so that :math:`\int c\,n\,\mathrm{d}n` equals its initial value, so
+mass conservation is imposed by the rescaling. The cell Péclet number is
+written to the log. Reference case: ``cases/verification/cluster/mass_conservation_1D``.
 
-.. note::
-
-   Cluster dynamics is a newer, exploratory capability -- a path towards a
-   genuine micro-to-continuum link -- and is not yet the subject of a published
-   verification study.
-
-Implemented in :class:`z3st.models.cluster_dynamic_model.ClusterDynamicModel`.
 
 .. _coupled-scheme:
 
-Coupled Thermo-Mechanical Analysis
-----------------------------------
+Coupled Solution
+----------------
 
-The default coupling between thermal, mechanical, damage, and cluster physics is
-a **staggered scheme**. Within each time step the active blocks are solved in
-sequence -- thermal, then mechanical with the updated temperature, then damage
-with the updated displacement (after refreshing the history field), then cluster
--- and each new field is under-relaxed,
+Within each time step the active blocks are solved in the order temperature,
+displacement, damage, cluster, porosity, each with the others fixed
+(``Solver.solve_staggered``), and the sequence is repeated. The gap
+conductance and the contact pressure are updated inside this loop. The
+mechanical forms hold the damage field by reference, so each mechanical solve
+sees the latest damage iterate and damage is coupled within the step. At the
+start of a step the field holds :math:`d^n`.
 
-.. math::
-
-   \phi \leftarrow \alpha\, \phi^{new} + (1 - \alpha)\, \phi^{old},
-
-with separate factors :math:`\alpha_T, \alpha_u, \alpha_D`. The factors are
-**adapted automatically**: an exponential moving average of the relative residual
-is tracked, and each :math:`\alpha` is grown when convergence is monotone or
-shrunk on divergence, within hard bounds
-:math:`\alpha \in [\alpha_{min}, \alpha_{max}]`. The staggered loop converges when
-the relative or absolute change in every active field drops below tolerance
-simultaneously,
+**Convergence.** For temperature, displacement and damage the test is
 
 .. math::
 
-   \|T^{k+1} - T^k\| < \mathrm{tol}_T, \qquad
-   \|\boldsymbol{u}^{k+1} - \boldsymbol{u}^k\| < \mathrm{tol}_u, \qquad
-   \|D^{k+1} - D^k\| < \mathrm{tol}_D .
+   \frac{\|X^k - X^{k-1}\|_2}{\|X^k\|_2} < \texttt{stag\_tol}_X
+   \quad (\texttt{convergence: rel\_norm}), \qquad
+   \|X^k - X^{k-1}\|_2 < \texttt{stag\_tol}_X
+   \quad (\texttt{convergence: norm}),
 
-.. seealso::
+with :math:`X^k` the unrelaxed solution of the iteration, so the measure does
+not depend on the relaxation factor. ``stag_tol`` (default 1e-4) and
+``convergence`` (required) are set per block. The creep predictor and the
+porosity add their own tests (above). The step has converged when all active
+tests pass in the same iteration. The maximum number of iterations is
+``solver_settings.max_iters`` (default 100). A step that reaches it is accepted
+with a warning, unless ``time_adaptivity.enabled: true``, in which case the
+step is rolled back and bisected, down to ``time_adaptivity.dt_min`` (default
+1e3 s) or ``max_cuts`` (default 6) bisections, after which the run stops. The
+plastic and creep histories are updated once, at the end of the step.
 
-   For *why* this staggered scheme is mathematically sound -- its variational
-   structure, separate convexity and convergence to a critical point, the
-   equivalence with a monolithic solve at convergence, why local (not global)
-   minimization is the correct concept, and the role of second-order stability --
-   see :ref:`staggered-theory`.
+**Relaxation** (``solver_settings`` block). Each update is relaxed,
+:math:`X \leftarrow \omega X^k + (1-\omega) X^{k-1}`:
 
-**Solvers.** Each block is a separate variational problem solved through PETSc: a
-direct LU solver (MUMPS), or CG/GMRES with smoothed-aggregation AMG (PETSc GAMG)
-or HYPRE BoomerAMG. Symmetric positive-definite blocks (thermal, damage) use
-conjugate gradients; the mechanical block uses GMRES. Non-linear mechanical
-problems (hyperelasticity, custom non-linear route) use PETSc SNES with a
-Newton line search.
+- fixed factors ``relax_T`` (0.9), ``relax_u`` (0.4), ``relax_D`` (0.4),
+- ``relax_adaptive: true`` (default false): an exponential moving average
+  :math:`\bar r \leftarrow 0.3\,r + 0.7\,\bar r` of the residual is kept per
+  field, and the factor is multiplied by ``relax_growth`` (1.2) when the
+  residual is below the average and by ``relax_shrink`` (0.5) otherwise,
+  clamped to [``relax_min``, ``relax_max``] = [0.05, 1.0]. The adapted factors
+  carry over to the next step,
+- ``relax_aitken: true`` (default false): Aitken's :math:`\Delta^2` factor for
+  the displacement,
+  :math:`\omega_{k+1} = -\omega_k\, r_{k-1}\cdot\Delta r / |\Delta r|^2`,
+  clamped to the same bounds and restarted from ``relax_u`` at every step. It
+  replaces the adaptive rule for :math:`\boldsymbol u`.
 
-Application: thermal-shock cracking of a UO\ :sub:`2` pellet
-------------------------------------------------------------
+With the default ``relax_max = 1.0`` no factor exceeds one. See
+:ref:`staggered-theory` for what the converged fixed point represents.
 
-The full coupled set -- thermal, mechanical, and phase-field damage -- meets in
-the UO\ :sub:`2` thermal-shock case (``benchmarks/damage/pellet_quench_2D_xy``), a 2D
-plane-strain transverse cross-section reproducer of McClenny et al.,
-*J. Nucl. Mater.* 565 (2022). A cold-contact wedge cools the rim of a hot disc;
-the tensile hoop-stress ring it sets up drives discrete radial cracks (AT1 +
-Amor + hybrid, fully coupled :math:`T \to \boldsymbol{\varepsilon}_{el} \to D`).
+**Linear solvers** (``linear_solver`` per block,
+``Solver.get_solver_options``):
+
+- ``iterative_hypre`` (default for thermal, mechanical and damage): CG for
+  thermal and damage, GMRES for mechanics, with hypre BoomerAMG,
+- ``iterative_amg``: the same Krylov methods with PETSc GAMG. On the linear
+  mechanical path the operator receives the rigid-body modes as
+  near-nullspace,
+- ``direct_mumps``: LU with MUMPS (default for porosity).
+
+``mechanical.remove_rigid_nullspace: true`` (default false) removes, on the
+linear mechanical path only, the rigid-body modes that the Dirichlet
+conditions leave free.
+
+**Non-linear mechanics.** The SNES path (creep, plasticity, hyperelasticity,
+or ``mechanical.solver`` other than ``linear``) uses ``newtonls`` with
+``snes_atol = snes_rtol = mechanical.rtol``. With ``direct_mumps`` the line
+search is ``basic`` and the iteration limit is ``mechanical.snes_max_it``
+(default 50). With an iterative inner solver the line search is ``bt`` and the
+limit is fixed at 100.
+
+
+Application: thermal shock of a UO\ :sub:`2` pellet
+---------------------------------------------------
+
+``cases/benchmarks/damage/pellet_quench_2D_xy`` couples temperature,
+displacement and damage on a plane-strain cross-section of a UO\ :sub:`2`
+pellet after McClenny et al., *J. Nucl. Mater.* 565 (2022). A cold arc cools
+the rim of the hot disc and the tensile hoop stress it produces drives radial
+cracks. The case uses AT1, the star-convex split with :math:`\gamma^* = 0`
+(equal to the volumetric-deviatoric split), the hybrid constraint and
+:math:`\ell = 50` µm.
 
 .. figure:: images/full_cylinder_cracking/temperature_field.png
    :width: 49%
@@ -1159,8 +1030,8 @@ Amor + hybrid, fully coupled :math:`T \to \boldsymbol{\varepsilon}_{el} \to D`).
 .. figure:: images/full_cylinder_cracking/stress_hoop_field.png
    :width: 49%
 
-   Cold-contact wedge cools the rim (left); the tensile hoop-stress ring it sets
-   up drives the cracking (right).
+   Temperature after the cold contact (left) and the tensile hoop stress at
+   the rim (right).
 
 .. figure:: images/full_cylinder_cracking/damage_field.png
    :width: 49%
@@ -1168,12 +1039,12 @@ Amor + hybrid, fully coupled :math:`T \to \boldsymbol{\varepsilon}_{el} \to D`).
 .. figure:: images/full_cylinder_cracking/UO2_damage_sample.png
    :width: 49%
 
-   Simulated damage with discrete radial cracks at the rim (left) against a
-   cross-section of a real cracked UO\ :sub:`2` pellet (right).
+   Computed phase field with radial cracks at the rim (left) and a
+   cross-section of a cracked UO\ :sub:`2` pellet (right).
 
 **See also**
 
-- :doc:`examples` -- the full verification-case catalogue
+- :doc:`examples` -- the verification-case catalogue
 - :doc:`differentiable_features` -- automatic differentiation in Z3ST
-- :doc:`usage` -- YAML configuration of every model
+- :doc:`usage` -- YAML configuration
 - :doc:`api` -- implementation reference

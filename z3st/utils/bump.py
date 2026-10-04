@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.4.0 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 """Propagate the version across the repository, or check that it already agrees.
@@ -48,7 +48,7 @@ def tracked_files():
 
 
 def occurrences(text, version):
-    """Spans of `version` not embedded in a longer number: 0.4.0 must not match
+    """Spans of `version` not embedded in a longer number: 0.4.1 must not match
     inside 0.3.20, and 10.3.2 must not match at its tail."""
     pattern = re.compile(rf"(?<![\d.]){re.escape(version)}(?![\d.])")
     return list(pattern.finditer(text))
@@ -86,6 +86,7 @@ DECLARATIONS = re.compile(
         | version:\s*                    # CITATION.cff
         | release\s*=\s*"                # Sphinx conf.py
         | __version__\s*=\s*"            # package fallback
+        | Version\s+(?=\d+\.\d+\.\d+\.?\s+https?://)  # citation block in docs
     )(\d+\.\d+\.\d+)""",
     re.M | re.X,
 )
@@ -173,12 +174,17 @@ def main(argv=None):
 def demo():
     """Self-check on the substring edge cases, which is where a naive replace
     silently corrupts a file. Run: python -m z3st.utils.bump --demo"""
-    assert len(occurrences("Version: 0.4.0 (2026)", "0.4.0")) == 1
-    assert len(occurrences("0.3.20 is not it", "0.4.0")) == 0
-    assert len(occurrences("see 10.3.2 above", "0.4.0")) == 0
-    assert len(occurrences("10.5281/zenodo.17748028", "0.4.0")) == 0
-    assert len(occurrences("v0.4.0 and 0.4.0", "0.4.0")) == 2
-    assert len(occurrences("", "0.4.0")) == 0
+    assert len(occurrences("Version: 0.4.1 (2026)", "0.4.1")) == 1
+    assert len(occurrences("0.3.20 is not it", "0.4.1")) == 0
+    assert len(occurrences("see 10.3.2 above", "0.4.1")) == 0
+    assert len(occurrences("10.5281/zenodo.17748028", "0.4.1")) == 0
+    assert len(occurrences("v0.4.1 and 0.4.1", "0.4.1")) == 2
+    assert len(occurrences("", "0.4.1")) == 0
+    # declarations: header banner and the citation line of the docs, not prose
+    assert DECLARATIONS.search("# Version: 0.4.1 (2026)").group(1) == "0.4.1"
+    # split literal, so this line is not itself a declaration of an old version
+    assert DECLARATIONS.search("   Version " + "0.3.2. https://doi.org/10.5281/x").group(1) == "0.3.2"
+    assert DECLARATIONS.search("Version 0.3.2 introduced the gap model") is None
     print("bump: self-check ok")
 
 

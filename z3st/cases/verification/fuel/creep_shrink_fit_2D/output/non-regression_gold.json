@@ -16,9 +16,30 @@
         },
         "contact_pressure_elastic_MPa": {
             "numerical": 24.7028,
-            "reference": 25.469543866365182,
-            "abs_error": 0.7667438663651822,
-            "rel_error": 0.030104342283794737,
+            "reference": 24.698606355878418,
+            "abs_error": 0.004193644121581741,
+            "rel_error": 0.00016979274300566471,
+            "status": "PASS"
+        },
+        "contact_pressure_600d_MPa": {
+            "numerical": 7.2556,
+            "reference": 7.120346903685524,
+            "abs_error": 0.13525309631447602,
+            "rel_error": 0.018995295895550875,
+            "status": "PASS"
+        },
+        "contact_pressure_1240d_MPa": {
+            "numerical": 5.1397,
+            "reference": 5.06349166908595,
+            "abs_error": 0.07620833091405022,
+            "rel_error": 0.015050549283871374,
+            "status": "PASS"
+        },
+        "contact_pressure_2500d_MPa": {
+            "numerical": 3.6477,
+            "reference": 3.60471466520221,
+            "abs_error": 0.042985334797789765,
+            "rel_error": 0.01192475377115,
             "status": "PASS"
         },
         "gap_final_um": {
@@ -50,7 +71,7 @@
             "status": "PASS"
         }
     },
-    "tolerance": 0.05,
+    "tolerance": 0.03,
     "summary": "PASS",
-    "regression": "FAIL"
+    "regression": "PASS"
 }

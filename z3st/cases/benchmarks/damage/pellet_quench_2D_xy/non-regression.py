@@ -396,6 +396,17 @@ try:
         # Thermal-shock cracks merge into one continuous band at the very rim and
         # fade out deeper in. Sweep overlapping shells and take the one where the
         # fingers are most separated.
+        #
+        # NOTE on what this number is. It counts the separate D >= 0.5 arcs in the
+        # one annular shell, among those swept between 0.56 and 1.01 Ro, where most
+        # of them are distinct, in the modelled upper half only. In the current
+        # gold that shell is 0.83-0.95 Ro, 0.5 to 1.7 mm below the surface, which
+        # the short cracks do not reach, so the count picks out the deeper cracks:
+        # 4. It is a regression metric and is not the
+        # number of cracks that reach the perimeter. Counted at the surface, the
+        # final field has 10 cracks with D > 0.5 in the modelled 30-degree half of
+        # the cold arc (19 over the full arc, one lying on the symmetry plane), of
+        # which 4 penetrate more than 0.85 mm and 6 stop within 0.27 mm.
         bands = [(c - 0.06, c + 0.06) for c in np.arange(0.62, 0.96, 0.03)]
         best_n, best_prof, best_band = 0, angular_dmax(0.80, 0.90), (0.80, 0.90)
         for r_lo, r_hi in bands:

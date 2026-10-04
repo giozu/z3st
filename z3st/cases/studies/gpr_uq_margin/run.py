@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: propagation of the GPR conductivity uncertainty to the melting margin
 # Author: Giovanni Zullo
-# Version: 0.4.0 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """Solve the same high-rated MA-MOX pin at several offsets of the GPR posterior.
 

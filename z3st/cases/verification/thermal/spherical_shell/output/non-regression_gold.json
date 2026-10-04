@@ -1,33 +1,49 @@
 {
     "results": {
         "T_max": {
-            "numerical": 566.6324113290586,
-            "reference": 474.30000637518634,
-            "abs_error": 92.3324049538723,
-            "rel_error": 0.19467089123510245,
+            "numerical": 542.4192669267165,
+            "reference": 542.0916996710238,
+            "abs_error": 0.32756725569277023,
+            "rel_error": 0.0006042653962264302,
             "status": "PASS"
         },
-        "sigma1_mean": {
-            "numerical": -260644084.82996973,
+        "L2_error_T": {
+            "numerical": 0.2668090295905079,
             "reference": 0.0,
-            "abs_error": 260644084.82996973,
-            "rel_error": 0.001472565451016778,
+            "abs_error": 0.2668090295905079,
+            "rel_error": 0.0005102842988291065,
             "status": "PASS"
         },
-        "sigma2_mean": {
-            "numerical": -1248473964.5097995,
+        "Linf_error_T": {
+            "numerical": 0.4485608952802522,
             "reference": 0.0,
-            "abs_error": 1248473964.5097995,
-            "rel_error": 0.007053525223219206,
+            "abs_error": 0.4485608952802522,
+            "rel_error": 0.00877952579711592,
             "status": "PASS"
         },
-        "sigma3_mean": {
-            "numerical": -1266292639.021121,
+        "L2_error_sigma_rr": {
+            "numerical": 5921510.572718255,
             "reference": 0.0,
-            "abs_error": 1266292639.021121,
-            "rel_error": 0.0071541957006843,
+            "abs_error": 5921510.572718255,
+            "rel_error": 0.004247125220478646,
+            "status": "PASS"
+        },
+        "L2_error_sigma_tt": {
+            "numerical": 8337351.175141912,
+            "reference": 0.0,
+            "abs_error": 8337351.175141912,
+            "rel_error": 0.005979854973336258,
+            "status": "PASS"
+        },
+        "L2_error_u_r": {
+            "numerical": 1.3294920100767149e-06,
+            "reference": 0.0,
+            "abs_error": 1.3294920100767149e-06,
+            "rel_error": 0.00041397503315290064,
             "status": "PASS"
         }
     },
-    "tolerance": 0.6
+    "tolerance": 0.02,
+    "summary": "PASS",
+    "regression": "PASS"
 }

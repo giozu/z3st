@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.4.0 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import dolfinx
@@ -21,7 +21,7 @@ def as_bool(v):
 
 
 def aitken_omega(r_k, r_prev, omega, comm, n_owned, lo, hi):
-    """Aitken \u0394\u00b2 relaxation factor from the last two staggered residuals.
+    """Aitken \u0394\u00b2 relaxation factor from the last two staggered residuals::
 
         \u03c9_{k+1} = -\u03c9_k (r_{k-1}\u00b7\u0394r) / |\u0394r|\u00b2,   \u0394r = r_k - r_{k-1}
 
