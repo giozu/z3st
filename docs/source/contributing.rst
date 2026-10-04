@@ -5,7 +5,7 @@ Branches
 --------
 
 Pull requests target the ``develop`` branch. ``develop`` is merged into
-``main`` for a release, and releases are tagged (``0.4.0``). Commit and pull
+``main`` for a release, and releases are tagged (``0.4.1``). Commit and pull
 request conventions are in ``GIT-COMMANDS.md`` at the repository root.
 
 .. code-block:: bash

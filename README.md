@@ -464,5 +464,5 @@ A software paper describing the framework is in preparation.
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
-* **Version:** 0.4.0 (2026)
+* **Version:** 0.4.1 (2026)
 * **License:** Apache 2.0

@@ -205,4 +205,4 @@ Update sequence:
 
 - Giovanni Zullo
 
-Verified against the blessed gold with Z3ST 0.4.0 and FEniCSx 0.11.0.
+Verified against the blessed gold with Z3ST 0.4.1 and FEniCSx 0.11.0.

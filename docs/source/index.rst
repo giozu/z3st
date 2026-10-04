@@ -4,7 +4,7 @@ Z3ST
 **Z3ST** (pronounced *zest*) is an open-source finite-element framework for
 coupled thermo-mechanical and fracture analysis of nuclear materials, written
 in Python on FEniCSx (dolfinx 0.11.0). This documentation describes version
-0.4.0.
+0.4.1.
 
 Overview
 --------
@@ -48,7 +48,7 @@ software paper.
 Scope and limitations
 ---------------------
 
-Z3ST 0.4.0 is verified against analytical solutions and compared with
+Z3ST 0.4.1 is verified against analytical solutions and compared with
 TRANSURANUS and OFFBEAT for one fuel rod segment. It has not been validated
 against integral irradiation experiments. The following are not available:
 
@@ -88,11 +88,11 @@ If you use Z3ST, cite the archived software:
 
    Giovanni Zullo (2026).
    Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis.
-   Version 0.4.0. https://doi.org/10.5281/zenodo.23023124
+   Version 0.4.1. https://doi.org/10.5281/zenodo.17748028
 
-The version DOI 10.5281/zenodo.23023124 identifies release 0.4.0. The concept
-DOI 10.5281/zenodo.17748028 covers every release and resolves to the most
-recent one. The git tags ``course-2627.0`` and ``course-2627.1`` mark the
+The concept DOI 10.5281/zenodo.17748028 covers every release and resolves to
+the most recent one. Each release also has its own version DOI, listed on that
+Zenodo record (release 0.4.0: 10.5281/zenodo.23023124). The git tags ``course-2627.0`` and ``course-2627.1`` mark the
 releases used in the course Nuclear Design and Technology at Politecnico di
 Milano, academic year 2026-27.
 
