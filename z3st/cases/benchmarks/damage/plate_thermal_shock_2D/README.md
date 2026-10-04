@@ -56,9 +56,10 @@ then `plot_damage.py`.
 
 ### Comparison with Kamagate et al.
 
-<!-- [TBC] crack count, spacing and depth are not computed by non-regression.py; they come from a manual inspection of the stored run -->
-The stored run gives 13 cracks on each quenched edge, spacing about 1.9 mm,
-penetrating 0.2 to 1.6 mm (mean 0.87 mm), alternating deep and shallow.
+Counted by hand on the damage field of the stored run at `t = 5 ms` (no script
+computes these yet): 13 cracks on each quenched edge, spacing about 1.9 mm,
+penetrating 0.2 to 1.6 mm (mean 0.87 mm), alternating deep and shallow. An
+automatic count in `non-regression.py` is planned.
 Differences with the reference:
 
 - Time. The gold state is at `t = 5 ms`. Kamagate Fig. 2 and 3 are at

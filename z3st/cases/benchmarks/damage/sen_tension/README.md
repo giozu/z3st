@@ -40,9 +40,9 @@ AT2 analytical threshold (derived in `spine.py` at load time):
 - AT2 crack-density functional, `lc = 4 µm`.
 - No `split` key, so AT2 uses the default Miehe spectral split
   (`damage_model.py`).
-- No `hybrid_constraint` key.
-
-<!-- [TBC] the case is described as the Ambati hybrid formulation; input.yaml sets neither hybrid_constraint nor a split, check which is intended -->
+- No `hybrid_constraint` key, so the default `true` applies.
+- With these defaults the case runs the Ambati hybrid formulation: the whole
+  stress is degraded and the positive part of the Miehe split drives the crack.
 
 ## Solver (`input.yaml`)
 

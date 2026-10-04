@@ -373,7 +373,7 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T, k_pen=None):
     k2 = ((2/n) * B2 * C2 / (C2 - B2))**n * (1 - (n * B2 / 4) * (C2 - B2) / (B2 * C2))
 
     # --- Step 4: phi, relaxation rate (eq. 21-22) ---
-    phi = -(CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T)) / b) * f**n * (k2 - k1)
+    phi = -(CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T)) / b) * f**n * (k1 + k2)
     contact_mask = Delta_arr > 1e-9          # physical threshold, not 1e-12
     Pk = np.zeros_like(t)
 

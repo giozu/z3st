@@ -85,6 +85,10 @@ and it is not available as a model or an input key. The stored result
 coefficient within 1.63 % of the value used to generate the data. The case is
 excluded from the local suite (501 steps).
 
+Planned: a comparison of the crystal-plasticity case
+``verification/plasticity/crystal_single_grain`` with the same law written in
+MFront and called through MGIS, on the same single-grain problem.
+
 ``z3st/conference/fenics2026/demo/identify_creep.py`` is the earlier
 demonstration of the same approach: it identifies the two parameters
 :math:`(A, n)` of a known Norton law.

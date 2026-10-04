@@ -194,8 +194,6 @@ Update sequence:
 3. `PlasticityModel` sets `ep_n ← ep_new`.
 4. The next step uses the updated `ep_n`.
 
-<!-- [TBC] removed the "FEniCS 2026 Conference Message" and the planned MFront/MGIS comparison (claims such as "90% less code" and "hours vs days" are not checked anywhere); restore from git if the comparison is still planned -->
-
 ## References
 
 1. Asaro, R. J., & Rice, J. R. (1977). Strain localization in ductile single crystals. *Journal of the Mechanics and Physics of Solids*, 25(5), 309-338.

@@ -55,15 +55,10 @@ carries a `Clamp_x` to remove rigid x-translation.
 | Damage | AT1, `split: star_convex` with `gamma_star: 0.0` (the Amor split), `lc = 50 um`, `hybrid_constraint: true` |
 | Time window | 0.0001 to 0.1 s, n_steps = 100. The 99 intervals are uniform at dt = 1.01 ms, the first step is 0.1 ms |
 
-`sigma_c = 1 GPa` (from `materials/uo2.yaml`) lies above the
-plane-strain bulk threshold (about 3.0 MJ/m^3 from the blocked
-z thermal expansion, which `damage_model.py` suppresses) and below
-the peak surface tensile strain energy at the rim, so damage initiates
-only along the cold contact arc. `spine.py` derives `Gc` from it:
+`sigma_c = 1 GPa` comes from `materials/uo2.yaml`. In the stored run damage
+initiates only along the cold contact arc. `spine.py` derives `Gc` from it:
 Gc = (8/3) lc sigma_c^2 / E = 650 J/m^2 at E = 205 GPa, as printed
 in the run log.
-
-<!-- [TBC] "about 3.0 MJ/m^3" and "below the peak surface tensile strain energy" are not checked by any script in this case -->
 
 ### Phase-field formulation
 

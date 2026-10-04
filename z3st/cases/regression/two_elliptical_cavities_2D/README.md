@@ -131,7 +131,3 @@ Coverage / percolation and the restraint coupling:
   triple-junction saturation vs percolation; high semi-dihedral angle promotes it
   (relevant to the `Fc` sweep and the 50° dihedral).
   https://doi.org/10.1016/j.commatsci.2019.01.019
-<!-- [TBC] no citation given for the BWR SEM observations -->
-- Transient-tested BWR fuel SEM observations: under high compressive restraint
-  bubbles ripen with little interlinkage. Intergranular cracks open at the end of
-  the transient, when the restraint is removed.

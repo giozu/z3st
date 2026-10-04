@@ -9,7 +9,6 @@ Reference for the closed form: Esposito, Bruno, Bertocco, *Int. J. Pressure
 Vessels and Piping* 185 (2020) 104126, eq. (21), shrink-fit assembly
 relaxing by Norton creep:
 
-<!-- [TBC] plots.py evaluates phi with (k2 - k1); the formula below has (k1 + k2). Equal here because k1 = 0 (solid shaft); check eq. (22) of the paper -->
     Pk(t) = Δu_el(t) · f,   Δu_el(t) = Δ · (1 + φ(1-n)·t / Δ^(1-n))^(1/(1-n))
     φ = -(A/b) · f^n · (k1 + k2)
 

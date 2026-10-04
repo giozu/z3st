@@ -70,7 +70,11 @@ Stored run (`energies.txt`, `force_displacement.txt`, gold):
 - Peak reaction force 0.556 kN at `u_x = 27.4 µm` (step 782).
 - `D_max = 1.0`.
 
-<!-- [TBC] the stored final E_frac (4.67 J) exceeds the Ambati arrest target (2.84 J): crack arrest is not reproduced at 30 µm, or the target is not comparable -->
+Open point, low priority. Beyond the regularised notch the crack dissipates
+4.669 - 1.358 = 3.31 J, against 1.49 J (`Gc · 0.55 mm`) for the arrest length of
+Ambati Fig. 12d. At 30 µm the case does not reproduce the arrest: either the
+crack runs further than in the reference, or AT2 on this mesh overestimates the
+fracture energy. To investigate from the damage field at the last step.
 
 ## Files
 

@@ -9,23 +9,16 @@ Regression and verification
 
 Two different checks are run on a case, and they answer different questions.
 
-..
-   [TBC] rule 2 (history): the 223.7 W defect "corrected in version 0.4.0" is a
-   past fix. Keep as the worked example of a gold protecting a wrong result, or
-   cut to the first three sentences of this paragraph?
-
 **Regression against a gold.** A case that carries
 ``output/non-regression_gold.json`` compares the metrics of the current run
 with the values stored in that file. The comparison detects a change in the
 results between two versions of the code. It does not establish that either
 version is correct: a gold blessed from a wrong result protects the wrong
-result. An example is recorded in the software paper. The rod case
-``regression/pwr_rod_2D`` generated 223.7 W instead of the nominal 200 W,
-because the radial power shape was normalised by the mean of its nodal values
-rather than by its integral. Its regression test passed throughout, because the
-burnup it checked was the nodal mean, which that normalisation preserves. The
-defect was found by a comparison with OFFBEAT and is corrected in version
-0.4.0.
+result. An example of the mechanism: a radial power shape normalised by the
+mean of its nodal values, in place of its integral, changes the power the rod
+receives, while a burnup metric computed as a nodal mean stays the same. A gold
+on that metric passes. A check of the heat balance against the nominal linear
+heat rate, or a comparison with another code, detects it.
 
 **Verification against a reference.** A case whose metric has an analytical
 solution, or an independent numerical solution of the same problem, compares
