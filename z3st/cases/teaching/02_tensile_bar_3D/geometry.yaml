@@ -1,0 +1,14 @@
+name: tensile_bar_3d
+geometry_type: cyl
+
+Ro: 0.005   # bar radius (m), d = 10 mm
+Lz: 0.050   # gauge length (m)
+
+# A quarter of the bar: x = 0 and y = 0 are symmetry planes.
+labels:
+  symx: 1
+  symy: 2
+  bottom: 3
+  top: 4
+  outer: 5
+  steel: 6

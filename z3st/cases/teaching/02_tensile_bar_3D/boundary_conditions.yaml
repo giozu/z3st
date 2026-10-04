@@ -1,0 +1,16 @@
+mechanical:
+  steel:
+  # Symmetry planes of the quarter bar, and the fixed end. Nothing restrains the
+  # lateral contraction, so the bar is in uniaxial stress.
+  - type: Clamp_x
+    region: symx
+
+  - type: Clamp_y
+    region: symy
+
+  - type: Clamp_z
+    region: bottom
+
+  - type: Neumann
+    region: top
+    traction: 1.909859e+8   # F/A = 15 kN / (pi 5^2 mm^2) = 191 MPa, tensile
