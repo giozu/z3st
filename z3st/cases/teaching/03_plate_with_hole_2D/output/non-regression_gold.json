@@ -1,0 +1,34 @@
+{
+    "results": {
+        "Kt": {
+            "numerical": 3.018436553606947,
+            "reference": 3.0,
+            "abs_error": 0.01843655360694685,
+            "rel_error": 0.0061455178689822825,
+            "status": "PASS"
+        },
+        "sigma_on_load_axis": {
+            "numerical": -1.0174260846929932,
+            "reference": -1.0,
+            "abs_error": 0.017426084692993227,
+            "rel_error": 0.017426084692993227,
+            "status": "PASS"
+        },
+        "section_profile_rms": {
+            "numerical": 0.011659511682740636,
+            "reference": 0.0,
+            "abs_error": 0.011659511682740636,
+            "rel_error": 0.011659511682740636,
+            "status": "PASS"
+        },
+        "hole_edge_rms": {
+            "numerical": 0.014202270655698004,
+            "reference": 0.0,
+            "abs_error": 0.014202270655698004,
+            "rel_error": 0.014202270655698004,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.03,
+    "summary": "PASS"
+}

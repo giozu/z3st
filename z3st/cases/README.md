@@ -10,7 +10,7 @@ Every case directory is self-contained and runs the same way. This file document
 | `regression/`   | No closed-form truth; **only a blessed gold**. | no | yes (gold only) |
 | `benchmarks/`   | Phenomenological demonstrators, often qualitative. | sometimes | case-by-case |
 | `studies/`      | Parameter sweeps and custom-driver work. Custom `run_*.py`/`plot_*.py`, not the `Allrun`+gold pattern. | n/a | no |
-| `teaching/`     | Minimal pedagogical starters (`01_1D`, `01_3D`, `02_tensile_bar_3D`). | n/a | no |
+| `teaching/`     | Minimal pedagogical starters (`01_1D`, `01_3D`, `02_tensile_bar_3D`, `03_plate_with_hole_2D`). | n/a | no |
 | `sandbox/`      | Explicitly **unprotected** work-in-progress. Keeps the historical `U_` prefix. | n/a | never (pruned) |
 
 `verification/` is further split by physics domain: `thermal/`, `mechanics/`,
