@@ -48,10 +48,17 @@ def analytic_T(x):
     return term1 + term2
 
 
-def sigma_th_ana(x, T_num, c=1.0):
-    """Analytical thermal stress"""
-    T_mean = np.trapezoid(T_num, x) / (x.max() - x.min())
-    return alpha * E / (1.0 - c * nu) * (T_mean - T_num)
+def sigma_th_ana(x, c=1.0):
+    """Analytical thermal stress sigma_yy(x) of the strip, plane strain.
+
+    The mean temperature is the integral of analytic_T over [0, Lx], computed
+    on a fine grid. It used to be the trapezoid of T over the sampled cell
+    centres, which leaves out half a cell at each end: the reference then
+    carried an O(h) error and the stress appeared to converge at first order.
+    """
+    xf = np.linspace(0.0, Lx, 200001)
+    T_mean = np.trapezoid(analytic_T(xf), xf) / Lx
+    return alpha * E / (1.0 - c * nu) * (T_mean - analytic_T(x))
 
 
 # --- Sensitivity loop ---
@@ -83,7 +90,7 @@ for nx in nx_values:
     T_ref = analytic_T(xn_p)
     l2_err_T = np.sqrt(np.mean((Tn_p - T_ref) ** 2)) / (Ti - To)
 
-    S_ref = sigma_th_ana(xc_p, analytic_T(xc_p))
+    S_ref = sigma_th_ana(xc_p)
     l2_err_S = np.sqrt(np.mean((Sn_p - S_ref) ** 2)) / np.max(np.abs(S_ref))
 
     print(f"   -> Err T: {l2_err_T:.2e} | Err S: {l2_err_S:.2e}")
@@ -118,7 +125,7 @@ plt.loglog(h, eT, "o-", color="#0072B2", label=r"Error $L_2$ Temperature", linew
 plt.loglog(h, eS, "o-", color="#D55E00", label=r"Error $L_2$ Stress ($\sigma_{yy}$)", linewidth=2)
 
 plt.loglog(h, h**2 * (eT[0] / h[0] ** 2), "k--", alpha=0.5, label="Slope 2 (Theoretical T)")
-plt.loglog(h, h * (eS[0] / h[0]), "k:", alpha=0.5, label=r"Slope 1 (Theoretical $\sigma$)")
+plt.loglog(h, h**2 * (eS[0] / h[0] ** 2), "k:", alpha=0.5, label=r"Slope 2 ($\sigma$ at cell centres)")
 
 plt.grid(True, which="both", ls="-", alpha=0.5)
 plt.xlabel("h (mesh size)")
