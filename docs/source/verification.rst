@@ -9,6 +9,11 @@ Regression and verification
 
 Two different checks are run on a case, and they answer different questions.
 
+..
+   [TBC] rule 2 (history): the 223.7 W defect "corrected in version 0.4.0" is a
+   past fix. Keep as the worked example of a gold protecting a wrong result, or
+   cut to the first three sentences of this paragraph?
+
 **Regression against a gold.** A case that carries
 ``output/non-regression_gold.json`` compares the metrics of the current run
 with the values stored in that file. The comparison detects a change in the
@@ -93,7 +98,7 @@ those of Table 6 of the software paper and agree with the
      - ax.
      - irradiation creep
      - closed form
-     - 8.9e-14
+     - 8.8e-14
    * - ``verification/fuel/creep_shrink_fit_2D``
      - ax.
      - contact, creep relaxation
@@ -288,11 +293,11 @@ applied to that closed form in the case, and are documented in the case
 Guard cases
 -----------
 
-``verification/thermal/two_heated_materials_2D`` guards a defect of the volumetric
-heat source. The source is nodal, and a node on the interface between two
-heated materials belongs to both. Before version 0.4.0 the source of each
-material was added at those nodes, so the interface nodes carried twice the
-source. The case splits a gamma-heated cylindrical wall into two identical
+``verification/thermal/two_heated_materials_2D`` guards the volumetric heat
+source at material interfaces. The source is nodal, and a node on the interface
+between two heated materials belongs to both. ``Spine.set_power`` gives such a
+node the mean of the sources of the heated materials that touch it, and a node
+between a heated and an unheated material the heated value. The case splits a gamma-heated cylindrical wall into two identical
 materials and compares its temperature, node by node, with the same wall meshed
 as one material (``single/``), with a tolerance of 1e-6.
 

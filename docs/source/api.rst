@@ -1,7 +1,7 @@
 API Reference
 =============
 
-This section provides a detailed reference of the **Z3ST** core modules,
+This section documents the Z3ST core modules,
 including the solver, the physics models, the conductivity models, the
 SCIANTIX binding, output, case utilities and mesh handling.
 

@@ -251,8 +251,8 @@ Each of these is a single-effect check against a closed form, in
   ``reference_1d.py`` (see :doc:`verification`).
 - ``burnup``: burnup accumulation and a rim-peaking radial power shape on an
   axisymmetric pellet. Mean burnup against the closed form.
-- ``swelling``: a free 3D block with a constant volumetric swelling. Zero
-  stress and the free expansion :math:`u_x = (\Delta V/V)L_x/3`.
+- ``swelling``: a free 3D block with a constant volumetric swelling. Zero von
+  Mises stress and the free expansion :math:`u_x = (\Delta V/V)L_x/3`.
 - ``fuel_swelling``: swelling driven by the burnup field, same checks.
 - ``cracking``: the isotropic-softening cracking model, which rescales the
   elastic constants from the number of radial cracks.

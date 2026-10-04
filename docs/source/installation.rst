@@ -1,7 +1,7 @@
 Installation
 ============
 
-Z3ST runs on FEniCSx **dolfinx 0.11.0**, the version of the continuous-integration
+Z3ST runs on FEniCSx dolfinx 0.11.0, the version of the continuous-integration
 image ``dolfinx/dolfinx:v0.11.0`` (``.github/workflows/ci.yml``). The steps below
 create a conda environment with that version, install Z3ST into it, and check the
 result.
@@ -135,9 +135,8 @@ FEniCSx modules are mocked in ``docs/source/conf.py``, so the build runs outside
 The pages are written to ``docs/build/html``, entry point
 ``docs/build/html/index.html``.
 
-Use ``docs/requirements.txt`` rather than ``pip install -e '.[docs]'``: the ``docs``
-extra of ``pyproject.toml`` lacks ``sphinxcontrib-mermaid``, which renders the
-diagrams of the architecture page.
+Use ``docs/requirements.txt``. The Pages workflow installs it, and it sets the
+version floors the documentation is built with.
 
 Test suites
 -----------

@@ -1,9 +1,9 @@
-# UO2 pellet thermal-shock fracture - 2D transverse cross-section
+# UO2 pellet thermal-shock fracture, 2D transverse cross-section
 ## z3st test case, configured after McClenny et al. (2022)
 
 ### Role
 
-This case is a **test case** of the phase-field module on a thermal
+This case is a test case of the phase-field module on a thermal
 transient. Its configuration follows the UO2 pellet thermal-shock study of
 McClenny et al. (JNM 565, 2022): a transverse cross-section under plane
 strain, a circular pellet with a 60-deg cold-contact arc on its perimeter,
@@ -12,41 +12,33 @@ validation, and it does not reproduce their experiment (see Section 3.2 of
 the SoftwareX paper): formulation, discretisation, regularisation length and
 initial temperature differ from theirs.
 
-Unlike an axisymmetric (r-z) idealization
-(which can only produce an unphysical annular damage band), this case
-can break azimuthal symmetry and capture the localized tensile-hoop
-stress pattern that drives the experimentally observed radial cracks.
+It is in the local suite (carries a gold).
 
-### Why this 2D idealization is faithful to the experiment
+An axisymmetric (r-z) model can only produce an annular damage band. This
+(x, y) cross-section can break azimuthal symmetry and produce the localised
+tensile hoop stress that drives radial cracks.
 
-McClenny's experimental setup was deliberately designed so that:
-- The cold bath was in contact with **only 1/6 of the lateral surface
-  area** of the pellet (Fig. 4), creating a 60-deg azimuthal contact
-  wedge.
-- An **alumina spacer at the capsule bottom** eliminated axial thermal
-  contact (Section 3), so heat transfer was confined to the radial
-  direction.
+### Plane-strain idealisation
 
-The "no axial gradient" condition is exactly the plane-strain
-assumption: every transverse cross-section sees the same physics.
-The plane-strain (x, y) cross-section of the pellet, with a 60-deg
-contact arc on its perimeter, therefore captures the dominant physics
-of the experiment at much lower compute cost than the full 3D
-simulation. McClenny themselves use this 2D representation for their
-parametric study (Fig. 8 top row, Fig. A.13, Fig. A.14).
+In the McClenny experiment:
+- The cold bath was in contact with 1/6 of the lateral surface
+  of the pellet (Fig. 4), a 60-deg azimuthal contact wedge.
+- An alumina spacer at the capsule bottom removed axial thermal
+  contact (Section 3), so heat transfer was radial.
 
-### Geometry choice: half-disc with mirror symmetry
+With no axial gradient, every transverse cross-section sees the same loading,
+which is the plane-strain assumption. McClenny use the same 2D representation
+for their parametric study (Fig. 8 top row, Fig. A.13, Fig. A.14).
 
-The contact wedge in the model is centered around the +x axis and
-spans -30 deg to +30 deg (full 60 deg). This makes the y = 0 plane a
-mirror symmetry plane: the loading and the geometry are symmetric
-across it. The mesh therefore covers only the **upper half** of the
-disc (y >= 0); the lower half is implicit by mirror symmetry.
+### Geometry: half-disc with mirror symmetry
 
-This halves the compute cost and lets `Clamp_y` on the diameter act
-as the symmetry boundary condition (removing both rigid-body
-y-translation and rotation around z). A small 50-um pin segment near
-(-R, 0) carries a `Clamp_x` to remove rigid x-translation.
+The contact wedge is centred on the +x axis and spans -30 deg to +30 deg
+(60 deg in total). The y = 0 plane is a mirror symmetry plane of loading and
+geometry. The mesh covers the upper half of the disc (y >= 0).
+
+`Clamp_y` on the diameter is the symmetry condition (it removes rigid
+y-translation and rotation around z). A 50-um pin segment near (-R, 0)
+carries a `Clamp_x` to remove rigid x-translation.
 
 ### Geometry, material, BCs
 
@@ -54,87 +46,86 @@ y-translation and rotation around z). A small 50-um pin segment near
 |---|---|
 | Pellet radius `R` | 10 mm |
 | Domain | upper half-disc (y >= 0); contact arc 0 to +30 deg in the upper half (= 60 deg full) |
-| Material | UO2 from `materials/uo2.yaml`: E = 205 GPa, nu = 0.32, alpha = 1e-5 /K, sigma_c = 1 GPa |
+| Material | UO2 from `z3st/materials/uo2.yaml`: E = 205 GPa, nu = 0.32, alpha = 1e-5 /K, sigma_c = 1 GPa |
 | `T_initial` | 1023.15 K (= 750 deg C), uniform |
 | `T_quench` | 263.15 K (= -10 deg C), Dirichlet on the 60-deg contact arc |
-| Insulated rest of perimeter | natural Neumann (zero heat flux) |
+| Rest of perimeter | natural Neumann (zero heat flux) |
 | Symmetry plane y = 0 | `Clamp_y` (mirror BC) |
 | Pin segment at (-R, 0) | `Clamp_x` (50 um, removes rigid x-translation) |
-| Damage | AT1, Ambati hybrid, Amor split, `lc = 50 um`, hybrid_constraint = true |
+| Damage | AT1, `split: star_convex` with `gamma_star: 0.0` (the Amor split), `lc = 50 um`, `hybrid_constraint: true` |
 | Time window | 0.0001 to 0.1 s, n_steps = 100. The 99 intervals are uniform at dt = 1.01 ms, the first step is 0.1 ms |
 
-`sigma_c = 1 GPa` (from `materials/uo2.yaml`) is calibrated above the
-bulk-artifact threshold of plane strain (about 3.0 MJ/m^3 from the blocked
-z-thermal-expansion, suppressed by the regime-aware eigenstrain fix in
-`damage_model.py`) and below
-the peak surface tensile-strain energy at the rim, so that damage initiates
-only along the cold contact arc. The corresponding `Gc` is auto-derived in
-`spine.py`: Gc = (8/3) lc sigma_c^2 / E = 650 J/m^2 at E = 205 GPa, as printed
-by the run log.
+`sigma_c = 1 GPa` (from `materials/uo2.yaml`) lies above the
+plane-strain bulk threshold (about 3.0 MJ/m^3 from the blocked
+z thermal expansion, which `damage_model.py` suppresses) and below
+the peak surface tensile strain energy at the rim, so damage initiates
+only along the cold contact arc. `spine.py` derives `Gc` from it:
+Gc = (8/3) lc sigma_c^2 / E = 650 J/m^2 at E = 205 GPa, as printed
+in the run log.
+
+<!-- [TBC] "about 3.0 MJ/m^3" and "below the peak surface tensile strain energy" are not checked by any script in this case -->
 
 ### Phase-field formulation
 
-Z3ST uses the **Ambati hybrid formulation** (Comput. Mech. 55 (2015)
-383-405, Eq. 27): linear isotropic stress degradation `sigma = (1-D)^2
-* dPsi0/de`, AT1 surface energy with Amor (volumetric/deviatoric)
-elastic-energy split, hybrid constraint setting `H = 0` in compression-
-dominated cells. The damage driving force is evaluated on the
-**elastic strain** `eps_el = eps(u) - alpha (T - T_ref) I` so that
-uniform thermal expansion doesn't appear as a damage driver. In 2D
-plane strain, the z-component of the eigenstrain is suppressed (it
-would otherwise create a uniform compressive bulk artifact via the
-geometrically-blocked thermal expansion in z; see `damage_model.py::
-_thermal_eigenstrain` docstring).
+Ambati hybrid formulation (Comput. Mech. 55 (2015) 383-405, Eq. 27):
+- linear isotropic stress degradation `sigma = (1-D)^2 * dPsi0/de`;
+- AT1 surface energy;
+- star-convex split with `gamma_star = 0`, identical to the Amor
+  (volumetric/deviatoric) split;
+- hybrid constraint, `H = 0` in compression-dominated cells.
 
-McClenny instead uses the Miehe anisotropic formulation with viscous
-Allen-Cahn evolution; this case uses the hybrid formulation instead, so
-agreement with their pattern would not be a code-to-code verification.
+The damage driving force is evaluated on the elastic strain
+`eps_el = eps(u) - alpha (T - T_ref) I`. In 2D plane strain the z-component
+of the eigenstrain is suppressed (see the `damage_model.py::_thermal_eigenstrain`
+docstring).
+
+McClenny use the Miehe anisotropic formulation with viscous Allen-Cahn
+evolution. Agreement with their crack pattern is therefore not a
+code-to-code verification.
 
 ### Expected results
 
-- Discrete radial cracks emerge from the cold contact arc within the
+From McClenny:
+- Discrete radial cracks from the cold contact arc within the
   -30 deg to +30 deg wedge.
-- Per McClenny (p. 7): "two major (longer) radial cracks" plus a fan
-  of shorter surface cracks.
-- The long cracks **do not reach the centre**: they are arrested by
-  the central compression zone (the Amor split sends the compressive
-  hoop strain into psi_neg, and the hybrid constraint sets H = 0 in
-  those cells).
-- Crack initiation around `t ~ 1e-2 s` (McClenny p. 8: "the cracks
-  immediately appear on the pellet outer surface at about 10^-2 s
-  right after the instantaneous drop in temperature").
-- `E_frac` should grow rapidly once cracks initiate; `E_el` should
-  ramp up before the crack threshold and partially relax after.
+- "two major (longer) radial cracks" plus a fan of shorter surface
+  cracks (p. 7).
+- Cracks "immediately appear on the pellet outer surface at about
+  10^-2 s right after the instantaneous drop in temperature" (p. 8).
 
-Crack bands will appear ~50x wider than McClenny's because of the lc
-coarsening (50 um vs 1 um in the reference). The topology and timing
-are the diagnostic targets, not the band width.
+Stored run (`energies.txt`, 100 steps):
+- `E_el` is largest at step 0 (364.48 J) and decreases at every step, to
+  355.39 J at step 99 (t = 0.1 s).
+- `E_frac` is already 0.31 J at step 0 (t = 1e-4 s), 1.28 J at step 1,
+  2.52 J at step 10, 4.22 J at step 50 and 5.22 J at step 99.
+
+The regularisation length is 50 um against 1 um in McClenny, so crack bands
+are about 50 times wider.
 
 ### Running
 
 ```bash
-cd benchmarks/pellet_quench_2D_xy/
+cd z3st/cases/benchmarks/damage/pellet_quench_2D_xy
 ./Allrun
 ```
 
-### Outputs (in `output/`)
+`python3 mpi_scaling.py` reruns the case at 1, 2 and 4 MPI ranks and writes
+`output/mpi/non-regression_np<N>.json` for each.
 
-- `damage_field.png` -- ParaView-style 2D colormap of `D` on the half-disc,
-  with the cold contact arc highlighted (compare, qualitatively only,
+### Outputs (in `output/`, written by `non-regression.py`)
+
+- `damage_field.png`: 2D colour map of `D` on the half-disc,
+  with the cold contact arc highlighted (compare qualitatively with
   McClenny Fig. 8, top right).
-- `temperature_field.png` -- same paraview-like rendering of `T` at the
-  final time.
-- `stress_vm_field.png` -- von-Mises equivalent stress at the final time
-  (clipped to the 99th percentile to keep the colorbar informative).
-- `stress_hoop_field.png` -- hoop stress sigma_theta_theta with a
-  symmetric red/blue colormap (red = tensile = crack-driver).
-- `damage_angular.png` -- D_max(theta) along the outer ring, peaks count
-  individual radial cracks.
-- `thermal_shock_results.png` -- T(r) along contact midline, T(t) at
-  reference points, D(r) within the wedge.
-- `stress_evolution.png` -- sigma_rr(r), sigma_tt(r) along the contact
-  midline.
-- `energy_balance.png` -- E_el(t), E_frac(t).
+- `temperature_field.png`: `T` at the final time.
+- `stress_vm_field.png`: von Mises stress at the final time
+  (clipped to the 99th percentile).
+- `stress_hoop_field.png`: hoop stress sigma_theta_theta, symmetric
+  red/blue colour map (red = tensile).
+- `damage_angular.png`: D_max(theta) along the outer ring. Each peak is one radial crack.
+- `energy_balance.png`: E_el(t), E_frac(t).
+- `non-regression.json`: tracked values `T_final_mean_in_range`, `D_max_final`,
+  `crack_count_above_0p5`.
 
 ### References
 

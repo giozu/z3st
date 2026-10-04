@@ -86,8 +86,8 @@ Solver
 ------
 
 ``[WARNING] Staggered solver did not converge. Using last iteration state.``
-   followed by ``[time-loop] step N/M did NOT converge — proceeding with
-   last-iteration state.``
+   followed by ``[time-loop] step N/M did NOT converge``, with the rest of that
+   line stating that the last-iteration state is kept.
 
    The step reached ``solver_settings.max_iters`` before every field met its
    ``stag_tol``. The last iterate is accepted and the run continues, so check the

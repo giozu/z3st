@@ -3,8 +3,8 @@
 The Staggered Solver: What It Computes
 ======================================
 
-Z3ST solves temperature, displacement, phase field and porosity one block at a
-time within each time step and repeats the sequence until every block passes
+Z3ST solves temperature, displacement, phase field, cluster distribution and
+porosity one block at a time within each time step and repeats the sequence until every block passes
 its staggered tolerance (:ref:`coupled-scheme`). This page states what the
 converged result is, which theoretical guarantees apply to the formulation
 implemented, and what has been measured in their place.
@@ -147,9 +147,9 @@ Relaxation and acceleration
   over-relaxes. The over-relaxed alternate minimisation of Farrell and
   Maurini [FarrellMaurini2017]_ is therefore not what Z3ST does by default.
 
-Gerasimov and De Lorenzis [Gerasimov2016]_ show that staggered schemes for
-phase-field fracture are robust and that their results depend on the
-staggered tolerance, which is why the tolerance sweeps above are reported.
+Gerasimov and De Lorenzis [Gerasimov2016]_ show that the results of staggered
+schemes for phase-field fracture depend on the staggered tolerance. The
+tolerance sweeps above report that dependence for Z3ST.
 
 
 Stability of the computed state

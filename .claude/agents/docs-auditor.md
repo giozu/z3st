@@ -188,6 +188,26 @@ These were wrong in the documentation at least once. Verify each explicitly:
 Add to this list in your report when you find a new class of error, so the
 next audit checks it too.
 
+## Style (report as `style`)
+
+The owner keeps one style across code comments and documents. It is the
+style of the comment-auditor agent (`.claude/agents/comment-auditor.md`) plus
+three rules of their own. Report each violation in the pages you audit:
+
+- an em dash, or an en dash used as punctuation;
+- history in a document: dates of past fixes, "used to", "until version X",
+  "now" contrasted with a past state, changelog sections (citations,
+  provenance and credits are not history);
+- AI-sounding prose: "seamlessly", "robust", "powerful", "comprehensive",
+  "leverage", "it is worth noting", rhetorical questions, "not X but Y"
+  contrasts written for weight, punchline endings, triplets for rhythm, bold
+  for emphasis inside a sentence, capitalised words for stress, emojis;
+- a sentence with no checkable fact in it;
+- US spelling in prose (the documents use UK spelling).
+
+Give the line and a replacement. A long list of style findings goes at the
+end of each page's section, after the content findings.
+
 ## Code bugs found on the way
 
 Reading the code to verify the docs exposes bugs. Report them in their own
@@ -205,7 +225,8 @@ One Markdown report, in this order:
    - severity: `error` (a user following the docs gets a crash or a wrong
      result), `stale` (true once, false now), `missing` (code feature a user
      needs, undocumented), `overstated` (wording claims more than the code or
-     the data support), `quality` (unresolved reference, duplication, unclear);
+     the data support), `quality` (unresolved reference, duplication, unclear),
+     `style` (see the Style section);
    - the doc location `file:line` and the claim quoted;
    - the code location `file:line` and what it does;
    - the fix, in one line.

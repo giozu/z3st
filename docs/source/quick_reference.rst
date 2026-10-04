@@ -76,7 +76,7 @@ input.yaml
 
    time: [0.0, 100.0, 200.0]      # REQUIRED: breakpoints (s)
    lhr:  [0.0, 2.0e4, 2.0e4]      # REQUIRED: linear heat rate (W/m), fissile materials only
-   n_steps: 10                    # total time points, or a list of intervals per segment
+   n_steps: 10                    # approx. total time points (9 here), or a list of intervals per segment
 
    output:
      format: vtu                  # vtu | xdmf   (vtu becomes xdmf under MPI)
@@ -115,7 +115,7 @@ boundary_conditions.yaml
 
    thermal:
      steel:
-     - {type: Dirichlet, region: xmin, temperature: 500.0}   # (K), scalar or n_steps list
+     - {type: Dirichlet, region: xmin, temperature: 500.0}   # (K), scalar or one value per time point
      - {type: Neumann,   region: xmax, flux: 5000.0}         # (W/m²), positive leaves the body
      - {type: Robin,     region: ymin, h_conv: 3.5e4, T_ext: 580.0}   # convection
      - {type: Robin,     region: lateral_1, pair: inner_2}   # gap, h from gap_conductance

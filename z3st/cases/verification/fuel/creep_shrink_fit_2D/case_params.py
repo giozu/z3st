@@ -173,13 +173,11 @@ def elastic_factor(a, b, c, E1, nu1, E2, nu2):
     the Lame solution in plane stress. Purely elastic, with no creep and no
     equivalent-stress criterion.
 
-    Eq. (4) as printed in Esposito et al. (2020) carries +nu1 for the shaft and
-    -nu2 for the hub. The Lame interference fit has the opposite signs: the
-    radial pressure on the shaft surface shrinks it by (b/E1)(... - nu1) and
-    expands the hub bore by (b/E2)(... + nu2). With equal materials, as in
-    their validation, the two terms cancel and the misprint has no effect. With
-    the pellet and the cladding of this case it raised f by 3 %, which was the
-    whole of the deviation of the elastic point. reference_1d.py reproduces the
+    The signs of nu are those of the Lame interference fit: the pressure on the
+    shaft surface shrinks it by (b/E1)(... - nu1) and expands the hub bore by
+    (b/E2)(... + nu2). Eq. (4) as printed in Esposito et al. (2020) has +nu1
+    and -nu2, which gives the same f only for equal materials. For this pellet
+    and cladding the printed signs raise f by 3 %. reference_1d.py uses the
     signs used here.
     """
     denom = ((b / E1) * ((a**2 + b**2) / (b**2 - a**2) - nu1)

@@ -366,16 +366,15 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T, k_pen=None):
         ) ** n
 
     # --- Step 3: k2, hub creep contribution (eq. 20) ---
-    # Plane-stress hub with the Tresca criterion, as printed in eq. (20). An
-    # earlier version used here the von Mises form of the shaft, eq. (16),
-    # with c in place of a, which is 0.61 times eq. (20) for this clad: the
-    # closed form then relaxed too slowly and Z3ST appeared 15-17 % faster.
+    # Plane-stress hub with the Tresca criterion, eq. (20) as printed. The
+    # shaft form, eq. (16), with c in place of a gives 0.61 times this value
+    # for this clad.
     B2, C2 = b**(2/n), c**(2/n)
     k2 = ((2/n) * B2 * C2 / (C2 - B2))**n * (1 - (n * B2 / 4) * (C2 - B2) / (B2 * C2))
 
     # --- Step 4: phi, relaxation rate (eq. 21-22) ---
     phi = -(CREEP_A0 * np.exp(-CREEP_Q / (R_GAS * T)) / b) * f**n * (k2 - k1)
-    contact_mask = Delta_arr > 1e-9          # seuil physique, pas 1e-12
+    contact_mask = Delta_arr > 1e-9          # physical threshold, not 1e-12
     Pk = np.zeros_like(t)
 
     if not np.any(contact_mask):
@@ -384,7 +383,7 @@ def contact_pressure(t, Delta, a, b, c, E1, nu1, E2, nu2, A, n, T, k_pen=None):
         # and t_rel below are only meaningful once contact exists.
         return Pk / 1e6, f, k1, k2, phi
 
-    idx0 = np.argmax(contact_mask)        # premier indice de contact
+    idx0 = np.argmax(contact_mask)        # first step in contact
     t0 = t[idx0]                          # time at which creep starts
     t_rel = t[idx0:] - t0
 
@@ -419,7 +418,7 @@ def plot_contact_pressure_evolution():
 
     # --- Joint geometry [mm] ---
     a = 0.0      # shaft inner radius (a = 0 for a solid shaft)
-    b = R_CLAD_I    # rayon commun (interface de contact)
+    b = R_CLAD_I    # common radius (contact interface)
     c = R_CLAD_O     # hub outer radius
 
     # --- Elastic properties ---
@@ -489,13 +488,13 @@ def plot_contact_pressure_evolution():
     # --- Figure: Pk = f(t) ---
     fig, ax = plt.subplots(figsize=(7, 5))
     ax.plot(time_days, Pk, "-", color="#0072B2", lw=1.8,
-            label=f"Esposito eq. (21) — Tresca hub, n = {n:g}")
+            label=f"Esposito eq. (21), Tresca hub, n = {n:g}")
     from reference_1d import pressure_history
     t_ref = np.linspace(0.0, float(time_days[-1]), 60)
     ax.plot(t_ref, pressure_history(list(t_ref)) / 1e6, "--", color="0.2", lw=1.4,
             label="radial reference, J2 hub (reference_1d.py)")
     ax.plot(time_days, pressure, "o", ms=5, mfc="none", mec="#C44E52", mew=1.6,
-            label="Z3ST — J2 (von Mises), penalty contact")
+            label="Z3ST, J2 (von Mises), penalty contact")
     ax.set_xlabel("time (days)")
     ax.set_ylabel("contact pressure $P_k$ (MPa)")
     ax.set_title("Shrink-fit contact pressure relaxing under Norton creep\n"

@@ -26,6 +26,15 @@ convergence plot (see :doc:`getting_started`). Two command-line flags exist:
 - ``--debug`` prints every key of every material card after loading, and the
   per-material average heat flux after each step.
 
+A case directory may hold a ``diagnostics.py`` module with a function
+``per_step(problem, step, t)``. ``python3 -m z3st`` imports it at start-up and
+calls it after each converged step has been written, with the ``Spine`` object,
+the step index and the time in s. An exception inside ``per_step`` prints a
+``[WARNING]`` and the run continues. ``benchmarks/damage/sen_shear``,
+``verification/cohesive/bar_1D``, ``verification/fuel/creep_shrink_fit_2D``,
+``regression/pwr_rod_2D``, ``regression/fg_test_2D`` and
+``regression/fg_test_fuel`` use this hook.
+
 When standard output is not a terminal, the log is written as Markdown: steps
 become ``## Step`` headings and staggered iterations ``#### Iteration``
 headings. Set ``Z3ST_PLAIN_LOG=1`` to keep the plain form.
@@ -64,8 +73,10 @@ Gmsh numbers groups without an explicit tag in the order they are defined, so
 - every material name in ``input.yaml`` must be a ``labels`` entry whose tag is a
   volume group (a surface group in 2D, a curve group in 1D);
 - every ``region`` in ``boundary_conditions.yaml`` must be a ``labels`` entry
-  whose tag is a facet group. An unknown region stops the run with
-  ``[ERROR] Region '<name>' not found in label_map``.
+  whose tag is a facet group. An unknown region in a ``thermal`` or
+  ``mechanical`` condition stops the run with
+  ``[ERROR] Region '<name>' not found in label_map``. An unknown region in a
+  ``damage`` condition prints the same message, and the condition is skipped.
 
 ``geometry_type`` selects how the cross-section area :math:`A` and perimeter are
 computed. :math:`A` converts the linear heat rate ``lhr`` into a volumetric source
@@ -144,9 +155,10 @@ Top level
      - Linear heat rate in W/m at each breakpoint, same length as ``time``.
    * - ``n_steps``
      - 10
-     - Integer: total number of time points, distributed over the segments in
-       proportion to their duration. List: number of intervals in each segment
-       (one entry per segment).
+     - Integer: approximate total number of time points. Each segment gets
+       ``max(2, int((n_steps - 1) * duration / total_duration))`` intervals, so the
+       generated count can differ from ``n_steps``. List: number of intervals in
+       each segment (one entry per segment).
    * - ``output.format``
      - ``vtu``
      - ``vtu`` or ``xdmf``. Under MPI ``vtu`` is replaced by ``xdmf``.
@@ -495,6 +507,11 @@ steps through the time points built from them and ``n_steps``, interpolating
    lhr: [0.0, 20000.0, 20000.0, 20000.0]
    n_steps: [8, 60, 40]   # intervals per segment
 
+A step-dependent boundary-condition list (see `Boundary conditions`_) is
+indexed by time point, so it needs one value per generated time point: the sum
+of the intervals plus one, 109 for this history. A list of any other length
+stops the run.
+
 The first step is solved at ``time[0]`` with :math:`\Delta t` equal to
 ``time[0]``, so a history starting at 0 begins with a static step.
 
@@ -514,9 +531,9 @@ tolerance, the solver prints
 .. code-block:: text
 
    [WARNING] Staggered solver did not converge. Using last iteration state.
-   [time-loop] step N/M did NOT converge — proceeding with last-iteration state.
 
-and accepts the last iterate, including the plastic and creep history updates.
+followed by a ``[time-loop] step N/M did NOT converge`` line, and accepts the
+last iterate, including the plastic and creep history updates.
 The run continues. With `Time adaptivity`_ enabled the step is bisected instead.
 
 Time adaptivity
@@ -532,10 +549,27 @@ Time adaptivity
 A step that does not converge is rolled back to the last converged state, its
 :math:`\Delta t` is halved, and it is solved as two sub-steps. Each sub-step may be
 bisected again, up to ``max_cuts`` levels or until :math:`\Delta t` reaches
-``dt_min``. The snapshot taken before each attempt holds the primary fields, the
-damage history, burnup, plastic and creep variables, porosity, the cracking
-scalars of each material and the SCIANTIX state, so a failed attempt leaves
-nothing behind. Output is written on the original grid only.
+``dt_min``. Output is written on the original grid only.
+
+The snapshot taken before each attempt (``Spine.snapshot_state``) restores:
+
+- the fields ``T``, ``u``, ``D``, the crack-driving history, the mixed cohesive
+  state, burnup, gaseous swelling, the cluster and porosity fields and the
+  plastic variables;
+- the creep strains of each material;
+- the material entries ``E``, ``nu``, ``bulk_modulus`` and ``_lhr_max``, and the
+  values of the ``lmbda`` and ``G`` constants, which pellet cracking modifies;
+- the SCIANTIX state.
+
+At the start of every staggered solve the Aitken history, the gap-conductance
+damping memory and the contact secant history are reset. The snapshot does not
+restore:
+
+- the contact pressure and the last gap and pressure of the contact model;
+- the gap conductance :math:`h_\mathrm{gap}`;
+- ``relax_T``, ``relax_u`` and ``relax_D`` as adapted by ``relax_adaptive``.
+
+A retry starts from the values these held at the end of the failed attempt.
 
 If a step fails at ``dt_min``, the run prints
 ``[ERROR] Simulation aborted: adaptive time-stepping could not converge a step even
@@ -545,8 +579,8 @@ with status 1.
 Only ``lhr`` is interpolated to sub-step times. A boundary condition given as a
 per-step list keeps its grid-step value inside a bisected step, and a warning is
 printed at start-up when such a list coexists with adaptivity.
-``verification/fuel/creep_shrink_fit_2D`` and ``regression/pwr_rod_2D`` use this
-block.
+``verification/fuel/creep_shrink_fit_2D``, ``regression/pwr_rod_2D``,
+``regression/fg_test_2D`` and ``regression/fg_test_fuel`` use this block.
 
 Hot-reloaded parameters
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -589,7 +623,7 @@ Thermal conditions
      - Keys
      - Condition
    * - ``Dirichlet``
-     - ``temperature`` (K), scalar or a list of ``n_steps`` values
+     - ``temperature`` (K), scalar or a list with one value per time point
      - :math:`T = T_0`.
    * - ``Neumann``
      - ``flux`` (W/m²)
@@ -621,19 +655,19 @@ Mechanical conditions
      - Keys
      - Condition
    * - ``Dirichlet``
-     - ``displacement``: a vector of mesh dimension, or a list of ``n_steps``
-       vectors
+     - ``displacement``: a vector of mesh dimension, or a list with one vector
+       per time point
      - Every component prescribed.
    * - ``Dirichlet_x/y/z``, ``Clamp_x/y/z``
-     - ``displacement`` or ``value`` (default 0), scalar or a list of ``n_steps``
-       values
+     - ``displacement`` or ``value`` (default 0), scalar or a list with one
+       value per time point
      - One component prescribed on the whole region. ``Clamp_z`` is refused in
        ``2d`` and ``axisymmetric``.
    * - ``Slip_x/y/z``
      - none
      - The named component is free, the others are zero.
    * - ``Neumann``
-     - ``traction`` (Pa), scalar or a list of ``n_steps`` values
+     - ``traction`` (Pa), scalar or a list with one value per time point
      - :math:`\boldsymbol{\sigma}\mathbf{n} = t\,\mathbf{n}`.
 
 The scalar traction acts along the outward normal :math:`\mathbf{n}`. A positive
@@ -704,6 +738,23 @@ Keys read by the loader (``Spine.load_materials`` and the models):
      - ``lame`` (default), ``hyperelastic``, ``plasticity`` or ``custom``.
    * - ``yield_strength``
      - Promotes ``lame`` to ``plasticity`` when ``models.plasticity`` is on.
+   * - ``hardening_modulus``
+     - Linear isotropic hardening modulus :math:`H` (Pa) of J2 plasticity:
+       yield stress ``yield_strength`` :math:`+ H p`. Required by the J2 model.
+   * - ``swelling``
+     - Constant volumetric swelling :math:`\Delta V/V`, added as the isotropic
+       eigenstrain :math:`(\Delta V/V)/3\,\boldsymbol I`.
+   * - ``initial_porosity``
+     - Initial porosity of the material (default 0), read by the porosity
+       model. With porosity on, the heat source is scaled by
+       :math:`(1 - p)/(1 - p_0)`.
+   * - ``thermal_conductivity_model``
+     - ``kato_porosity`` replaces ``k`` with the porosity-dependent Kato
+       correlation, with ``stoichiometry_deviation`` (default 0.025) and
+       ``helium_conductivity`` (default 0.69 W/(m·K)). Needs the porosity model.
+   * - ``p_c``, ``tau_c``
+     - Cohesive model only: critical hydrostatic stress and shear strength (Pa)
+       of the strength surface. ``tau_c`` is not used in 1D.
    * - ``stress_function``
      - Stress function for ``constitutive: custom``.
    * - ``creep``, ``creep_A0``, ``creep_n``, ``creep_Q``, ``creep_irr_B``, ``fast_flux``
@@ -722,7 +773,8 @@ Properties as Python functions
 ``axial_profile`` and ``stress_function`` accept, in place of a number, the
 dotted path of a Python function. ``Spine.resolve_function`` splits the path at its
 last dot, imports the module with ``importlib.import_module`` and takes the
-function from it. ``python3 -m z3st`` puts both the ``z3st`` package directory and
+function from it. ``MechanicalModel`` resolves ``stress_function`` the same way
+when the stress is assembled. ``python3 -m z3st`` puts both the ``z3st`` package directory and
 the case directory on the import path, so a path can name
 
 - a module in ``z3st/materials``, as ``materials.<module>.<function>``;
@@ -819,7 +871,7 @@ Available cards
 
 Python modules in the same directory: ``ceramic.py``, ``oxide.py``,
 ``fuel_thermal.py`` (UO\ :sub:`2` ``k(T)``), ``magni_mox_thermal.py`` (MA-MOX
-``k``), ``zircaloy_E.py`` (``E(T)``, currently a constant 99.3 GPa),
+``k``), ``zircaloy_E.py`` (``E(T)``, a constant 99.3 GPa),
 ``fuel_swelling.py`` and ``sciantix_swelling.py`` (eigenstrains),
 ``fuel_profiles.py`` (radial and axial power profiles).
 

@@ -46,8 +46,11 @@ Conventions
   ``axisymmetric`` (default ``2d``). ``2d`` is plane strain,
   :math:`\varepsilon_{zz} = 0`. In ``axisymmetric`` the coordinates are
   :math:`(r, z)`, the hoop strain :math:`\varepsilon_{\theta\theta} = u_r/r` is
-  part of the strain tensor, and every volume and surface integral carries the
-  weight :math:`w = 2\pi r`. In the other regimes :math:`w = 1`. The ``1d``
+  part of the strain tensor, and the volume and surface integrals carry the
+  weight :math:`w = 2\pi r`. In the other regimes :math:`w = 1`. The porosity
+  transport forms (CG and DG) use unweighted measures in every regime, so in
+  ``axisymmetric`` they carry no cylindrical weight. The regime is not refused
+  with porosity on. Both porosity cases run in ``2d``. The ``1d``
   regime is a bar in uniaxial stress, :math:`\sigma = E\varepsilon`.
 - **Strain tensor.** In the ``2d``, ``3d`` and ``axisymmetric`` regimes the
   strain is stored as a :math:`3\times 3` tensor (``MechanicalModel.epsilon``),
@@ -79,8 +82,8 @@ with the time derivative omitted when ``thermal.analysis: stationary``
 
 **Boundary conditions** (``thermal:`` block of ``boundary_conditions.yaml``):
 
-- ``Dirichlet``: :math:`T = T_d`, key ``temperature``, a scalar or a list of
-  ``n_steps`` values.
+- ``Dirichlet``: :math:`T = T_d`, key ``temperature``, a scalar or a list with
+  one value per generated time point (the sum of the intervals plus one).
 - ``Neumann``: :math:`-k\nabla T\cdot\boldsymbol n = q_N`, key ``flux``
   (W/m²). A positive ``flux`` removes heat from the body.
 - ``Robin``, convective: :math:`-k\nabla T\cdot\boldsymbol n = h(T - T_\mathrm{ext})`,
@@ -175,9 +178,10 @@ and Gaussian-process models on the Picard route need neither (see
 Neural network
 ^^^^^^^^^^^^^^
 
-A small multilayer perceptron :math:`k = \mathrm{NN}(T)` with ``tanh`` and
-``softplus`` activations, so :math:`\mathrm{d}k/\mathrm{d}T` is continuous and
-is obtained by automatic differentiation of the network:
+A small multilayer perceptron :math:`k = \mathrm{NN}(T)` with one activation
+for all hidden layers, ``tanh`` (default) or ``softplus``, stored in the
+checkpoint. :math:`\mathrm{d}k/\mathrm{d}T` is continuous and is obtained by
+automatic differentiation of the network:
 
 .. code-block:: yaml
 
@@ -186,7 +190,11 @@ is obtained by automatic differentiation of the network:
      weights: knet.pt        # checkpoint, resolved relative to the case directory
 
 The checkpoint stores the weights, the architecture and the input
-normalisation. The case ``cases/verification/thermal/nn_conductivity_slab_2D``
+normalisation. At evaluation, :math:`T` is clamped to the training range
+stored in the checkpoint (default: four normalisation scales around the
+normalisation centre), with a warning printed once, and :math:`k` is floored at ``k_floor``
+(default :math:`10^{-3}` W/(m·K)). The tangent is zero where either guard is
+active. The case ``cases/verification/thermal/nn_conductivity_slab_2D``
 trains the network on the closed-form law :math:`k = 1/(a + bT)`
 (``train_knet.py``), solves with ``solver: newton`` and compares the profile
 with the analytical one. Implemented in :mod:`z3st.models.nn_conductivity`.
@@ -235,18 +243,21 @@ with :math:`\bar r` and :math:`s` the posterior mean and standard deviation:
 
 - The correction multiplies :math:`k_\mathrm{Magni}` by a positive factor, so
   :math:`k > 0`.
-- The kernel is an anisotropic squared exponential with homoscedastic noise
-  and a zero-mean prior on standardised variables. Far from the training data
+- The kernel is a squared exponential with homoscedastic noise and a
+  zero-mean prior on standardised variables. The shipped fits use one
+  lengthscale for all inputs. Far from the training data
   the posterior mean tends to the mean training residual, so :math:`k` tends to
   the Magni correlation times a constant.
 - ``mode: affine`` with ``xi`` (default 0) solves at :math:`\xi` posterior
   standard deviations.
 
 The ``.npz`` checkpoint is produced by
-``cases/studies/magni_gpr_conductivity/fit_gpr.py``, trained on a residual
-prescribed in closed form. ``verify_machinery.py`` in the same directory
+``cases/studies/magni_gpr_conductivity/make_synthetic_gpr.py``, trained on a
+residual prescribed in closed form. Each GPR case's ``Allrun`` calls it.
+``fit_gpr.py`` in the same directory fits a measured dataset passed with
+``--csv``, which is not distributed with the repository. ``verify_machinery.py`` in the same directory
 compares the fitted value and temperature derivative with the prescribed ones
-over 600--1900 K, checks the two methods against a finite difference, and
+over 600 to 1900 K, checks the two methods against a finite difference, and
 checks that the fit is flat in the variables the residual does not depend on.
 No measured MA-MOX dataset ships with the repository. Implemented in
 :mod:`z3st.models.gpr_conductivity`.
@@ -500,8 +511,8 @@ model is on), ``swelling`` (constant :math:`\Delta V/V`) and ``eigenstrain``
 ``Dirichlet`` (full vector ``displacement``), ``Dirichlet_x/y/z`` (one
 component), ``Clamp_x/y/z`` (one component set to zero), ``Slip_x/y/z`` (the
 named component free, the others zero) and ``Neumann`` (key ``traction``, a
-normal traction :math:`t_N\boldsymbol n`). Values may be lists of ``n_steps``
-entries.
+normal traction :math:`t_N\boldsymbol n`). Values may be lists with one entry
+per generated time point (the sum of the intervals plus one).
 
 **Weak form** (linear elastic path):
 
@@ -713,9 +724,10 @@ The constant term gives AT1 an elastic threshold, :math:`d` stays zero until
 :math:`\boldsymbol\varepsilon_{el} = \boldsymbol\varepsilon - \alpha(T - T_\mathrm{ref})\boldsymbol I`.
 The swelling and callable eigenstrains are not subtracted. In the ``2d``
 regime the :math:`zz` component of the thermal eigenstrain is omitted from the
-driving force only (the equilibrium keeps it), because the blocked axial
-expansion of plane strain would otherwise drive damage through the deviatoric
-part. With :math:`\langle x\rangle_\pm = (x\pm|x|)/2` and
+driving force and from ``MechanicalModel.elastic_energy_density``, which gives
+the ``StrainEnergyDensity`` output and the ``E_el`` column of ``energies.txt``.
+The equilibrium keeps it. In plane strain the axial expansion is blocked, and
+keeping the :math:`zz` term would drive damage through the deviatoric part. With :math:`\langle x\rangle_\pm = (x\pm|x|)/2` and
 :math:`K_n = \lambda + 2\mu/n_d`, where :math:`n_d` is the dimension of the
 strain tensor (3 in the ``2d``, ``3d`` and ``axisymmetric`` regimes, so
 :math:`K_n` is the bulk modulus), the splits selected by ``damage.split`` are

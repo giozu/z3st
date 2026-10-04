@@ -40,9 +40,10 @@ selected by the ``regime`` entry. The models available are:
   through an eigenstrain.
 
 The fields are solved in a staggered loop within each time step, in the order
-temperature, displacement, damage, porosity. Section :doc:`verification` lists
-the verification cases and their errors, and :doc:`in_development` the models
-that are in the code but not yet described in the software paper.
+temperature, displacement, damage, cluster, porosity. Section
+:doc:`verification` lists the verification cases and their errors, and
+:doc:`in_development` the models that are in the code but not described in the
+software paper.
 
 Scope and limitations
 ---------------------
