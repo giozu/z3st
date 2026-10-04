@@ -177,7 +177,7 @@ z3st/                                # repository root
     ├── ai/                          # agent onboarding (PROMPT.md, CONTEXT.md)
     ├── conference/                  # FEniCS 2026 materials (slides, demo, handout)
     ├── examples/                    # minimal didactic setups
-    └── cases/                       # 68 cases carrying a gold, 63 in the local suite
+    └── cases/                       # 70 cases carrying a gold, 65 in the local suite
         ├── verification/            # single-effect checks against a closed-form solution
         │   ├── thermal/             #   slabs, shells, heated box
         │   ├── mechanics/           #   Lamé, GPS, Mariotte, cylinders, cavities

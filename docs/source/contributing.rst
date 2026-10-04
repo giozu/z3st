@@ -93,7 +93,7 @@ Running the suites
 .. code-block:: bash
 
    cd z3st/cases
-   ./non-regression_local.sh          # 63 discovered cases
+   ./non-regression_local.sh          # 65 discovered cases
    ./non-regression_github.sh         # the 21 cases of cases_ci.txt
 
 GitHub Actions runs ``non-regression_github.sh`` on every push to ``main``,

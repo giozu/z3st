@@ -311,11 +311,11 @@ missing, or if its ``summary`` or ``regression`` verdict is not ``PASS``.
    ./non-regression_local.sh           # run all
    ./non-regression_local.sh verification/fuel/creep   # run named cases
 
-68 case directories carry a gold. Five are listed in ``suite_exclude.txt``
+70 case directories carry a gold. Five are listed in ``suite_exclude.txt``
 (``benchmarks/damage/sen_shear``, ``benchmarks/damage/sen_tension``,
 ``benchmarks/damage/plate_thermal_shock_2D``,
 ``verification/fuel/creep_law_discovery`` and ``regression/pwr_rod_2D``), so
-the local suite has 63 cases, 17 of them three-dimensional. The excluded cases
+the local suite has 65 cases, 18 of them three-dimensional. The excluded cases
 are run by hand. ``regression/pwr_rod_2D`` carries a gold and is run by hand
 outside the suite, because the contact path it covers is also covered by
 ``creep_shrink_fit_2D``.

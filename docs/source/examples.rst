@@ -321,5 +321,19 @@ Teaching cases
 ``teaching/01_1D`` and ``teaching/01_3D`` are a bar in uniaxial tension on a
 1D line mesh (``regime: 1d``) and on a 3D hexahedral mesh. Both are checked
 against :math:`u_x(L) = PL/E`. Both carry a gold and are in the local suite.
+
+``teaching/02_tensile_bar_3D`` is a round tensile specimen (d = 10 mm,
+L = 50 mm, F = 15 kN, steel) in 3D, a quarter meshed with two symmetry planes.
+The stress is uniaxial, so :math:`\sigma_{zz} = F/A`, the strains, the normal
+and shear stress on an inclined plane and the Tresca and von Mises stresses
+have closed forms. The displacement field is linear, so linear tetrahedra match
+them to machine precision.
+
+``teaching/03_plate_with_hole_2D`` is a circular hole in a wide plate under
+remote tension, in plane strain, checked against Kirsch's solution: stress
+concentration factor within 0.6 % of 3, hoop stress on the hole edge and
+:math:`\sigma_{xx}` across the section within 1.8 %.
+
+All four carry a gold and are in the local suite.
 The tags ``course-2627.0`` and ``course-2627.1`` mark the releases used in the
 course Nuclear Design and Technology at Politecnico di Milano, 2026-27.
