@@ -48,9 +48,15 @@ ux_num = float(np.max(u[:, 0]))
 _, _, _, vm = extract_field(VTU_FILE, field_name="VonMises (cells)")
 vm_num = float(np.mean(np.abs(vm)))     # should be close to zero for free swelling
 
+# Von Mises cannot see an isotropic error: the eigenstress -K*s*I missing from
+# the written stress leaves it unchanged. The hydrostatic part checks it.
+_, _, _, ph = extract_field(VTU_FILE, field_name="Hydrostatic (cells)")
+ph_num = float(np.mean(np.abs(ph)))
+
 print(f"[INFO] swelling ΔV/V = {s} → linear eigenstrain s/3 = {eps_lin:.4e}")
 print(f"[INFO] u_x(max): numerical = {ux_num:.6e} m, analytical = {UX_REF:.6e} m")
 print(f"[INFO] mean |von Mises|: {vm_num:.3e} Pa  (free swelling ⇒ ≈ 0)")
+print(f"[INFO] mean |hydrostatic|: {ph_num:.3e} Pa  (free swelling ⇒ ≈ 0)")
 print(f"[INFO] bulk modulus K = {K:.3e} Pa; fully constrained would give σ = -K·s = {-K*s:.3e} Pa")
 
 errors = {
@@ -61,6 +67,12 @@ errors = {
         "reference": 0.0,
         "abs_error": vm_num,
         "rel_error": float(vm_num / (K * s)),
+    },
+    "hydrostatic_free_residual": {
+        "numerical": ph_num,
+        "reference": 0.0,
+        "abs_error": ph_num,
+        "rel_error": float(ph_num / (K * s)),
     },
 }
 

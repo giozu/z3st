@@ -48,9 +48,8 @@ Conventions
   :math:`(r, z)`, the hoop strain :math:`\varepsilon_{\theta\theta} = u_r/r` is
   part of the strain tensor, and the volume and surface integrals carry the
   weight :math:`w = 2\pi r`. In the other regimes :math:`w = 1`. The porosity
-  transport forms (CG and DG) use unweighted measures in every regime, so in
-  ``axisymmetric`` they carry no cylindrical weight. The regime is not refused
-  with porosity on. Both porosity cases run in ``2d``. The ``1d``
+  transport forms (CG and DG) carry no cylindrical weight, so ``axisymmetric``
+  is refused with porosity on. Both porosity cases run in ``2d``. The ``1d``
   regime is a bar in uniaxial stress, :math:`\sigma = E\varepsilon`.
 - **Strain tensor.** In the ``2d``, ``3d`` and ``axisymmetric`` regimes the
   strain is stored as a :math:`3\times 3` tensor (``MechanicalModel.epsilon``),
@@ -129,8 +128,11 @@ the ``lhr`` history of ``input.yaml``, :math:`A` the fuel cross-section, and
 1/m) adds a gamma-heating source: :math:`q_0 e^{-\mu_\gamma x}` for
 ``geometry_type: rect``, :math:`q_0 K_0(\mu_\gamma r)/K_0(\mu_\gamma R_i)`
 for cylinders and :math:`q_0 (R_i/r)\, e^{-\mu_\gamma (r - R_i)}` for spheres,
-with :math:`R_i` the geometry ``inner_radius`` or the card key
-``gamma_inner_radius``. Both sources may act on the same material and add.
+with :math:`R_i` the card key ``gamma_inner_radius`` or else the geometry
+``inner_radius``. ``cyl-cyl`` uses the cylinder profile and requires
+``gamma_inner_radius``, and :math:`R_i = 0` is refused. Other geometry types
+have no gamma profile and are refused. Both sources may act on the same
+material and add.
 
 **Solver keys** (``thermal:`` block): ``solver`` (``linear``, default, or
 ``newton`` for a data-driven :math:`k`), ``linear_solver`` (default
@@ -681,7 +683,10 @@ error for:
   would not be a ductile-fracture model,
 - the cohesive model without ``models.mechanical``, or with damage or
   plasticity,
-- an irradiation-creep card with only one of ``creep_irr_B`` and ``fast_flux``.
+- an irradiation-creep card with only one of ``creep_irr_B`` and ``fast_flux``,
+- porosity migration in the ``axisymmetric`` regime,
+- a material card with ``alpha`` and no ``T_ref``, or, with the thermal model
+  on, with neither ``T_initial`` nor ``T_ref``.
 
 
 Phase-Field Fracture
