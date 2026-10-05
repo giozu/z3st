@@ -74,7 +74,7 @@ Open point, low priority. Beyond the regularised notch the crack dissipates
 4.669 - 1.358 = 3.31 J, against 1.49 J (`Gc · 0.55 mm`) for the arrest length of
 Ambati Fig. 12d. At 30 µm the case does not reproduce the arrest: either the
 crack runs further than in the reference, or AT2 on this mesh overestimates the
-fracture energy. To investigate from the damage field at the last step.
+fracture energy. The investigation plan is in `INVESTIGATION.md`.
 
 ## Files
 
@@ -85,6 +85,7 @@ fracture energy. To investigate from the damage field at the last step.
 - `diagnostics.py`: per-step hook, writes `force_displacement.txt` at the case root.
 - `non-regression.py`: field plots of the last step, energy balance, gold checks.
 - `plot_energy_balance.py`, `plot_force_displacement.py`: standalone plots.
+- `INVESTIGATION.md`: plan for the open point on crack arrest.
 - `sweep_gamma.sh`: runs the case for `gamma_star` = 0, 1, 5 into `output_starconvex_<tag>/`.
 - `Allrun`, `Allclean`.
 
