@@ -41,8 +41,30 @@
             "abs_error": 1.4901161193847656e-08,
             "rel_error": 1.5604462103063792e-16,
             "status": "PASS"
+        },
+        "eps_zz": {
+            "numerical": 0.0009549295000000804,
+            "reference": 0.0009549295,
+            "abs_error": 8.033938098117588e-17,
+            "rel_error": 8.413121699683157e-14,
+            "status": "PASS"
+        },
+        "eps_xx": {
+            "numerical": -0.00028647885000000235,
+            "reference": -0.00028647885,
+            "abs_error": 2.3310346708438345e-18,
+            "rel_error": 8.136847347871699e-15,
+            "status": "PASS"
+        },
+        "gamma_45": {
+            "numerical": 0.0012414083500000828,
+            "reference": 0.00124140835,
+            "abs_error": 8.283304597789254e-17,
+            "rel_error": 6.672505946805702e-14,
+            "status": "PASS"
         }
     },
     "tolerance": 1e-06,
-    "summary": "PASS"
+    "summary": "PASS",
+    "regression": "PASS"
 }
