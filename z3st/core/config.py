@@ -112,6 +112,11 @@ class Config:
             raise ValueError(
                 f"Invalid regime '{self.regime}'. Must be one of {sorted(valid_regimes)}."
             )
+        # The porosity forms carry no
+        # 2*pi*r weight, so in r-z they would drop the v_r*p/r term of the
+        # divergence. Weight both the SUPG and the DG forms to lift this.
+        if self.on.get("porosity", False) and self.regime == "axisymmetric":
+            raise ValueError("Porosity migration is not implemented in the axisymmetric regime.")
 
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")
