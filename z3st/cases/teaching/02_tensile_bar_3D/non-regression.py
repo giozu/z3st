@@ -88,7 +88,7 @@ for th in thetas:
 sn_fe, tau_fe = np.array(sn_fe), np.array(tau_fe)
 for deg in (0, 30, 45, 60, 90):
     i = 2 * deg
-    print(f"   {deg:>5}d {sn_fe[i]/1e6:14.1f} {tau_fe[i]/1e6:10.1f}")
+    print(f"   {deg:>5}d {round(sn_fe[i]/1e6, 1) + 0.0:14.1f} {round(tau_fe[i]/1e6, 1) + 0.0:10.1f}")
 print(f"   largest shear {tau_fe.max()/1e6:.1f} MPa at {np.degrees(thetas[tau_fe.argmax()]):.0f} deg: sigma/2")
 
 print("\n3. strains, from the strain field and from the displacements of the ends:")
