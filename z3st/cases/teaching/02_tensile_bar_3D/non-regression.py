@@ -37,7 +37,7 @@ bcs = load_yaml(CASE_DIR, "boundary_conditions.yaml")["mechanical"]["steel"]
 R, L = float(geom["Ro"]), float(geom["Lz"])
 E, nu = float(mat["E"]), float(mat["nu"])
 P = next(float(b["traction"]) for b in bcs if b["type"] == "Neumann" and b["region"] == "top")
-S_y = 235e6  # Pa, S235: the 235 is the grade
+S_y = float(mat["yield_strength"])  # Pa, from s235.yaml: the 235 is the grade
 
 A = np.pi * R**2
 F = P * A
