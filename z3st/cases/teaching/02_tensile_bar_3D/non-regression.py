@@ -5,10 +5,9 @@
 Z3ST case: teaching/02_tensile_bar_3D  --  a round tensile bar, solved in 3D.
 
 The specimen of a uniaxial tensile test: d = 10 mm, L = 50 mm, pulled by
-F = 15 kN, steel (E = 200 GPa, nu = 0.3). The whole bar is meshed, held on its interior
-planes x = 0 and y = 0 (which the exact solution leaves in place) and axially at
-the bottom end, so nothing restrains the lateral contraction and the bar is in
-uniaxial stress:
+F = 15 kN, steel (E = 200 GPa, nu = 0.3). The whole bar is meshed and held only axially at
+the bottom end, its free rigid-body motions projected out of the solve, so
+nothing restrains the lateral contraction and the bar is in uniaxial stress:
 
     sigma_zz = F/A,  every other component 0
     eps_zz = sigma/E,  eps_rr = -nu sigma/E,  eps_v = (1 - 2 nu) sigma/E

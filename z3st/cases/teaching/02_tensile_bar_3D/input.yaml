@@ -23,8 +23,13 @@ models:
 
 mechanical:
   solver: linear
-  linear_solver: direct_mumps
-  rtol: 1.0e-8
+  # The bar is held only axially (boundary_conditions.yaml).
+  # With "remove_rigid_nullspace: true", z3st finds by itself thr free six rigid motions. 
+  # It attaches them to the matrix as nullspace, and the solver removes them from the known term and solution.
+  # The operator is then singular, which is what a Krylov solver is built for, so iterative solver rather than LU.
+  remove_rigid_nullspace: true
+  linear_solver: iterative_hypre
+  rtol: 1.0e-12
   stag_tol: 1.0e-8
   convergence: rel_norm
   debug: false

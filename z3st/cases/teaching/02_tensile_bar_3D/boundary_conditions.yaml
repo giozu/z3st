@@ -1,15 +1,9 @@
 mechanical:
   steel:
-  # The bar is held on the interior planes x = 0 and y = 0, which the exact solution
-  # leaves at u_x = 0 and u_y = 0 anyway (u_x = -nu eps x): the constraints remove the
-  # rigid-body motions and nothing else. The bottom end is held axially only, so nothing
-  # restrains the lateral contraction and the bar is in uniaxial stress.
-  - type: Clamp_x
-    region: symx
-
-  - type: Clamp_y
-    region: symy
-
+  # The bottom end is held axially only, so nothing restrains the lateral contraction
+  # and the bar is in uniaxial stress. That leaves three rigid-body motions free
+  # (translation in x and y, rotation about z): input.yaml removes them from the solve
+  # with remove_rigid_nullspace, instead of pinning the bar anywhere else.
   - type: Clamp_z
     region: bottom
 
