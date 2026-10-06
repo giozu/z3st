@@ -1,0 +1,9 @@
+name: hex_shell_2d # new name for the geometry
+orientation: flat # flat | vertical
+D: 0.200    # outer circumscribed diameter (m)
+t: 0.0045   # wall thickness (m)
+
+labels: #consistent with the Builtin mesh.geo
+  steel: 2
+  inner: 4
+  outer: 5

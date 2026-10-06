@@ -2,17 +2,17 @@ thermal:
   steel:
   - type: Neumann
     region: inner
-    flux: -5000.0   # (W/m²)
+    flux: -7000.0   # (W/m²)
 
   - type: Dirichlet
     region: outer
-    temperature: 600.0   # (K)
+    temperature: 500.0   # (K)
 
 
-mechanical:
-  steel:
-  - type: Clamp_z
-    region: bottom
+#mechanical:
+#  steel:
+#  - type: Clamp_z
+#    region: bottom
   # - type: Dirichlet_z # remove for hourglassing
   #   region: top
   #   value: 2.504e-5 # (m) u_z = eps_zz * Lz = alpha * (T_mean - T_ref) * Lz

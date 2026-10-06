@@ -4,8 +4,8 @@
 # Version: 0.3.2 (2026)
 # ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. ---
 
-mesh_path: mesh.msh
-geometry_path: geometry.yaml
+mesh_path: 3d/mesh.msh
+geometry_path: 3d/geometry.yaml
 boundary_conditions_path: boundary_conditions.yaml
 
 materials:
