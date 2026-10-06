@@ -4,7 +4,8 @@ geometry_type: cyl
 Ro: 0.005   # bar radius (m), d = 10 mm
 Lz: 0.050   # gauge length (m)
 
-# A quarter of the bar: x = 0 and y = 0 are symmetry planes.
+# The whole bar, meshed as four quarters so that the planes x = 0 and y = 0 exist as
+# interior surfaces: symx and symy are those planes.
 labels:
   symx: 1
   symy: 2

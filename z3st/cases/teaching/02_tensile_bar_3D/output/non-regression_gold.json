@@ -1,66 +1,66 @@
 {
     "results": {
         "sigma_zz": {
-            "numerical": 190985900.0000001,
-            "reference": 190985900.0,
-            "abs_error": 8.940696716308594e-08,
-            "rel_error": 4.681338630919138e-16,
-            "status": "PASS"
-        },
-        "von_mises": {
-            "numerical": 190985899.99999902,
-            "reference": 190985900.0,
-            "abs_error": 9.834766387939453e-07,
-            "rel_error": 5.149472494011052e-15,
-            "status": "PASS"
-        },
-        "tresca": {
             "numerical": 190985900.00000003,
             "reference": 190985900.0,
             "abs_error": 2.9802322387695312e-08,
             "rel_error": 1.5604462103063792e-16,
             "status": "PASS"
         },
+        "von_mises": {
+            "numerical": 190985900.00000137,
+            "reference": 190985900.0,
+            "abs_error": 1.3709068298339844e-06,
+            "rel_error": 7.178052567409344e-15,
+            "status": "PASS"
+        },
+        "tresca": {
+            "numerical": 190985899.99999997,
+            "reference": 190985900.0,
+            "abs_error": 2.9802322387695312e-08,
+            "rel_error": 1.5604462103063792e-16,
+            "status": "PASS"
+        },
         "u_z_top": {
-            "numerical": 4.7746474999999776e-05,
+            "numerical": 4.774647500000038e-05,
             "reference": 4.7746475000000006e-05,
-            "abs_error": 2.303929616531697e-19,
-            "rel_error": 4.8253397062960074e-15,
+            "abs_error": 3.7269449679189215e-19,
+            "rel_error": 7.80569658371413e-15,
             "status": "PASS"
         },
         "u_r_rim": {
-            "numerical": -1.4323942499999932e-06,
+            "numerical": -1.4323942500000099e-06,
             "reference": -1.4323942500000001e-06,
-            "abs_error": 6.988021814847978e-21,
-            "rel_error": 4.878560364821331e-15,
+            "abs_error": 9.740878893424454e-21,
+            "rel_error": 6.800417478235795e-15,
             "status": "PASS"
         },
         "tau_max": {
-            "numerical": 95492950.00000001,
+            "numerical": 95492949.99999999,
             "reference": 95492950.0,
             "abs_error": 1.4901161193847656e-08,
             "rel_error": 1.5604462103063792e-16,
             "status": "PASS"
         },
         "eps_zz": {
-            "numerical": 0.0009549295000000804,
+            "numerical": 0.0009549295000002427,
             "reference": 0.0009549295,
-            "abs_error": 8.033938098117588e-17,
-            "rel_error": 8.413121699683157e-14,
+            "abs_error": 2.426444462022559e-16,
+            "rel_error": 2.5409671206330505e-13,
             "status": "PASS"
         },
         "eps_xx": {
-            "numerical": -0.00028647885000000235,
+            "numerical": -0.0002864788500000484,
             "reference": -0.00028647885,
-            "abs_error": 2.3310346708438345e-18,
-            "rel_error": 8.136847347871699e-15,
+            "abs_error": 4.83554168928535e-17,
+            "rel_error": 1.6879227521631526e-13,
             "status": "PASS"
         },
         "gamma_45": {
-            "numerical": 0.0012414083500000828,
+            "numerical": 0.0012414083500002912,
             "reference": 0.00124140835,
-            "abs_error": 8.283304597789254e-17,
-            "rel_error": 6.672505946805702e-14,
+            "abs_error": 2.912167035296065e-16,
+            "rel_error": 2.345857457214675e-13,
             "status": "PASS"
         }
     },

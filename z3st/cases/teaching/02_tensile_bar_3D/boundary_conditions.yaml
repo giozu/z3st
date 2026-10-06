@@ -1,7 +1,9 @@
 mechanical:
   steel:
-  # Symmetry planes of the quarter bar, and the fixed end. Nothing restrains the
-  # lateral contraction, so the bar is in uniaxial stress.
+  # The bar is held on the interior planes x = 0 and y = 0, which the exact solution
+  # leaves at u_x = 0 and u_y = 0 anyway (u_x = -nu eps x): the constraints remove the
+  # rigid-body motions and nothing else. The bottom end is held axially only, so nothing
+  # restrains the lateral contraction and the bar is in uniaxial stress.
   - type: Clamp_x
     region: symx
 

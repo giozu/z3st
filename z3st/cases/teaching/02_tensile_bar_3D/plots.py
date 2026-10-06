@@ -7,7 +7,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """Figures of the tensile-bar case, written to output/.
 
-  mesh.png             the quarter bar and its extruded tetrahedral mesh
+  mesh.png             the bar and its extruded tetrahedral mesh
   stress_field.png     sigma_zz and von Mises on the deformed bar, the undeformed
                        outline behind it; both uniform, both equal to F/A
   strain_field.png     eps_zz, eps_xx and eps_v on the bar deformed x200, in
