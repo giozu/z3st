@@ -101,7 +101,7 @@ those of Table 6 of the software paper and agree with the
      - 3D
      - contact
      - Lamé interference pressure
-     - 1.2e-2
+     - 4.7e-3
    * - ``verification/thermal/coaxial_gap_3D``
      - 3D
      - gap conductance
@@ -214,17 +214,19 @@ goes to zero with the mesh.
 quarter of a solid disc of radius 4.1 mm inside a ring of radii 4.13 and
 4.75 mm, 1 mm thick, with an initial gap of 30 µm, closed by uniform heating
 of the disc and loaded through penalty contact. The reference is the
-plane-stress Lamé interference pressure. At the final step the computed
-pressure is 74.19 MPa against the analytical 74.97 MPa, a difference of 1.2 %
-in the gold (the paper quotes 1.0 % at the final step and 1.2 % at the first
-closed step, the largest). The software paper reports three meshes, with
-21606, 49131 and 102228 displacement degrees of freedom, and errors of 1.39,
-1.16 and 1.10 %, approaching a floor near 1.05 %. The floor is a model
-difference: the penalty contact admits a penetration of order
-:math:`p/k_\mathrm{pen}`, and the reference is a plane-stress solution while the
-computed body has a symmetry plane and a free surface. The case is therefore
-accurate to about 1 % against its reference, and is not claimed to converge to
-it. The three-mesh series is not stored in the repository.
+plane-stress Lamé interference pressure, with the ring compliance taken at the
+ring's inner radius :math:`b_{ci}` and the disc compliance at its radius
+:math:`b`. With open ends, a uniform temperature in each body and frictionless
+contact the plane-stress solution is exact for this body. At the final step
+the computed pressure is 74.19 MPa against the analytical 74.45 MPa, a
+difference of 0.35 %. The largest difference, 0.47 % at the first closed step,
+is the gold value. On three meshes with 21606, 49131 and 102228 displacement
+degrees of freedom the largest difference is 0.70, 0.47 and 0.41 %,
+approaching about 0.35 %. That remainder is the penalty: the contact admits a
+penetration of order :math:`p/k_\mathrm{pen}`. An independent CalculiX model of
+the same mesh gives a difference of 0.33 % with a penalty of
+:math:`10^{15}` Pa/m and 0.03 % with mortar contact, which has no penalty.
+The three-mesh series is not stored in the repository.
 
 **Porosity migration** (``verification/fuel/porosity_migration``). The software
 paper reports a radial mesh refinement from 100 to 200 and 400 elements, which

@@ -13,8 +13,8 @@ and the outer ring does not expand. The interference
 then gives the exact Lame shrink-fit pressure for a solid disk in a ring
 (plane-strain form, eps_zz = 0):
 
-    p = delta / { b [ (1+nu_c)/E_c ((1-nu_c)(c^2+b^2)/(c^2-b^2) + nu_c)
-                    + (1+nu_f)(1-2 nu_f)/E_f ] }
+    p = delta / { b_ci (1+nu_c)/E_c ((1-nu_c)(c^2+b_ci^2)/(c^2-b_ci^2) + nu_c)
+                  + b (1+nu_f)(1-2 nu_f)/E_f }
 
 """
 
@@ -48,9 +48,11 @@ Ef, nuf, af, Trf = (float(fuel[k]) for k in ("E", "nu", "alpha", "T_ref"))
 clad = yaml.safe_load(open(os.path.join(CASE, inp["materials"]["cyl_2"])))
 Ec, nuc = float(clad["E"]), float(clad["nu"])
 
-# Lame interference-fit compliance (plane strain): delta = p * b * comp
-comp = (1.0 + nuc) / Ec * ((1.0 - nuc) * (c**2 + bci**2) / (c**2 - bci**2) + nuc) \
-     + (1.0 + nuf) * (1.0 - 2.0 * nuf) / Ef
+# Lame interference-fit compliance (plane strain): delta = p * comp
+# The ring term is multiplied by bci and the disc term by b: the ring opens at
+# its own inner radius.
+comp = bci * (1.0 + nuc) / Ec * ((1.0 - nuc) * (c**2 + bci**2) / (c**2 - bci**2) + nuc) \
+     + b * (1.0 + nuf) * (1.0 - 2.0 * nuf) / Ef
 
 amean = lambda v, r, lo, hi: (lambda m: np.sum(v[m] * r[m]) / np.sum(r[m]))((r >= lo) & (r <= hi))
 
@@ -67,7 +69,7 @@ for f in files:
     p_z3st.append(float(m.cell_data["ContactPressure"][0]) / 1e6)   # MPa
 
     delta = (1.0 + nuf) * af * (Tp - Trf) * b - g0            # exact interference (plane strain)
-    p_lame.append((delta / (b * comp) / 1e6) if delta > 0 else 0.0)
+    p_lame.append((delta / comp / 1e6) if delta > 0 else 0.0)
 
 T_pellet, p_z3st, p_lame = map(np.array, (T_pellet, p_z3st, p_lame))
 

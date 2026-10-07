@@ -106,15 +106,17 @@ The paper accompanying Z3ST version 0.4 reports the following measurements.
 ==================  =========  ================  ==============  =================
 Case                Tolerance  Iterations/step   Error vs Lamé   Peak fuel T (K)
 ==================  =========  ================  ==============  =================
-Shrink fit, 2D      1e-3       11.8              1.18 %          --
-Shrink fit, 2D      1e-6       15.9              1.18 %          --
-Shrink fit, 3D      1e-3       15.4              1.16 %          --
-Shrink fit, 3D      1e-6       18.7              1.16 %          --
+Shrink fit, 2D      1e-3       11.8              0.48 %          --
+Shrink fit, 2D      1e-6       15.9              0.48 %          --
+Shrink fit, 3D      1e-3       15.4              0.47 %          --
+Shrink fit, 3D      1e-6       18.7              0.47 %          --
 Rod, no creep       1e-3       12.7              --              1076.41
 Rod, no creep       1e-6       24.1              --              1076.30
 ==================  =========  ================  ==============  =================
 
-The error of the contact pressure against the analytical Lamé interference
+The error is against the Lamé interference pressure with the ring compliance
+at the ring's inner radius. The error of the
+contact pressure against the analytical Lamé interference
 pressure does not change over the three decades, so the coupling error is
 below 0.005 percentage points of that error. In the rod case, with the
 cladding creep off, a 200-day horizon and adaptive time stepping off, the peak
