@@ -5,7 +5,7 @@
 #   - a stable output/non-regression_gold.json, and
 #   - it exercises a physics path no other listed case reaches.
 #
-# Budget: 13 min 21 s total, from the times measured by a full local
+# Budget: 14 min 06 s total, from the times measured by a full local
 # suite run on 2026-08-09. Most cases are well under a minute; two are not, and
 # they are listed with their cost because they buy coverage nothing else does.
 # Re-measure before adding anything: ./non-regression_local.sh prints per-case times.
@@ -41,6 +41,7 @@ verification/thermal/coaxial_gap_3D   # 74 s
 
 # --. mechanics and plasticity --..
 verification/mechanics/full_cylinder
+verification/mechanics/thermal_bending_plate_3D   # 45 s (2026-10-08); the only CI case that uses remove_rigid_nullspace and the only one checking free thermal bending
 verification/plasticity/j2_hardening_2D
 verification/plasticity/crystal_single_grain
 
