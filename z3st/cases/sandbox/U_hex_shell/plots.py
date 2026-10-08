@@ -15,18 +15,26 @@ flat, each with the other two coordinates fixed:
 Fields are read from the last step of ``output/fields.xdmf`` and mapped into
 the local frame by ``case_params.local_fields``; the six flats collapse onto
 one curve. Figures are written to ``output/profile_{xi,s,z}.png``.
+
+3D pyvista views of the last step are written to
+``output/3d_{mesh,original,deformed,stress,strain}.png``.
 """
 
 import os
 
+import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 
+os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
+import pyvista as pv  # noqa: E402
+
 from case_params import (
-    DT, H, L_MID, NT, T_I, T_WALL, XI_CELLS,
+    D, DT, H, L_MID, NT, T_I, T_WALL, XI_CELLS,
     along_axis, along_flat, check_consistency, local_fields, on_layer, profile,
-    sigma_wall, temperature, through_wall,
+    XDMF, sigma_wall, temperature, through_wall, flat_frame,
 )
+from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "output")
@@ -136,6 +144,79 @@ def plot_z(nodes, cells):
     return fig
 
 
+# ----------------------------------------------------------------------
+# 4. 3D VIEW (pyvista)
+# ----------------------------------------------------------------------
+def load_grid(step_index=-1):
+    """pyvista grid of a step: T, u, |u| on the nodes; stress and strain
+    components in the local frame of the flats (nn, ss, zz) on the cells."""
+    with h5py.File(XDMF.replace(".xdmf", ".h5"), "r") as f:
+        pts = np.array(f["Mesh/mesh/geometry"])
+        topo = np.array(f["Mesh/mesh/topology"])
+    grid = pv.UnstructuredGrid(
+        np.hstack([np.full((len(topo), 1), topo.shape[1]), topo]).ravel(),
+        np.full(len(topo), pv.CellType.HEXAHEDRON, dtype=np.uint8), pts)
+
+    get = lambda name: extract_field_xdmf(XDMF, name, step_index, return_coords=False)
+    U = get("Displacement")
+    grid.point_data["T (K)"] = get("Temperature")
+    grid.point_data["u"] = U
+    grid.point_data["u (um)"] = np.linalg.norm(U, axis=1) * 1e6
+
+    centres = pts[topo].mean(axis=1)
+    n, tang, _, _ = flat_frame(centres[:, 0], centres[:, 1])
+    ez = np.broadcast_to([0.0, 0.0, 1.0], n.shape)
+    for name, sym, scale, unit in (("Stress", "sigma", 1e-6, "MPa"),
+                                   ("Strain", "eps", 1.0, "-")):
+        A = get(name).reshape(-1, 3, 3)
+        for comp, e in (("nn", n), ("ss", tang), ("zz", ez)):
+            grid.cell_data[f"{sym}_{comp} ({unit})"] = (
+                np.einsum("ci,cij,cj->c", e, A, e) * scale)
+    return grid
+
+
+def plot_3d(out=OUT, warp=None):
+    """Mesh, original, deformed, sigma_ss and eps_ss of the last step.
+
+    Field panels show the lower half (cut at mid-height), so the
+    through-wall gradient is visible on the cut face. ``warp`` scales the
+    displacement; by default the peak |u| is drawn as 5 % of D.
+    """
+    grid = load_grid()
+    U = grid.point_data["u"]
+    if warp is None:
+        warp = 0.05 * D / max(np.linalg.norm(U, axis=1).max(), 1e-30)
+    warped = grid.warp_by_vector("u", factor=warp)
+    cut = lambda m: m.clip(normal="z", origin=(0, 0, H / 2))
+    outline = cut(grid).extract_feature_edges()
+    half, warped = cut(grid), cut(warped)
+
+    panels = (
+        ("mesh", "Mesh", grid, None),
+        ("original", "Original, temperature", half, "T (K)"),
+        ("deformed", f"Deformed (x{warp:.0f}), displacement magnitude", warped, "u (um)"),
+        ("stress", "sigma_ss, deformed", warped, "sigma_ss (MPa)"),
+        ("strain", "eps_ss, deformed", warped, "eps_ss (-)"),
+    )
+    for name, title, mesh, scalars in panels:
+        p = pv.Plotter(off_screen=True, window_size=[900, 900])
+        p.add_text(title, font_size=12)
+        if scalars is None:
+            p.add_mesh(mesh, color="lightgray", show_edges=True, line_width=0.3)
+        else:
+            p.add_mesh(mesh, scalars=scalars, cmap="turbo", show_edges=False,
+                       scalar_bar_args={"title": scalars, "vertical": True,
+                                        "fmt": "%.4g", "position_x": 0.82})
+        if mesh is warped:
+            p.add_mesh(outline, color="black", line_width=0.5, opacity=0.4)
+        p.view_isometric()
+        p.camera.elevation = 25
+        p.reset_camera()
+        path = os.path.join(out, f"3d_{name}.png")
+        p.screenshot(path)
+        p.close()
+        print(f"[INFO] {path}")
+
 if __name__ == "__main__":
     nodes, cells = local_fields()
     problems = check_consistency(cells)
@@ -145,3 +226,4 @@ if __name__ == "__main__":
         path = os.path.join(OUT, f"profile_{name}.png")
         plot(nodes, cells).savefig(path, dpi=150)
         print(f"[INFO] {path}")
+    plot_3d()
