@@ -34,9 +34,9 @@ verdicts: ``summary`` (against the reference, where the case has one) and
 Verification cases
 ------------------
 
-The cases below have an analytical or independent reference. The values are
-those of Table 6 of the software paper and agree with the
-``output/non-regression_gold.json`` of each case.
+The cases below have an analytical or independent reference. The values agree
+with the ``output/non-regression_gold.json`` of each case and, except for
+``thermal_bending_plate_3D``, are those of Table 6 of the software paper.
 
 .. list-table::
    :header-rows: 1
@@ -77,6 +77,11 @@ those of Table 6 of the software paper and agree with the
      - thermo-elasticity
      - imposed gradient, analytical
      - 3.5e-2
+   * - ``verification/mechanics/thermal_bending_plate_3D``
+     - 3D
+     - thermo-elasticity
+     - free plate, linear T, closed form
+     - 3.2e-3
    * - ``verification/plasticity/j2_hardening_2D``
      - 2D
      - J2 plasticity
@@ -128,6 +133,9 @@ are checked. The exceptions are:
 - ``lame_gps_3D``: the error is dominated by the axial stress of the
   generalised plane-strain constraint. The radial and hoop errors are
   1.1e-2 and 2.6e-3.
+- ``thermal_bending_plate_3D``: the curvature of the plate, the largest of the
+  checks. The analytic stress is zero; its rms over all cells is 9.4e-4 of
+  the stress the same gradient causes in a plate held flat.
 - ``mariotte_thin_shell``: the axial stress, the larger of the axial and hoop
   errors (the hoop error is 1.2e-2). The radial stress vanishes in the
   membrane limit and its relative error (0.58 in the gold) is not meaningful.
