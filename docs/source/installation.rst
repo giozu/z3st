@@ -67,10 +67,15 @@ Check the installation
 The first line must read ``dolfinx 0.11.0``. Every run also prints the versions of
 Python, dolfinx, basix, UFL, PETSc, NumPy and SciPy at the top of its log.
 
-Gmsh under WSL
---------------
+Windows
+-------
 
-Under Windows Subsystem for Linux the Gmsh window can open black or without fonts.
+Use WSL2 and create the environment inside the Linux distribution. conda-forge
+ships a native ``win-64`` build of ``fenics-dolfinx``, so ``conda env create``
+succeeds on Windows, but that build has no PETSc (no ``petsc4py`` and no
+``dolfinx.fem.petsc``), which every Z3ST solver imports.
+
+Under WSL the Gmsh window can open black or without fonts.
 Two remedies:
 
 .. code-block:: bash

@@ -108,6 +108,80 @@ computed. :math:`A` converts the linear heat rate ``lhr`` into a volumetric sour
      - ``area``, ``perimeter`` (default 0)
      - ``area``
 
+Z3ST reads only ``mesh.msh``. Every case in the repository writes it from
+``mesh.geo``, since ``z3st/utils/allrun.sh`` runs ``gmsh mesh.geo -$DIM``. Two
+other routes produce the same file:
+
+- the Gmsh Python API (``import gmsh``), for parametric geometry that needs
+  loops, conditionals or computed positions;
+- a CAD model exported as STEP (not STL, which is already triangulated) and
+  imported in Gmsh with the OpenCASCADE kernel.
+
+A STEP file carries surfaces and volumes but no physical groups, so they are
+assigned in Gmsh. Select faces by geometry (centre of mass, normal), not by the
+tags Gmsh assigns on import, which depend on the CAD tool and the exporter.
+Axis-aligned ``BoundingBox`` selection can pick wrong faces on non-rectangular
+shapes: on a hexagonal shell it puts outer faces in the inner group. Example for
+a hexagonal shell with inner apothem 0.057 m and outer apothem 0.060 m:
+
+.. code-block:: python
+
+   # mesh.py
+   import math
+   import gmsh
+
+   gmsh.initialize()
+   gmsh.option.setString("Geometry.OCCTargetUnit", "M")   # STEP in mm -> metres
+   gmsh.model.occ.importShapes("hex_shell.step")
+   gmsh.model.occ.synchronize()
+
+   xmin, ymin, zmin, xmax, ymax, zmax = gmsh.model.getBoundingBox(-1, -1)
+   tol = 1e-6
+   groups = {"zmin": [], "zmax": [], "outer": [], "inner": []}
+
+   for dim, tag in gmsh.model.getEntities(2):
+       x, y, z = gmsh.model.occ.getCenterOfMass(dim, tag)
+       if abs(z - zmin) < tol:
+           groups["zmin"].append(tag)
+       elif abs(z - zmax) < tol:
+           groups["zmax"].append(tag)
+       elif math.hypot(x, y) > 0.0585:   # between inner and outer apothem
+           groups["outer"].append(tag)
+       else:
+           groups["inner"].append(tag)
+
+   for i, (name, tags) in enumerate(groups.items(), start=1):
+       gmsh.model.addPhysicalGroup(2, tags, i, name)
+   gmsh.model.addPhysicalGroup(3, [t for _, t in gmsh.model.getEntities(3)], 5, "steel")
+
+   gmsh.option.setNumber("Mesh.MeshSizeMax", 0.004)
+   gmsh.model.mesh.generate(3)
+   gmsh.write("mesh.msh")
+   gmsh.finalize()
+
+The matching ``labels`` in ``geometry.yaml`` are ``zmin: 1``, ``zmax: 2``,
+``outer: 3``, ``inner: 4``, ``steel: 5``. Three checks:
+
+- Units. CAD tools usually export in millimetres and Z3ST works in metres.
+  Without ``Geometry.OCCTargetUnit = "M"`` the geometry is 1000 times larger, and
+  nothing reports it.
+- Several bodies. Export all of them (for example pellet and cladding) in one STEP
+  file and call ``gmsh.model.occ.fragment`` so the contact faces are shared and
+  the mesh is conforming.
+- Groups. Open ``mesh.msh`` in Gmsh, use Tools → Visibility, and confirm that each
+  physical group holds the intended faces before running the case.
+
+``allrun.sh`` meshes only from ``mesh.geo``, so a case meshed by ``mesh.py`` needs
+its own ``Allrun``:
+
+.. code-block:: bash
+
+   #!/bin/bash
+   set -e
+   cd "${0%/*}"
+   python3 mesh.py > log_mesh.md
+   python3 -m z3st > log_z3st.md
+
 boundary_conditions.yaml
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
