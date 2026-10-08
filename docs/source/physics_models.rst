@@ -754,7 +754,8 @@ Without ``split`` the default is ``miehe`` for AT2 and ``amor`` for AT1
 new contribution to :math:`\mathcal H` is set to zero in every cell where
 :math:`\psi^- > \psi^+`, so damage does not grow under compression.
 
-**Irreversibility.** :math:`\mathcal H` is stored on DG0 cells. AT2 takes
+**Irreversibility.** :math:`\mathcal H` is stored on DG0 cells, or at the points
+of a degree-2 quadrature rule with ``damage.history: quadrature``. AT2 takes
 :math:`\mathcal H^{n+1} = \max(\mathcal H^n, \mathcal H)` against the value of
 the last converged step. AT1 stores the current :math:`\mathcal H` and relies
 on the projection of :math:`d`. After each damage solve the field is projected,

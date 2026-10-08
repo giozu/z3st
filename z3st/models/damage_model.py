@@ -369,7 +369,7 @@ class DamageModel:
             re-opening rather than enforcing pointwise crack closure.
         """
 
-        Q = self.Q
+        Q = self.Q_H
         H_new_array = np.zeros_like(self.H.x.array)
 
         use_hybrid_constraint = self.dmg_cfg.get("hybrid_constraint", True)
@@ -559,6 +559,9 @@ class DamageModel:
 
             tag = self.label_map[label]
             dx = self.dx_tags[tag]
+            if self.H_qdeg is not None:
+                # H lives at the points of this rule: integrate with the same one.
+                dx = dx.reconstruct(metadata={"quadrature_degree": self.H_qdeg})
 
             missing = [k for k in ("Gc", "sigma_c", "E") if k not in material]
             if missing:

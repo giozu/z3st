@@ -342,6 +342,12 @@ non-empty when ``models.damage`` is on.
      - ``true``
      - Suppress growth of the driving force in cells where
        :math:`\psi^- > \psi^+` (Ambati et al. 2015).
+   * - ``history``
+     - ``cell``
+     - Space of the history field :math:`\mathcal H`: ``cell`` (DG0, one value
+       per cell at its centre) or ``quadrature`` (one value per point of a
+       degree-2 rule, 2 x 2 Gauss points on quadrilaterals, and the damage
+       form integrated with the same rule).
 
 **porosity** (``z3st/models/porosity_migration_model.py``). The porosity solve
 has its own convergence test and does not read ``convergence`` or ``stag_tol``.

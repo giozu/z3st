@@ -479,7 +479,23 @@ class Spine(
             print("\nInitializing the damage field...")
             self.D = dolfinx.fem.Function(self.V_d, name="Damage")
             self.D.x.array[:] = 0.0  # undamaged initial state
-            self.H = dolfinx.fem.Function(self.Q, name="CrackDrivingForce")
+            # History space: one value per cell (DG0, default), or one per
+            # quadrature point of a degree-2 rule (2 x 2 Gauss points on
+            # quadrilaterals, 3 on triangles), as in fully integrated FE codes.
+            history = str(self.dmg_cfg.get("history", "cell")).lower()
+            if history == "quadrature":
+                import basix.ufl
+                self.H_qdeg = 2
+                el_H = basix.ufl.quadrature_element(
+                    self.mesh.topology.cell_name(), value_shape=(), degree=self.H_qdeg)
+                self.Q_H = dolfinx.fem.functionspace(self.mesh, el_H)
+            elif history == "cell":
+                self.H_qdeg = None
+                self.Q_H = self.Q
+            else:
+                raise ValueError(
+                    f"damage.history must be 'cell' or 'quadrature' (got '{history}').")
+            self.H = dolfinx.fem.Function(self.Q_H, name="CrackDrivingForce")
             self.H.x.array[:] = 0.0
 
         # Cohesive fracture: the mixed (u, eigenstrain) state and its phase
