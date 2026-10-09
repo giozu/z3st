@@ -166,8 +166,8 @@ The matching ``labels`` in ``geometry.yaml`` are ``zmin: 1``, ``zmax: 2``,
   Without ``Geometry.OCCTargetUnit = "M"`` the geometry is 1000 times larger, and
   nothing reports it.
 - Several bodies. Export all of them (for example pellet and cladding) in one STEP
-  file and call ``gmsh.model.occ.fragment`` so the contact faces are shared and
-  the mesh is conforming.
+  file and call ``gmsh.model.occ.fragment``, so that each contact face belongs to
+  both bodies and their meshes share nodes there.
 - Groups. Open ``mesh.msh`` in Gmsh, use Tools → Visibility, and confirm that each
   physical group holds the intended faces before running the case.
 

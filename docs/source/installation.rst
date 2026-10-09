@@ -75,6 +75,9 @@ ships a native ``win-64`` build of ``fenics-dolfinx``, so ``conda env create``
 succeeds on Windows, but that build has no PETSc (no ``petsc4py`` and no
 ``dolfinx.fem.petsc``), which every Z3ST solver imports.
 
+To install WSL2 with Ubuntu, run ``wsl --install`` in PowerShell as administrator,
+restart, and follow the steps above from the Ubuntu terminal.
+
 Under WSL the Gmsh window can open black or without fonts.
 Two remedies:
 
