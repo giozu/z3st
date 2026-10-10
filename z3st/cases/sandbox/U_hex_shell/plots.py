@@ -3,6 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Bianca Funaro
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 Analytic slab solution vs z3st along the three lines of the local frame of a
@@ -10,14 +11,15 @@ flat, each with the other two coordinates fixed:
 
   1. xi (through the wall), at mid-flat and mid-height;
   2. s (along the flat), at mid-height;
-  3. z (along the axis), at mid-flat.
+  3. z (along the axis), at mid-flat (3d only).
 
 Fields are read from the last step of ``output/fields.xdmf`` and mapped into
 the local frame by ``case_params.local_fields``; the six flats collapse onto
 one curve. Figures are written to ``output/profile_{xi,s,z}.png``.
 
-3D pyvista views of the last step are written to
-``output/3d_{mesh,original,deformed,stress,strain}.png``.
+pyvista views of the last step are written to
+``output/3d_{mesh,original,deformed,stress,strain}.png`` (in 2d, the
+cross-section seen from +z).
 """
 
 import os
@@ -30,7 +32,7 @@ os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
 import pyvista as pv  # noqa: E402
 
 from case_params import (
-    D, DT, H, L_MID, NT, T_I, T_WALL, XI_CELLS,
+    D, DT, H, IS_3D, L_MID, NT, SIGMA_ZZ_OFFSET_2D, T_I, T_WALL, XI_CELLS,
     along_axis, along_flat, check_consistency, local_fields, on_layer, profile,
     XDMF, sigma_wall, temperature, through_wall, flat_frame,
 )
@@ -72,13 +74,16 @@ def plot_xi(nodes, cells):
     axT.set_title(r"Temperature, mid-flat, mid-height")
 
     m = through_wall(cells)
+    # 2d: sigma_zz carries the exact plane-strain offset, removed to share the axis
+    zz_shift, zz_label = (0.0, "") if IS_3D else (SIGMA_ZZ_OFFSET_2D, " - offset")
     axS.plot(xi * 1e3, sigma_wall(xi) / 1e6, "k-", lw=2,
-             label=r"analytic $\sigma_{ss} = \sigma_{zz}$")
+             label=rf"analytic $\sigma_{{ss}} = \sigma_{{zz}}${zz_label}")
     for comp, mk, color in (("ss", "s", "tab:green"), ("zz", "^", "tab:blue"),
                             ("nn", "x", "tab:gray")):
         c, v = profile(cells, "xi", comp, m)
-        axS.plot(c * 1e3, v / 1e6, mk, color=color, ms=7, mfc="none",
-                 label=rf"z3st $\sigma_{{{comp}}}$")
+        shift, extra = (zz_shift, zz_label) if comp == "zz" else (0.0, "")
+        axS.plot(c * 1e3, (v - shift) / 1e6, mk, color=color, ms=7, mfc="none",
+                 label=rf"z3st $\sigma_{{{comp}}}${extra}")
     axS.axhline(0, color="gray", lw=0.8)
     axS.set_xlabel(r"$\xi$ (mm)   inner $\rightarrow$ outer")
     axS.set_ylabel("stress (MPa)")
@@ -153,12 +158,17 @@ def load_grid(step_index=-1):
     with h5py.File(XDMF.replace(".xdmf", ".h5"), "r") as f:
         pts = np.array(f["Mesh/mesh/geometry"])
         topo = np.array(f["Mesh/mesh/topology"])
+    if pts.shape[1] == 2:
+        pts = np.hstack([pts, np.zeros((len(pts), 1))])
+    cell_type = pv.CellType.HEXAHEDRON if IS_3D else pv.CellType.QUAD
     grid = pv.UnstructuredGrid(
         np.hstack([np.full((len(topo), 1), topo.shape[1]), topo]).ravel(),
-        np.full(len(topo), pv.CellType.HEXAHEDRON, dtype=np.uint8), pts)
+        np.full(len(topo), cell_type, dtype=np.uint8), pts)
 
     get = lambda name: extract_field_xdmf(XDMF, name, step_index, return_coords=False)
     U = get("Displacement")
+    if U.shape[1] == 2:
+        U = np.hstack([U, np.zeros((len(U), 1))])
     grid.point_data["T (K)"] = get("Temperature")
     grid.point_data["u"] = U
     grid.point_data["u (um)"] = np.linalg.norm(U, axis=1) * 1e6
@@ -178,7 +188,7 @@ def load_grid(step_index=-1):
 def plot_3d(out=OUT, warp=None):
     """Mesh, original, deformed, sigma_ss and eps_ss of the last step.
 
-    Field panels show the lower half (cut at mid-height), so the
+    In 3d the field panels show the lower half (cut at mid-height), so the
     through-wall gradient is visible on the cut face. ``warp`` scales the
     displacement; by default the peak |u| is drawn as 5 % of D.
     """
@@ -187,7 +197,7 @@ def plot_3d(out=OUT, warp=None):
     if warp is None:
         warp = 0.05 * D / max(np.linalg.norm(U, axis=1).max(), 1e-30)
     warped = grid.warp_by_vector("u", factor=warp)
-    cut = lambda m: m.clip(normal="z", origin=(0, 0, H / 2))
+    cut = (lambda m: m.clip(normal="z", origin=(0, 0, H / 2))) if IS_3D else (lambda m: m)
     outline = cut(grid).extract_feature_edges()
     half, warped = cut(grid), cut(warped)
 
@@ -209,8 +219,11 @@ def plot_3d(out=OUT, warp=None):
                                         "fmt": "%.4g", "position_x": 0.82})
         if mesh is warped:
             p.add_mesh(outline, color="black", line_width=0.5, opacity=0.4)
-        p.view_isometric()
-        p.camera.elevation = 25
+        if IS_3D:
+            p.view_isometric()
+            p.camera.elevation = 25
+        else:
+            p.view_xy()
         p.reset_camera()
         path = os.path.join(out, f"3d_{name}.png")
         p.screenshot(path)
@@ -222,7 +235,8 @@ if __name__ == "__main__":
     problems = check_consistency(cells)
     if problems:
         raise RuntimeError("; ".join(problems))
-    for name, plot in (("xi", plot_xi), ("s", plot_s), ("z", plot_z)):
+    lines = (("xi", plot_xi), ("s", plot_s)) + ((("z", plot_z),) if IS_3D else ())
+    for name, plot in lines:
         path = os.path.join(OUT, f"profile_{name}.png")
         plot(nodes, cells).savefig(path, dpi=150)
         print(f"[INFO] {path}")

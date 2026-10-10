@@ -3,6 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Bianca Funaro
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 Single source of truth for the post-processing of this case.
@@ -21,6 +22,10 @@ material card or the boundary conditions reaches all of them through the YAML
 files named in ``input.yaml``. The only default is ``orientation: flat``, the
 same as in ``mesh.geo``; any other missing key fails here instead of silently
 using a value the mesh or the solver did not use.
+
+Two variants, chosen by ``./Allrun 2d|3d`` (``regime`` in ``input.yaml``):
+``3d`` is the shell of height H; ``2d`` is its cross-section in plane strain,
+with no z line (H = 0, one element "along z").
 
 Local frame of a flat: xi through the wall (0 at mid-wall, outward), s along
 the flat (0 at mid-flat), z along the axis.
@@ -52,7 +57,9 @@ _mat = _load(_input["materials"]["steel"])
 # --- Geometry (m) -----------------------------------------------------------
 D = float(_geom["D"])                               # outer circumscribed diameter
 T_WALL = float(_geom["t"])                          # wall thickness
-H = float(_geom["H"])                               # height
+REGIME = _input["regime"]                           # "2d" | "3d"
+IS_3D = REGIME == "3d"
+H = float(_geom["H"]) if IS_3D else 0.0             # height
 ORIENTATION = _geom.get("orientation", "flat")
 R_O = D / 2                                         # outer circumradius
 R_I = R_O - 2 * T_WALL / np.sqrt(3)                 # inner circumradius
@@ -61,9 +68,10 @@ L_MID = 0.5 * (R_I + R_O)                           # flat length at mid-wall
 A0 = np.pi / 2 if ORIENTATION == "vertical" else 0.0
 
 # --- Mesh (transfinite, see mesh.geo) ---------------------------------------
-NF, NT, NZ = int(_geom["nf"]), int(_geom["nt"]), int(_geom["nz"])
+NF, NT = int(_geom["nf"]), int(_geom["nt"])
+NZ = int(_geom["nz"]) if IS_3D else 1
 H_S = L_MID / NF                                    # element width at mid-wall
-H_Z = H / NZ                                        # element height
+H_Z = H / NZ if IS_3D else np.inf                   # element height (2d: no z band)
 XI_CELLS = -T_WALL / 2 + (np.arange(NT) + 0.5) * T_WALL / NT  # cell-centre layers
 BAND = 0.75                                         # sampling half-width, in elements
 
@@ -107,6 +115,13 @@ def temperature(xi):
 def sigma_wall(xi):
     """sigma_ss = sigma_zz = alpha E / (1 - nu) (T_mean - T), for linear T(xi)."""
     return C_TH * DT * np.asarray(xi) / T_WALL
+
+
+# sigma_zz = sigma_wall + a uniform offset. In 3d the offset comes from the
+# axial force balance over the whole section, corners included: no closed form.
+# In 2d (plane strain, eps_zz = 0) sigma_zz = nu sigma_ss - E alpha (T - T_ref),
+# and with sigma_ss = alpha E / (1 - nu) (T_mean - T) the offset is exact.
+SIGMA_ZZ_OFFSET_2D = -E * ALPHA * (T_O + DT / 2 - T_REF)   # (Pa)
 
 
 # --- Sample stations (read every step by diagnostics.py) ---------------------
@@ -161,16 +176,19 @@ STATIONS = {
     "T_i": ("node", XI_I, 0.5, 0.5),
     "T_o": ("node", XI_O, 0.5, 0.5),
     "T_i_corner": ("node", XI_I, _EPS, 0.5),
-    "T_i_bottom": ("node", XI_I, 0.5, _EPS),
-    "T_i_top": ("node", XI_I, 0.5, 1 - _EPS),
     **{f"L{j}": ("cell", xi, _centre(0.5, NF), _centre(0.5, NZ))
        for j, xi in enumerate(XI_CELLS)},
     "window_s": ("cell", XI_CELLS[-1], _centre(0.25, NF), _centre(0.5, NZ)),
     "corner": ("cell", XI_CELLS[-1], _centre(1.0, NF), _centre(0.5, NZ)),
-    "window_z": ("cell", XI_CELLS[-1], _centre(0.5, NF), _centre(0.25, NZ)),
-    "bottom": ("cell", XI_CELLS[-1], _centre(0.5, NF), _centre(0.0, NZ)),
-    "top": ("cell", XI_CELLS[-1], _centre(0.5, NF), _centre(1.0, NZ)),
 }
+if IS_3D:  # the z line
+    STATIONS.update({
+        "T_i_bottom": ("node", XI_I, 0.5, _EPS),
+        "T_i_top": ("node", XI_I, 0.5, 1 - _EPS),
+        "window_z": ("cell", XI_CELLS[-1], _centre(0.5, NF), _centre(0.25, NZ)),
+        "bottom": ("cell", XI_CELLS[-1], _centre(0.5, NF), _centre(0.0, NZ)),
+        "top": ("cell", XI_CELLS[-1], _centre(0.5, NF), _centre(1.0, NZ)),
+    })
 
 
 # --- z3st fields in the local frame -----------------------------------------
@@ -255,8 +273,8 @@ def check_consistency(cells=None):
     if abs(curvature) > 1e-9 * abs(k(T_mid)):
         problems.append("k(T) is not linear: the Kirchhoff closed form is not exact")
 
-    if _input.get("regime") != "3d":
-        problems.append(f"regime is '{_input.get('regime')}', the analysis needs '3d'")
+    if REGIME not in ("2d", "3d"):
+        problems.append(f"regime is '{REGIME}', the analysis needs '2d' or '3d'")
 
     # Every cell centre lies on one of the NT layers when geometry.yaml
     # (orientation, D, t, nt) matches the solved mesh.
@@ -274,7 +292,7 @@ def check_consistency(cells=None):
 def report():
     """Print the resolved parameter set and the analytic reference values."""
     print("[case_params] resolved from the case YAML files:")
-    for key in ("D", "T_WALL", "H", "ORIENTATION", "R_O", "R_I", "NF", "NT", "NZ",
+    for key in ("REGIME", "D", "T_WALL", "H", "ORIENTATION", "R_O", "R_I", "NF", "NT", "NZ",
                 "E", "NU", "ALPHA", "T_REF", "Q", "T_O"):
         print(f"  {key:<12} = {globals()[key]}")
     print(f"  {'DT':<12} = {DT:.6f} K (T_i - T_o)")

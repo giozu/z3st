@@ -1,13 +1,15 @@
-// ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. ---
+// --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
 //  Gmsh GEO for a 3D hexagonal shell (assembly wrapper), hexahedral mesh
 //
 //  Author: Bianca Funaro
+//  Version: 0.4.1 (2026)
 //
 //  Parameters can be overridden from the command line, e.g.
 //    gmsh -setnumber D 0.25 -setnumber H 1.5 mesh.geo -3
+//  Allrun passes them from 3d/geometry.yaml through z3st.utils.geo_args.
 //
-// ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. ---
+// --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 SetFactory("Built-in");
 

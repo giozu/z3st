@@ -1,7 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
-# Z3ST: print gmsh -setnumber / -setstring flags from geometry.yaml.
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+# Print gmsh -setnumber / -setstring flags from geometry.yaml.
 #
 #     gmsh $(python3 -m z3st.utils.geo_args) mesh.geo -2
 #

@@ -1,13 +1,16 @@
-// ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. ---
+// --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 //
-//  Gmsh GEO for a 2D hexagonal shell (assembly wrapper), hexahedral mesh
+//  Gmsh GEO for the 2D cross-section of a hexagonal shell (assembly
+//  wrapper), quadrilateral mesh
 //
 //  Author: Bianca Funaro
+//  Version: 0.4.1 (2026)
 //
 //  Parameters can be overridden from the command line, e.g.
-//    gmsh -setnumber D 0.25 -setnumber H 1.5 mesh.geo -3
+//    gmsh -setnumber D 0.25 -setnumber t 0.005 mesh.geo -2
+//  Allrun passes them from 2d/geometry.yaml through z3st.utils.geo_args.
 //
-// ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. --- ..-. ..- -. .- .-. ---
+// --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 SetFactory("Built-in");
 // gmsh cannot read yaml, so py helper converts the yaml into command line flags

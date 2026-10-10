@@ -1,4 +1,29 @@
 #!/bin/bash
-DIM=3
-POST="plots.py"
-. "$(python3 -c 'import z3st,os;print(os.path.dirname(z3st.__file__))')/utils/allrun.sh"
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+#     ./Allrun        3D variant (default)
+#     ./Allrun 2d     2D variant (plane strain)
+#
+# Each variant lives in its own folder (geometry.yaml, mesh.geo, input.yaml).
+# z3st reads ./input.yaml, so the variant's input is copied here (git-ignored);
+# the mesh is built from the variant's geometry.yaml through geo_args.
+
+set -e
+cd "${0%/*}" || exit 1
+
+V="${1:-3d}"
+case "$V" in
+    2d|3d) ;;
+    *) echo "usage: ./Allrun [2d|3d]" >&2; exit 1 ;;
+esac
+
+cp "$V/input.yaml" input.yaml
+gmsh $(python3 -m z3st.utils.geo_args "$V/geometry.yaml") "$V/mesh.geo" -"${V%d}" -o "$V/mesh.msh" > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 non-regression.py
+python3 plots.py
+python3 -m z3st.utils.plot_convergence log_z3st.md

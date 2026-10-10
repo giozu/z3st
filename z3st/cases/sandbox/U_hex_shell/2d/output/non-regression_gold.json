@@ -1,0 +1,83 @@
+{
+    "results": {
+        "wall_dT_K": {
+            "numerical": 1.8976710000000026,
+            "reference": 1.8976703319051549,
+            "abs_error": 6.680948476667226e-07,
+            "rel_error": 3.5206054309548735e-07,
+            "status": "PASS"
+        },
+        "wall_dT_last_step_change": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "sigma_ss_xi_L2": {
+            "numerical": 0.0012537522125531636,
+            "reference": 0.0,
+            "abs_error": 0.0012537522125531636,
+            "rel_error": 0.0012537522125531636,
+            "status": "PASS"
+        },
+        "sigma_zz_xi_L2": {
+            "numerical": 0.0004357647239620392,
+            "reference": 0.0,
+            "abs_error": 0.0004357647239620392,
+            "rel_error": 0.0004357647239620392,
+            "status": "PASS"
+        },
+        "sigma_nn_xi_max": {
+            "numerical": 0.003570476979788057,
+            "reference": 0.0,
+            "abs_error": 0.003570476979788057,
+            "rel_error": 0.003570476979788057,
+            "status": "PASS"
+        },
+        "sigma_ss_xi_odd": {
+            "numerical": 0.00015548021717390055,
+            "reference": 0.0,
+            "abs_error": 0.00015548021717390055,
+            "rel_error": 0.00015548021717390055,
+            "status": "PASS"
+        },
+        "sigma_ss_flat_spread": {
+            "numerical": 1.527259e-09,
+            "reference": 0.0,
+            "abs_error": 1.527259e-09,
+            "rel_error": 1.527259e-09,
+            "status": "PASS"
+        },
+        "sigma_zz_offset_MPa": {
+            "numerical": -409.9388913333333,
+            "reference": -409.93562373854326,
+            "abs_error": 0.0032675947900315805,
+            "rel_error": 7.970994958261181e-06,
+            "status": "PASS"
+        },
+        "sigma_ss_s_window": {
+            "numerical": 1829499.0,
+            "reference": 1843451.1795650078,
+            "abs_error": 13952.179565007798,
+            "rel_error": 0.0075685104762579294,
+            "status": "PASS"
+        },
+        "sigma_ss_corner_ratio": {
+            "numerical": 0.7159685130969624,
+            "reference": 0.7159685130969624,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "T_inner_corner_drop_K": {
+            "numerical": 0.4986020000000053,
+            "reference": 0.4986020000000053,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

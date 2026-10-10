@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-# --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 """
 Z3ST case: sandbox/U_hex_shell
@@ -11,7 +14,11 @@ gradient: Neumann heat flux q on the inner faces, Dirichlet T_o on the outer
 faces, no mechanical load (rigid-body modes removed by the null space); an
 axial clamp at the bottom (u_z = 0) is a mirror plane and stays within the
 validity range. The derivation is in
-"Exercise - Thermal stress in flat plate.ipynb".
+"Exercise - Thermal stress in hexagone- flats.ipynb".
+
+Two variants (``./Allrun 2d|3d``), each with its own result and gold in
+``<variant>/output/``. In 2d (plane strain) there is no z line, and the
+sigma_zz offset has a closed form (``case_params.SIGMA_ZZ_OFFSET_2D``).
 
 All metrics are read from ``output/history.csv`` — the per-step values at the
 sample stations of ``case_params.STATIONS``, streamed by the case-local
@@ -52,14 +59,16 @@ import csv
 import yaml
 import numpy as np
 
-from case_params import DT, NT, SIGMA_SURF, T_I, XI_CELLS, sigma_wall
+from case_params import (DT, IS_3D, NT, REGIME, SIGMA_SURF, SIGMA_ZZ_OFFSET_2D,
+                         XI_CELLS, sigma_wall)
 from z3st.utils.non_regression import error_metric, finish, metric, tracked
 from z3st.utils.utils_load import generate_power_history
 
-CASE_DIR = os.path.dirname(__file__)
-OUT = os.path.join(CASE_DIR, "output")
-OUT_JSON = os.path.join(OUT, "non-regression.json")
-HISTORY = os.path.join(OUT, "history.csv")
+CASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HISTORY = os.path.join(CASE_DIR, "output", "history.csv")
+VARIANT_DIR = os.path.join(CASE_DIR, REGIME)  # result and gold, per variant
+OUT_JSON = os.path.join(VARIANT_DIR, "output", "non-regression.json")
+os.makedirs(os.path.dirname(OUT_JSON), exist_ok=True)
 
 TOLERANCE = 1e-2
 
@@ -109,15 +118,6 @@ print(f"[INFO] s line : sigma_ss(L/4) = {ss_window_s / 1e6:+.4f} MPa (analytic "
       f"{sigma_outer / 1e6:+.4f}), corner / analytic = {corner_ratio:.3f}, "
       f"corner T_i drop = {corner_drop:.4f} K")
 
-# --. line 3: along the axis (z) --..
-ss_window_z = float(last["ss_window_z_MPa"]) * 1e6
-bottom_ratio = float(last["ss_bottom_MPa"]) * 1e6 / sigma_outer
-top_ratio = float(last["ss_top_MPa"]) * 1e6 / sigma_outer
-T_i_z = np.array([float(last[k]) for k in ("T_i_bottom_K", "T_i_K", "T_i_top_K")])
-
-print(f"[INFO] z line : sigma_ss(H/4) = {ss_window_z / 1e6:+.4f} MPa, "
-      f"bottom / analytic = {bottom_ratio:.3f}, top / analytic = {top_ratio:.3f}")
-
 errors = {
     # xi
     "wall_dT_K": metric(dT, DT),
@@ -127,16 +127,29 @@ errors = {
     "sigma_nn_xi_max": error_metric(np.abs(nn).max() / SIGMA_SURF),
     "sigma_ss_xi_odd": error_metric(abs(ss[0] + ss[-1]) / abs(ss[-1])),
     "sigma_ss_flat_spread": error_metric(flat_spread),
-    "sigma_zz_offset_MPa": tracked(zz_offset / 1e6),
+    "sigma_zz_offset_MPa": (tracked(zz_offset / 1e6) if IS_3D
+                            else metric(zz_offset / 1e6, SIGMA_ZZ_OFFSET_2D / 1e6)),
     # s
     "sigma_ss_s_window": metric(ss_window_s, sigma_outer),
     "sigma_ss_corner_ratio": tracked(corner_ratio),
     "T_inner_corner_drop_K": tracked(corner_drop),
-    # z
-    "T_inner_z_max": error_metric(np.abs(T_i_z - T_i_z[1]).max() / DT),
-    "sigma_ss_z_window": metric(ss_window_z, sigma_outer),
-    "sigma_ss_bottom_ratio": tracked(bottom_ratio),
-    "sigma_ss_top_ratio": tracked(top_ratio),
 }
 
-finish(errors, TOLERANCE, OUT_JSON, CASE_DIR)
+# --. line 3: along the axis (z), 3d only --..
+if IS_3D:
+    ss_window_z = float(last["ss_window_z_MPa"]) * 1e6
+    bottom_ratio = float(last["ss_bottom_MPa"]) * 1e6 / sigma_outer
+    top_ratio = float(last["ss_top_MPa"]) * 1e6 / sigma_outer
+    T_i_z = np.array([float(last[k]) for k in ("T_i_bottom_K", "T_i_K", "T_i_top_K")])
+
+    print(f"[INFO] z line : sigma_ss(H/4) = {ss_window_z / 1e6:+.4f} MPa, "
+          f"bottom / analytic = {bottom_ratio:.3f}, top / analytic = {top_ratio:.3f}")
+
+    errors.update({
+        "T_inner_z_max": error_metric(np.abs(T_i_z - T_i_z[1]).max() / DT),
+        "sigma_ss_z_window": metric(ss_window_z, sigma_outer),
+        "sigma_ss_bottom_ratio": tracked(bottom_ratio),
+        "sigma_ss_top_ratio": tracked(top_ratio),
+    })
+
+finish(errors, TOLERANCE, OUT_JSON, VARIANT_DIR)

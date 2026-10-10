@@ -14,8 +14,4 @@ cp: 200           # Specific heat capacity (J/kg·K)
 # Physical properties
 rho: 7750         # Density (kg/m³)
 
-# swelling: true / false
-  # parameters for swelling model
-# creep: true / false
-  # model: blabla  
-  # parameters for creep model
+# Swelling and creep: not modelled yet (next step: bowing)

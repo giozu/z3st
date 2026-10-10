@@ -1,9 +1,9 @@
-name: hex_shell_3d # new name for the geometry
+name: hex_shell_3d
 
 D: 0.200    # outer circumscribed diameter (m)
 H: 1.000    # height (m)
 t: 0.0045   # wall thickness (m)
-Lz: 1.000   # height (m)
+Lz: 1.000   # height (m), read by the z3st mesh manager
 
 orientation: flat # flat | vertical
 
@@ -11,8 +11,7 @@ nf: 20      # elements along each flat
 nt: 3       # elements through the thickness
 nz: 40      # elements along the height
 
-
-labels: #consistent with the Builtin mesh.geo
+labels: # consistent with 3d/mesh.geo
   steel: 1
   bottom: 10
   top: 11

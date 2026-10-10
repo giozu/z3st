@@ -1,0 +1,56 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+# 2D variant (plane strain), run with ./Allrun 2d: paths are relative to the case directory
+mesh_path: 2d/mesh.msh
+geometry_path: 2d/geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  steel: 15_15Ti_local.yaml
+
+regime: 2d
+
+solver_settings:
+  max_iters: 100
+  relax_T: 1.0
+  relax_u: 1.0 
+  relax_adaptive: false 
+
+models:
+  thermal: true
+  mechanical: true
+
+thermal:
+  solver: linear
+  linear_solver: direct_mumps # direct_mumps | iterative_amg** | iterative_hypre
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm # rel_norm | norm
+
+mechanical:
+  solver: linear
+  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
+  remove_rigid_nullspace: true # More applications, here for not unique solution for displacements, dilatation around initial position
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm # rel_norm | norm
+  
+lhr: #linear heat rate (power generation)
+- 0.0
+- 0.0
+time: # steady state, repeated: k(T) uses the previous step's T
+- 0.0
+- 3.0
+n_steps: 4
+
+# time_adaptivity:
+#   enabled: true
+#   dt_min: 1.0e+4
+#   max_cuts: 8
+
+output:
+  format: xdmf #time series complete output vs vtu per timestep
