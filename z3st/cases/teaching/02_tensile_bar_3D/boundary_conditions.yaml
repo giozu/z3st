@@ -1,0 +1,12 @@
+mechanical:
+  steel:
+  # The bottom end is held axially only, so nothing restrains the lateral contraction
+  # and the bar is in uniaxial stress. That leaves three rigid-body motions free
+  # (translation in x and y, rotation about z): input.yaml removes them from the solve
+  # with remove_rigid_nullspace, instead of pinning the bar anywhere else.
+  - type: Clamp_z
+    region: bottom
+
+  - type: Neumann
+    region: top
+    traction: 1.909859e+8   # F/A = 15 kN / (pi 5^2 mm^2) = 191 MPa, tensile

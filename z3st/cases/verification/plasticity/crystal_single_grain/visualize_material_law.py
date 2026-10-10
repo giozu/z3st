@@ -8,6 +8,9 @@ the use of automatic differentiation.
 import numpy as np
 import matplotlib.pyplot as plt
 
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
+
 def plot_slip_law():
     """
     Plot the power-law slip rate and its derivative (strongly nonlinear).
@@ -32,10 +35,10 @@ def plot_slip_law():
 
     # ========== Plot 1: Slip Rate Law ==========
     ax1 = axes[0, 0]
-    ax1.plot(tau * 1e-6, gamma_dot, linewidth=2.5, color='#2E86AB')
-    ax1.axvline(x=g0 * 1e-6, color='red', linestyle='--', linewidth=2,
+    ax1.plot(tau * 1e-6, gamma_dot, linewidth=2.5, color="#0072B2")
+    ax1.axvline(x=g0 * 1e-6, color="#D55E00", linestyle='--', linewidth=2,
                 label=f'Slip resistance g₀ = {g0*1e-6:.0f} MPa')
-    ax1.axvline(x=-g0 * 1e-6, color='red', linestyle='--', linewidth=2)
+    ax1.axvline(x=-g0 * 1e-6, color="#D55E00", linestyle='--', linewidth=2)
     ax1.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
     ax1.set_xlabel('Resolved Shear Stress τ (MPa)', fontsize=12, fontweight='bold')
     ax1.set_ylabel('Slip Rate γ̇', fontsize=12, fontweight='bold')
@@ -46,10 +49,10 @@ def plot_slip_law():
 
     # ========== Plot 2: Derivative (Tangent Stiffness) ==========
     ax2 = axes[0, 1]
-    ax2.semilogy(tau * 1e-6, np.abs(dgamma_dtau) + 1e-20, linewidth=2.5, color='#E63946')
-    ax2.axvline(x=g0 * 1e-6, color='red', linestyle='--', linewidth=2,
+    ax2.semilogy(tau * 1e-6, np.abs(dgamma_dtau) + 1e-20, linewidth=2.5, color="#D55E00")
+    ax2.axvline(x=g0 * 1e-6, color="#D55E00", linestyle='--', linewidth=2,
                 label='Critical stress')
-    ax2.axvline(x=-g0 * 1e-6, color='red', linestyle='--', linewidth=2)
+    ax2.axvline(x=-g0 * 1e-6, color="#D55E00", linestyle='--', linewidth=2)
     ax2.set_xlabel('Resolved Shear Stress τ (MPa)', fontsize=12, fontweight='bold')
     ax2.set_ylabel('|dγ̇/dτ| (log scale)', fontsize=12, fontweight='bold')
     ax2.set_title('Derivative: What Z3ST Computes Automatically',
@@ -60,7 +63,7 @@ def plot_slip_law():
     # ========== Plot 3: Comparison with Linear Law ==========
     ax3 = axes[1, 0]
     gamma_dot_linear = gamma0 * tau / g0  # Linear approximation
-    ax3.plot(tau * 1e-6, gamma_dot, linewidth=2.5, color='#2E86AB', label=f'Power law (n={n_pow})')
+    ax3.plot(tau * 1e-6, gamma_dot, linewidth=2.5, color="#0072B2", label=f'Power law (n={n_pow})')
     ax3.plot(tau * 1e-6, gamma_dot_linear, '--', linewidth=2, color='gray', alpha=0.7, label='Linear (n=1)')
     ax3.axhline(y=0, color='black', linestyle='-', linewidth=0.5)
     ax3.set_xlabel('Resolved Shear Stress τ (MPa)', fontsize=12, fontweight='bold')
@@ -75,8 +78,8 @@ def plot_slip_law():
     # Show derivative variation over stress range
     tau_positive = tau[tau > 0]
     dgamma_positive = gamma0 * n_pow * (tau_positive / g0)**(n_pow - 1) / g0
-    ax4.loglog(tau_positive * 1e-6, dgamma_positive, linewidth=2.5, color='#E63946')
-    ax4.axvline(x=g0 * 1e-6, color='red', linestyle='--', linewidth=2, label=f'g₀ = {g0*1e-6:.0f} MPa')
+    ax4.loglog(tau_positive * 1e-6, dgamma_positive, linewidth=2.5, color="#D55E00")
+    ax4.axvline(x=g0 * 1e-6, color="#D55E00", linestyle='--', linewidth=2, label=f'g₀ = {g0*1e-6:.0f} MPa')
     ax4.set_xlabel('Resolved Shear Stress τ (MPa)', fontsize=12, fontweight='bold')
     ax4.set_ylabel('dγ̇/dτ (log-log)', fontsize=12, fontweight='bold')
     ax4.set_title('Derivative Variation (Why Manual Jacobian Fails)', fontsize=13, fontweight='bold')

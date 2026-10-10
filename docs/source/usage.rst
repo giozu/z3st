@@ -1,121 +1,585 @@
 Usage
 =====
 
-This section describes how to configure and run a Z3ST simulation using the reference example case, and how to execute the available verification and non-regression tests.
+This page is the reference for setting up a case: how a run is launched, the
+keys of ``input.yaml`` with their defaults, the geometry and boundary-condition
+files, the material cards, and parallel runs. :doc:`getting_started` walks
+through one complete case first.
 
-Input files
------------
+Running a case
+--------------
 
-A minimal demonstration case is provided in ``z3st/cases/verification/mechanics/uniaxial_tension``.
-It illustrates the complete workflow of a thermo-mechanical simulation:
-- YAML-based configuration input;
-- mesh generation and region tagging;
-- coupled thermal and mechanical solver execution.
-
-To run the example:
+A case is a directory. ``python3 -m z3st`` reads ``input.yaml`` from the current
+directory, and every other path in it is relative to that directory:
 
 .. code-block:: bash
 
-   cd z3st/cases/verification/mechanics/uniaxial_tension
-   python3 -m z3st
+   cd z3st/cases/verification/thermal/thin_slab_dirichlet_2D
+   gmsh mesh.geo -2          # writes mesh.msh
+   python3 -m z3st > log_z3st.md
 
-Optional flags:
+``./Allrun`` does the same and then runs the case's ``non-regression.py`` and the
+convergence plot (see :doc:`getting_started`). Two command-line flags exist:
 
-- ``--mesh_plot`` — displays the generated mesh before solving
-- ``--debug`` — verbose logging
+- ``--mesh_plot`` opens a PyVista window with the mesh and its facet tags before
+  solving.
+- ``--debug`` prints every key of every material card after loading, and the
+  per-material average heat flux after each step.
 
-Example folder structure:
+A case directory may hold a ``diagnostics.py`` module with a function
+``per_step(problem, step, t)``. ``python3 -m z3st`` imports it at start-up and
+calls it after each converged step has been written, with the ``Spine`` object,
+the step index and the time in s. An exception inside ``per_step`` prints a
+``[WARNING]`` and the run continues. ``benchmarks/damage/sen_shear``,
+``verification/cohesive/bar_1D``, ``verification/fuel/creep_shrink_fit_2D``,
+``regression/pwr_rod_2D``, ``regression/fg_test_2D`` and
+``regression/fg_test_fuel`` use this hook.
 
-.. code-block:: text
+When standard output is not a terminal, the log is written as Markdown: steps
+become ``## Step`` headings and staggered iterations ``#### Iteration``
+headings. Set ``Z3ST_PLAIN_LOG=1`` to keep the plain form.
 
-   verification/mechanics/uniaxial_tension/
-   ├── input.yaml
-   ├── geometry.yaml
-   ├── boundary_conditions.yaml
-   └── mesh.msh
-
-Each file defines one aspect of the model setup:
-
+Case files
+----------
 
 input.yaml
-~~~~~~~~~~
+^^^^^^^^^^
 
-This file controls the **coupling strategy**, solver tolerance, relaxation factors, and physical models (thermal/mechanical).
-The staggered scheme alternates between thermal and mechanical solves until both reach convergence.
+``input.yaml`` names the other files, the materials, the regime, the active
+models, the solver settings and the load history. All its keys are listed in
+`input.yaml key reference`_. Keys the code does not read are ignored without a
+warning.
 
-.. code-block:: yaml
+geometry.yaml and the mesh
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-   mesh_path: mesh.msh
-   geometry_path: geometry.yaml
-   boundary_conditions_path: boundary_conditions.yaml
+``geometry.yaml`` gives the geometry type, its dimensions, and ``labels``, which
+maps every region name to the integer tag of a Gmsh physical group. From
+``verification/thermal/thin_slab_dirichlet_2D``:
 
-   materials:
-     steel: ../../materials/steel.yaml
+.. literalinclude:: ../../z3st/cases/verification/thermal/thin_slab_dirichlet_2D/geometry.yaml
+   :language: yaml
 
-   regime: 2D
+The physical groups of its ``mesh.geo``:
 
-   solver_settings:
-     max_iters: 100
-     relax_T: 0.9
-     relax_u: 0.7
-     relax_adaptive: true
-     relax_aitken: false
-     relax_growth: 1.2
-     relax_shrink: 0.8
-     relax_min: 0.05
-     relax_max: 0.95
+.. literalinclude:: ../../z3st/cases/verification/thermal/thin_slab_dirichlet_2D/mesh.geo
+   :language: c
+   :start-after: // --- Physical Groups for Z3ST ---
+   :end-before: // Meshing settings
 
-   models:
-     thermal: true
-     mechanical: true
-     damage: true
-     cluster_dynamics: false
+Gmsh numbers groups without an explicit tag in the order they are defined, so
+``ymin`` gets 1 and ``steel`` gets 5, as in ``geometry.yaml``. Two rules follow:
 
-   mechanical:
-     solver: linear
-     linear_solver: iterative_amg
-     rtol: 1.0e-6
-     stag_tol: 1.0e-6
-     convergence: rel_norm
+- every material name in ``input.yaml`` must be a ``labels`` entry whose tag is a
+  volume group (a surface group in 2D, a curve group in 1D);
+- every ``region`` in ``boundary_conditions.yaml`` must be a ``labels`` entry
+  whose tag is a facet group. An unknown region in a ``thermal`` or
+  ``mechanical`` condition stops the run with
+  ``[ERROR] Region '<name>' not found in label_map``. An unknown region in a
+  ``damage`` condition prints the same message, and the condition is skipped.
 
-   thermal:
-     solver: linear
-     linear_solver: iterative_amg
-     rtol: 1.0e-6
-     stag_tol: 1.0e-6
-     convergence: rel_norm
+``geometry_type`` selects how the cross-section area :math:`A` and perimeter are
+computed. :math:`A` converts the linear heat rate ``lhr`` into a volumetric source
+(see `Load history and heat source`_).
 
-   damage:
-     type: AT2 # AT1 | AT2
-     solver: linear
-     linear_solver: iterative_hypre
-     rtol: 1.0e-6
-     stag_tol: 1.0e-6
-     convergence: rel_norm
-     lc: 0.002 # (m) characteristic length
+.. list-table::
+   :header-rows: 1
+   :widths: 18 42 40
 
-   lhr:
-   - 0
-   time:
-   - 0
-   n_steps: 1
+   * - ``geometry_type``
+     - Keys read
+     - :math:`A`
+   * - ``rect``
+     - ``Lx``, ``Ly`` (required), ``Lz``
+     - :math:`L_x L_y`
+   * - ``cyl`` or ``cylinder``
+     - outer radius ``outer_radius``, ``outer_radius_1`` or ``Ro`` (required),
+       inner radius ``inner_radius``, ``inner_radius_1`` or ``Ri`` (default 0)
+     - :math:`\pi (R_o^2 - R_i^2)`
+   * - ``cyl-cyl``
+     - ``inner_radius_1``, ``outer_radius_1``, ``inner_radius_2``,
+       ``outer_radius_2`` (all required)
+     - :math:`\pi (R_{o,1}^2 - R_{i,1}^2)`, the inner body
+   * - ``sphere``
+     - ``Ro`` or ``outer_radius`` (required), ``Ri`` or ``inner_radius``
+       (default 0)
+     - :math:`\pi (R_o^2 - R_i^2)`
+   * - any other value
+     - ``area``, ``perimeter`` (default 0)
+     - ``area``
 
-Two relaxation strategies are available for the displacement update. The
-default adaptive controller grows or shrinks ``relax_u`` heuristically from
-the residual trend; setting ``relax_aitken: true`` replaces it with Aitken
-delta-squared dynamic relaxation, which computes a quasi-optimal factor each
-staggered iteration from the last two residuals (clamped to
-``[relax_min, relax_max]``, restarted from ``relax_u`` at every time step).
-Aitken is recommended for strongly coupled physics. 
-Both ``relax_*`` settings and the tolerances are hot-reloadable: edits to
-``input.yaml`` during a run are picked up at the next step boundary (see
-`Hot-reloaded parameters`_ below for the full allow-list).
+Z3ST reads only ``mesh.msh``. Every case in the repository writes it from
+``mesh.geo``, since ``z3st/utils/allrun.sh`` runs ``gmsh mesh.geo -$DIM``. Two
+other routes produce the same file:
 
-The time grid is built from the piecewise-linear ``time``/``lhr`` history.
-``n_steps`` accepts either an integer (total number of points, distributed
-across segments proportionally to their duration) or a list with one entry
-per segment giving the number of time intervals in that segment — useful to
-resolve a fast transition finely while striding across a slow plateau:
+- the Gmsh Python API (``import gmsh``), for parametric geometry that needs
+  loops, conditionals or computed positions;
+- a CAD model exported as STEP (not STL, which is already triangulated) and
+  imported in Gmsh with the OpenCASCADE kernel.
+
+A STEP file carries surfaces and volumes but no physical groups, so they are
+assigned in Gmsh. Select faces by geometry (centre of mass, normal), not by the
+tags Gmsh assigns on import, which depend on the CAD tool and the exporter.
+Axis-aligned ``BoundingBox`` selection can pick wrong faces on non-rectangular
+shapes: on a hexagonal shell it puts outer faces in the inner group. Example for
+a hexagonal shell with inner apothem 0.057 m and outer apothem 0.060 m:
+
+.. code-block:: python
+
+   # mesh.py
+   import math
+   import gmsh
+
+   gmsh.initialize()
+   gmsh.option.setString("Geometry.OCCTargetUnit", "M")   # STEP in mm -> metres
+   gmsh.model.occ.importShapes("hex_shell.step")
+   gmsh.model.occ.synchronize()
+
+   xmin, ymin, zmin, xmax, ymax, zmax = gmsh.model.getBoundingBox(-1, -1)
+   tol = 1e-6
+   groups = {"zmin": [], "zmax": [], "outer": [], "inner": []}
+
+   for dim, tag in gmsh.model.getEntities(2):
+       x, y, z = gmsh.model.occ.getCenterOfMass(dim, tag)
+       if abs(z - zmin) < tol:
+           groups["zmin"].append(tag)
+       elif abs(z - zmax) < tol:
+           groups["zmax"].append(tag)
+       elif math.hypot(x, y) > 0.0585:   # between inner and outer apothem
+           groups["outer"].append(tag)
+       else:
+           groups["inner"].append(tag)
+
+   for i, (name, tags) in enumerate(groups.items(), start=1):
+       gmsh.model.addPhysicalGroup(2, tags, i, name)
+   gmsh.model.addPhysicalGroup(3, [t for _, t in gmsh.model.getEntities(3)], 5, "steel")
+
+   gmsh.option.setNumber("Mesh.MeshSizeMax", 0.004)
+   gmsh.model.mesh.generate(3)
+   gmsh.write("mesh.msh")
+   gmsh.finalize()
+
+The matching ``labels`` in ``geometry.yaml`` are ``zmin: 1``, ``zmax: 2``,
+``outer: 3``, ``inner: 4``, ``steel: 5``. Three checks:
+
+- Units. CAD tools usually export in millimetres and Z3ST works in metres.
+  Without ``Geometry.OCCTargetUnit = "M"`` the geometry is 1000 times larger, and
+  nothing reports it.
+- Several bodies. Export all of them (for example pellet and cladding) in one STEP
+  file and call ``gmsh.model.occ.fragment``, so that each contact face belongs to
+  both bodies and their meshes share nodes there.
+- Groups. Open ``mesh.msh`` in Gmsh, use Tools → Visibility, and confirm that each
+  physical group holds the intended faces before running the case.
+
+``allrun.sh`` meshes only from ``mesh.geo``, so a case meshed by ``mesh.py`` needs
+its own ``Allrun``:
+
+.. code-block:: bash
+
+   #!/bin/bash
+   set -e
+   cd "${0%/*}"
+   python3 mesh.py > log_mesh.md
+   python3 -m z3st > log_z3st.md
+
+boundary_conditions.yaml
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Conditions are grouped by physics (``thermal``, ``mechanical``, ``damage``) and
+then by material name. Each entry has a ``type`` and a ``region``. See
+`Boundary conditions`_.
+
+input.yaml key reference
+------------------------
+
+Defaults are those the code applies when a key is absent. "Required" means the
+run stops with an error, usually a ``KeyError``, when the key is missing.
+
+Top level
+^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 22 50
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``mesh_path``
+     - required
+     - Gmsh ``.msh`` file.
+   * - ``geometry_path``
+     - required
+     - ``geometry.yaml``.
+   * - ``boundary_conditions_path``
+     - required
+     - ``boundary_conditions.yaml``.
+   * - ``materials``
+     - required
+     - Map from material name to card path, e.g. ``steel: ../../../../materials/steel.yaml``.
+   * - ``regime``
+     - ``2d``
+     - ``1d``, ``2d`` (plane strain), ``3d`` or ``axisymmetric``, case-insensitive.
+       Any other value stops the run with ``Invalid regime``.
+   * - ``time``
+     - required
+     - Time breakpoints in s, strictly increasing.
+   * - ``lhr``
+     - required
+     - Linear heat rate in W/m at each breakpoint, same length as ``time``.
+   * - ``n_steps``
+     - 10
+     - Integer: approximate total number of time points. Each segment gets
+       ``max(2, int((n_steps - 1) * duration / total_duration))`` intervals, so the
+       generated count can differ from ``n_steps``. List: number of intervals in
+       each segment (one entry per segment).
+   * - ``output.format``
+     - ``vtu``
+     - ``vtu`` or ``xdmf``. Under MPI ``vtu`` is replaced by ``xdmf``.
+   * - ``output.filename``
+     - ``fields``
+     - Base name in ``output/``. The extension is set from the format.
+   * - ``time_adaptivity``
+     - off
+     - See `Time adaptivity`_.
+
+``solver_settings``
+^^^^^^^^^^^^^^^^^^^
+
+Read in ``z3st/core/solver.py`` (``Solver.__init__``). An empty or absent block
+uses every default.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 15 60
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``max_iters``
+     - 100
+     - Maximum staggered iterations per time step (``__main__.py``).
+   * - ``relax_T``
+     - 0.9
+     - Under-relaxation factor of the temperature update.
+   * - ``relax_u``
+     - 0.4
+     - Under-relaxation factor of the displacement update.
+   * - ``relax_D``
+     - 0.4
+     - Under-relaxation factor of the damage update.
+   * - ``relax_adaptive``
+     - ``false``
+     - Adapt ``relax_T``, ``relax_u`` and ``relax_D`` from the residual history.
+       With the default ``false`` the three factors stay fixed.
+   * - ``relax_growth``
+     - 1.2
+     - Factor applied when the residual is below its moving average.
+   * - ``relax_shrink``
+     - 0.5
+     - Factor applied otherwise.
+   * - ``relax_min`` / ``relax_max``
+     - 0.05 / 1.0
+     - Bounds of the adapted factors, and of the Aitken factor.
+   * - ``relax_aitken``
+     - ``false``
+     - Aitken :math:`\Delta^2` relaxation of the displacement update. It replaces
+       the adaptive controller for ``relax_u`` and restarts from ``relax_u`` at
+       every time step.
+
+The adaptive controller compares each residual :math:`r_k` with the moving
+average :math:`\bar r_k = 0.3\,r_k + 0.7\,\bar r_{k-1}`, multiplies the factor by
+``relax_growth`` when :math:`r_k < \bar r_k` and by ``relax_shrink`` otherwise,
+and clamps it to ``[relax_min, relax_max]``.
+
+Per-physics blocks
+^^^^^^^^^^^^^^^^^^
+
+A block is read only when its model is switched on in ``models``.
+
+**thermal** (``z3st/models/thermal_model.py``)
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 20 55
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``convergence``
+     - required
+     - ``rel_norm`` (:math:`\|\Delta T\|/\|T\|`) or ``norm`` (:math:`\|\Delta T\|`),
+       the staggered convergence measure.
+   * - ``stag_tol``
+     - 1e-4
+     - Staggered tolerance on that measure.
+   * - ``rtol``
+     - 1e-6
+     - Relative tolerance of the iterative linear solver.
+   * - ``linear_solver``
+     - ``iterative_hypre``
+     - ``iterative_hypre`` (CG + BoomerAMG), ``iterative_amg`` (CG + GAMG) or
+       ``direct_mumps`` (LU, MUMPS).
+   * - ``analysis``
+     - ``stationary``
+     - ``transient`` adds the backward-Euler mass term :math:`\rho c_p/\Delta t`.
+       A step with :math:`\Delta t = 0` then keeps the initial temperature.
+   * - ``solver``
+     - ``linear``
+     - Any other value selects Newton iteration with the conductivity as an
+       external operator. It requires a data-driven ``k`` card for every
+       material and supports neither ``transient`` nor Robin conditions.
+   * - ``quadrature_degree``
+     - 2
+     - Quadrature degree of the Newton path only.
+   * - ``newton_max_it``
+     - 25
+     - Newton iterations per staggered iteration, Newton path only.
+
+**mechanical** (``z3st/models/mechanical_model.py``)
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 20 55
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``solver``
+     - required
+     - ``linear`` or any other value for Newton (PETSc SNES). Creep, plasticity
+       and hyperelasticity use SNES whatever this key says.
+   * - ``convergence``
+     - required
+     - ``rel_norm`` or ``norm``, as for thermal.
+   * - ``stag_tol``
+     - 1e-4
+     - Staggered tolerance.
+   * - ``rtol``
+     - 1e-6
+     - Linear-solver tolerance. On the SNES path it is also ``snes_atol`` and
+       ``snes_rtol``.
+   * - ``linear_solver``
+     - ``iterative_hypre``
+     - ``iterative_hypre`` (GMRES + BoomerAMG), ``iterative_amg`` (GMRES + GAMG,
+       with the rigid-body modes as near-nullspace) or ``direct_mumps``.
+   * - ``order``
+     - 1
+     - Lagrange degree of the displacement.
+   * - ``gravity``
+     - 0.0
+     - :math:`g` in m/s². Body force :math:`-\rho g` along :math:`y` in 2D and
+       axisymmetric, :math:`z` in 3D, :math:`x` in 1D.
+   * - ``remove_rigid_nullspace``
+     - ``false``
+     - Project out the rigid-body modes that the Dirichlet conditions leave
+       free. Linear path only.
+   * - ``snes_max_it``
+     - 50
+     - SNES iteration limit. Honoured only with ``direct_mumps``; with an
+       iterative inner solver the limit is 100.
+
+**damage** (``z3st/models/damage_model.py``). The block must be present and
+non-empty when ``models.damage`` is on.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 20 55
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``type``
+     - required
+     - ``AT1`` or ``AT2``.
+   * - ``lc``
+     - required
+     - Regularisation length in m.
+   * - ``convergence``
+     - required
+     - ``rel_norm`` or ``norm``.
+   * - ``stag_tol`` / ``rtol``
+     - 1e-4 / 1e-6
+     - As for thermal.
+   * - ``linear_solver``
+     - ``iterative_hypre``
+     - As for thermal. The damage problem is always linear, so there is no
+       ``solver`` key.
+   * - ``split``
+     - by type
+     - ``amor``, ``miehe`` or ``star_convex``. Without the key, AT1 uses Amor and
+       AT2 uses Miehe.
+   * - ``gamma_star``
+     - 0.0
+     - Star-convex parameter. 0 reproduces the Amor split.
+   * - ``hybrid_constraint``
+     - ``true``
+     - Suppress growth of the driving force in cells where
+       :math:`\psi^- > \psi^+` (Ambati et al. 2015).
+   * - ``history``
+     - ``cell``
+     - Space of the history field :math:`\mathcal H`: ``cell`` (DG0, one value
+       per cell at its centre) or ``quadrature`` (one value per point of a
+       degree-2 rule, 2 x 2 Gauss points on quadrilaterals, and the damage
+       form integrated with the same rule).
+
+**porosity** (``z3st/models/porosity_migration_model.py``). The porosity solve
+has its own convergence test and does not read ``convergence`` or ``stag_tol``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 20 55
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``linear_solver``
+     - ``direct_mumps``
+     - As above.
+   * - ``rtol``
+     - 1e-8
+     - Linear-solver tolerance.
+   * - ``stag_tol_rel`` / ``stag_tol_abs``
+     - 1e-6 / 1e-8
+     - Mixed relative/absolute staggered test on every degree of freedom.
+   * - ``conv_metric``
+     - ``max_dof``
+     - ``integral`` tests the change of :math:`\int p\,\mathrm{d}x` against
+       ``conv_integral_tol`` (default 1e-4) instead.
+   * - ``discretisation``
+     - ``cg``
+     - ``cg`` (stabilised continuous) or ``dg`` (upwind discontinuous).
+   * - ``relax``
+     - 1.0
+     - Fixed under-relaxation of the porosity update.
+   * - ``aitken`` / ``aitken_omega0``
+     - ``false`` / 0.5
+     - Aitken relaxation of the porosity update, and its starting factor.
+   * - ``saturation_cap``
+     - ``false``
+     - Redistribute porosity above 1 instead of clipping it (DG path).
+
+The pore-velocity parameters (``v0``, ``c1`` to ``c4``, ``Hs``) and the DG
+time-integration keys are described in :doc:`physics_models`.
+
+**plasticity**: ``mode`` is ``j2`` (default) or ``custom``. With ``custom`` the
+internal variables come from ``get_cp_internal_variables`` in the module of the
+material's ``stress_function``.
+
+**cluster** (``z3st/models/cluster_dynamic_model.py``): ``advection_velocity``
+(default 1.0), ``diffusion_coefficient`` (default 0.5) and ``initial_condition``
+(``type: constant`` by default). ``verification/cluster/mass_conservation_1D`` is
+a complete example.
+
+models
+^^^^^^
+
+Each switch is ``true``/``false`` or a block. Config evaluates a block as on when
+it is non-empty.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 78
+
+   * - Switch
+     - Model
+   * - ``thermal``
+     - Heat conduction.
+   * - ``mechanical``
+     - Small-strain mechanics, with the constitutive law chosen per material.
+   * - ``damage``
+     - Phase-field fracture. Needs the ``damage`` block.
+   * - ``plasticity``
+     - J2 or custom plasticity for materials with ``yield_strength``. Refused
+       together with damage.
+   * - ``contact``
+     - Penalty contact between two surfaces. Must be a block (below).
+   * - ``porosity``
+     - Temperature-gradient-driven pore migration.
+   * - ``cluster``
+     - Cluster-size advection-diffusion.
+   * - ``cohesive``
+     - Cohesive phase-field fracture. Under development. A block with ``ell``
+       (required) and ``r_norm``. Requires ``mechanical`` and is refused together
+       with ``damage`` or ``plasticity``.
+   * - ``fission_gas``
+     - SCIANTIX coupling. ``true`` or a block with ``enabled``, ``lib``,
+       ``initial_conditions`` (default ``input_initial_conditions.txt``) and
+       ``energy_per_fission`` (default 3.2e-11 J).
+
+**models.contact.** Writing ``contact: true`` stops the run with
+``AttributeError: 'bool' object has no attribute 'get'``: the switch must be a
+block.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 22 50
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``surface_a``
+     - ``lateral_1``
+     - Outer surface of the inner body.
+   * - ``surface_b``
+     - ``inner_2``
+     - Inner surface of the outer body.
+   * - ``penalty_stiffness``
+     - 5.0e13
+     - Penalty stiffness in Pa/m.
+   * - ``initial_gap``
+     - from geometry
+     - Initial gap in m. Without it, ``inner_radius_2 - outer_radius_1`` from
+       ``geometry.yaml``.
+
+**models.gap_conductance.** The gap is a Robin condition with a ``pair`` key on
+both surfaces (see `Thermal conditions`_). The block sets its conductance.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 20 50
+
+   * - Key
+     - Default
+     - Meaning
+   * - ``type``
+     - none
+     - ``Fixed``: :math:`h_\mathrm{gap}` = ``value`` in W/(m²·K). ``Gas``:
+       :math:`h_\mathrm{gap} = k_\mathrm{gas}/\delta` with
+       :math:`k_\mathrm{gas} = \texttt{value}\cdot 10^{-4}\,T_\mathrm{gap}^{0.79}`
+       and :math:`\delta` the gap width. Without ``type``, :math:`h = 0`.
+   * - ``value``
+     - 0.0
+     - See ``type``.
+   * - ``surface_a`` / ``surface_b``
+     - ``lateral_1`` / ``inner_2``
+     - Surfaces whose mean distance gives :math:`\delta` (``Gas``) while contact is off. With contact on, :math:`\delta` is the contact model's current gap.
+   * - ``relax``
+     - 1.0
+     - Under-relaxation of :math:`h_\mathrm{gap}` between staggered iterations.
+   * - ``contact_coupling.enabled``
+     - ``false``
+     - Add the Ross-Stoute contact term when ``contact`` reports a pressure.
+   * - ``contact_coupling.meyer_hardness``
+     - 9.65e8
+     - Meyer hardness in Pa.
+   * - ``contact_coupling.gas_thickness``
+     - 4.0e-6
+     - Gas thickness on contact in m.
+
+The pellet-cladding case ``regression/pwr_rod_2D`` uses both blocks:
+
+.. literalinclude:: ../../z3st/cases/regression/pwr_rod_2D/input.yaml
+   :language: yaml
+   :start-at: gap_conductance:
+   :end-at: initial_gap:
+
+Load history and heat source
+----------------------------
+
+``time`` and ``lhr`` are breakpoints of a piecewise-linear history. The solver
+steps through the time points built from them and ``n_steps``, interpolating
+``lhr`` linearly:
 
 .. code-block:: yaml
 
@@ -123,57 +587,87 @@ resolve a fast transition finely while striding across a slow plateau:
    lhr: [0.0, 20000.0, 20000.0, 20000.0]
    n_steps: [8, 60, 40]   # intervals per segment
 
+A step-dependent boundary-condition list (see `Boundary conditions`_) is
+indexed by time point, so it needs one value per generated time point: the sum
+of the intervals plus one, 109 for this history. A list of any other length
+stops the run.
 
-Time adaptivity (optional)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The first step is solved at ``time[0]`` with :math:`\Delta t` equal to
+``time[0]``, so a history starting at 0 begins with a static step.
 
-By default the time grid above is fixed: every step is solved once at its
-prescribed ``dt``. When several non-linear physics are active at once (for
-example contact onset in a fuel-rod run), a step can occasionally fail to
-converge within ``max_iters`` at that ``dt``. The optional ``time_adaptivity``
-block lets the solver recover by sub-stepping the offending step instead of
-aborting the run:
+``lhr`` heats only materials with ``fissile: true`` in their card. Their
+volumetric source is :math:`q''' = \mathrm{LHR}/A`, with :math:`A` from
+``geometry_type``, optionally shaped by the card's ``radial_profile`` and
+``axial_profile`` functions with its integral unchanged. A card's
+``gamma_heating`` (W/m³, with ``mu_gamma`` in 1/m) adds a source that does not
+depend on ``lhr``.
+
+Behaviour on non-convergence
+----------------------------
+
+When a step reaches ``max_iters`` without every field meeting its staggered
+tolerance, the solver prints
+
+.. code-block:: text
+
+   [WARNING] Staggered solver did not converge. Using last iteration state.
+
+followed by a ``[time-loop] step N/M did NOT converge`` line, and accepts the
+last iterate, including the plastic and creep history updates.
+The run continues. With `Time adaptivity`_ enabled the step is bisected instead.
+
+Time adaptivity
+^^^^^^^^^^^^^^^
 
 .. code-block:: yaml
 
    time_adaptivity:
-     enabled: true     # default false — fixed grid unless turned on
-     dt_min: 1.0e3     # (s) smallest dt to attempt before giving up
-     max_cuts: 6       # maximum bisection depth per original-grid step
+     enabled: true     # default false
+     dt_min: 1.0e3     # (s) default 1.0e3
+     max_cuts: 6       # default 6, bisection depth per grid step
 
-When a step does not converge, the solver rolls the state back to the last
-converged step, halves ``dt``, and re-solves the step as two sub-steps; each
-sub-step may bisect again, recursively, up to ``max_cuts`` levels or until
-``dt`` reaches ``dt_min``. The roll-back and retry are exact: the full step
-state (primary fields, history variables, plasticity and creep accumulators,
-per-material cracking scalars) is snapshotted before the attempt and restored
-on failure, so a failed attempt never pollutes the retry. Output is still
-written on the **original grid** — sub-steps are internal and do not appear in
-the time series. If a step cannot converge even at ``dt_min``, the run rolls
-back to the last converged step, prints the reason, writes the output up to
-that step, and exits with a non-zero status.
+A step that does not converge is rolled back to the last converged state, its
+:math:`\Delta t` is halved, and it is solved as two sub-steps. Each sub-step may be
+bisected again, up to ``max_cuts`` levels or until :math:`\Delta t` reaches
+``dt_min``. Output is written on the original grid only.
 
-The feature is off by default and adds no cost to a run that converges. Two
-caveats:
+The snapshot taken before each attempt (``Spine.snapshot_state``) restores:
 
-- Only the linear heat rate ``lhr`` is interpolated to sub-step times.
-  Per-step ramped boundary-condition lists are applied at their grid-step value
-  within a bisected step (not re-interpolated to the sub-step times); a warning
-  is printed at start-up when a ramped BC coexists with adaptivity.
-- ``dt_min`` is a floor in seconds; set it well below the smallest physically
-  meaningful step so the bisection has room to work before the run aborts.
+- the fields ``T``, ``u``, ``D``, the crack-driving history, the mixed cohesive
+  state, burnup, gaseous swelling, the cluster and porosity fields and the
+  plastic variables;
+- the creep strains of each material;
+- the material entries ``E``, ``nu``, ``bulk_modulus`` and ``_lhr_max``, and the
+  values of the ``lmbda`` and ``G`` constants, which pellet cracking modifies;
+- the SCIANTIX state.
 
+At the start of every staggered solve the Aitken history, the gap-conductance
+damping memory and the contact secant history are reset. The snapshot does not
+restore:
+
+- the contact pressure and the last gap and pressure of the contact model;
+- the gap conductance :math:`h_\mathrm{gap}`;
+- ``relax_T``, ``relax_u`` and ``relax_D`` as adapted by ``relax_adaptive``.
+
+A retry starts from the values these held at the end of the failed attempt.
+
+If a step fails at ``dt_min``, the run prints
+``[ERROR] Simulation aborted: adaptive time-stepping could not converge a step even
+at dt_min``, keeps the output written up to the last converged step, and exits
+with status 1.
+
+Only ``lhr`` is interpolated to sub-step times. A boundary condition given as a
+per-step list keeps its grid-step value inside a bisected step, and a warning is
+printed at start-up when such a list coexists with adaptivity.
+``verification/fuel/creep_shrink_fit_2D``, ``regression/pwr_rod_2D``,
+``regression/fg_test_2D`` and ``regression/fg_test_fuel`` use this block.
 
 Hot-reloaded parameters
-^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
 
-A subset of ``input.yaml`` can be changed **while a simulation is running**:
-edit and save the file mid-run and the new value is picked up at the next step
-boundary, with a ``[hot-reload]`` line logged. This is meant for steering a long
-run — tightening or loosening tolerances, nudging relaxation — without
-restarting it. Only an explicit allow-list is reloaded; structural settings
-(mesh, geometry, materials, model on/off switches, the time grid) are read once
-at start-up and ignored if edited mid-run:
+``input.yaml`` is re-read at the start of every time step. Changes to the keys
+below take effect at that step and are logged with ``[hot-reload]``. Every other
+key is read once at start-up.
 
 .. list-table::
    :header-rows: 1
@@ -192,464 +686,303 @@ at start-up and ignored if edited mid-run:
    * - ``damage``
      - ``stag_tol``, ``rtol``, ``hybrid_constraint``, ``gamma_star``
 
-A malformed or half-written file (caught mid-save) is ignored for that cycle,
-so saving over ``input.yaml`` during a run is always safe.
+A file that fails to parse, for example while it is being saved, is skipped for
+that step.
 
-
-geometry.yaml
-~~~~~~~~~~~~~
-
-Defines the domain geometry, dimensions, and tagged boundaries.
-
-.. code-block:: yaml
-
-   name: box
-   geometry_type: rect
-
-   Lx: 0.100   # length in x (m)
-   Ly: 2.000   # length in y (m)
-   Lz: 2.000   # length in z (m)
-
-   labels:
-     zmin: 1
-     zmax: 2
-     ymin: 3
-     xmax: 4
-     ymax: 5
-     xmin: 6
-     steel: 7
-
-Z3ST automatically interprets these labels as physical regions and surfaces.
-Each label is used later to apply boundary conditions or assign material subdomains.
-Also, each label corresponds to a **Physical Group** defined in the mesh (either a surface or a volume). These integer IDs are essential for boundary condition assignment and material region identification.
-
-Mesh labeling and physical groups
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Z3ST uses *Gmsh* to define and export all geometric entities.
-The mapping between the textual labels in ``geometry.yaml`` and the numeric
-tags in the mesh file ``mesh.msh`` is handled through *Physical Groups*.
-
-Example from ``mesh.msh``, created from ``mesh.geo``:
-
-.. code-block:: text
-
-   $MeshFormat
-   4.1 0 8
-   $EndMeshFormat
-   $PhysicalNames
-   7
-   2 1 "zmin"
-   2 2 "ymin"
-   2 3 "xmax"
-   2 4 "ymax"
-   2 5 "xmin"
-   2 6 "zmax"
-   3 7 "steel"
-
-Here:
-- the first number (`2`) indicates a **surface** (2D entity),
-- the second number is the **ID** used in `geometry.yaml`,
-- and the quoted string (e.g. `"zmin"`) is the **name** of the region.
-
-The 3D entity labeled `"steel"` represents the solid volume domain.
-When the `.msh` file is read, Z3ST automatically associates each
-boundary or volume tag to its corresponding label in `geometry.yaml`.
-
-boundary_conditions.yaml
-~~~~~~~~~~~~~~~~~~~~~~~~
-
-This file specifies the model boundary conditions applied during the simulation.
-The available models are **thermal** and **mechanical**.
-Each boundary condition is assigned to a material region (e.g. ``steel``) and
-applied on a named region defined in ``mesh.msh`` and ``geometry.yaml``.
-
-An example is given here below:
-
-.. code-block:: yaml
-
-  thermal:
-    steel:
-    - type: Dirichlet
-      region: xmin
-      temperature: 490.0   # (K)
-
-  mechanical:
-    steel:
-    - type: Clamp_x
-      region: xmin
-
-    - type: Clamp_y
-      region: ymin
-
-    - type: Clamp_z
-      region: zmin
-
-In this configuration:
-- the thermal field is fixed at **490 K** on the ``xmin`` face;
-- the mechanical problem applies a tri-directional clamping (fixed displacements in X, Y, and Z) on the corresponding faces.
-
-This setup results in a steady-state thermo-mechanical equilibrium problem on a 3D rectangular domain.
-
-Thermal boundary conditions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Dirichlet
-"""""""""
-
-- Enforces a fixed temperature (K) on a boundary region.
-
-- Example:
-
-  .. code-block:: yaml
-
-    - type: Dirichlet
-      region: xmin
-      temperature: 490.0
-
-- Mathematical form: :math:`T = T_0` on :math:`\Gamma_D`
-
-- Used to impose constant temperature fields.
-
-Neumann
-"""""""
-
-- Applies a constant heat flux (:math:`\mathrm{W\,m^{-2}}`).
-
-- Example:
-
-  .. code-block:: yaml
-
-    - type: Neumann
-      region: zmax
-      flux: 5000.0
-
-- Mathematical form: :math:`-k \nabla T \cdot \mathbf{n} = q_0 \text{ on } \Gamma_N`
-
-- Positive flux, exiting from the region. Negative flux, entering in the region.
-
-- Used for convection or heat generation boundaries.
-
-Mechanical boundary conditions
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Dirichlet
-"""""""""
-
-- Imposes a fixed displacement :math:`\mathbf{u} = (u_x, u_y, u_z)` (m).
-
-- Example:
-
-  .. code-block:: yaml
-
-    - type: Dirichlet
-      region: outer
-      displacement: [0.0, 0.0, 0.0]
-
-- Mathematical form: :math:`\mathbf{u} = \mathbf{u}_0 \text{ on } \Gamma_D`
-
-Neumann
-"""""""
-
-- Imposes a surface traction or pressure load :math:`\mathbf{t}_0` (:math:`\mathrm{N\,m^{-2}}`) on the specified boundary.
-
-- Example:
-
-  .. code-block:: yaml
-
-    - type: Neumann
-      region: inner
-      traction: 1.0e6
-
-- Mathematical form: :math:`\boldsymbol{\sigma} \cdot \mathbf{n} = \mathbf{t}_0 \text{ on } \Gamma_N`
-
-- A scalar value must be provided, it is interpreted as a **pressure acting normal to the surface**,  i.e. :math:`\mathbf{t}_0 = p\, \mathbf{n}`.
-
-Clamp
-"""""
-- Constrains displacement in a single direction only, on the assigned region.
-
-  **Clamp_x**
-
-  - Constrains :math:`u_x = 0` on the assigned region.
-
-  **Clamp_y**
-
-  - Constrains :math:`u_y = 0` on the assigned region.
-
-  **Clamp_z**
-
-  - Constrains :math:`u_z = 0` on the assigned region.
-
-- **Example**
-
-  .. code-block:: yaml
-
-    - type: Clamp_x
-      region: xmin
-
-    - type: Clamp_y
-      region: ymin
-
-    - type: Clamp_z
-      region: zmin
-
-  Note: The combined effect of the tri-directional clamping above is a single **fixed point**, preventing rigid-body motion and rotation of the domain.
-
-Slip
-""""
-
-- Enforces a *slip* condition by constraining two displacement components while leaving the normal component free.
-
-- Used to prevent rigid-body motion while allowing tangential sliding along a boundary.
-
-  **Slip_x**
-
-  - Constrains :math:`u_y = 0` and :math:`u_z = 0`
-
-  - Allows displacement in the :math:`x` direction
-
-  **Slip_y**
-
-  - Constrains :math:`u_x = 0` and :math:`u_z = 0`
-
-  - Allows displacement in the :math:`y` direction
-
-  **Slip_z**
-
-  - Constrains :math:`u_x = 0` and :math:`u_y = 0`
-
-  - Allows displacement in the :math:`z` direction
-
-- **Example**
-
-  .. code-block:: yaml
-
-    - type: Slip_x
-      region: xmin
-
-    - type: Slip_y
-      region: ymin
-
-    - type: Slip_z
-      region: zmin
-
-The slip boundary condition blocks motion tangential to the boundary
-while allowing displacement along the normal direction.
-It is typically used to remove rigid-body modes without fully clamping
-the structure.
-
-Damage boundary conditions
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Dirichlet
-"""""""""
-
-- Imposes a fixed damage value :math:`D \in [0, 1]`.
-- Used to prescribe initial cracks or fully damaged regions.
-- Example:
-
-  .. code-block:: yaml
-
-    - type: Dirichlet
-      region: crack
-      value: 1.0
-
-Notes:
-
-- Each boundary condition is applied to a *region* defined in ``geometry.yaml``
-  and associated with the corresponding physical tag in the mesh file (``.msh``).
-
----
-
-Material Properties
+Boundary conditions
 -------------------
 
-Materials in Z3ST are defined using YAML files stored in the ``materials/`` directory. Each material file specifies thermal and mechanical properties used in the simulation.
-
-Material File Format
-~~~~~~~~~~~~~~~~~~~~
-
-A typical material file contains the following properties:
-
-.. code-block:: yaml
-
-   name: vessel_steel_0
-
-   # Mechanical properties
-   E: 1.77e+11           # Young's modulus (Pa)
-   nu: 0.30              # Poisson's ratio (dimensionless)
-   alpha: 1.7e-5         # Thermal expansion coefficient (1/K)
-   T_ref: 300.0          # Reference temperature (K)
-   rho: 8000.0           # Density (kg/m³)
-
-   # Thermal properties
-   k: 48.1               # Thermal conductivity (W/m·K)
-   cp: 200.0             # Specific heat capacity (J/kg·K)
-
-   # Optional: Radiation properties
-   mu_gamma: 24.0        # Linear attenuation coefficient (1/m)
-   gamma_heating: 0.0    # Volumetric gamma heating (W/m³)
-
-**Units Convention**:
-
-All properties must use **SI units**:
-
-- **Length**: meters (m)
-- **Mass**: kilograms (kg)
-- **Time**: seconds (s)
-- **Temperature**: Kelvin (K)
-- **Force**: Newtons (N)
-- **Pressure/Stress**: Pascals (Pa)
-- **Energy**: Joules (J)
-- **Power**: Watts (W)
-
-Property Descriptions
-~~~~~~~~~~~~~~~~~~~~~
-
-**Mechanical Properties:**
-
-- ``E`` — Young's modulus (Pa): Stiffness in linear elasticity
-- ``nu`` — Poisson's ratio (dimensionless): Lateral contraction ratio
-- ``alpha`` — Thermal expansion coefficient (1/K): Thermal strain per degree
-- ``T_ref`` — Reference temperature (K): Zero thermal strain temperature
-- ``rho`` — Density (kg/m³): Mass per unit volume
-
-**Thermal Properties:**
-
-- ``k`` — Thermal conductivity (W/m·K): Heat conduction coefficient
-- ``cp`` — Specific heat capacity (J/kg·K): Heat required to raise temperature
-
-**Advanced Properties:**
-
-- ``mu_gamma`` — Attenuation coefficient (1/m): For gamma ray heating calculations
-- ``gamma_heating`` — Volumetric heating (W/m³): Internal heat generation rate
-
-Available Materials
-~~~~~~~~~~~~~~~~~~~
-
-Z3ST ships a database of materials in ``z3st/materials/``; a representative subset:
+Thermal conditions
+^^^^^^^^^^^^^^^^^^
 
 .. list-table::
    :header-rows: 1
-   :widths: 20 80
+   :widths: 15 30 55
 
-   * - Material
-     - Description
-   * - ``vessel_steel_0.yaml``
-     - Reactor pressure vessel steel (reference properties)
-   * - ``T91.yaml``
-     - T91 ferritic-martensitic steel
-   * - ``15_15Ti.yaml``
-     - 15-15Ti austenitic stainless steel
-   * - ``austenitic_steel.yaml``
-     - Generic austenitic steel
+   * - ``type``
+     - Keys
+     - Condition
+   * - ``Dirichlet``
+     - ``temperature`` (K), scalar or a list with one value per time point
+     - :math:`T = T_0`.
+   * - ``Neumann``
+     - ``flux`` (W/m²)
+     - :math:`-k\nabla T\cdot\mathbf{n} = q`. Positive ``flux`` leaves the body.
+   * - ``Robin`` (convective)
+     - ``h_conv`` (W/(m²·K)), ``T_ext`` (K)
+     - :math:`-k\nabla T\cdot\mathbf{n} = h_\mathrm{conv}(T - T_\mathrm{ext})`.
+   * - ``Robin`` (gap)
+     - ``pair``: the facing region
+     - :math:`-k\nabla T\cdot\mathbf{n} = h_\mathrm{gap}(T - T_\mathrm{pair})`, with
+       :math:`h_\mathrm{gap}` from ``models.gap_conductance``.
+
+A facet region without a condition is adiabatic. The thermal conditions of
+``regression/pwr_rod_2D``, with a gap pair between fuel and cladding and
+convection to the coolant:
+
+.. literalinclude:: ../../z3st/cases/regression/pwr_rod_2D/boundary_conditions.yaml
+   :language: yaml
+   :end-before: mechanical:
+
+Mechanical conditions
+^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+   :widths: 22 30 48
+
+   * - ``type``
+     - Keys
+     - Condition
+   * - ``Dirichlet``
+     - ``displacement``: a vector of mesh dimension, or a list with one vector
+       per time point
+     - Every component prescribed.
+   * - ``Dirichlet_x/y/z``, ``Clamp_x/y/z``
+     - ``displacement`` or ``value`` (default 0), scalar or a list with one
+       value per time point
+     - One component prescribed on the whole region. ``Clamp_z`` is refused in
+       ``2d`` and ``axisymmetric``.
+   * - ``Slip_x/y/z``
+     - none
+     - The named component is free, the others are zero.
+   * - ``Neumann``
+     - ``traction`` (Pa), scalar or a list with one value per time point
+     - :math:`\boldsymbol{\sigma}\mathbf{n} = t\,\mathbf{n}`.
+
+The scalar traction acts along the outward normal :math:`\mathbf{n}`. A positive
+value is a tension. A pressure :math:`p` on a surface is ``traction: -p``.
+
+``Clamp_x``, ``Clamp_y`` and ``Clamp_z`` on the faces ``xmin``, ``ymin`` and
+``zmin`` of a box fix one component on each whole face. The faces act as three
+symmetry planes. Together they remove the rigid-body modes, and the box can still
+contract laterally.
+
+From ``verification/mechanics/lame_gps_2D``, an axisymmetric cylinder under an
+internal pressure of 1 MPa in generalised plane strain:
+
+.. literalinclude:: ../../z3st/cases/verification/mechanics/lame_gps_2D/boundary_conditions.yaml
+   :language: yaml
+
+The internal pressure is ``traction: -1.0e+6``. ``Clamp_y`` on ``top`` with a
+``value`` prescribes the uniform axial displacement of generalised plane strain.
+
+Damage conditions
+^^^^^^^^^^^^^^^^^
+
+``Dirichlet`` with ``value`` fixes the phase field, :math:`d \in [0, 1]`, on a
+region, for example ``value: 1.0`` on a pre-existing crack.
+
+Material cards
+--------------
+
+.. warning::
+
+   The cards in ``z3st/materials`` hold representative values chosen for the
+   demonstration and verification cases. They are not qualified design data.
+   A card cites a source where it has one: ``mox_magni.yaml`` (Magni et al.,
+   through ``magni_mox_thermal.py``), ``15_15Ti.yaml``, and ``fuel_thermal.py``
+   (modified NFI correlation of FRAPCON-3). Most cards cite none. Supply your
+   own property data, with its source, for any design or safety work.
+
+A card is a YAML file of properties in SI units. It is referenced from
+``input.yaml`` by a path relative to the case directory, either into
+``z3st/materials`` or to a card in the case directory, as ``regression/pwr_rod_2D``
+does with ``fuel.yaml`` and ``clad.yaml``.
+
+Keys read by the loader (``Spine.load_materials`` and the models):
+
+.. list-table::
+   :header-rows: 1
+   :widths: 30 70
+
+   * - Key
+     - Meaning
+   * - ``E``, ``nu``
+     - Young's modulus (Pa) and Poisson's ratio. Needed for mechanics.
+   * - ``k``, ``cp``, ``rho``
+     - Conductivity (W/(m·K)), specific heat (J/(kg·K)), density (kg/m³).
+       ``rho`` is also required by mechanics (gravity body force) and read by burnup.
+   * - ``alpha``, ``T_ref``
+     - Thermal expansion (1/K) and its reference temperature (K).
+   * - ``T_initial``
+     - Initial temperature (K). Default ``T_ref``.
+   * - ``fissile``, ``heavy_metal_fraction``
+     - Heated by ``lhr``. Heavy-metal fraction for burnup, default 0.8815.
+   * - ``gamma_heating``, ``mu_gamma``, ``gamma_inner_radius``
+     - Gamma heating (W/m³), attenuation (1/m), reference radius (m).
+   * - ``Gc``, ``sigma_c``
+     - Fracture energy (J/m²) and strength (Pa). With ``damage.lc`` either one is
+       derived from the other.
+   * - ``constitutive``
+     - ``lame`` (default), ``hyperelastic``, ``plasticity`` or ``custom``.
+   * - ``yield_strength``
+     - Promotes ``lame`` to ``plasticity`` when ``models.plasticity`` is on.
+   * - ``hardening_modulus``
+     - Linear isotropic hardening modulus :math:`H` (Pa) of J2 plasticity:
+       yield stress ``yield_strength`` :math:`+ H p`. Required by the J2 model.
+   * - ``swelling``
+     - Constant volumetric swelling :math:`\Delta V/V`, added as the isotropic
+       eigenstrain :math:`(\Delta V/V)/3\,\boldsymbol I`.
+   * - ``initial_porosity``
+     - Initial porosity of the material (default 0), read by the porosity
+       model. With porosity on, the heat source is scaled by
+       :math:`(1 - p)/(1 - p_0)`.
+   * - ``thermal_conductivity_model``
+     - ``kato_porosity`` replaces ``k`` with the porosity-dependent Kato
+       correlation, with ``stoichiometry_deviation`` (default 0.025) and
+       ``helium_conductivity`` (default 0.69 W/(m·K)). Needs the porosity model.
+   * - ``p_c``, ``tau_c``
+     - Cohesive model only: critical hydrostatic stress and shear strength (Pa)
+       of the strength surface. ``tau_c`` is not used in 1D.
+   * - ``stress_function``
+     - Stress function for ``constitutive: custom``.
+   * - ``creep``, ``creep_A0``, ``creep_n``, ``creep_Q``, ``creep_irr_B``, ``fast_flux``
+     - Norton thermal creep (``creep: norton``) and optional irradiation creep.
+   * - ``cracking``, ``cracking_lhr0``, ``cracking_n0``, ``cracking_n_inf``, ``cracking_tau``
+     - Isotropic-softening pellet cracking (``cracking: isotropic``).
+   * - ``eigenstrain``, ``radial_profile``, ``axial_profile``
+     - Functions, see below.
+
+The models are described in :doc:`physics_models`.
+
+Properties as Python functions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``k``, ``E``, ``nu``, ``Gc``, ``eigenstrain``, ``radial_profile``,
+``axial_profile`` and ``stress_function`` accept, in place of a number, the
+dotted path of a Python function. ``Spine.resolve_function`` splits the path at its
+last dot, imports the module with ``importlib.import_module`` and takes the
+function from it. ``MechanicalModel`` resolves ``stress_function`` the same way
+when the stress is assembled. ``python3 -m z3st`` puts both the ``z3st`` package directory and
+the case directory on the import path, so a path can name
+
+- a module in ``z3st/materials``, as ``materials.<module>.<function>``;
+- a module in the case directory, as ``<module>.<function>``, which is how
+  ``verification/plasticity/crystal_single_grain`` loads
+  ``single_crystal_law.single_crystal_stress``.
+
+The card ``ceramic.yaml`` gives its conductivity as a function:
+
+.. literalinclude:: ../../z3st/materials/ceramic.yaml
+   :language: yaml
+
+``materials/ceramic.py`` returns a constant, which shows the mechanism with the
+simplest possible law:
+
+.. literalinclude:: ../../z3st/materials/ceramic.py
+   :language: python
+   :pyobject: k
+
+``materials/fuel_thermal.py`` returns the UO\ :sub:`2` conductivity as a UFL
+expression in the temperature, used by ``regression/pwr_rod_2D`` with
+``k: materials.fuel_thermal.k``:
+
+.. literalinclude:: ../../z3st/materials/fuel_thermal.py
+   :language: python
+   :pyobject: k
+
+The function receives the temperature field and returns a UFL expression, which
+enters the weak form and is evaluated at the current staggered iterate. The call
+signature depends on the property:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 40 35
+
+   * - Property
+     - Called as
+     - Returns
+   * - ``k``
+     - ``k(T)``, plus ``material=`` and ``model=`` if the function declares them
+     - UFL scalar
+   * - ``E``, ``nu``
+     - ``E(T)``
+     - UFL scalar. Requires the thermal model.
+   * - ``Gc``
+     - ``Gc(mesh)``
+     - UFL scalar in space
+   * - ``eigenstrain``
+     - ``f(T, material, model=, dim=)``
+     - UFL tensor of size ``dim``
+   * - ``radial_profile``, ``axial_profile``
+     - ``f(coords, burnup, material, model=)``
+     - NumPy array of shape factors
+   * - ``stress_function``
+     - ``f(u, T, material, model=)``
+     - UFL stress tensor
+
+To add a law, write the function in a module (in ``z3st/materials`` or in the case
+directory) and replace the number in the card by its dotted path, for example
+``k: materials.my_law.k``. The solver needs no change.
+
+Available cards
+^^^^^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+   :widths: 28 72
+
+   * - Card
+     - Content
+   * - ``uo2.yaml``
+     - UO\ :sub:`2`, constant properties, ``sigma_c`` for phase-field damage.
+   * - ``mox_magni.yaml``
+     - MA-MOX, ``fissile``, ``k`` from ``magni_mox_thermal.k`` with composition and
+       porosity keys.
    * - ``ceramic.yaml``
-     - Ceramic material properties
-   * - ``h2o.yaml``
-     - Water properties
+     - Generic ceramic, ``fissile``, ``k`` from ``ceramic.k``.
+   * - ``oxide.yaml``
+     - Oxide in micrometre-based units, ``k`` and ``Gc`` from ``oxide.py``.
+   * - ``zircaloy.yaml``
+     - Zircaloy-4 cladding, constant properties.
+   * - ``steel.yaml``
+     - Generic steel.
+   * - ``austenitic_steel.yaml``, ``martensitic_steel.yaml``, ``high_carbon_steel.yaml``
+     - Generic steel grades.
+   * - ``T91.yaml``, ``15_15Ti.yaml``
+     - T91 ferritic-martensitic steel and 15-15Ti austenitic steel.
+   * - ``vessel_steel.yaml``, ``vessel_steel_0.yaml``
+     - Vessel steel with and without gamma heating.
+   * - ``lead.yaml``, ``h2o.yaml``
+     - Lead and water.
+   * - ``plastic.yaml``
+     - HDPE.
 
-Using Materials in Simulations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Python modules in the same directory: ``ceramic.py``, ``oxide.py``,
+``fuel_thermal.py`` (UO\ :sub:`2` ``k(T)``), ``magni_mox_thermal.py`` (MA-MOX
+``k``), ``zircaloy_E.py`` (``E(T)``, a constant 99.3 GPa),
+``fuel_swelling.py`` and ``sciantix_swelling.py`` (eigenstrains),
+``fuel_profiles.py`` (radial and axial power profiles).
 
-To use a material in your simulation, reference it in ``input.yaml``:
-
-.. code-block:: yaml
-
-   materials:
-     steel: ../../materials/vessel_steel_0.yaml
-     water: ../../materials/h2o.yaml
-
-Multiple materials can be defined for multi-material simulations.
-
-Temperature-Dependent Properties
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-For temperature-dependent material properties, you can define a Python module instead of a YAML file (future enhancement), or use piecewise definitions.
-
-**Current approach** (constant properties):
-
-.. code-block:: yaml
-
-   k: 48.1  # Constant thermal conductivity
-
-**Future enhancement** (temperature-dependent):
-
-.. code-block:: python
-
-   # materials/steel_temperature_dependent.py
-   def thermal_conductivity(T):
-       """
-       Returns k(T) in W/m·K
-       """
-       return 50.0 - 0.01 * (T - 300.0)
-
-Creating Custom Materials
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To create a custom material:
-
-1. Copy an existing material file from ``z3st/materials/``
-2. Modify the properties for your material
-3. Save with a descriptive name (e.g., ``my_alloy.yaml``)
-4. Reference it in your ``input.yaml``
-
-**Example custom material**:
-
-.. code-block:: yaml
-
-   name: my_custom_alloy
-
-   # From experimental data or literature
-   E: 2.10e+11           # Young's modulus
-   nu: 0.33              # Poisson's ratio
-   k: 35.0               # Thermal conductivity
-   cp: 450.0             # Specific heat
-   alpha: 1.2e-5         # Thermal expansion
-   rho: 7850.0           # Density
-   T_ref: 293.15         # Reference temperature (20°C)
-
----
-
-Verification cases
-------------------
-
-The ``z3st/cases/`` directory contains a collection of verification and benchmark problems
-used to validate the numerical formulation and solver performance.
-
-Each case reproduces a reference simulation and compares the computed results
-with analytical or previously validated data.
-
-To run a verification case:
+Parallel runs
+-------------
 
 .. code-block:: bash
 
-   cd z3st/cases/verification/thermal/thin_slab_neumann_3D
-   ./Allrun
+   export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+   mpirun -n 4 python3 -m z3st > log_z3st.md
 
-Each verification folder contains:
-- Input and configuration files;
-- Reference output fields for comparison;
-- (Optional) post-processing or plotting scripts.
+Bind one thread per rank. The linear algebra is threaded and otherwise takes every
+core on every rank, so the ranks oversubscribe the machine. On a 6-core laptop the
+3D contact case ``verification/fuel/shrink_fit_disk_3d`` (102228 displacement
+degrees of freedom) reached a speed-up of 1.74 at 4 ranks with one thread per rank
+and no further gain at 6 ranks. With the threads left unbound, its 49131-DOF variant
+peaked at 1.35 on 4 ranks and fell to 1.13 on 6.
 
+What changes under MPI:
 
-Non-Regression tests
---------------------
+- Output: the VTU writer is serial. With ``output.format: vtu`` it prints a warning
+  and writes ``output/fields.xdmf`` and ``output/fields.h5`` instead.
+- Logging: only rank 0 writes to standard output, except ``[WARNING]`` and
+  ``[ERROR]`` lines, which every rank writes. Field ranges printed in the log
+  (``min``, ``max``, ``mean``) are those of the rank-0 partition.
+- Global quantities are reduced across ranks: the gap-surface temperature
+  averages, the gap width (the surface points are gathered from every rank), the contact gap, the Aitken products and the porosity
+  stability limit.
+- The porosity saturation cap acts on the cells owned by each rank, without
+  exchange between ranks.
+- ``input.yaml`` is re-read for hot reload on rank 0 and broadcast.
 
-To maintain numerical consistency across code updates, Z3ST provides an automated
-non-regression test suite.
-
-Run all tests with:
-
-.. code-block:: bash
-
-   cd z3st/cases
-   ./non-regression_local.sh
-
-This script executes verification tests, compares each new result with its reference,
-and logs the outcome to ``non-regression_summary.txt``.
-
-.. note::
-
-   The non-regression workflow ensures that modifications to Z3ST preserve
-   validated physics and solver consistency.
+Both test suites run every case on one rank, so neither detects a regression
+specific to parallel runs.

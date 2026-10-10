@@ -1,99 +1,114 @@
-# Case 19 — Single-edge notched tension test (SENT, plane strain)
+# Single-edge notched tension test (SENT, plane strain)
 
-Reproduces the **Ambati et al. 2015** (Comput Mech 55:383–405) §4.1 SENT-tension
-benchmark using the AT2 hybrid phase-field formulation (their Eq. 27). Companion
-to `benchmarks/sen_shear/` (same plate and notch, different BC).
+Test case based on the SENT-tension benchmark of Ambati et al. 2015
+(Comput Mech 55:383-405, §4.1), using the AT2 phase-field formulation.
+Companion to `benchmarks/damage/sen_shear/` (same plate and notch, different load).
 
-## Geometry & loading
+Excluded from the local suite (`suite_exclude.txt`: 701 steps). Run it by hand.
+
+## Geometry and loading
 
 - 1 mm × 1 mm square plate, 2D plane strain.
 - Horizontal notch of length 0.5 mm from the left edge to the centre, at
-  `y = Ly/2`. Modelled as a zero-width slit, with `D = 1` Dirichlet along the
-  notch to anchor the crack from step 0.
-- Bottom edge fully clamped: `u = (0, 0)`.
+  `y = Ly/2`. Modelled as a zero-width slit, with a `D = 1` Dirichlet condition
+  on the notch (`region: crack`).
+- Bottom edge clamped: `u = (0, 0)`.
 - Top edge displaced vertically: `u = (0, u_y)`. Left and right edges are free.
-- `u_y` ramps from 0 to 7 µm in steps of 0.01 µm (`bc_generator.ipynb`
-  defaults). Ambati's hybrid peak (Fig. 9) lands at `u_y ≈ 5.6 µm`; the
-  brittle drop is essentially vertical at that displacement.
+- `u_y` ramps from 0 to 7 µm in steps of 0.01 µm, 701 steps (`n_steps: 701`).
+  The list is written by `bc_generator.ipynb`.
 
-## Material (`../../../materials/high_carbon_steel.yaml`)
+## Material (`z3st/materials/high_carbon_steel.yaml`)
 
-| Parameter | Value | Matches Ambati §4.1 |
+| Parameter | Value | Ambati §4.1 |
 |---|---|---|
-| `E`  | 210 GPa | ✓ (λ = 121.15 GPa, μ = 80.77 GPa) |
-| `nu` | 0.3 | ✓ |
-| `Gc` | 2700 J/m² | ✓ (2.7×10⁻³ kN/mm) |
+| `E`  | 210 GPa | same (λ = 121.15 GPa, μ = 80.77 GPa) |
+| `nu` | 0.3 | same |
+| `Gc` | 2700 J/m² | same (2.7×10⁻³ kN/mm) |
 
 AT2 analytical threshold (derived in `spine.py` at load time):
 `σ_c = sqrt(27·Gc·E / (256·ℓ_c)) ≈ 3.87 GPa` at `ℓ_c = 4 µm`.
 
-## Mesh
+## Mesh (`mesh.geo`)
 
 - 2D triangulation, graded:
-  - `h_fine = ℓ_c / 5 = 0.8 µm` at the notch tip and mouth (Points 5 and 6).
+  - `h_fine = ℓ_c / 7 ≈ 0.57 µm` at the notch tip and mouth (Points 5 and 6).
   - `h_coarse = Lx / 75 ≈ 13.3 µm` at the corners.
   - Gmsh interpolates linearly between the per-point sizes.
-- The fine zone at the notch tip is required to resolve the Mode-I singular
-  stress concentration that initiates the straight crack.
-- The coarse mesh at the corners (h ≈ 2·ℓc) smears the BC singularity at
-  the top/bottom-edge-meets-side-edge corners below the damage-growth rate.
 
-## Phase-field formulation
+## Phase-field formulation (`input.yaml`)
 
-- **AT2** crack-density functional.
-- **Amor split** for `ψ⁺ / ψ⁻` decomposition (under tension, the volumetric
-  and deviatoric parts both feed `ψ⁺` — the correct Mode-I driver).
-- **Hybrid constraint** (Ambati Eq. 27): in cells where `ψ⁻ > ψ⁺`, the
-  contribution of `ψ⁺` to `H` is zeroed.
+- AT2 crack-density functional, `lc = 4 µm`.
+- No `split` key, so AT2 uses the default Miehe spectral split
+  (`damage_model.py`).
+- No `hybrid_constraint` key, so the default `true` applies.
+- With these defaults the case runs the Ambati hybrid formulation: the whole
+  stress is degraded and the positive part of the Miehe split drives the crack.
 
-## Solver
+## Solver (`input.yaml`)
 
-- Staggered scheme with adaptive relaxation off, `relax_u = 1.0`, `relax_D = 0.8`.
-- Mechanical: linear, `direct_mumps` (robust against the `g(D) → K = 10⁻⁶`
-  heterogeneity once cracks open).
-- Damage: linear, `iterative_hypre` (AT2's mild `(H + 1)` mass coefficient).
+- Staggered scheme, `max_iters: 500`, `relax_u: 1.0`, `relax_D: 0.8`,
+  adaptive relaxation off.
+- Mechanical: linear, `direct_mumps`, `stag_tol: 1e-5`.
+- Damage: linear, `iterative_hypre`, `stag_tol: 1e-5`.
+- No time adaptivity: a step that reaches `max_iters` is accepted with its last iterate.
 
-## Expected results (Ambati Fig. 8 / Fig. 9, p.396)
+## Convergence of the stored run (`log_z3st.md`)
 
-- **Damage field**: straight horizontal Mode-I crack from the notch tip
-  `(0.5 mm, 0.5 mm)` to the right edge `(1.0 mm, 0.5 mm)`. Ambati Fig. 8c at
-  u = 6 µm shows full ligament traversal.
-- **Force-displacement** (Fig. 9): linear up to `u_y ≈ 5.5 µm`, peak at
-  `u_y ≈ 5.6 µm` and ~0.7 kN, near-vertical brittle drop as the crack
-  traverses the ligament.
-- **Energy balance**: `E_frac` starts at `Gc · Dn = 1.35 J` (regularised
-  notch baseline) and ramps to `Gc · Lx = 2.7 J` once the crack reaches the
-  right edge (full ligament traversal).
+- 698 of 701 steps converge. Steps 539, 573 and 650 reach the 500-iteration cap
+  and are accepted. They coincide with the largest jumps of fracture energy.
+- 20 650 staggered iterations in total: median 7 per step, 90th percentile 80,
+  maximum 399. Thirty steps take more than 200 iterations, all in the crack-growth phase.
+- Wall time 9 h 09 min.
+- In the three capped steps the residuals fall for tens of iterations, then rise
+  to a plateau. The step after (651) converges in 167 iterations with
+  falling residuals.
+
+Missing capabilities related to this behaviour are listed in `z3st/ai/CONTEXT.md` §10.
+
+## Expected results
+
+Ambati Fig. 8 and Fig. 9 (p.396): a straight horizontal Mode-I crack from the notch
+tip `(0.5 mm, 0.5 mm)` to the right edge `(1.0 mm, 0.5 mm)`. Force-displacement
+linear up to `u_y ≈ 5.5 µm`, peak at `u_y ≈ 5.6 µm` and about 0.7 kN, then a
+near-vertical drop.
+
+The energy plot draws two references: notch baseline `Gc · Dn = 1.35 J` and full
+ligament `Gc · Lx = 2.7 J`.
+
+Stored run (`energies.txt`, gold):
+- `E_frac`: 1.357 J at step 0, 2.521 J at step 700.
+- `E_el` at step 700: 1.943 J.
+- `D_max = 1.0`, `sigma_vm_max_MPa = 3212`.
 
 ## Files
 
-- `mesh.geo`, `geometry.yaml`         — geometry and label map.
-- `input.yaml`                        — physics, regime, solver options.
-- `boundary_conditions.yaml`          — clamped bottom, vertically displaced top,
-                                         D=1 pre-crack.
-- `bc_generator.ipynb`                — notebook to regenerate the displacement
-                                         list. Sets `u0`, `u1`, `delta_u1`.
-- `non-regression.py`                 — quick diagnostic on the last VTU.
-- `Allrun`, `Allclean`                — case-14-style drivers.
+- `mesh.geo`, `geometry.yaml`: geometry and label map.
+- `input.yaml`: physics, regime, solver options.
+- `boundary_conditions.yaml`: clamped bottom, vertically displaced top, `D = 1` on the notch.
+- `bc_generator.ipynb`: notebook that writes the displacement list. Sets `u0`, `u1`, `delta_u1`.
+- `non-regression.py`: field plots of the last VTU, energy balance, gold checks.
+- `plot_force_displacement.py`: force-displacement plot.
+- `Allrun`, `Allclean`.
 
-## Diagnostic outputs (in `output/`)
+## Outputs
 
-- `damage_field.png`                  — 2D map of D at the final step
-                                         (Ambati Fig. 8c reproducer); notch
-                                         slit overlaid in cyan.
-- `stress_yy_field.png`               — σ_yy (Mode-I tensile driver) at final.
-- `stress_xx_field.png`               — σ_xx (transverse; Poisson response).
-- `stress_vm_field.png`               — Von Mises at final.
-- `crack_driving_force_field.png`     — H = (2·ℓc/Gc)·ψ⁺ at final.
-- `energy_balance.png`                — E_el, E_frac, E_tot vs step with the
-                                         notch-baseline (Gc·Dn = 1.35 J) and
-                                         full-ligament (Gc·Lx = 2.7 J) refs.
+Written by `non-regression.py` in `output/`:
+- `damage_field.png`: D at the last step.
+- `stress_yy_field.png`: σ_yy at the last step.
+- `stress_xx_field.png`: σ_xx at the last step.
+- `stress_vm_field.png`: von Mises stress at the last step.
+- `crack_driving_force_field.png`: H at the last step (written only when the VTU carries H).
+- `energy_balance.png`: E_el, E_frac, E_tot against step with the two references above.
+- `non-regression.json`: tracked values `D_max`, `sigma_vm_max_MPa`, `E_el_final`,
+  `E_frac_final`, `E_tot_final`.
+
+Written by `plot_force_displacement.py`: `output/force_displacement.png`.
 
 ## Running
 
 ```bash
-# regenerate BC list if needed (open bc_generator.ipynb and run all cells,
-# then update `n_steps` in input.yaml to match the printed count)
+# to regenerate the BC list: run all cells of bc_generator.ipynb,
+# then set n_steps in input.yaml to the printed count
 ./Allclean
 ./Allrun
 ```

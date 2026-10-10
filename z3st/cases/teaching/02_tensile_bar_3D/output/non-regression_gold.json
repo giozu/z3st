@@ -1,0 +1,70 @@
+{
+    "results": {
+        "sigma_zz": {
+            "numerical": 190985899.99999452,
+            "reference": 190985900.0,
+            "abs_error": 5.4836273193359375e-06,
+            "rel_error": 2.8712210269637376e-14,
+            "status": "PASS"
+        },
+        "von_mises": {
+            "numerical": 190985900.00000903,
+            "reference": 190985900.0,
+            "abs_error": 9.03010368347168e-06,
+            "rel_error": 4.7281520172283296e-14,
+            "status": "PASS"
+        },
+        "tresca": {
+            "numerical": 190985900.00001675,
+            "reference": 190985900.0,
+            "abs_error": 1.6748905181884766e-05,
+            "rel_error": 8.769707701921852e-14,
+            "status": "PASS"
+        },
+        "u_z_top": {
+            "numerical": 4.774647500000131e-05,
+            "reference": 4.7746475000000006e-05,
+            "abs_error": 1.3010426069826053e-18,
+            "rel_error": 2.724897716496569e-14,
+            "status": "PASS"
+        },
+        "u_r_rim": {
+            "numerical": -1.4323942500000357e-06,
+            "reference": -1.4323942500000001e-06,
+            "abs_error": 3.5575383784680614e-20,
+            "rel_error": 2.4836307311817686e-14,
+            "status": "PASS"
+        },
+        "tau_max": {
+            "numerical": 95492950.00000264,
+            "reference": 95492950.0,
+            "abs_error": 2.637505531311035e-06,
+            "rel_error": 2.7619897922422913e-14,
+            "status": "PASS"
+        },
+        "eps_zz": {
+            "numerical": 0.0009549295000000196,
+            "reference": 0.0009549295,
+            "abs_error": 1.951563910473908e-17,
+            "rel_error": 2.0436732873724268e-14,
+            "status": "PASS"
+        },
+        "eps_xx": {
+            "numerical": -0.00028647885000001824,
+            "reference": -0.00028647885,
+            "abs_error": 1.8214596497756474e-17,
+            "rel_error": 6.358094671825328e-14,
+            "status": "PASS"
+        },
+        "gamma_45": {
+            "numerical": 0.001241408350000038,
+            "reference": 0.00124140835,
+            "abs_error": 3.7947076036992655e-17,
+            "rel_error": 3.056776284531408e-14,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 1e-06,
+    "summary": "PASS",
+    "regression": "PASS"
+}

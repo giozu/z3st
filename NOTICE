@@ -35,3 +35,43 @@ the terms of that license.
 
 If you use Z3ST in published research, please cite it (see CITATION.cff). This
 is a request following scholarly practice, not a condition of the license.
+-------------------------------------------------------------------------
+
+THIRD-PARTY COMPONENTS
+
+z3st/models/cohesive_model.py adapts the variational form (elastic energy
+density, strength potential and their regularizations) of the reference
+implementation accompanying:
+
+    F. Vicentini, J. Heinzmann, P. Carrara, L. De Lorenzis,
+    "Variational phase-field modeling of cohesive fracture with flexibly
+    tunable strength surface", Journal of the Mechanics and Physics of
+    Solids 207 (2026) 106424. doi:10.1016/j.jmps.2025.106424
+
+    https://github.com/jonas-heinzmann/phase_field_cohesive_fracture
+
+That code is distributed under the MIT License, reproduced below. Its terms
+apply to the adapted portions; the remainder of Z3ST is Apache-2.0.
+
+    Copyright (C) 2025 ETH Zurich
+    Creators: Jonas Heinzmann, Francesco Vicentini, Pietro Carrara,
+              Laura De Lorenzis
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -2,12 +2,18 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 
 MODEL_NAMES = ("thermal", "mechanical", "damage", "cluster",
-               "plasticity", "contact", "porosity")
+               "plasticity", "contact", "porosity", "cohesive")
+
+# Constitutive routes that cannot share a mechanical solve with the cohesive
+# phase-field model: it owns its own mixed (u, eigenstrain) unknown and its own
+# variational step, so there is no displacement-only solve left for them to
+# augment. "damage" additionally competes for the same phase field.
+_COHESIVE_CONFLICTS = ("damage", "plasticity")
 
 
 class Config:
@@ -16,10 +22,11 @@ class Config:
 
     Parses the user input YAML and initializes the global configuration used by
     the other modules. Loads:
-      * active physical models (thermal, mechanical, gap conductance)
-      * solver settings (linear/non-linear, tolerances, coupling scheme)
-      * paths for geometry, mesh, and boundary conditions
-      * number of time steps
+
+    * active physical models (thermal, mechanical, gap conductance)
+    * solver settings (linear/non-linear, tolerances, coupling scheme)
+    * paths for geometry, mesh, and boundary conditions
+    * number of time steps
     """
 
     def __init__(self, input_file):
@@ -39,6 +46,20 @@ class Config:
         # A switch may be a bool or a configuration block; a non-empty block is on.
         models = self.input_file.get("models", {})
         self.on = {name: bool(models.get(name, False)) for name in MODEL_NAMES}
+
+        if self.on["cohesive"]:
+            if not self.on["mechanical"]:
+                raise ValueError(
+                    "models.cohesive requires models.mechanical: true "
+                    "(the cohesive model is a mechanical constitutive route)."
+                )
+            clash = [n for n in _COHESIVE_CONFLICTS if self.on[n]]
+            if clash:
+                raise ValueError(
+                    f"models.cohesive cannot be combined with {clash}. "
+                    f"The cohesive phase-field model replaces the displacement-only "
+                    f"mechanical step and owns the phase field itself."
+                )
 
         # --. Fission-gas behaviour via SCIANTIX coupling (default OFF) --..
         # ``models.fission_gas`` may be a bool or a block:
@@ -91,6 +112,11 @@ class Config:
             raise ValueError(
                 f"Invalid regime '{self.regime}'. Must be one of {sorted(valid_regimes)}."
             )
+        # The porosity forms carry no
+        # 2*pi*r weight, so in r-z they would drop the v_r*p/r term of the
+        # divergence. Weight both the SUPG and the DG forms to lift this.
+        if self.on.get("porosity", False) and self.regime == "axisymmetric":
+            raise ValueError("Porosity migration is not implemented in the axisymmetric regime.")
 
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")

@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 """Shared skeleton for the per-case ``non-regression.py`` scripts.
@@ -13,7 +13,7 @@ keeps only what is specific to it: which fields it reads, its analytic
 references, its plots.
 
 Metrics come in three shapes, and the distinction matters because pass/fail
-reads ``rel_error`` only:
+reads ``rel_error`` only::
 
     metric(value, reference)   a real comparison: abs = |v-r|, rel = |v-r|/r
     error_metric(value, rel)   the value is itself an error (an L2 norm, a

@@ -4,7 +4,7 @@
 
 Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 Author: Giovanni Zullo
-Version: 0.3.2 (2026)
+Version: 0.4.1 (2026)
 
 ***
 
@@ -72,6 +72,7 @@ Unique tags found in facet data: [1 2 3 4 5 6]
       plasticity → OFF
       contact    → OFF
       porosity   → OFF
+      cohesive   → OFF
       fission_gas → OFF
   → Gap conductance     : None (value = 0.0)
 
@@ -189,7 +190,7 @@ Convergence check
 
 #### Iteration 3/100
 
-  ||Δu||/||u|| = 3.960e-01
+  ||Δu||/||u|| = 3.600e-01
   [adaptive] relax_u=0.48
 
 Convergence check
@@ -197,7 +198,7 @@ Convergence check
 
 #### Iteration 4/100
 
-  ||Δu||/||u|| = 2.439e-01
+  ||Δu||/||u|| = 2.016e-01
   [adaptive] relax_u=0.53
 
 Convergence check
@@ -205,7 +206,7 @@ Convergence check
 
 #### Iteration 5/100
 
-  ||Δu||/||u|| = 1.385e-01
+  ||Δu||/||u|| = 1.040e-01
   [adaptive] relax_u=0.59
 
 Convergence check
@@ -213,7 +214,7 @@ Convergence check
 
 #### Iteration 6/100
 
-  ||Δu||/||u|| = 7.122e-02
+  ||Δu||/||u|| = 4.864e-02
   [adaptive] relax_u=0.64
 
 Convergence check
@@ -221,7 +222,7 @@ Convergence check
 
 #### Iteration 7/100
 
-  ||Δu||/||u|| = 3.246e-02
+  ||Δu||/||u|| = 2.016e-02
   [adaptive] relax_u=0.71
 
 Convergence check
@@ -229,7 +230,7 @@ Convergence check
 
 #### Iteration 8/100
 
-  ||Δu||/||u|| = 1.270e-02
+  ||Δu||/||u|| = 7.171e-03
   [adaptive] relax_u=0.78
 
 Convergence check
@@ -237,7 +238,7 @@ Convergence check
 
 #### Iteration 9/100
 
-  ||Δu||/||u|| = 4.072e-03
+  ||Δu||/||u|| = 2.090e-03
   [adaptive] relax_u=0.86
 
 Convergence check
@@ -245,7 +246,7 @@ Convergence check
 
 #### Iteration 10/100
 
-  ||Δu||/||u|| = 9.877e-04
+  ||Δu||/||u|| = 4.608e-04
   [adaptive] relax_u=0.94
 
 Convergence check
@@ -253,7 +254,7 @@ Convergence check
 
 #### Iteration 11/100
 
-  ||Δu||/||u|| = 1.549e-04
+  ||Δu||/||u|| = 6.569e-05
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -261,7 +262,7 @@ Convergence check
 
 #### Iteration 12/100
 
-  ||Δu||/||u|| = 9.331e-06
+  ||Δu||/||u|| = 3.733e-06
   [adaptive] relax_u=1.00
 
 Convergence check
@@ -277,5 +278,5 @@ Convergence check
 **[SUCCESS]** Staggered solver converged in 13 iterations.
 Computing symbolic result fields (strain, stress, ...)
 
-Simulation completed in 6.23 s
+Simulation completed in 2.24 s
 Total time steps solved: 1

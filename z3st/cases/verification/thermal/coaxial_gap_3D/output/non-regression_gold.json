@@ -1,20 +1,21 @@
 {
     "results": {
         "L2_error_T": {
-            "numerical": 0.002877060186067355,
+            "numerical": 0.001944984751444709,
             "reference": 0.0,
-            "abs_error": 0.002877060186067355,
-            "rel_error": 8.214726731237564e-06,
+            "abs_error": 0.001944984751444709,
+            "rel_error": 5.553418140821698e-06,
             "status": "PASS"
         },
         "Linf_error_T": {
-            "numerical": 0.004336321569155643,
+            "numerical": 0.003152654836583224,
             "reference": 0.0,
-            "abs_error": 0.004336321569155643,
-            "rel_error": 1.2381283117360182e-05,
+            "abs_error": 0.003152654836583224,
+            "rel_error": 9.00161841794689e-06,
             "status": "PASS"
         }
     },
     "tolerance": 0.05,
-    "summary": "PASS"
+    "summary": "PASS",
+    "regression": "PASS"
 }

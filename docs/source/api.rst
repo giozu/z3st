@@ -1,8 +1,9 @@
 API Reference
 =============
 
-This section provides a detailed reference of the **Z3ST** core modules,
-including solver setup, configuration management, and mesh handling.
+This section documents the Z3ST core modules,
+including the solver, the physics models, the conductivity models, the
+SCIANTIX binding, output, case utilities and mesh handling.
 
 Core Modules
 ------------
@@ -50,6 +51,11 @@ Physics Models
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: z3st.models.cohesive_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. automodule:: z3st.models.gap_model
    :members:
    :undoc-members:
@@ -70,10 +76,64 @@ Physics Models
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: z3st.models.porosity_migration_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.cracking_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Machine-learned and data-driven conductivity
+--------------------------------------------
+
+.. automodule:: z3st.models.nn_conductivity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.gpr_conductivity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.models.magni_conductivity
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+External-code coupling
+----------------------
+
+.. automodule:: z3st.coupling.sciantix.sciantix_binding
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Output
 ------
 
 .. automodule:: z3st.utils.writer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Case utilities
+--------------
+
+.. automodule:: z3st.utils.utils_load
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.utils.non_regression
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. automodule:: z3st.utils.plot_convergence
    :members:
    :undoc-members:
    :show-inheritance:

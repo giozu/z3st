@@ -82,11 +82,11 @@ plt.figure(figsize=(10, 7))
 
 # Stress
 ax1 = plt.gca()
-ax1.plot(x_s, sigma_xx * Pa_to_MPa, "b.", label=r"Num. $\sigma_{xx}$", alpha=0.5)
-ax1.plot(x_s, sigma_yy * Pa_to_MPa, "g.", label=r"Num. $\sigma_{yy}$", alpha=0.5)
-ax1.plot(x_s, sigma_zz * Pa_to_MPa, "c.", label=r"Num. $\sigma_{zz}$", alpha=0.5)
+ax1.plot(x_s, sigma_xx * Pa_to_MPa, ".", color="#0072B2", label=r"Num. $\sigma_{xx}$", alpha=0.5)
+ax1.plot(x_s, sigma_yy * Pa_to_MPa, ".", color="#009E73", label=r"Num. $\sigma_{yy}$", alpha=0.5)
+ax1.plot(x_s, sigma_zz * Pa_to_MPa, ".", color="#56B4E9", label=r"Num. $\sigma_{zz}$", alpha=0.5)
 ax1.plot(
-    x_s, sigma_th_ref * Pa_to_MPa, "m--", label=r"Ana. $\sigma_{th}$", linewidth=2.0, alpha=0.7
+    x_s, sigma_th_ref * Pa_to_MPa, "--", color="#CC79A7", label=r"Ana. $\sigma_{th}$", linewidth=2.0, alpha=0.7
 )
 
 ax1.set_xlabel("x (m)", fontsize=12)

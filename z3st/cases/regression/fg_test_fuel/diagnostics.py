@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 """
 Diagnostics for regression/fg_test_fuel.
@@ -58,10 +58,9 @@ def per_step(problem, step, t):
     bu_fn = getattr(problem, "burnup", None)
     if bu_fn is not None:
         bu = np.asarray(bu_fn.x.array)[:_owned(bu_fn)]
-        pos = bu > 0
-        s = comm.allreduce(float(bu[pos].sum()), op=MPI.SUM)
-        c = comm.allreduce(int(pos.sum()), op=MPI.SUM)
-        bu_avg = s / c if c > 0 else 0.0
+        # Weighted FE mean (2πr) over the fissile material. Collective.
+        fuel = next(n for n, m in problem.materials.items() if m.get("fissile", False))
+        bu_avg = problem.material_mean(bu_fn, fuel)
         bu_max = comm.allreduce(float(bu.max()) if bu.size else 0.0, op=MPI.MAX)
 
     T_fn = getattr(problem, "T", None)

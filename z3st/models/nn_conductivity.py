@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import os
@@ -109,13 +109,21 @@ def make_external_operator(nn, T, quadrature_degree=2, scheme="default",
     placed in a form and differentiated (ufl.derivative spawns the dk/dT
     operator). Requires the optional `dolfinx-external-operator` package.
 
-    nn: a conductivity model (NNConductivity, or any callable exposing the same
+    Parameters
+    ----------
+    nn
+        A conductivity model (NNConductivity, or any callable exposing the same
         __call__/value_and_grad interface).
-    T:  the temperature Function the operator wraps — must be the same Function
-        the Newton solver iterates, so updates propagate.
-    aux_operands / aux_names: optional extra operands (Pu fraction, burnup, ...)
-        passed to the model by keyword. They are frozen in the Newton tangent —
-        only T is differentiated — so they must not themselves depend on T.
+    T
+        The temperature Function the operator wraps. It must be the same
+        Function the Newton solver iterates, so updates propagate.
+    aux_operands, aux_names
+        Optional extra operands (Pu fraction, burnup, ...) passed to the model
+        by keyword. They are frozen in the Newton tangent, where only T is
+        differentiated, so they must not themselves depend on T.
+
+    Notes
+    -----
     The integration measure in the residual must use the same quadrature_degree
     and scheme as passed here, or assembly fails on a quadrature mismatch.
     """

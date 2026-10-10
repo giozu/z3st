@@ -18,6 +18,9 @@ import sys
 from glob import glob
 
 import matplotlib.pyplot as plt
+
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
 import numpy as np
 import pyvista as pv
 import yaml
@@ -127,7 +130,7 @@ plt.figure(figsize=(7, 5))
 plt.plot(u_mm, F_kN, "C0-o", markersize=3, label="Numerical")
 if F_kN.size > 0:
     peak = int(np.nanargmax(F_kN))
-    plt.plot(u_mm[peak], F_kN[peak], "r*", markersize=12,
+    plt.plot(u_mm[peak], F_kN[peak], "*", color="#D55E00", markersize=12,
              label=f"Peak: F = {F_kN[peak]:.3f} kN at u = {u_mm[peak]:.4f} mm")
 plt.xlabel(r"Top-edge displacement $u_x$ (mm)")
 plt.ylabel(r"Force $F_x$ (kN, per 1 mm depth)")

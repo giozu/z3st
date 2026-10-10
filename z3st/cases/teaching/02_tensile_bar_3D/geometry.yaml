@@ -1,0 +1,11 @@
+name: tensile_bar_3d
+geometry_type: cyl
+
+Ro: 0.005   # bar radius (m), d = 10 mm
+Lz: 0.050   # gauge length (m)
+
+labels:
+  bottom: 1
+  top: 2
+  outer: 3
+  steel: 4

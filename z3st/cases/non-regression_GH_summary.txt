@@ -6,7 +6,6 @@ Case: verification/thermal/thick_slab_adiabatic_3D -> OK
 Case: verification/thermal/box_heated -> OK
 Case: verification/mechanics/full_cylinder -> OK
 Case: regression/coaxial_gap_3D -> OK
-Case: regression/box_crack_2D -> OK
 Case: verification/plasticity/j2_hardening_2D -> OK
 Case: verification/plasticity/crystal_single_grain -> OK
 Case: verification/fuel/coaxial_contact -> OK

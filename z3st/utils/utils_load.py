@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 from datetime import datetime
@@ -37,6 +37,7 @@ def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_his
     proportionally in each time segment.
 
     Parameters:
+
     - t_points (list of float): Time values in seconds.
     - lhr_points (list of float): Corresponding LHR values in W/m.
     - n_steps (int or list of int): If an int, total number of output points,
@@ -48,6 +49,7 @@ def generate_power_history(t_points, lhr_points, n_steps=20, filename="power_his
     - filename (str): Output filename (TSV format).
 
     Returns:
+
     - times (np.ndarray): Interpolated time points.
     - lhrs (np.ndarray): Interpolated LHR values.
     - n_actual (int): Actual number of steps generated.

@@ -1,0 +1,12 @@
+mechanical:
+  plate:
+  # Symmetry planes of the quarter plate. The hole and the top edge are free.
+  - type: Clamp_x
+    region: xmin
+
+  - type: Clamp_y
+    region: ymin
+
+  - type: Neumann
+    region: xmax
+    traction: 1.0e+8   # remote tension along x (Pa) = 100 MPa

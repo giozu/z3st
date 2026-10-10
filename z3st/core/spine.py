@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import importlib
@@ -25,6 +25,7 @@ from z3st.models.contact_model import ContactModel
 from z3st.models.cracking_model import CrackingModel
 from z3st.models.creep_model import CreepModel
 from z3st.models.damage_model import DamageModel
+from z3st.models.cohesive_model import CohesiveModel
 from z3st.models.gap_model import GapModel
 from z3st.models.mechanical_model import MechanicalModel
 from z3st.models.thermal_model import ThermalModel
@@ -34,7 +35,7 @@ from z3st.models.porosity_migration_model import PorosityMigrationModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel, PorosityMigrationModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, CohesiveModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel, PorosityMigrationModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -75,6 +76,8 @@ class Spine(
             ContactModel.__init__(self)
         if self.on.get("damage", False):
             DamageModel.__init__(self)
+        if self.on.get("cohesive", False):
+            CohesiveModel.__init__(self)
         if self.on.get("cluster", False):
             ClusterDynamicsModel.__init__(self)
         if self.on.get("plasticity", False):
@@ -214,6 +217,21 @@ class Spine(
             else:
                 print(f"  → Gc not defined for {name}")
 
+            # Cohesive fracture prescribes the strength surface directly, so
+            # p_c/tau_c are read from the card and never derived from lc.
+            if self.on.get("cohesive", False) and "p_c" in mat:
+                if "_Gc_func" in mat:
+                    raise ValueError(
+                        f"Material '{name}': the cohesive model needs a numeric Gc "
+                        f"(the strain-hardening check ell <= ell_ch/4 is evaluated "
+                        f"on scalars); a symbolic Gc is not supported."
+                    )
+                for key in ("Gc", "p_c", "tau_c"):
+                    if key in mat:
+                        mat[key] = float(mat[key])
+                print(f"  → cohesive strength: p_c = {mat['p_c']:.3e} Pa"
+                      + (f", tau_c = {mat['tau_c']:.3e} Pa" if "tau_c" in mat else ""))
+
             dmg_type = getattr(self, "dmg_cfg", {}).get("type")
 
             if lc:
@@ -261,6 +279,19 @@ class Spine(
                 mat["constitutive_mode"] = "plasticity"
                 constitutive_mode = "plasticity"
                 print(f"  → constitutive model promoted to: plasticity (yield_strength present)")
+
+            # Plasticity and damage are not supported together. The J2 stress is
+            # degraded by g(d), but the plastic work does not enter the crack
+            # driving force psi+, and the return map does not subtract the
+            # eigenstrain. The combination therefore runs without being a
+            # ductile-fracture model, which is worse than refusing it. Mirrors
+            # the creep guard below.
+            if constitutive_mode == "plasticity" and self.on.get("damage", False):
+                raise ValueError(
+                    f"Material '{name}': plasticity cannot be combined with damage. "
+                    f"The plastic work does not drive the phase field, so the "
+                    f"combination is not a ductile-fracture model. Switch one off."
+                )
 
             # Material inelastic eigenstrain
             # A material card may expose an ``eigenstrain`` callable "module.func"
@@ -325,13 +356,24 @@ class Spine(
                         f"Material '{name}': creep is only supported with the "
                         f"'lame' constitutive route (got '{constitutive_mode}')."
                     )
-                if self.on.get("damage", False) or self.on.get("plasticity", False):
+                if (self.on.get("damage", False) or self.on.get("plasticity", False)
+                        or self.on.get("cohesive", False)):
                     raise ValueError(
-                        "Creep cannot yet be combined with damage or plasticity "
-                        "in the same run."
+                        "Creep cannot yet be combined with damage, plasticity or "
+                        "cohesive fracture in the same run."
                     )
                 print(f"  → creep: Norton, A0 = {mat['creep_A0']:.3e} Pa^-n/s, "
                       f"n = {mat['creep_n']:.2f}, Q = {mat['creep_Q']:.3e} J/mol")
+
+            # Without T_ref the thermal eigenstrain alpha*(T - T_ref) is dropped
+            # silently (MechanicalModel.eigenstrain), and the initial
+            # temperature falls back to T_ref when T_initial is absent.
+            if "alpha" in mat and "T_ref" not in mat:
+                raise ValueError(f"Material '{name}': 'alpha' requires 'T_ref'.")
+            if self.on.get("thermal", False) and "T_initial" not in mat and "T_ref" not in mat:
+                raise ValueError(
+                    f"Material '{name}': the thermal model needs 'T_initial' or 'T_ref'."
+                )
 
             mat["__label__"] = name
             self.materials[name] = mat
@@ -355,8 +397,14 @@ class Spine(
             self.boundary_conditions = yaml.safe_load(f)
 
         if self.on.get("thermal", False): self.set_thermal_boundary_conditions(self.V_t)
-        if self.on.get("mechanical", False): self.set_mechanical_boundary_conditions(self.V_m)
-        if self.on.get("damage", False): self.set_damage_boundary_conditions(self.V_d)
+        # Under the cohesive route the displacement lives in the first block of
+        # the mixed space, so its BCs must be built on that subspace.
+        if self.on.get("mechanical", False):
+            self.set_mechanical_boundary_conditions(
+                self.W.sub(0) if self.on.get("cohesive", False) else self.V_m
+            )
+        if self.on.get("damage", False) or self.on.get("cohesive", False):
+            self.set_damage_boundary_conditions(self.V_d)
 
     def initialize_fields(self):
         print(f"[spine.initialize_fields]")
@@ -403,6 +451,13 @@ class Spine(
                 print(f"    Set {len(dofs)} DOFs to {T_init:.2f} K")
 
             self.T.x.scatter_forward()
+            # Staggered temperature iterate T^k, persistent across steps. Symbolic
+            # k(T), E(T), nu(T) below are built on it, so the thermal solve is a
+            # Picard iteration within the step and mechanics sees the properties
+            # at the current temperature. self.T stays T^n (backward Euler).
+            # Outside the staggered loop the two hold the same values.
+            self.T_iter = self.T.copy()
+            self.T_iter.name = "Temperature_iterate"
             T_vals = self.T.x.array
             print(
                 f"  Initial T: min={T_vals.min():.2f} K, max={T_vals.max():.2f} K, mean={T_vals.mean():.2f} K"
@@ -424,8 +479,39 @@ class Spine(
             print("\nInitializing the damage field...")
             self.D = dolfinx.fem.Function(self.V_d, name="Damage")
             self.D.x.array[:] = 0.0  # undamaged initial state
-            self.H = dolfinx.fem.Function(self.Q, name="CrackDrivingForce")
+            # History space: one value per cell (DG0, default), or one per
+            # quadrature point of a degree-2 rule (2 x 2 Gauss points on
+            # quadrilaterals, 3 on triangles), as in fully integrated FE codes.
+            history = str(self.dmg_cfg.get("history", "cell")).lower()
+            if history == "quadrature":
+                import basix.ufl
+                self.H_qdeg = 2
+                el_H = basix.ufl.quadrature_element(
+                    self.mesh.topology.cell_name(), value_shape=(), degree=self.H_qdeg)
+                self.Q_H = dolfinx.fem.functionspace(self.mesh, el_H)
+            elif history == "cell":
+                self.H_qdeg = None
+                self.Q_H = self.Q
+            else:
+                raise ValueError(
+                    f"damage.history must be 'cell' or 'quadrature' (got '{history}').")
+            self.H = dolfinx.fem.Function(self.Q_H, name="CrackDrivingForce")
             self.H.x.array[:] = 0.0
+
+        # Cohesive fracture: the mixed (u, eigenstrain) state and its phase
+        # field. self.u stays allocated above and is kept as the mirror of the
+        # displacement block, so output and get_results are unaffected.
+        if self.on.get("cohesive", False):
+            print("\nInitializing the cohesive state (u, eigenstrain, alpha)...")
+            self.w = dolfinx.fem.Function(self.W, name="CohesiveState")
+            self.w.x.array[:] = 0.0
+            # Parent-space dof indices of the displacement block, for the
+            # mirror into self.u after every solve.
+            self._w_u_dofs = np.asarray(
+                self.W.sub(0).collapse()[1], dtype=np.int32).ravel()
+            self.D = dolfinx.fem.Function(self.V_d, name="Damage")
+            self.D.x.array[:] = 0.0
+            self.check_strain_hardening()
 
         # CD variables
         if self.on.get("cluster", False):
@@ -453,7 +539,7 @@ class Spine(
         for name, mat in self.materials.items():
             if "_k_func" in mat and self.T:
                 k_func = mat["_k_func"]
-                mat["k"] = self.call_material_function(k_func, self.T, mat)
+                mat["k"] = self.call_material_function(k_func, self.T_iter, mat)
                 print("\nk expression for", name, "→", mat["k"])
 
             # Data-driven conductivity
@@ -472,17 +558,17 @@ class Spine(
                 print(f"\nInitialized porosity-dependent thermal conductivity field for {name}")
 
             # Temperature-dependent elastic constants: build lmbda/G/bulk_modulus
-            # as UFL expressions in the live T field, so the per-iteration T
-            # propagates by reference into both the mechanical form and the
-            # (pre-compiled) output-writer stress expression.
+            # as UFL expressions in the staggered iterate T_iter, so the
+            # per-iteration T propagates by reference into both the mechanical
+            # form and the (pre-compiled) output-writer stress expression.
             if "_E_func" in mat or "_nu_func" in mat:
                 if getattr(self, "T", None) is None:
                     raise ValueError(
                         f"Material '{name}': temperature-dependent E/nu requires an "
                         f"active thermal field (set models.thermal: true)."
                     )
-                E_T = mat["_E_func"](self.T) if "_E_func" in mat else mat["E"]
-                nu_T = mat["_nu_func"](self.T) if "_nu_func" in mat else mat["nu"]
+                E_T = mat["_E_func"](self.T_iter) if "_E_func" in mat else mat["E"]
+                nu_T = mat["_nu_func"](self.T_iter) if "_nu_func" in mat else mat["nu"]
                 mat["lmbda"] = E_T * nu_T / ((1 + nu_T) * (1 - 2 * nu_T))
                 mat["G"] = E_T / (2 * (1 + nu_T))
                 mat["bulk_modulus"] = E_T / (3 * (1 - 2 * nu_T))
@@ -509,15 +595,56 @@ class Spine(
             self.update_porosity_dependent_properties(self.T, self.porosity)
 
 
+    def material_mean(self, fn, name, integral=False):
+        """Weighted FE mean of ``fn`` over material ``name``,
+
+            ∫_Ωm w fn dx / ∫_Ωm w dx,   w = 2πr (axisymmetric) or 1,
+
+        or the integral ∫_Ωm w fn dx itself when ``integral`` is set. Global
+        over ranks (``assemble_scalar`` is rank-local, hence the allreduce).
+        The forms are compiled once per (Function, material) and consume
+        ``fn`` by reference, so a Function updated in place needs no rebuild.
+        """
+        cache = self.__dict__.setdefault("_material_mean_forms", {})
+        key = (id(fn), name)
+        if key not in cache:
+            x_sc = ufl.SpatialCoordinate(self.mesh)
+            w = 2.0 * ufl.pi * x_sc[0] if self.regime == "axisymmetric" else 1.0
+            dx_m = ufl.Measure("dx", domain=self.mesh, subdomain_data=self.cell_tags,
+                               subdomain_id=self.label_map[name])
+            one = dolfinx.fem.Constant(self.mesh, dolfinx.default_scalar_type(1.0))
+            vol = self.mesh.comm.allreduce(
+                dolfinx.fem.assemble_scalar(dolfinx.fem.form(w * one * dx_m)), op=MPI.SUM)
+            cache[key] = (dolfinx.fem.form(w * fn * dx_m), vol)
+        form, vol = cache[key]
+        val = self.mesh.comm.allreduce(dolfinx.fem.assemble_scalar(form), op=MPI.SUM)
+        if integral:
+            return val
+        return val / vol if vol > 0 else 0.0
+
     def set_power(self):
         if self.q_third is None:
             return
 
         print(f"[UPDATING q_third]")
         self.q_third.x.array[:] = 0.0
+        if not hasattr(self, "_scratch_shape"):
+            self._scratch_shape = dolfinx.fem.Function(self.V_t)
+
+        # Sources add WITHIN a material (fissile + gamma_heating) but not ACROSS
+        # materials. q_third is nodal (CG1), and a node on the interface between
+        # two materials belongs to both dof sets: a plain += gave it both
+        # materials' sources, i.e. twice the value when they agree (liner bonded
+        # to a gamma-heated wall: +2-3 % of the deposited power). Such a node now
+        # takes the mean over the HEATED materials touching it; a node between a
+        # heated and an unheated material keeps the heated value, as before.
+        q_sum = np.zeros_like(self.q_third.x.array)
+        n_src = np.zeros_like(self.q_third.x.array)
+        fissile_names = []
 
         for name, mat in self.materials.items():
             dofs = self.mgr.locate_domain_dofs(label=self.label_map[name], V=self.V_t)
+            q_mat = np.zeros(len(dofs))
 
             if mat.get("fissile", False):
                 print("Fissile material")
@@ -526,11 +653,15 @@ class Spine(
                 # Power form factors. A fissile material may shape its own
                 # volumetric source through the callables ``radial_profile``
                 # f(r, bu) and/or ``axial_profile`` f(z) (e.g. the chopped
-                # cosine). Each callable
-                # receives the dof coordinates and the current local burnup. The
-                # composite f_r·f_z is normalised once to nodal mean 1, so the
-                # shaping redistributes the linear heat rate without changing its
-                # integral. Default (no callables): f ≡ 1, the flat source.
+                # cosine). Each callable receives the dof coordinates and the
+                # current local burnup. The composite f = f_r·f_z is divided by
+                # its weighted FE mean over the material,
+                #     mean = ∫_Ωm w f dx / ∫_Ωm w dx,
+                # so ∫_Ωm w q''' dx = (LHR/A)·∫_Ωm w dx for any profile: the
+                # shaping redistributes the linear heat rate without changing
+                # its integral. A nodal mean would not (a rim-peaked profile on a
+                # uniform radial grid under-weights the rim and over-generates).
+                # Default (no callables): f ≡ 1, the flat source, untouched.
                 shape = np.ones(len(dofs))
                 rprof = mat.get("_radial_profile_func")
                 zprof = mat.get("_axial_profile_func")
@@ -545,17 +676,11 @@ class Spine(
                         shape = shape * np.asarray(rprof(coords, bu_vals, mat, model=self), dtype=float)
                     if zprof is not None:
                         shape = shape * np.asarray(zprof(coords, bu_vals, mat, model=self), dtype=float)
-                    # Nodal-mean normalisation. The mean is global over owned
-                    # dofs — a rank-local mean would normalise each partition
-                    # independently and make q''' partition-dependent.
-                    n_owned = self.V_t.dofmap.index_map.size_local
-                    dofs_arr = np.asarray(dofs)
-                    owned = dofs_arr < n_owned
-                    s_loc = float(shape[owned].sum()) if owned.any() else 0.0
-                    n_loc = int(np.count_nonzero(owned))
-                    s_glob = self.mesh.comm.allreduce(s_loc, op=MPI.SUM)
-                    n_glob = self.mesh.comm.allreduce(n_loc, op=MPI.SUM)
-                    mean = s_glob / n_glob if n_glob > 0 else 0.0
+                    shape_fn = self._scratch_shape
+                    shape_fn.x.array[:] = 0.0
+                    shape_fn.x.array[dofs] = shape
+                    shape_fn.x.scatter_forward()
+                    mean = self.material_mean(shape_fn, name)
                     if mean > 0:
                         shape = shape / mean
                     else:
@@ -565,61 +690,38 @@ class Spine(
 
                 # Accumulate: multiple sources on the same material (e.g.
                 # fissile + gamma_heating below) add.
-                self.q_third.x.array[dofs] += q_val * shape
-                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu)·f(z) (fissile, mean f = 1)")
+                q_mat += q_val * shape
+                print(f"  q_third += {q_val:.3e} W/m³ × f(r,bu)·f(z) (fissile, weighted mean f = 1)")
                 print(f"  Heat flux = {self.lhr / self.perimeter:.3e} W/m2")
-
-                # Integrated-power diagnostic: the exact FE integral of the
-                # fissile source over this material, with the regime weight
-                # (2πr in axisymmetric). For a rod this tracks LHR·Lz; a radially
-                # peaked profile deviates slightly, the mean-1 normalisation
-                # being nodal rather than area-weighted. The form is compiled
-                # once and cached; q_third updates in place.
-                if not hasattr(self, "_power_forms"):
-                    self._power_forms = {}
-                if name not in self._power_forms:
-                    x_sc = ufl.SpatialCoordinate(self.mesh)
-                    w_int = 2.0 * ufl.pi * x_sc[0] if self.regime == "axisymmetric" else 1.0
-                    dx_mat = ufl.Measure(
-                        "dx", domain=self.mesh,
-                        subdomain_data=self.cell_tags,
-                        subdomain_id=self.label_map[name],
-                    )
-                    self._power_forms[name] = dolfinx.fem.form(w_int * self.q_third * dx_mat)
-                P_int = dolfinx.fem.assemble_scalar(self._power_forms[name])
-                P_int = self.mesh.comm.allreduce(P_int, op=MPI.SUM)
-                unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
-                        "1d": "W/m²"}.get(self.regime, "W")
-                print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
+                # The integrated-power diagnostic needs the final q_third, so
+                # it is assembled after the loop over materials.
+                fissile_names.append(name)
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
-                # Cylindrical and spherical gamma-decay correlations use
-                # `inner_radius` as the reference surface, and require it
-                # non-zero: K_0(0) = +inf (cyl), 1/r at r = 0 (sphere).
-                if (
-                    self.geometry_type in ("cyl", "cylinder", "sphere")
-                    and float(getattr(self, "inner_radius", 0.0) or 0.0) == 0.0
-                ):
+                if self.geometry_type not in ("rect", "cyl", "cylinder", "cyl-cyl", "sphere"):
                     raise ValueError(
-                        f"Material '{name}' has gamma_heating > 0 with "
-                        f"geometry_type='{self.geometry_type}' and inner_radius == 0. "
-                        f"The decay correlation requires a non-zero inner radius "
-                        f"as the reference surface; set inner_radius > 0 in geometry.yaml "
-                        f"or use geometry_type='rect'."
+                        f"Material '{name}': gamma_heating has no profile for "
+                        f"geometry_type='{self.geometry_type}'."
                     )
-
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
-                # Per-material reference surface for the cylindrical/spherical
-                # decay correlation. Defaults to the geometry inner_radius.
-                # `gamma_inner_radius` normalises the K_0 profile at the
-                # material's own inner surface instead.
-                gamma_Ri = float(mat.get("gamma_inner_radius", self.inner_radius))
+                # Reference surface of the cylindrical/spherical decay: the
+                # material's own gamma_inner_radius, else the geometry
+                # inner_radius. cyl-cyl has two bodies and no single
+                # inner_radius, so it needs gamma_inner_radius.
+                gamma_Ri = float(mat.get("gamma_inner_radius", self.inner_radius or 0.0))
+                if self.geometry_type != "rect" and gamma_Ri == 0.0:
+                    raise ValueError(
+                        f"Material '{name}': gamma_heating with geometry_type="
+                        f"'{self.geometry_type}' needs a non-zero reference radius "
+                        f"(K_0(0) and 1/r diverge at r = 0). Set gamma_inner_radius "
+                        f"in the card or inner_radius in geometry.yaml."
+                    )
 
                 def f(x, q_third_0=q_third_0, mu=mu, gamma_Ri=gamma_Ri):
                     if self.geometry_type == "rect":
                         return q_third_0 * np.exp(-x[0] * mu)
-                    elif self.geometry_type in ["cyl", "cylinder"]:
+                    elif self.geometry_type in ["cyl", "cylinder", "cyl-cyl"]:
                         import scipy.special as sp
 
                         if (
@@ -646,13 +748,29 @@ class Spine(
                 f_func = dolfinx.fem.Function(self.V_t)
                 f_func.interpolate(f)
                 # Accumulate: fissile + gamma_heating on the same material combine.
-                self.q_third.x.array[dofs] += f_func.x.array[dofs]
+                q_mat += f_func.x.array[dofs]
 
+            if np.any(q_mat != 0.0):
+                q_sum[dofs] += q_mat
+                n_src[dofs] += 1.0
+
+        self.q_third.x.array[:] = q_sum / np.maximum(n_src, 1.0)
         self.q_third.x.scatter_forward()
+
+        unit = {"axisymmetric": "W", "3d": "W", "2d": "W/m",
+                "1d": "W/m²"}.get(self.regime, "W")
+        
+        # Integrated-power diagnostic: the exact FE integral of the source over
+        # each fissile material, with the regime weight. For a rod it equals
+        # LHR·Lz to round-off for any profile.
+        for name in fissile_names:
+            P_int = self.material_mean(self.q_third, name, integral=True)
+            print(f"  [INFO] Integrated fissile power in {name}: {P_int:.6e} {unit}")
 
     def update_state(self, dt):
         """Advance each material's own history over a step of ``dt`` seconds.
-        Called once per step, *after* the solve.
+        Called once per step, after ``set_power`` and *before* the solve, so the
+        step sees bu^{n+1} = bu^n + q'''^{n+1}·dt (right-endpoint rule).
 
         Burnup: a fissile material accumulates its local burnup from the deposited
         fission power. The volumetric source ``q_third`` [W/m³] is the energy
@@ -690,6 +808,13 @@ class Spine(
             self.burnup.x.array[dofs] += q * dt / (float(rho) * hm * SECONDS_PER_MWD)
 
         self.burnup.x.scatter_forward()
+        # Weighted FE mean per fissile material. With the weighted power
+        # normalisation of set_power it equals the flat closed form
+        # Σ LHR·dt / (A·ρ·HM·8.64e10) for any power profile.
+        for name, mat in self.materials.items():
+            if mat.get("fissile", False) and mat.get("rho") is not None:
+                print(f"  [INFO] Mean burnup in {name}: "
+                      f"{self.material_mean(self.burnup, name):.6e} MWd/kgU")
         print(f"[update_state] burnup max = {self.burnup.x.array.max():.4e} MWd/kgU")
 
         # --. SCIANTIX gaseous swelling (opt-in; rides the eigenstrain bus) --..
@@ -784,7 +909,7 @@ class Spine(
               f"fuel-avg FGR = {fgr:.4f}")
 
     _SNAPSHOT_FIELDS = (
-        "T", "u", "D", "H", "burnup", "gas_swelling", "c", "c_n",
+        "T", "u", "w", "D", "H", "burnup", "gas_swelling", "c", "c_n",
         "p", "ep", "p_n", "ep_n",
         "porosity", "porosity_n",
     )  # dolfinx Functions
@@ -801,6 +926,7 @@ class Spine(
         present, per active physics):
 
         - primary fields T, u, D and the crack-driving history H;
+        - the mixed cohesive state w = (u, eigenstrain), when that route is on;
         - the burnup accumulator and the cluster pair c / c_n;
         - the plasticity history p, ep, p_n, ep_n;
         - the per-material creep dicts eps_cr and _dgamma0;
@@ -903,16 +1029,33 @@ class Spine(
         else:
             self.strain = None
 
+        if self.on.get("cohesive", False):
+            # tr_eta / dev_eta, not to be confused with the material's p_c.
+            u_coh, tr_eta, dev_eta = self.split_state(self.w)
+
         for name, mat in self.materials.items():
-            if self.on.get("mechanical", False):
+            if self.on.get("cohesive", False):
+                # The cohesive stress derives from the undegraded elastic energy
+                # evaluated on the elastic strain (eps - eta); the degradation
+                # acts on the strength potential, not here.
+                self.energy_density[name] = self.psi_cohesive_elastic(
+                    self.epsilon(u_coh), tr_eta, dev_eta, mat
+                )
+                self.stress_mech[name] = self.sigma_cohesive(
+                    u_coh, tr_eta, dev_eta, mat)
+            elif self.on.get("mechanical", False):
                 # Elastic energy uses the elastic strain (eps - alpha*(T - T_ref)*I)
                 # so uniform thermal expansion does not appear as stored elastic energy.
                 T_field = getattr(self, "T", None) if self.on.get("thermal", False) else None
                 self.energy_density[name] = self.elastic_energy_density(self.u, mat, T=T_field)
                 self.stress_mech[name] = self.sigma_mech(self.u, mat)
             
-            if self.on.get("thermal", False):
-                self.stress_th[name] = self.sigma_th(self.T, mat)      
+            # Same predicate and temperature as the momentum balance, so the
+            # written stress includes swelling and material eigenstrains also
+            # when the thermal model is off.
+            if self.applies_eigenstress(mat):
+                T_eig = self.T if self.on.get("thermal", False) else None
+                self.stress_th[name] = self.sigma_th(T_eig, mat)
                       
             if name in self.stress_mech and name in self.stress_th:
                 self.stress[name] = self.stress_mech[name] + self.stress_th[name]

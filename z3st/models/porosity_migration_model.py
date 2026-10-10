@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import dolfinx
@@ -600,6 +600,10 @@ class PorosityMigrationModel:
             p_new.x.array[:] = np.clip(p_new.x.array, 0.0, 1.0)
             p_new.x.scatter_forward()
 
+        # Unrelaxed update, kept for the convergence test below so the
+        # tolerances do not scale with the relaxation factor.
+        p_raw = p_new.x.array.copy()
+
         # Under-relaxation against the previous staggered iterate. Two options:
         #  - fixed factor porosity.relax in (0, 1];
         #  - Aitken Δ² (porosity.aitken: true): the factor is recomputed each
@@ -631,7 +635,8 @@ class PorosityMigrationModel:
                 p_new.x.array[:] = relax_p * p_new.x.array + (1.0 - relax_p) * p_prev_iter
                 p_new.x.scatter_forward()
 
-        # Convergence between successive staggered iterates. Two metrics
+        # Convergence of the unrelaxed update p_raw against the previous
+        # staggered iterate (not of the relaxed iterate). Two metrics
         # (porosity.conv_metric):
         #  - "max_dof" (default): mixed rel/abs max over DOFs (Barani Eq. 2).
         #  - "integral": relative change of the conserved void volume
@@ -643,7 +648,7 @@ class PorosityMigrationModel:
         eps_rel = float(self.porosity_cfg.get("stag_tol_rel", 1.0e-6))
         eps_abs = float(self.porosity_cfg.get("stag_tol_abs", 1.0e-8))
         n_owned = self.V_p.dofmap.index_map.size_local
-        p_now = p_new.x.array[:n_owned]
+        p_now = p_raw[:n_owned]
         diff = np.abs(p_now - p_prev_iter[:n_owned])
         check_vals = diff - np.abs(p_now) * eps_rel - eps_abs
         local_max = float(np.max(check_vals)) if check_vals.size > 0 else -1.0
@@ -651,8 +656,10 @@ class PorosityMigrationModel:
 
         conv_metric = str(self.porosity_cfg.get("conv_metric", "max_dof")).lower()
         if conv_metric == "integral":
+            p_raw_fn = dolfinx.fem.Function(self.V_p)
+            p_raw_fn.x.array[:] = p_raw
             Q_now = self.mesh.comm.allreduce(
-                dolfinx.fem.assemble_scalar(dolfinx.fem.form(p_new * ufl.dx)), op=MPI.SUM)
+                dolfinx.fem.assemble_scalar(dolfinx.fem.form(p_raw_fn * ufl.dx)), op=MPI.SUM)
             p_prev_fn = dolfinx.fem.Function(self.V_p)
             p_prev_fn.x.array[:] = p_prev_iter
             Q_prev = self.mesh.comm.allreduce(

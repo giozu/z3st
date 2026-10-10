@@ -20,6 +20,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 
+from z3st.utils.plotstyle import apply as _apply_plotstyle
+_apply_plotstyle()
+
 os.environ.setdefault("HDF5_USE_FILE_LOCKING", "FALSE")
 
 # Plate dimensions (must match geometry.yaml).

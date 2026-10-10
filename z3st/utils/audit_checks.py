@@ -3,7 +3,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 """Static consistency checks over the repository. Runs in seconds, solves nothing.
@@ -32,6 +32,7 @@ The checks
   docs          case paths, dependencies and regime values in the prose
   ci            cases_ci.txt against the tree it names
   env           pyproject runtime deps are installed by z3st_env.yml
+  version       every version declaration agrees with pyproject
 
 Where a check is a heuristic that might misfire, it says so in its own output.
 
@@ -317,7 +318,8 @@ def check_docs():
             if ".git" not in str(p)]
 
     # a) case paths cited in prose
-    cited = re.compile(r"`((?:verification|regression|benchmarks|studies|teaching|sandbox)/[\w/]+)`")
+    # with or without a leading cases/ or z3st/cases/
+    cited = re.compile(r"`(?:z3st/)?(?:cases/)?((?:verification|regression|benchmarks|studies|teaching|sandbox)/[\w/]+)`")
     for p in docs:
         text = p.read_text()
         for match in set(cited.findall(text)):
@@ -357,7 +359,7 @@ def check_docs():
 def check_mro():
     """Method-name collisions between Spine's parent classes.
 
-    ``Spine`` multiply-inherits 13 classes into one flat namespace, so two mixins
+    ``Spine`` multiply-inherits 14 classes into one flat namespace, so two mixins
     defining the same method name do not conflict -- the MRO silently picks one and
     the other is never called.
 
@@ -686,6 +688,23 @@ def check_env():
     return findings
 
 
+def check_version():
+    """Every version declaration must name the version in pyproject.toml.
+
+    The repository repeats its version in ~130 files, so a release can be tagged
+    while the tree still names the previous one. Cited versions in prose are left
+    alone; only declarations are compared. `python -m z3st.utils.bump X.Y.Z` fixes it.
+    """
+    from z3st.utils.bump import current_version, disagreements
+
+    version = current_version()
+    return [
+        f"{path.relative_to(ROOT)}:{line} declares {found}, but pyproject.toml "
+        f"says {version} — run `python -m z3st.utils.bump {version}`"
+        for path, line, found in disagreements(version)
+    ]
+
+
 CHECKS = {
     "models": check_models,
     "assertions": check_assertions,
@@ -701,6 +720,7 @@ CHECKS = {
     "workflow": check_workflow,
     "ci": check_ci,
     "env": check_env,
+    "version": check_version,
 }
 
 

@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import sys
@@ -93,15 +93,21 @@ class ThermalModel:
                     # a time-varying Dirichlet temperature. The Constant is updated per step by the
                     # solver; a scalar is broadcast to every step.
                     if isinstance(temperature, list):
-                        # Step index is capped at the last entry by the solver,
-                        # so a length mismatch with n_steps is tolerated (the
-                        # final value simply holds). Warn if they differ.
+                        # The list is indexed by step, not interpolated on the
+                        # `time` breakpoints the way `lhr` is. A short list used
+                        # to be tolerated with its last entry holding, which
+                        # silently turned an intended ramp over the whole
+                        # transient into one that finished in the first few
+                        # steps and then sat at its final value. It is an error.
                         if len(temperature) != self.n_steps:
                             print(
-                                f"  [WARNING] Thermal Dirichlet list on '{label}' region "
+                                f"  [ERROR] Thermal Dirichlet list on '{label}' region "
                                 f"'{region_name}' has length {len(temperature)} != n_steps "
-                                f"{self.n_steps}; the last value will hold for extra steps."
+                                f"{self.n_steps}. The list is indexed by step, so it must "
+                                f"carry one value per step. To ramp over the transient, "
+                                f"expand it to {self.n_steps} values."
                             )
+                            sys.exit(1)
                         raw_value = [float(t) for t in temperature]
                     else:
                         raw_value = [float(temperature)] * self.n_steps
@@ -339,9 +345,15 @@ class ThermalModel:
                         self._refresh_gap_pair(aux, T_new)
                         gap_aux.append(aux)
 
-                        a_t += w * h_gap * u_t * v_t * ds_robin
-                        L_t += w * h_gap * T_other * v_t * ds_robin
-                        print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'")
+                        # h_gap is referred to the reference surface of the
+                        # pair; the other side scales it by the weighted-area
+                        # ratio so the heat crossing the gap balances.
+                        ratio = self._gap_area_ratio(region_id, self.label_map[pair_region])
+                        h_here = h_gap if ratio is None else h_gap * ratio
+                        a_t += w * h_here * u_t * v_t * ds_robin
+                        L_t += w * h_here * T_other * v_t * ds_robin
+                        print(f"  Robin (gap) BC on region {region_id}, paired with '{pair_region}'"
+                              + ("" if ratio is None else f", h scaled by |Γ_ref|/|Γ| = {ratio:.6f}"))
 
                     else:
                         # Convective mode: fixed h_conv and T_ext
@@ -399,12 +411,13 @@ class ThermalModel:
         if transient:
             print(f"  T^n (self.T): min={self.T.x.array.min():.2f} K, max={self.T.x.array.max():.2f} K")
 
-        # Relax
-        T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
-        dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
-
+        # Convergence on the unrelaxed update T_solve - T^{k-1}, so stag_tol
+        # does not scale with relax_T. Then relax.
         conv_th, norm_dT, rel_norm_dT, res_curr = self._stagger_residual(
             T_new, T_old, self.th_cfg, stag_tol_th, "T")
+
+        T_new.x.array[:] = self.relax_T * T_new.x.array + (1.0 - self.relax_T) * T_old.x.array
+        dolfinx.fem.set_bc(T_new.x.array, bcs_thermal_actual)
 
         if self.relax_adaptive:
             prev_res_T = self._adapt_relax("T", res_curr, prev_res_T)
@@ -604,6 +617,38 @@ class ThermalModel:
             T_new, T_old, self.th_cfg, stag_tol_th, "T")
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
     
+    def _gap_area_ratio(self, id_here, id_other):
+        """Conservative scaling of h_gap on one surface of a gap pair.
+
+        h_gap is defined per unit area of the reference surface Γ_ref, which is
+        ``models.gap_conductance.surface_a`` (pellet outer by default) when it
+        belongs to the pair, otherwise the pair surface with the lower tag. The
+        reference side returns None (h_gap used as is). The other side returns
+        |Γ_ref|_w / |Γ_here|_w, the ratio of weighted areas ∫ w ds (w = 2πr in
+        axisymmetric), so that ∫ w h ΔT ds is the same on both sides for a
+        uniform ΔT: r_f/r_c for coaxial cylinders, 1 for equal areas. Computed
+        once per surface pair and MPI-summed.
+        """
+        ref = self.label_map.get(getattr(self, "gap_surface_a", None))
+        if ref not in (id_here, id_other):
+            ref = min(id_here, id_other)
+        if id_here == ref:
+            return None
+        cache = self.__dict__.setdefault("_gap_area_ratios", {})
+        if (id_here, ref) not in cache:
+            one = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(1.0))
+            comm = self.mesh.comm
+
+            def area(tag):
+                form = dolfinx.fem.form(self.weight * one * self.ds_tags[tag])
+                return comm.allreduce(dolfinx.fem.assemble_scalar(form), op=MPI.SUM)
+
+            a_here = area(id_here)
+            if a_here <= 0.0:
+                raise RuntimeError(f"Gap pair: surface id {id_here} has zero area.")
+            cache[(id_here, ref)] = area(ref) / a_here
+        return cache[(id_here, ref)]
+
     def _build_gap_pair_aux(self, fn, dofs_here, dofs_other):
         """Geometric matching between two paired gap surfaces (built once per
         step alongside the cached thermal form).
@@ -633,8 +678,10 @@ class ThermalModel:
             )
         nn = (cKDTree(other_xyz).query(coords[dofs_here], k=1)[1]
               if dofs_here.size else np.array([], dtype=np.int64))
+        
         return {"fn": fn, "dofs_here": dofs_here, "other_owned": other_owned,
                 "nn": nn}
+    
     def _refresh_gap_pair(self, aux, T_new):
         """Copy the paired surface's current temperatures onto the persistent
         T_other Function through the precomputed nearest-neighbour map. In

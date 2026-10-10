@@ -2,7 +2,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 # Author: Giovanni Zullo
-# Version: 0.3.2 (2026)
+# Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 import sys
@@ -353,7 +353,10 @@ class MechanicalModel:
 
             # Components of the strain tensor in cylindrical coordinates (r, theta, z)
             eps_rr = u[0].dx(0)  # Normal radial strain
-            eps_tt = u[0] / r  # Hoop strain (tangential)
+            # Hoop strain u_r/r, with its limit du_r/dr on the axis r = 0, where
+            # output fields are interpolated at nodes. Quadrature points never
+            # lie on the axis, so the assembled forms are unchanged.
+            eps_tt = ufl.conditional(ufl.gt(r, 0.0), u[0] / r, u[0].dx(0))
             eps_zz = u[1].dx(1)  # Normal axial strain
             eps_rz = 0.5 * (u[0].dx(1) + u[1].dx(0))  # Shear strain in the r-z plane
 
@@ -409,7 +412,7 @@ class MechanicalModel:
             # F in cylindrical coordinates (r, θ, z)
             F_def = ufl.as_tensor([
                 [1.0 + u[0].dx(0),  0.0,  u[0].dx(1)],
-                [0.0,               1.0 + u[0] / r,  0.0],
+                [0.0,               1.0 + ufl.conditional(ufl.gt(r, 0.0), u[0] / r, u[0].dx(0)),  0.0],
                 [u[1].dx(0),        0.0,  1.0 + u[1].dx(1)],
             ])
 
@@ -491,6 +494,8 @@ class MechanicalModel:
                     material["lmbda"] * ufl.tr(eps) * ufl.Identity(dim) + 2.0 * material["G"] * eps
                 )
 
+        # self.D is the damage iterate inside the staggered loop
+        # (solve_staggered), the converged damage outside it.
         if self.on.get("damage", False):
             g_d = self.degradation_function(self.D)
             sigma = g_d * sigma
@@ -1012,11 +1017,13 @@ class MechanicalModel:
             self.relax_u = omega
             print(f"  [aitken] relax_u={omega:.3f}")
 
-        u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
-        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
-
+        # Convergence on the unrelaxed update u_solve - u^{k-1} (the Aitken
+        # residual R above), so stag_tol does not scale with relax_u.
         conv_mech, norm_du, rel_norm_du, res_curr = self._stagger_residual(
             u_new, u_old, self.mech_cfg, stag_tol_mech, "u")
+
+        u_new.x.array[:] = self.relax_u * u_new.x.array + (1 - self.relax_u) * u_old.x.array
+        dolfinx.fem.set_bc(u_new.x.array, bcs_mech)
 
         # The creep predictor must be consistent with u as well — |Δu| alone
         # can pass on the first iteration of a step while Δγ₀ is still moving.

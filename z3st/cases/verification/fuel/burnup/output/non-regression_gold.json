@@ -1,10 +1,10 @@
 {
     "results": {
         "burnup_mean_closed_form": {
-            "numerical": 27.19699824399601,
-            "reference": 27.196998243996006,
-            "abs_error": 3.552713678800501e-15,
-            "rel_error": 1.306288895166876e-16,
+            "numerical": 27.22181,
+            "reference": 27.221813023415713,
+            "abs_error": 3.023415711567168e-06,
+            "rel_error": 1.1106592014890705e-07,
             "status": "PASS"
         },
         "rim_core_ratio": {
@@ -15,12 +15,14 @@
             "status": "PASS"
         },
         "total_power": {
-            "numerical": 237.4619,
-            "reference": 237.38075844346844,
-            "abs_error": 0.08114155653157695,
-            "rel_error": 0.00034182027668809806,
+            "numerical": 200.0,
+            "reference": 200.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
             "status": "PASS"
         }
     },
-    "tolerance": 0.01
+    "tolerance": 0.01,
+    "summary": "PASS",
+    "regression": "PASS"
 }

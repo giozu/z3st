@@ -1,0 +1,44 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Giovanni Zullo
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  steel: s235.yaml
+
+regime: 3d
+
+solver_settings:
+  max_iters: 20
+  relax_u: 1.0
+  relax_adaptive: false
+
+models:
+  mechanical: true
+
+mechanical:
+  solver: linear
+  # The bar is held only axially (boundary_conditions.yaml).
+  # With "remove_rigid_nullspace: true", z3st checks the six rigid-body motions and keeps
+  # those the boundary conditions leave free, here three (translation in x and y, rotation
+  # about z). It attaches them to the matrix as its nullspace, and the solver removes them
+  # from the right-hand side and from the solution.
+  # The operator is then singular, which is what a Krylov solver is built for, so an
+  # iterative solver rather than LU.
+  remove_rigid_nullspace: true
+  linear_solver: iterative_hypre
+  rtol: 1.0e-12
+  stag_tol: 1.0e-8
+  convergence: rel_norm
+  debug: false
+
+lhr:
+- 0.0
+time:
+- 0.0
+n_steps: 1

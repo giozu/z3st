@@ -8,15 +8,15 @@
             "status": "PASS"
         },
         "T_max_final": {
-            "numerical": 550.0014821086851,
-            "reference": 550.0014821086851,
+            "numerical": 550.0014821097463,
+            "reference": 550.0014821097463,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "T_mean_final": {
-            "numerical": 403.92842647069796,
-            "reference": 403.92842647069796,
+            "numerical": 403.9284190025541,
+            "reference": 403.9284190025541,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
@@ -29,41 +29,70 @@
             "status": "PASS"
         },
         "D_mean_final": {
-            "numerical": 0.226270465279185,
-            "reference": 0.226270465279185,
+            "numerical": 0.0337585922691082,
+            "reference": 0.0337585922691082,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "damaged_node_fraction": {
-            "numerical": 0.25223240721002393,
-            "reference": 0.25223240721002393,
+            "numerical": 0.03249721689286814,
+            "reference": 0.03249721689286814,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_bottom_0.1mm": {
+            "numerical": 13.0,
+            "reference": 13.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_bottom_0.8mm": {
+            "numerical": 8.0,
+            "reference": 8.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_top_0.1mm": {
+            "numerical": 13.0,
+            "reference": 13.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_top_0.8mm": {
+            "numerical": 8.0,
+            "reference": 8.0,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "E_el_final": {
-            "numerical": 2.77265,
-            "reference": 2.77265,
+            "numerical": 3.548683,
+            "reference": 3.548683,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "E_frac_final": {
-            "numerical": 3.448725,
-            "reference": 3.448725,
+            "numerical": 1.909753,
+            "reference": 1.909753,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         },
         "E_tot_final": {
-            "numerical": 6.221375,
-            "reference": 6.221375,
+            "numerical": 5.458436,
+            "reference": 5.458436,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
         }
     },
     "tolerance": 0.01,
-    "summary": "PASS"
+    "summary": "PASS",
+    "regression": "PASS"
 }

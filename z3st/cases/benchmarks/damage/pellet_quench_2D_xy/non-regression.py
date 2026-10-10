@@ -230,6 +230,9 @@ def plot_field_2d(triang, field, output_path, *,
                   show_mesh=True, levels=40):
     """ParaView-like 2D field plot: filled contours + optional mesh overlay + contact-arc marker."""
     levels_arr = np.linspace(vmin, vmax, levels + 1)
+    
+    plt.rcParams.update({"font.size": 13, "axes.labelsize": 14,
+                         "xtick.labelsize": 12, "ytick.labelsize": 12})
     fig, ax = plt.subplots(figsize=(9, 6))
     cf = ax.tricontourf(triang, field, levels=levels_arr, cmap=cmap,
                         vmin=vmin, vmax=vmax, extend="both")
@@ -238,14 +241,15 @@ def plot_field_2d(triang, field, output_path, *,
     if contact_R is not None and contact_half_angle_deg is not None:
         theta_contact = np.linspace(0.0, np.deg2rad(contact_half_angle_deg), 60)
         ax.plot(contact_R * np.cos(theta_contact), contact_R * np.sin(theta_contact),
-                color="cyan", linewidth=2.5,
+                color="#56B4E9", linewidth=2.5,
                 label=f"Cold contact arc (0-{contact_half_angle_deg:.0f} deg)")
-        ax.legend(loc="upper left", fontsize=8)
+        ax.legend(loc="upper left", fontsize=11)
     fig.colorbar(cf, ax=ax, label=cbar_label)
     ax.set_xlabel("x (m)")
     ax.set_ylabel("y (m)")
     ax.set_aspect("equal")
-    ax.set_title(title)
+    if title:
+        ax.set_title(title)
     ax.set_xlim(-Ro * 1.05, Ro * 1.05)
     ax.set_ylim(-0.05 * Ro, Ro * 1.05)
     plt.tight_layout()
@@ -280,8 +284,8 @@ try:
         plot_field_2d(
             triang, D_field,
             output_path=os.path.join(OUT_DIR, "damage_field.png"),
-            title=f"Damage field D at t = {last_t:.3e} s",
-            cbar_label="Damage D", cmap="hot_r", vmin=0.0, vmax=1.0,
+            title=None,
+            cbar_label="Phase field $d$", cmap="hot_r", vmin=0.0, vmax=1.0,
             contact_R=Ro, contact_half_angle_deg=CONTACT_HALF_ANGLE_DEG,
         )
         print(f"[INFO] Damage field plot saved: {os.path.join(OUT_DIR, 'damage_field.png')}")
@@ -392,6 +396,17 @@ try:
         # Thermal-shock cracks merge into one continuous band at the very rim and
         # fade out deeper in. Sweep overlapping shells and take the one where the
         # fingers are most separated.
+        #
+        # NOTE on what this number is. It counts the separate D >= 0.5 arcs in the
+        # one annular shell, among those swept between 0.56 and 1.01 Ro, where most
+        # of them are distinct, in the modelled upper half only. In the current
+        # gold that shell is 0.83-0.95 Ro, 0.5 to 1.7 mm below the surface, which
+        # the short cracks do not reach, so the count picks out the deeper cracks:
+        # 4. It is a regression metric and is not the
+        # number of cracks that reach the perimeter. Counted at the surface, the
+        # final field has 10 cracks with D > 0.5 in the modelled 30-degree half of
+        # the cold arc (19 over the full arc, one lying on the symmetry plane), of
+        # which 4 penetrate more than 0.85 mm and 6 stop within 0.27 mm.
         bands = [(c - 0.06, c + 0.06) for c in np.arange(0.62, 0.96, 0.03)]
         best_n, best_prof, best_band = 0, angular_dmax(0.80, 0.90), (0.80, 0.90)
         for r_lo, r_hi in bands:
@@ -405,7 +420,7 @@ try:
         ax5.plot(theta_mid, best_prof, "k-", linewidth=1.0)
         ax5.fill_between(theta_mid, 0, best_prof, alpha=0.3)
         ax5.axhline(0.5, color="grey", lw=0.8, ls=":")
-        ax5.axvspan(0, CONTACT_HALF_ANGLE_DEG, color="red", alpha=0.10,
+        ax5.axvspan(0, CONTACT_HALF_ANGLE_DEG, color="#D55E00", alpha=0.10,
                     label=f"Cold contact arc (0-{CONTACT_HALF_ANGLE_DEG:.0f} deg, upper half)")
         ax5.set_xlabel("Angle theta (deg)  [upper half only]")
         ax5.set_ylabel(f"D_max ({best_band[0]:.2f} < r/Ro < {best_band[1]:.2f})")
@@ -414,7 +429,7 @@ try:
             f"counted at the best-separated shell; fingers fuse nearer the rim"
         )
         ax5.grid(True, alpha=0.3)
-        ax5.legend(fontsize=8)
+        ax5.legend(fontsize=10)
         ax5.set_xlim(0, 180)
         ax5.set_ylim(0, 1.05)
         plt.tight_layout()

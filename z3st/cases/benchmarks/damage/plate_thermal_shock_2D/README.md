@@ -1,24 +1,23 @@
-# Plate under thermal shock — pure crack nucleation
+# Plate under thermal shock: crack nucleation
 
-## z3st damage benchmark case (Kamagate et al. 2025 replica)
+## z3st damage benchmark case, after Kamagate et al. (2025)
 
-Reproduces the quenching-plate benchmark of Kamagate, Cheng, Abdelmoula,
-Danho & Kondo (2025), *An incremental variational method to the coupling
+Configured after the quenching-plate benchmark of Kamagate, Cheng, Abdelmoula,
+Danho and Kondo (2025), *An incremental variational method to the coupling
 between gradient damage, thermoelasticity and heat conduction*,
-C. R. Mecanique **353**:1063-1084 (Fig. 1-3).
+C. R. Mecanique 353:1063-1084 (Fig. 1-3).
+
+Excluded from the local suite (`suite_exclude.txt`, about 2 h). Run it by hand.
 
 ### Scope
 
-There is **no pre-crack and no damage seed** anywhere (see
-`boundary_conditions.yaml`: there is no `damage:` block). Cracks must
-**nucleate** from the quenched edges. This is the
-gradient-damage instability, not seeded propagation: the AT1 model has an
+There is no pre-crack and no damage seed (`boundary_conditions.yaml` has no
+`damage:` block). Cracks nucleate from the quenched edges. The AT1 model has an
 elastic threshold `w1 = 3*Gc/(8*lc)` (strength
-`sigma_c = sqrt(3*E*Gc/(8*lc)) ~ 243 MPa`), and where the transient
+`sigma_c = sqrt(3*E*Gc/(8*lc)) ~ 243 MPa`). Where the transient
 thermoelastic tension at the cooled surface exceeds it, damage localises
-into bands of width ~`lc`. A continuous damage front along the edge is
-itself unstable to a periodic perturbation, so it breaks into the
-discrete array of edge cracks.
+into bands of width about `lc`. A continuous damage front along the edge is
+unstable to a periodic perturbation and breaks into an array of edge cracks.
 
 ### Set-up
 
@@ -29,8 +28,10 @@ discrete array of edge cracks.
 | Right edge | `u_x = 0` symmetry plane, adiabatic |
 | Pin | 50-um `Clamp_y` segment (removes rigid y-translation) |
 | Initial / stress-free T | `T_0 = T_ref = 550 K` (so `dT = 250 K`) |
-| Model | AT1, `lc = 0.092 mm`, Amor split, hybrid constraint |
+| Model | AT1, `lc = 0.092 mm`, `split: amor`, `hybrid_constraint: true` |
 | Material | `plate_ceramic.yaml` (paper Table 1: E=340 GPa, nu=0.22, Gc=42.47 J/m2, alpha=8e-6) |
+| Time | 0 to 5 ms, 50 steps of 100 us |
+| Output | XDMF (`output/fields.xdmf`) |
 
 ### Run
 
@@ -38,27 +39,46 @@ discrete array of edge cracks.
 ./Allrun
 ```
 
-then open `output/fields.xdmf` in ParaView and colour by `damage`. You
-should see short, roughly parallel cracks appear at the bottom and top
-edges and grow inward, with smaller cracks interleaved between the
-longer ones (Kamagate Fig. 2d).
+Open `output/fields.xdmf` in ParaView and colour by `Damage`. Kamagate Fig. 2d
+shows short, roughly parallel cracks at the bottom and top edges, growing
+inward, with shorter cracks between the longer ones.
 
-### Knobs
+`Allrun` ends with `plot_damage.py`, which writes `output/damage_field.png` from
+the XDMF file. `./Allrun_mpi [NP]` runs the solver on `NP` MPI ranks (default 4),
+then `plot_damage.py`.
 
-- **Shock amplitude:** in `plate_ceramic.yaml` set `T_initial = T_ref = 880.0`
-  for the `dT = 580 K` case — expect more and deeper cracks (paper Fig. 3).
-- **Mesh:** `lc_fine` in `mesh.geo` is `lc/3` for a first look; drop it to
-  ~`2e-5` (`lc/4.5`) once nucleation is confirmed, for crack counts that
-  no longer move with refinement.
+### Parameters to vary
 
-### Caveats
+- Shock amplitude: in `plate_ceramic.yaml` set `T_initial = T_ref = 880.0`
+  for the `dT = 580 K` case (paper Fig. 3: more and deeper cracks).
+- Mesh: `lc_fine` in `mesh.geo` is `3e-5` (about `lc/3`). The `mesh.geo` comment
+  gives `2e-5` (`lc/4.5`) for converged crack counts.
 
-- The **number** of cracks is sensitive to mesh / `lc` / heterogeneity —
-  a known feature of this benchmark. Match the pattern and the
-  `dT`-trend (more cracks at higher `dT`), not an exact count.
-- This reproduces the cracking **physics/pattern** via the staggered
-  thermo -> mech -> damage loop. It does **not** reproduce the paper's
-  kinetic-entropy incremental-variational *formulation*; for this
-  benchmark (constant k,c, moderate coupling, damage heat neglected) the
-  temperature field is effectively one-way and the pattern is governed by
-  the thermoelastic stress + AT1, both of which z3st has.
+### Comparison with Kamagate et al.
+
+On the damage field of the stored run at `t = 5 ms` there are 13 cracks on
+each of the bottom and top edges, spacing about 1.9 mm, penetrating 0.2 to
+1.6 mm (mean 0.87 mm), alternating deep and shallow. `non-regression.py` counts
+the separate `D >= 0.5` runs along each edge 0.1 mm inside it (13 and 13) and
+0.8 mm inside it (8 and 8, the deep cracks), and tracks the four counts. The
+depths were measured by hand.
+Differences with the reference:
+
+- Time. The gold state is at `t = 5 ms`. Kamagate Fig. 2 and 3 are at
+  `t = 10 us`. The first time step is 100 us, so there is no snapshot at the
+  reference time.
+- Crack count. Fig. 2d has roughly 20 to 25 cracks per edge, about twice as
+  many as here. The `lc/4.5` mesh has not been run.
+- The `dT = 580 K` case has not been run.
+
+Gold values at the last step: `D_max_final = 1.0`, `D_mean_final = 0.0338`,
+`E_el_final = 3.549 J`, `E_frac_final = 1.910 J`, `T_mean_final = 403.9 K`.
+
+### Limits
+
+- The number of cracks depends on mesh, `lc` and heterogeneity. The checks to make
+  are the pattern and the `dT` trend (more cracks at higher `dT`), not an exact count.
+- The coupling is the staggered thermal -> mechanical -> damage loop. The
+  kinetic-entropy incremental variational formulation of the paper is not
+  implemented. In this benchmark (constant k and c, damage heat neglected) the
+  temperature field is one-way coupled.

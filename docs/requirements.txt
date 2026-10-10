@@ -4,8 +4,11 @@
 #   cd docs && make clean html
 #
 # The FEniCSx runtime stack (dolfinx, basix, ufl, mpi4py, petsc4py, pyvista,
-# h5py, gmsh) is not needed here: it is mocked via `autodoc_mock_imports` in
-# docs/source/conf.py, so the docs build in a plain environment.
+# h5py, gmsh) and the optional packages (torch, shapely, scipy,
+# dolfinx-external-operator) are mocked via `autodoc_mock_imports` in
+# docs/source/conf.py. numpy, pyyaml and matplotlib are installed instead:
+# z3st modules use them at import time, and without them autodoc leaves the
+# API pages empty.
 #
 # Version floors are the ones verified to build the docs cleanly; they are lower
 # bounds, not exact pins.
@@ -16,3 +19,6 @@ sphinx-book-theme>=1.1
 sphinx-rtd-theme>=2.0
 sphinx-autodoc-typehints>=2.0
 sphinxcontrib-mermaid>=1.0
+numpy>=2
+pyyaml>=6
+matplotlib>=3.8
