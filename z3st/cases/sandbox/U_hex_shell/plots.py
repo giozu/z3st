@@ -15,11 +15,11 @@ flat, each with the other two coordinates fixed:
 
 Fields are read from the last step of ``output/fields.xdmf`` and mapped into
 the local frame by ``case_params.local_fields``; the six flats collapse onto
-one curve. Figures are written to ``output/profile_{xi,s,z}.png``.
+one curve. Figures are written to ``output/<regime>_profile_{xi,s,z}.png``.
 
 pyvista views of the last step are written to
-``output/3d_{mesh,original,deformed,stress,strain}.png`` (in 2d, the
-cross-section seen from +z).
+``output/<regime>_{mesh,original,deformed,stress,strain}.png``, with
+<regime> = 3d or 2d (in 2d, the cross-section seen from +z).
 """
 
 import os
@@ -32,7 +32,7 @@ os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
 import pyvista as pv  # noqa: E402
 
 from case_params import (
-    D, DT, H, IS_3D, L_MID, NT, SIGMA_ZZ_OFFSET_2D, T_I, T_WALL, XI_CELLS,
+    D, DT, H, IS_3D, L_MID, REGIME, NT, SIGMA_ZZ_OFFSET_2D, T_I, T_WALL, XI_CELLS,
     along_axis, along_flat, check_consistency, local_fields, on_layer, profile,
     XDMF, sigma_wall, temperature, through_wall, flat_frame,
 )
@@ -225,7 +225,7 @@ def plot_3d(out=OUT, warp=None):
         else:
             p.view_xy()
         p.reset_camera()
-        path = os.path.join(out, f"3d_{name}.png")
+        path = os.path.join(out, f"{REGIME}_{name}.png")
         p.screenshot(path)
         p.close()
         print(f"[INFO] {path}")
@@ -237,7 +237,7 @@ if __name__ == "__main__":
         raise RuntimeError("; ".join(problems))
     lines = (("xi", plot_xi), ("s", plot_s)) + ((("z", plot_z),) if IS_3D else ())
     for name, plot in lines:
-        path = os.path.join(OUT, f"profile_{name}.png")
+        path = os.path.join(OUT, f"{REGIME}_profile_{name}.png")
         plot(nodes, cells).savefig(path, dpi=150)
         print(f"[INFO] {path}")
     plot_3d()
