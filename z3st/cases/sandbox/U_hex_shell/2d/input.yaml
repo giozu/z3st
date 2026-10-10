@@ -54,3 +54,4 @@ n_steps: 4
 
 output:
   format: xdmf #time series complete output vs vtu per timestep
+  filename: fields_2d # output/fields_2d.xdmf + .h5: the variants do not overwrite each other

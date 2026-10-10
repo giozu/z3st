@@ -13,7 +13,7 @@ flat, each with the other two coordinates fixed:
   2. s (along the flat), at mid-height;
   3. z (along the axis), at mid-flat (3d only).
 
-Fields are read from the last step of ``output/fields.xdmf`` and mapped into
+Fields are read from the last step of ``output/fields_<regime>.xdmf`` and mapped into
 the local frame by ``case_params.local_fields``; the six flats collapse onto
 one curve. Figures are written to ``output/<regime>_profile_{xi,s,z}.png``.
 

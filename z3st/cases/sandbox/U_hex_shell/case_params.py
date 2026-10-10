@@ -13,7 +13,7 @@ analytic solution, and each reads them at a different moment:
 
   * ``diagnostics.py``   inside the z3st run, after every converged step;
   * ``non-regression.py`` after the run, from ``output/history.csv``;
-  * ``plots.py``          after the run, from ``output/fields.xdmf``;
+  * ``plots.py``          after the run, from ``output/fields_<regime>.xdmf``;
   * the notebook          interactively.
 
 Defining the geometry, the sample stations and the analytic solution once here
@@ -41,7 +41,6 @@ import yaml
 from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-XDMF = os.path.join(HERE, "output", "fields.xdmf")
 
 
 def _load(name):
@@ -50,6 +49,9 @@ def _load(name):
 
 
 _input = _load("input.yaml")
+# output.filename in input.yaml (fields_2d | fields_3d), same rule as the z3st writer
+_fields = os.path.splitext(_input.get("output", {}).get("filename", "fields"))[0]
+XDMF = os.path.join(HERE, "output", _fields + ".xdmf")
 _geom = _load(_input["geometry_path"])
 _bcs = _load(_input["boundary_conditions_path"])
 _mat = _load(_input["materials"]["steel"])
