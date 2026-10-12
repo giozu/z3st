@@ -52,6 +52,27 @@ def aitken_omega(r_k, r_prev, omega, comm, n_owned, lo, hi):
     return omega
 
 
+def anderson_mix(G, F, comm, n_owned):
+    """Anderson-accelerated iterate from the stored map outputs ``G`` and
+    residuals ``F = G(x) - x`` (lists, oldest first, same length >= 2)::
+
+        x_new = sum_j alpha_j G_j,   alpha = argmin |sum_j alpha_j F_j|, sum alpha = 1
+
+    solved in the difference form (gamma on dF_j = F_{j+1} - F_j). The normal
+    equations are reduced over owned dofs and allreduce'd, so the result is
+    rank-independent under MPI. Algorithm 1 of Storvik et al., CMAME 381
+    (2021) 113822.
+    """
+    dF = np.array([F[j + 1][:n_owned] - F[j][:n_owned] for j in range(len(F) - 1)])
+    A = comm.allreduce(dF @ dF.T, op=MPI.SUM)
+    b = comm.allreduce(dF @ F[-1][:n_owned], op=MPI.SUM)
+    gamma = np.linalg.lstsq(A, b, rcond=1e-12)[0]
+    x = G[-1].copy()
+    for j, gj in enumerate(gamma):
+        x -= gj * (G[j + 1] - G[j])
+    return x
+
+
 def _rigid_body_modes(V, regime=None):
     """Zero-strain rigid-body displacement modes of the elastic operator, as a
     list of Functions.
@@ -187,6 +208,25 @@ class Solver:
         self.relax_aitken = as_bool(solver_settings.get("relax_aitken", False))
         if self.relax_aitken:
             print("  Aitken Δ² relaxation enabled for displacement")
+
+        # Anderson acceleration of the damage iterate (see _damage_step):
+        # depth m (0 = off) and the number of strictly decreasing residuals
+        # after which it restarts from relaxation (Storvik et al. 2021, N_ω→AA).
+        self.anderson_depth = int(solver_settings.get("anderson_depth", 0))
+        self.anderson_switch = int(solver_settings.get("anderson_switch", 5))
+        if self.anderson_depth > 0:
+            print(f"  Anderson acceleration of damage, depth {self.anderson_depth}, "
+                  f"switch {self.anderson_switch}")
+
+        # damage.staggered: lagged is Box 1 of Miehe, Hofacker and Welschinger
+        # (2010): H = max(H^n, psi+(u^n)) once per step, from the step-start
+        # displacement, and frozen for the step. The loop then converges to
+        # d^{n+1} for that H and u^{n+1} at that d^{n+1}.
+        staggered = str(self.input_file.get("damage", {}).get("staggered", "coupled")).lower()
+        if staggered not in ("coupled", "lagged"):
+            raise ValueError(
+                f"damage.staggered must be 'coupled' or 'lagged' (got '{staggered}').")
+        self._H_frozen = self.on.get("damage", False) and staggered == "lagged"
 
         if self.relax_adaptive:
             print("  Adaptive relaxation enabled")
@@ -441,6 +481,8 @@ class Solver:
             self._D_step_start = self.D.x.array.copy()
             if getattr(self, "H", None) is not None:
                 self._H_step_start = self.H.x.array.copy()
+            if self._H_frozen:
+                self.update_history(self.u, T=self.T if self.on.get("thermal", False) else None)
         else:
             D_new = D_old = None
 
@@ -491,6 +533,8 @@ class Solver:
         # accelerator above; nulling R_prev restarts ω from porosity.aitken_omega0.
         self._aitken_p_R_prev = None
         self._aitken_p_omega = None
+        # Anderson state for the damage iterate, per step.
+        self._aa = {"G": [], "F": [], "res": [], "relaxing": False}
         # Contact secant history: per step, the free gap changes with the
         # step's thermal state.
         if self.on.get("contact", False):
@@ -530,7 +574,8 @@ class Solver:
                 # Pass T_new so the damage driving force uses the elastic strain
                 # (eps - alpha*(T - T_ref)*I), not the total strain: uniform
                 # thermal expansion must not contribute to psi_pos.
-                self.update_history(u_new, T=T_new)
+                if not self._H_frozen:
+                    self.update_history(u_new, T=T_new)
                 conv_damage, _, _, prev_res_D = self._damage_step(
                     D_new,
                     D_old,

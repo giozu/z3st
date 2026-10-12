@@ -1007,6 +1007,8 @@ With the default ``relax_max = 1.0`` no factor exceeds one. See
   near-nullspace,
 - ``direct_mumps``: LU with MUMPS (default for porosity).
 
+See :ref:`linear-solvers` for when to use which.
+
 ``mechanical.remove_rigid_nullspace: true`` (default false) removes, on the
 linear mechanical path only, the rigid-body modes that the Dirichlet
 conditions leave free.

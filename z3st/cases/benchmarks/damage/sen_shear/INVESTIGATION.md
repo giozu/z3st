@@ -41,6 +41,25 @@ after.
   along the top and bottom edges (section 9). The mesh alone does not explain
   the differences; the notch representation and the energy split are the next
   factors.
+- With the notch as a band of fully damaged cells on Ambati's mesh (section
+  12) the crack starts from the tip at 13.3 um (peak 0.567 kN, Ambati about
+  0.49 kN at 12.5 um), follows Ambati's and Hirshikesh's path to the bottom
+  edge, and the edges are no longer damaged. The line notch caused the
+  missing initiation. Still different: the initial slope is 4 % above
+  Ambati's and the peak 16 % above (section 13), and at 28.2 um, in a non-converged step, the
+  bottom ligament breaks and the force drops to zero.
+- The initial slope depends on how the notch is represented (section 13).
+  An elastic run with the notch as a geometric slit, the exact sharp notch,
+  gives 0.046 kN/um on Ambati's mesh and on a mesh twice as fine. Ambati's
+  slope, about 0.043 kN/um, is 7 % below that of the sharp slit, so his
+  initial history field softens the specimen more than a sharp notch would.
+  The line notch is 18 % above the slit and the band notch 4 % below it.
+  An initial history field narrower than one cell (Borden's width, lc / 2)
+  is as stiff as the line notch on this mesh; from a half-width of 8 um the
+  first row of nodes is broken and the slope is within 4 % of Ambati's
+  (section 14).
+  Plane strain, the boundary conditions and the material constants are the
+  same as Ambati's.
 - On every refined mesh tried, the staggered loop stops converging within the
   first 8 um of loading. The cause is an exact period-2 oscillation of the
   damage, of amplitude about 1e-5, at nodes along the notch line behind the
@@ -318,24 +337,356 @@ tip) the crack starts close to Ambati's load, on uniform triangles it starts
 late, on uniform quadrilaterals it does not start and a constrained edge,
 where the strain is high but smooth, fails first. It is a hypothesis.
 
+### 11. History at quadrature points
+
+Option `damage.history: quadrature` (added for this test): `H` at the points
+of a degree-2 rule, 2 x 2 Gauss points on quadrilaterals, and the damage form
+integrated with the same rule. Default `cell` unchanged (checked on
+`regression/two_elliptical_cavities_2D` against its gold). On Ambati's mesh
+with the settings of section 9, at step 620 (u about 14 um):
+
+| Run | max D ahead of the tip (within 30 um) | max D at the top edge | max D at the bottom edge |
+|---|---|---|---|
+| H per cell (section 9) | 0.106 | 0.240 | 0.230 |
+| H at quadrature points | 0.108 | 0.300 | 0.287 |
+
+The force at 14 um is the same (0.74 and 0.75 kN). Storing the history at
+the Gauss points does not make the notch initiate earlier; it increases the
+damage at the edges. The hypothesis of section 10 is not supported.
+
+Remaining candidate for the missing initiation: the notch. With `D = 1`
+imposed only at the nodes of the notch line and cells of 7 um (above lc), the
+damage drops from 1 to 0 within one cell on each side, so the cells across
+the notch are only partly degraded and the notch still carries part of the
+shear. On the stored mesh (0.8 um at the notch) the profile is resolved and
+the faces are separated. Ambati models the notch with an initial history
+field, which produces a damage band a few lc wide also on a coarse mesh.
+
+### 12. Notch as a band of damaged cells
+
+Same quadrilateral mesh and settings as section 9 (star-convex split,
+`gamma_star: 5`, hybrid constraint, H per cell), one change: `D = 1` on the
+notch line and on the two grid lines one cell above and below it (y = 0.5 mm
+and 0.5 +- 1/144 mm, 0 <= x <= 0.5 mm), so the two rows of cells across the
+notch are fully damaged and the faces are separated. This is a stand-in for
+Ambati's initial history field, with no change to the code. 796 steps in
+9 h 23 min, 224 of them not converged (69 up to the peak, the rest during
+propagation).
+
+| | Ambati | Line notch (section 9) | Band notch |
+|---|---|---|---|
+| force at 10 um | about 0.41 kN | 0.54 kN | 0.439 kN |
+| first peak | about 0.49 kN at 12.5 um | 0.928 kN at 17.8 um | 0.567 kN at 13.3 um |
+| crack from the notch tip | yes | no | yes, from 13.3 um |
+| after the peak | about 0.35 kN, then rising | - | 0.433 kN at 20 um, rising to 0.498 kN at 28 um |
+| crack tip at 21 um | - | - | about (0.71, 0.10) mm (Hirshikesh: (0.77, 0.08) mm) |
+| crack at 25 um | - | - | reaches the bottom edge at x about 0.76 mm |
+| force at 30 um | about 0.47 kN | 0.734 kN | 0.001 kN (bottom ligament broken at 28.2 um) |
+| max D at the top / bottom edge | not shown | bands along both edges | 0.16 / 0.08 until the crack arrives |
+
+With the faces separated the notch tip initiates a crack on Ambati's mesh, at
+about Ambati's load, and the crack follows his path and Hirshikesh's to the
+bottom edge, with the force rising again after the drop as in his Fig. 13.
+The damage bands along the top and bottom edges of sections 9 to 11 are gone.
+The line notch, not the split or the storage of `H`, caused the missing
+initiation. Two differences remain. The initial slope is 4 % above Ambati's
+(0.045 against about 0.043 kN/um) and the peak is about 16 % higher; section
+13 traces the slope to the representation of the notch. At 28.2 um, in one step that did not
+converge, the ligament between the crack and the lower-right corner breaks
+along the bottom edge and the force drops to zero; the uniform triangles of
+section 8 end in the same way. Ambati's force is still rising at 30 um.
+
+### 13. Initial slope and the notch
+
+Ambati states plane strain and fully integrated bilinear quadrilaterals
+(p. 395); his Fig. 7b clamps the bottom edge and moves the top edge
+horizontally with the vertical displacement fixed, the lateral edges free.
+These are the conditions of this case, and his lambda = 121.15 and
+mu = 80.77 kN/mm2 are E = 210 GPa and nu = 0.3, the constants of
+`high_carbon_steel.yaml`. The force is per 1 mm of thickness in both.
+Before the peak his curves overlap. Digitising the Miehe curve, the one
+that can be separated from the grid in the image, gives F = 0.22 kN at 5 um
+and 0.43 kN at 10 um, a slope of about 0.043 kN/um (a first reading by eye
+gave 0.041).
+
+Elastic runs (damage off, two steps of 1 um) with the notch as a geometric
+slit, the two faces being separate lines that share only the tip, give the
+slope of a sharp notch:
+
+| Notch | Mesh | Slope at 1 um (kN/um) | against the slit |
+|---|---|---|---|
+| geometric slit, no damage | 144 x 144 quadrilaterals | 0.0470 | - |
+| geometric slit, no damage | 288 x 288 quadrilaterals | 0.0465 | - |
+| `D = 1` on a line (section 9) | 144 x 144 quadrilaterals | 0.0552 | +18 % |
+| `D = 1` on a line (section 8) | uniform 7 um triangles | 0.0544 | +17 % |
+| `D = 1` on a band (section 12) | 144 x 144 quadrilaterals | 0.0448 | -4 % |
+| Ambati, initial history field | 20592 quadrilaterals | about 0.043 | about -7 % |
+
+The slit converges with the mesh (1 % between the two meshes). The line
+notch is stiffer than a sharp notch: the faces stay partly bonded, as found
+in section 12. The band notch is slightly softer than the slit, as expected
+from two rows of cells with `D = 1` and the damage profile around them.
+Ambati's specimen is about 7 % softer than a sharp notch from the first
+step, which points to his initial history field, a damage band several lc
+wide along the notch, rather than to the elasticity. Z3ST's elastic
+response is not in question; the initial slope measures the notch.
+
+### 14. Notch as an initial history field
+
+Option `damage.notch_history` (added for this test): `H0 = B (1 - d / w)`
+within a distance `w` of the notch segment, with `B = 1000`, as in Borden et
+al. (2012), whom Ambati follows. Z3ST normalises `H` by `Gc / (2 lc)`, so
+`H0` needs no material constant. Borden's half-width is his `l0`, which is
+`lc / 2` in the convention of Miehe and Ambati, so the default is
+`w = lc / 2 = 2 um`. Ambati's mesh (section 9) with the notch line in the
+mesh but no `D = 1` on it, history at quadrature points (section 11), four
+steps of 1 um:
+
+| w | mean D on the rows of nodes at 0 / 7 / 14 / 21 um from the notch | slope at 1 um (kN/um) |
+|---|---|---|
+| 2 um (lc / 2, Borden) | 1.00 / 0.30 / 0.04 / 0.005 | 0.0546 |
+| 4 um (lc) | 1.00 / 0.30 / 0.04 / 0.005 | 0.0546 |
+| 8 um | 1.00 / 0.99 / 0.13 / 0.016 | 0.0445 |
+| 12 um | 0.99 / 1.00 / 0.80 / 0.10 | 0.0437 |
+| Ambati | - | about 0.043 |
+
+With `w` up to `lc` the history reaches only the Gauss points nearer the
+notch line, the first row of nodes off the line keeps `D = 0.3`, and the
+specimen is as stiff as with the line notch (0.055). Ambati, on cells of the
+same size, gets about 0.043, so his initial field must reach the first row of
+nodes; the paper does not give its width. From `w = 8 um`, about one cell,
+the first row is broken and the slope is within 4 % of Ambati's, the same as
+the band notch of section 12. A full run with `w = 8 um` is in progress.
+
+### 15. Latching the hybrid mask within a step
+
+The option of this section was removed from the code after section 18:
+with `staggered: lagged` the mask is computed once per step and cannot
+cycle, and with `coupled` the latch leaves 34 non-converged steps after the
+peak. The sections below record what it did.
+
+Option A of step 2, available as `damage.hybrid_latch: true` (default
+false, see below). A history point is latched off
+by the hybrid test (`psi- > psi+`) only when it switches off for the second
+time in a step (off, on, off). From then on it stays off until the end of the
+step, and every point is tested afresh at the next step (`_hybrid_offs` and
+`_hybrid_latched` in `solver.py`, applied in `update_history`). A point that
+switches once keeps the unlatched behaviour, so only a cycling point can be
+latched and the period-2 cycle of section 6 ends after one period. The log
+reports, at the end of each step, how many points are latched.
+
+A first version latched a point at its first switch-off. It removed the
+cycle in this case (section 16 uses it), but it also kept off the points
+switched off by the early iterates of a step. In `pellet_quench_2D_xy` it
+changed the iteration path (step 1: 9 iterations instead of 18) and left
+step 6 non-converged, where the committed code converges. The second
+switch-off rule replaced it.
+
+First 46 steps (to 8.25 um) of the case of section 14:
+
+| | Without latch (run of section 14) | Latch, second switch-off |
+|---|---|---|
+| non-converged steps | 11 | 0 |
+| staggered iterations per step | 7 to 11, 200 when not converged | 7 to 12 |
+| latched points per step | - | 0 to 2 |
+
+Other cases with the second switch-off rule, against the committed code
+(266964e):
+
+| case | result |
+|---|---|
+| `pellet_quench_2D_xy`, 100 steps | same iterations at every step, same results to the last digit, gold PASS; one point latched, at step 97 |
+| `two_elliptical_cavities_2D` | gold PASS |
+| `sen_shear` as committed (line notch, triangle mesh), first 14 steps | 1 non-converged step against 6 |
+| `sen_tension`, 701 steps | same iterations at every step, 3 non-converged steps as without, gold PASS (energies identical); 37 points latched, at one step |
+| `plate_thermal_shock_2D`, 50 steps | gold FAIL: fracture energy -2.2 %, elastic energy +1.1 %, damaged node fraction +1.9 %, mean D -0.5 %; total energy, max D, crack counts and temperatures PASS. 0 non-converged steps with and without. About 9300 points latched at step 4, 50 to 350 per step after |
+
+In `plate_thermal_shock_2D` the mask does cycle, and the latch moves the
+converged solution to a different path: the same cracks, with about 2 % of
+the energy moved from fracture to elastic. The latch is therefore an option
+(`hybrid_latch`, default false): the default behaviour and the golds are
+those of the committed code. With the option on, the 46-step run above is
+reproduced exactly (same iterations, same latched points, same energy).
+
+### 16. Full runs with the initial history field, with and without the latch
+
+Case of section 14 (`w = 8 um`, history at quadrature points), 796 steps.
+The latch here is the first version (first switch-off, section 15).
+
+| | Without latch | With latch | Band notch (section 12) | Ambati |
+|---|---|---|---|---|
+| run time | 8 h 30 min | 5 h 3 min | 9 h 23 min | - |
+| non-converged steps up to 12 um | 89 | 0 | - | - |
+| non-converged steps after 12 um | 133 | 79 | - | - |
+| force at 10 um | 0.436 kN | 0.436 kN | 0.439 kN | about 0.43 kN |
+| peak | 0.573 kN at 14.1 um | 0.573 kN at 14.1 um | 0.567 kN at 13.3 um | about 0.49 kN at 12.5 um |
+| force at 20 um | 0.377 kN | 0.380 kN | 0.433 kN | about 0.36 kN |
+| crack tip at 20 um | (0.78, 0.15) mm | (0.78, 0.15) mm | (0.71, 0.10) mm at 21 um | - |
+| crack reaches the bottom edge | about 24 um, x = 0.99 mm | about 24 um, x = 0.98 mm | about 25 um, x = 0.76 mm | near the lower-right corner |
+| force at 30 um | 0.005 kN | 0.178 kN, rising from 0.168 at 28 um | 0.001 kN | about 0.47 kN, rising |
+
+The latch removes every non-converged step before the peak and does not
+change the force up to the peak. After the peak 79 steps still do not
+converge. Their damage residual does not oscillate: it stalls at a level
+between 1e-7 and 1e-3 and decreases slowly, while the latch keeps adding
+points (up to about 700 per step) as the crack advances. This is the slow
+convergence of the alternate minimisation during crack growth, a different
+problem from the cycle of section 6.
+
+With the latch the specimen keeps a residual force after the crack reaches
+the bottom edge and the force rises again, as in Ambati, but at a lower
+level (0.18 against about 0.47 kN at 30 um); without the latch it drops to
+zero. The crack runs further right than with the band notch and than in
+Ambati, and reaches the bottom edge about 6 um earlier. The peak is still
+16 % above Ambati's.
+
+### 17. The stored run predates the coupling of damage into the mechanics
+
+The stored run and the gold of this case (8 August 2026) were produced with
+z3st 0.2.0. Commit 8c24cf9 (15 September 2026) made the damage iterate
+`self.D` itself, so that each mechanical solve within a step sees the current
+damage. Before it, the mechanics saw `D^n` for the whole step: `u`, hence
+`psi+` and `psi-`, did not change with the damage iterate, the hybrid mask
+could not cycle and the loop converged in a few iterations. In effect this
+is one staggered iteration per step (u with `D^n`, then d), the one-pass
+scheme of Miehe et al. (2010). Ambati does not use it: he iterates u and d
+within the step and stops on a normalised energy slope (his Sect. 3.4,
+Eqs. 41-43, Tol about 10 deg), and his Figs. 10-11 show that one staggered
+iteration per step gives inaccurate results, more so with larger increments.
+The coupled scheme of HEAD is the one described in the docs
+(`staggered_theory.rst`) and in the paper.
+
+The case as committed, on HEAD (266964e), first steps:
+
+| | Iterations per step | Energies at steps 1 to 8 |
+|---|---|---|
+| stored run (0.2.0) | 12 7 8 8 8 8 8 8 | - |
+| HEAD | 12 7 8 X 14 25 26 X | - |
+| HEAD with `D_new = self.D` reverted to a separate function | 12 7 8 8 8 8 8 8 8 8 8 | identical to the stored run in all printed digits |
+
+Option `damage.staggered` (default `coupled`). With `lagged` the history
+is computed once per step from the step-start displacement,
+`H = max(H^n, psi+(u^n))`, and kept fixed while the loop solves d and then u
+at that d: Box 1 and Eq. (54) of Miehe, Hofacker and Welschinger, CMAME 199
+(2010) 2765-2778. It is not the 0.2.0 behaviour, which solved u with `D^n`
+and then d with the history of that u (the two subproblems in the opposite
+order). On this case, first 13 steps with `lagged`: iterations
+12 2 7 8 8 8 8 8 8 8 8 8 8, no step non-converged; the fracture energy at
+step n equals that of the 0.2.0 run at step n - 1 to all printed digits
+(the crack lags by one increment), and the elastic energy is 0.04 to 0.4 %
+higher. `coupled` keeps `regression/two_elliptical_cavities_2D` at PASS.
+
+The difference between the stored run and every run of sections 3 to 16 is
+the coupling, not the mesh, the code version otherwise, or round-off. All
+runs from section 3 on use the coupled scheme; the stored run they are
+compared with uses the 0.2.0 one. The cycle of section 6 and the slow
+convergence after the peak belong to the coupled scheme.
+
+### 18. Coupled with latch against lagged, and Ambati's stopping criterion
+
+Case of section 16 (Ambati's mesh, history at quadrature points,
+`notch_history` with `w = 8 um`, star-convex `gamma_star: 5`, damage
+tolerance 1e-7), 700 steps (14.8 um), current latch (section 15). Total
+energy printed at every staggered iteration in a scratch copy of the code.
+
+| | `coupled` + `hybrid_latch` | `lagged` (Miehe) |
+|---|---|---|
+| run time | 3 h 51 min | 45 min |
+| non-converged steps | 34, all after step 558 (12.6 um) | 0 |
+| mean iterations per converged step | 18 up to step 550, 102 after | 6.5 |
+| force at 5 / 10 / 12 um | 0.2215 / 0.4358 / 0.5171 kN | 0.2219 / 0.4358 / 0.5171 kN |
+| force at 14 um | 0.570 kN | 0.583 kN |
+| peak | 0.573 kN at 14.1 um | 0.587 kN at 14.6 um |
+
+The two schemes give the same force up to 13 um. The lagged peak is 2.4 %
+higher and 0.5 um later, as expected from the one-increment lag of the
+history (Miehe 2010, Sect. 4.1.5). The coupled peak equals that of section 16
+(first-version latch). Both are 17 to 20 % above Ambati's (about 0.49 kN at
+12.5 um): the staggered scheme does not explain the gap.
+
+Ambati's criterion (`gamma = atan(N (E^{N-1} - E^N) / (E^1 - E^N))`,
+stop at `|gamma| <= 10 deg`) applied to the 34 non-converged steps: it stops
+26 of them, at iteration 4 to 199, with the energy at that iteration within
+5e-9 to 7e-5 (relative) of the energy at iteration 200; it never stops the
+other 8. In these steps the total energy rises within the step (by 2e-6 to
+2.5e-5 relative from the first iterate) and over the last 50 iterations
+oscillates by 5e-8 to 1.2e-5: the cycle is negligible in energy, but the
+criterion, which assumes a monotone decrease, does not detect its end.
+
+### 19. Anderson acceleration on the committed case
+
+`solver_settings.anderson_depth` (default 0, off) applies Anderson mixing (Storvik
+et al., CMAME 381 (2021) 113822, Alg. 1 and 3) to the damage iterate: mixing
+while the norm of the damage increment decreases, relaxation (`relax_D`)
+once it rises, back to a restarted mixing after `anderson_switch` (default 5)
+decreasing norms. Storvik switches on the mechanical residual of a
+variational model; here the indicator is the damage increment, the quantity
+that the convergence test uses.
+
+Committed case (fine mesh, line notch, `coupled`, damage tolerance 1e-7),
+split `amor`, `anderson_depth: 5`, all 796 steps, 8 h 7 min:
+
+| | committed, star-convex + latch (step 2) | `amor` + Anderson |
+|---|---|---|
+| steps run | 524 (stopped at 13 um) | 796 (30 um) |
+| non-converged steps | 163 | 41 |
+| mean iterations per converged step | - | 7.9 to the peak, 18 after |
+| first peak | 0.455 kN at 10.2 um | 0.460 kN at 10.5 um |
+| force at 12 / 15 / 20 / 24.8 um | - | 0.417 / 0.393 / 0.402 / 0.363 kN |
+| force at 30 um | - | 0.004 kN (bottom ligament broken at 25.0 um) |
+
+Ambati (Fig. 13): first peak about 0.49 kN at 12.5 um, about 0.35 kN near
+16 um, about 0.47 kN at 30 um. The split changes the peak by 1 %; the peak
+is 6 % below Ambati's and 2 um earlier. After the peak the force stays at
+0.36 to 0.42 kN without the minimum and the rise of Ambati's curve.
+
+The non-converged steps are 11 and 12, three at the peak (267 to 269), and
+36 spread over the propagation (294 to 769). Anderson does not remove them.
+In these steps the damage increment falls to about 8e-7 and jumps to about
+2.5e-6 when Gauss points switch side of the hybrid mask, so the residual
+never reaches 1e-7; with star-convex the same steps (4, 8, 11 on a test run)
+fail with and without a safeguarded restart of the mixing.
+
+At step 770 (25.0 um) a band along the bottom edge, x from 0.93 to 0.99 mm,
+breaks and the force falls from 0.363 to 0.003 kN, as at 28.2 um in the
+stored run (section 12). The step converged in 132 iterations: the break is
+not an artefact of a non-converged step (step 1f). At step 769 the main
+crack has reached about (0.71, 0.10) mm.
+
 ## Next steps
 
 1. Done (section 8): on a uniform 7 um mesh the crack reaches the bottom
    edge; initiation is late on that mesh.
 1b. Done (section 9): on Ambati's mesh the crack does not start from the
    notch and the edges are damaged.
-1c. History at quadrature points instead of DG0 cells (code change), on
-   Ambati's mesh. Isolates the representation of `H`, the suspected reason why
-   the notch does not initiate on coarse cells.
-1d. Notch as in Ambati: an initial history field along the notch instead of
-   `D = 1` (needs a small addition to the code). Isolates the notch
-   representation, the suspected cause of the high peak.
-2. Fix the cycling switch in the code (issue to open). Options: evaluate the
-   hybrid mask once per step from the start-of-step displacement (closest
-   precedent), or make it irreversible within the step (a cell switched off
-   stays off until the next step, which ends the cycle by construction).
-   Report the number of switched cells per step in the log. Check the damage
-   cases of the suite against their golds.
+1c. Done (section 11): history at quadrature points does not change the
+   initiation on Ambati's mesh.
+1d. Done in part (sections 12 and 14): with the notch as a band of fully
+   damaged cells the crack starts at about Ambati's load and follows his
+   path. The initial history field is implemented (`notch_history`); with
+   Borden's width it is too narrow for this mesh, with `w = 8 um` its slope
+   matches the band. Full run with `w = 8 um` in progress.
+1e. Done (section 13): plane strain, boundary conditions, constants and
+   force are as in Ambati. The initial slope is set by the notch: a sharp
+   slit gives 0.046 kN/um, Ambati about 0.043, the band notch and the
+   initial history field with `w = 8 um` 0.0445 (section 14).
+1f. Find why the bottom ligament breaks at 28.2 um. With `amor` and
+   Anderson (section 19) it breaks at 25.0 um in a step that converged, so
+   convergence does not remove it.
+2. Done (sections 15 and 16). Option A (`damage.hybrid_latch`, off by
+   default; a point latched off at its second switch-off in a step) removes
+   the cycle before the peak, and the log reports the latched points per
+   step. Suite checked (section 15): the latch changes
+   `plate_thermal_shock_2D` only (about 2 % of the energy), hence the
+   default. Still open: after the peak many steps converge slowly (79 with
+   the first-version latch, section 16). The committed `sen_shear` with the
+   latch was stopped at step 524 of 796 (13 um, 163 non-converged steps,
+   peak 0.455 kN at 10.2 um), since the case is to be rebuilt (step 5).
+   Issue to open on the cycle. The latch was later removed (section 15). On Ambati's mesh (section 18)
+   `staggered: lagged` converges every step in a fifth of the time, with
+   the same force up to 13 um and a 2.4 % higher peak. Anderson
+   acceleration (section 19) cuts the non-converged steps of the committed
+   case to 41 of 796 with `amor`, but does not remove the cycle.
 3. Decide the energy split of the case: the star-convex split with
    `gamma_star: 5` has no precedent with the hybrid model and can make psi+
    negative in compression. On Ambati's mesh Amor behaves like star-convex

@@ -497,6 +497,30 @@ class Spine(
                     f"damage.history must be 'cell' or 'quadrature' (got '{history}').")
             self.H = dolfinx.fem.Function(self.Q_H, name="CrackDrivingForce")
             self.H.x.array[:] = 0.0
+            # Optional notch as an initial history field (Borden et al. 2012,
+            # used by Ambati et al. 2015): H0 = B * (1 - d / w) within a
+            # distance w of the segment [start, end], H being normalised by
+            # Gc / (2 lc). Default w = lc / 2, Borden's l0 in this convention.
+            notch = self.dmg_cfg.get("notch_history")
+            if notch is not None:
+                if str(self.dmg_cfg.get("type", "AT2")).upper() != "AT2":
+                    raise ValueError("damage.notch_history requires damage.type: AT2.")
+                p = np.asarray(notch["start"], dtype=float)
+                q = np.asarray(notch["end"], dtype=float)
+                B = float(notch.get("B", 1.0e3))
+                w = float(notch.get("half_width", 0.5 * float(self.dmg_cfg["lc"])))
+                x = ufl.SpatialCoordinate(self.mesh)
+                xy = ufl.as_vector([x[0], x[1]])
+                pq = ufl.as_vector(list(q - p))
+                t = ufl.dot(xy - ufl.as_vector(list(p)), pq) / float(np.dot(q - p, q - p))
+                t = ufl.min_value(ufl.max_value(t, 0.0), 1.0)
+                r = xy - ufl.as_vector(list(p)) - t * pq
+                d = ufl.sqrt(ufl.dot(r, r))
+                H0 = ufl.conditional(ufl.lt(d, w), B * (1.0 - d / w), 0.0)
+                self.H.interpolate(
+                    dolfinx.fem.Expression(H0, self.Q_H.element.interpolation_points))
+                print(f"  Notch history: {int(np.count_nonzero(self.H.x.array))} "
+                      f"history points with H0 > 0 (B = {B:g}, w = {w:.3e} m)")
 
         # Cohesive fracture: the mixed (u, eigenstrain) state and its phase
         # field. self.u stays allocated above and is kept as the mirror of the

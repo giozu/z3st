@@ -8,6 +8,7 @@ if [ -d output ]; then
     find output -mindepth 1 -maxdepth 1 \
          ! -name "${LAST_VTU:-__none__}" \
          ! -name "force_displacement.csv" \
+         ! -name "non-regression_gold.json" \
          -exec rm -rf {} +
     [ -n "$LAST_VTU" ]                        && echo "  Preserved: output/$LAST_VTU"
     [ -f output/force_displacement.csv ]      && echo "  Preserved: output/force_displacement.csv"

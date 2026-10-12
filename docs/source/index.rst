@@ -116,6 +116,7 @@ Documentation contents
    architecture
    physics_models
    staggered_theory
+   linear_solvers
    examples
    verification
 

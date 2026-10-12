@@ -12,6 +12,8 @@ import numpy as np
 import ufl
 from mpi4py import MPI
 
+from z3st.core.solver import anderson_mix
+
 
 class DamageModel:
     def __init__(self):
@@ -655,7 +657,41 @@ class DamageModel:
         # L_inf of the same unrelaxed, projected update (log only).
         res_D_inf = np.linalg.norm(D_new.x.array - D_old.x.array, ord=np.inf)
 
-        D_new.x.array[:] = self.relax_D * D_solve + (1 - self.relax_D) * D_old.x.array
+        # Anderson acceleration (solver_settings.anderson_depth > 0): the
+        # combined scheme of Storvik et al., CMAME 381 (2021) 113822, Alg. 3,
+        # on the damage iterate (u follows D through the next mechanical
+        # solve). Anderson while the residual decreases; relaxation with
+        # relax_D once it rises, back to a restarted Anderson after
+        # anderson_switch decreasing residuals. The residual is the damage
+        # increment norm, where Storvik use the mechanical residual.
+        aa = getattr(self, "_aa", None)
+        use_aa = False
+        if getattr(self, "anderson_depth", 0) > 0 and aa is not None:
+            res = aa["res"]
+            res.append(norm_dD)
+            N = self.anderson_switch
+            if aa["relaxing"]:
+                if len(res) > N and all(res[-i] < res[-i - 1] for i in range(1, N + 1)):
+                    aa["relaxing"] = False
+                    aa["G"].clear()
+                    aa["F"].clear()
+            elif len(res) > 1 and res[-1] > res[-2]:
+                aa["relaxing"] = True
+            use_aa = not aa["relaxing"]
+
+        if use_aa:
+            g = D_new.x.array.copy()
+            aa["G"].append(g)
+            aa["F"].append(g - D_old.x.array)
+            del aa["G"][:-(self.anderson_depth + 1)], aa["F"][:-(self.anderson_depth + 1)]
+            if len(aa["G"]) > 1:
+                imap = self.V_d.dofmap.index_map
+                n_owned = imap.size_local * self.V_d.dofmap.index_map_bs
+                D_new.x.array[:] = anderson_mix(aa["G"], aa["F"], self.mesh.comm, n_owned)
+                D_new.x.scatter_forward()
+            print(f"  [Anderson] depth {len(aa['G']) - 1}")
+        else:
+            D_new.x.array[:] = self.relax_D * D_solve + (1 - self.relax_D) * D_old.x.array
         D_new.x.array[:] = np.maximum(D_new.x.array, D_floor)
         D_new.x.array[:] = np.clip(D_new.x.array, 0.0, 1.0)
 

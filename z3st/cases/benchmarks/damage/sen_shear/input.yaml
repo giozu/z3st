@@ -18,6 +18,7 @@ solver_settings:
   relax_u: 1.0
   relax_D: 0.8
   relax_adaptive: false
+  anderson_depth: 5
 
 models:
   thermal: false
@@ -40,8 +41,7 @@ damage:
   convergence: rel_norm
   lc: 4.0e-6
   hybrid_constraint: true
-  split: star_convex
-  gamma_star: 5.0
+  split: amor
 
 lhr:
 - 0.0

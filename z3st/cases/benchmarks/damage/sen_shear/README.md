@@ -4,7 +4,7 @@ Test case based on the SENS-shear benchmark of Ambati et al. 2015
 (Comput Mech 55:383-405, §4.2), using the AT2 phase-field formulation with
 the hybrid constraint (their Eq. 27).
 
-Excluded from the local suite (`suite_exclude.txt`: 796 steps, about 2 h). Run it by hand.
+Excluded from the local suite (`suite_exclude.txt`: 796 steps, about 8 h). Run it by hand.
 
 ## Geometry and loading
 
@@ -46,35 +46,54 @@ AT2 analytical threshold (derived in `spine.py` at load time):
 ## Phase-field formulation (`input.yaml`)
 
 - AT2 crack-density functional, `lc = 4 µm`.
-- Star-convex energy split: `split: star_convex`, `gamma_star: 5.0`.
+- Amor energy split: `split: amor`.
 - Hybrid constraint (Ambati Eq. 27): `hybrid_constraint: true`.
 
 ## Solver (`input.yaml`)
 
 - Staggered scheme, `max_iters: 200`, `relax_u: 1.0`, `relax_D: 0.8`,
   adaptive relaxation off (`relax_adaptive: false`).
+- Anderson acceleration of the damage update, `anderson_depth: 5`
+  (`anderson_switch` at its default 5).
 - Mechanical: linear, `direct_mumps`.
 - Damage: linear, `direct_mumps`.
 
 ## Expected results
 
-Ambati Fig. 12 (hybrid row, p.398): a curved Mode-II crack starts at the notch tip
-`(0.5 mm, 0.5 mm)`, arcs down-right and arrests in the lower-right region without
-reaching the corner. The energy plots draw the Ambati Fig. 12d arrest target
-`Gc · (Dn + 0.55 mm) ≈ 2.84 J`.
+Ambati Fig. 12 (hybrid row, p. 398): a curved Mode-II crack starts at the notch
+tip `(0.5 mm, 0.5 mm)` and runs down-right to the bottom edge near the
+lower-right corner. Fig. 13, hybrid curve: first peak about 0.49 kN at about
+12.5 µm, minimum about 0.35 kN near 16 µm, about 0.47 kN at 30 µm.
 
-Stored run (`energies.txt`, `force_displacement.txt`, gold):
-- `E_frac` starts at 1.358 J (regularised notch, `Gc · Dn ≈ 1.35 J`) and reaches
-  4.669 J at the last step.
-- `E_el` at the last step: 8.079 J.
-- Peak reaction force 0.556 kN at `u_x = 27.4 µm` (step 782).
-- `D_max = 1.0`.
+Stored run (`energies.txt`, `force_displacement.txt`, gold), 796 steps,
+8 h 7 min, 41 steps not converged within 200 iterations:
+- First peak 0.460 kN at `u_x = 10.5 µm`.
+- After the peak the force falls to 0.42 kN at 12 µm, then stays between 0.36
+  and 0.41 kN (0.393 kN at 15 µm, 0.402 kN at 20 µm, 0.363 kN at 24.8 µm).
+- At 25.0 µm (step 770) the ligament between the crack and the lower-right
+  corner breaks along the bottom edge and the force drops to 0.003 kN. The
+  main crack has then reached about `(0.71, 0.10) mm`.
+- Last step, per unit depth: `E_el` = 0.053 J/m, `E_frac` = 6.07 J/m.
 
-Open point, low priority. Beyond the regularised notch the crack dissipates
-4.669 - 1.358 = 3.31 J, against 1.49 J (`Gc · 0.55 mm`) for the arrest length of
-Ambati Fig. 12d. At 30 µm the case does not reproduce the arrest: either the
-crack runs further than in the reference, or AT2 on this mesh overestimates the
-fracture energy. The investigation plan is in `INVESTIGATION.md`.
+## Differences from Ambati
+
+Measured in `INVESTIGATION.md`:
+- Peak 6 % below Ambati's and 2 µm earlier. With the star-convex split
+  (`gamma_star: 5`) the peak is 0.455 kN at 10.2 µm, so the split moves it by
+  1 %. The notch is a line with `D = 1` here and an initial history field in
+  Ambati; on Ambati's mesh the notch representation sets the initial slope
+  (sections 13 and 14).
+- No post-peak minimum and rise, and the bottom ligament breaks. Ambati drives
+  the damage with the spectral split. Amor puts the whole deviatoric energy
+  in `psi+`, also under compression: at the lower-right corner, where the
+  strain trace is about -2 %, Amor's `psi+` exceeds `psi-` and the damage
+  grows, while the spectral `psi+` stays 7 to 60 times below `psi-`. The
+  spectral split is not used because the staggered loop almost never converges
+  with it (section 10).
+- 41 steps do not converge: Gauss points switch side of the hybrid
+  constraint (`psi- > psi+`) between iterations and the damage increment
+  stalls at about 1e-6, above `stag_tol: 1e-7` (sections 6 and 19). The last
+  iterate is kept.
 
 ## Files
 
@@ -85,29 +104,35 @@ fracture energy. The investigation plan is in `INVESTIGATION.md`.
 - `diagnostics.py`: per-step hook, writes `force_displacement.txt` at the case root.
 - `non-regression.py`: field plots of the last step, energy balance, gold checks.
 - `plot_energy_balance.py`, `plot_force_displacement.py`: standalone plots.
-- `INVESTIGATION.md`: plan for the open point on crack arrest.
-- `sweep_gamma.sh`: runs the case for `gamma_star` = 0, 1, 5 into `output_starconvex_<tag>/`.
+- `INVESTIGATION.md`: comparison with Ambati, one factor at a time.
+- `sweep_gamma.sh`: star-convex study, runs the case for `gamma_star` = 0, 1, 5 into
+  `output_starconvex_<tag>/`. It needs `split: star_convex` and a `gamma_star`
+  line in `input.yaml`, which the stored case does not have.
 - `Allrun`, `Allclean`.
 
 ## Outputs
 
-Written by the solver at the case root: `energies.txt`, `force_displacement.txt`.
+Written by the solver: `output/fields_NNNN.vtu` (one per step), `energies.txt`
+at the case root. Written by `diagnostics.py` at the case root:
+`force_displacement.txt`. `Allrun` writes the log `log_z3st.md`.
 
 Written by `non-regression.py` in `output/`:
 - `damage_field.png`: D at the last step.
 - `stress_vm_field.png`: von Mises stress at the last step.
 - `stress_xy_field.png`: σ_xy at the last step.
 - `stress_xx_field.png`: σ_xx at the last step.
-- `crack_driving_force_field.png`: H at the last step (written only when the VTU carries H).
+- `crack_driving_force_field.png`: H at the last step, averaged from cells to points.
 - `energy_balance.png`: E_el, E_frac, E_tot against step.
 - `non-regression.json`: tracked values `D_max`, `sigma_vm_max_MPa`, `E_el_final`,
   `E_frac_final`, `E_tot_final`.
 
-Written by `plot_force_displacement.py`: `output/force_displacement.png`.
+Written by `plot_force_displacement.py`: `output/force_displacement.csv` and
+`output/force_displacement.png`.
 
 ## Running
 
 ```bash
-./Allclean      # remove output and logs (mesh preserved)
+./Allclean      # remove output and logs; keeps the mesh, the last VTU,
+                # force_displacement.csv and the gold
 ./Allrun        # mesh -> z3st -> non-regression
 ```
