@@ -41,7 +41,8 @@ damage:
   convergence: rel_norm
   lc: 4.0e-6
   hybrid_constraint: true
-  split: amor
+  split: miehe
+  staggered: lagged
 
 lhr:
 - 0.0

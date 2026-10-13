@@ -88,6 +88,8 @@ Stored run (`energies.txt`, gold):
 - `bc_generator.ipynb`: notebook that writes the displacement list. Sets `u0`, `u1`, `delta_u1`.
 - `non-regression.py`: field plots of the last VTU, energy balance, gold checks.
 - `plot_force_displacement.py`: force-displacement plot.
+- `plot_damage_evolution.py`: damage at three steps and the crack-growth animation;
+  needs all the VTU files and `output/force_displacement.csv`.
 - `Allrun`, `Allclean`.
 
 ## Outputs
@@ -102,7 +104,11 @@ Written by `non-regression.py` in `output/`:
 - `non-regression.json`: tracked values `D_max`, `sigma_vm_max_MPa`, `E_el_final`,
   `E_frac_final`, `E_tot_final`.
 
-Written by `plot_force_displacement.py`: `output/force_displacement.png`.
+Written by `plot_force_displacement.py`: `output/force_displacement.csv` and
+`output/force_displacement.png`.
+
+Written by `plot_damage_evolution.py`: `output/damage_steps.png` (steps 550,
+625 and 700) and `output/damage_evolution.gif`.
 
 ## Running
 

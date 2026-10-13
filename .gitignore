@@ -43,6 +43,7 @@ input_check.txt
 # --. Data / results / figures --..
 *.csv
 *.png
+*.gif
 *.pdf
 
 # --. Mesh and simulation outputs --..

@@ -78,6 +78,10 @@ after.
   iterative convergence under mesh refinement with that split and leave it
   open. The combination used here (hybrid with star-convex, `gamma_star: 5`)
   has no published precedent.
+- The case now uses the spectral split with `staggered: lagged` (section 20):
+  all 796 steps converge in 2 or 3 iterations, in 1 h 16 min, the bottom
+  ligament does not break and the force has Ambati's peak, minimum and rise,
+  8 to 26 % above his curve.
 
 ## What has been done
 
@@ -653,6 +657,31 @@ stored run (section 12). The step converged in 132 iterations: the break is
 not an artefact of a non-converged step (step 1f). At step 769 the main
 crack has reached about (0.71, 0.10) mm.
 
+### 20. Spectral split with lagged staggering
+
+Committed case (fine mesh, line notch, damage tolerance 1e-7,
+`anderson_depth: 5`) with `split: miehe` and `staggered: lagged`, all 796
+steps, 1 h 16 min. With `lagged` the history is fixed within a step, so the
+hybrid mask cannot change side between iterations (section 15).
+
+| | `amor` + `coupled` (section 19) | `miehe` + `lagged` | Ambati (Fig. 13) |
+|---|---|---|---|
+| run time | 8 h 7 min | 1 h 16 min | - |
+| non-converged steps | 41 | 0 (794 in 3 iterations, 2 in 2) | - |
+| first peak | 0.460 kN at 10.5 um | 0.531 kN at 10.6 um | about 0.49 kN at 12.5 um |
+| minimum after the peak | none | 0.442 kN at 15.0 um | about 0.35 kN near 16 um |
+| force at 20 / 25 / 30 um | 0.402 / 0.003 / 0.004 kN | 0.538 / 0.577 / 0.588 kN | - / - / about 0.47 kN |
+| crack tip at 30 um | ligament broken at 25.0 um | about (0.74, 0.10) mm | bottom edge |
+| `E_frac` at 30 um | 6.07 J/m | 4.30 J/m | - |
+
+Up to 5 um the two splits give the same force (0.261 and 0.259 kN); at
+8.79 um the spectral one is 15 % higher (0.453 against 0.393 kN). The damage
+stays below 0.14 on the top edge and below 0.09 on the bottom edge. The force
+is 8 % above Ambati's at the first peak and 25 to 26 % above at the minimum
+and at 30 um. The one-increment lag of `lagged` accounts for 2.4 % at the
+peak on Ambati's mesh (section 18); the notch representation sets the initial
+slope (sections 13 and 14).
+
 ## Next steps
 
 1. Done (section 8): on a uniform 7 um mesh the crack reaches the bottom
@@ -672,7 +701,8 @@ crack has reached about (0.71, 0.10) mm.
    initial history field with `w = 8 um` 0.0445 (section 14).
 1f. Find why the bottom ligament breaks at 28.2 um. With `amor` and
    Anderson (section 19) it breaks at 25.0 um in a step that converged, so
-   convergence does not remove it.
+   convergence does not remove it. Done (section 20): with the spectral split
+   and `lagged` it does not break.
 2. Done (sections 15 and 16). Option A (`damage.hybrid_latch`, off by
    default; a point latched off at its second switch-off in a step) removes
    the cycle before the peak, and the log reports the latched points per
@@ -686,15 +716,17 @@ crack has reached about (0.71, 0.10) mm.
    `staggered: lagged` converges every step in a fifth of the time, with
    the same force up to 13 um and a 2.4 % higher peak. Anderson
    acceleration (section 19) cuts the non-converged steps of the committed
-   case to 41 of 796 with `amor`, but does not remove the cycle.
+   case to 41 of 796 with `amor`, but does not remove the cycle. Done
+   (section 20): with `lagged` and the spectral split every step converges.
 3. Decide the energy split of the case: the star-convex split with
    `gamma_star: 5` has no precedent with the hybrid model and can make psi+
    negative in compression. On Ambati's mesh Amor behaves like star-convex
-   (section 10) and the spectral split almost never converges.
+   (section 10) and the spectral split almost never converges. Done (section
+   20): spectral split, as in Ambati, with `staggered: lagged`.
 4. With the loop converging, run a mesh fine at the notch tip (0.8 um) and
    uniform along the whole expected path (2 to 4 um, no coarsening towards the
    bottom) to the end of the loading and compare path, force-displacement and energy per unit length
    with Ambati Fig. 12 and 13.
-5. Outcome: update the case (mesh, split), the gold with owner approval, and
+5. Done (section 20): case, gold and README updated. Outcome: update the case (mesh, split), the gold with owner approval, and
    the README, or state in the README the measured differences and their
    cause.

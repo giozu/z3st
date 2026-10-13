@@ -4,7 +4,7 @@ Test case based on the SENS-shear benchmark of Ambati et al. 2015
 (Comput Mech 55:383-405, §4.2), using the AT2 phase-field formulation with
 the hybrid constraint (their Eq. 27).
 
-Excluded from the local suite (`suite_exclude.txt`: 796 steps, about 8 h). Run it by hand.
+Excluded from the local suite (`suite_exclude.txt`: 796 steps, about 1.3 h). Run it by hand.
 
 ## Geometry and loading
 
@@ -46,12 +46,14 @@ AT2 analytical threshold (derived in `spine.py` at load time):
 ## Phase-field formulation (`input.yaml`)
 
 - AT2 crack-density functional, `lc = 4 µm`.
-- Amor energy split: `split: amor`.
+- Spectral energy split (Miehe), as in Ambati: `split: miehe`.
 - Hybrid constraint (Ambati Eq. 27): `hybrid_constraint: true`.
 
 ## Solver (`input.yaml`)
 
-- Staggered scheme, `max_iters: 200`, `relax_u: 1.0`, `relax_D: 0.8`,
+- Staggered scheme with the history field frozen within each step at the
+  displacement of the previous step (Miehe 2010, Box 1): `staggered: lagged`.
+  `max_iters: 200`, `relax_u: 1.0`, `relax_D: 0.8`,
   adaptive relaxation off (`relax_adaptive: false`).
 - Anderson acceleration of the damage update, `anderson_depth: 5`
   (`anderson_switch` at its default 5).
@@ -66,34 +68,37 @@ lower-right corner. Fig. 13, hybrid curve: first peak about 0.49 kN at about
 12.5 µm, minimum about 0.35 kN near 16 µm, about 0.47 kN at 30 µm.
 
 Stored run (`energies.txt`, `force_displacement.txt`, gold), 796 steps,
-8 h 7 min, 41 steps not converged within 200 iterations:
-- First peak 0.460 kN at `u_x = 10.5 µm`.
-- After the peak the force falls to 0.42 kN at 12 µm, then stays between 0.36
-  and 0.41 kN (0.393 kN at 15 µm, 0.402 kN at 20 µm, 0.363 kN at 24.8 µm).
-- At 25.0 µm (step 770) the ligament between the crack and the lower-right
-  corner breaks along the bottom edge and the force drops to 0.003 kN. The
-  main crack has then reached about `(0.71, 0.10) mm`.
-- Last step, per unit depth: `E_el` = 0.053 J/m, `E_frac` = 6.07 J/m.
+1 h 16 min, every step converged in 2 or 3 iterations:
+- First peak 0.531 kN at `u_x = 10.6 µm`.
+- Minimum 0.442 kN at 15 µm, then the force rises to 0.538 kN at 20 µm and
+  0.588 kN at 30 µm.
+- The crack starts at the notch tip, kinks down-right and at 30 µm reaches
+  about `(0.74, 0.10) mm`. The damage stays below 0.14 on the top and bottom
+  edges.
+- Last step, per unit depth: `E_el` = 8.74 J/m, `E_frac` = 4.30 J/m.
+  `Gc` times the crack length (about 0.97 mm) is 2.6 J/m.
+- The largest von Mises stress, 14.5 GPa, is at the clamped lower-right
+  corner `(1, 0) mm`, a corner singularity, where the damage stays 0.
+
+`output/damage_steps.png` shows the damage at steps 300, 550 and 795, and
+`output/damage_evolution.gif` the crack growth.
 
 ## Differences from Ambati
 
-Measured in `INVESTIGATION.md`:
-- Peak 6 % below Ambati's and 2 µm earlier. With the star-convex split
-  (`gamma_star: 5`) the peak is 0.455 kN at 10.2 µm, so the split moves it by
-  1 %. The notch is a line with `D = 1` here and an initial history field in
+Measured in `INVESTIGATION.md` (section 20):
+- The curve has Ambati's shape (peak, minimum, rise) but lies above it: first
+  peak 8 % higher and 1.9 µm earlier, minimum 26 % higher and 1 µm earlier,
+  force at 30 µm 25 % higher.
+- `staggered: lagged` delays the history by one increment. On Ambati's mesh
+  this raised the peak by 2.4 % against the coupled scheme (section 18).
+- The notch is a line with `D = 1` here and an initial history field in
   Ambati; on Ambati's mesh the notch representation sets the initial slope
   (sections 13 and 14).
-- No post-peak minimum and rise, and the bottom ligament breaks. Ambati drives
-  the damage with the spectral split. Amor puts the whole deviatoric energy
-  in `psi+`, also under compression: at the lower-right corner, where the
-  strain trace is about -2 %, Amor's `psi+` exceeds `psi-` and the damage
-  grows, while the spectral `psi+` stays 7 to 60 times below `psi-`. The
-  spectral split is not used because the staggered loop almost never converges
-  with it (section 10).
-- 41 steps do not converge: Gauss points switch side of the hybrid
-  constraint (`psi- > psi+`) between iterations and the damage increment
-  stalls at about 1e-6, above `stag_tol: 1e-7` (sections 6 and 19). The last
-  iterate is kept.
+- At 30 µm Ambati's crack reaches the bottom edge; here its tip is at
+  `y = 0.10 mm`.
+- With the coupled scheme (`staggered: coupled`) the spectral split almost
+  never converges (section 10). With the Amor split it converges in most
+  steps, but the bottom ligament breaks at 25 µm (section 19).
 
 ## Files
 
@@ -104,6 +109,8 @@ Measured in `INVESTIGATION.md`:
 - `diagnostics.py`: per-step hook, writes `force_displacement.txt` at the case root.
 - `non-regression.py`: field plots of the last step, energy balance, gold checks.
 - `plot_energy_balance.py`, `plot_force_displacement.py`: standalone plots.
+- `plot_damage_evolution.py`: damage at three steps and the crack-growth animation;
+  needs all the VTU files and `output/force_displacement.csv`.
 - `INVESTIGATION.md`: comparison with Ambati, one factor at a time.
 - `sweep_gamma.sh`: star-convex study, runs the case for `gamma_star` = 0, 1, 5 into
   `output_starconvex_<tag>/`. It needs `split: star_convex` and a `gamma_star`
@@ -128,6 +135,9 @@ Written by `non-regression.py` in `output/`:
 
 Written by `plot_force_displacement.py`: `output/force_displacement.csv` and
 `output/force_displacement.png`.
+
+Written by `plot_damage_evolution.py`: `output/damage_steps.png` and
+`output/damage_evolution.gif`.
 
 ## Running
 
