@@ -26,6 +26,10 @@ dependencies:
 - pyvista>=0.42
 - shapely   # utils/geo_files/pellet_fragmented.py imports it at module level
 
+  # --. Gmsh --..
+- gmsh          # executable used by Allrun
+- python-gmsh   # Python API; the pip wheel needs glibc >= 2.23 but is tagged manylinux1
+
   # --. Jupyter / visualization --..
 - jupyterlab
 - ipywidgets
@@ -53,7 +57,4 @@ dependencies:
   # Note: torch needs setuptools<82 while fenics-ffcx needs >=77.0.3; pin 81 if pip drifts:
   #   pip install "setuptools>=77.0.3,<82"
 
-  # --. Install via pip (not conda!) --..
-- pip:
-  - gmsh
   # docs: pip install -e '.[docs]'

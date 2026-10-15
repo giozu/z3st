@@ -20,27 +20,41 @@ Each physics model is a mixin of the `Spine` class (see [`docs/source/architectu
 ## Quick installation
 
 Clone the repository:
-  ```bash
-  git clone https://github.com/giozu/z3st.git
-  ```
+```bash
+git clone [https://github.com/giozu/z3st.git](https://github.com/giozu/z3st.git)
+```
 
 Z3ST requires FEniCSx (dolfinx), which is not installed by pip. Install it with Conda or use a Docker image.
-To install miniconda:
-  ```bash
-  mkdir -p ~/miniconda3
-  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-  rm ~/miniconda3/miniconda.sh
-  source ~/miniconda3/bin/activate
-  conda init --all
-  ```
+
+To install miniconda (for modern Linux systems):
+```bash
+mkdir -p ~/miniconda3
+wget [https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm ~/miniconda3/miniconda.sh
+source ~/miniconda3/bin/activate
+conda init --all
+```
+
+#### Note for HPC or Older Linux systems:
+If you get an error like 'Installer requires GLIBC >=2.28, but system has 2.17', you are on an older system (like CentOS 7). Use this compatible Miniconda version instead:
+```bash
+mkdir -p ~/miniconda3
+wget [https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh](https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh) -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm ~/miniconda3/miniconda.sh
+source ~/miniconda3/bin/activate
+conda init --all
+```
 
 Create and activate the Conda environment:
-  ```bash
-  cd z3st
-  conda env create -f z3st_env.yml
-  conda activate z3st
-  ```
+```bash
+cd z3st
+conda env create -f z3st_env.yml
+conda activate z3st
+```
+
+This ensures that users on modern laptops get the most up-to-date Python environment, while students or researchers deploying `z3st` on older cluster nodes know how to bypass the GLIBC error.
 
 Install in editable mode:
   ```bash
