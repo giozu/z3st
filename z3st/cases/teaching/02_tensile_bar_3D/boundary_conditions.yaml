@@ -1,13 +1,9 @@
 mechanical:
   steel:
-  # Symmetry planes of the quarter bar, and the fixed end. Nothing restrains the
-  # lateral contraction, so the bar is in uniaxial stress.
-  - type: Clamp_x
-    region: symx
-
-  - type: Clamp_y
-    region: symy
-
+  # The bottom end is held axially only, so nothing restrains the lateral contraction
+  # and the bar is in uniaxial stress. That leaves three rigid-body motions free
+  # (translation in x and y, rotation about z): input.yaml removes them from the solve
+  # with remove_rigid_nullspace, instead of pinning the bar anywhere else.
   - type: Clamp_z
     region: bottom
 

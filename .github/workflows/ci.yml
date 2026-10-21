@@ -10,13 +10,13 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # tested
     container:
       image: dolfinx/dolfinx:v0.11.0
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Verify FEniCSx environment
       run: |
@@ -36,7 +36,7 @@ jobs:
 
     - name: Upload test summary
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: non-regression-summary
         path: z3st/cases/non-regression_GH_summary.txt

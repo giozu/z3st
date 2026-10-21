@@ -48,7 +48,7 @@ is in the suite.
   `cases/`) with a trailing-comment reason.
 - CI runs the subset listed in `cases_ci.txt` (consumed by
   `non-regression_github.sh`). The file header states the time budget
-  (13 min 21 s for the listed cases). Most cases take under a minute;
+  (14 min 06 s for the listed cases). Most cases take under a minute;
   `porosity_migration_dg` (~364 s), `two_elliptical_cavities_2D` (~80 s) and
   `coaxial_gap_3D` (~74 s) do not.
 

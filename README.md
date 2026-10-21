@@ -1,5 +1,6 @@
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 [![DOI](https://zenodo.org/badge/648784453.svg)](https://doi.org/10.5281/zenodo.17748028)
+[![Paper](https://img.shields.io/badge/SoftwareX-10.1016%2Fj.softx.2026.103138-blue)](https://doi.org/10.1016/j.softx.2026.103138)
 [![CI](https://github.com/giozu/z3st/actions/workflows/ci.yml/badge.svg)](https://github.com/giozu/z3st/actions/workflows/ci.yml)
 ![static](https://github.com/giozu/z3st/actions/workflows/static.yml/badge.svg)
 <!-- ![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg) -->
@@ -20,27 +21,41 @@ Each physics model is a mixin of the `Spine` class (see [`docs/source/architectu
 ## Quick installation
 
 Clone the repository:
-  ```bash
-  git clone https://github.com/giozu/z3st.git
-  ```
+```bash
+git clone [https://github.com/giozu/z3st.git](https://github.com/giozu/z3st.git)
+```
 
 Z3ST requires FEniCSx (dolfinx), which is not installed by pip. Install it with Conda or use a Docker image.
-To install miniconda:
-  ```bash
-  mkdir -p ~/miniconda3
-  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-  rm ~/miniconda3/miniconda.sh
-  source ~/miniconda3/bin/activate
-  conda init --all
-  ```
+
+To install miniconda (for modern Linux systems):
+```bash
+mkdir -p ~/miniconda3
+wget [https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm ~/miniconda3/miniconda.sh
+source ~/miniconda3/bin/activate
+conda init --all
+```
+
+#### Note for HPC or Older Linux systems:
+If you get an error like 'Installer requires GLIBC >=2.28, but system has 2.17', you are on an older system (like CentOS 7). Use this compatible Miniconda version instead:
+```bash
+mkdir -p ~/miniconda3
+wget [https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh](https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh) -O ~/miniconda3/miniconda.sh
+bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+rm ~/miniconda3/miniconda.sh
+source ~/miniconda3/bin/activate
+conda init --all
+```
 
 Create and activate the Conda environment:
-  ```bash
-  cd z3st
-  conda env create -f z3st_env.yml
-  conda activate z3st
-  ```
+```bash
+cd z3st
+conda env create -f z3st_env.yml
+conda activate z3st
+```
+
+This ensures that users on modern laptops get the most up-to-date Python environment, while students or researchers deploying `z3st` on older cluster nodes know how to bypass the GLIBC error.
 
 Install in editable mode:
   ```bash
@@ -444,7 +459,21 @@ The Newton route for data-driven conductivity builds on **dolfinx-external-opera
 
 ## License & author
 
-If you use Z3ST in your research, please cite the archived software:
+If you use Z3ST in your research, please cite the SoftwareX article:
+
+```bibtex
+@article{Zullo2026Z3ST,
+  author  = {Giovanni Zullo and Aya Zayat and Giovanni Nicodemo and Elisa Cappellari and Davide Pizzocri and Lelio Luzzi},
+  title   = {Z3ST: an open-source FEniCSx framework for thermo-mechanics and fracture of nuclear materials},
+  journal = {SoftwareX},
+  volume  = {36},
+  pages   = {103138},
+  year    = {2026},
+  doi     = {10.1016/j.softx.2026.103138}
+}
+```
+
+and the archived software:
 
 ```bibtex
 @software{Z3ST,
@@ -459,8 +488,6 @@ If you use Z3ST in your research, please cite the archived software:
 This is the concept DOI. It covers every release and resolves to the most recent
 one. To cite the exact code behind a result, use the version DOI from the Zenodo
 page of the release you used, and give the version number.
-
-A software paper describing the framework is in preparation.
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano

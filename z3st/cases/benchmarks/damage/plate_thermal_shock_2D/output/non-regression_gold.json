@@ -8,8 +8,8 @@
             "status": "PASS"
         },
         "T_max_final": {
-            "numerical": 550.0014821097465,
-            "reference": 550.0014821097465,
+            "numerical": 550.0014821097463,
+            "reference": 550.0014821097463,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
@@ -29,8 +29,8 @@
             "status": "PASS"
         },
         "D_mean_final": {
-            "numerical": 0.03375859226910794,
-            "reference": 0.03375859226910794,
+            "numerical": 0.0337585922691082,
+            "reference": 0.0337585922691082,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
@@ -38,6 +38,34 @@
         "damaged_node_fraction": {
             "numerical": 0.03249721689286814,
             "reference": 0.03249721689286814,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_bottom_0.1mm": {
+            "numerical": 13.0,
+            "reference": 13.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_bottom_0.8mm": {
+            "numerical": 8.0,
+            "reference": 8.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_top_0.1mm": {
+            "numerical": 13.0,
+            "reference": 13.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "crack_count_top_0.8mm": {
+            "numerical": 8.0,
+            "reference": 8.0,
             "abs_error": 0.0,
             "rel_error": 0.0,
             "status": "PASS"
@@ -66,5 +94,5 @@
     },
     "tolerance": 0.01,
     "summary": "PASS",
-    "regression": "FAIL"
+    "regression": "PASS"
 }

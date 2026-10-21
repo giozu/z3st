@@ -139,6 +139,10 @@ def _get(pv_mesh, names):
     for n in names:
         if n in pv_mesh.point_data:
             return np.asarray(pv_mesh.point_data[n])
+    # Cell fields (H is written per cell): averaged to the points.
+    for n in names:
+        if n in pv_mesh.cell_data:
+            return np.asarray(pv_mesh.cell_data_to_point_data().point_data[n])
     return None
 
 

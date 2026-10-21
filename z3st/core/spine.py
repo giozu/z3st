@@ -365,6 +365,16 @@ class Spine(
                 print(f"  → creep: Norton, A0 = {mat['creep_A0']:.3e} Pa^-n/s, "
                       f"n = {mat['creep_n']:.2f}, Q = {mat['creep_Q']:.3e} J/mol")
 
+            # Without T_ref the thermal eigenstrain alpha*(T - T_ref) is dropped
+            # silently (MechanicalModel.eigenstrain), and the initial
+            # temperature falls back to T_ref when T_initial is absent.
+            if "alpha" in mat and "T_ref" not in mat:
+                raise ValueError(f"Material '{name}': 'alpha' requires 'T_ref'.")
+            if self.on.get("thermal", False) and "T_initial" not in mat and "T_ref" not in mat:
+                raise ValueError(
+                    f"Material '{name}': the thermal model needs 'T_initial' or 'T_ref'."
+                )
+
             mat["__label__"] = name
             self.materials[name] = mat
             # Full per-key material dump only under --debug
@@ -469,8 +479,48 @@ class Spine(
             print("\nInitializing the damage field...")
             self.D = dolfinx.fem.Function(self.V_d, name="Damage")
             self.D.x.array[:] = 0.0  # undamaged initial state
-            self.H = dolfinx.fem.Function(self.Q, name="CrackDrivingForce")
+            # History space: one value per cell (DG0, default), or one per
+            # quadrature point of a degree-2 rule (2 x 2 Gauss points on
+            # quadrilaterals, 3 on triangles), as in fully integrated FE codes.
+            history = str(self.dmg_cfg.get("history", "cell")).lower()
+            if history == "quadrature":
+                import basix.ufl
+                self.H_qdeg = 2
+                el_H = basix.ufl.quadrature_element(
+                    self.mesh.topology.cell_name(), value_shape=(), degree=self.H_qdeg)
+                self.Q_H = dolfinx.fem.functionspace(self.mesh, el_H)
+            elif history == "cell":
+                self.H_qdeg = None
+                self.Q_H = self.Q
+            else:
+                raise ValueError(
+                    f"damage.history must be 'cell' or 'quadrature' (got '{history}').")
+            self.H = dolfinx.fem.Function(self.Q_H, name="CrackDrivingForce")
             self.H.x.array[:] = 0.0
+            # Optional notch as an initial history field (Borden et al. 2012,
+            # used by Ambati et al. 2015): H0 = B * (1 - d / w) within a
+            # distance w of the segment [start, end], H being normalised by
+            # Gc / (2 lc). Default w = lc / 2, Borden's l0 in this convention.
+            notch = self.dmg_cfg.get("notch_history")
+            if notch is not None:
+                if str(self.dmg_cfg.get("type", "AT2")).upper() != "AT2":
+                    raise ValueError("damage.notch_history requires damage.type: AT2.")
+                p = np.asarray(notch["start"], dtype=float)
+                q = np.asarray(notch["end"], dtype=float)
+                B = float(notch.get("B", 1.0e3))
+                w = float(notch.get("half_width", 0.5 * float(self.dmg_cfg["lc"])))
+                x = ufl.SpatialCoordinate(self.mesh)
+                xy = ufl.as_vector([x[0], x[1]])
+                pq = ufl.as_vector(list(q - p))
+                t = ufl.dot(xy - ufl.as_vector(list(p)), pq) / float(np.dot(q - p, q - p))
+                t = ufl.min_value(ufl.max_value(t, 0.0), 1.0)
+                r = xy - ufl.as_vector(list(p)) - t * pq
+                d = ufl.sqrt(ufl.dot(r, r))
+                H0 = ufl.conditional(ufl.lt(d, w), B * (1.0 - d / w), 0.0)
+                self.H.interpolate(
+                    dolfinx.fem.Expression(H0, self.Q_H.element.interpolation_points))
+                print(f"  Notch history: {int(np.count_nonzero(self.H.x.array))} "
+                      f"history points with H0 > 0 (B = {B:g}, w = {w:.3e} m)")
 
         # Cohesive fracture: the mixed (u, eigenstrain) state and its phase
         # field. self.u stays allocated above and is kept as the mirror of the
@@ -672,33 +722,30 @@ class Spine(
                 fissile_names.append(name)
 
             if float(mat.get("gamma_heating", 0.0)) > 0.0:
-                # Cylindrical and spherical gamma-decay correlations use
-                # `inner_radius` as the reference surface, and require it
-                # non-zero: K_0(0) = +inf (cyl), 1/r at r = 0 (sphere).
-                if (
-                    self.geometry_type in ("cyl", "cylinder", "sphere")
-                    and float(getattr(self, "inner_radius", 0.0) or 0.0) == 0.0
-                ):
+                if self.geometry_type not in ("rect", "cyl", "cylinder", "cyl-cyl", "sphere"):
                     raise ValueError(
-                        f"Material '{name}' has gamma_heating > 0 with "
-                        f"geometry_type='{self.geometry_type}' and inner_radius == 0. "
-                        f"The decay correlation requires a non-zero inner radius "
-                        f"as the reference surface; set inner_radius > 0 in geometry.yaml "
-                        f"or use geometry_type='rect'."
+                        f"Material '{name}': gamma_heating has no profile for "
+                        f"geometry_type='{self.geometry_type}'."
                     )
-
                 q_third_0 = float(mat["gamma_heating"])
                 mu = float(mat["mu_gamma"])
-                # Per-material reference surface for the cylindrical/spherical
-                # decay correlation. Defaults to the geometry inner_radius.
-                # `gamma_inner_radius` normalises the K_0 profile at the
-                # material's own inner surface instead.
-                gamma_Ri = float(mat.get("gamma_inner_radius", self.inner_radius))
+                # Reference surface of the cylindrical/spherical decay: the
+                # material's own gamma_inner_radius, else the geometry
+                # inner_radius. cyl-cyl has two bodies and no single
+                # inner_radius, so it needs gamma_inner_radius.
+                gamma_Ri = float(mat.get("gamma_inner_radius", self.inner_radius or 0.0))
+                if self.geometry_type != "rect" and gamma_Ri == 0.0:
+                    raise ValueError(
+                        f"Material '{name}': gamma_heating with geometry_type="
+                        f"'{self.geometry_type}' needs a non-zero reference radius "
+                        f"(K_0(0) and 1/r diverge at r = 0). Set gamma_inner_radius "
+                        f"in the card or inner_radius in geometry.yaml."
+                    )
 
                 def f(x, q_third_0=q_third_0, mu=mu, gamma_Ri=gamma_Ri):
                     if self.geometry_type == "rect":
                         return q_third_0 * np.exp(-x[0] * mu)
-                    elif self.geometry_type in ["cyl", "cylinder"]:
+                    elif self.geometry_type in ["cyl", "cylinder", "cyl-cyl"]:
                         import scipy.special as sp
 
                         if (
@@ -1027,8 +1074,12 @@ class Spine(
                 self.energy_density[name] = self.elastic_energy_density(self.u, mat, T=T_field)
                 self.stress_mech[name] = self.sigma_mech(self.u, mat)
             
-            if self.on.get("thermal", False):
-                self.stress_th[name] = self.sigma_th(self.T, mat)      
+            # Same predicate and temperature as the momentum balance, so the
+            # written stress includes swelling and material eigenstrains also
+            # when the thermal model is off.
+            if self.applies_eigenstress(mat):
+                T_eig = self.T if self.on.get("thermal", False) else None
+                self.stress_th[name] = self.sigma_th(T_eig, mat)
                       
             if name in self.stress_mech and name in self.stress_th:
                 self.stress[name] = self.stress_mech[name] + self.stress_th[name]

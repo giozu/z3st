@@ -92,7 +92,8 @@ by thermal expansion and loads the ring through penalty contact
 (:math:`k_\mathrm{pen} = 10^{15}` Pa/m). P1 temperature, P2 displacement.
 
 Check: contact pressure against the plane-stress Lamé interference pressure.
-The mesh study and its 1 % model floor are described in :doc:`verification`.
+The mesh study and its floor of about 0.35 %, set by the penalty, are described
+in :doc:`verification`.
 
 Thermo-mechanics
 ----------------

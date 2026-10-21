@@ -200,9 +200,13 @@ class GapModel:
                     return
 
                 self.gap_temperature = 0.5 * (mean_here + mean_other)
-                # Remember the paired regions so the Ross-Stoute contact term
-                # uses the conductivities of the actual contacting materials.
-                self._gap_pair_labels = (label, pair_region)
+                # Remember the two materials of the pair so the Ross-Stoute
+                # contact term uses their conductivities. pair_region is a
+                # surface: its material is the one whose Robin list holds it.
+                pair_id = self.label_map[pair_region]
+                other = next((m for m, bcs in self.robin_thermal.items()
+                              if any(b["id"] == pair_id for b in bcs)), None)
+                self._gap_pair_labels = (label, other)
 
                 print(
                     f"  → Average gap temperature between {label} and {pair_region}: {self.gap_temperature:.2f} K"

@@ -353,7 +353,10 @@ class MechanicalModel:
 
             # Components of the strain tensor in cylindrical coordinates (r, theta, z)
             eps_rr = u[0].dx(0)  # Normal radial strain
-            eps_tt = u[0] / r  # Hoop strain (tangential)
+            # Hoop strain u_r/r, with its limit du_r/dr on the axis r = 0, where
+            # output fields are interpolated at nodes. Quadrature points never
+            # lie on the axis, so the assembled forms are unchanged.
+            eps_tt = ufl.conditional(ufl.gt(r, 0.0), u[0] / r, u[0].dx(0))
             eps_zz = u[1].dx(1)  # Normal axial strain
             eps_rz = 0.5 * (u[0].dx(1) + u[1].dx(0))  # Shear strain in the r-z plane
 
@@ -409,7 +412,7 @@ class MechanicalModel:
             # F in cylindrical coordinates (r, θ, z)
             F_def = ufl.as_tensor([
                 [1.0 + u[0].dx(0),  0.0,  u[0].dx(1)],
-                [0.0,               1.0 + u[0] / r,  0.0],
+                [0.0,               1.0 + ufl.conditional(ufl.gt(r, 0.0), u[0] / r, u[0].dx(0)),  0.0],
                 [u[1].dx(0),        0.0,  1.0 + u[1].dx(1)],
             ])
 

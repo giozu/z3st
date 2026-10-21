@@ -19,25 +19,27 @@ Create the environment
    conda activate z3st
 
 ``z3st_env.yml`` pins ``python=3.12`` and ``fenics-dolfinx=0.11.0`` from
-``conda-forge`` and installs the Gmsh Python API with ``pip``.
+``conda-forge``, Gmsh included.
 
 **By hand**, with the same pins:
 
 .. code-block:: bash
 
    conda create -n z3st -c conda-forge python=3.12 fenics-dolfinx=0.11.0 \
-       "numpy>=2" scipy matplotlib "pyvista>=0.42" pyyaml h5py shapely pandas -y
+       "numpy>=2" scipy matplotlib "pyvista>=0.42" pyyaml h5py shapely pandas \
+       gmsh python-gmsh -y
    conda activate z3st
-   pip install gmsh
 
 Keep the ``=0.11.0`` pin. Without it ``conda`` installs the newest dolfinx on
 ``conda-forge``, whose API may differ from the one Z3ST is tested against.
 
 .. note::
 
-   The ``gmsh`` package on ``conda-forge`` provides the Gmsh executable but not the
-   Python module that ``dolfinx.io.gmsh`` imports, so Gmsh is installed with
-   ``pip``.
+   On ``conda-forge``, ``gmsh`` provides the executable and ``python-gmsh`` the
+   Python module that ``dolfinx.io.gmsh`` imports. Do not use ``pip install gmsh``:
+   the wheel is tagged ``manylinux1`` but ``libgmsh`` needs glibc >= 2.23, so on
+   older nodes (CentOS 7, glibc 2.17) it installs and then fails with
+   ``GLIBC_2.23 not found``.
 
 Install Z3ST (required)
 -----------------------
@@ -67,10 +69,18 @@ Check the installation
 The first line must read ``dolfinx 0.11.0``. Every run also prints the versions of
 Python, dolfinx, basix, UFL, PETSc, NumPy and SciPy at the top of its log.
 
-Gmsh under WSL
---------------
+Windows
+-------
 
-Under Windows Subsystem for Linux the Gmsh window can open black or without fonts.
+Use WSL2 and create the environment inside the Linux distribution. conda-forge
+ships a native ``win-64`` build of ``fenics-dolfinx``, so ``conda env create``
+succeeds on Windows, but that build has no PETSc (no ``petsc4py`` and no
+``dolfinx.fem.petsc``), which every Z3ST solver imports.
+
+To install WSL2 with Ubuntu, run ``wsl --install`` in PowerShell as administrator,
+restart, and follow the steps above from the Ubuntu terminal.
+
+Under WSL the Gmsh window can open black or without fonts.
 Two remedies:
 
 .. code-block:: bash

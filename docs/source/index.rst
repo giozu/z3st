@@ -82,7 +82,16 @@ Main modules
 Citing Z3ST
 -----------
 
-If you use Z3ST, cite the archived software:
+If you use Z3ST, cite the SoftwareX article:
+
+.. code-block:: text
+
+   G. Zullo, A. Zayat, G. Nicodemo, E. Cappellari, D. Pizzocri, L. Luzzi (2026).
+   Z3ST: an open-source FEniCSx framework for thermo-mechanics and fracture of
+   nuclear materials. SoftwareX 36, 103138.
+   https://doi.org/10.1016/j.softx.2026.103138
+
+and the archived software:
 
 .. code-block:: text
 
@@ -116,6 +125,7 @@ Documentation contents
    architecture
    physics_models
    staggered_theory
+   linear_solvers
    examples
    verification
 

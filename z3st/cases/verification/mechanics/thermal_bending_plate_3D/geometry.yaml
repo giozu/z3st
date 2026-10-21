@@ -1,0 +1,15 @@
+name: box
+geometry_type: rect
+
+Lx: 0.200 # plate thickness (m)
+Ly: 1.000 # half-span in y (m), symmetry plane at y = 0
+Lz: 1.000 # half-span in z (m), symmetry plane at z = 0
+
+labels:
+  zmin: 1
+  ymin: 2
+  xmax: 3
+  ymax: 4
+  zmax: 6
+  xmin: 5
+  steel: 7

@@ -52,9 +52,9 @@ def sigma_th_ana(x, c=1.0):
     """Analytical thermal stress sigma_yy(x) of the strip, plane strain.
 
     The mean temperature is the integral of analytic_T over [0, Lx], computed
-    on a fine grid. It used to be the trapezoid of T over the sampled cell
-    centres, which leaves out half a cell at each end: the reference then
-    carried an O(h) error and the stress appeared to converge at first order.
+    on a fine grid independent of the mesh. A trapezoid over the sampled cell
+    centres would leave out half a cell at each end and put an O(h) error in
+    the reference, which would show as first-order convergence of the stress.
     """
     xf = np.linspace(0.0, Lx, 200001)
     T_mean = np.trapezoid(analytic_T(xf), xf) / Lx

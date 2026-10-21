@@ -19,7 +19,7 @@ the interference is
 
 which gives the exact Lame shrink-fit pressure for a solid cylinder in a tube:
 
-    p = delta / { b [ (1/E_c)((c^2+b^2)/(c^2-b^2) + nu_c) + (1/E_f)(1 - nu_f) ] }
+    p = delta / { b_ci (1/E_c)((c^2+b_ci^2)/(c^2-b_ci^2) + nu_c) + b (1/E_f)(1 - nu_f) }
 
 plane-stress form, consistent with the axially-free pellet. Under volumetric
 heating the pellet develops a radial gradient instead, and the free-expansion
@@ -69,8 +69,10 @@ Ef, nuf, af, Trf = (float(fuel[k]) for k in ("E", "nu", "alpha", "T_ref"))
 clad = yaml.safe_load(open(os.path.join(CASE, inp["materials"]["cyl_2"])))
 Ec, nuc = float(clad["E"]), float(clad["nu"])
 
-# Lame interference-fit compliance (plane stress): delta = p * b * comp
-comp = (1.0 / Ec) * ((c**2 + bci**2) / (c**2 - bci**2) + nuc) + (1.0 / Ef) * (1.0 - nuf)
+# Lame interference-fit compliance (plane stress): delta = p * comp
+# The ring term is multiplied by bci and the disc term by b: the ring opens at
+# its own inner radius.
+comp = bci / Ec * ((c**2 + bci**2) / (c**2 - bci**2) + nuc) + b / Ef * (1.0 - nuf)
 
 amean = lambda v, r, lo, hi: (lambda m: np.sum(v[m] * r[m]) / np.sum(r[m]))((r >= lo) & (r <= hi))
 
@@ -121,7 +123,7 @@ for f in files:
 
     delta = af * (Tp_lame - Trf) * b - g0                     # exact interference
     gap_free.append(-delta)                                   # analytic OPEN gap (no contact)
-    p_lame.append((delta / (b * comp) / 1e6) if delta > 0 else 0.0)
+    p_lame.append((delta / comp / 1e6) if delta > 0 else 0.0)
 
 T_pellet, p_z3st, p_lame, gap_z3st, gap_free = map(
     np.array, (T_pellet, p_z3st, p_lame, gap_z3st, gap_free))

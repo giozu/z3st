@@ -678,8 +678,10 @@ class ThermalModel:
             )
         nn = (cKDTree(other_xyz).query(coords[dofs_here], k=1)[1]
               if dofs_here.size else np.array([], dtype=np.int64))
+        
         return {"fn": fn, "dofs_here": dofs_here, "other_owned": other_owned,
                 "nn": nn}
+    
     def _refresh_gap_pair(self, aux, T_new):
         """Copy the paired surface's current temperatures onto the persistent
         T_other Function through the precomputed nearest-neighbour map. In

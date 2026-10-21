@@ -108,6 +108,80 @@ computed. :math:`A` converts the linear heat rate ``lhr`` into a volumetric sour
      - ``area``, ``perimeter`` (default 0)
      - ``area``
 
+Z3ST reads only ``mesh.msh``. Every case in the repository writes it from
+``mesh.geo``, since ``z3st/utils/allrun.sh`` runs ``gmsh mesh.geo -$DIM``. Two
+other routes produce the same file:
+
+- the Gmsh Python API (``import gmsh``), for parametric geometry that needs
+  loops, conditionals or computed positions;
+- a CAD model exported as STEP (not STL, which is already triangulated) and
+  imported in Gmsh with the OpenCASCADE kernel.
+
+A STEP file carries surfaces and volumes but no physical groups, so they are
+assigned in Gmsh. Select faces by geometry (centre of mass, normal), not by the
+tags Gmsh assigns on import, which depend on the CAD tool and the exporter.
+Axis-aligned ``BoundingBox`` selection can pick wrong faces on non-rectangular
+shapes: on a hexagonal shell it puts outer faces in the inner group. Example for
+a hexagonal shell with inner apothem 0.057 m and outer apothem 0.060 m:
+
+.. code-block:: python
+
+   # mesh.py
+   import math
+   import gmsh
+
+   gmsh.initialize()
+   gmsh.option.setString("Geometry.OCCTargetUnit", "M")   # STEP in mm -> metres
+   gmsh.model.occ.importShapes("hex_shell.step")
+   gmsh.model.occ.synchronize()
+
+   xmin, ymin, zmin, xmax, ymax, zmax = gmsh.model.getBoundingBox(-1, -1)
+   tol = 1e-6
+   groups = {"zmin": [], "zmax": [], "outer": [], "inner": []}
+
+   for dim, tag in gmsh.model.getEntities(2):
+       x, y, z = gmsh.model.occ.getCenterOfMass(dim, tag)
+       if abs(z - zmin) < tol:
+           groups["zmin"].append(tag)
+       elif abs(z - zmax) < tol:
+           groups["zmax"].append(tag)
+       elif math.hypot(x, y) > 0.0585:   # between inner and outer apothem
+           groups["outer"].append(tag)
+       else:
+           groups["inner"].append(tag)
+
+   for i, (name, tags) in enumerate(groups.items(), start=1):
+       gmsh.model.addPhysicalGroup(2, tags, i, name)
+   gmsh.model.addPhysicalGroup(3, [t for _, t in gmsh.model.getEntities(3)], 5, "steel")
+
+   gmsh.option.setNumber("Mesh.MeshSizeMax", 0.004)
+   gmsh.model.mesh.generate(3)
+   gmsh.write("mesh.msh")
+   gmsh.finalize()
+
+The matching ``labels`` in ``geometry.yaml`` are ``zmin: 1``, ``zmax: 2``,
+``outer: 3``, ``inner: 4``, ``steel: 5``. Three checks:
+
+- Units. CAD tools usually export in millimetres and Z3ST works in metres.
+  Without ``Geometry.OCCTargetUnit = "M"`` the geometry is 1000 times larger, and
+  nothing reports it.
+- Several bodies. Export all of them (for example pellet and cladding) in one STEP
+  file and call ``gmsh.model.occ.fragment``, so that each contact face belongs to
+  both bodies and their meshes share nodes there.
+- Groups. Open ``mesh.msh`` in Gmsh, use Tools → Visibility, and confirm that each
+  physical group holds the intended faces before running the case.
+
+``allrun.sh`` meshes only from ``mesh.geo``, so a case meshed by ``mesh.py`` needs
+its own ``Allrun``:
+
+.. code-block:: bash
+
+   #!/bin/bash
+   set -e
+   cd "${0%/*}"
+   python3 mesh.py > log_mesh.md
+   python3 -m z3st > log_z3st.md
+
 boundary_conditions.yaml
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -212,11 +286,32 @@ uses every default.
      - Aitken :math:`\Delta^2` relaxation of the displacement update. It replaces
        the adaptive controller for ``relax_u`` and restarts from ``relax_u`` at
        every time step.
+   * - ``anderson_depth``
+     - 0
+     - Anderson acceleration of the phase-field damage update, combining the
+       last ``anderson_depth + 1`` solver outputs; 0 switches it off. Restarts
+       at every time step. Not used by the cohesive route.
+   * - ``anderson_switch``
+     - 5
+     - Consecutive decreases of the damage increment after which Anderson
+       restarts, once a rise has switched it to ``relax_D``.
 
 The adaptive controller compares each residual :math:`r_k` with the moving
 average :math:`\bar r_k = 0.3\,r_k + 0.7\,\bar r_{k-1}`, multiplies the factor by
 ``relax_growth`` when :math:`r_k < \bar r_k` and by ``relax_shrink`` otherwise,
 and clamps it to ``[relax_min, relax_max]``.
+
+Anderson acceleration follows Storvik et al. (CMAME 381, 2021, 113822,
+Algorithms 1 and 3): the new damage field is the combination of the last
+solver outputs that minimises the norm of their combined increment. When the
+norm of the damage increment rises, the update falls back to ``relax_D``;
+after ``anderson_switch`` decreases it returns to Anderson with an empty
+history. While Anderson is active ``relax_D`` is not applied: the first
+update of a step, and the first after a restart, is the unrelaxed solver
+output. Storvik switches on the mechanical residual; Z3ST switches on the
+damage increment, the quantity of the convergence test. Anderson speeds up
+steps that converge smoothly; it does not remove the cycle of the hybrid
+mask (``sen_shear/INVESTIGATION.md``, sections 6 and 19).
 
 Per-physics blocks
 ^^^^^^^^^^^^^^^^^^
@@ -342,6 +437,31 @@ non-empty when ``models.damage`` is on.
      - ``true``
      - Suppress growth of the driving force in cells where
        :math:`\psi^- > \psi^+` (Ambati et al. 2015).
+   * - ``history``
+     - ``cell``
+     - Space of the history field :math:`\mathcal H`: ``cell`` (DG0, one value
+       per cell at its centre) or ``quadrature`` (one value per point of a
+       degree-2 rule, 2 x 2 Gauss points on quadrilaterals, and the damage
+       form integrated with the same rule).
+   * - ``staggered``
+     - ``coupled``
+     - ``coupled``: the history is updated from every displacement iterate
+       and u and d are iterated to the staggered tolerance. ``lagged``: the
+       history is computed once per step from the converged displacement of
+       the previous step (for AT2 :math:`\mathcal H = \max(\mathcal H^n,
+       \psi^+(\boldsymbol u^n))`) and kept fixed; the loop then gives
+       :math:`d^{n+1}` for that history and :math:`\boldsymbol u^{n+1}` at
+       that :math:`d^{n+1}`. This is the operator split of Miehe, Hofacker
+       and Welschinger, *Comput. Methods Appl. Mech. Engrg.* 199 (2010)
+       2765-2778, doi:10.1016/j.cma.2010.04.011, Eq. (54) and Box 1. It lags
+       the crack by one load increment, so its accuracy depends on the
+       increment (Miehe et al., Sect. 4.1.5).
+   * - ``notch_history``
+     - none
+     - Notch as an initial history field (Borden et al. 2012), AT2 only:
+       ``{start: [x, y], end: [x, y], B: 1000, half_width: lc/2}``. Sets
+       :math:`\mathcal H_0 = B\,(1 - d/w)` within a distance :math:`w` of the
+       segment, :math:`\mathcal H` being normalised by :math:`G_c/(2\ell)`.
 
 **porosity** (``z3st/models/porosity_migration_model.py``). The porosity solve
 has its own convergence test and does not read ``convergence`` or ``stag_tol``.

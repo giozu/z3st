@@ -17,9 +17,10 @@ sys.path.insert(0, str(ROOT))
 from z3st.materials.magni_mox_thermal import k_numpy  # noqa: E402
 
 # The assimilation dataset (Th_Cond_UPuAm, Magni + new data) is NOT part of
-# this repository, so --csv has no default and must be given explicitly. The
-# committed checkpoint in output/ is the artefact of a previous fit; refitting
-# requires obtaining the source data separately.
+# this repository, so --csv has no default and must be given explicitly. No
+# checkpoint is committed (*.npz is gitignored). The fit is written to
+# output/magni_gpr_model.npz, the same file make_synthetic_gpr.py writes for
+# the suite, so running this script replaces the synthetic checkpoint.
 
 FEATURES = ["Temp", "Pu", "Am", "x", "p"]
 

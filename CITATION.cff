@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
+message: "If you use this software, please cite the SoftwareX article below and the archived software."
 title: "Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis"
 authors:
   - family-names: Zullo
@@ -22,3 +22,24 @@ keywords:
   - plasticity
   - nuclear fuel performance
   - UO2
+preferred-citation:
+  type: article
+  title: "Z3ST: an open-source FEniCSx framework for thermo-mechanics and fracture of nuclear materials"
+  authors:
+    - family-names: Zullo
+      given-names: Giovanni
+    - family-names: Zayat
+      given-names: Aya
+    - family-names: Nicodemo
+      given-names: Giovanni
+    - family-names: Cappellari
+      given-names: Elisa
+    - family-names: Pizzocri
+      given-names: Davide
+    - family-names: Luzzi
+      given-names: Lelio
+  journal: SoftwareX
+  volume: 36
+  start: 103138
+  year: 2026
+  doi: 10.1016/j.softx.2026.103138

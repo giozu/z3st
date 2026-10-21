@@ -7,17 +7,15 @@ Z3ST case: benchmarks/damage/plate_thermal_shock_2D
 Kamagate et al. (2025) quenched-plate replica: crack nucleation under thermal
 shock, no pre-crack and no damage seed.
 
-Not checked
---.--.--.--.-
+The number of nucleated cracks per quenched edge is counted and tracked. It is
+sensitive to mesh, lc and heterogeneity, and the shipped mesh is lc/3, not the
+lc/4.5 at which counts stop moving under refinement, so it is a regression
+metric on this mesh and not a comparison with the paper.
 
-The number of nucleated cracks: the count is sensitive to mesh, lc and
-heterogeneity, and the shipped mesh is lc/3, not the lc/4.5 at which counts
-stop moving under refinement.
-
-Checked instead: quantities that do not depend on how a damage band splits. The
-temperature field is effectively one-way (constant k and c, damage heat
-neglected). Everything is tracked() -- recorded in the gold and guarded against
-regression; the paper gives a pattern to match, not numbers to hit.
+The other metrics do not depend on how a damage band splits. The temperature
+field is effectively one-way (constant k and c, damage heat neglected).
+Everything is tracked(): recorded in the gold and guarded against regression.
+The paper gives a pattern to match, not numbers to hit.
 """
 
 import os
@@ -55,13 +53,42 @@ errors["T_mean_final"] = tracked(T.mean())
 # The damaged-node fraction integrates "how much" damage there is without caring
 # how it splits into bands. It is mesh-dependent in absolute terms; the
 # regression check compares runs on the same mesh.
-_, _, _, D = extract_field_xdmf(XDMF_FILE, "Damage", step_index=-1)
+x, y, _, D = extract_field_xdmf(XDMF_FILE, "Damage", step_index=-1)
 D = np.asarray(D).reshape(-1)
 frac = float(np.count_nonzero(D > 0.5)) / D.size
 print(f"[INFO] D final: max = {D.max():.4f}, nodes with D > 0.5 = {frac*100:.3f} %")
 errors["D_max_final"] = tracked(D.max())
 errors["D_mean_final"] = tracked(D.mean())
 errors["damaged_node_fraction"] = tracked(frac)
+
+
+# --.. ..- .-.. .-.. --- crack count on the bottom and top edges --.. ..-
+def count_cracks(dist, depth, width=5e-5, bin_x=5e-5, thr=0.5):
+    """Separate D >= thr runs along x in the band depth <= dist < depth + width.
+    Empty bins are filled from their populated neighbours, so a bin without
+    nodes never reads as a gap between two cracks."""
+    band = (dist >= depth) & (dist < depth + width)
+    bins = np.arange(x.min(), x.max() + bin_x, bin_x)
+    idx = np.digitize(x[band], bins) - 1
+    prof = np.full(len(bins) - 1, np.nan)
+    for i in np.unique(idx):
+        prof[i] = D[band][idx == i].max()
+    valid = ~np.isnan(prof)
+    if not valid.any():
+        return 0
+    prof = np.interp(np.arange(prof.size), np.where(valid)[0], prof[valid])
+    above = prof >= thr
+    return int(np.sum(~above[:-1] & above[1:]) + above[0])
+
+
+# Counted 0.1 mm inside the edge, where every crack is still separate from its
+# neighbours, and at 0.8 mm, where only the deep ones remain.
+Ly = float(y.max())
+for edge, dist in (("bottom", y), ("top", Ly - y)):
+    for depth in (1e-4, 8e-4):
+        n = count_cracks(dist, depth)
+        print(f"[INFO] cracks on the {edge} edge at {depth*1e3:.1f} mm depth: {n}")
+        errors[f"crack_count_{edge}_{depth*1e3:.1f}mm"] = tracked(n)
 
 # --.. ..- .-.. .-.. --- global energy balance, if the solver wrote it --..
 energy_file = os.path.join(CASE_DIR, "energies.txt")
