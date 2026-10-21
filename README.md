@@ -1,5 +1,6 @@
 # Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
 [![DOI](https://zenodo.org/badge/648784453.svg)](https://doi.org/10.5281/zenodo.17748028)
+[![Paper](https://img.shields.io/badge/SoftwareX-10.1016%2Fj.softx.2026.103138-blue)](https://doi.org/10.1016/j.softx.2026.103138)
 [![CI](https://github.com/giozu/z3st/actions/workflows/ci.yml/badge.svg)](https://github.com/giozu/z3st/actions/workflows/ci.yml)
 ![static](https://github.com/giozu/z3st/actions/workflows/static.yml/badge.svg)
 <!-- ![paper build](https://github.com/giozu/z3st/actions/workflows/paper.yml/badge.svg) -->
@@ -458,7 +459,21 @@ The Newton route for data-driven conductivity builds on **dolfinx-external-opera
 
 ## License & author
 
-If you use Z3ST in your research, please cite the archived software:
+If you use Z3ST in your research, please cite the SoftwareX article:
+
+```bibtex
+@article{Zullo2026Z3ST,
+  author  = {Giovanni Zullo and Aya Zayat and Giovanni Nicodemo and Elisa Cappellari and Davide Pizzocri and Lelio Luzzi},
+  title   = {Z3ST: an open-source FEniCSx framework for thermo-mechanics and fracture of nuclear materials},
+  journal = {SoftwareX},
+  volume  = {36},
+  pages   = {103138},
+  year    = {2026},
+  doi     = {10.1016/j.softx.2026.103138}
+}
+```
+
+and the archived software:
 
 ```bibtex
 @software{Z3ST,
@@ -473,8 +488,6 @@ If you use Z3ST in your research, please cite the archived software:
 This is the concept DOI. It covers every release and resolves to the most recent
 one. To cite the exact code behind a result, use the version DOI from the Zenodo
 page of the release you used, and give the version number.
-
-A software paper describing the framework is in preparation.
 
 * **Author:** Giovanni Zullo
 * **Institution:** Politecnico di Milano
