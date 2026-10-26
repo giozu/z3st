@@ -1,0 +1,23 @@
+# IAEA VP2 temperature (IWGFR/75 Part I, Example 2, App. 2 p. 108 and Fig. 1):
+# as VP1, 400 °C below the core (z < 1.5 m), linear rise over the core
+# (1.5-2.5 m), constant above. At the top of the core the hot half, corners
+# 3, 4, 5 (y >= +0.0375), is at 550 °C and the cold half, corners 6, 1, 2
+# (y <= -0.0375), at 500 °C; T varies linearly between corners, i.e. across
+# the flats 2-3 and 5-6. 0.0375 m = half the mid-wall corner radius (75 mm,
+# geometry.yaml): corners 2, 3, 5, 6 at y = +-37.5 mm on the mid-wall.
+thermal:
+  steel:
+  - type: Dirichlet
+    region: inner
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 25.0 * np.clip(y / 0.0375, -1.0, 1.0))"   # (K)
+
+  - type: Dirichlet
+    region: outer
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 25.0 * np.clip(y / 0.0375, -1.0, 1.0))"   # (K)
+
+# cantilever: clamped at the nozzle, top free (unrestrained, elastic)
+mechanical:
+  steel:
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]   # (m)

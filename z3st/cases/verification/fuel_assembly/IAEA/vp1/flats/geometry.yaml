@@ -1,0 +1,22 @@
+name: hex_shell_vp1_flats
+
+# IAEA VP1 duct with two flats normal to y, as duct 1 of VP3B: the VP1
+# gradient turned to point at a flat (ANL/NSE-22/38, §2.2).
+
+D: 0.150    # outer corner-to-corner (m), 129.9 mm across flats
+H: 4.000    # duct length (m), nozzle at z = 0
+t: 0.003    # wall thickness (m)
+Lz: 4.000   # height (m), read by the z3st mesh manager
+
+orientation: flat # flats at ±y: hot flat at +y, cold flat at -y
+
+nf: 10      # elements along each flat
+nt: 2       # elements through the thickness
+nz: 160     # elements along the height (25 mm)
+
+labels: # consistent with ../mesh.geo
+  steel: 1
+  bottom: 10
+  top: 11
+  inner: 12
+  outer: 13

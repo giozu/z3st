@@ -1,0 +1,22 @@
+name: hex_shell_vp1_1515Ti
+
+# IAEA VP1 duct (IWGFR verification report; geometry as in ANL.pdf, Table 2.1)
+# ANL.pdf: Continued Verification of MOOSE Structural Mechanics Tools for Modeling Core Bowing Phenomena in Fast Reactors
+
+D: 0.150    # outer corner-to-corner (m), 129.9 mm across flats
+H: 4.000    # duct length (m), nozzle at z = 0
+t: 0.003    # wall thickness (m)
+Lz: 4.000   # height (m), read by the z3st mesh manager
+
+orientation: flat # flats parallel to x: upper flat at +y faces the core
+
+nf: 10      # elements along each flat
+nt: 2       # elements through the thickness
+nz: 160     # elements along the height (25 mm)
+
+labels: # consistent with ../mesh.geo
+  steel: 1
+  bottom: 10
+  top: 11
+  inner: 12
+  outer: 13

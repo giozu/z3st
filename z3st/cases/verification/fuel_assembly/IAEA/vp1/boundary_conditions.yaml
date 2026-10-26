@@ -1,0 +1,21 @@
+# IAEA VP1 temperature (ANL/NSE-21/30, §2.5, Figs. 2.20-2.21): 400 °C below the
+# core (z < 1.5 m), linear rise over the core (1.5-2.5 m), constant above. At
+# the top of the core: 550 °C at corner 4 (+y), 537.5 °C at corners 3, 5,
+# 512.5 °C at corners 2, 6, 500 °C at corner 1 (-y). T is linear in y across
+# the duct, 0.075 m = outer corner radius.
+thermal:
+  steel:
+  - type: Dirichlet
+    region: inner
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 25.0 * y / 0.075)"   # (K)
+
+  - type: Dirichlet
+    region: outer
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 25.0 * y / 0.075)"   # (K)
+
+# cantilever: clamped at the nozzle, top free (unrestrained, elastic)
+mechanical:
+  steel:
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]   # (m)

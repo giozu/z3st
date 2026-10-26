@@ -1,0 +1,10 @@
+# IAEA VP1, ANL/NSE-21/30 (0.biblio/169472.pdf), §2.5 and Table 2.2
+# corner temperatures at the top of the core (constant above, 400 °C below z = 1.5 m)
+# tip deflection at z = 4 m, published in inches, converted at 25.4 mm/in
+quantity,location,value,unit,source
+T,corner 4,550.0,degC,§2.5 / Fig. 2.21
+T,corners 3 and 5,537.5,degC,§2.5 / Fig. 2.21
+T,corners 2 and 6,512.5,degC,§2.5 / Fig. 2.21
+T,corner 1,500.0,degC,§2.5 / Fig. 2.21
+u_tip,IAEA analytical,-12.250,mm,§2.5 and Table 2.2 (0.4823 in)
+u_tip,MOOSE,-12.210,mm,§2.5 and Table 2.2 (0.4807 in)

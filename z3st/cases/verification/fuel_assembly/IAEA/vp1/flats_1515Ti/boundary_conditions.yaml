@@ -1,0 +1,21 @@
+# 15-15Ti variant: 550 / 500 °C on the two flats (same T on the inner and outer face):
+#   400 °C below the core (z < 1.5 m), linear rise over the core (1.5-2.5 m),
+#   constant above; at the top of the core the upper flat (+y, toward the core
+#   centre) is at 550 °C and the lower flat at 500 °C. T is linear in y across
+#   the duct, 0.0634519 m = mid-wall apothem of the flats.
+thermal:
+  steel:
+  - type: Dirichlet
+    region: inner
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 25.0 * y / 0.0634519)"   # (K)
+
+  - type: Dirichlet
+    region: outer
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 25.0 * y / 0.0634519)"   # (K)
+
+# cantilever: clamped at the nozzle, top free (unrestrained, elastic)
+mechanical:
+  steel:
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]   # (m)

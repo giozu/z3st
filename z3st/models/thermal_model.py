@@ -89,6 +89,29 @@ class ThermalModel:
                         )
                         sys.exit(1)
 
+                    # Spatial temperature: a string is an expression in x, y, z (m)
+                    # and np, giving T (K); constant in time. Evaluated with eval: the
+                    # case input is trusted, as are the material modules it imports.
+                    if isinstance(temperature, str):
+                        T_f = dolfinx.fem.Function(V_t)
+                        T_f.interpolate(
+                            lambda X, e=temperature: np.broadcast_to(
+                                eval(e, {"__builtins__": {}, "np": np},
+                                     {"x": X[0], "y": X[1], "z": X[2]}),
+                                X.shape[1],
+                            )
+                        )
+                        dofs = dolfinx.fem.locate_dofs_topological(
+                            V_t, self.fdim, self.facet_tags.find(region_id)
+                        )
+                        bc = dolfinx.fem.dirichletbc(T_f, dofs)
+                        self.dirichlet_thermal[label].append({"id": region_id, "value": bc})
+                        print(
+                            f"  [INFO] Dirichlet thermal BC on '{label}' → T = {temperature} "
+                            f"at region '{region_name}'"
+                        )
+                        continue
+
                     # Step-dependent temperature: a list of length n_steps gives
                     # a time-varying Dirichlet temperature. The Constant is updated per step by the
                     # solver; a scalar is broadcast to every step.

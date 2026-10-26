@@ -1,0 +1,17 @@
+name: VP2 steel
+
+# Mechanical properties: IWGFR/75 Part I, Appendix 2, Example 1 (p. 108),
+# alpha = 18E-6 /deg C, E = 1.7E5 MPa, nu = 0.3; the same for Example 2.
+# E and nu do not enter the free bow.
+E: 1.7e11         # Young's modulus (Pa)
+nu: 0.3           # Poisson's ratio (-)
+alpha: 1.8e-5     # Thermal expansion coefficient (1/K)
+T_ref: 673.15     # Reference temperature (K): 400 °C, the unheated core (as ANL, dimensions at 400 °C)
+T_initial: 600.0  # Initial temperature field (K)
+
+# Thermal properties: T is imposed on both faces, k does not enter the result
+k: 20.0           # (W/m·K)
+cp: 200           # Specific heat capacity (J/kg·K)
+
+# Physical properties
+rho: 7750         # Density (kg/m³)

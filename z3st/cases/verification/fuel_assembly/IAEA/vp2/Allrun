@@ -1,0 +1,15 @@
+#!/bin/bash
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+# IAEA VP2 (IWGFR/75 Example 2): free thermal bow of a single duct,
+# non-linear gradient. mesh.geo takes its dimensions from geometry.yaml.
+
+set -e
+cd "${0%/*}" || exit 1
+
+gmsh $(python3 -m z3st.utils.geo_args geometry.yaml) mesh.geo -3 -o mesh.msh > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 plots_vp2.py

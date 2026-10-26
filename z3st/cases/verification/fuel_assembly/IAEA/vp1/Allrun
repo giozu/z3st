@@ -1,0 +1,32 @@
+#!/bin/bash
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+# IAEA VP1 free thermal bow of a single duct.
+#
+#     ./Allrun                 IAEA VP1: gradient corner to corner (this folder)
+#     ./Allrun flats           same gradient across the flats, as duct 1 of VP3B
+#     ./Allrun flats_1515Ti    50 °C across the flats, 15-15Ti card
+#
+# mesh.geo takes its dimensions from the variant's geometry.yaml; z3st runs in
+# the variant folder and finds its material card there.
+
+set -e
+cd "${0%/*}" || exit 1
+
+V="${1:-}"
+case "$V" in
+    ""|flats|flats_1515Ti) ;;
+    *) echo "usage: ./Allrun [flats|flats_1515Ti]" >&2; exit 1 ;;
+esac
+D="${V:-.}"
+
+gmsh $(python3 -m z3st.utils.geo_args "$D/geometry.yaml") mesh.geo -3 -o "$D/mesh.msh" > "$D/log_mesh.md"
+(cd "$D" && python3 -m z3st > log_z3st.md)
+if [ -d "$D/iso" ]; then        # uniform 400 °C, for animate_vp1.py; k_1515.py is in $D
+    (cd "$D/iso" && PYTHONPATH=.. python3 -m z3st > log_z3st.md)
+fi
+python3 plots_vp1.py $V

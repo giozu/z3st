@@ -1,0 +1,23 @@
+name: hex_shell_vp2
+
+# IAEA VP2 duct (as VP1), turned so that two corners lie on
+# the y axis: hot half (corners 3, 4, 5) at +y, cold half (6, 1, 2) at -y.
+
+D: 0.1534641 # outer corner-to-corner (m): 150 mm between mid-wall corners
+             # (IWGFR/75 spec) + 2 t / sqrt(3); VP1 uses 150 mm outer
+H: 4.000    # duct length (m), nozzle at z = 0
+t: 0.003    # wall thickness (m)
+Lz: 4.000   # height (m), read by the z3st mesh manager
+
+orientation: vertical # corners at ±y: hot corner 4 at +y, cold corner 1 at -y
+
+nf: 10      # elements along each flat
+nt: 2       # elements through the thickness
+nz: 160     # elements along the height (25 mm)
+
+labels: # consistent with mesh.geo
+  steel: 1
+  bottom: 10
+  top: 11
+  inner: 12
+  outer: 13

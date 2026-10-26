@@ -1,0 +1,17 @@
+# flats_1515Ti at uniform 400 °C: the thermal expansion from T_ref = 300 K
+# without the gradient, subtracted by ../../animate_vp1.py to isolate the bow
+thermal:
+  steel:
+  - type: Dirichlet
+    region: inner
+    temperature: "673.15 + 0.0 * z"   # (K)
+
+  - type: Dirichlet
+    region: outer
+    temperature: "673.15 + 0.0 * z"   # (K)
+
+mechanical:
+  steel:
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]   # (m)

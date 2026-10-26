@@ -1,0 +1,11 @@
+# IAEA VP2 = IWGFR/75 Part I (0.biblio/22012674.pdf), Example 2
+# corner temperatures at the top of the core: Fig. 1 (p. 12)
+# bow: Data Table DT1BOW (p. 51), "linear theory (L/T) at 20 deg C" and the 11 participants' range
+quantity,location,value,unit,source
+T,corners 3 4 5,550.0,degC,Fig. 1
+T,corners 6 1 2,500.0,degC,Fig. 1
+u_beam,core top (z = 2.5 m),1.333,mm,DT1BOW linear theory
+u_beam,LRP (z = 3.0 m),4.333,mm,DT1BOW linear theory
+u_beam,URP (z = 4.0 m),16.333,mm,DT1BOW linear theory
+u_codes_min,URP (z = 4.0 m),16.020,mm,DT1BOW Japan (Mitsubishi)
+u_codes_max,URP (z = 4.0 m),16.444,mm,DT1BOW Japan (NAIG/Toshiba)

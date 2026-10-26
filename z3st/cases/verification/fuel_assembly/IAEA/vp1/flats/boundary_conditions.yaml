@@ -1,0 +1,22 @@
+# VP1 field turned to point at a flat, as on duct 1 of VP3B (ANL/NSE-22/38,
+# §2.2): same gradient as VP1, 50 K / 0.150 m = 333.33 K/m, now along the flat
+# normal y. 400 °C below the core (z < 1.5 m), linear rise over the core
+# (1.5-2.5 m), constant above; at the top of the core 525 °C on the axis and
+# 546.1 / 503.9 °C at mid-wall of the +y / -y flats (43.3 K across the outer
+# flats instead of the 50 K across corners).
+thermal:
+  steel:
+  - type: Dirichlet
+    region: inner
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 50.0 / 0.150 * y)"   # (K)
+
+  - type: Dirichlet
+    region: outer
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 + 50.0 / 0.150 * y)"   # (K)
+
+# cantilever: clamped at the nozzle, top free (unrestrained, elastic)
+mechanical:
+  steel:
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]   # (m)
