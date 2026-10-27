@@ -74,6 +74,29 @@ def _hydrostatic(sig):
     return _zero_nonfinite(p, "Hydrostatic")
 
 
+def _temperature_prescribed(problem):
+    """True when the thermal Dirichlet BCs pin every temperature dof. The
+    thermal solve then returns the imposed field (e.g. IAEA VP1 with one
+    element through the thickness and T on every face), so -k grad T of it is
+    not a solved heat flux and no energy balance holds for it."""
+    bcs = [
+        bc["value"] if isinstance(bc, dict) else bc
+        for bc_list in getattr(problem, "dirichlet_thermal", {}).values()
+        for bc in bc_list
+    ]
+    if not bcs:
+        return False
+    imap = problem.T.function_space.dofmap.index_map
+    bs = problem.T.function_space.dofmap.index_map_bs
+    n_owned = imap.size_local * bs
+    pinned = np.zeros(n_owned, dtype=bool)
+    for bc in bcs:
+        dofs, first_ghost = bc.dof_indices()
+        pinned[dofs[:first_ghost]] = True
+    n_pinned = problem.mesh.comm.allreduce(int(np.count_nonzero(pinned)))
+    return n_pinned == imap.size_global * bs
+
+
 # ---------------------------------------------------------------------------
 # Writer
 # ---------------------------------------------------------------------------
@@ -218,6 +241,12 @@ class OutputWriter:
         mats = problem.materials
         mech = on.get("mechanical", False)
         therm = on.get("thermal", False) and getattr(problem, "T", None) is not None
+        if therm and _temperature_prescribed(problem):
+            if problem.mesh.comm.rank == 0:
+                print("  [INFO] HeatFlux not written: every temperature dof is "
+                      "Dirichlet-constrained, so T is the imposed field and "
+                      "-k grad T is not a solved heat flux.")
+            therm = False
 
         if mech and any(n in problem.stress for n in mats):
             self._stress_fn_cells = dolfinx.fem.Function(self.V_tensor_cells, name="Stress")
