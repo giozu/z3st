@@ -1,0 +1,97 @@
+{
+    "results": {
+        "L2_error_sigma_rr": {
+            "numerical": 0.0008969949096712136,
+            "reference": 0.0,
+            "abs_error": 0.0008969949096712136,
+            "rel_error": 0.0008969949096712136,
+            "status": "PASS"
+        },
+        "L2_error_sigma_tt": {
+            "numerical": 8.381700766263379e-05,
+            "reference": 0.0,
+            "abs_error": 8.381700766263379e-05,
+            "rel_error": 8.381700766263379e-05,
+            "status": "PASS"
+        },
+        "L2_error_sigma_zz": {
+            "numerical": 0.00010464416216302867,
+            "reference": 0.0,
+            "abs_error": 0.00010464416216302867,
+            "rel_error": 0.00010464416216302867,
+            "status": "PASS"
+        },
+        "L2_error_von_mises": {
+            "numerical": 0.00015816082166752673,
+            "reference": 0.0,
+            "abs_error": 0.00015816082166752673,
+            "rel_error": 0.00015816082166752673,
+            "status": "PASS"
+        },
+        "L2_error_tresca": {
+            "numerical": 0.00016494356458591957,
+            "reference": 0.0,
+            "abs_error": 0.00016494356458591957,
+            "rel_error": 0.00016494356458591957,
+            "status": "PASS"
+        },
+        "max_von_mises": {
+            "numerical": 176569798.90528497,
+            "reference": 176563272.3256053,
+            "abs_error": 6526.57967966795,
+            "rel_error": 3.69645373791674e-05,
+            "status": "PASS"
+        },
+        "max_tresca": {
+            "numerical": 202518631.56777662,
+            "reference": 202511281.47278613,
+            "abs_error": 7350.094990491867,
+            "rel_error": 3.6294743369542044e-05,
+            "status": "PASS"
+        },
+        "vM_dev_minus_vM_tot": {
+            "numerical": 1.5293495095434477e-16,
+            "reference": 0.0,
+            "abs_error": 1.5293495095434477e-16,
+            "rel_error": 1.5293495095434477e-16,
+            "status": "PASS"
+        },
+        "vM_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "Tresca_dev_minus_Tresca_tot": {
+            "numerical": 3.0586990190868953e-16,
+            "reference": 0.0,
+            "abs_error": 3.0586990190868953e-16,
+            "rel_error": 3.0586990190868953e-16,
+            "status": "PASS"
+        },
+        "Tresca_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "writer_vM_minus_vM_tot": {
+            "numerical": 1.5293495095434477e-16,
+            "reference": 0.0,
+            "abs_error": 1.5293495095434477e-16,
+            "rel_error": 1.5293495095434477e-16,
+            "status": "PASS"
+        },
+        "writer_Tresca_minus_Tresca_tot": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.03,
+    "summary": "PASS"
+}

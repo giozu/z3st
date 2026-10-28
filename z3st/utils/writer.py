@@ -8,7 +8,7 @@
 OutputWriter: unified VTU / XDMF writer for z3st.
 
 Both backends share the same field set (temperature, displacement, per-material
-stress / von Mises / hydrostatic / strain-energy density, global strain,
+stress / von Mises / Tresca / hydrostatic / strain-energy density, global strain,
 per-material heat flux, damage + crack-driving-force, cluster density,
 cumulative plastic strain).
 
@@ -66,6 +66,19 @@ def _von_mises(sig):
         )
     return _zero_nonfinite(vm, "VonMises")
 
+
+def _tresca(sig):
+    """Tresca equivalent stress max|sigma_i - sigma_j| = sigma_1 - sigma_3 on an
+    tensor sig (N, 3, 3), that is a (..., 3, 3) batch, from the principal stresses (valid with shear too).
+    The output is a (N,) array, una Tresca value per cell.
+    Same axisymmetric r=0 guard as :func:`_von_mises`."""
+
+    ok = np.isfinite(sig).all(axis=(-2, -1)) # check for non-finite numbers in the last two axes (the 3x3 tensor)
+    tr = np.full(sig.shape[:-2], np.nan) # initialize the output array with NaN
+    ev = np.linalg.eigvalsh(sig[ok]) # ascending
+    tr[ok] = ev[..., -1] - ev[..., 0]
+    
+    return _zero_nonfinite(tr, "Tresca")
 
 def _hydrostatic(sig):
     """Hydrostatic pressure p = tr(sigma) / 3 on an (..., 3, 3) batch. Guarded
@@ -513,6 +526,8 @@ class OutputWriter:
             grid.point_data["Stress (points)"] = s_points.reshape(n_points, 9)
             grid.cell_data["VonMises (cells)"] = _von_mises(s_cells)
             grid.point_data["VonMises (points)"] = _von_mises(s_points)
+            grid.cell_data["Tresca (cells)"] = _tresca(s_cells)
+            grid.point_data["Tresca (points)"] = _tresca(s_points)
             grid.cell_data["Hydrostatic (cells)"] = _hydrostatic(s_cells)
             grid.point_data["Hydrostatic (points)"] = _hydrostatic(s_points)
 

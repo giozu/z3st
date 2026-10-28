@@ -1,0 +1,10 @@
+#!/bin/bash
+# Five runs on one mesh
+set -e
+cd "${0%/*}" || exit 1
+
+gmsh mesh.geo -2 > log_mesh.md
+for sub in total thermal mechanical total_hydrostatic mechanical_hydrostatic; do
+    (cd "$sub" && python3 -m z3st > log_z3st.md)
+done
+python3 non-regression.py

@@ -1,0 +1,26 @@
+thermal:
+  steel:
+  - type: Dirichlet
+    region: inner_radius
+    temperature: 500.0   # (K)
+
+  - type: Dirichlet
+    region: outer_radius
+    temperature: 400.0   # (K)
+
+mechanical:
+  steel:
+  - type: Clamp_y
+    region: bottom
+
+  - type: Neumann
+    region: inner_radius
+    traction: -50.0e+6   # (Pa) p = 50 MPa on every loaded face: sigma = -p I
+
+  - type: Neumann
+    region: outer_radius
+    traction: -50.0e+6   # (Pa)
+
+  - type: Neumann
+    region: top
+    traction: -50.0e+6   # (Pa)
