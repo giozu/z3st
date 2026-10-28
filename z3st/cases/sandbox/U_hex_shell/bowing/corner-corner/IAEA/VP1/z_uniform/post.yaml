@@ -1,0 +1,14 @@
+# Post-processing of this subfolder: python <U_hex_shell>/hex_post.py . (paths relative to here)
+# IAEA VP1 step 1 without axial gradient (Z_UNIFORM): the case the Ansys exports reproduce
+fields: output/vp1_step1_fields_3d.xdmf
+material: ../15_15Ti_local.yaml
+temperature: vp1_temperature.T_vp1   # thermal model off: T imposed, not in the fields file
+option: z-uniform                    # no axial gradient (Z_UNIFORM): compared only with the same option
+support: clamped                     # bottom fully clamped (IAEA VP1)
+closed_form: vp1:vp1_temperature   # kappa = alpha (T2 - T1) / D, constant along z
+stations_z: [1.0, 1.5, 2.5, 3.0, 4.0]   # VTB table: core top 2.5, ACLP 3.0, duct top 4.0
+along_s_z:                           # heights of the along-s figures (m): core inlet, mid, outlet and duct tip
+  inlet core: 1.5
+  mid core: 2.0
+  outlet core: 2.5
+  tip: 4.0

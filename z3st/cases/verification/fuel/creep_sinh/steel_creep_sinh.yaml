@@ -1,0 +1,22 @@
+name: steel-creep-sinh-test
+
+# 15-15Ti (1.4970) thermal creep, nabarro_herring_structure (sinh) law, with E(T) and cp(T) of
+# materials/steel_1515Ti_Tdep.py. No thermal expansion (no alpha, no
+# eigenstrain), so the bar strain is elastic + creep only.
+
+E: materials.steel_1515Ti_Tdep.E_Sobolev    # (Pa) UFL(T)
+nu: 0.3                                     # (-)
+
+k: 20.0                                     # (W/(m·K))
+cp: materials.steel_1515Ti_Tdep.cp_Sobolev  # (J/(kg·K)) UFL(T)
+rho: 7900.0                                 # (kg/m³)
+
+T_ref: 900.0      # (K) no alpha: no thermal strain
+T_initial: 900.0  # (K)
+
+# ε̇ (1/s) = A0·exp(-Q/(R·T))·sinh(B·σ/(R·T)), σ (Pa), R = 8.314462618 J/(mol·K)
+# = steel_1515Ti_Tdep.sinh_creep_SI(7.49e15 %/h, 91000 cal/mol, 57.46 cal/(mol·MPa))
+creep: nabarro_herring_structure
+creep_A0: 2.08055556e+10   # (1/s)
+creep_Q: 3.80974873e+05    # (J/mol)
+creep_B: 2.40558420e-04    # (J/(mol·Pa))

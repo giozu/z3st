@@ -1,0 +1,173 @@
+{
+    "results": {
+        "uy_core_top": {
+            "numerical": 0.0010509744703686996,
+            "reference": 0.001066231832396183,
+            "abs_error": 1.525736202748337e-05,
+            "rel_error": 0.01430961031541792,
+            "status": "PASS"
+        },
+        "uy_ACLP": {
+            "numerical": 0.0034740049153180554,
+            "reference": 0.0034902961847529767,
+            "abs_error": 1.6291269434921297e-05,
+            "rel_error": 0.0046675893885705574,
+            "status": "PASS"
+        },
+        "uy_duct_top": {
+            "numerical": 0.013206569512793772,
+            "reference": 0.013227066587330567,
+            "abs_error": 2.0497074536794668e-05,
+            "rel_error": 0.0015496311598240246,
+            "status": "PASS"
+        },
+        "vonMises_max": {
+            "numerical": 2814973.2290151794,
+            "reference": 2814973.2290151794,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "vonMises_median": {
+            "numerical": 102360.31284814922,
+            "reference": 102360.31284814922,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.02,
+    "summary": "PASS",
+    "hypotheses": {
+        "boundary_conditions": {
+            "mechanical": {
+                "steel": [
+                    {
+                        "displacement": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "region": "bottom",
+                        "type": "Dirichlet"
+                    }
+                ]
+            },
+            "thermal": {
+                "steel": [
+                    {
+                        "region": "face1",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face2",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face3",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face4",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face5",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face6",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face1_in",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face2_in",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face3_in",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face4_in",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face5_in",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    },
+                    {
+                        "region": "face6_in",
+                        "temperature": "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)",
+                        "type": "Dirichlet"
+                    }
+                ]
+            }
+        },
+        "geometry": {
+            "D": 0.153464101,
+            "H": 4.0,
+            "Lz": 4.0,
+            "labels": {
+                "bottom": 10,
+                "face1": 21,
+                "face1_in": 31,
+                "face2": 22,
+                "face2_in": 32,
+                "face3": 23,
+                "face3_in": 33,
+                "face4": 24,
+                "face4_in": 34,
+                "face5": 25,
+                "face5_in": 35,
+                "face6": 26,
+                "face6_in": 36,
+                "steel": 1,
+                "top": 11
+            },
+            "name": "hex_shell_3d",
+            "nf": 8,
+            "nt": 1,
+            "nz": 400,
+            "orientation": "vertical",
+            "t": 0.003
+        },
+        "lhr": [
+            0.0
+        ],
+        "materials": {
+            "steel": {
+                "E": "materials.steel_1515Ti_Tdep.E_Sobolev",
+                "T_initial": 673.15,
+                "T_ref": 673.15,
+                "cp": "materials.steel_1515Ti_Tdep.cp_Sobolev",
+                "eigenstrain": "materials.steel_1515Ti_Tdep.eigenstrain",
+                "expansion_law": "Sobolev",
+                "k": "materials.steel_1515Ti_Tdep.k_Sobolev",
+                "name": "1515Ti_Tdep (VP1)",
+                "nu": 0.3,
+                "rho": 7900.0,
+                "swelling_law": "none"
+            }
+        },
+        "models": {
+            "mechanical": true,
+            "thermal": true
+        },
+        "regime": "3d"
+    }
+}

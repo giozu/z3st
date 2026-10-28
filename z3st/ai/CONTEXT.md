@@ -13,6 +13,44 @@
 > **Students:** onboarding, working agreements, and per-student topic/branch tracking
 > live in the private note `../personal_stuff/z3st_students.md` (not in this repo).
 
+## Index
+
+Read only the section the task needs.
+
+| §    | Section                                                                 | Read when                                         |
+|------|-------------------------------------------------------------------------|---------------------------------------------------|
+| 1    | [Purpose and scope](#1-purpose-and-scope)                               | first contact with the code                       |
+| 2.1  | [Directory structure](#21-directory-structure)                          | looking for where something lives                 |
+| 2.2  | [The `Spine` driver](#22-the-spine-driver)                              | touching `core/spine.py` or model mixins          |
+| 2.3  | [Execution flow](#23-execution-flow-z3st__main__py)                     | time loop, staggering, output order               |
+| 3.1  | [`core/config.py`](#31-coreconfigpy--config)                            | `input.yaml` parsing, `self.on`, regime           |
+| 3.2  | [`core/finite_element_setup.py`](#32-corefinite_element_setuppy--finiteelementsetup) | function spaces                     |
+| 3.3  | [`core/solver.py`](#33-coresolverpy--solver)                            | solver options, PETSc, relaxation, convergence    |
+| 3.4  | [`core/mesh/*`](#34-coremesh)                                           | mesh reading, tags                                |
+| 3.5  | [`utils/logger.py`](#35-utilsloggerpy)                                  | logging                                           |
+| 4.1  | [Thermal](#41-thermal-thermal_modelpy)                                  | thermal BCs, k(T), heat flux                      |
+| 4.2  | [Mechanical](#42-mechanical-mechanical_modelpy)                         | strain/stress, eigenstrain, mech BCs              |
+| 4.3  | [Damage](#43-damage-damage_modelpy)                                     | phase-field AT1/AT2                               |
+| 4.4  | [Plasticity](#44-plasticity-plasticity_modelpy)                         | J2, crystal plasticity hook                       |
+| 4.5  | [Gap conductance](#45-gap-conductance-gap_modelpy)                      | gap models                                        |
+| 4.6  | [Creep](#46-creep-creep_modelpy)                                        | creep laws and creep cases                        |
+| 4.7  | [Cluster dynamics](#47-cluster-dynamics-cluster_dynamic_modelpy)        | 1D advection–diffusion                            |
+| 4.8  | [Mechanical contact](#48-mechanical-contact-contact_modelpy)            | PCMI penalty contact                              |
+| 4.9  | [Fuel cracking](#49-fuel-cracking--isotropic-softening-cracking_modelpy) | isotropic softening                              |
+| 4.10 | [Porosity migration](#410-porosity-migration-porosity_migration_modelpy) | pore migration, SUPG                             |
+| 5    | [Material database](#5-material-database-z3stmaterials)                 | material card keys, units, Python callables       |
+| 6    | [Simulation cases](#6-simulation-cases-z3stcases)                       | case layout, suite, golds, verdicts               |
+| 6.1  | [Catalogue of cases](#61-catalogue-of-cases)                            | finding an existing case to copy                  |
+| 6.2  | [`input.yaml` structure](#62-typical-inputyaml-structure)               | writing or editing `input.yaml`                   |
+| 6.3  | [`boundary_conditions.yaml`](#63-typical-boundary_conditionsyaml)       | writing BCs                                       |
+| 7    | [Capabilities summary](#7-capabilities-summary)                         | "does z3st already do X?"                         |
+| 8    | [Running a case](#8-running-a-case)                                     | running a case by hand                            |
+| 9    | [Extensibility points](#9-extensibility-points)                         | plugging in a material module or custom law       |
+| 10   | [Missing capabilities](#10-missing-capabilities)                        | before planning a new feature                     |
+| 10.1 | [Cluster dynamics pins](#101-cluster-dynamics-what-the-case-does-and-does-not-pin) | cluster-dynamics case coverage          |
+| 11   | [Case 14 — thermal shock](#11-case-14--thermal-shock-fracture-uo2)      | `pellet_quench_2D_xy`                             |
+| 12   | [File-level quick index](#12-file-level-quick-index)                    | which file does what                              |
+
 ---
 
 ## 1. Purpose and scope
@@ -80,7 +118,7 @@ z3st/
     │   ├── gap_model.py              Fixed / Gas gap conductance (+ contact-coupled)
     │   ├── contact_model.py          penalty pellet-clad mechanical contact (gap closure)
     │   ├── cluster_dynamic_model.py  1D advection-diffusion (DG+SIPG+upwind)
-    │   ├── creep_model.py            implicit Norton (+irradiation) creep, AD tangent
+    │   ├── creep_model.py            implicit Norton/Nabarro-Herring (+irradiation) creep, AD tangent
     │   ├── cracking_model.py         Barani isotropic-softening fuel cracking
     │   ├── porosity_migration_model.py  thermal-gradient pore migration (SU/SUPG)
     │   └── nn_conductivity.py        neural-network k(T) (Picard / external-operator Newton)
@@ -456,6 +494,8 @@ Implicit Norton creep (`ε̇_eq = A0·exp(−Q/RT)·σ_eq^n`) for a material car
 
 **Irradiation creep**: a linear-in-stress in-pile term ε̇_irr = B·φ·σ_eq is added inside the same radial return, g(Δγ) = Δγ − Δt·[A(T)·base^n + B·φ·base] = 0 with base = σ_eq − 3GΔγ — the linear term preserves the monotone/concave structure, so the Newton convergence argument is unchanged. Card keys `creep_irr_B` (Pa⁻¹ per n/m²) and `fast_flux` (n/(m²·s)), both required together (spine validates); absent → exact no-op (both creep verification golds unchanged at machine precision). First user: the Zircaloy clad of `regression/pwr_rod_2D` (B = 2.0e-36, φ = 7.0e17 → ε̇ ≈ 1e-10 s⁻¹ at 80 MPa, ~1 % over three years — in-pile creep-down at 580 K, where thermal Norton alone is negligible).
 
+**Nabarro-Herring creep**: `creep: nabarro_herring_structure` replaces σ^n by sinh(β·σ), β = `creep_B`/(R·T) (1/Pa), keys `creep_A0` (1/s), `creep_B` (J/(mol·Pa)), `creep_Q` (J/mol); spine requires `creep_n` for norton or `creep_B` for nabarro_herring_structure. `CreepModel._creep_F` returns F and dF/dσ for both laws, used by the numpy predictor and the UFL step alike; F is increasing and convex, so the monotone Newton argument holds. The predictor interpolates G and β per cell (`_interpolate_on_cells`), so E/nu may be UFL functions of T. Verified by `verification/fuel/creep_sinh`.
+
 ### 4.7 Cluster dynamics (`cluster_dynamic_model.py`)
 
 1D advection–diffusion solver for defect-cluster size distributions `c(n,t)`:
@@ -651,6 +691,7 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-reg
 - `verification/fuel/axial_power` — axial-power source bus (chopped-cosine `f(z)`, Todreas & Kazimi 1-D axial problem) on a tall axisymmetric fuel column: closed-form mean burnup (machine precision); axial peaking factor = 1/[(2L′/πL)·sin(πL/2L′)]; end/peak = cos(πL/2L′).
 - `verification/fuel/axial_table` — tabulated axial profile (`tabulated_axial`, piecewise-linear node-wise peaking factors — the standard core-physics input): closed-form mean burnup (exact); table-node ratio f₃/f₁ (machine precision); peak/mean = max f / trapezoid mean.
 - `verification/fuel/creep` — implicit Norton creep, constant-stress uniaxial bar (backward Euler exact): total/creep/radial strain vs closed form at 1e-14 (radial pins the deviatoric −½ flow).
+- `verification/fuel/creep_sinh` — `creep: nabarro_herring_structure` (15-15Ti 1.4970, Többe) with E(T) and cp(T) cards on a constant-stress bar at uniform T (stationary thermal, so cp(T) is only parsed and E(T) is checked at one T): total/creep/radial strain vs closed form at 2e-14, plus the card SI rate vs `materials/steel_1515Ti_Tdep.creep_rate_1_4970` in thesis units (3e-8); `sinh_creep_SI` itself is not called.
 - `verification/fuel/creep_relaxation` — stress relaxation at held strain: Z3ST ≡ the scalar backward-Euler recursion at 4e-15; deviation from the exact `σ(t)` equals the predicted O(dt) defect (2.11% at 50 steps, pinned to 2e-13).
 - `verification/fuel/creep_law_discovery` — the framework's first **inverse / constitutive-identification** case (EUCLID-style, independent implementation — the published EUCLID codes are GPL-3.0 and are not used). Forward problem: the relaxation case re-run with **500** implicit steps (own `input.yaml`; ~36 min — data defect ~0.2%, below the noise; observations cached to `output/fem_stress_history.csv`). Inverse: 51 noisy (2%) observations of mean σ_zz; 5-mechanism library `{S, S², S³, S⁵, sinh S}` (S = σ/σ_ref); self-contained dual-number forward AD through the implicit BE integrator (different grid from the data → no inverse crime); damped Gauss-Newton on log-coefficients; backward elimination by strain share + **one-standard-error rule** (plain BIC could NOT separate {S²,S³} from {S³}; with the original coarse 50-step data a spurious S² absorbed the time-discretisation defect in 6/10 seeds — hence the 500-step forward run). Result: cubic Norton selected alone **10/10 seeds**, coefficient to 1.6%. Gold-blessed (`discover.py` ~16 s given the CSV); feeds the z3st paper's identification section (figure `creep_law_discovery.png`). In the local suite only, not in CI: the forward run is too long.
 - `verification/fuel/shrink_fit` — penalty contact pressure vs the analytical plane-stress Lamé interference-fit. The drive is a uniform Dirichlet ramp (300 → 1500 K, lhr = 0): a uniform pellet temperature expands stress-free, so the Lamé reference is exact rather than approximate. Siblings `shrink_fit_disk` (2D plane strain) and `shrink_fit_disk_3d`.
@@ -784,7 +825,7 @@ Damage BC types: `Dirichlet` (`D = const`).
 | Burnup accumulation               | ✓ per-fissile-material `burnup` field via `update_state(dt)` (state bus)            |
 | Radial power shaping              | ✓ `radial_profile` form factor `f(r, bu)` (source bus); built-in rim-peaking        |
 | Axial power shaping               | ✓ `axial_profile` form factor `f(z)` (source bus, composed `f_r·f_z`, single weighted mean-1 normalisation); built-ins: chopped cosine (T&K), tabulated (node-wise peaking factors) |
-| Cladding creep (implicit, AD)     | ✓ Norton + Arrhenius via the incremental variational principle (`models/creep_model.py`): condensed radial return on the displacement space, DG0 predictor + one symbolic Newton step → exact IFT consistent tangent by `ufl.derivative`; per-material `ε_cr` DG0 state; card keys `creep: norton`, `creep_A0/n/Q`; optional irradiation creep ε̇ = B·φ·σ in the same radial return (`creep_irr_B` + `fast_flux`); verified to 1e-14 (constant stress) and 4e-15 vs the BE recursion (relaxation) |
+| Cladding creep (implicit, AD)     | ✓ Norton + Arrhenius via the incremental variational principle (`models/creep_model.py`): condensed radial return on the displacement space, DG0 predictor + one symbolic Newton step → exact IFT consistent tangent by `ufl.derivative`; per-material `ε_cr` DG0 state; card keys `creep: norton` + `creep_A0/n/Q` or `creep: nabarro_herring_structure` + `creep_A0/B/Q`; optional irradiation creep ε̇ = B·φ·σ in the same radial return (`creep_irr_B` + `fast_flux`); verified to 1e-14 (constant stress) and 4e-15 vs the BE recursion (relaxation) |
 | Fuel cracking (isotropic softening) | ✓ Barani et al. (2019) model (`models/cracking_model.py`): n(LHR_max) macro-cracks rescale E and ν from the virgin constants; irreversible; card `cracking: isotropic` (§4.9) |
 | Constitutive-law identification   | ✓ EUCLID-style sparse mechanism selection from simulation data (`cases/verification/fuel/creep_law_discovery/discover.py`): candidate-library fit via self-contained forward-mode AD (dual numbers) through the implicit BE integrator, Gauss-Newton + backward elimination + one-SE rule; cubic Norton recovered 10/10 noise seeds; independent of the GPL-3.0 EUCLID codes |
 | Integrated-power diagnostic       | ✓ `set_power` prints the exact FE integral of the fissile source per material per step (regime-weighted, MPI-reduced); the normalisation is the weighted FE mean, so it equals LHR·Lz to round-off for any profile — pinned by the `total_power` checks in the burnup-family `V_` cases; `update_state` also prints the weighted mean burnup, which the burnup checks compare with the flat closed form |
@@ -937,7 +978,7 @@ garbage residuals against the seven-order-of-magnitude heterogeneous SPD that AT
 | `z3st/models/plasticity_model.py`             | J2 return mapping + custom crystal-plasticity hook    |
 | `z3st/models/gap_model.py`                    | Fixed / Gas gap-conductance model (+ contact-coupled) |
 | `z3st/models/contact_model.py`                | Penalty pellet-clad mechanical contact (PCMI)         |
-| `z3st/models/creep_model.py`                  | Implicit Norton creep (incremental variational, IFT tangent by AD) |
+| `z3st/models/creep_model.py`                  | Implicit Norton or Nabarro-Herring creep (incremental variational, IFT tangent by AD) |
 | `z3st/models/cluster_dynamic_model.py`        | 1D advection–diffusion cluster dynamics (DG/SIPG)     |
 | `z3st/models/cracking_model.py`               | Barani isotropic-softening fuel cracking (§4.9)       |
 | `z3st/models/porosity_migration_model.py`     | Thermal-gradient pore migration, SU/SUPG (§4.10)       |

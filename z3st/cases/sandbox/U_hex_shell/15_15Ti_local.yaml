@@ -1,7 +1,7 @@
 name: 15-15 Ti
 
 # Mechanical properties
-E: 1.7e11         # Young's modulus (Pa)
+E: 1.7e+11         # Young's modulus (Pa)
 nu: 0.3           # Poisson's ratio (-)
 alpha: 1.2e-5     # Thermal expansion coefficient (1/K)
 T_ref: 300.0      # Reference temperature (K)
@@ -14,4 +14,27 @@ cp: 200           # Specific heat capacity (J/kg·K)
 # Physical properties
 rho: 7750         # Density (kg/m³)
 
-# Swelling and creep: not modelled yet (next step: bowing)
+# Irradiation 
+# Laws: z3st/materials/steel_irradiation.py. Values and sources: see
+# z3st/materials/15_15Ti.yaml (Ye et al. 2020, 316Ti CW placeholder,
+# 560 °C, ≤ 75 dpa). With creep active z3st promotes the mechanical step to
+# the nonlinear (SNES) path by itself.
+#
+# dpa_rate: 1.0e-6           # (dpa/s) uniform; ~32 dpa per full-power year
+# # dose_profile: <module.func>  # optional f(coords, material, model) → flux gradient
+#
+# eigenstrain: materials.steel_irradiation.void_swelling
+# swelling_g0_max: 3.0e-3    # (1/dpa)
+# swelling_T_peak: 733.15    # (K)
+# swelling_T_width: 152.5    # (K)
+# swelling_D_inc: 50.0       # (dpa)
+# swelling_D_tr: 0.0         # (dpa)
+#
+# creep: norton
+# creep_A0: 0.0              # (Pa^-n s^-1) thermal creep OFF
+# creep_n: 3.1               # (-)
+# creep_Q: 3.206e5           # (J/mol)
+# creep_irr: materials.steel_irradiation.irradiation_creep_uncoupled   # first phase: no swelling coupling
+# # creep_irr: materials.steel_irradiation.irradiation_creep           # coupled: also reads creep_irr_Dsc
+# creep_irr_B0: 1.1e-12      # (1/(Pa·dpa))
+# creep_irr_Dsc: 1.2e-8      # (1/Pa)

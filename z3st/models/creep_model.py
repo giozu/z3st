@@ -7,8 +7,8 @@
 """
 Implicit creep via the incremental variational principle, tangent by AD.
 
-A creeping material (card key ``creep: norton``) evolves a creep-strain tensor
-state ε_cr. The implicit (backward-Euler) step is the stationarity point of the
+A creeping material (card key ``creep: norton`` or ``creep: nabarro_herring_structure``) evolves a
+creep-strain tensor state ε_cr. The implicit (backward-Euler) step is the stationarity point of the
 incremental potential (Ortiz & Stainier)
 
     Π(u, Δε_cr) = ∫ ψ_el(ε(u) − ε* − ε_cr^n − Δε_cr) + Δt φ*(Δε_cr/Δt) dx,
@@ -17,15 +17,24 @@ with the Norton dual dissipation potential φ*. Because Δε_cr is cell-local
 (no gradients), its stationarity condition condenses to one scalar equation
 per point — the classical viscoplastic radial return for von Mises flow:
 
-    g(Δγ) = Δγ − Δt·[A(T)·(σ_eq_trial − 3G·Δγ)^n + B·φ·(σ_eq_trial − 3G·Δγ)] = 0,
+    g(Δγ) = Δγ − Δt·[A(T)·F(σ_eq_trial − 3G·Δγ) + B·φ·(σ_eq_trial − 3G·Δγ)] = 0,
     Δε_cr = Δγ · (3/2) s_trial / σ_eq_trial,
 
-with A(T) = A0·exp(−Q/RT) (Norton + Arrhenius) and an optional in-pile
-irradiation-creep term linear in stress, ε̇_irr = B·φ·σ_eq (card keys
-``creep_irr_B`` + ``fast_flux``; absent → B·φ = 0 and the law reduces to
-thermal Norton). g is increasing and concave with g(0) ≤ 0, so Newton
-converges monotonically and the base (σ_eq_trial − 3GΔγ) never goes
-negative at the root — the linear term preserves both properties.
+with the Arrhenius prefactor A(T) = A0·exp(−Q/RT) and the stress function F
+of the card's thermal-creep law (σ in Pa, T in K, R = R_GAS in J/(mol·K)):
+
+    norton:                     F(σ) = σ^n           A0 (Pa^-n s^-1), n (-),          Q (J/mol)
+    nabarro_herring_structure:  F(σ) = sinh(β·σ),    A0 (1/s),        B (J/(mol·Pa)), Q (J/mol)
+                                β(T) = B/(R·T) (1/Pa)
+
+The sinh law is the Nabarro-Herring-type form of the 15-15Ti laws (Többe 1975); for
+β·σ ≪ 1 it reduces to Norton with n = 1 and prefactor A(T)·β(T).
+An optional in-pile irradiation-creep term linear in stress, ε̇_irr = B·φ·σ_eq
+(card keys ``creep_irr_B`` + ``fast_flux``; absent → B·φ = 0 and the law
+reduces to thermal creep), adds to either law. For both laws g is increasing
+and concave with g(0) ≤ 0 (F is increasing and convex for σ ≥ 0), so Newton
+converges monotonically and the base (σ_eq_trial − 3GΔγ) never goes negative
+at the root — the linear term preserves both properties.
 
 The scalar equation is solved by a predictor–corrector split that keeps the
 exact consistent tangent without symbolic nesting (a fully unrolled symbolic
@@ -46,9 +55,10 @@ advanced once per converged time step (mirroring ``update_plastic_history``).
 It is deviatoric by construction (radial-return direction), so creep is
 volume-preserving.
 
-Scope (v1): isotropic Lamé elasticity, Norton law, regimes with 3×3 strain
-tensors (axisymmetric / 2d / 3d). Not combinable with damage or plasticity on
-the same run — spine.load_materials guards this.
+Scope (v1): isotropic Lamé elasticity (E, nu constant or functions of T),
+Norton or nabarro_herring_structure law, regimes with 3×3 strain tensors
+(axisymmetric / 2d / 3d). Not combinable with damage or plasticity on the
+same run — spine.load_materials guards this.
 """
 
 import dolfinx
@@ -78,6 +88,44 @@ class CreepModel:
         if T is None:
             T = float(material.get("T_initial", material.get("T_ref", 293.15)))
         return A0 * ufl.exp(-Q / (R_GAS * T))
+
+    def _creep_beta(self, material, T):
+        """Stress scale β(T) = B/(R·T) (1/Pa) of the nabarro_herring_structure (sinh) law, B in
+        J/(mol·Pa).
+        Zero for Norton (unused there). T as in :meth:`_creep_A`."""
+        if material["creep"] != "nabarro_herring_structure":
+            return 0.0
+        if T is None:
+            T = float(material.get("T_initial", material.get("T_ref", 293.15)))
+        return float(material["creep_B"]) / (R_GAS * T)
+
+    def _creep_F(self, material, base, beta, xp):
+        """Stress function F(σ) of the thermal-creep law and its derivative
+        dF/dσ, σ = ``base`` in Pa; ``xp`` is ``ufl`` or ``numpy``.
+
+            norton:                     F = σ^n,        dF/dσ = n·σ^(n-1)
+            nabarro_herring_structure:  F = sinh(β·σ),  dF/dσ = β·cosh(β·σ)
+
+        The Norton derivative floors σ at 1 Pa inside the (n-1) power so a
+        fractional exponent (n < 1) cannot produce 0**(negative) = inf; for
+        the usual n >= 1 this is a no-op at the root."""
+        if material["creep"] == "nabarro_herring_structure":
+            return xp.sinh(beta * base), beta * xp.cosh(beta * base)
+        n = float(material["creep_n"])
+        floor = ufl.max_value(base, 1.0) if xp is ufl else np.maximum(base, 1.0)
+        return base**n, n * floor ** (n - 1.0)
+
+    def _interpolate_on_cells(self, expr, V, cells):
+        """Values (numpy, one per cell) of the UFL ``expr`` on ``cells`` of
+        the DG0 space V; plain numbers and Constants are broadcast."""
+        if isinstance(expr, (int, float)) or hasattr(expr, "value"):
+            return np.full(cells.size, float(getattr(expr, "value", expr)))
+        tmp = dolfinx.fem.Function(V)
+        tmp.interpolate(
+            dolfinx.fem.Expression(ufl.as_ufl(expr), V.element.interpolation_points),
+            cells0=cells,
+        )
+        return tmp.x.array[cells].copy()
 
     def _creep_irr_C(self, material):
         """Irradiation-creep compliance C = B·φ (Pa⁻¹ s⁻¹): the linear-in-stress
@@ -110,17 +158,15 @@ class CreepModel:
         a no-op in value but supplies the exact IFT consistent tangent."""
         _, s_tr, sig_eq_tr = self._creep_trial(u, material, T)
         G = material["G"]
-        n = float(material["creep_n"])
         Adt = dt * self._creep_A(material, T)
+        beta = self._creep_beta(material, T)
         Cdt = dt * self._creep_irr_C(material)
 
         dg0 = self._creep_predictor(material["__label__"])
         base = ufl.max_value(sig_eq_tr - 3.0 * G * dg0, 0.0)
-        f = dg0 - Adt * base**n - Cdt * base
-        # floor the base inside the (n-1) power so a fractional Norton exponent
-        # (n < 1) cannot produce 0**(negative) = inf in the AD tangent; for the
-        # usual n >= 1 this is a no-op (and Adt = 0 when thermal creep is off).
-        fp = 1.0 + 3.0 * G * (n * Adt * ufl.max_value(base, 1.0)**(n - 1.0) + Cdt)
+        F, dF = self._creep_F(material, base, beta, ufl)
+        f = dg0 - Adt * F - Cdt * base
+        fp = 1.0 + 3.0 * G * (Adt * dF + Cdt)
         dg = dg0 - f / fp
 
         flow_dir = 1.5 * s_tr / sig_eq_tr
@@ -212,25 +258,29 @@ class CreepModel:
                 tmp.interpolate(Texpr, cells0=cells)
                 Adt = dt * tmp.x.array[cells]
 
-            G = float(getattr(material["G"], "value", material["G"]))
-            n = float(material["creep_n"])
+            # G (Pa) and β (1/Pa) per cell: G is a UFL(T) expression when E or
+            # nu is a function of T, β = B/(R·T) is a UFL(T) for the nabarro_herring_structure law.
+            V0 = pred.function_space
+            G = self._interpolate_on_cells(material["G"], V0, cells)
+            beta = self._interpolate_on_cells(self._creep_beta(material, T), V0, cells)
             Cdt = dt * self._creep_irr_C(material)
 
-            # Warm-started Newton on g(x) = x − Adt·(σ − 3Gx)^n − Cdt·(σ − 3Gx),
+            # Warm-started Newton on g(x) = x − Adt·F(σ − 3Gx) − Cdt·(σ − 3Gx),
             # clamped to the admissible interval [0, σ/3G). The irradiation term
             # is linear in the base, so g stays increasing and concave.
             x_old = pred.x.array[cells].copy()
             x = np.clip(x_old, 0.0, sig / (3.0 * G) * (1 - 1e-12))
             for _ in range(_PRED_NEWTON_ITS):
                 base = np.maximum(sig - 3.0 * G * x, 0.0)
-                g = x - Adt * base**n - Cdt * base
-                gp = 1.0 + 3.0 * G * (n * Adt * np.maximum(base, 1.0) ** (n - 1.0) + Cdt)
+                F, dF = self._creep_F(material, base, beta, np)
+                g = x - Adt * F - Cdt * base
+                gp = 1.0 + 3.0 * G * (Adt * dF + Cdt)
                 x = np.clip(x - g / gp, 0.0, sig / (3.0 * G) * (1 - 1e-12))
             # Convergence check on the fixed-iteration Newton: a high Norton
             # exponent with Δt·A·σⁿ ≫ σ/3G needs more than _PRED_NEWTON_ITS
             # contractions.
             base = np.maximum(sig - 3.0 * G * x, 0.0)
-            g_res = x - Adt * base**n - Cdt * base
+            g_res = x - Adt * self._creep_F(material, base, beta, np)[0] - Cdt * base
             res_scale = np.maximum(np.abs(x), 1e-30)
             worst = float(np.max(np.abs(g_res) / res_scale)) if x.size else 0.0
             if worst > 1e-8:

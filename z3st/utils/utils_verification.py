@@ -19,7 +19,28 @@ BOLD = "\033[1m" if USE_COLOR else ""
 END = "\033[0m" if USE_COLOR else ""
 
 
-def pass_fail_check(errors, tolerance, out_json, case_dir):
+def _normalize(hypotheses):
+    """JSON round trip, so a run's hypotheses compare with the gold's as stored."""
+    return json.loads(json.dumps(hypotheses, sort_keys=True, default=str))
+
+
+def _flatten(d, prefix=""):
+    """Dotted paths of a nested dict (lists are compared whole)."""
+    if not isinstance(d, dict):
+        return {prefix: d}
+    out = {}
+    for k, v in d.items():
+        out.update(_flatten(v, f"{prefix}.{k}" if prefix else str(k)))
+    return out
+
+
+def hypotheses_diff(gold, now):
+    """Entries that differ between two hypothesis sets, ``{path: (gold, now)}``."""
+    g, n = _flatten(_normalize(gold)), _flatten(_normalize(now))
+    return {k: (g.get(k), n.get(k)) for k in sorted(set(g) | set(n)) if g.get(k) != n.get(k)}
+
+
+def pass_fail_check(errors, tolerance, out_json, case_dir, hypotheses=None):
     """
     Evaluate relative errors in 'errors' dict and mark PASS/FAIL.
 
@@ -33,6 +54,9 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
         Path to output JSON file.
     case_dir : str
         Case directory (for logs).
+    hypotheses : dict, optional
+        Inputs that define the case (material cards, BCs, ...), written to the
+        JSON, hence into a gold blessed from it (see regression_check).
     """
     print(f"\nPass/Fail check (tolerance = {tolerance:.1e})")
 
@@ -63,20 +87,20 @@ def pass_fail_check(errors, tolerance, out_json, case_dir):
     print(f"\n[SUMMARY] {BOLD}{summary}{END}")
 
     # Save results
+    payload = {"results": errors, "tolerance": tolerance, "summary": "PASS" if all_pass else "FAIL"}
+    if hypotheses is not None:
+        payload["hypotheses"] = _normalize(hypotheses)
     with open(out_json, "w") as f:
-        json.dump(
-            {"results": errors, "tolerance": tolerance, "summary": "PASS" if all_pass else "FAIL"},
-            f,
-            indent=4,
-        )
+        json.dump(payload, f, indent=4)
 
     print(f"[INFO] non-regression results written to: {out_json}")
     return all_pass
 
 
 def _write_regression_verdict(case_dir, verdict):
-    """Persist the gold-regression result ('PASS'/'FAIL') into the run's
-    non-regression.json so the suite drivers (non-regression*.sh) can read it."""
+    """Persist the gold-regression result ('PASS'/'FAIL'/'NOT COMPARABLE') into
+    the run's non-regression.json so the suite drivers (non-regression*.sh) can
+    read it; they accept PASS only."""
     out_json = os.path.join(case_dir, "output", "non-regression.json")
     try:
         with open(out_json, "r") as f:
@@ -91,12 +115,17 @@ def _write_regression_verdict(case_dir, verdict):
               f"see no regression verdict for this case.{END}")
 
 
-def regression_check(errors, case_dir, regression_tol=1e-3):
+def regression_check(errors, case_dir, regression_tol=1e-3, hypotheses=None):
     """
     Compare the current run against the GOLD benchmark.
 
     Normalizes error data (scalars or sequences) and reports whether accuracy
     has improved or degraded relative to gold.
+
+    A run is never compared with a gold made under different hypotheses: when
+    both record them and they differ, the check is skipped and the verdict is
+    'NOT COMPARABLE' (a different case, not a regression). A gold without
+    hypotheses is compared as before.
 
     Parameters
     ----------
@@ -106,6 +135,8 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         Directory of the case (expects output/non-regression_gold.json inside).
     regression_tol : float
         Relative tolerance for regression comparison.
+    hypotheses : dict, optional
+        Inputs that define the run (as given to pass_fail_check).
     """
     gold_file = os.path.join(case_dir, "output", "non-regression_gold.json")
 
@@ -123,6 +154,19 @@ def regression_check(errors, case_dir, regression_tol=1e-3):
         print(f"  {RED}[ERROR] GOLD file unreadable ({exc}); marking regression FAIL.{END}")
         _write_regression_verdict(case_dir, "FAIL")
         return False
+
+    gold_hypotheses = gold_data.get("hypotheses") if isinstance(gold_data, dict) else None
+    if hypotheses is not None and gold_hypotheses is not None:
+        diff = hypotheses_diff(gold_hypotheses, hypotheses)
+        if diff:
+            for path, (g, n) in diff.items():
+                print(f"  {path}: GOLD {g!r} → run {n!r}")
+            print(f"\n[SUMMARY] {BOLD}{RED}NOT COMPARABLE{END}{BOLD} GOLD made under different "
+                  f"hypotheses → regression check skipped{END}")
+            _write_regression_verdict(case_dir, "NOT COMPARABLE")
+            return None
+    elif hypotheses is not None:
+        print("  [INFO] GOLD records no hypotheses: compared as before (bless it again to record them)")
 
     gold_results = gold_data.get("results", gold_data)
     reg_pass = True

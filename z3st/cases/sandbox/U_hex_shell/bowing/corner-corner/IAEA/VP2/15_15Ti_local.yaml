@@ -1,0 +1,17 @@
+name: 15-15 Ti
+
+# Mechanical properties (IWGFR/75, App. 2: EXAMPLE 2 "as for EXAMPLE 1")
+E: 1.7e+11        # Young's modulus (Pa), IAEA VP1/VP2: 1.7e5 MPa
+nu: 0.3           # Poisson's ratio (-), IAEA VP1/VP2
+alpha: 1.8e-5     # Thermal expansion coefficient (1/K), IAEA VP1/VP2: 18e-6 1/°C
+T_ref: 673.15     # Stress-free temperature (K), 400 °C as in VP1
+
+# Imposed temperature (thermal model off): alpha * (T_vp2(x) - T_ref) * I
+eigenstrain: vp2_temperature.eigenstrain
+
+# Thermal properties
+k: 10            # (W/m·K) not used: thermal model off
+cp: 200           # (J/kg·K) not used: thermal model off
+
+# Physical properties
+rho: 7750         # Density (kg/m³)

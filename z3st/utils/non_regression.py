@@ -21,6 +21,11 @@ reads ``rel_error`` only::
                                rel = the supplied relative norm, or value
     tracked(value)             no analytic reference; recorded for the gold
                                baseline but always passes pass_fail_check
+
+A case may pass ``finish(..., hypotheses=case_hypotheses(CASE_DIR))``: the
+inputs that define it are stored with the results, so a gold blessed from them
+carries them, and a run made under different hypotheses (another material
+law, other BCs) is reported NOT COMPARABLE instead of being compared.
 """
 
 import os
@@ -46,6 +51,24 @@ def load_yaml(case_dir, name):
     """Parse one of the case's YAML files by name (e.g. ``"geometry.yaml"``)."""
     with open(os.path.join(case_dir, name)) as f:
         return yaml.safe_load(f)
+
+
+INPUT_HYPOTHESES = ("regime", "models", "lhr")   # input.yaml keys that define the physics
+
+
+def case_hypotheses(case_dir, inp=None):
+    """Inputs that define the case, for ``finish(..., hypotheses=...)``: every
+    material card of ``input.yaml``, the boundary conditions, the geometry and
+    the INPUT_HYPOTHESES keys. Solver settings are not hypotheses: a change
+    there is what the gold regression has to catch.
+    """
+    inp = inp or load_yaml(case_dir, "input.yaml")
+    hyp = {"materials": {k: load_yaml(case_dir, v) for k, v in inp["materials"].items()}}
+    for key in ("boundary_conditions_path", "geometry_path"):
+        if key in inp:
+            hyp[key[: -len("_path")]] = load_yaml(case_dir, inp[key])
+    hyp.update({k: inp[k] for k in INPUT_HYPOTHESES if k in inp})
+    return hyp
 
 
 def load_case(case_dir, material=None):
@@ -126,8 +149,12 @@ def line(vtu, field, component=None, **planes):
     return coords[along][mask][order], values[mask][order]
 
 
-def finish(errors, tolerance, out_json, case_dir):
-    """Run the pass/fail check and the gold regression check, then report."""
-    pass_fail_check(errors, tolerance, out_json, case_dir)
-    regression_check(errors, case_dir)
+def finish(errors, tolerance, out_json, case_dir, hypotheses=None):
+    """Run the pass/fail check and the gold regression check, then report.
+
+    ``hypotheses`` (e.g. from case_hypotheses) is stored with the results and
+    checked against the gold's before any comparison.
+    """
+    pass_fail_check(errors, tolerance, out_json, case_dir, hypotheses)
+    regression_check(errors, case_dir, hypotheses=hypotheses)
     print("\n[INFO] non-regression completed.\n")

@@ -1,0 +1,11 @@
+#!/bin/bash
+# IAEA VP1 step 1 without axial gradient (Z_UNIFORM): mesh of ../ (run ../Allrun first),
+# then z3st, hex_post figures and the comparison with Ansys (same option).
+set -e
+cd "${0%/*}" || exit 1
+export HDF5_USE_FILE_LOCKING=FALSE
+U_HEX=../../../../..
+
+python3 -m z3st > log_z3st.md
+python3 "$U_HEX/hex_post.py" .
+python3 ../compare_ansys.py --case .

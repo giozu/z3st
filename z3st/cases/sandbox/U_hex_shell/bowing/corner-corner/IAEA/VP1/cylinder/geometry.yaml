@@ -1,0 +1,22 @@
+name: tube_3d
+
+Rm: 0.0716197244  # mid-wall radius (m): same mid-wall perimeter as VP1, 6 L_mid / (2 pi), L_mid = 0.075 m
+H: 4.000    # height (m)
+t: 0.003    # wall thickness (m), as VP1
+Lz: 4.000   # height (m), read by the z3st mesh manager
+
+# read by vp1_temperature.py only (same T field as VP1): D is the hexagon outer
+# circumscribed diameter, D - 2 t / sqrt(3) = 0.150 m the corner-to-corner depth
+D: 0.153464101
+orientation: vertical # sector boundaries at the hexagon vertices (90, 150, ..., 30 deg); hot direction -y
+
+nf: 8       # elements along each 60-degree sector (VP1: 8 per flat, same element length 9.375 mm)
+nt: 1       # elements through the thickness (VP1)
+nz: 400     # elements along the height (VP1)
+
+labels:
+  steel: 1
+  bottom: 10
+  top: 11
+  inner: 12
+  outer: 13

@@ -1,0 +1,23 @@
+name: 1515Ti_Tdep DiMarcello (VP1)
+
+# 15-15Ti 20 % CW, T-dependent (materials/1515Ti_Tdep.yaml) on the solved
+# VP1 temperature (Dirichlet T(y, z) on all faces, ../boundary_conditions.yaml).
+# Di Marcello set (TRANSURANUS): E, eta, k, cp; Sobolev set in ../
+
+# Mechanical properties
+E: materials.steel_1515Ti_Tdep.E_DiMarcello       # (Pa) UFL(T_iter)
+nu: 0.3                                           # (-) as 1515Ti_Tdep.yaml and IAEA VP1
+
+# Thermal expansion: η(T) through the eigenstrain hook, no 'alpha'
+eigenstrain: materials.steel_1515Ti_Tdep.eigenstrain
+expansion_law: DiMarcello                            # Sobolev | DiMarcello
+swelling_law: none
+T_ref: 673.15        # (K) stress-free temperature, VP1 400 °C: strain (η(T) - η(T_ref)) / (1 + η(T_ref))
+T_initial: 673.15    # (K)
+
+# Thermal properties
+k: materials.steel_1515Ti_Tdep.k_DiMarcello          # (W/m·K)
+cp: materials.steel_1515Ti_Tdep.cp_DiMarcello        # (J/kg·K)
+
+# Physical properties
+rho: 7900.0          # (kg/m³) ρ0 at 20 °C

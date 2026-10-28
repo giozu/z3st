@@ -25,7 +25,7 @@ the `z3st/` package directory, which `z3st/__main__.py` puts on `sys.path`,
 and against the working directory, which `python -m z3st` puts there, so a
 module in the case directory can be named the same way (as
 `verification/plasticity/crystal_single_grain` does with its stress function).
-Keys resolved this way: `E`, `nu`, `k`, `Gc`, `eigenstrain`,
+Keys resolved this way: `E`, `nu`, `k`, `cp`, `Gc`, `eigenstrain`,
 `radial_profile`, `axial_profile`, and `stress_function`. `stress_function` is
 resolved in `MechanicalModel` for `constitutive: custom`. With
 `plasticity.mode: custom` the plasticity model imports the same module for
@@ -44,6 +44,7 @@ conductivity model (`type: neural_network`, `gpr` or `magni`).
 | `martensitic_steel.yaml` | martensitic stainless steel (AISI 410/420, 12Cr class) |
 | `T91.yaml` | T91 steel, constant properties |
 | `15_15Ti.yaml` | 15-15Ti steel; the linear k(T) note in the card cites "Homework 2024-2025, NDT" and is not used by the code |
+| `1515Ti_Tdep.yaml` | 15-15Ti 20 % CW with T-dependent `k`, `cp`, `E` and thermal expansion η(T) from `steel_1515Ti_Tdep.py` (Sobolev set by default, Di Marcello as alternative); commented `creep: nabarro_herring_structure` (sinh law, 1.4970, AIM1) and irradiation creep |
 | `zircaloy.yaml` | Zircaloy-4, E = 99.3 GPa, k = 17 W/m K |
 | `uo2.yaml` | UO₂ for the quenched-pellet case: E = 205 GPa, k = 5 W/m K, σc = 1 GPa, initial temperature 1023.15 K |
 | `mox_magni.yaml` | MA-MOX with the conductivity of Magni et al. (`magni_mox_thermal.k`) and its composition parameters |
@@ -61,6 +62,7 @@ conductivity model (`type: neural_network`, `gpr` or `magni`).
 | `fuel_thermal.py` | `k(T)`, UO₂ modified NFI correlation (Ohira and Itagaki 1997, as adopted in FRAPCON-3) at zero burnup, 95 % TD; burnup degradation not included |
 | `magni_mox_thermal.py` | `k(T, ...)` and numpy versions, MA-MOX conductivity of Magni et al. (INSPYRE coefficients) |
 | `zircaloy_E.py` | `E(T)`, a constant 99.3 GPa written as a UFL expression |
+| `steel_1515Ti_Tdep.py` | 15-15Ti correlations of a PoliMi master thesis (Sobolev 2011, Di Marcello 2013, Többe 1975): `k_*`, `cp_*`, `E_*`, `eta_*`, `eigenstrain` (η(T) + optional void swelling), `sinh_creep_SI` (thesis units → `creep: nabarro_herring_structure` card keys), `creep_irr_B`; post-processing `rho`, yield/ultimate strength, creep rates, rupture time, CDF |
 | `fuel_swelling.py` | `solid_gas_densification`, solid and gaseous swelling with early-life densification as an eigenstrain driven by burnup |
 | `sciantix_swelling.py` | eigenstrains from the SCIANTIX gaseous-swelling field, alone or with solid swelling and densification |
 | `fuel_profiles.py` | radial and axial power form factors: `rim_peaking`, `chopped_cosine`, `tabulated_axial`, `olander_plutonium_redistribution` |

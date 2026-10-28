@@ -1,0 +1,124 @@
+IAEA VP1 - IWGFR/75 App. 2, EXAMPLE 1: single wrapper, linear thermal gradient
+================================================================================
+
+Two cases on the same mesh, BCs and temperature:
+  VP1/                       constant 15-15Ti (IAEA VP1 values)
+  VP1/1515Ti_Tdependent/     T-dependent 15-15Ti (materials/1515Ti_Tdep.yaml, Sobolev)
+They are compared with each other and with the beam solution, not with the
+IAEA/IWGFR benchmarks.
+
+Case
+----
+  geometry   D = 0.153464101 m (outer circumscribed), t = 3 mm, H = 4 m, orientation vertical
+             mid-wall corner-to-corner depth 0.150 m; mesh nf 8, nt 1, nz 400 (hex, 38496 nodes)
+  BC         thermal: Dirichlet T(y, z) on face1..6 and face1_in..6_in (string expression)
+             mechanical: bottom fully clamped (u = 0)
+  T          T(y, z) = 673.15 + clip((z - 1.5) / 1.0, 0, 1) * (125 - 25 y / 0.075)   (K)
+             400 C below the core, linear ramp across it (1.5-2.5 m), constant above;
+             above the core 500 C at the cold corner (+y), 550 C at the hot corner (-y)
+             nt = 1: every node lies on a Dirichlet face, so T is the expression itself
+  solver     3d, thermal and mechanical on, linear (direct_mumps), 1 static step at t = 0, xdmf output
+
+  material   VP1/15_15Ti_const.yaml        E 1.7e+11 Pa, nu 0.3, alpha 1.8e-5 1/K, T_ref 400 C
+             1515Ti_Tdependent/1515Ti_Tdep_local.yaml
+                                           E(T) = E_Sobolev, 167.2 GPa at 400 C, 154.3 GPa at 550 C
+                                           eps_th = (eta(T) - eta(T_ref)) / (1 + eta(T_ref)), eta Sobolev
+                                           (secant alpha 400-550 C = 1.93e-5 1/K), T_ref 400 C
+                                           k, cp Sobolev; nu 0.3; no alpha in the card
+
+Files
+-----
+  VP1/
+    Allrun                    mesh -> solve -> non-regression.py -> convergence plot
+    input.yaml                thermal true, card 15_15Ti_const.yaml, output vp1_const_fields_3d
+    geometry.yaml, mesh.geo   duct and mesh (also used by 1515Ti_Tdependent/ and z_uniform/)
+    boundary_conditions.yaml  thermal Dirichlet T(y, z) + clamp (z_uniform/ reads only the clamp)
+    15_15Ti_const.yaml        constant card, alpha read by z3st (no eigenstrain hook)
+    non-regression.py         u_y vs beam at core top / ACLP / duct top, von Mises tracked
+  VP1/1515Ti_Tdependent/
+    Allrun                    solve (mesh of ../) -> non-regression.py -> convergence plot
+    input.yaml                as ../, card 1515Ti_Tdep_local.yaml, output vp1_tdep_fields_3d
+    boundary_conditions.yaml  as ../
+    1515Ti_Tdep_local.yaml    hooks of materials/steel_1515Ti_Tdep.py, T_ref = 400 C
+    non-regression.py         as ../non-regression.py, beam with eta(T) and E(T)
+
+Native z3st files: the string Dirichlet temperature was added by the colleague
+(commit 98e2603, models/thermal_model.py); _temperature_prescribed() was added
+to utils/writer.py (commit 4b97ab6). No other native file was changed.
+
+Dependencies and functions called
+---------------------------------
+  z3st, models/thermal_model.py
+    Dirichlet 'temperature' string   eval in x, y, z, np -> Function on V_t, constant in time
+  z3st, core/spine.py
+    E, k, cp strings                 resolved as module.func, built as UFL on T_iter
+  z3st, models/mechanical_model.py
+    alpha (T - T_ref) I              constant card
+    eigenstrain hook                 1515Ti card: steel_1515Ti_Tdep.eigenstrain(T, material)
+                                     -> thermal_strain(T, T_ref, expansion_law)
+  z3st, utils/writer.py
+    _temperature_prescribed(problem)   True when the thermal Dirichlet BCs constrain every
+                                     T dof (owned dofs counted, summed over the MPI ranks);
+                                     HeatFlux is then not written and the log reports:
+      [INFO] HeatFlux not written: every temperature dof is Dirichlet-constrained, so T is
+      the imposed field and -k grad T is not a solved heat flux.
+  materials/steel_1515Ti_Tdep.py
+    E_Sobolev(T), k_Sobolev(T), cp_Sobolev(T), eta_Sobolev(T), thermal_strain(T, T_ref, law)
+
+  VP1/non-regression.py  (z3st.utils.non_regression, utils_extract_xdmf)
+    beam_uy(z)          closed form, kappa0 = alpha dT/dy, dT/dy = 50 K / 0.150 m
+    von_mises(S)
+    section mean of u_y at every node level; metric() at the stations, tracked() for von Mises; finish()
+  1515Ti_Tdependent/non-regression.py  (as above + steel_1515Ti_Tdep)
+    temperature(y, z)   T of boundary_conditions.yaml
+    midwall_hexagon()   points and ds on the mid-wall line, corners at +-R on y
+    beam_uy(z)          kappa(z) from the plane-section fit eps ~ a + b y weighted by E(T) ds,
+                        kappa = -b, u_y = int kappa (z - s) ds (trapezoid, 4001 points)
+
+Closed form
+-----------
+  u_y(z) = int_0^z kappa(s) (z - s) ds,  kappa = alpha dT/dy r(z),  r = clip(z - 1.5, 0, 1)
+  constant:  u_y = kappa0 (z - 1.5)^3 / 6 (core), kappa0 [1/6 + (z - 2.5)/2 + (z - 2.5)^2/2] (above)
+             core top 1.000, ACLP 3.250, duct top 12.250 mm (as verification/fuel_assembly/IAEA/vp1)
+  Tdep:      same integral, kappa from the E(T)-weighted fit of eps_th(T) on the section;
+             reduces to the constant one for constant alpha and E
+  T linear in y in every section: nearly stress-free bow (the y·z term over the core and the
+  kinks at z = 1.5 and 2.5 m leave ~3 MPa), so E(T) has almost no effect on u.
+
+Results (z3st runs of 2026-10-27, 1 step)
+-----------------------------------------
+                          constant              T-dependent
+  u_y core top  (mm)      0.9860 / 1.0000       1.0510 / 1.0662      z3st / beam, -1.4 %
+  u_y ACLP      (mm)      3.2350 / 3.2500       3.4740 / 3.4903      -0.5 %
+  u_y duct top  (mm)     12.2311 / 12.2500     13.2066 / 13.2271     -0.15 %
+  von Mises max / median  2.73 / 0.06 MPa       2.82 / 0.10 MPa      max at the ramp kink z = 1.5 m
+  Tdep / constant at the duct top: 1.07975 (z3st), 1.07976 (beam)
+  z3st sits ~0.015 mm below the beam at every station with both cards; tolerance 2 %
+  (verification/fuel_assembly/IAEA/vp1: -2.1 % at the core top).
+
+Limits
+------
+  - T is fixed on every node: the thermal equation is never solved, k and cp have no effect,
+    and -k grad T would not be a balanced flux (about 6 kW/m2 through the slanted faces,
+    about -1.5 kW/m3 from dk/dT |grad T|^2). HeatFlux is therefore not written
+    (utils/writer.py, _temperature_prescribed(), see below).
+  - eta Sobolev is not the IAEA alpha: the Tdep bow is 8 % larger by definition.
+  - The T expression is written in boundary_conditions.yaml of both cases and in
+    1515Ti_Tdependent/non-regression.py.
+
+Changes of 2026-10-27
+---------------------
+  - VP1: thermal model on, T from the Dirichlet expression instead of vp1_temperature.eigenstrain;
+    card 15_15Ti_const.yaml (15_15Ti_local.yaml kept for z_uniform/). Same fields as before (4e-9).
+  - 1515Ti_Tdependent/ created: T-dependent card on the same T.
+  - All bowing cases (VP1, z_uniform, cylinder, cylinder/fine, cylinder/fine_hex, VP2,
+    1515Ti_Tdependent): 1 static step instead of 4 (identical fields, <= 4e-9).
+  - VP1/Allrun: vp1_benchmark, vp1_corners, ../along_y, ../iwgfr_table removed (benchmark
+    comparisons, read vp1_temperature); the files are kept.
+  - VP1/non-regression.py replaced (it was the copy of the inner q + out T case);
+    VP1/diagnostics.py and VP1/case_params.py removed (same case; z3st loaded diagnostics.py
+    at every run and failed with a warning).
+  - utils/writer.py: HeatFlux skipped when every T dof is Dirichlet-constrained (both VP1
+    cases: log line above, no HeatFlux in the .h5; non-regression and gold unchanged, PASS).
+  - Still on vp1_temperature (thermal off): z_uniform/, cylinder/, cylinder/fine*/, and the
+    post files post.yaml, gui_fields.py, compare_ansys.py, vp1_benchmark.py, vp1_corners.py.

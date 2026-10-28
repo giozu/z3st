@@ -129,7 +129,7 @@ class Spine(
                 # elastic constants are then built as UFL expressions in the T
                 # field by initialize_fields (T does not exist yet here).
                 # NOTE: symbolic E/nu is not yet compatible with the per-step
-                # cracking rescale or the numpy creep predictor.
+                # cracking rescale.
                 def _is_symbolic(v):
                     if not isinstance(v, str):
                         return False
@@ -186,6 +186,17 @@ class Spine(
                     print(f"  → k defined as constant: {mat['k']}")
             else:
                 print(f"  → k not defined for {name}")
+
+            # Specific heat cp (J/(kg·K)): a number or a "module.func" cp(T),
+            # built on T_iter by initialize_fields like a symbolic k. rho stays a
+            # number: the thermal problem lives on the undeformed mesh, so the
+            # mass per unit volume is the reference density.
+            if isinstance(mat.get("cp"), str):
+                try:
+                    mat["cp"] = float(mat["cp"])
+                except ValueError:
+                    print(f"  → cp defined as symbolic function: {mat['cp']}")
+                    mat["_cp_func"] = self.resolve_function(mat["cp"])
 
             sigma_c = mat.get("sigma_c")
             Gc = mat.get("Gc")
@@ -330,14 +341,23 @@ class Spine(
                       f"n_inf = {float(mat.get('cracking_n_inf', 12.0)):.0f})")
 
             if mat.get("creep") is not None:
-                if str(mat["creep"]).lower() != "norton":
+                # Thermal creep law, ε̇ = A0·exp(-Q/RT)·F(σ_eq), σ_eq in Pa:
+                #   norton:                    F = σ^n,              A0 (Pa^-n s^-1), n (-),          Q (J/mol)
+                #   nabarro_herring_structure: F = sinh(B·σ/(R·T)),  A0 (1/s),        B (J/(mol·Pa)), Q (J/mol)
+                creep_keys = {
+                    "norton": ("creep_A0", "creep_n", "creep_Q"),
+                    "nabarro_herring_structure": ("creep_A0", "creep_B", "creep_Q"),
+                }
+                law = str(mat["creep"]).lower()
+                if law not in creep_keys:
                     raise ValueError(
                         f"Material '{name}': creep model '{mat['creep']}' unknown "
-                        f"(only 'norton' is implemented)."
+                        f"(implemented: {', '.join(creep_keys)})."
                     )
-                for key in ("creep_A0", "creep_n", "creep_Q"):
+                mat["creep"] = law
+                for key in creep_keys[law]:
                     if key not in mat:
-                        raise ValueError(f"Material '{name}': creep requires '{key}'.")
+                        raise ValueError(f"Material '{name}': creep '{law}' requires '{key}'.")
                     mat[key] = float(mat[key])
                 # Optional irradiation creep ε̇_irr = B·φ·σ_eq: both keys or neither.
                 has_B, has_phi = "creep_irr_B" in mat, "fast_flux" in mat
@@ -362,8 +382,12 @@ class Spine(
                         "Creep cannot yet be combined with damage, plasticity or "
                         "cohesive fracture in the same run."
                     )
-                print(f"  → creep: Norton, A0 = {mat['creep_A0']:.3e} Pa^-n/s, "
-                      f"n = {mat['creep_n']:.2f}, Q = {mat['creep_Q']:.3e} J/mol")
+                if law == "norton":
+                    print(f"  → creep: Norton, A0 = {mat['creep_A0']:.3e} Pa^-n/s, "
+                          f"n = {mat['creep_n']:.2f}, Q = {mat['creep_Q']:.3e} J/mol")
+                else:
+                    print(f"  → creep: Nabarro Herring structure, A0 = {mat['creep_A0']:.3e} 1/s, "
+                          f"B = {mat['creep_B']:.3e} J/(mol·Pa), Q = {mat['creep_Q']:.3e} J/mol")
 
             # Without T_ref the thermal eigenstrain alpha*(T - T_ref) is dropped
             # silently (MechanicalModel.eigenstrain), and the initial
@@ -541,6 +565,10 @@ class Spine(
                 k_func = mat["_k_func"]
                 mat["k"] = self.call_material_function(k_func, self.T_iter, mat)
                 print("\nk expression for", name, "→", mat["k"])
+
+            if "_cp_func" in mat and self.T:
+                mat["cp"] = self.call_material_function(mat["_cp_func"], self.T_iter, mat)
+                print("\ncp expression for", name, "→", mat["cp"])
 
             # Data-driven conductivity
             if "_k_model" in mat and self.T is not None:

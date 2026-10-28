@@ -247,6 +247,8 @@ Each of these is a single-effect check against a closed form, in
   against the scalar backward-Euler recursion and the exact solution.
 - ``creep_irradiation``: irradiation creep :math:`\dot\varepsilon = B\phi\sigma`
   on the same bar.
+- ``creep_sinh``: sinh thermal creep of 15-15Ti (1.4970) with :math:`E(T)` on
+  the same bar. Axial, creep and radial strain against the closed form.
 - ``creep_shrink_fit_2D``: contact-pressure relaxation of a shrink fit by
   cladding creep, against the independent radial solution
   ``reference_1d.py`` (see :doc:`verification`).

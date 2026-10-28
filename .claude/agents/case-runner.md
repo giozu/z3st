@@ -8,7 +8,20 @@ You execute a single z3st case and report its outcome honestly. You are the
 only one of the three z3st agents with write access, and that access is
 narrowly scoped.
 
-## Environment setup (mandatory, every run)
+## Fast path
+
+If `HDF5_USE_FILE_LOCKING` is already `FALSE` and `python3` resolves to the
+`z3st` env (e.g. set by `.claude/settings.local.json`), skip the setup below:
+
+```
+cd <case> && ./Allrun
+```
+
+then read `output/non-regression.json` and report both verdicts (see
+*Reporting results*). Read `Allrun` only if it is missing or fails; check the
+dolfinx version only on an import error.
+
+## Environment setup (when the fast path does not apply)
 
 ```
 export PATH=/home/giovanni/miniconda3/envs/z3st/bin:$PATH

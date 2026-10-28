@@ -1,0 +1,10 @@
+#!/bin/bash
+# IAEA VP1 on a circular tube: same T field (vp1_temperature.py, copy of ../vp1_temperature.py),
+# same material, clamp and mesh layout as VP1, same mid-wall perimeter. Then the comparison
+# hexagon (../output) vs tube vs thin-shell closed form.
+set -e
+cd "${0%/*}" || exit 1
+
+gmsh $(python3 -m z3st.utils.geo_args) mesh.geo -3 > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 vp1_cylinder_compare.py

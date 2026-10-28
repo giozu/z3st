@@ -1,0 +1,15 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+# No thermal BCs: the thermal model is off and T is imposed by vp1_temperature.py.
+# Regions: face1..face6 (outer), face1_in..face6_in (inner), bottom, top.
+
+# MOOSE VP1: disp_x = disp_y = disp_z = 0 on the base (boundary `fixed`)
+mechanical:
+  steel:
+   - type: Dirichlet
+     region: bottom    
+     displacement: [0.0, 0.0, 0.0] # fully clamped (IAEA VP1: Clamp_x/y/z)

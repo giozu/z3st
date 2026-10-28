@@ -634,6 +634,17 @@ class MechanicalModel:
         if T is not None and "alpha" in material and "T_ref" in material:
             eps_star = eps_star + material["alpha"] * (T - material["T_ref"]) * I
 
+        return eps_star + self.material_eigenstrain(T, material, dim)
+
+    def material_eigenstrain(self, T, material, dim):
+        """
+        The material's own eigenstrain (dim × dim UFL tensor, -): the scalar
+        ``swelling`` card key and the ``eigenstrain`` card callable, i.e.
+        :meth:`eigenstrain` without the α(T - T_ref) I term.
+        """
+        I = ufl.Identity(dim)
+        eps_star = 0.0 * I
+
         # Constant volumetric swelling ΔV/V from a scalar material field
         # Isotropic, the linear eigenstrain per direction is (ΔV/V)/3 since tr(ε*) = ΔV/V
         s = material.get("swelling")
@@ -694,9 +705,10 @@ class MechanicalModel:
 
             psi_el = 0.5 * [lambda * tr(eps_el)^2 + 2G * eps_el : eps_el]
 
-        where eps_el = eps(u) - alpha*(T - T_ref)*I is the elastic strain
-        (total strain minus thermal eigenstrain). When T is None or the
-        material has no thermal-expansion properties, eps_el = eps(u).
+        where eps_el = eps(u) - alpha*(T - T_ref)*I - eps*_mat is the elastic
+        strain (total strain minus thermal and material eigenstrain,
+        :meth:`material_eigenstrain`). Without T or alpha the thermal term is
+        dropped; without a material eigenstrain eps*_mat = 0.
 
         For other constitutive modes (hyperelastic / plasticity /
         custom), fall back to 0.5 * sigma_mech(u, material) : eps(u) on
@@ -734,6 +746,12 @@ class MechanicalModel:
                 eps_el = eps - eth
             else:
                 eps_el = eps
+            # The material's own eigenstrain (swelling, card callable), as in
+            # the momentum balance. Not in regime 1d, whose eps_el is a padded
+            # 3x3 with only the axial component.
+            if self.has_material_eigenstrain(material) and \
+                    str(getattr(self, "regime", "3d")).lower() != "1d":
+                eps_el = eps_el - self.material_eigenstrain(T, material, eps.ufl_shape[0])
             if str(getattr(self, "regime", "3d")).lower() == "1d":
                 # Engineering 1D bar: psi_el = 0.5 E eps_xx^2, consistent with
                 # the sigma = E eps law used for regime 1d. eps_el is the 3x3

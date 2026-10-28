@@ -1,0 +1,10 @@
+#!/bin/bash
+# Hexagonal shell, Dirichlet T on the nord and sud flats (boundary_conditions.yaml).
+# The mesh takes D, H, t, orientation and nf/nt/nz from geometry.yaml (geo_args).
+set -e
+cd "${0%/*}" || exit 1
+
+gmsh $(python3 -m z3st.utils.geo_args) mesh.geo -3 > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 plots.py
+python3 -m z3st.utils.plot_convergence log_z3st.md

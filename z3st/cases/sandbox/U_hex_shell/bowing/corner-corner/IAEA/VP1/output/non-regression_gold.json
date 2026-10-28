@@ -1,0 +1,41 @@
+{
+    "results": {
+        "uy_core_top": {
+            "numerical": 0.0009859543564277725,
+            "reference": 0.001,
+            "abs_error": 1.4045643572227484e-05,
+            "rel_error": 0.014045643572227484,
+            "status": "PASS"
+        },
+        "uy_ACLP": {
+            "numerical": 0.003234996483878211,
+            "reference": 0.0032500000000000003,
+            "abs_error": 1.5003516121789382e-05,
+            "rel_error": 0.004616466499012117,
+            "status": "PASS"
+        },
+        "uy_duct_top": {
+            "numerical": 0.012231107533670843,
+            "reference": 0.01225,
+            "abs_error": 1.88924663291571e-05,
+            "rel_error": 0.001542242149318947,
+            "status": "PASS"
+        },
+        "vonMises_max": {
+            "numerical": 2731499.183281989,
+            "reference": 2731499.183281989,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "vonMises_median": {
+            "numerical": 59730.424901032275,
+            "reference": 59730.424901032275,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.02,
+    "summary": "PASS"
+}

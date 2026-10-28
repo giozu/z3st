@@ -1,0 +1,46 @@
+name: 1515Ti_Tdep
+
+# 15-15Ti stabilised austenitic steel, 20 % cold worked, T-dependent.
+# Correlations, sources and the corrections to the notes:
+# z3st/materials/steel_1515Ti_Tdep.py. Default set: Sobolev (2011);
+# swap the hooks for the Di Marcello (TRANSURANUS) ones below.
+
+# Mechanical properties
+E: materials.steel_1515Ti_Tdep.E_Sobolev         # (Pa) UFL(T)
+# E: materials.steel_1515Ti_Tdep.E_DiMarcello
+nu: 0.3                                          # (-) not in the notes, value of 15_15Ti.yaml
+
+# Thermal expansion: η(T) from 20 °C through the eigenstrain hook, no 'alpha'
+eigenstrain: materials.steel_1515Ti_Tdep.eigenstrain
+expansion_law: Sobolev                           # Sobolev | DiMarcello
+T_ref: 293.15                                    # (K) t_ref = 20 °C
+
+# Void swelling at a uniform fast fluence (off by default)
+swelling_law: none                               # none | generalized | aim1
+# fluence: 5.0                                   # (1e22 n/cm²), 2e21 n/cm² = 1 dpa
+
+# Thermal properties
+k: materials.steel_1515Ti_Tdep.k_Sobolev         # (W/m·K) lagged on T_iter
+# k: materials.steel_1515Ti_Tdep.k_DiMarcello
+cp: materials.steel_1515Ti_Tdep.cp_Sobolev       # (J/kg·K) UFL(T_iter), transient term only
+# cp: materials.steel_1515Ti_Tdep.cp_DiMarcello
+
+# Physical properties
+rho: 7900.0         # (kg/m³) ρ0 at 20 °C, reference density of the undeformed
+                    # mesh; ρ(T) = ρ0/(1+η)³ is post-processing only
+
+# Creep, ε̇ (1/s) = A0·exp(-Q/(R·T))·sinh(B·σ/(R·T)) + creep_irr_B·φ·σ,
+# σ = von Mises σ_eq (Pa), T (K), R = 8.314462618 J/(mol·K).
+# Thermal part: steel_1515Ti_Tdep.sinh_creep_SI(A %/h, Q cal/mol, B cal/(mol·MPa))
+#   1.4970 (Többe):  A = 7.49e15, Q = 91000, B = 57.46
+#   AIM1:            A = 2.30e14, Q = 84600, B = 39.72
+# Irradiation part: creep_irr_B = steel_1515Ti_Tdep.creep_irr_B(Ē), from
+#   ε̇ (%/h) = 3.2e-24·Ē·φ·σ (Ē MeV, φ n/(cm²·s), σ MPa); value for Ē = 0.5 MeV.
+#   fast_flux is the case loading. Delete both keys for thermal creep only.
+#
+# creep: nabarro_herring_structure
+# creep_A0: 2.08055556e+10   # (1/s)          1.4970;  AIM1: 6.38888889e+08
+# creep_Q: 3.80974873e+05    # (J/mol)        1.4970;  AIM1: 3.54181036e+05
+# creep_B: 2.40558420e-04    # (J/(mol·Pa))   1.4970;  AIM1: 1.66289252e-04
+# creep_irr_B: 4.444e-40     # (Pa^-1 per n/m²)
+# fast_flux: 2.0e+19         # (n/(m²·s)), i.e. 2e15 n/(cm²·s)

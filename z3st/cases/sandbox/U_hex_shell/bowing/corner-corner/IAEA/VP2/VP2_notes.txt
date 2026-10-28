@@ -1,0 +1,111 @@
+IAEA VP2 - IWGFR/75 App. 2, EXAMPLE 2: single wrapper, non-linear thermal gradient
+==================================================================================
+
+Case
+----
+As the former VP1 (same geometry, mesh, material, clamp, axial T profile); only the
+section temperature changes. Thermal model off: T is imposed as a material eigenstrain.
+(VP1 now solves T from a Dirichlet expression, see ../VP1/VP1_notes.txt.)
+
+  geometry   D = 0.153464101 m (outer circumscribed), t = 3 mm, H = 4 m, orientation vertical
+             mid-wall corner-to-corner depth 0.150 m; mesh nf 8, nt 1, nz 400 (hex, 38496 nodes)
+  material   E 1.7e+11 Pa, nu 0.3, alpha 1.8e-5 1/K, T_ref 400 C (673.15 K)
+  BC         bottom fully clamped (u = 0); no thermal BCs
+  T          below the core (z < 1.5 m): 400 C everywhere
+             above the core top (z > 2.5 m): corners 1, 2, 6 at T1 = 500 C, corners 3, 4, 5 at T2 = 550 C
+             across the core: linear ramp in z, as VP1
+             section: T1 for h <= -D/4, linear for |h| < D/4, T2 for h >= D/4
+             (h along the hot-corner direction PHI_HOT = -pi/2, h = -y; hot corner 4 at -y)
+  coords     x, y, z global (IAEA: X east, Y north, Z up); local frame of hex_post:
+             xi through the wall, s along the flat at mid-wall, p mid-wall perimeter
+  solver     3d, mechanical linear (direct_mumps), 1 static step at t = 0, xdmf output
+             (4 steps until 2026-10-27, identical fields)
+
+Files
+-----
+  Allrun                    mesh -> solve -> vp2_post -> vp2_benchmark -> vp2_corners -> along_y -> convergence plot
+  input.yaml                as VP1, output filename vp2_fields_3d
+  geometry.yaml             as VP1
+  boundary_conditions.yaml  clamp only (as the former VP1)
+  15_15Ti_local.yaml        as ../VP1/15_15Ti_local.yaml, eigenstrain: vp2_temperature.eigenstrain
+  mesh.geo                  copy of ../VP1/mesh.geo
+  post.yaml                 as VP1, temperature vp2_temperature.T_vp2, closed_form vp2:vp2_temperature
+  vp2_temperature.py        new section shape (only file with new physics)
+  vp2_post.py               hex_post figures with the VP2 closed form
+  vp2_benchmark.py          z3st vs IWGFR/75 and IWGFR/76 tables
+  vp2_corners.py            copy of vp1_corners.py on vp2_temperature
+  ../along_y.py             shared with VP1: T, stress, strain at mid-wall against y (half x >= 0)
+  ../iwgfr.py               shared with VP1: CRP codes (DT1BOW, AT1LEN) and IAEA declared values
+  ../iwgfr_table.py         shared with VP1: z3st vs every reference, diff (%), IAEA band
+
+No native z3st file and no shared U_hex_shell file (hex_post.py) was changed.
+
+Dependencies and functions called
+---------------------------------
+  vp2_temperature.py
+    T1(z), T2(z)        corner temperatures, _ramp(z) across the core
+    section_shape(h)    0 / linear / 1 over the section
+    T_vp2(x)            T at x = (x, y, z), UFL or numpy
+    eigenstrain(...)    alpha (T_vp2(x) - T_ref) I, read by z3st through the material card
+
+  vp2_post.py  (imports ../../../../hex_post.py as hp)
+    class VP2(hp.VP1)   kappa = C alpha (T2 - T1) / D, C integrated on the mid-wall perimeter
+                        (hp.perimeter_point) and checked against 4/3; references(): none,
+                        T not linear in (x, y)
+    closed_form(...)    'vp2:' -> VP2, otherwise hp.closed_form
+    run_case()          hp.load_z3st, hp.load_material, hp.frame, hp.analyse, hp.save_all
+
+  vp2_benchmark.py  (hp, vp2_post)
+    z3st_profiles()     hp.load_z3st, vp2_post.closed_form, hp.analyse, section_dims
+    compare()           Y and Z at core top / LRP / URP, dimensions at z = 1.0 / 3.5 m;
+                        Z and dimensions rebased to the T_ref of each source
+                        (alpha (T_ref,case - T_ref,source))
+    figure(), figure_tables()   hp._table, hp._finish
+
+  vp2_corners.py  (hp, vp2_post, vp2_temperature)
+    corner_profiles()   u_y, sigma_zz, sigma_ss, sigma_vm, eps_zz, eps_ss at the hot corner 4
+                        and the cold corner 1
+    figure_corners()
+
+  ../along_y.py <case>  (hp, the temperature module of post.yaml)
+    profiles()          hp.analyse, hp.perimeter_point: cells at the along_s_z heights on x >= 0,
+                        averaged through the wall, sorted by y; sigma_ss, sigma_zz, eps_ss, eps_zz, alpha (T - T_ref)
+    figure()            3 panels against y, corners 1, 2/6, 3/5, 4 marked
+
+Closed form
+-----------
+  kappa(z) = alpha int theta h dp / int h^2 dp = C alpha (T2 - T1) / D
+  VP1 (T linear in h): C = 1; VP2: C = 4/3 -> URP bow 16.333 mm against 12.25 mm of VP1.
+  Mean section T is (T1 + T2) / 2 as in VP1: u_z is the VP1 one.
+
+Reference data (mm)
+-------------------
+  source                         T_ref   Y core top  Y LRP   Y URP    Z core top  Z LRP   Z URP
+  IWGFR/75 AT1BOW linear theory   20 C    1.333      4.333   16.333   -           -       -
+  IWGFR/75 average of 10 codes    20 C    -          -       16.340   -           -       -
+  S1 (CEA, SOLO) Part II Table 2  20 C    1.333      4.338   16.334   18.338      22.882  31.973
+  STRAW Table III reference        0 C    1.333      4.332   16.328   19.125      23.850  33.300
+  STRAW Table IV zero thickness    0 C    1.330      4.333   16.333   19.125      23.850  33.300
+  STRAW Table IV non adiabatic     0 C    1.334      4.336   16.345   (other T field, reference only)
+
+  STRAW Table III dimensions, mid-wall (across corners OY / across flats OX):
+    hot below core bottom 151.076 / 130.840, hot above core top 151.412 / 131.157, cold 150.000 / 129.904
+
+  Part II page 27, EXAMPLE 3 (array, natural restraint, pad distances over flats): not VP2, not used.
+
+Results (z3st run of 2026-10-26, 4 steps, 15.8 s)
+-------------------------------------------------
+  C = 1.33333
+  Y   core top 1.314, LRP 4.311, URP 16.300 mm  (theory 1.333 / 4.333 / 16.333: -0.02 / -0.03 mm)
+  Z   T_ref 0 C: 19.125 / 23.850 / 33.300 mm (= STRAW); T_ref 20 C: S1 - 0.113 mm, constant as in VP1
+  OY / OX above core top: 151.417 / 131.131 mm (STRAW 151.412 / 131.157)
+  No point beyond 0.1 mm and 5 %.
+
+Outputs in U_hex_shell/results/
+-------------------------------
+  VP2_*.png, VP2_summary.json                   hex_post figures (vp2_post.py)
+  IAEA_VP2_vs_benchmark{,_tables}.png, _summary.json   (vp2_benchmark.py)
+  IAEA_VP2_corners_z.png                         (vp2_corners.py)
+  IAEA_VP2_along_y.png                           (../along_y.py)
+  IAEA_VP2_vs_codes.png, .csv                    (../iwgfr_table.py)
+  results_organize.py moves them to results/bowing_corner-corner_IAEA_VP2/z-gradient/ (IAEA_VP2_z-gradient_*)

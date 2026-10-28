@@ -837,8 +837,10 @@ Keys read by the loader (``Spine.load_materials`` and the models):
        of the strength surface. ``tau_c`` is not used in 1D.
    * - ``stress_function``
      - Stress function for ``constitutive: custom``.
-   * - ``creep``, ``creep_A0``, ``creep_n``, ``creep_Q``, ``creep_irr_B``, ``fast_flux``
-     - Norton thermal creep (``creep: norton``) and optional irradiation creep.
+   * - ``creep``, ``creep_A0``, ``creep_n``, ``creep_B``, ``creep_Q``, ``creep_irr_B``, ``fast_flux``
+     - Thermal creep, ``creep: norton`` (``creep_n``) or ``creep: nabarro_herring_structure``
+       (``creep_B``), and optional irradiation creep.
+       See :doc:`physics_models`.
    * - ``cracking``, ``cracking_lhr0``, ``cracking_n0``, ``cracking_n_inf``, ``cracking_tau``
      - Isotropic-softening pellet cracking (``cracking: isotropic``).
    * - ``eigenstrain``, ``radial_profile``, ``axial_profile``
@@ -849,7 +851,7 @@ The models are described in :doc:`physics_models`.
 Properties as Python functions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``k``, ``E``, ``nu``, ``Gc``, ``eigenstrain``, ``radial_profile``,
+``k``, ``cp``, ``E``, ``nu``, ``Gc``, ``eigenstrain``, ``radial_profile``,
 ``axial_profile`` and ``stress_function`` accept, in place of a number, the
 dotted path of a Python function. ``Spine.resolve_function`` splits the path at its
 last dot, imports the module with ``importlib.import_module`` and takes the

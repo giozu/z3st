@@ -1,0 +1,33 @@
+#!/bin/bash
+# IAEA VP1 with the T-dependent 15-15Ti properties (1515Ti_Tdep), T solved from the VP1 Dirichlet: mesh of ../ (run ../Allrun first).
+# Reference: ../ (constant 15-15Ti, same mesh, BCs and T); beam check in non-regression.py.
+# One gold per correlation set: expansion_law of 1515Ti_Tdep_local.yaml (Sobolev | DiMarcello)
+# selects <law>/output/, reached through the output -> <law>/output link.
+set -e
+cd "${0%/*}" || exit 1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+LAW=$(python3 - <<'EOF'
+import sys, yaml
+mat = yaml.safe_load(open("1515Ti_Tdep_local.yaml"))
+law = str(mat["expansion_law"])
+if law not in ("Sobolev", "DiMarcello"):
+    sys.exit(f"expansion_law: {law}, expected Sobolev or DiMarcello")
+mixed = [k for k in ("E", "k", "cp") if not str(mat[k]).endswith(f"_{law}")]
+if mixed:
+    sys.exit(f"{', '.join(mixed)} not of the {law} set: one gold per set, do not mix")
+print(law)
+EOF
+)
+
+if [ -e output ] && [ ! -L output ]; then
+    echo "output/ is a folder, not the link to <law>/output: move it into Sobolev/ or DiMarcello/" >&2
+    exit 1
+fi
+mkdir -p "$LAW/output"
+ln -sfn "$LAW/output" output
+echo "1515Ti_Tdep set: $LAW -> $LAW/output"
+
+python3 -m z3st > log_z3st.md
+python3 non-regression.py
+python3 -m z3st.utils.plot_convergence log_z3st.md

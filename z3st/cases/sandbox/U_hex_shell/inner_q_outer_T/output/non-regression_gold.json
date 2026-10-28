@@ -1,0 +1,62 @@
+{
+    "results": {
+        "L2_error_T": {
+            "numerical": 1.5798306677916186e-06,
+            "reference": 0.0,
+            "abs_error": 1.5798306677916186e-06,
+            "rel_error": 8.325106006192114e-07,
+            "status": "PASS"
+        },
+        "Linf_error_T": {
+            "numerical": 2.5174901452373888e-06,
+            "reference": 0.0,
+            "abs_error": 2.5174901452373888e-06,
+            "rel_error": 1.3266214383559285e-06,
+            "status": "PASS"
+        },
+        "T_max": {
+            "numerical": 501.8976728493951,
+            "reference": 501.897670331905,
+            "abs_error": 2.5174901452373888e-06,
+            "rel_error": 5.015943077744458e-09,
+            "status": "PASS"
+        },
+        "wall_dT": {
+            "numerical": 1.8976728493951214,
+            "reference": 1.8976703319051549,
+            "abs_error": 2.517489966491482e-06,
+            "rel_error": 1.3266213441636424e-06,
+            "status": "PASS"
+        },
+        "L2_error_sigma_ss": {
+            "numerical": 0.0012526052626995756,
+            "reference": 0.0,
+            "abs_error": 0.0012526052626995756,
+            "rel_error": 0.0012526052626995756,
+            "status": "PASS"
+        },
+        "L2_error_sigma_zz": {
+            "numerical": 0.00044109888472357544,
+            "reference": 0.0,
+            "abs_error": 0.00044109888472357544,
+            "rel_error": 0.00044109888472357544,
+            "status": "PASS"
+        },
+        "L2_error_sigma_nn": {
+            "numerical": 0.006393179875215102,
+            "reference": 0.0,
+            "abs_error": 0.006393179875215102,
+            "rel_error": 0.006393179875215102,
+            "status": "PASS"
+        },
+        "sigma_zz_offset": {
+            "numerical": -71004.62027936017,
+            "reference": -71004.62027936017,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

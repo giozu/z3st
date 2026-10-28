@@ -77,7 +77,9 @@ The temperature :math:`T` satisfies
 with the time derivative omitted when ``thermal.analysis: stationary``
 (default) and discretised by backward Euler when
 ``thermal.analysis: transient``. The card keys are ``rho`` (kg/m³), ``cp``
-(J/(kg·K)) and ``k`` (W/(m·K)).
+(J/(kg·K)) and ``k`` (W/(m·K)). ``k`` and ``cp`` may be functions of T,
+evaluated on the staggered iterate; ``rho`` is a number, the reference
+density of the undeformed mesh on which the problem is written.
 
 **Boundary conditions** (``thermal:`` block of ``boundary_conditions.yaml``):
 
@@ -636,23 +638,33 @@ integrated by backward Euler, with the Newton tangent from ``ufl.derivative``.
 Creep
 ^^^^^
 
-A card with ``creep: norton`` and the keys ``creep_A0`` (Pa\ :sup:`-n`/s),
-``creep_n`` and ``creep_Q`` (J/mol) follows
+A creeping material follows
 
 .. math::
 
-   \dot\varepsilon^{cr}_{eq} = A_0\, e^{-Q/RT}\,\sigma_{eq}^{\,n} + B\phi\,\sigma_{eq},
+   \dot\varepsilon^{cr}_{eq} = A_0\, e^{-Q/RT}\,F(\sigma_{eq}) + B\phi\,\sigma_{eq},
    \qquad
    \dot{\boldsymbol\varepsilon}_{cr} = \dot\varepsilon^{cr}_{eq}\,\tfrac32\,\frac{\boldsymbol s}{\sigma_{eq}} ,
 
-thermal Norton creep plus an irradiation-creep term that is present only when
-both ``creep_irr_B`` (:math:`B`) and ``fast_flux`` (:math:`\phi`) are on the
-card. Backward Euler with a radial return gives one scalar equation per point
-for the increment :math:`\Delta\gamma`,
+with :math:`\sigma_{eq}` in Pa, :math:`T` in K and :math:`R` = 8.314462618
+J/(mol·K). The card key ``creep`` selects the thermal-creep law :math:`F`:
+
+- ``creep: norton``, :math:`F = \sigma_{eq}^{\,n}`, keys ``creep_A0``
+  (Pa\ :sup:`-n`/s), ``creep_n`` (-) and ``creep_Q`` (J/mol);
+- ``creep: nabarro_herring_structure``, :math:`F = \sinh(\beta\sigma_{eq})` with
+  :math:`\beta = B_{s}/(RT)` (1/Pa), keys ``creep_A0`` (1/s), ``creep_B``
+  (:math:`B_s`, J/(mol·Pa)) and ``creep_Q`` (J/mol). This is the
+  Nabarro-Herring-type law of the 15-15Ti steels (Többe 1975); for
+  :math:`\beta\sigma_{eq} \ll 1` it reduces to Norton with :math:`n = 1`.
+
+The irradiation-creep term is present only when both ``creep_irr_B``
+(:math:`B`) and ``fast_flux`` (:math:`\phi`) are on the card. Backward Euler
+with a radial return gives one scalar equation per point for the increment
+:math:`\Delta\gamma`,
 
 .. math::
 
-   \Delta\gamma - \Delta t\, A(T)\, b^n - \Delta t\, B\phi\, b = 0, \qquad
+   \Delta\gamma - \Delta t\, A(T)\, F(b) - \Delta t\, B\phi\, b = 0, \qquad
    b = \sigma_{eq}^{tr} - 3\mu\,\Delta\gamma ,
 
 where the trial stress uses
@@ -663,10 +675,11 @@ correction from that predictor, so ``ufl.derivative`` gives the consistent
 tangent (:mod:`z3st.models.creep_model`). The relative change of the predictor
 enters the staggered convergence test of the mechanical block. The creep strain
 is stored on a DG0 tensor field per material and updated once per time step.
-Creep forces the SNES path. Without the thermal model, :math:`A(T)` is
-evaluated at the card ``T_initial``. Verified by
-``cases/verification/fuel/creep``, ``creep_irradiation`` and
-``creep_relaxation``.
+Creep forces the SNES path. Without the thermal model, :math:`A(T)` and
+:math:`\beta(T)` are evaluated at the card ``T_initial``. ``E`` and ``nu`` may
+be functions of T. Verified by ``cases/verification/fuel/creep``,
+``creep_irradiation``, ``creep_relaxation`` and ``creep_sinh`` (nabarro_herring_structure law with
+:math:`E(T)`).
 
 .. _model-restrictions:
 

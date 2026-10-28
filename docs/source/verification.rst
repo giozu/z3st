@@ -97,6 +97,11 @@ with the ``output/non-regression_gold.json`` of each case and, except for
      - irradiation creep
      - closed form
      - 8.8e-14
+   * - ``verification/fuel/creep_sinh``
+     - ax.
+     - Nabarro-Herring (sinh) creep, :math:`E(T)`
+     - closed form
+     - 1.9e-14
    * - ``verification/fuel/creep_shrink_fit_2D``
      - ax.
      - contact, creep relaxation

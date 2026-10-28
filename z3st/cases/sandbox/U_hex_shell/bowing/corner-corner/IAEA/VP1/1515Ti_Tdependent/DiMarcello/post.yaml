@@ -1,0 +1,14 @@
+# Post-processing of this subfolder: python <U_hex_shell>/hex_post.py . (paths relative to here)
+# IAEA VP1, T-dependent 15-15Ti card, Di Marcello set (Sobolev set: ../)
+fields: output/vp1_tdep_fields_3d.xdmf
+material: 1515Ti_Tdep_local.yaml
+temperature: field                   # thermal model on: T from the Dirichlet, in the fields file
+option: z-gradient                   # axial ramp across the core, as ../
+support: clamped                     # bottom fully clamped (IAEA VP1)
+closed_form: vp1:../../vp1_temperature # T-dependent card: beam with eta(T) and E(T) (hex_post VP1Tdep)
+stations_z: [1.0, 1.5, 2.5, 3.0, 4.0]   # VTB table: core top 2.5, ACLP 3.0, duct top 4.0
+along_s_z:                           # heights of the along-s figures (m): core inlet, mid, outlet and duct tip
+  inlet core: 1.5
+  mid core: 2.0
+  outlet core: 2.5
+  tip: 4.0

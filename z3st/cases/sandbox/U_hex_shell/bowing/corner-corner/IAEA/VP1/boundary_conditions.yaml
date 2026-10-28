@@ -1,0 +1,59 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+# IAEA VP1 temperature, the same field as 1515Ti_Tdependent/: 400 °C below
+# the core (z < 1.5 m), linear rise over the core (1.5-2.5 m), constant above;
+# at the core top 500 °C at the cold corner (+y) and 550 °C at the hot corner
+# (-y, as MOOSE VP1). T linear in y, 0.075 m = mid-wall corner radius.
+# Imposed on every inner and outer face: with nt = 1 all nodes are on them.
+thermal:
+  steel:
+   - type: Dirichlet
+     region: face1
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face2
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face3
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face4
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face5
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face6
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face1_in
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face2_in
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face3_in
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face4_in
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face5_in
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+   - type: Dirichlet
+     region: face6_in
+     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+# z_uniform/ (thermal model off) does not read this block.
+
+# Regions: face1..face6 (outer), face1_in..face6_in (inner), bottom, top.
+
+# MOOSE VP1: disp_x = disp_y = disp_z = 0 on the base (boundary `fixed`)
+mechanical:
+  steel:
+   - type: Dirichlet
+     region: bottom    
+     displacement: [0.0, 0.0, 0.0] # fully clamped (IAEA VP1: Clamp_x/y/z)

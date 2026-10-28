@@ -1,0 +1,34 @@
+thermal:
+  steel:
+  - type: Dirichlet
+    region: nord
+    temperature: 600.0 # (K)
+  - type: Dirichlet
+    region: sud
+    temperature: 1700.0 # (K)
+  # - type: Dirichlet
+  #   region: nord-est
+  #   temperature: 625.0 # (K)
+  # - type: Dirichlet
+  #   region: nord-west
+  #   temperature: 625.0 # (K)
+  # - type: Dirichlet
+  #   region: sud-est
+  #   temperature: 675.0 # (K)
+  # - type: Dirichlet
+  #   region: sud-west
+  #   temperature: 675.0 # (K)
+  
+
+
+mechanical:
+ steel:
+ - type: Clamp_z
+   region: bottom
+#   # - type: Dirichlet_z # remove for hourglassing
+#   #   region: top
+#   #   value: 2.504e-5 # (m) u_z = eps_zz * Lz = alpha * (T_mean - T_ref) * Lz
+#  - type: Clamp_y
+#    region: bottom
+#  - type: Clamp_x
+#    region: bottom

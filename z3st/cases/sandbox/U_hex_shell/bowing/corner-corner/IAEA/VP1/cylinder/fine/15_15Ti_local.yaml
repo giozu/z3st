@@ -1,0 +1,19 @@
+name: 15-15 Ti
+
+# Mechanical properties
+E: 1.7e+11        # Young's modulus (Pa), IAEA VP1: 1.7e5 MPa
+nu: 0.3           # Poisson's ratio (-), IAEA VP1
+alpha: 1.8e-5     # Thermal expansion coefficient (1/K), IAEA VP1: 18e-6 1/°C
+T_ref: 673.15     # Stress-free temperature (K), VP1 stress_free_temperature = 400 °C
+
+# Imposed temperature (thermal model off): alpha * (T_vp1(x) - T_ref) * I
+eigenstrain: vp1_temperature.eigenstrain
+
+# Thermal properties
+k: 10            # (W/m·K) not used: thermal model off
+cp: 200           # (J/kg·K) not used: thermal model off
+
+# Physical properties
+rho: 7750         # Density (kg/m³)
+
+# Swelling and creep: not modelled yet (next step: bowing)

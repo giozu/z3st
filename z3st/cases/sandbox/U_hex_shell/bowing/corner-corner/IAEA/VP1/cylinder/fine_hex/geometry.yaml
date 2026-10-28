@@ -1,0 +1,29 @@
+name: hex_shell_3d
+
+D: 0.153464101  # outer circumscribed diameter (m): 2 * 0.066451905 / cos(30 deg), outer apothem 0.066451905
+H: 4.000    # height (m)
+t: 0.003   # wall thickness (m): 0.066451905 - 0.063451905 (duct apothem)
+Lz: 4.000   # height (m), read by the z3st mesh manager
+
+orientation: vertical # flat | vertical; MOOSE VP1 has the corners on +-y (temp_func at y = +-0.075 m)
+
+nf: 8       # elements along each flat (num_sectors_per_side)
+nt: 3       # elements through the thickness (fine check)
+nz: 620     # graded layers in mesh.geo: 1 mm within 100 mm of the core entry and exit
+
+labels: # consistent with IAEA_VP1/mesh.geo, one label per side (MOOSE VP1 face1..face6)
+  steel: 1
+  bottom: 10
+  top: 11
+  face1: 21
+  face2: 22
+  face3: 23
+  face4: 24
+  face5: 25
+  face6: 26
+  face1_in: 31
+  face2_in: 32
+  face3_in: 33
+  face4_in: 34
+  face5_in: 35
+  face6_in: 36

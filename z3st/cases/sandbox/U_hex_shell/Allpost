@@ -1,0 +1,26 @@
+#!/bin/bash
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+#
+#     ./Allpost      post-process every subfolder with a post.yaml, at any depth
+#                    (hex_post.py), compare IAEA VP1 z_uniform with Ansys
+#                    (bowing/corner-corner/IAEA/VP1/compare_ansys.py) and group
+#                    results/ by problem (results_organize.py)
+#
+# Reads only the existing outputs: run the cases first. A subfolder with no
+# output is skipped. Every figure and summary goes to results/, first named
+# after its subfolder (<subfolder>_<figure>.png, IAEA_VP1_<option>_vs_Ansys_<figure>),
+# then moved to results/<problem>/.
+
+set -e
+cd "${0%/*}" || exit 1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+find . -name post.yaml -not -path '*/output/*' | sort | while read -r post; do
+    python3 hex_post.py "$(dirname "$post")"
+done
+python3 bowing/corner-corner/IAEA/VP1/compare_ansys.py
+python3 results_organize.py

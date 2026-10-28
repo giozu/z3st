@@ -1,0 +1,55 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# Z3ST: An open-source FEniCSx framework for thermo-mechanical analysis
+# Author: Bianca Funaro
+# Version: 0.4.1 (2026)
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+# Data and setup is taken from IAEA VP1 (1990)
+mesh_path: mesh.msh
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:
+  steel: 15_15Ti_const.yaml
+
+regime: 3d
+
+solver_settings:
+  max_iters: 100
+  relax_T: 1.0
+  relax_u: 1.0 
+  relax_adaptive: false 
+
+models:
+  thermal: true # T(y, z) of VP1 imposed as Dirichlet on the faces (boundary_conditions.yaml)
+  mechanical: true
+
+thermal:
+  solver: linear
+  linear_solver: direct_mumps # direct_mumps | iterative_amg** | iterative_hypre
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm # rel_norm | norm
+
+mechanical:
+  solver: linear
+  linear_solver: direct_mumps # direct_mumps | iterative_amg | iterative_hypre
+  remove_rigid_nullspace: false # bottom fully clamped (Clamp_x/y/z, as MOOSE VP1): no rigid-body mode left
+  rtol: 1.0e-6
+  stag_tol: 1.0e-6
+  convergence: rel_norm # rel_norm | norm
+  
+lhr: #linear heat rate (power generation)
+- 0.0
+time: # steady state, one static step at t = 0 (more steps give identical fields)
+- 0.0
+n_steps: 1
+
+# time_adaptivity:
+#   enabled: true
+#   dt_min: 1.0e+4
+#   max_cuts: 8
+
+output:
+  format: xdmf #time series complete output vs vtu per timestep
+  filename: vp1_const_fields_3d # output/vp1_const_fields_3d.xdmf + .h5

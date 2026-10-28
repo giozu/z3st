@@ -1,0 +1,24 @@
+name: hex_shell_3d # new name for the geometry
+
+D: 0.200    # outer circumscribed diameter (m)
+H: 1.000    # height (m)
+t: 0.0045   # wall thickness (m)
+Lz: 1.000   # height (m)
+
+orientation: flat # flat | vertical
+
+nf: 20      # elements along each flat
+nt: 3       # elements through the thickness
+nz: 40      # elements along the height
+
+
+labels: #consistent with the 3d/Builtin mesh.geo
+  steel: 1
+  bottom: 10
+  top: 11
+  nord: 12
+  sud: 13
+  sud-est: 14
+  nord-est: 15
+  nord-west: 16
+  sud-west: 17

@@ -22,7 +22,7 @@ selected by the ``regime`` entry. The models available are:
 - steady and transient heat conduction with Dirichlet, Neumann and Robin
   conditions, and gap conductance between paired surfaces;
 - small-strain isotropic elasticity, Neo-Hookean hyperelasticity, J2
-  plasticity with linear isotropic hardening, Norton thermal creep and
+  plasticity with linear isotropic hardening, Norton and Nabarro-Herring (sinh) thermal creep and
   irradiation creep, and user-supplied stress functions;
 - phase-field fracture in AT1 and AT2 forms, in the hybrid formulation of
   Ambati et al., with the volumetric-deviatoric, spectral or star-convex split

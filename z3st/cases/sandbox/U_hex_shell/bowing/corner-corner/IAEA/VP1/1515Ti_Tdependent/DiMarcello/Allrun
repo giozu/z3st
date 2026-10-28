@@ -1,0 +1,10 @@
+#!/bin/bash
+# IAEA VP1 with the T-dependent 15-15Ti card, Di Marcello set (E, eta, k, cp): mesh of ../../
+# (run ../../Allrun first), BCs and non-regression of ../ (Sobolev set, same mesh, BCs and T).
+set -e
+cd "${0%/*}" || exit 1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+python3 -m z3st > log_z3st.md
+python3 non-regression.py
+python3 -m z3st.utils.plot_convergence log_z3st.md

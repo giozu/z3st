@@ -1,0 +1,15 @@
+#!/bin/bash
+# IAEA VP2 (IWGFR/75 EXAMPLE 2): mesh of VP1 (mesh.geo is a copy of ../VP1/mesh.geo, D, H, t, orientation
+# and nf/nt/nz from geometry.yaml), T from vp2_temperature.py, then the hex_post figures with the
+# VP2 closed form, the benchmark comparison and the corner profiles.
+set -e
+cd "${0%/*}" || exit 1
+
+gmsh $(python3 -m z3st.utils.geo_args) mesh.geo -3 > log_mesh.md
+python3 -m z3st > log_z3st.md
+python3 vp2_post.py
+python3 vp2_benchmark.py
+python3 vp2_corners.py
+python3 ../along_y.py .
+python3 ../iwgfr_table.py VP2
+python3 -m z3st.utils.plot_convergence log_z3st.md
