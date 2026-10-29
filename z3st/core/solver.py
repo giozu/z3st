@@ -267,14 +267,15 @@ class Solver:
 
     def get_solver_options(self, physics, solver_type="iterative_amg", rtol=1e-10):
         """PETSc options for the linear solver of ``physics`` (thermal, mechanical,
-        damage or porosity) and ``solver_type``."""
-        if physics not in ["thermal", "mechanical", "damage", "porosity"]:
+        damage, porosity or corrosion) and ``solver_type``."""
+        if physics not in ["thermal", "mechanical", "damage", "porosity", "corrosion"]:
             raise ValueError(
-                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical', 'damage' or 'porosity'."
+                f"Unknown physics '{physics}'. Must be 'thermal', 'mechanical', 'damage', "
+                f"'porosity' or 'corrosion'."
             )
 
         # 1) KSP type
-        if physics in ["thermal", "damage"]:
+        if physics in ["thermal", "damage", "corrosion"]:
             ksp_type = "cg"  # SPD
         else:  # mechanical
             ksp_type = "gmres"  # non-symmetric
@@ -515,6 +516,13 @@ class Solver:
             p_new = None
             conv_porosity = True
 
+        if self.on.get("corrosion", False):
+            x_new = dolfinx.fem.Function(self.V_x)
+            x_new.x.array[:] = self.x_cr.x.array
+            self.x_cr_n.x.array[:] = self.x_cr.x.array
+        else:
+            x_new = None
+
         prev_res_T = None
         prev_res_u = None
         prev_res_D = None
@@ -553,6 +561,10 @@ class Solver:
                 conv_th, _, _, prev_res_T = self._thermal_step(
                     T_new, T_old, bcs_t, rtol_th, stag_tol_th, prev_res_T, p_new=p_new
                 )
+
+            # --. CORROSION STEP --..
+            if self.on.get("corrosion", False):
+                self._corrosion_step(x_new, self.x_cr_n, dt, T_new)
 
             # --. MECHANICAL STEP --..
             # The cohesive route replaces both the displacement-only mechanical
@@ -616,6 +628,9 @@ class Solver:
                 if self.on.get("porosity", False):
                     self.porosity.x.array[:] = p_new.x.array
 
+                if self.on.get("corrosion", False):
+                    self.x_cr.x.array[:] = x_new.x.array
+
                 if self.on.get("mechanical", False) and self.on.get("plasticity", False):
                     self.update_plastic_history(u_new)
 
@@ -642,6 +657,8 @@ class Solver:
             self.c.x.array[:] = c_new.x.array
         if self.on.get("porosity", False):
             self.porosity.x.array[:] = p_new.x.array
+        if self.on.get("corrosion", False):
+            self.x_cr.x.array[:] = x_new.x.array
 
         # Advance the internal-variable history exactly as on the converged
         # exit: the fields above are accepted, so ε_p / ε_cr must move with

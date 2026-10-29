@@ -32,10 +32,11 @@ from z3st.models.thermal_model import ThermalModel
 from z3st.models.cluster_dynamic_model import ClusterDynamicsModel
 from z3st.models.plasticity_model import PlasticityModel
 from z3st.models.porosity_migration_model import PorosityMigrationModel
+from z3st.models.corrosion_model import CorrosionModel
 
 
 class Spine(
-    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, CohesiveModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel, PorosityMigrationModel
+    Config, FiniteElementSetup, Solver, ThermalModel, MechanicalModel, GapModel, ContactModel, DamageModel, CohesiveModel, ClusterDynamicsModel, PlasticityModel, CreepModel, CrackingModel, PorosityMigrationModel, CorrosionModel
 ):
     """Main Z3ST simulation driver."""
 
@@ -84,6 +85,8 @@ class Spine(
             PlasticityModel.__init__(self)
         if self.on.get("porosity", False):
             PorosityMigrationModel.__init__(self)
+        if self.on.get("corrosion", False):
+            CorrosionModel.__init__(self)
 
     def parameters(self, lhr):
         # Gravity body force (m/s²), opt-in via mechanical.gravity
@@ -405,6 +408,8 @@ class Spine(
             )
         if self.on.get("damage", False) or self.on.get("cohesive", False):
             self.set_damage_boundary_conditions(self.V_d)
+        if self.on.get("corrosion", False):
+            self.set_corrosion_boundary_conditions(self.V_x)
 
     def initialize_fields(self):
         print(f"[spine.initialize_fields]")
@@ -420,6 +425,7 @@ class Spine(
         self.D = None
         self.c = None
         self.porosity = None
+        self.x_cr = None
 
         # Temperature
         if self.on.get("thermal", False):
@@ -558,6 +564,13 @@ class Spine(
 
             print("\nSetting porosity initial conditions...")
             self.set_porosity_initial_conditions()
+
+        # Corrosion: Cr atomic fraction in the alloy
+        if self.on.get("corrosion", False):
+            print("\nInitializing the Cr fraction field...")
+            self.x_cr = dolfinx.fem.Function(self.V_x, name="CrFraction")
+            self.x_cr_n = dolfinx.fem.Function(self.V_x, name="CrFraction_old")
+            self.set_corrosion_initial_conditions()
 
         # Material properties
         for name, mat in self.materials.items():
@@ -936,6 +949,7 @@ class Spine(
         "T", "u", "w", "D", "H", "burnup", "gas_swelling", "c", "c_n",
         "p", "ep", "p_n", "ep_n",
         "porosity", "porosity_n",
+        "x_cr", "x_cr_n",
     )  # dolfinx Functions
     _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
     _SNAPSHOT_MATERIAL_KEYS = ("E", "nu", "bulk_modulus", "_lhr_max")

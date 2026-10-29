@@ -526,6 +526,8 @@ if __name__ == "__main__":
 
         # Export converged step (writer handles both VTU and XDMF, same field set).
         writer.write(t=t, step=step)
+        if problem.on.get("corrosion", False):
+            problem.write_corrosion_history(t, step, output_dir=writer.output_dir)
 
         # Case-local per-step diagnostics (see top of __main__ where it's loaded).
         if case_diagnostics is not None:

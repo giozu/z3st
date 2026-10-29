@@ -81,6 +81,11 @@ class FiniteElementSetup:
             family = "DG" if self.porosity_discretisation == "dg" else "Lagrange"
             self.V_p = dolfinx.fem.functionspace(self.mesh, (family, 1))
             print(f"Porosity function space (V_p): {self.V_p} [{self.porosity_discretisation}]")
+
+        # --. Corrosion: Cr atomic fraction --..
+        if self.on.get("corrosion", False):
+            self.V_x = dolfinx.fem.functionspace(self.mesh, ("Lagrange", 1))
+            print("Corrosion function space (V_x):", self.V_x)
     
         # --. Plasticity --..
         if self.on.get("plasticity", False):

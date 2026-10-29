@@ -469,6 +469,8 @@ class OutputWriter:
                 write(fn, t)
         if on.get("porosity", False) and getattr(p, "porosity", None) is not None:
             write(self._p_cg_fn if self._p_cg_fn is not None else p.porosity, t)
+        if on.get("corrosion", False) and getattr(p, "x_cr", None) is not None:
+            write(p.x_cr, t)
 
     def _write_vtu(self, step):
         p = self.problem
@@ -557,6 +559,10 @@ class OutputWriter:
         if on.get("porosity", False) and getattr(p, "porosity", None) is not None:
             poro_out = self._p_cg_fn if self._p_cg_fn is not None else p.porosity
             grid.point_data["Porosity"] = poro_out.x.array.copy()
+
+        # Corrosion: Cr atomic fraction (Lagrange-1, nodal)
+        if on.get("corrosion", False) and getattr(p, "x_cr", None) is not None:
+            grid.point_data["CrFraction"] = p.x_cr.x.array.copy()
 
         # Plasticity: cumulative plastic strain p lives on a quadrature space.
         # Projection per step is needed; the LinearProblem is built once.

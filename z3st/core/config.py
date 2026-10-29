@@ -7,7 +7,7 @@
 
 
 MODEL_NAMES = ("thermal", "mechanical", "damage", "cluster",
-               "plasticity", "contact", "porosity", "cohesive")
+               "plasticity", "contact", "porosity", "cohesive", "corrosion")
 
 # Constitutive routes that cannot share a mechanical solve with the cohesive
 # phase-field model: it owns its own mixed (u, eigenstrain) unknown and its own
@@ -117,6 +117,8 @@ class Config:
         # divergence. Weight both the SUPG and the DG forms to lift this.
         if self.on.get("porosity", False) and self.regime == "axisymmetric":
             raise ValueError("Porosity migration is not implemented in the axisymmetric regime.")
+        if self.on.get("corrosion", False) and self.regime == "axisymmetric":
+            raise ValueError("Corrosion is not implemented in the axisymmetric regime.")
 
         print(f"  → Geometry            : {self.geometry_path}")
         print(f"  → Mesh                : {self.mesh_path}")
