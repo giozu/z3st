@@ -1,0 +1,10 @@
+name: corrosion_1d
+geometry_type: rect
+
+Lx: 150.0e-6   # alloy depth (m); the salt-facing surface is xmax
+Ly: 0.0        # placeholder, unused in 1D
+
+labels:
+  xmin: 1
+  xmax: 2
+  alloy: 3

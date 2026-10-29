@@ -1,0 +1,13 @@
+thermal:
+  alloy:
+  - type: Dirichlet
+    region: xmin
+    temperature: 973.0
+  - type: Dirichlet
+    region: xmax
+    temperature: 973.0
+
+corrosion:
+  alloy:
+  - type: Dirichlet
+    region: xmax

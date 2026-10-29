@@ -1,0 +1,9 @@
+#!/bin/bash
+# Bhave et al. 2023 1D benchmark: one run per alloy, then the shared check.
+set -e
+cd "${0%/*}" || exit 1
+
+for alloy in ni5cr ni20cr; do
+    (cd "$alloy" && gmsh mesh.geo -1 > log_mesh.md && python3 -m z3st > log_z3st.md)
+done
+python3 non-regression.py

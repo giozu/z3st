@@ -1,0 +1,13 @@
+# Ni-20Cr, Bhave et al. 2023: Cr diffusion Eqs. 44-45 (um2/s converted to m2/s),
+# GB width Table 1, grain size and density Table 3, initial Cr Sec. 2.5
+name: alloy
+
+corrosion:
+  x0: 0.2201
+  rho: 8570.0
+  D0_bulk: 4.28e-4
+  Q_bulk: 2.852e+5
+  D0_gb: 4.85e-2
+  Q_gb: 1.962e+5
+  gb_width: 5.0e-10
+  grain_size: 4.64e-06

@@ -1,0 +1,17 @@
+# V1 test alloy with an Arrhenius Cr diffusivity: D(973 K) = 1e-16 m2/s
+name: alloy
+
+# E, nu, alpha: required by get_results whenever thermal is on (mechanics is off)
+E: 2.0e+11
+nu: 0.3
+alpha: 1.6e-5
+k: 20.0
+T_ref: 973.0
+rho: 8570.0
+cp: 500.0
+
+corrosion:
+  x0: 0.2
+  rho: 8570.0
+  D0_bulk: 5.452712e-06
+  Q_bulk: 2.0e+5

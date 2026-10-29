@@ -1,0 +1,8 @@
+# V1 test alloy: constant Cr diffusivity D = 1e-16 m2/s (Q = 0)
+name: alloy
+
+corrosion:
+  x0: 0.2
+  rho: 8570.0
+  D0_bulk: 1.0e-16
+  Q_bulk: 0.0

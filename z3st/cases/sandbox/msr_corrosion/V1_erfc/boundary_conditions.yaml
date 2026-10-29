@@ -1,0 +1,4 @@
+corrosion:
+  alloy:
+  - type: Dirichlet
+    region: xmax

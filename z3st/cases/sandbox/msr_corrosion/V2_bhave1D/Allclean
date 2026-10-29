@@ -1,0 +1,11 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+echo "Cleaning current directory..."
+
+for alloy in ni5cr ni20cr; do
+    rm -rf "$alloy/output" "$alloy"/*.msh "$alloy"/log_*.md
+done
+rm -rf *.png output
+
+echo "Done. All output and temporary files cleaned."
