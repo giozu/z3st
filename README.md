@@ -55,6 +55,8 @@ conda env create -f z3st_env.yml
 conda activate z3st
 pip install -e .
 ```
+Cloning with git is recommended: `git pull` updates the code, and the developer tools (`z3st/utils/bump.py`, `z3st_validate.sh`, the pre-commit hook) need a git clone. A ZIP downloaded from GitHub also runs, but if it is unpacked in Windows Explorer the `Allrun` scripts lose their executable flag. Restore it with `find . -name Allrun -exec chmod +x {} +`.
+
 `pip install -e .` is required: `./Allrun` and `python3 -m z3st` find the package through it.
 
 Check the installation (the first value must be `0.11.0`):

@@ -48,6 +48,12 @@ Create the environment
    conda env create -f z3st_env.yml
    conda activate z3st
 
+Cloning with git is recommended: ``git pull`` updates the code, and the developer
+tools (``z3st/utils/bump.py``, ``z3st_validate.sh``, the pre-commit hook) need a git
+clone. A ZIP downloaded from GitHub also runs, but if it is unpacked in Windows
+Explorer the ``Allrun`` scripts lose their executable flag. Restore it with
+``find . -name Allrun -exec chmod +x {} +``.
+
 ``z3st_env.yml`` pins ``python=3.12`` and ``fenics-dolfinx=0.11.0`` from
 ``conda-forge``, Gmsh included.
 
