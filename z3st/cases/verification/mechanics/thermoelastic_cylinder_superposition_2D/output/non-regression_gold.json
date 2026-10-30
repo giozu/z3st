@@ -1,0 +1,363 @@
+{
+    "results": {
+        "total_L2_error_sigma_rr": {
+            "numerical": 0.0008969949096815035,
+            "reference": 0.0,
+            "abs_error": 0.0008969949096815035,
+            "rel_error": 0.0008969949096815035,
+            "status": "PASS"
+        },
+        "total_L2_error_sigma_tt": {
+            "numerical": 8.3817007662161e-05,
+            "reference": 0.0,
+            "abs_error": 8.3817007662161e-05,
+            "rel_error": 8.3817007662161e-05,
+            "status": "PASS"
+        },
+        "total_L2_error_sigma_zz": {
+            "numerical": 0.00010464416216540557,
+            "reference": 0.0,
+            "abs_error": 0.00010464416216540557,
+            "rel_error": 0.00010464416216540557,
+            "status": "PASS"
+        },
+        "total_L2_error_von_mises": {
+            "numerical": 0.00015816082166797462,
+            "reference": 0.0,
+            "abs_error": 0.00015816082166797462,
+            "rel_error": 0.00015816082166797462,
+            "status": "PASS"
+        },
+        "total_L2_error_tresca": {
+            "numerical": 0.00016494356458685497,
+            "reference": 0.0,
+            "abs_error": 0.00016494356458685497,
+            "rel_error": 0.00016494356458685497,
+            "status": "PASS"
+        },
+        "total_max_von_mises": {
+            "numerical": 176569798.90527895,
+            "reference": 176563272.3256053,
+            "abs_error": 6526.579673647881,
+            "rel_error": 3.696453734507158e-05,
+            "status": "PASS"
+        },
+        "thermal_L2_error_sigma_rr": {
+            "numerical": 0.002896641997871955,
+            "reference": 0.0,
+            "abs_error": 0.002896641997871955,
+            "rel_error": 0.002896641997871955,
+            "status": "PASS"
+        },
+        "thermal_L2_error_sigma_tt": {
+            "numerical": 0.0001232915223095662,
+            "reference": 0.0,
+            "abs_error": 0.0001232915223095662,
+            "rel_error": 0.0001232915223095662,
+            "status": "PASS"
+        },
+        "thermal_L2_error_sigma_zz": {
+            "numerical": 0.00010587659091591791,
+            "reference": 0.0,
+            "abs_error": 0.00010587659091591791,
+            "rel_error": 0.00010587659091591791,
+            "status": "PASS"
+        },
+        "thermal_L2_error_von_mises": {
+            "numerical": 0.00034853492166917474,
+            "reference": 0.0,
+            "abs_error": 0.00034853492166917474,
+            "rel_error": 0.00034853492166917474,
+            "status": "PASS"
+        },
+        "thermal_L2_error_tresca": {
+            "numerical": 0.00029311875029615835,
+            "reference": 0.0,
+            "abs_error": 0.00029311875029615835,
+            "rel_error": 0.00029311875029615835,
+            "status": "PASS"
+        },
+        "thermal_max_von_mises": {
+            "numerical": 156081900.15769055,
+            "reference": 156137045.90389547,
+            "abs_error": 55145.74620491266,
+            "rel_error": 0.0003531880975822717,
+            "status": "PASS"
+        },
+        "mechanical_L2_error_sigma_rr": {
+            "numerical": 1.5298477863378206e-05,
+            "reference": 0.0,
+            "abs_error": 1.5298477863378206e-05,
+            "rel_error": 1.5298477863378206e-05,
+            "status": "PASS"
+        },
+        "mechanical_L2_error_sigma_tt": {
+            "numerical": 5.759306048895278e-06,
+            "reference": 0.0,
+            "abs_error": 5.759306048895278e-06,
+            "rel_error": 5.759306048895278e-06,
+            "status": "PASS"
+        },
+        "mechanical_L2_error_von_mises": {
+            "numerical": 5.253043109619083e-06,
+            "reference": 0.0,
+            "abs_error": 5.253043109619083e-06,
+            "rel_error": 5.253043109619083e-06,
+            "status": "PASS"
+        },
+        "mechanical_L2_error_tresca": {
+            "numerical": 5.922447678383781e-06,
+            "reference": 0.0,
+            "abs_error": 5.922447678383781e-06,
+            "rel_error": 5.922447678383781e-06,
+            "status": "PASS"
+        },
+        "mechanical_max_von_mises": {
+            "numerical": 159066036.89666593,
+            "reference": 159065630.54305366,
+            "abs_error": 406.3536122739315,
+            "rel_error": 2.5546286201904906e-06,
+            "status": "PASS"
+        },
+        "total_hydrostatic_L2_error_sigma_rr": {
+            "numerical": 0.0005049249145824028,
+            "reference": 0.0,
+            "abs_error": 0.0005049249145824028,
+            "rel_error": 0.0005049249145824028,
+            "status": "PASS"
+        },
+        "total_hydrostatic_L2_error_sigma_tt": {
+            "numerical": 0.00010503541704226833,
+            "reference": 0.0,
+            "abs_error": 0.00010503541704226833,
+            "rel_error": 0.00010503541704226833,
+            "status": "PASS"
+        },
+        "total_hydrostatic_L2_error_sigma_zz": {
+            "numerical": 8.631459465495233e-05,
+            "reference": 0.0,
+            "abs_error": 8.631459465495233e-05,
+            "rel_error": 8.631459465495233e-05,
+            "status": "PASS"
+        },
+        "total_hydrostatic_L2_error_von_mises": {
+            "numerical": 0.0003485349194300201,
+            "reference": 0.0,
+            "abs_error": 0.0003485349194300201,
+            "rel_error": 0.0003485349194300201,
+            "status": "PASS"
+        },
+        "total_hydrostatic_L2_error_tresca": {
+            "numerical": 0.00029311874770750993,
+            "reference": 0.0,
+            "abs_error": 0.00029311874770750993,
+            "rel_error": 0.00029311874770750993,
+            "status": "PASS"
+        },
+        "total_hydrostatic_max_von_mises": {
+            "numerical": 156081900.1578827,
+            "reference": 156137045.90389544,
+            "abs_error": 55145.74601274729,
+            "rel_error": 0.0003531880963515236,
+            "status": "PASS"
+        },
+        "mechanical_max_abs_sigma_zz_over_Pi": {
+            "numerical": 9.332448983043432e-06,
+            "reference": 0.0,
+            "abs_error": 9.332448983043432e-06,
+            "rel_error": 9.332448983043432e-06,
+            "status": "PASS"
+        },
+        "superposition_total": {
+            "numerical": 6.683192271477307e-13,
+            "reference": 0.0,
+            "abs_error": 6.683192271477307e-13,
+            "rel_error": 6.683192271477307e-13,
+            "status": "PASS"
+        },
+        "superposition_total_hydrostatic": {
+            "numerical": 5.801504647691054e-13,
+            "reference": 0.0,
+            "abs_error": 5.801504647691054e-13,
+            "rel_error": 5.801504647691054e-13,
+            "status": "PASS"
+        },
+        "mechanical_hydrostatic_max_dev_from_minus_pI": {
+            "numerical": 9.331700354814529e-09,
+            "reference": 0.0,
+            "abs_error": 9.331700354814529e-09,
+            "rel_error": 9.331700354814529e-09,
+            "status": "PASS"
+        },
+        "equality_hydrostatic_von_Mises": {
+            "numerical": 6.549328966215049e-12,
+            "reference": 0.0,
+            "abs_error": 6.549328966215049e-12,
+            "rel_error": 6.549328966215049e-12,
+            "status": "PASS"
+        },
+        "equality_hydrostatic_Tresca": {
+            "numerical": 4.339749262966146e-12,
+            "reference": 0.0,
+            "abs_error": 4.339749262966146e-12,
+            "rel_error": 4.339749262966146e-12,
+            "status": "PASS"
+        },
+        "Tresca_coaxial_fraction_Pi_case": {
+            "numerical": 0.445,
+            "reference": 0.445,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "vM_sum_overestimate_max": {
+            "numerical": 1.1625389425396089,
+            "reference": 1.1625389425396089,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "total_vM_dev_minus_vM_tot": {
+            "numerical": 1.5293495095434388e-16,
+            "reference": 0.0,
+            "abs_error": 1.5293495095434388e-16,
+            "rel_error": 1.5293495095434388e-16,
+            "status": "PASS"
+        },
+        "total_vM_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "total_Tresca_dev_minus_Tresca_tot": {
+            "numerical": 3.0586990190868776e-16,
+            "reference": 0.0,
+            "abs_error": 3.0586990190868776e-16,
+            "rel_error": 3.0586990190868776e-16,
+            "status": "PASS"
+        },
+        "total_Tresca_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "thermal_vM_dev_minus_vM_tot": {
+            "numerical": 1.5293495095434388e-16,
+            "reference": 0.0,
+            "abs_error": 1.5293495095434388e-16,
+            "rel_error": 1.5293495095434388e-16,
+            "status": "PASS"
+        },
+        "thermal_vM_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "thermal_Tresca_dev_minus_Tresca_tot": {
+            "numerical": 6.117398038173755e-16,
+            "reference": 0.0,
+            "abs_error": 6.117398038173755e-16,
+            "rel_error": 6.117398038173755e-16,
+            "status": "PASS"
+        },
+        "thermal_Tresca_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "mechanical_vM_dev_minus_vM_tot": {
+            "numerical": 2.294024264315158e-16,
+            "reference": 0.0,
+            "abs_error": 2.294024264315158e-16,
+            "rel_error": 2.294024264315158e-16,
+            "status": "PASS"
+        },
+        "mechanical_vM_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "mechanical_Tresca_dev_minus_Tresca_tot": {
+            "numerical": 3.0586990190868776e-16,
+            "reference": 0.0,
+            "abs_error": 3.0586990190868776e-16,
+            "rel_error": 3.0586990190868776e-16,
+            "status": "PASS"
+        },
+        "mechanical_Tresca_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "total_hydrostatic_vM_dev_minus_vM_tot": {
+            "numerical": 1.5293495095434388e-16,
+            "reference": 0.0,
+            "abs_error": 1.5293495095434388e-16,
+            "rel_error": 1.5293495095434388e-16,
+            "status": "PASS"
+        },
+        "total_hydrostatic_vM_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "total_hydrostatic_Tresca_dev_minus_Tresca_tot": {
+            "numerical": 4.588048528630316e-16,
+            "reference": 0.0,
+            "abs_error": 4.588048528630316e-16,
+            "rel_error": 4.588048528630316e-16,
+            "status": "PASS"
+        },
+        "total_hydrostatic_Tresca_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "mechanical_hydrostatic_vM_dev_minus_vM_tot": {
+            "numerical": 8.198558241006042e-20,
+            "reference": 0.0,
+            "abs_error": 8.198558241006042e-20,
+            "rel_error": 8.198558241006042e-20,
+            "status": "PASS"
+        },
+        "mechanical_hydrostatic_vM_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "mechanical_hydrostatic_Tresca_dev_minus_Tresca_tot": {
+            "numerical": 1.8474218596213834e-16,
+            "reference": 0.0,
+            "abs_error": 1.8474218596213834e-16,
+            "rel_error": 1.8474218596213834e-16,
+            "status": "PASS"
+        },
+        "mechanical_hydrostatic_Tresca_hyd": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.03,
+    "summary": "PASS"
+}

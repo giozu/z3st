@@ -6,6 +6,36 @@ image ``dolfinx/dolfinx:v0.11.0`` (``.github/workflows/ci.yml``). The steps belo
 create a conda environment with that version, install Z3ST into it, and check the
 result.
 
+Supported systems
+-----------------
+
+- Linux: supported, tested in CI.
+- Windows: through WSL2 only (see `Windows`_). Native Windows does not work.
+- macOS: conda-forge ships dolfinx 0.11.0 for Intel and Apple silicon, so the conda
+  steps below apply, but Z3ST has not been tested on macOS.
+- Any system with Docker: see `Docker`_.
+
+Install conda
+-------------
+
+Install Miniforge, a conda installer configured for ``conda-forge``. The same
+command selects the Linux or macOS (Intel or Apple silicon) installer:
+
+.. code-block:: bash
+
+   wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+   bash Miniforge3-$(uname)-$(uname -m).sh -b -p ~/miniforge3
+   ~/miniforge3/bin/conda init --all
+
+On macOS, use ``curl -LO`` in place of ``wget``. Close and reopen the terminal, so
+that ``conda`` is on the path. An existing Miniconda or Anaconda installation also
+works: ``z3st_env.yml`` takes every package from ``conda-forge``.
+
+On older Linux nodes (CentOS 7, glibc 2.17) recent installers stop with
+``Installer requires GLIBC >=2.28``. Use
+``https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh``
+there instead.
+
 Create the environment
 ----------------------
 
@@ -17,6 +47,12 @@ Create the environment
    cd z3st
    conda env create -f z3st_env.yml
    conda activate z3st
+
+Cloning with git is recommended: ``git pull`` updates the code, and the developer
+tools (``z3st/utils/bump.py``, ``z3st_validate.sh``, the pre-commit hook) need a git
+clone. A ZIP downloaded from GitHub also runs, but if it is unpacked in Windows
+Explorer the ``Allrun`` scripts lose their executable flag. Restore it with
+``find . -name Allrun -exec chmod +x {} +``.
 
 ``z3st_env.yml`` pins ``python=3.12`` and ``fenics-dolfinx=0.11.0`` from
 ``conda-forge``, Gmsh included.
@@ -72,13 +108,29 @@ Python, dolfinx, basix, UFL, PETSc, NumPy and SciPy at the top of its log.
 Windows
 -------
 
-Use WSL2 and create the environment inside the Linux distribution. conda-forge
-ships a native ``win-64`` build of ``fenics-dolfinx``, so ``conda env create``
-succeeds on Windows, but that build has no PETSc (no ``petsc4py`` and no
+Use WSL2 and create the environment inside the Linux distribution. Native Windows
+(PowerShell, cmd, Anaconda Prompt) does not work. conda-forge ships a native
+``win-64`` build of ``fenics-dolfinx``, so ``conda env create`` succeeds on
+Windows, but that build has no PETSc (no ``petsc4py`` and no
 ``dolfinx.fem.petsc``), which every Z3ST solver imports.
 
-To install WSL2 with Ubuntu, run ``wsl --install`` in PowerShell as administrator,
-restart, and follow the steps above from the Ubuntu terminal.
+1. Open PowerShell as administrator and run ``wsl --install``. This installs WSL2
+   with Ubuntu.
+2. Restart the computer, open "Ubuntu" from the Start menu and create the Linux
+   user name and password.
+3. In the Ubuntu terminal, install the basic tools:
+
+   .. code-block:: bash
+
+      sudo apt update && sudo apt install -y git wget
+
+4. Follow `Install conda`_ and the steps after it in the Ubuntu terminal, with the
+   Linux installer. Clone the repository in the Linux home (``~``), not under
+   ``/mnt/c/``: runs on the Windows file system are much slower.
+
+The Windows drives are visible from Ubuntu under ``/mnt/c/``, and the Linux home
+is visible from Windows Explorer as ``\\wsl$\Ubuntu\home\<user>``. VS Code with
+the WSL extension edits files inside the Linux home.
 
 Under WSL the Gmsh window can open black or without fonts.
 Two remedies:
@@ -90,6 +142,21 @@ Two remedies:
 
 The cases never open the Gmsh window: ``Allrun`` meshes with ``gmsh mesh.geo -2`` or
 ``-3``, which needs no display.
+
+Docker
+------
+
+The continuous-integration image ``dolfinx/dolfinx:v0.11.0`` contains dolfinx and
+runs Z3ST after ``pip install -e .``, which installs the remaining dependencies
+listed in ``pyproject.toml``. From the cloned repository:
+
+.. code-block:: bash
+
+   docker run -ti --name z3st -v "$(pwd)":/root/z3st -w /root/z3st dolfinx/dolfinx:v0.11.0
+   pip install -e .
+
+The repository is mounted, so output files appear on the host. Reopen the same
+container with ``docker start -ai z3st``, so the installed packages are kept.
 
 Optional: neural-network conductivity
 -------------------------------------

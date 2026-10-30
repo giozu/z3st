@@ -10,6 +10,10 @@ Installation
 ``ModuleNotFoundError: No module named 'dolfinx'``
    The ``z3st`` environment is not active. Run ``conda activate z3st``.
 
+``ModuleNotFoundError: No module named 'petsc4py'`` or ``'dolfinx.fem.petsc'``
+   The environment was created on native Windows, where the conda-forge dolfinx
+   build has no PETSc. Install Z3ST inside WSL2 (:doc:`installation`, Windows).
+
 ``ModuleNotFoundError: No module named 'z3st'`` when running ``./Allrun``
    Z3ST is not installed in the environment. ``Allrun`` finds the shared runner
    through ``import z3st``. Run ``pip install -e .`` from the repository root.
