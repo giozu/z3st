@@ -14,7 +14,7 @@ Every case directory is self-contained and runs the same way. This file document
 | `sandbox/`      | Unprotected work in progress. Case names keep the `U_` prefix. | n/a | never (pruned) |
 
 `verification/` is further split by physics domain: `thermal/`, `mechanics/`,
-`plasticity/`, `fuel/`, `cluster/` and `cohesive/` (cohesive is under development).
+`plasticity/`, `fuel/`, `cluster/`, `corrosion/` and `cohesive/` (cohesive is under development).
 
 ## Per-case layout
 

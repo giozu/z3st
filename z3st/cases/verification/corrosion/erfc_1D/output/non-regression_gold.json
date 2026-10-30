@@ -1,0 +1,55 @@
+{
+    "results": {
+        "initial_field": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "mass_loss_t0": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "profile_1000h": {
+            "numerical": 0.0010278210802133203,
+            "reference": 0.0,
+            "abs_error": 0.0010278210802133203,
+            "rel_error": 0.0051391054010666015,
+            "status": "PASS"
+        },
+        "mass_loss_1000h": {
+            "numerical": 0.03343254,
+            "reference": 0.03358681125912101,
+            "abs_error": 0.0001542712591210138,
+            "rel_error": 0.004593209457450924,
+            "status": "PASS"
+        },
+        "depth_1000h": {
+            "numerical": 3.760544e-05,
+            "reference": 3.7974703875410085e-05,
+            "abs_error": 3.692638754100846e-07,
+            "rel_error": 0.009723943513070961,
+            "status": "PASS"
+        },
+        "flux_1000h": {
+            "numerical": 6.031545e-13,
+            "reference": 5.947080387175904e-13,
+            "abs_error": 8.446461282409532e-15,
+            "rel_error": 0.014202702389265182,
+            "status": "PASS"
+        },
+        "snapshot_roster": {
+            "numerical": 0.0,
+            "reference": 0.0,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.02,
+    "summary": "PASS"
+}

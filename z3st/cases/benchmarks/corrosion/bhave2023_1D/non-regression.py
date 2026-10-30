@@ -2,21 +2,23 @@
 # SPDX-License-Identifier: Apache-2.0
 # --.. ..- .-.. .-.. --- Z3ST non-regression script --.. ..- .-.. .-.. ---
 """
-Z3ST case: sandbox/msr_corrosion/V2_bhave1D -- Bhave et al. (2023) 1D benchmark.
+Z3ST case: benchmarks/corrosion/bhave2023_1D -- Bhave et al. (2023) 1D benchmark.
 
 C. V. Bhave et al., J. Nucl. Mater. 574 (2023) 154147. Ni-5Cr and Ni-20Cr in FLiBe
 at 973 K, Hart effective Cr diffusivity (Eqs. 44-46), surface c_surf = 1.8e-3 mass
 fraction. Bhave show their 1D phase-field model follows Eq. 50 within 5 % (Sec. 4).
 
-Checks, per alloy, at 50 / 500 / 1000 h:
-  - mass loss against the exact erfc-profile integral (the model's own solution): 1 %
-  - mass loss against Bhave Eq. 50: 2 %
-Reported only: the experiments of Table 3, the Ni-5Cr depth at 500 h (18 um in
-Bhave Fig. 2) and the redox surface value from Bhave's Table 1 data.
+Checks, per alloy, at 50 / 500 / 1000 h: mass loss against the exact erfc-profile
+integral (the model's own solution), 1 %. The depletion depth at 500 h is tracked
+for the gold.
+Reported only: the difference to Bhave Eq. 50 (linear in the mass fraction, so
+about 0.7 % below the exact integral), the experiments of Table 3, the Ni-5Cr
+depth at 500 h (18 um in Bhave Fig. 2) and the redox surface value from Bhave's
+Table 1 data.
+
 """
 
 import os
-import sys
 
 import matplotlib
 
@@ -32,7 +34,7 @@ from z3st.models.corrosion_model import (
     profile_mass_loss,
     redox_surface_fraction,
 )
-from z3st.utils.utils_verification import pass_fail_check
+from z3st.utils.non_regression import finish, metric, tracked
 
 CASE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(CASE_DIR, "output")
@@ -49,7 +51,7 @@ ALLOYS = {
     "ni20cr": {"label": "Ni-20Cr", "eq50": [1.007, 3.184, 4.503], "exp": [0.67, 3.06, 7.12]},
 }
 
-errors_1, errors_2 = {}, {}
+errors = {}
 fig, ax = plt.subplots(figsize=(6, 4.5))
 
 for key, ref in ALLOYS.items():
@@ -66,14 +68,15 @@ for key, ref in ALLOYS.items():
     m_eq50 = np.array(ref["eq50"])
     m_exp = np.array(ref["exp"])
 
-    errors_1[f"{key}_exact"] = {"rel_error": list(np.abs(m_model - m_exact) / m_exact)}
-    errors_2[f"{key}_eq50"] = {"rel_error": list(np.abs(m_model - m_eq50) / m_eq50)}
+    for i, h in enumerate(HOURS):
+        errors[f"{key}_mass_loss_{h:.0f}h"] = metric(m_model[i], m_exact[i])
+    errors[f"{key}_depth_500h"] = tracked(depth_h[idx[1]])
 
     print(f"\n{ref['label']}: D_eff = {D:.4e} m2/s, w0 = {mass_fraction_cr(card['x0']):.4f}")
-    print("   t (h)   model    exact    Eq.50    exp     model/exp   (mg/cm2)")
+    print("   t (h)   model    exact    Eq.50   vs Eq.50   exp    model/exp   (mg/cm2)")
     for i, h in enumerate(HOURS):
-        print(f"  {h:6.0f}  {m_model[i]:7.4f}  {m_exact[i]:7.4f}  {m_eq50[i]:7.4f}  {m_exp[i]:6.2f}  "
-              f"{m_model[i] / m_exp[i]:6.2f}")
+        print(f"  {h:6.0f}  {m_model[i]:7.4f}  {m_exact[i]:7.4f}  {m_eq50[i]:7.4f}  "
+              f"{100 * (m_model[i] / m_eq50[i] - 1):+6.2f} %  {m_exp[i]:6.2f}  {m_model[i] / m_exp[i]:6.2f}")
     if key == "ni5cr":
         print(f"  depth at 500 h: {depth_h[idx[1]] * 1e6:.1f} um (Bhave Fig. 2: 18 um, with their D)")
 
@@ -94,9 +97,7 @@ ax.set_title("Bhave et al. 2023 1D benchmark, FLiBe, 973 K")
 ax.grid(True, ls=":", alpha=0.6)
 ax.legend(fontsize=8)
 fig.tight_layout()
-fig.savefig(os.path.join(CASE_DIR, "mass_loss.png"), dpi=150)
+fig.savefig(os.path.join(OUT, "mass_loss.png"), dpi=150)
 plt.close(fig)
 
-ok_1 = pass_fail_check(errors_1, 1.0e-2, OUT_JSON, CASE_DIR)
-ok_2 = pass_fail_check(errors_2, 2.0e-2, os.path.join(OUT, "non-regression_eq50.json"), CASE_DIR)
-sys.exit(0 if ok_1 and ok_2 else 1)
+finish(errors, 1.0e-2, OUT_JSON, CASE_DIR)

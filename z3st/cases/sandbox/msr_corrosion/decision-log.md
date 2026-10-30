@@ -103,10 +103,36 @@ Implementation: `z3st/models/corrosion_model.py` (new), hooks in `core/config.py
 
 **Known limits left as they are:** depth assumes one planar salt face along `depth_axis`; molar masses are fixed to Ni-Cr; the diffusion step uses the thermal field while the redox x_surf uses `corrosion.T`; no case exercises adaptive time-step rollback (the code path was reviewed, not run).
 
+## 2026-10-30 · Model version 1 documented; cases moved into the suite
+
+**Re-run.** All cases and the parametric studies (time step, thermal gradient, redox surface mode) were re-run; all checks pass.
+
+**Cases moved out of the sandbox, with gold files:**
+
+| Was | Now (under `z3st/cases/`) | Analytic tolerance |
+| --- | --- | --- |
+| `V1_erfc` | `verification/corrosion/erfc_1D` | 2 % |
+| `V1_erfc_thermal` | `verification/corrosion/erfc_thermal_1D` | 1 % |
+| `V2_bhave1D` | `benchmarks/corrosion/bhave2023_1D` | 1 % |
+
+- The checks now go through `finish()`, so `non-regression.json` carries both verdicts and the gold comparison (0.1 % per value) applies.
+- erfc_1D: one tolerance of 2 % for all checks, because the depth (nodal) and the flux (P1 gradient) sit at 1.0 % and 1.4 %. Profile and mass loss stay at 0.5 %, and the gold guards them more tightly.
+- erfc_thermal_1D now checks against the exact solution instead of reading erfc_1D's output, so it runs alone.
+- bhave2023_1D: mass loss against the exact integral, per alloy at 50/500/1000 h, in one JSON. Eq. 50 is printed, not a pass criterion: it is linear in the mass fraction and sits about 0.7 % below the exact integral by construction. The depth at 500 h is tracked for the gold. Its `Allclean` no longer deletes `output/`, which holds the gold.
+- All three are listed in `cases_ci.txt` (43 s together). `audit_checks` coverage now passes.
+
+**Notation.** The surface Cr fraction is written x_s in figures and slides (`x_surf` in inputs and code).
+
+**Found while comparing with Bhave et al.:**
+- Bhave use Crank's semi-infinite solution only through its mass-loss integral (Eq. 50, verified in their Fig. 4). The erfc profile, the depth 2 sqrt(Dt) and the surface flux are checked in z3st only.
+- The 0.843 x0 depth threshold is our choice. Bhave's 18 um at 500 h (Fig. 2) is quoted without a stated definition, so the 17.4 vs 18 um comparison is indicative.
+- D_eff for Ni-5Cr from Bhave's Eqs. 44-46 and Table 2 inputs is 4.41e-17 m2/s; their Table 2 lists 4.53e-17 (2.7 % higher). R and T = 973 vs 973.15 K explain about 0.5 %; the rest is unexplained.
+
 ## Pending
 
 - [x] User approval of `design-reduced-model.md`, then the step-by-step implementation plan.
 - [x] User review of the implementation plan, then implementation.
-- [ ] Move V1 and V2 to `cases/verification/` and `cases/benchmarks/` with a gold file (until then the suite does not protect the corrosion model).
-- [ ] Resolve the 1.8e-3 vs 1.86e-4 surface value discrepancy.
+- [x] Move V1 and V2 to `cases/verification/` and `cases/benchmarks/` with a gold file (done 2026-10-30).
+- [ ] A case that exercises adaptive time-step rollback with corrosion on. Corrosion is linear and never triggers a cut by itself, so it needs a coupled step that fails to converge.
+- [ ] Resolve the 1.8e-3 vs 1.86e-4 surface value discrepancy, and the 4.41 vs 4.53e-17 m2/s D_eff difference (Bhave's public inputs, ref. [64]).
 - [ ] Re-read Sankar & Singh 2022/2023 for the attack-depth definition and capsule/impurity inventory, before planning phase 2.

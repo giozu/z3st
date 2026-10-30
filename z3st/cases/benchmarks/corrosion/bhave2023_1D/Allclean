@@ -6,6 +6,7 @@ echo "Cleaning current directory..."
 for alloy in ni5cr ni20cr; do
     rm -rf "$alloy/output" "$alloy"/*.msh "$alloy"/log_*.md
 done
-rm -rf *.png output
+rm -f output/non-regression.json output/non-regression_eq50.json output/mass_loss.png
+rm -f *.png
 
 echo "Done. All output and temporary files cleaned."

@@ -5,7 +5,7 @@
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
 # V1 with the thermal model on: uniform 973 K from Dirichlet ends, D from an
-# Arrhenius law with D(973 K) = 1e-16 m2/s. Must reproduce V1_erfc.
+# Arrhenius law with D(973 K) = 1e-16 m2/s. Must reproduce erfc_1D.
 
 mesh_path: mesh.msh
 geometry_path: geometry.yaml

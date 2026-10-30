@@ -5,9 +5,10 @@
 #   - a stable output/non-regression_gold.json, and
 #   - it exercises a physics path no other listed case reaches.
 #
-# Budget: about 15 min 56 s total: 14 min 06 s from the times measured by a full
+# Budget: about 16 min 39 s total: 14 min 06 s from the times measured by a full
 # local suite run on 2026-08-09 and for thermal_bending_plate_3D, plus 110 s for
-# sen_tension_accelerated_2D measured on 2026-10-12. Most cases are well under a
+# sen_tension_accelerated_2D measured on 2026-10-12, plus 43 s for the three
+# corrosion cases measured on 2026-10-30. Most cases are well under a
 # minute; those that are not are listed with their cost because they buy coverage
 # nothing else does.
 # Re-measure before adding anything: ./non-regression_local.sh prints per-case times.
@@ -64,6 +65,16 @@ verification/fuel/creep
 verification/fuel/creep_relaxation
 verification/fuel/creep_irradiation
 verification/fuel/cracking
+
+
+# --. corrosion: the only coverage of corrosion_model.py. erfc_1D checks the solver,
+# depth and flux against the exact solution; erfc_thermal_1D takes D from the
+# thermal field; bhave2023_1D is the only case with the Hart grain-boundary D.
+# Times measured on 2026-10-30.
+# --..
+verification/corrosion/erfc_1D           # 11 s
+verification/corrosion/erfc_thermal_1D   # 13 s
+benchmarks/corrosion/bhave2023_1D        # 19 s
 
 
 # --. porosity migration: the only coverage of porosity_migration_model.py (674

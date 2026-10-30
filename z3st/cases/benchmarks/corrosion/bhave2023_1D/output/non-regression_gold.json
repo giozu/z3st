@@ -1,0 +1,62 @@
+{
+    "results": {
+        "ni5cr_mass_loss_50h": {
+            "numerical": 0.1330603,
+            "reference": 0.13365870754792786,
+            "abs_error": 0.000598407547927865,
+            "rel_error": 0.004477131036997988,
+            "status": "PASS"
+        },
+        "ni5cr_mass_loss_500h": {
+            "numerical": 0.4207346,
+            "reference": 0.42266594496579113,
+            "abs_error": 0.0019313449657911153,
+            "rel_error": 0.004569435954787961,
+            "status": "PASS"
+        },
+        "ni5cr_mass_loss_1000h": {
+            "numerical": 0.5949871,
+            "reference": 0.5977399117238619,
+            "abs_error": 0.002752811723861881,
+            "rel_error": 0.004605367100086833,
+            "status": "PASS"
+        },
+        "ni5cr_depth_500h": {
+            "numerical": 1.743327e-05,
+            "reference": 1.743327e-05,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        },
+        "ni20cr_mass_loss_50h": {
+            "numerical": 1.013623,
+            "reference": 1.0181264409637172,
+            "abs_error": 0.004503440963717242,
+            "rel_error": 0.0044232629490051035,
+            "status": "PASS"
+        },
+        "ni20cr_mass_loss_500h": {
+            "numerical": 3.205082,
+            "reference": 3.219598499486303,
+            "abs_error": 0.014516499486302958,
+            "rel_error": 0.004508791853586437,
+            "status": "PASS"
+        },
+        "ni20cr_mass_loss_1000h": {
+            "numerical": 4.532511,
+            "reference": 4.5531998633695965,
+            "abs_error": 0.020688863369596078,
+            "rel_error": 0.0045438074300312575,
+            "status": "PASS"
+        },
+        "ni20cr_depth_500h": {
+            "numerical": 3.286432e-05,
+            "reference": 3.286432e-05,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}
