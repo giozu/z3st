@@ -20,47 +20,71 @@ Each physics model is a mixin of the `Spine` class (see [`docs/source/architectu
 
 ## Quick installation
 
-Clone the repository:
+Z3ST runs on Linux. On Windows it runs inside WSL2 (Ubuntu); on macOS the conda route below should work but has not been tested. FEniCSx (dolfinx 0.11.0) is not installed by pip: install it with conda, as below, or use the Docker image (any system).
+
+### Windows: set up WSL2 first
+
+Native Windows (PowerShell, cmd, Anaconda Prompt) does not work: the conda-forge Windows build of dolfinx has no PETSc, which every Z3ST solver imports.
+
+1. Open PowerShell as administrator and run `wsl --install`. This installs WSL2 with Ubuntu.
+2. Restart the computer, open "Ubuntu" from the Start menu and create the Linux user name and password.
+3. In the Ubuntu terminal, install the basic tools:
+   ```bash
+   sudo apt update && sudo apt install -y git wget
+   ```
+4. Follow the Linux steps below in the Ubuntu terminal. Clone the repository in the Linux home (`~`), not under `/mnt/c/`: runs on the Windows file system are much slower.
+
+The Windows folders are visible from Ubuntu under `/mnt/c/`, and the Linux home is visible from Windows Explorer as `\\wsl$\Ubuntu\home\<user>`. VS Code with the WSL extension edits files inside the Linux home.
+
+### Linux, WSL2 and macOS
+
+Install Miniforge (conda with the conda-forge channel). The same command selects the Linux or macOS (Intel or Apple silicon) installer:
 ```bash
-git clone [https://github.com/giozu/z3st.git](https://github.com/giozu/z3st.git)
+wget "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh -b -p ~/miniforge3
+~/miniforge3/bin/conda init --all
 ```
+On macOS, use `curl -LO` in place of `wget`. Close and reopen the terminal, so that `conda` is on the path.
 
-Z3ST requires FEniCSx (dolfinx), which is not installed by pip. Install it with Conda or use a Docker image.
-
-To install miniconda (for modern Linux systems):
+Clone the repository, create the environment and install Z3ST in it:
 ```bash
-mkdir -p ~/miniconda3
-wget [https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh](https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh) -O ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm ~/miniconda3/miniconda.sh
-source ~/miniconda3/bin/activate
-conda init --all
-```
-
-#### Note for HPC or Older Linux systems:
-If you get an error like 'Installer requires GLIBC >=2.28, but system has 2.17', you are on an older system (like CentOS 7). Use this compatible Miniconda version instead:
-```bash
-mkdir -p ~/miniconda3
-wget [https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh](https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh) -O ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm ~/miniconda3/miniconda.sh
-source ~/miniconda3/bin/activate
-conda init --all
-```
-
-Create and activate the Conda environment:
-```bash
+cd ~
+git clone https://github.com/giozu/z3st.git
 cd z3st
 conda env create -f z3st_env.yml
 conda activate z3st
+pip install -e .
+```
+`pip install -e .` is required: `./Allrun` and `python3 -m z3st` find the package through it.
+
+Check the installation (the first value must be `0.11.0`):
+```bash
+python -c "import dolfinx, gmsh, z3st; print('dolfinx', dolfinx.__version__, '| gmsh', gmsh.__version__)"
 ```
 
-This ensures that users on modern laptops get the most up-to-date Python environment, while students or researchers deploying `z3st` on older cluster nodes know how to bypass the GLIBC error.
+Open a new terminal with `conda activate z3st` before running Z3ST.
 
-Install in editable mode:
-  ```bash
-  pip install -e .
-  ```
+#### Older Linux systems (HPC nodes)
+
+If the installer stops with 'Installer requires GLIBC >=2.28, but system has 2.17' (CentOS 7 and similar), use this older Miniconda installer instead, then continue from `conda init`:
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-py310_23.11.0-2-Linux-x86_64.sh
+bash Miniconda3-py310_23.11.0-2-Linux-x86_64.sh -b -p ~/miniconda3
+~/miniconda3/bin/conda init --all
+```
+
+### Docker (Linux, Windows, macOS)
+
+The continuous-integration image `dolfinx/dolfinx:v0.11.0` runs Z3ST after `pip install -e .`. From the cloned repository:
+```bash
+docker run -ti --name z3st -v "$(pwd)":/root/z3st -w /root/z3st dolfinx/dolfinx:v0.11.0
+pip install -e .
+```
+Reopen the same container later with `docker start -ai z3st`, so the installed packages are kept.
+
+The full installation guide, with the optional neural-network and SCIANTIX dependencies, is in [`docs/source/installation.rst`](docs/source/installation.rst).
+
+### Run a case
 
 Run a case from its directory, for instance:
   ```bash
