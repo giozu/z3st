@@ -29,7 +29,7 @@ corrosion:
   depletion_threshold: 0.843
   surface:
     type: fixed
-    x_surf: 2.0315e-3
+    x_surf: 1.7726e-3   # authors' 1D inputs: equilibrium with the salt potentials (atomic)
 
 output:
   format: vtu

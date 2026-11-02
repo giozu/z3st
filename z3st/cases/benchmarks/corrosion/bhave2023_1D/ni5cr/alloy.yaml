@@ -1,13 +1,15 @@
 # Ni-5Cr, Bhave et al. 2023: Cr diffusion Eqs. 44-45 (um2/s converted to m2/s),
-# GB width Table 1, grain size and density Table 3, initial Cr Sec. 2.5
+# GB width Table 1, grain size and density Table 3, initial Cr Sec. 2.5.
+# D0 and Q as in the authors' 1D inputs (ref. [64]: Q/R = 34311.274 K bulk, 23576.457 K GB),
+# which reproduce the D of Table 2; Eqs. 44-45 round Q_gb to 196.2 kJ/mol (2 % lower D).
 name: alloy
 
 corrosion:
   x0: 0.0561
   rho: 8700.0
-  D0_bulk: 4.28e-4
-  Q_bulk: 2.852e+5
-  D0_gb: 4.85e-2
-  Q_gb: 1.962e+5
+  D0_bulk: 4.278214e-4
+  Q_bulk: 2.852798e+5
+  D0_gb: 4.849144e-2
+  Q_gb: 1.960256e+5
   gb_width: 5.0e-10
-  grain_size: 1.622e-05
+  grain_size: 1.61122e-05

@@ -69,20 +69,26 @@ def _gibbs_cr_in_ni(T):
     """G of Cr on the FCC Ni lattice (eV/atom), Eqs. A.3 and A.8."""
     G_fcc_cr = (-1572.94 + 157.643 * T - 26.908 * T * math.log(T) + 1.89435e-3 * T**2
                 - 1.47721e-6 * T**3 + 139250.0 / T)
-    H_xs, S_xs = -1.5644e4, -1.5601
+    H_xs, S_xs = -1.56448695e4, -1.56011217
     return (G_fcc_cr + H_xs - S_xs * T) / FARADAY
 
 
 def _gibbs_bcc_cr(T):
-    """G of Cr on BCC (eV/atom), Eq. 32."""
-    return (-1.53e-11 * T**3 + 1.96e-8 * T**2 - 2.78e-4 * T * math.log(T)
-            + 1.63e-3 * T - 9.18e-2 + 1.44 / T)
+    """G of Cr on BCC (eV/atom), SGTE form as in the authors' MOOSE inputs
+    (ref. [64], E0_Cr_Cr). The fit of Eq. 32 differs by 3.8 meV at 973 K, which
+    moves the redox surface value by 4.5 %."""
+    return (-8856.94 + 157.48 * T - 26.908 * T * math.log(T) + 1.89435e-3 * T**2
+            - 1.47721e-6 * T**3 + 139250.0 / T) / FARADAY
 
 
 def redox_surface_fraction(T, E_F, E0_F, E0_Cr=-0.39, E0_Ni=0.473,
-                           x_Cr_salt=2.5e-6, x_Ni_salt=3.69e-11):
+                           x_Cr_salt=2.5e-5, x_Ni_salt=3.696e-11):
     """Cr and Ni atomic fractions of the alloy surface in equilibrium with the salt
     (Bhave et al. 2023, Eqs. 30-31, B.2-B.4, B.8-B.9).
+
+    Default salt fractions are those of the authors' 1D inputs (ref. [64]), whose
+    salt chemical potentials correspond to x_Cr2+ = 2.5e-5 and x_Ni2+ = 3.696e-11;
+    with E_F = 3.3607 V this gives x_Cr = 1.77e-3 (atomic), the c_surf they quote.
 
     The salt redox state enters as the fluoride-potential shift E_F - E0_F, applied
     to both Cr2+ and Ni2+ as Eq. 30 states it. With x_Ni_salt fixed and A_Ni >> 1

@@ -128,11 +128,32 @@ Implementation: `z3st/models/corrosion_model.py` (new), hooks in `core/config.py
 - The 0.843 x0 depth threshold is our choice. Bhave's 18 um at 500 h (Fig. 2) is quoted without a stated definition, so the 17.4 vs 18 um comparison is indicative.
 - D_eff for Ni-5Cr from Bhave's Eqs. 44-46 and Table 2 inputs is 4.41e-17 m2/s; their Table 2 lists 4.53e-17 (2.7 % higher). R and T = 973 vs 973.15 K explain about 0.5 %; the rest is unexplained.
 
+## 2026-10-30 · Aligned with the authors' public inputs (ref. [64])
+
+Read `simulations/1d_validation/Ni5Cr_hart.i` and `Ni20Cr_hart.i` of github.com/chaitanyaBhave26/mesoscale_molten_salt_model and evaluated their material expressions at 973 K.
+
+| Item | Was | Authors' inputs | Effect |
+| --- | --- | --- | --- |
+| Salt Cr2+ fraction (redox default) | 2.5e-6 | 2.5e-5 (salt potentials w_Ni = -0.45065, w_Cr = -0.9699 eV) | the 11x surface-value gap |
+| Gibbs energy of BCC Cr | Eq. 32 fit | SGTE expression (`E0_Cr_Cr`) | 3.8 meV, 4.5 % on x_s |
+| Benchmark x_s | 2.0315e-3 (1.8e-3 read as mass) | 1.7726e-3 atomic, the equilibrium value; the paper's c_surf = 1.8e-3 is this value | about 1 % on mass loss |
+| Arrhenius constants | Q_gb = 196.2 kJ/mol with R = 8.3144626 | Q/R = 23576.457 K (196.03 kJ/mol); bulk 34311.274 K | 2.2 % on D |
+| Ni-5Cr grain size | 16.22 um | 16.1122 um | 0.7 % on D |
+
+**Changes.**
+- `corrosion_model.py`: BCC Cr Gibbs energy from the SGTE form; H_xs, S_xs to the inputs' digits; `redox_surface_fraction` defaults x_Cr_salt = 2.5e-5, x_Ni_salt = 3.696e-11. With E_F = 3.3607 V it gives x_s = 1.7711e-3 against 1.7726e-3 from the inputs (0.08 %, rounding of kB, F).
+- `bhave2023_1D`: cards and x_s from the inputs; D_eff = 4.531e-17 and 1.568e-16 m2/s, now equal to Table 2. Eq. 50 is computed in the script from the case's D, not hard-coded. Gold re-blessed (values moved by 1.2 to 1.9 %). Ni-5Cr depth at 500 h: 17.7 um (Bhave Fig. 2: 18 um).
+- `check_corrosion_functions.py`: redox and Hart references switched to the inputs' values.
+
+**Finding for phase 2.** In the authors' model the salt is set by chemical potentials w_Ni, w_Cr, and the salt Ni potential equals the alloy's (Ni does not corrode). The metal surface value depends on w only; E_F enters only the conversion between w and the salt concentrations. So the redox potential acts on corrosion only through the salt potentials it implies: the phase-2 impurity lever has to move w_Cr (and w_Ni), consistent with the cancellation found on 2026-10-29.
+
+**Still open:** the authors' scripts give no depletion-depth definition, so 17.7 vs 18 um stays indicative.
+
 ## Pending
 
 - [x] User approval of `design-reduced-model.md`, then the step-by-step implementation plan.
 - [x] User review of the implementation plan, then implementation.
 - [x] Move V1 and V2 to `cases/verification/` and `cases/benchmarks/` with a gold file (done 2026-10-30).
 - [ ] A case that exercises adaptive time-step rollback with corrosion on. Corrosion is linear and never triggers a cut by itself, so it needs a coupled step that fails to converge.
-- [ ] Resolve the 1.8e-3 vs 1.86e-4 surface value discrepancy, and the 4.41 vs 4.53e-17 m2/s D_eff difference (Bhave's public inputs, ref. [64]).
+- [x] Resolve the 1.8e-3 vs 1.86e-4 surface value discrepancy, and the 4.41 vs 4.53e-17 m2/s D_eff difference (done 2026-10-30 from the authors' inputs).
 - [ ] Re-read Sankar & Singh 2022/2023 for the attack-depth definition and capsule/impurity inventory, before planning phase 2.
