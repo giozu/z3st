@@ -1,0 +1,21 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# beam1d: IAEA VP1
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+# IAEA VP1 temperature, the string of the Z3ST 3D case (its boundary_conditions.yaml):
+# 400 °C below the core (z < 1.5 m), linear rise over the core (1.5-2.5 m), constant
+# above; at the core top 500 °C at the cold corner (+y) and 550 °C at the hot corner
+# (-y). T linear in y, 0.075 m = mid-wall corner radius. Integrated over the wall.
+thermal:
+  steel:
+  - type: expression
+    region: all
+    temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+
+# Clamp at the base as in the 3D case (IAEA VP1: Clamp_x/y/z), tip free.
+mechanical:
+  steel:
+  - type: Dirichlet
+    region: bottom
+    displacement: [0.0, 0.0, 0.0]   # (u_x, u_y, u_z)
+    rotation: [0.0, 0.0]            # (u_x', u_y'): the section stays normal to the axis

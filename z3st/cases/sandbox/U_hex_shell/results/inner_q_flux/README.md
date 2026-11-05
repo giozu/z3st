@@ -24,8 +24,8 @@ through the wall: inner face 228.72 °C, outer face 226.85 °C (hot face: inner)
 
 ## Bowing figures
 
-**FLAG convergence/statistics** `*vtb_bowing.png`: max |w| = 8.5e-12 mm ≈ 0  
-**FLAG convergence/statistics** `*curvature.png`: max |kappa| = 7.4e-14 1/m ≈ 0  
+**FLAG convergence/statistics** `*vtb_bowing.png`: max |w| = 8.7e-12 mm ≈ 0  
+**FLAG convergence/statistics** `*curvature.png`: max |kappa| = 7.5e-14 1/m ≈ 0  
 
 ## Files
 
@@ -40,3 +40,12 @@ through the wall: inner face 228.72 °C, outer face 226.85 °C (hot face: inner)
 - `3d_vtb_temperature_bowing.png`
 - `geometry_2d.png`
 - `geometry_3d.png`
+- `inner_q_outer_T_along_s_zmaxvm.png`
+- `inner_q_outer_T_along_s_zmid.png`
+- `inner_q_outer_T_curvature.png`
+- `inner_q_outer_T_displacement_z.png`
+- `inner_q_outer_T_max_stress.png`
+- `inner_q_outer_T_stress_z.png`
+- `inner_q_outer_T_summary.json`
+- `inner_q_outer_T_vtb_bowing.png`
+- `inner_q_outer_T_vtb_temperature_bowing.png`

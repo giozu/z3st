@@ -26,8 +26,8 @@ No along-s panel at the statistical zero (< 1e-4).
 ## outlet core (z = 2500.0 mm)
 
 ```
-outlet core, z = 2500.0 mm: hot flat normal 300° (544.5 °C), cold flat normal 120° (506.2 °C); hot vertex V5 (550.0 °C), cold vertex V2 (500.0 °C)
-through the wall: inner face 525.00 °C, outer face 525.00 °C (hot face: none, ΔT = 4.5e-13 K negligible against the 51.2 K range)
+outlet core, z = 2500.0 mm: hot flat normal 300° (544.5 °C), cold flat normal 120° (506.3 °C); hot vertex V5 (550.0 °C), cold vertex V2 (500.0 °C)
+through the wall: inner face 525.00 °C, outer face 525.00 °C (hot face: none, ΔT = 1.1e-13 K negligible against the 51.2 K range)
 ```
 
 No along-s panel at the statistical zero (< 1e-4).
@@ -35,8 +35,8 @@ No along-s panel at the statistical zero (< 1e-4).
 ## tip (z = 4000.0 mm)
 
 ```
-tip, z = 4000.0 mm: hot flat normal 300° (544.5 °C), cold flat normal 120° (506.2 °C); hot vertex V5 (550.0 °C), cold vertex V2 (500.0 °C)
-through the wall: inner face 525.00 °C, outer face 525.00 °C (hot face: none, ΔT = 4.5e-13 K negligible against the 51.2 K range)
+tip, z = 4000.0 mm: hot flat normal 300° (544.5 °C), cold flat normal 120° (506.3 °C); hot vertex V5 (550.0 °C), cold vertex V2 (500.0 °C)
+through the wall: inner face 525.00 °C, outer face 525.00 °C (hot face: none, ΔT = 1.1e-13 K negligible against the 51.2 K range)
 ```
 
 No along-s panel at the statistical zero (< 1e-4).

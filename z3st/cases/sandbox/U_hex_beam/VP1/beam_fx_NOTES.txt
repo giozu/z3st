@@ -1,0 +1,100 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# beam_fx: IAEA VP1 beam in weak form with FEniCSx, changes and rationale
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+1. PERCHE' SERVIVA
+------------------
+Il caso 3D (U_hex_shell/bowing/corner-corner/IAEA/VP1) e' risolto da z3st come
+continuo elastico: u(x, y, z) vettore su una mesh gmsh 3D della parete.
+beam1d risolveva lo stesso caso come trave di Euler-Bernoulli, ma con un
+solutore numpy proprio (Hermite, assemblaggio a mano): z3st e FEniCSx non
+erano usati.
+
+z3st da solo non basta per la trave:
+- regime: 1d di z3st e' una barra (una incognita u, sigma = E eps): copre
+  l'asta assiale u_z, non la flessione;
+- non c'e' u'' (Lagrange e' C0), ne' curvatura kappa*, ne' EI, ne' integrali
+  di sezione;
+- un mesh.geo 1D da solo da' i nodi, non la fisica.
+
+Serviva quindi una forma debole della trave scritta con dolfinx, sulla mesh
+1D gmsh, come prototipo locale al caso (nessuna modifica nativa a z3st).
+
+2. RIDUZIONE 3D -> 1D (cosa resta uguale al caso 3D)
+----------------------------------------------------
+- Sezione: la parete esagonale indeformata con gli stessi D, t, orientation
+  della mesh 3D (beam1d.section), A_w = 1.350e-3 m^2, I_w = 3.166e-6 m^4.
+- Temperatura: la stessa stringa expression del caso 3D, T in K.
+- Materiale: la stessa scheda 15_15Ti_const.yaml, E = 1.7e+11 Pa,
+  alpha = 1.8e-5 1/K, T_ref = 673.15 K.
+- Vincolo: incastro alla base come nel 3D (Clamp_x/y/z), punta libera.
+- Il campo 3D eps*(x, y, z) = alpha (T - T_ref) (-) diventa due carichi 1D,
+  integrali di sezione:
+      eps0*(z)  = 1/A_w int eps* dA            (-)
+      kappa*(z) = 1/I_w int eps* (x, y) dA      (1/m)
+
+3. FORMA DEBOLE
+---------------
+Flessione, piano a = x, y, formulazione mista (u, M), Lagrange P2/P3:
+      M = EI (u'' - k),  k = -kappa*_a,  M'' = q
+      int M tau/EI + int u' tau' + int k tau = sum_estremi theta tau n
+      int M' v' + int q v + sum_i F_i v(z_i) = 0
+  u in m, M in N m, EI in N m^2, q in N/m, F in N, theta in rad.
+  Rotazione imposta: naturale (n = -1 in z = 0, +1 in z = H); estremo con
+  rotazione libera: M = 0 essenziale. Serve la forma mista perche' u'' non
+  esiste con elementi C0; e' simmetrica (punto di sella), risolta con MUMPS.
+
+Asta assiale, Lagrange P2/P3:
+      int EA (u_z' - eps0*) w' = int q_z w + sum_i F_z,i w(z_i)     EA in N
+
+4. FILE NUOVI (in VP1, nessun file esistente modificato)
+---------------------------------------------------------
+- mesh.geo: linea gmsh lungo x (asse della trave), punti alle stations,
+  4 tratti Transfinite con h = H/nz; H e nz da geometry.yaml via
+  z3st.utils.geo_args; physical points bottom, core_bottom, core_top, LRP,
+  top (le region di boundary_conditions.yaml) e curve steel. Le quote delle
+  stations sono ripetute nel .geo (geo_args non passa i blocchi annidati) e
+  beam_fx.py le confronta con geometry.yaml.
+- mesh.msh, log_mesh.md: generati con
+      gmsh $(python -m z3st.utils.geo_args) mesh.geo -1 -o mesh.msh > log_mesh.md
+- beam_fx.py: legge mesh.msh con dolfinx.io.gmsh.read_from_msh (come
+  z3st/core/mesh/reader.py), controlla nz e stations, risolve i due piani di
+  flessione e l'asta, scrive output/fields_fx.npz e lo confronta con
+  output/fields.npz (Hermite). Riusa beam1d per sezione, T, eps* e lettura
+  dei file del caso.
+      cd VP1 && PYTHONPATH=.. python beam_fx.py [grado]     (default 3)
+- beam_fx_NOTES.txt: questo file.
+
+Rispetto alla mesh costruita in memoria (prima versione) le BC sono indicate
+per nome della regione (tag gmsh), non per quota.
+
+5. VERIFICHE
+------------
+VP1, 400 elementi, P2 e P3:
+- u_y(core top, LRP, URP) = 1.000, 3.250, 12.250 mm (IWGFR/75), u_y'(H) =
+  12.000 mrad; max |u_y - forma chiusa| = 1.8e-15 m su tutto z.
+- u_z(H) = 4.500 mm; max |u_z - forma chiusa| = 1.0e-13 m.
+- M = 0, N ~ 4e-5 N: incurvamento libero, nessuno sforzo (T lineare in y).
+- vs Hermite: u_y 4.7e-13 m; u_z 2.8e-6 m, errore dell'asta lineare di
+  beam1d a meta' elemento (h^2 u_z''/8 con h = 0.1 m del vecchio fields.npz),
+  non di beam_fx.
+Casi con carico (40 elementi, P2 e P3), esatti alle cifre stampate:
+- mensola, forza in punta e q: w(H) = F H^3/(3EI) + q H^4/(8EI),
+  M(0) = F H + q H^2/2;
+- appoggio-appoggio, q: w(H/2) = 5 q H^4/(384 EI);
+- rotazione imposta 2 mrad alla base o in punta: u = theta (z - z_incastro).
+Revisione physics-reviewer: nessun errore di segno o unita'; i rilievi sul
+tag dei vertici e sul confronto esatto tra float sono superati dalla mesh
+gmsh, aggiunto il controllo di convergenza di MUMPS.
+
+6. LIMITI E PASSI PER PORTARLO IN Z3ST (nativo, da concordare)
+--------------------------------------------------------------
+Non implementati: pad (Contact, active set di beam1d.solver), momenti
+applicati, rotazione imposta lontano dagli estremi, E variabile sulla
+sezione. L'interpolazione DG di kappa*, eps0* e' esatta solo se T ha i kink
+sui nodi e alpha e' costante (vero per VP1); per tabelle T o alpha(T)
+servirebbe la quadratura.
+Per farlo risolvere da python -m z3st servirebbero modifiche native:
+models/beam_model.py (forma mista, carichi da sezione), una chiave in
+Config (models: beam), BC rotation e Contact per la trave, output M, N nel
+writer. Richiedono l'approvazione del maintainer.

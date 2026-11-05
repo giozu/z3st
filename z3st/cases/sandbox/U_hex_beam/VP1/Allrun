@@ -1,0 +1,11 @@
+#!/bin/bash
+# beam1d: IAEA VP1, Euler-Bernoulli beam (axial and bending). Solve, check
+# against the closed forms, then compare with the Z3ST 3D run and IWGFR/75.
+# Run ../../U_hex_shell/bowing/corner-corner/IAEA/VP1 first (mesh.msh, fields).
+set -e
+cd "${0%/*}" || exit 1
+export PYTHONPATH="$(cd .. && pwd)${PYTHONPATH:+:$PYTHONPATH}"
+
+python3 -m beam1d > log_beam1d.md
+python3 non-regression.py
+python3 vp1_vs_z3st.py

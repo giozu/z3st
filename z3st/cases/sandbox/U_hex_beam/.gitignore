@@ -1,0 +1,3 @@
+# The digitised data of Ma et al. (2019) are tracked; the repo .gitignore drops *.csv.
+# figures/ (the paper's images) and overlays/ stay out (*.png).
+!Ma2019/data/*.csv

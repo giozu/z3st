@@ -38,7 +38,8 @@ Outputs in ``U_hex_shell/results/`` (with the other subfolders), named
 ``IAEA_VP1_<option>_vs_Ansys_<figure>``: the hex_post figures with one curve set per
 code and the closed forms of ``post.yaml``, a table of the largest
 differences, and the summary (.json). With a T-dependent card, one set per
-expansion law: ``results/steel_Tdependent/IAEA_VP1_<law>_vs_Ansys_<figure>``.
+expansion law:
+``results/bowing_corner-corner_IAEA_VP1/1515Ti_Tdep/<law>_vs_Ansys/IAEA_VP1_<law>_vs_Ansys_<figure>``.
 """
 
 import argparse
@@ -149,7 +150,8 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--ansys", action="append",
                     help="folder with vp1_ansys_nodes.txt and vp1_ansys_elems.txt (repeatable)")
-    ap.add_argument("--out", help="default: results/, or results/steel_Tdependent/ for a T-dependent card")
+    ap.add_argument("--out", help="default: results/, or results/bowing_corner-corner_IAEA_VP1/1515Ti_Tdep/<law>_vs_Ansys/ "
+                    "for a T-dependent card")
     ap.add_argument("--case", default=CASE,
                     help="z3st case folder (post.yaml + output) run with the same option as the Ansys exports")
     args = ap.parse_args()
@@ -172,10 +174,10 @@ def main():
     mat = hp.load_material(os.path.join(case, cfg["material"]))
     if "alpha" in mat:
         prefix, title, out = f"IAEA_VP1_{option}_vs_Ansys", f"IAEA_VP1 ({option}): z3st vs Ansys", hp.RESULTS
-    else:   # T-dependent card: results/steel_Tdependent/, one prefix per expansion law
+    else:   # T-dependent card: one folder and prefix per expansion law
         law = mat["expansion_law"] or "Sobolev"
         prefix, title = f"IAEA_VP1_{law}_vs_Ansys", f"IAEA_VP1 ({option}), 1515Ti_Tdep {law}: z3st vs Ansys"
-        out = os.path.join(hp.RESULTS, "steel_Tdependent")
+        out = os.path.join(hp.RESULTS, "bowing_corner-corner_IAEA_VP1", "1515Ti_Tdep", f"{law}_vs_Ansys")
     args.out = args.out or out
     os.makedirs(args.out, exist_ok=True)
     z = hp.load_z3st(xdmf, temperature=cfg["temperature"], case_dir=case)

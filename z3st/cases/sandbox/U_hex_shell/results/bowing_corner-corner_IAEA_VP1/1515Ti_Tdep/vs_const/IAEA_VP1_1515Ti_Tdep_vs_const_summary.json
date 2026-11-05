@@ -1,0 +1,655 @@
+{
+  "max_stresses": {
+    "Sobolev": {
+      "von Mises": {
+        "MPa": 2.8149732290128644,
+        "x_m": -0.004059494063605012,
+        "y_m": -0.07265624970203509,
+        "z_m": 1.505,
+        "flat": "normal 240\u00b0",
+        "s_mm": 32.81249986542345,
+        "xi_mm": 2.7755575615628914e-14,
+        "to_vertex_mm": 4.687499980792154
+      },
+      "sigma_ss max": {
+        "MPa": 1.6512629903095826,
+        "x_m": -0.028416458445214267,
+        "y_m": -0.05859374975967084,
+        "z_m": 1.495,
+        "flat": "normal 240\u00b0",
+        "s_mm": 4.687499980694985,
+        "xi_mm": -1.3877787807814457e-14,
+        "to_vertex_mm": 32.81249986552059
+      },
+      "sigma_ss min": {
+        "MPa": -1.581682879908533,
+        "x_m": -0.028416458445214267,
+        "y_m": -0.05859374975967084,
+        "z_m": 2.495,
+        "flat": "normal 240\u00b0",
+        "s_mm": 4.687499980694985,
+        "xi_mm": -1.3877787807814457e-14,
+        "to_vertex_mm": 32.81249986552059
+      },
+      "|sigma_zz| max": {
+        "MPa": -2.4092786582327865,
+        "x_m": -0.004059494063605012,
+        "y_m": -0.07265624970203509,
+        "z_m": 1.505,
+        "flat": "normal 240\u00b0",
+        "s_mm": 32.81249986542345,
+        "xi_mm": 2.7755575615628914e-14,
+        "to_vertex_mm": 4.687499980792154
+      }
+    },
+    "DiMarcello": {
+      "von Mises": {
+        "MPa": 2.664407990759098,
+        "x_m": 0.004059494063585399,
+        "y_m": -0.0726562497020464,
+        "z_m": 1.505,
+        "flat": "normal 300\u00b0",
+        "s_mm": -32.81249986544613,
+        "xi_mm": 0.0,
+        "to_vertex_mm": 4.687499980769394
+      },
+      "sigma_ss max": {
+        "MPa": 1.5628306351425822,
+        "x_m": 0.02841645844507092,
+        "y_m": -0.05859374975975362,
+        "z_m": 1.505,
+        "flat": "normal 300\u00b0",
+        "s_mm": -4.6874999808605535,
+        "xi_mm": 1.3877787807814457e-14,
+        "to_vertex_mm": 32.81249986535501
+      },
+      "sigma_ss min": {
+        "MPa": -1.5058099790957538,
+        "x_m": -0.028416458445214267,
+        "y_m": -0.05859374975967084,
+        "z_m": 2.495,
+        "flat": "normal 240\u00b0",
+        "s_mm": 4.687499980694985,
+        "xi_mm": -1.3877787807814457e-14,
+        "to_vertex_mm": 32.81249986552059
+      },
+      "|sigma_zz| max": {
+        "MPa": -2.2804503817838597,
+        "x_m": 0.004059494063585399,
+        "y_m": -0.0726562497020464,
+        "z_m": 1.505,
+        "flat": "normal 300\u00b0",
+        "s_mm": -32.81249986544613,
+        "xi_mm": 0.0,
+        "to_vertex_mm": 4.687499980769394
+      }
+    },
+    "constant": {
+      "von Mises": {
+        "MPa": 2.731499183285573,
+        "x_m": -0.004059494063605012,
+        "y_m": -0.07265624970203509,
+        "z_m": 1.505,
+        "flat": "normal 240\u00b0",
+        "s_mm": 32.81249986542345,
+        "xi_mm": 2.7755575615628914e-14,
+        "to_vertex_mm": 4.687499980792154
+      },
+      "sigma_ss max": {
+        "MPa": 1.6039052773311375,
+        "x_m": -0.028416458445214267,
+        "y_m": -0.05859374975967084,
+        "z_m": 1.505,
+        "flat": "normal 240\u00b0",
+        "s_mm": 4.687499980694985,
+        "xi_mm": -1.3877787807814457e-14,
+        "to_vertex_mm": 32.81249986552059
+      },
+      "sigma_ss min": {
+        "MPa": -1.5873724296432117,
+        "x_m": -0.028416458445214267,
+        "y_m": -0.05859374975967084,
+        "z_m": 2.495,
+        "flat": "normal 240\u00b0",
+        "s_mm": 4.687499980694985,
+        "xi_mm": -1.3877787807814457e-14,
+        "to_vertex_mm": 32.81249986552059
+      },
+      "|sigma_zz| max": {
+        "MPa": 2.4601439861249923,
+        "x_m": 0.004059494063585399,
+        "y_m": -0.0726562497020464,
+        "z_m": 2.505,
+        "flat": "normal 300\u00b0",
+        "s_mm": -32.81249986544613,
+        "xi_mm": 0.0,
+        "to_vertex_mm": 4.687499980769394
+      }
+    }
+  },
+  "stations": [
+    [
+      "w at z = 2500 mm (mm)",
+      "1.051",
+      "0.9792",
+      "0.986",
+      "-0.06502",
+      "-6.19",
+      "+0.00679",
+      "+0.69"
+    ],
+    [
+      "w at z = 3000 mm (mm)",
+      "3.474",
+      "3.237",
+      "3.235",
+      "-0.239",
+      "-6.88",
+      "-0.002026",
+      "-0.06"
+    ],
+    [
+      "w at z = 4000 mm (mm)",
+      "13.21",
+      "12.31",
+      "12.23",
+      "-0.9755",
+      "-7.39",
+      "-0.07522",
+      "-0.61"
+    ],
+    [
+      "\u03ba at z = 3000 mm (1/m)",
+      "0.006516",
+      "0.006072",
+      "0.005998",
+      "-0.000518",
+      "-7.95",
+      "-7.408e-05",
+      "-1.22"
+    ],
+    [
+      "u_z at the top (mm)",
+      "4.792",
+      "4.464",
+      "4.5",
+      "-0.2923",
+      "-6.10",
+      "+0.03558",
+      "+0.80"
+    ],
+    [
+      "max \u03c3_vm (MPa)",
+      "2.815",
+      "2.664",
+      "2.731",
+      "-0.08347",
+      "-2.97",
+      "+0.06709",
+      "+2.52"
+    ],
+    [
+      "max \u03c3_vm, 2600 < z < 3900 mm (MPa)",
+      "0.4913",
+      "0.4647",
+      "0.4192",
+      "-0.07208",
+      "-14.67",
+      "-0.04546",
+      "-9.78"
+    ],
+    [
+      "max |\u03c3_ss| (MPa)",
+      "1.651",
+      "1.563",
+      "1.604",
+      "-0.04736",
+      "-2.87",
+      "+0.04107",
+      "+2.63"
+    ]
+  ],
+  "max_error_along_z": {
+    "bowing w (mm)": {
+      "Sobolev": {
+        "max_abs": 0.9754619791275321,
+        "rel_pct": 7.386187443926496
+      },
+      "DiMarcello": {
+        "max_abs": 0.07522091046601531,
+        "rel_pct": 0.6112376311707339
+      }
+    },
+    "curvature \u03ba (1/m)": {
+      "Sobolev": {
+        "max_abs": 0.0005187049222968075,
+        "rel_pct": 7.955027498732041
+      },
+      "DiMarcello": {
+        "max_abs": 7.444903399366452e-05,
+        "rel_pct": 1.225254287545266
+      }
+    },
+    "u_z (mm)": {
+      "Sobolev": {
+        "max_abs": 0.2923267911059746,
+        "rel_pct": 6.0998926794323705
+      },
+      "DiMarcello": {
+        "max_abs": 0.03558341648385621,
+        "rel_pct": 0.7970451640900221
+      }
+    },
+    "max \u03c3_vm in the section (MPa)": {
+      "Sobolev": {
+        "max_abs": 0.14123829843140756,
+        "rel_pct": 5.017394019087565
+      },
+      "DiMarcello": {
+        "max_abs": 0.2601118346771547,
+        "rel_pct": 9.762462640079683
+      }
+    },
+    "max |\u03c3_ss| in the section (MPa)": {
+      "Sobolev": {
+        "max_abs": 0.047440377216046103,
+        "rel_pct": 2.8729752616300006
+      },
+      "DiMarcello": {
+        "max_abs": 0.08168727939795306,
+        "rel_pct": 5.226879839765904
+      }
+    }
+  },
+  "max_error_along_s": [
+    {
+      "level": "inlet core",
+      "key": "ss",
+      "law": "Sobolev",
+      "max_abs": 0.04738464680626309,
+      "rel_pct": 2.8696252663166133,
+      "unit": "MPa"
+    },
+    {
+      "level": "inlet core",
+      "key": "ss",
+      "law": "DiMarcello",
+      "max_abs": 0.041066732506172876,
+      "rel_pct": 2.627771035940142,
+      "unit": "MPa"
+    },
+    {
+      "level": "inlet core",
+      "key": "vm",
+      "law": "Sobolev",
+      "max_abs": 0.08280821586110854,
+      "rel_pct": 2.9563622900065827,
+      "unit": "MPa"
+    },
+    {
+      "level": "inlet core",
+      "key": "vm",
+      "law": "DiMarcello",
+      "max_abs": 0.06704040077987816,
+      "rel_pct": 2.528711350464071,
+      "unit": "MPa"
+    },
+    {
+      "level": "mid core",
+      "key": "ss",
+      "law": "Sobolev",
+      "max_abs": 0.0013029040819704518,
+      "rel_pct": 2.4581034862366904,
+      "unit": "MPa"
+    },
+    {
+      "level": "mid core",
+      "key": "ss",
+      "law": "DiMarcello",
+      "max_abs": 0.0022568915432989584,
+      "rel_pct": 4.494073664653446,
+      "unit": "MPa"
+    },
+    {
+      "level": "mid core",
+      "key": "vm",
+      "law": "Sobolev",
+      "max_abs": 0.01738417842208101,
+      "rel_pct": 6.280173092274568,
+      "unit": "MPa"
+    },
+    {
+      "level": "mid core",
+      "key": "vm",
+      "law": "DiMarcello",
+      "max_abs": 0.015666477143899293,
+      "rel_pct": 5.949613660688406,
+      "unit": "MPa"
+    },
+    {
+      "level": "outlet core",
+      "key": "ss",
+      "law": "Sobolev",
+      "max_abs": 0.007445059345187799,
+      "rel_pct": 0.47074698582044516,
+      "unit": "MPa"
+    },
+    {
+      "level": "outlet core",
+      "key": "ss",
+      "law": "DiMarcello",
+      "max_abs": 0.0816248649727056,
+      "rel_pct": 5.421035206449421,
+      "unit": "MPa"
+    },
+    {
+      "level": "outlet core",
+      "key": "vm",
+      "law": "Sobolev",
+      "max_abs": 0.1403858800887754,
+      "rel_pct": 5.4496153575626485,
+      "unit": "MPa"
+    },
+    {
+      "level": "outlet core",
+      "key": "vm",
+      "law": "DiMarcello",
+      "max_abs": 0.2599889743689907,
+      "rel_pct": 10.583860291350591,
+      "unit": "MPa"
+    },
+    {
+      "level": "tip",
+      "key": "ss",
+      "law": "Sobolev",
+      "max_abs": 0.044704342220902436,
+      "rel_pct": 9.279499039334608,
+      "unit": "MPa"
+    },
+    {
+      "level": "tip",
+      "key": "ss",
+      "law": "DiMarcello",
+      "max_abs": 0.042456518893599506,
+      "rel_pct": 9.272251113268409,
+      "unit": "MPa"
+    },
+    {
+      "level": "tip",
+      "key": "vm",
+      "law": "Sobolev",
+      "max_abs": 0.013694648256476205,
+      "rel_pct": 2.761669046505792,
+      "unit": "MPa"
+    },
+    {
+      "level": "tip",
+      "key": "vm",
+      "law": "DiMarcello",
+      "max_abs": 0.030842361732784207,
+      "rel_pct": 6.533812687321485,
+      "unit": "MPa"
+    },
+    {
+      "level": "inlet core",
+      "key": "eps_ss",
+      "law": "Sobolev",
+      "max_abs": 6.774609226265979e-07,
+      "rel_pct": 4.50834592593207,
+      "unit": "-"
+    },
+    {
+      "level": "inlet core",
+      "key": "eps_ss",
+      "law": "DiMarcello",
+      "max_abs": 3.61173895876474e-07,
+      "rel_pct": 2.581992951275389,
+      "unit": "-"
+    },
+    {
+      "level": "inlet core",
+      "key": "eps_zz",
+      "law": "Sobolev",
+      "max_abs": 5.932150905462033e-07,
+      "rel_pct": 4.528818014716056,
+      "unit": "-"
+    },
+    {
+      "level": "inlet core",
+      "key": "eps_zz",
+      "law": "DiMarcello",
+      "max_abs": 3.117577896127227e-07,
+      "rel_pct": 2.556711754811075,
+      "unit": "-"
+    },
+    {
+      "level": "mid core",
+      "key": "eps_ss",
+      "law": "Sobolev",
+      "max_abs": 7.84031149104285e-05,
+      "rel_pct": 5.516721940749124,
+      "unit": "-"
+    },
+    {
+      "level": "mid core",
+      "key": "eps_ss",
+      "law": "DiMarcello",
+      "max_abs": 1.9074675356824068e-05,
+      "rel_pct": 1.4409983881172233,
+      "unit": "-"
+    },
+    {
+      "level": "mid core",
+      "key": "eps_zz",
+      "law": "Sobolev",
+      "max_abs": 7.804574759637316e-05,
+      "rel_pct": 5.492577388911884,
+      "unit": "-"
+    },
+    {
+      "level": "mid core",
+      "key": "eps_zz",
+      "law": "DiMarcello",
+      "max_abs": 1.942526870062685e-05,
+      "rel_pct": 1.4677637045727692,
+      "unit": "-"
+    },
+    {
+      "level": "outlet core",
+      "key": "eps_ss",
+      "law": "Sobolev",
+      "max_abs": 0.00018745361785566135,
+      "rel_pct": 6.557352093003311,
+      "unit": "-"
+    },
+    {
+      "level": "outlet core",
+      "key": "eps_ss",
+      "law": "DiMarcello",
+      "max_abs": 1.847692778599681e-05,
+      "rel_pct": 0.6937645213221083,
+      "unit": "-"
+    },
+    {
+      "level": "outlet core",
+      "key": "eps_zz",
+      "law": "Sobolev",
+      "max_abs": 0.0001884002074237349,
+      "rel_pct": 6.536965147624466,
+      "unit": "-"
+    },
+    {
+      "level": "outlet core",
+      "key": "eps_zz",
+      "law": "DiMarcello",
+      "max_abs": 1.946352842757031e-05,
+      "rel_pct": 0.7248685743177489,
+      "unit": "-"
+    },
+    {
+      "level": "tip",
+      "key": "eps_ss",
+      "law": "Sobolev",
+      "max_abs": 0.00018879868121745485,
+      "rel_pct": 6.563568390473219,
+      "unit": "-"
+    },
+    {
+      "level": "tip",
+      "key": "eps_ss",
+      "law": "DiMarcello",
+      "max_abs": 1.8628375703975443e-05,
+      "rel_pct": 0.695125329131018,
+      "unit": "-"
+    },
+    {
+      "level": "tip",
+      "key": "eps_zz",
+      "law": "Sobolev",
+      "max_abs": 0.00018846915183131025,
+      "rel_pct": 6.558354075614937,
+      "unit": "-"
+    },
+    {
+      "level": "tip",
+      "key": "eps_zz",
+      "law": "DiMarcello",
+      "max_abs": 1.8706572783638723e-05,
+      "rel_pct": 0.6987073640658771,
+      "unit": "-"
+    },
+    {
+      "level": "inlet core",
+      "key": "eps_nn",
+      "law": "Sobolev",
+      "max_abs": 4.426174902860002e-07,
+      "rel_pct": 4.517015039700499,
+      "unit": "-"
+    },
+    {
+      "level": "inlet core",
+      "key": "eps_nn",
+      "law": "DiMarcello",
+      "max_abs": 2.3461562508527555e-07,
+      "rel_pct": 2.572071491403143,
+      "unit": "-"
+    },
+    {
+      "level": "inlet core",
+      "key": "u_n",
+      "law": "Sobolev",
+      "max_abs": 5.2443126874211765e-05,
+      "rel_pct": 4.657278283055717,
+      "unit": "mm"
+    },
+    {
+      "level": "inlet core",
+      "key": "u_n",
+      "law": "DiMarcello",
+      "max_abs": 3.109619884351087e-05,
+      "rel_pct": 2.9672172428461145,
+      "unit": "mm"
+    },
+    {
+      "level": "mid core",
+      "key": "eps_nn",
+      "law": "Sobolev",
+      "max_abs": 7.848311447913219e-05,
+      "rel_pct": 5.517454458988528,
+      "unit": "-"
+    },
+    {
+      "level": "mid core",
+      "key": "eps_nn",
+      "law": "DiMarcello",
+      "max_abs": 1.908056141433764e-05,
+      "rel_pct": 1.4401642816247548,
+      "unit": "-"
+    },
+    {
+      "level": "mid core",
+      "key": "u_n",
+      "law": "Sobolev",
+      "max_abs": 0.004746436708418539,
+      "rel_pct": 5.445667647636793,
+      "unit": "mm"
+    },
+    {
+      "level": "mid core",
+      "key": "u_n",
+      "law": "DiMarcello",
+      "max_abs": 0.0012475582685698705,
+      "rel_pct": 1.5368123587639833,
+      "unit": "mm"
+    },
+    {
+      "level": "outlet core",
+      "key": "eps_nn",
+      "law": "Sobolev",
+      "max_abs": 0.00018816211406630931,
+      "rel_pct": 6.563620732594438,
+      "unit": "-"
+    },
+    {
+      "level": "outlet core",
+      "key": "eps_nn",
+      "law": "DiMarcello",
+      "max_abs": 1.845996855348109e-05,
+      "rel_pct": 0.6911784986215236,
+      "unit": "-"
+    },
+    {
+      "level": "outlet core",
+      "key": "u_n",
+      "law": "Sobolev",
+      "max_abs": 0.011285216801025011,
+      "rel_pct": 6.437277691351417,
+      "unit": "mm"
+    },
+    {
+      "level": "outlet core",
+      "key": "u_n",
+      "law": "DiMarcello",
+      "max_abs": 0.0011289760641161883,
+      "rel_pct": 0.6912225945814652,
+      "unit": "mm"
+    },
+    {
+      "level": "tip",
+      "key": "eps_nn",
+      "law": "Sobolev",
+      "max_abs": 0.00018865813279646607,
+      "rel_pct": 6.559408134184576,
+      "unit": "-"
+    },
+    {
+      "level": "tip",
+      "key": "eps_nn",
+      "law": "DiMarcello",
+      "max_abs": 1.8737974128758784e-05,
+      "rel_pct": 0.699291493267724,
+      "unit": "-"
+    },
+    {
+      "level": "tip",
+      "key": "u_n",
+      "law": "Sobolev",
+      "max_abs": 0.01160231104720666,
+      "rel_pct": 6.5720803801357475,
+      "unit": "mm"
+    },
+    {
+      "level": "tip",
+      "key": "u_n",
+      "law": "DiMarcello",
+      "max_abs": 0.0015362841789313408,
+      "rel_pct": 0.9341148335424033,
+      "unit": "mm"
+    }
+  ],
+  "sources": {
+    "Sobolev": "/home/mat/z3st_macro/z3st/cases/sandbox/U_hex_shell/bowing/corner-corner/IAEA/VP1/1515Ti_Tdependent/Sobolev/output",
+    "DiMarcello": "/home/mat/z3st_macro/z3st/cases/sandbox/U_hex_shell/bowing/corner-corner/IAEA/VP1/1515Ti_Tdependent/DiMarcello/output",
+    "constant": "/home/mat/z3st_macro/z3st/cases/sandbox/U_hex_shell/bowing/corner-corner/IAEA/VP1/output"
+  }
+}

@@ -1,0 +1,3 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+rm -f log_beam1d.md log_mesh.md mesh.msh output/*.npz output/non-regression.json output/*.png

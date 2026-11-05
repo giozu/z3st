@@ -1,0 +1,62 @@
+{
+  "z3st_source": "../../U_hex_shell/bowing/corner-corner/IAEA/VP1/output/vp1_const_fields_3d.xdmf",
+  "beam_elements": 80,
+  "thermal_shear_c_m2": 0.0023062499332720185,
+  "thermal_shear_c_over_R2": 0.40999999150000066,
+  "gamma_core_z3st_rad": -1.3675971845861e-05,
+  "gamma_core_thin_wall_rad": -1.3837499599632096e-05,
+  "max_abs_z3st_minus_beam_mm": 0.018892472584247297,
+  "rows": [
+    {
+      "station": "Core top",
+      "z_mm": 2500.0,
+      "theory_mm": 1.0,
+      "beam_mm": 1.0000000029764233,
+      "z3st_mm": 0.9859543564264032,
+      "z3st_minus_beam_mm": -0.014045646550020163,
+      "z3st_minus_beam_pct": -1.4045646508214373,
+      "thermal_shear_mm": -0.013837499599632092,
+      "rest_mm": -0.0002081469503880714,
+      "uz_beam_mm": 1.1249999999999236,
+      "uz_z3st_mm": 1.125003032967708,
+      "uz_z3st_minus_beam_mm": 3.0329677844775915e-06,
+      "avg10_mm": 1.0020999999999998,
+      "avg10_min_mm": 0.989,
+      "avg10_max_mm": 1.011
+    },
+    {
+      "station": "LRP",
+      "z_mm": 3000.0,
+      "theory_mm": 3.25,
+      "beam_mm": 3.25000000402362,
+      "z3st_mm": 3.234996483876387,
+      "z3st_minus_beam_mm": -0.01500352014723294,
+      "z3st_minus_beam_pct": -0.4616467731894778,
+      "thermal_shear_mm": -0.013837499599632092,
+      "rest_mm": -0.0011660205476008486,
+      "uz_beam_mm": 2.2499999999999125,
+      "uz_z3st_mm": 2.2500000000128404,
+      "uz_z3st_minus_beam_mm": 1.2927880987945173e-11,
+      "avg10_mm": 3.2545,
+      "avg10_min_mm": 3.234,
+      "avg10_max_mm": 3.28
+    },
+    {
+      "station": "URP",
+      "z_mm": 4000.0,
+      "theory_mm": 12.25,
+      "beam_mm": 12.250000006252298,
+      "z3st_mm": 12.23110753366805,
+      "z3st_minus_beam_mm": -0.01889247258424831,
+      "z3st_minus_beam_pct": -0.15422426591514898,
+      "thermal_shear_mm": -0.013837499599632106,
+      "rest_mm": -0.005054972984616204,
+      "uz_beam_mm": 4.4999999999999,
+      "uz_z3st_mm": 4.500000000013525,
+      "uz_z3st_minus_beam_mm": 1.3625545136619621e-11,
+      "avg10_mm": 12.259,
+      "avg10_min_mm": 12.18,
+      "avg10_max_mm": 12.333
+    }
+  ]
+}

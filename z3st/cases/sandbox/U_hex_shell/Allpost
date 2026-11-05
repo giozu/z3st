@@ -8,7 +8,10 @@
 #     ./Allpost      post-process every subfolder with a post.yaml, at any depth
 #                    (hex_post.py), compare IAEA VP1 z_uniform with Ansys
 #                    (bowing/corner-corner/IAEA/VP1/compare_ansys.py) and group
-#                    results/ by problem (results_organize.py)
+#                    results/ by problem (results_organize.py). The 1515Ti_Tdependent
+#                    sets are post-processed only together with the constant card
+#                    (compare_const*.py) and with Ansys when ANSYS_1515TI is set, in
+#                    results/bowing_corner-corner_IAEA_VP1/1515Ti_Tdep/
 #
 # Reads only the existing outputs: run the cases first. A subfolder with no
 # output is skipped. Every figure and summary goes to results/, first named
@@ -19,8 +22,20 @@ set -e
 cd "${0%/*}" || exit 1
 export HDF5_USE_FILE_LOCKING=FALSE
 
-find . -name post.yaml -not -path '*/output/*' | sort | while read -r post; do
+find . -name post.yaml -not -path '*/output/*' -not -path '*/1515Ti_Tdependent/*' | sort | while read -r post; do
     python3 hex_post.py "$(dirname "$post")"
 done
 python3 bowing/corner-corner/IAEA/VP1/compare_ansys.py
+VP1=bowing/corner-corner/IAEA/VP1
+python3 $VP1/1515Ti_Tdependent/compare_const.py
+python3 $VP1/1515Ti_Tdependent/compare_const_corners.py
+A=${ANSYS_1515TI:-}   # folder with Sobolev/ and DiMarcello/ Ansys exports
+for law in Sobolev DiMarcello; do
+    case=$VP1/1515Ti_Tdependent; [ "$law" = DiMarcello ] && case=$case/DiMarcello
+    if [ -n "$A" ] && [ -f "$A/$law/vp1_ansys_nodes.txt" ]; then
+        python3 $VP1/compare_ansys.py --case "$case" --ansys "$A/$law"
+    else
+        echo "SKIP: no Ansys export in \${ANSYS_1515TI}/$law"
+    fi
+done
 python3 results_organize.py

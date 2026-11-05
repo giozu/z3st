@@ -1,0 +1,22 @@
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+# beam1d: IAEA VP1 (with z-gradient) as an Euler-Bernoulli beam, axial and bending
+# --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
+
+geometry_path: geometry.yaml
+boundary_conditions_path: boundary_conditions.yaml
+
+materials:  # the card of the Z3ST run (E, alpha, T_ref)
+  steel: ../../U_hex_shell/bowing/corner-corner/IAEA/VP1/15_15Ti_const.yaml
+
+models:
+  bending: true   # u_x, u_y (two Hermite planes)
+  axial: true     # u_z (linear rod)
+
+section:
+  n_gauss: 4  # Gauss points along the flat and through the wall (per trapezoid)
+
+element:
+  n_gauss: 3  # Gauss points for f_e (kappa* linear in z: 2 are exact)
+
+# Z3ST 3D run of the same case, read by vp1_vs_z3st.py (fields, IWGFR/75 tables)
+case_3d: ../../U_hex_shell/bowing/corner-corner/IAEA/VP1

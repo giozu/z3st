@@ -1,0 +1,17 @@
+name: hex_beam_VP1
+geometry_type: hex_beam
+
+# Same section as the Z3ST 3D case ../../U_hex_shell/bowing/corner-corner/IAEA/VP1/geometry.yaml
+D: 0.153464101  # outer circumscribed diameter (m): 2 * 0.066451905 / cos(30 deg), outer apothem 0.066451905
+t: 0.003        # wall thickness (m)
+H: 4.000        # height (m)
+orientation: vertical # flat | vertical; corners on +-y as the 3D case (MOOSE VP1)
+
+nz: 80  # elements along the height, h = 0.05 m: every station is a node; 120 or more fail the 1e-8 non-regression by round-off
+
+stations:       # name: z (m), forced nodes and BC regions (the beam counterpart of labels)
+  bottom: 0.0
+  core_bottom: 1.5
+  core_top: 2.5
+  LRP: 3.0
+  top: 4.0          # URP

@@ -23,6 +23,8 @@ Each subfolder carries a ``post.yaml`` (paths relative to the subfolder)::
     boundary_conditions: ../boundary_conditions.yaml   # 'radial' only: q and T_o
     stations_z: [0.25, 0.5, 0.75, 1.0] # heights of the tables (m), optional
     along_s_z: {inlet core: 1.5, tip: 4.0}  # heights of the along-s figures (m), optional
+    curvature: rotation                # rotation | gauss: u'' of the axis, from the nodal u (optional;
+                                       # read by run_case, other callers of analyse use the default)
 
 Every figure goes to ``results/`` next to this file, named
 ``<subfolder>_<figure>.png`` and titled with the subfolder name. The first
@@ -67,6 +69,16 @@ Closed forms (``closed_form``), never fitted to the FEM:
 
 With several runs, each run is compared with its own closed form.
 
+Curvature of the axis (``curvature``), both from the nodal displacements:
+
+  rotation  plane fit of u_z on every plane of nodes (section rotation),
+            u'' = -d(rotation)/dz between consecutive planes (default)
+  gauss     eps_zz = du_z/dz at the 2x2x2 Gauss points, u'' = -I^-1 int
+            eps_zz (dx, dy) dA with the same points for I
+
+The DG0 strain of the output is not used: constant in a cell, it misses the
+inertia of the cell itself and gives a curvature low by about I_cell / I.
+
 Local frame of a flat: xi through the wall (0 at mid-wall, outward), s along
 the flat. The perimeter coordinate p runs at mid-wall from the first vertex,
 counter-clockwise, flat after flat.
@@ -88,6 +100,7 @@ os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
 HERE = os.path.dirname(os.path.abspath(__file__))
 RESULTS = os.path.join(HERE, "results")   # results and comparisons of every subfolder
 COMPASS = {90: "nord", 30: "nord-est", 330: "sud-est", 270: "sud", 210: "sud-west", 150: "nord-west"}
+CURVATURE = ("rotation", "gauss")   # post.yaml 'curvature', the first is the default
 RUN_COLORS = ("tab:blue", "tab:orange", "tab:green", "tab:purple")
 LAYER_STYLES = {"inner": "-", "outer": "--"}
 
@@ -242,13 +255,15 @@ def _shape():
 
 def sections(d, fr):
     """Per z-layer: height, inertia tensor and int eps_zz dx, dy (dx, dy from
-    the layer centroid)."""
+    the layer centroid), with eps_zz = du_z/dz of the nodal u at the Gauss
+    points."""
     X, cells = d["X"], d["cells"]
     N, dN = _shape()
     Xc = X[cells]
     J = np.einsum("gnk,cnd->cgdk", dN, Xc)
     w = np.abs(np.linalg.det(J)) / len(_GP)
     xg = np.einsum("gn,cnd->cgd", N, Xc)
+    dNdz = np.einsum("gnk,cgk->cgn", dN, np.linalg.inv(J)[..., 2])
 
     layers, inv = np.unique(np.round(fr["cells"]["z"], 9), return_inverse=True)
     dz = np.bincount(inv, weights=np.ptp(Xc[:, :, 2], axis=1)) / np.bincount(inv)
@@ -260,9 +275,44 @@ def sections(d, fr):
     I = np.empty((len(layers), 2, 2))
     I[:, 0, 0], I[:, 1, 1] = L((w * dx * dx).sum(1)), L((w * dy * dy).sum(1))
     I[:, 0, 1] = I[:, 1, 0] = L((w * dx * dy).sum(1))
-    ezz = d["E"][:, 2, 2][:, None]
+    ezz = np.einsum("cgn,cn->cg", dNdz, d["u"][cells, 2])
     m_eps = np.stack([L((w * ezz * dx).sum(1)), L((w * ezz * dy).sum(1))], axis=1)
     return {"z": layers, "I": I, "m_eps": m_eps}
+
+
+def rotations(d):
+    """Per plane of nodes: z and the slopes g of the plane fit of u_z,
+    u_z = c + g . (x - x_c, y - y_c), each node weighted by its share of the
+    cell faces (V / 8 h of every cell around it). Needs a mesh extruded
+    along z: the same nodes in x, y on every plane."""
+    X, cells, uz = d["X"], d["cells"], d["u"][:, 2]
+    planes, inv = np.unique(np.round(X[:, 2], 9), return_inverse=True)
+    if len(set(np.bincount(inv))) != 1:
+        raise ValueError("curvature 'rotation' needs a mesh extruded along z (equal node planes): use 'gauss'")
+    _, dN = _shape()
+    Xc = X[cells]
+    V = np.abs(np.linalg.det(np.einsum("gnk,cnd->cgdk", dN, Xc))).sum(1) / len(_GP)
+    h = np.ptp(Xc[:, :, 2], axis=1)
+    wn = np.bincount(cells.ravel(), weights=np.repeat(V / (8 * h), 8), minlength=len(X))
+    P = lambda v: np.bincount(inv, weights=wn * v)
+    W = P(np.ones(len(X)))
+    dx, dy = X[:, 0] - (P(X[:, 0]) / W)[inv], X[:, 1] - (P(X[:, 1]) / W)[inv]
+    A = np.stack([np.stack([P(dx * dx), P(dx * dy)], -1), np.stack([P(dx * dy), P(dy * dy)], -1)], 1)
+    g = np.linalg.solve(A, np.stack([P(dx * uz), P(dy * uz)], -1)[..., None])[..., 0]
+    return planes, g
+
+
+def axis_curvature(d, fr, method="rotation"):
+    """u'' of the axis per z-layer, (z, (n, 2)):
+    rotation  slope of the section rotations, -dg/dz between consecutive node planes;
+    gauss     -I^-1 int eps_zz (dx, dy) dA with eps_zz from the nodal u (sections)."""
+    if method == "rotation":
+        z, g = rotations(d)
+        return 0.5 * (z[1:] + z[:-1]), -np.diff(g, axis=0) / np.diff(z)[:, None]
+    if method == "gauss":
+        sec = sections(d, fr)
+        return sec["z"], -np.einsum("lij,lj->li", np.linalg.inv(sec["I"]), sec["m_eps"])
+    raise ValueError(f"curvature: {method}, expected one of {CURVATURE}")
 
 
 def _integrate_twice(z, k):
@@ -487,9 +537,9 @@ def closed_form(cfg, mat, case_dir, fr):
 
 
 # --. analysis --..
-def analyse(d, mat, support="free", closed=None):
+def analyse(d, mat, support="free", closed=None, curvature=CURVATURE[0]):
     """FEM quantities of one dataset, projected on the closed-form bowing
-    direction when there is one."""
+    direction when there is one; curvature: rotation | gauss (axis_curvature)."""
     fr = frame(d)
     c = fr["cells"]
     S, E = d["S"], d["E"]
@@ -502,8 +552,7 @@ def analyse(d, mat, support="free", closed=None):
            "u_n": ((d["u"] - section_mean_u(fr["nodes"], d["u"])) * fr["nodes"]["n"]).sum(1)}
     if not fr["is_3d"]:
         return res
-    sec = sections(d, fr)
-    kap = -np.einsum("lij,lj->li", np.linalg.inv(sec["I"]), sec["m_eps"])
+    z_sec, kap = axis_curvature(d, fr, curvature)
     if closed is not None and closed.bows:
         e = closed.e
     else:
@@ -511,7 +560,7 @@ def analyse(d, mat, support="free", closed=None):
         e = k_max / np.linalg.norm(k_max) if np.linalg.norm(k_max) > 1e-9 else np.array([1.0, 0.0])
     zn, ubar = along_z_mean(fr["nodes"], d["u"])
     w = ubar[:, :2] @ e
-    res.update({"e": e, "e_perp": np.array([-e[1], e[0]]), "z_sec": sec["z"], "kappa": kap @ e,
+    res.update({"e": e, "e_perp": np.array([-e[1], e[0]]), "z_sec": z_sec, "kappa": kap @ e,
                 "z_nodes": zn, "u_bar": ubar, "w": w if support == "clamped" else chord(zn, w)})
     return res
 
@@ -1084,7 +1133,7 @@ def run_case(case_dir):
         sys.exit(f"{case}: no Temperature in {xdmf}; set 'temperature: module.func' in post.yaml")
     mat = load_material(path(cfg["material"]))
     cf = closed_form(cfg, mat, case_dir, frame(d))
-    res = analyse(d, mat, cfg.get("support", "free"), cf)
+    res = analyse(d, mat, cfg.get("support", "free"), cf, cfg.get("curvature", CURVATURE[0]))
     save_all([("z3st", res)], RESULTS, f"{case}_", case, cfg.get("stations_z"), levels=cfg.get("along_s_z"))
     return res
 

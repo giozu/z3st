@@ -16,7 +16,7 @@ No along-s panel at the statistical zero (< 1e-4).
 ## zmid (z = 487.5 mm)
 
 ```
-zmid, z = 487.5 mm: hot flat sud (1426.9 °C), cold flat nord (326.9 °C); hot vertex V5 (1425.6 °C), cold vertex V2 (329.0 °C)
+zmid, z = 487.5 mm: hot flat sud (1426.9 °C), cold flat nord (326.9 °C); hot vertex V5 (1425.6 °C), cold vertex V3 (329.0 °C)
 through the wall: inner face 909.41 °C, outer face 909.02 °C (hot face: none, ΔT = 0.39 K negligible against the 1.1e+03 K range)
 ```
 
