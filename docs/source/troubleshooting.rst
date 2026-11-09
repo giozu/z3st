@@ -16,7 +16,32 @@ Installation
 
 ``ModuleNotFoundError: No module named 'z3st'`` when running ``./Allrun``
    Z3ST is not installed in the environment. ``Allrun`` finds the shared runner
-   through ``import z3st``. Run ``pip install -e .`` from the repository root.
+   through ``import z3st``. Run ``python3 -m pip install -e .`` from the repository
+   root. First check that ``which python3`` points inside the ``z3st`` environment
+   (see the next entry).
+
+``/Library/Frameworks/Python.framework/.../python3: No module named z3st`` on macOS, with ``(z3st)`` in the prompt
+   ``python3`` is not the environment's interpreter: the path in the message is
+   outside ``envs/z3st``. Do not run ``pip install`` in this state. Seen in the
+   VS Code terminal, which starts a login shell and inherits the active environment:
+   ``~/.zprofile`` puts other directories ahead of ``envs/z3st/bin`` in ``PATH``, and
+   the prompt still shows ``(z3st)``. ``conda deactivate`` followed by
+   ``conda activate z3st`` did not change the order. Put the environment first:
+
+   .. code-block:: bash
+
+      export PATH="$CONDA_PREFIX/bin:$PATH"
+      which python3
+
+   To apply this to every new shell, add the same line, guarded, at the end of
+   ``~/.zshrc``:
+
+   .. code-block:: bash
+
+      [ -n "$CONDA_PREFIX" ] && export PATH="$CONDA_PREFIX/bin:$PATH"
+
+   Alternatively, set ``"terminal.integrated.inheritEnv": false`` in the VS Code
+   settings, restart VS Code and run ``conda activate z3st``.
 
 dolfinx version other than 0.11.0
    The environment was created without the pin. Recreate it, or reinstall with
