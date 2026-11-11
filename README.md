@@ -1,3 +1,8 @@
+> **Archived development history (June 2023 – September 2025).**
+> This branch preserves the original development history of z3st (formerly *zest*) before the public
+> release, with third-party documents and generated output files removed. It is read-only and not
+> maintained: the current code is on `main`.
+
 # ZEST: An Open-Source Framework for Thermo-Mechanical Analysis
 
 ## Overview
