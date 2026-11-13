@@ -1,0 +1,17 @@
+# Open cylinder filled with a heavy liquid up to its top edge.
+# Wall pressure p(z) = rho*g*(z_free - z): zero at the top, rho*g*Lz at the bottom.
+mechanical:
+  steel:
+  - type: Clamp_y
+    region: bottom
+
+  - type: Neumann
+    region: inner_radius
+    traction: 0.0        # (Pa) uniform part
+    hydrostatic:
+      rho: 10520.0       # (kg/m3) heavy liquid
+      z_free: 10.0       # (m) free surface
+
+  - type: Neumann
+    region: outer_radius
+    traction: 0.0        # (Pa)

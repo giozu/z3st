@@ -1,0 +1,13 @@
+name: lfr_vessel
+geometry_type: cyl
+
+Ri: 6.25 # inner radius (m), ELSY D = 12.5 m (Waltar Table 18.1)
+Ro: 6.30 # outer radius (m), t = 50 mm assumed
+H: 9.5   # inner height, bottom pole to top edge (m), ELSY (Waltar Table 18.1)
+
+labels:
+  inner: 10
+  outer: 11
+  symmetry_axis: 12
+  top_edge: 13
+  steel: 1

@@ -127,6 +127,7 @@ boundary_conditions.yaml
      - {type: Clamp_y,   region: top, value: -1.0e-6}   # prescribed u_y (m)
      - {type: Slip_x,    region: xmin}            # u_x free, u_y = u_z = 0
      - {type: Neumann,   region: inner, traction: -1.0e6}   # (Pa) t = value * n
+     - {type: Neumann,   region: wet, traction: 0.0, hydrostatic: {rho: 10520.0, z_free: 9.0}}   # liquid head, see usage
 
    damage:
      steel:

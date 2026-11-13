@@ -1,0 +1,20 @@
+{
+    "results": {
+        "L2_error_N_theta": {
+            "numerical": 0.0035266642862615246,
+            "reference": 0.0,
+            "abs_error": 0.0035266642862615246,
+            "rel_error": 0.0035266642862615246,
+            "status": "PASS"
+        },
+        "max_sigma_zz_over_hoop": {
+            "numerical": 0.0010241804701627043,
+            "reference": 0.0,
+            "abs_error": 0.0010241804701627043,
+            "rel_error": 0.0010241804701627043,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 0.01,
+    "summary": "PASS"
+}

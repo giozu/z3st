@@ -787,11 +787,23 @@ Mechanical conditions
      - none
      - The named component is free, the others are zero.
    * - ``Neumann``
-     - ``traction`` (Pa), scalar or a list with one value per time point
-     - :math:`\boldsymbol{\sigma}\mathbf{n} = t\,\mathbf{n}`.
+     - ``traction`` (Pa), scalar or a list with one value per time point;
+       optional ``hydrostatic: {rho, z_free, g}``
+     - :math:`\boldsymbol{\sigma}\mathbf{n} = (t - p_h)\,\mathbf{n}`, with
+       :math:`p_h = 0` unless ``hydrostatic`` is given.
 
 The scalar traction acts along the outward normal :math:`\mathbf{n}`. A positive
 value is a tension. A pressure :math:`p` on a surface is ``traction: -p``.
+
+``hydrostatic`` adds the head of a liquid of density ``rho`` (kg/m³) with its
+free surface at ``z_free`` (m):
+:math:`p_h = \rho\,g\,\max(z_\mathrm{free} - z,\,0)`, compressive, zero above the
+free surface. :math:`z` is the vertical mesh coordinate (``y`` in ``2d`` and
+``axisymmetric``, ``z`` in 3-D), so ``z_free`` is given in the mesh frame.
+``g`` defaults to 9.81 m/s² and is independent of ``mechanical.gravity``, which
+loads only the solid's own weight: the liquid and the self-weight can be
+switched on separately. Verified in
+``verification/mechanics/hydrostatic_cylinder``.
 
 ``Clamp_x``, ``Clamp_y`` and ``Clamp_z`` on the faces ``xmin``, ``ymin`` and
 ``zmin`` of a box fix one component on each whole face. The faces act as three

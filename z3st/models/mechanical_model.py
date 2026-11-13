@@ -83,6 +83,9 @@ class MechanicalModel:
 
         for mat_type, bc_list in mechanical_bcs_defs.items():
             for bc_info in bc_list:
+                # bc_info is the dictionary of an entry of boundary_conditions.yaml
+                # therefore, we can use bc_info.get("region") to get the entry "inner_radius"
+                # (if we defined "region: inner_radius" in boundary_conditions.yaml)
                 region_name = bc_info.get("region")
                 bc_type = bc_info.get("type")
 
@@ -218,14 +221,30 @@ class MechanicalModel:
 
         n_vec = self._regime_normal()
 
+        # Hydrostatic boundary condition, e.g., liquid head on top of the uniform part
+        #   hydrostatic: {rho: <kg/m3>, z_free: <m>}  ->  p_h = rho*g*max(z_free - z, 0)
+        # compressive, so it enters with the sign of a negative traction.
+        # Vertical coordinate = the one gravity acts on: x[tdim-1].
+        extra = 0.0
+        hydro = bc_info.get("hydrostatic") # this gets {rho: 10520.0, z_free: 9.0}, if the key misses, it gets None (and skips the next loop)
+        if hydro is not None:
+            # ufl.SpatialCoordinate(mesh)[0] <--> x
+            # ufl.SpatialCoordinate(mesh)[1] <--> y
+            # 2D, tdim = 2
+            z = ufl.SpatialCoordinate(self.mesh)[self.mgr.tdim - 1]
+            g = float(hydro.get("g", 9.81))
+            extra = float(hydro["rho"]) * g * ufl.max_value(float(hydro["z_free"]) - z, 0.0)
+            print(f"  [INFO] hydrostatic head on '{region_name}': rho = {hydro['rho']} kg/m3, z_free = {hydro['z_free']} m")
+
         # T = p * n
-        traction_expr = traction_const * n_vec
+        traction_expr = (traction_const - extra) * n_vec
 
         self.traction[mat_type].append({
             "id": region_id,
             "region_name": region_name,
             "value": traction_expr,  # --> in weak form
             "const": traction_const, # --> in the loop
+            "extra": extra,          # --> hydrostatic head (step-independent)
             "raw": raw_value,        # --> list
         })
 
@@ -839,7 +858,7 @@ class MechanicalModel:
 
                     n_vec = self._regime_normal()
 
-                    bc["value"] = bc["const"] * n_vec
+                    bc["value"] = (bc["const"] - bc.get("extra", 0.0)) * n_vec
 
             u_m, v_m = ufl.TrialFunction(self.V_m), ufl.TestFunction(self.V_m)
             a_m, L_m = 0, 0

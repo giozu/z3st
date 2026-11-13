@@ -1,0 +1,22 @@
+# LFR vessel, isothermal, two loads:
+#  - lead head on the wetted surface, p(z) = rho*g*(z_free - z);
+#  - self-weight of the steel (mechanical.gravity in input.yaml).
+# The vessel hangs from the support ring at the top edge.
+mechanical:
+  steel:
+  - type: Neumann
+    region: inner
+    traction: 0.0        # (Pa) cover gas at about atmospheric pressure
+    hydrostatic:
+      rho: 10520.0       # (kg/m3) lead, z3st materials/lead.yaml
+      z_free: 9.0        # (m) free surface, 0.5 m below the top edge (assumed)
+
+  - type: Neumann
+    region: outer
+    traction: 0.0        # (Pa)
+
+  - type: Clamp_y        # hung from the support ring
+    region: top_edge
+
+  - type: Clamp_x        # axis of symmetry
+    region: symmetry_axis

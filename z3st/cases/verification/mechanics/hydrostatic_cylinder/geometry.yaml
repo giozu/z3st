@@ -1,0 +1,13 @@
+name: cylindrical_shell
+geometry_type: cyl
+
+Ri: 2.40 # inner radius (m)
+Ro: 2.50 # outer radius (m)
+Lz: 10.0 # height = liquid free surface (m)
+
+labels:
+  inner_radius: 1
+  outer_radius: 2
+  bottom: 3
+  top: 4
+  steel: 10
