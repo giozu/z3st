@@ -66,7 +66,7 @@ dev = [
 # Optional: Neural network material laws, via FEniCSx external operators.
 nn = [
     "torch",
-    "dolfinx-external-operator",  # imported lazily by nn_conductivity and thermal_model
+    "dolfinx-external-operator",  # nn_conductivity and thermal_model (lazy); mechanical_model for stress_operator laws
     "setuptools>=77.0.3,<82",  # torch requires <82; fenics-ffcx requires >=77.0.3
 ]
 

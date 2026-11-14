@@ -1,0 +1,34 @@
+{
+    "results": {
+        "sigma_zz_curve": {
+            "numerical": 475761413.94897413,
+            "reference": 475761413.9489741,
+            "abs_error": 5.960464477539063e-08,
+            "rel_error": 6.264131876590488e-16,
+            "status": "PASS"
+        },
+        "cumulative_slip_final": {
+            "numerical": 0.018668033910431613,
+            "reference": 0.018668033910431606,
+            "abs_error": 6.938893903907228e-18,
+            "rel_error": 3.7169923395252716e-16,
+            "status": "PASS"
+        },
+        "other_stress_components": {
+            "numerical": 6.77309259156194e-16,
+            "reference": 0.0,
+            "abs_error": 6.77309259156194e-16,
+            "rel_error": 6.77309259156194e-16,
+            "status": "PASS"
+        },
+        "saturation_gap": {
+            "numerical": 0.10814866479650696,
+            "reference": 0.10814866479650696,
+            "abs_error": 0.0,
+            "rel_error": 0.0,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 1e-05,
+    "summary": "PASS"
+}

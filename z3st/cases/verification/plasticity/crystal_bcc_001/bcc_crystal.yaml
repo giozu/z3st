@@ -1,0 +1,19 @@
+name: bcc_crystal
+
+constitutive: custom
+stress_function: "materials.crystal_plasticity.crystal_stress"
+
+crystal: bcc                  # {110}<111> + {112}<111>, 24 slip systems
+euler_angles: [0.0, 0.0, 0.0] # Bunge angles (deg): crystal axes on the sample axes
+
+E: 200.0e+9     # Young's modulus (Pa)
+nu: 0.3         # Poisson's ratio
+g0: 200.0e+6    # slip resistance (Pa)
+gamma0: 0.001   # reference slip rate (1/s)
+n_pow: 5.0      # rate exponent
+
+k: 50.0         # thermal conductivity (W/m K), unused
+cp: 400.0       # specific heat (J/kg K), unused
+rho: 7800.0     # density (kg/m3)
+alpha: 1.2e-5   # thermal expansion (1/K), unused
+T_ref: 300.0    # reference temperature (K)

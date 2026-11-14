@@ -100,13 +100,16 @@ class PlasticityModel:
             if hasattr(module, 'get_cp_internal_variables'):
                 get_vars_func = getattr(module, 'get_cp_internal_variables')
                 T_field = self.T if self.on.get("thermal", False) else None
-                ep_new = get_vars_func(u, T_field, material, model=self)
+                out = get_vars_func(u, T_field, material, model=self)
 
-                # Calculate p_new from ep_new
-                # NOTE: For J2 plasticity, p = sqrt(3/2 * ep:ep) is exact.
-                #       For crystal plasticity, this gives p ≈ 0.866*γ instead of p = γ.
-                #       This is acceptable if p is not used in the constitutive law.
-                #       For slip-system hardening, p should be computed as cumulative slip.
+                # A law may return (ep_new, p_new), with p_new its own
+                # cumulative slip (needed by slip-system hardening).
+                if isinstance(out, tuple):
+                    return out
+
+                # Otherwise p falls back to the J2 equivalent plastic strain,
+                # which is about 0.866*γ on a single slip system.
+                ep_new = out
                 p_new = ufl.sqrt(1.5 * ufl.inner(ep_new, ep_new))
                 return ep_new, p_new
             else:

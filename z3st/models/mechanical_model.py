@@ -14,6 +14,14 @@ import ufl
 from dolfinx.fem.petsc import NonlinearProblem
 from petsc4py import PETSc
 
+# Optional. Imported here and not at the point of use: the package registers a
+# new UFL type, which must exist before UFL builds its type-dispatch tables.
+try:
+    import dolfinx_external_operator as dxo
+    from dolfinx_external_operator.petsc import assemble_residual_with_callback
+except ImportError:
+    dxo = None
+
 from z3st.core.solver import (
     aitken_omega,
     as_bool,
@@ -884,7 +892,12 @@ class MechanicalModel:
                         if self.applies_eigenstress(material):
                             F_m += w * ufl.inner(self.sigma_th(T_current, material), self.epsilon(v_m)) * dx
                     else:
-                        sigma = self.sigma_mech(u_new, material)
+                        if "stress_operator" in material:
+                            # Stress from a local solve outside UFL (external
+                            # operator), e.g. implicit crystal plasticity.
+                            sigma = self.resolve_function(material["stress_operator"])(u_new, material, self)
+                        else:
+                            sigma = self.sigma_mech(u_new, material)
                         F_m += w * ufl.inner(sigma, self.epsilon(v_m)) * dx - w * ufl.dot(body_force, v_m) * dx
                         # Eigenstress on the residual — mirrors the linear path.
                         if self.applies_eigenstress(material):
@@ -975,13 +988,39 @@ class MechanicalModel:
                         **ksp_opts,
                     }
 
+                # External operators: differentiate first, then replace each
+                # operator and its derivative by the coefficient that holds
+                # its values, refreshed before every residual assembly.
+                J_m, external_operators = None, []
+                if F_m.base_form_operators():
+                    if dxo is None:
+                        raise ImportError("this material law needs the dolfinx-external-operator package")
+                    J_m = ufl.algorithms.expand_derivatives(ufl.derivative(F_m, u_new, u_m))
+                    F_m, F_ops = dxo.replace_external_operators(F_m)
+                    J_m, J_ops = dxo.replace_external_operators(J_m)
+                    external_operators = F_ops + J_ops
+
+                    def _evaluate_external_operators():
+                        dxo.evaluate_external_operators(external_operators, dxo.evaluate_operands(external_operators))
+
+                    self._evaluate_external_operators = _evaluate_external_operators
+
                 problem_m = NonlinearProblem(
                     F_m,
                     u_new,
                     bcs=bcs_mech,
+                    J=J_m,
                     petsc_options=petsc_opts_mech,
                     petsc_options_prefix="elasticity_",
                 )
+
+                if external_operators:
+                    from functools import partial
+                    problem_m.solver.setFunction(
+                        partial(assemble_residual_with_callback, u_new, problem_m.F, problem_m.J,
+                                bcs_mech, self._evaluate_external_operators, []),
+                        problem_m.b,
+                    )
 
             self._mech_cache = {
                 "step": self.current_step,

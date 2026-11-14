@@ -57,6 +57,7 @@ conductivity model (`type: neural_network`, `gpr` or `magni`).
 | Module | Functions |
 |---|---|
 | `ceramic.py` | `k(T)`, a constant 2.5 W/m K written as a function |
+| `crystal_plasticity.py` | `crystal_stress` and `get_cp_internal_variables`: small-strain rate-dependent crystal plasticity on the fcc {111}<110> or bcc {110}<111> + {112}<111> slip systems, with the orientation from `euler_angles`; `crystal_stress_operator` (card key `stress_operator`): the same law integrated implicitly, as an external operator with a local Newton solve, with optional slip-system hardening (`hardening: saturation`, or `dislocation_density` with a Taylor resistance and Kocks-Mecking evolution); `uniaxial_reference` and `saturation_stress` for verification |
 | `oxide.py` | `k(T)` (constant, micron units), `Gc(mesh)` and `Gc_numpy(y)`, a tanh transition from a grain-boundary to a bulk toughness |
 | `fuel_thermal.py` | `k(T)`, UO₂ modified NFI correlation (Ohira and Itagaki 1997, as adopted in FRAPCON-3) at zero burnup, 95 % TD; burnup degradation not included |
 | `magni_mox_thermal.py` | `k(T, ...)` and numpy versions, MA-MOX conductivity of Magni et al. (INSPYRE coefficients) |

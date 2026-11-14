@@ -1,0 +1,28 @@
+name: fcc_crystal
+
+constitutive: custom
+stress_function: "materials.crystal_plasticity.crystal_stress"
+stress_operator: "materials.crystal_plasticity.crystal_stress_operator"  # implicit (backward Euler) local solve
+
+crystal: fcc                  # {111}<110>, 12 slip systems
+euler_angles: [0.0, 0.0, 0.0] # Bunge angles (deg): crystal axes on the sample axes
+
+E: 200.0e+9     # Young's modulus (Pa)
+nu: 0.3         # Poisson's ratio
+gamma0: 0.001   # reference slip rate (1/s)
+n_pow: 5.0      # rate exponent
+
+hardening: dislocation_density
+tau0: 20.0e+6        # lattice friction (Pa)
+alpha_taylor: 0.3    # Taylor coefficient
+burgers: 2.5e-10     # Burgers vector (m)
+rho0: 1.0e+11        # initial dislocation density per system (1/m2)
+k1: 1.3e+8           # storage coefficient (1/m)
+k2: 10.0             # dynamic-recovery coefficient
+a_latent: 1.0        # interaction between different systems
+
+k: 50.0         # thermal conductivity (W/m K), unused
+cp: 400.0       # specific heat (J/kg K), unused
+rho: 7800.0     # density (kg/m3)
+alpha: 1.2e-5   # thermal expansion (1/K), unused
+T_ref: 300.0    # reference temperature (K)

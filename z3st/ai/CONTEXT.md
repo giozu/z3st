@@ -435,6 +435,8 @@ BCs: only `Dirichlet` on D (e.g. `D=0` on healthy boundary).
 - **J2 plasticity** with isotropic linear hardening; constitutive update computed symbolically through `ufl.conditional` (returns stress `σ = σ_tr − 3μ Δp n`, yield stress `σ_y = σ_y0 + H p`).
 - History fields `ep`, `p`, `ep_n`, `p_n` on quadrature spaces.
 - `mode: custom` in `plasticity:` block hooks a user crystal-plasticity function `get_cp_internal_variables` inside the material's module — used by the `verification/plasticity/crystal_single_grain` case.
+- `get_cp_internal_variables` may return `(ep_new, p_new)`: `p` is then the law's own cumulative slip. If it returns `ep_new` alone, `p` is the J2 equivalent plastic strain. `materials/crystal_plasticity.py` is the library multi-slip law (small strain, slip rates on the trial stress: explicit in the plastic strain, first-order in time).
+- **External operators** (`dolfinx-external-operator`, optional dependency): a material card with `stress_operator: module.func` gets its weak-form stress from `func(u, material, model)`, which returns a `FEMExternalOperator` of the strain on `V_pl`. `_mechanical_step` differentiates the residual, replaces the operators by their coefficients and re-evaluates them before every SNES residual assembly (`self._evaluate_external_operators`). `stress_function` still provides the output stress. Used by `crystal_stress_operator` (implicit crystal plasticity, local Newton in numpy, hand-written consistent tangent). Card key `hardening` selects slip-system hardening: `saturation` (`dg_a/dt = sum_b q_ab h0 (1 - g_b/g_sat)^a |dgamma_b/dt|`) or `dislocation_density` (Taylor `g_a = tau0 + alpha G b sqrt(F_a)`, Kocks-Mecking `drho_a/dt = (k1 sqrt(F_a) - k2 rho_a)|dgamma_a/dt|`, `F_a = sum_b A_ab rho_b`). A law is a closure `law(z, |rate|) -> (g, dg/dz, M, D)` built by `_hardening`; the variables z (g or rho) join the local unknowns, live per material in `model.slip_state_n` (quadrature space, one component per slip system), listed in `_SNAPSHOT_DICTS` for rollback, and advance in `get_cp_internal_variables` once per accepted step. The local Newton falls back on continuation in dt when the trial stress is far above the slip resistance.
 - `update_plastic_history(u)` refreshes `ep_n`, `p_n` after the staggered iteration converges.
 
 ### 4.5 Gap conductance (`gap_model.py`)
@@ -662,6 +664,14 @@ The suite is driven by `z3st/cases/non-regression_local.sh` (local) and `non-reg
 - `U_cluster_dynamics_test`, `U_quarter_block` — unvalidated sandboxes under `cases/sandbox/`.
 
 **verification/plasticity/crystal_single_grain** — crystal-plasticity single-grain demo using the `custom` constitutive + `plasticity.mode: custom` hook.
+
+**verification/plasticity/crystal_fcc_001**, **crystal_bcc_001** — multi-slip crystal plasticity with the library law `materials/crystal_plasticity.py` (fcc 12 systems, bcc 24), tension along [001], checked to 1e-5 against the material-point integration of the same scheme.
+
+**verification/plasticity/crystal_fcc_001_implicit** — the fcc case with the implicit (backward Euler) law as an external operator; reaches the exact saturation stress.
+
+**verification/plasticity/crystal_fcc_001_hardening** — the same with slip-system hardening (saturation law with latent hardening).
+
+**verification/plasticity/crystal_fcc_001_dislocation_density** — the same with dislocation densities per slip system (Taylor + Kocks-Mecking).
 
 ### 6.2 Typical `input.yaml` structure
 

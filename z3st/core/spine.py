@@ -937,7 +937,7 @@ class Spine(
         "p", "ep", "p_n", "ep_n",
         "porosity", "porosity_n",
     )  # dolfinx Functions
-    _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0")
+    _SNAPSHOT_DICTS = ("eps_cr", "_dgamma0", "slip_state_n")
     _SNAPSHOT_MATERIAL_KEYS = ("E", "nu", "bulk_modulus", "_lhr_max")
     _SNAPSHOT_MATERIAL_CONSTANTS = ("lmbda", "G")
 
@@ -954,6 +954,7 @@ class Spine(
         - the burnup accumulator and the cluster pair c / c_n;
         - the plasticity history p, ep, p_n, ep_n;
         - the per-material creep dicts eps_cr and _dgamma0;
+        - the per-material hardening variables slip_state_n (crystal plasticity);
         - per-material cracking scalars (``_lhr_max`` is a running max that
           does not decrease) and the live lmbda/G Constants.
 

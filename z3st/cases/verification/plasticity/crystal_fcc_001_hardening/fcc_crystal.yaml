@@ -1,0 +1,25 @@
+name: fcc_crystal
+
+constitutive: custom
+stress_function: "materials.crystal_plasticity.crystal_stress"
+stress_operator: "materials.crystal_plasticity.crystal_stress_operator"  # implicit (backward Euler) local solve
+
+crystal: fcc                  # {111}<110>, 12 slip systems
+euler_angles: [0.0, 0.0, 0.0] # Bunge angles (deg): crystal axes on the sample axes
+
+E: 200.0e+9     # Young's modulus (Pa)
+nu: 0.3         # Poisson's ratio
+g0: 200.0e+6    # initial slip resistance (Pa)
+hardening: saturation
+h0: 5.0e+9      # hardening modulus (Pa)
+g_sat: 300.0e+6 # saturation slip resistance (Pa)
+a_hard: 2.25    # hardening exponent
+q_latent: 1.4   # latent-hardening ratio
+gamma0: 0.001   # reference slip rate (1/s)
+n_pow: 5.0      # rate exponent
+
+k: 50.0         # thermal conductivity (W/m K), unused
+cp: 400.0       # specific heat (J/kg K), unused
+rho: 7800.0     # density (kg/m3)
+alpha: 1.2e-5   # thermal expansion (1/K), unused
+T_ref: 300.0    # reference temperature (K)

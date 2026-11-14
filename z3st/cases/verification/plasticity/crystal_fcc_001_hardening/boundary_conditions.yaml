@@ -1,0 +1,61 @@
+mechanical:
+  grain:
+  # symmetry planes: with the crystal axes on the sample axes the response is
+  # homogeneous and the stress is uniaxial along z
+  - type: Dirichlet_x
+    region: xmin
+    displacement: 0.0
+
+  - type: Dirichlet_y
+    region: ymin
+    displacement: 0.0
+
+  - type: Dirichlet_z
+    region: zmin
+    displacement: 0.0
+
+  # 1 % strain in 2 s (strain rate 0.005 1/s)
+  - type: Dirichlet_z
+    region: zmax
+    displacement:
+      - 0.00000
+      - 0.00025
+      - 0.00050
+      - 0.00075
+      - 0.00100
+      - 0.00125
+      - 0.00150
+      - 0.00175
+      - 0.00200
+      - 0.00225
+      - 0.00250
+      - 0.00275
+      - 0.00300
+      - 0.00325
+      - 0.00350
+      - 0.00375
+      - 0.00400
+      - 0.00425
+      - 0.00450
+      - 0.00475
+      - 0.00500
+      - 0.00525
+      - 0.00550
+      - 0.00575
+      - 0.00600
+      - 0.00625
+      - 0.00650
+      - 0.00675
+      - 0.00700
+      - 0.00725
+      - 0.00750
+      - 0.00775
+      - 0.00800
+      - 0.00825
+      - 0.00850
+      - 0.00875
+      - 0.00900
+      - 0.00925
+      - 0.00950
+      - 0.00975
+      - 0.01000
