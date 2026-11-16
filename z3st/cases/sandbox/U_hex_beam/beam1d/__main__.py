@@ -10,7 +10,8 @@ beam1d.case; the section is the undeformed hexagonal wall (hex_shell) of geometr
 
 Unknowns: the centroid displacements u_x(z), u_y(z) (two Hermite bending
 planes) and u_z(z) (linear rod). Fibre strain eps = u_z' - x u_x'' - y u_y'',
-stress sigma = E (eps - eps*). With E uniform over the section (B1 = 0) the
+stress sigma = E (eps - eps*). 
+With E uniform over the section (B1 = 0) the
 three problems decouple (Ma et al. 2019, Eq. 17):
 
     (EA (u_z' - eps0*))' + q_z = 0
