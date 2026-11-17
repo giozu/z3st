@@ -274,7 +274,10 @@ class ThermalModel:
             print("\n[INFO] Assembling thermal problem...")
             u_t, v_t = ufl.TrialFunction(self.V_t), ufl.TestFunction(self.V_t)
             a_t = 0
-            L_t = 0
+            # A zero Constant, not the int 0: with no heated material and no
+            # Neumann/Robin term L_t would otherwise stay an int, not a form.
+            zero = dolfinx.fem.Constant(self.mesh, PETSc.ScalarType(0.0))
+            L_t = zero * v_t * ufl.dx(domain=self.mesh)
 
             # Volume integrals
             for label, material in self.materials.items():

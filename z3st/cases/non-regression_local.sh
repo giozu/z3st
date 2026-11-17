@@ -23,6 +23,12 @@
 # The script exits non-zero if any case failed.
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
+# Single-threaded BLAS: a multithreaded reduction under MUMPS is not
+# reproducible, and shrink_fit_disk moved by ~1e-5 between identical runs.
+# Override by setting the variables before the call.
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-1}"
+export OPENBLAS_NUM_THREADS="${OPENBLAS_NUM_THREADS:-1}"
+
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 EXCLUDE_FILE="${ROOT_DIR}/suite_exclude.txt"
 SUMMARY_FILE="${ROOT_DIR}/non-regression_summary.txt"

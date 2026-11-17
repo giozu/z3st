@@ -38,6 +38,7 @@ verification/thermal/thin_cylindrical_shell_dirichlet_2D
 verification/thermal/thick_slab_adiabatic_3D
 verification/thermal/box_heated
 verification/thermal/two_heated_materials_2D   # 8 s; the only case with two heated materials in contact
+verification/thermal/heated_unheated_bonded_2D   # 9 s; the only case with a heated and an unheated material sharing nodes
 verification/thermal/coaxial_gap_3D   # 74 s
 
 

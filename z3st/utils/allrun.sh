@@ -17,6 +17,13 @@
 # cd below lands in the case directory no matter where the suite invokes it.
 
 set -e
+
+# Single-threaded BLAS: a multithreaded reduction under MUMPS is not
+# reproducible, and shrink_fit_disk moved by ~1e-5 between identical runs.
+# Override by setting the variables before the call.
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-1}"
+export OPENBLAS_NUM_THREADS="${OPENBLAS_NUM_THREADS:-1}"
+
 cd "${0%/*}" || exit 1
 
 gmsh mesh.geo -"${DIM:-2}" > log_mesh.md

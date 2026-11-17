@@ -1,0 +1,20 @@
+{
+    "results": {
+        "Linf_error_T": {
+            "numerical": 1.1027623258996755e-11,
+            "reference": 0.0,
+            "abs_error": 1.1027623258996755e-11,
+            "rel_error": 2.6256245854754176e-13,
+            "status": "PASS"
+        },
+        "T_rise_max": {
+            "numerical": 41.99999999999102,
+            "reference": 42.0,
+            "abs_error": 8.981260180007666e-12,
+            "rel_error": 2.1383952809542062e-13,
+            "status": "PASS"
+        }
+    },
+    "tolerance": 1e-06,
+    "summary": "PASS"
+}
