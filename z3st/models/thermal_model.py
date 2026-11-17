@@ -287,16 +287,21 @@ class ThermalModel:
                 cp = material["cp"]
                 rho_cp = rho * cp
 
-                # Diffusion + source (always present)
+                # Diffusion + source. The source is integrated only over the
+                # materials that generate it: q_third is nodal (CG1), so an
+                # unheated neighbour sharing interface nodes would otherwise
+                # receive a spurious linearly decaying source (half an element
+                # of extra power along the interface).
                 a_t += w * k * ufl.inner(ufl.grad(u_t), ufl.grad(v_t)) * dx
-                if self.on.get("porosity", False) and p_new is not None:
-                    p0 = float(material.get("initial_porosity", 0.0))
-                    if p0 < 0.99:
-                        L_t += w * self.q_third * ((1.0 - p_new) / (1.0 - p0)) * v_t * dx
+                if self._is_heated(material):
+                    if self.on.get("porosity", False) and p_new is not None:
+                        p0 = float(material.get("initial_porosity", 0.0))
+                        if p0 < 0.99:
+                            L_t += w * self.q_third * ((1.0 - p_new) / (1.0 - p0)) * v_t * dx
+                        else:
+                            L_t += w * self.q_third * v_t * dx
                     else:
                         L_t += w * self.q_third * v_t * dx
-                else:
-                    L_t += w * self.q_third * v_t * dx
 
                 # Mass term (backward Euler, only for transient)
                 # self.T holds the converged temperature from the previous time step (T^n)
@@ -423,6 +428,12 @@ class ThermalModel:
             prev_res_T = self._adapt_relax("T", res_curr, prev_res_T)
 
         return conv_th, norm_dT, rel_norm_dT, prev_res_T
+
+    @staticmethod
+    def _is_heated(material):
+        """True if the material generates heat (fissile or gamma-heated)."""
+        return bool(material.get("fissile", False)) or float(material.get("gamma_heating", 0.0)) > 0.0
+
     def _thermal_conductivity_aux_operands(self, material):
         """Auxiliary operands for data-driven k(T, ...).
 
@@ -528,7 +539,8 @@ class ThermalModel:
                 )
                 # residual of  ∫ k ∇T·∇v dx − ∫ q''' v dx
                 F += w * k_op * ufl.inner(ufl.grad(T_new), ufl.grad(v_t)) * dx
-                F += -w * self.q_third * v_t * dx
+                if self._is_heated(material):
+                    F += -w * self.q_third * v_t * dx
 
             # Neumann (residual sign: linear path uses L_t += w*(-value)*v)
             for label in self.materials:
