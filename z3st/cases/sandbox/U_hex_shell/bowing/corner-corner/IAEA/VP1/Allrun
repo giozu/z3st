@@ -2,7 +2,7 @@
 # IAEA VP1: the mesh takes D, H, t, orientation and nf/nt/nz from geometry.yaml
 # (without geo_args gmsh falls back to the mesh.geo defaults: D 0.2, H 1, flat).
 # Constant properties, T from the Dirichlet in boundary_conditions.yaml; the benchmark
-# scripts (vp1_benchmark, vp1_corners, ../along_y, ../iwgfr_table) use vp1_temperature: not run.
+# scripts (vp1_benchmark, ../corners, ../iwgfr_table) use vp1_temperature: not run.
 set -e
 cd "${0%/*}" || exit 1
 

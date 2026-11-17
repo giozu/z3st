@@ -30,9 +30,9 @@ with open(os.path.join(HERE, "geometry.yaml")) as _f:
     _geo = yaml.safe_load(_f)
 
 
-D = float(_geo["D"]) - 2.0 * float(_geo["t"]) / np.sqrt(3.0) # (m)
-# corner-to-corner depth at mid-wall, the bending direction: 0.150 m in VP1.
-# geometry.yaml D is the outer circumscribed diameter; the mid-wall corner is t/sqrt(3) inside it.
+D = 0.150  # (m)
+# corner-to-corner depth at mid-wall, the bending direction, as in the MOOSE VP1 input (temp_func at y = +-0.075 m).
+# From geometry.yaml it is D - 2 t / sqrt(3) = 0.149999999 m (D is the outer circumscribed diameter, rounded).
 
 # Hot-corner direction (in rad). 'vertical': corners on +-y as in the MOOSE VP1 input (temp_func, hot at y = -0.075 m); 
 # 'flat': corners on +-x, hot at -x as in the VTB figure.

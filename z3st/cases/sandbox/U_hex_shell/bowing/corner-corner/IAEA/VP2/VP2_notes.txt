@@ -1,111 +1,219 @@
-IAEA VP2 - IWGFR/75 App. 2, EXAMPLE 2: single wrapper, non-linear thermal gradient
+IAEA VP2 - IWGFR/75 App. 2, EXAMPLE 2: guaina singola, gradiente termico non lineare
 ==================================================================================
 
-Case
+Caso
 ----
-As the former VP1 (same geometry, mesh, material, clamp, axial T profile); only the
-section temperature changes. Thermal model off: T is imposed as a material eigenstrain.
-(VP1 now solves T from a Dirichlet expression, see ../VP1/VP1_notes.txt.)
+Come il vecchio VP1 (stessa geometria, mesh, materiale, incastro, profilo assiale di T); cambia
+solo la temperatura della sezione. Modello termico spento: T è imposta come eigenstrain del materiale.
+(VP1 ora risolve T da un'espressione di Dirichlet, vedi ../VP1/VP1_notes.txt.)
 
-  geometry   D = 0.153464101 m (outer circumscribed), t = 3 mm, H = 4 m, orientation vertical
-             mid-wall corner-to-corner depth 0.150 m; mesh nf 8, nt 1, nz 400 (hex, 38496 nodes)
-  material   E 1.7e+11 Pa, nu 0.3, alpha 1.8e-5 1/K, T_ref 400 C (673.15 K)
-  BC         bottom fully clamped (u = 0); no thermal BCs
-  T          below the core (z < 1.5 m): 400 C everywhere
-             above the core top (z > 2.5 m): corners 1, 2, 6 at T1 = 500 C, corners 3, 4, 5 at T2 = 550 C
-             across the core: linear ramp in z, as VP1
-             section: T1 for h <= -D/4, linear for |h| < D/4, T2 for h >= D/4
-             (h along the hot-corner direction PHI_HOT = -pi/2, h = -y; hot corner 4 at -y)
-  coords     x, y, z global (IAEA: X east, Y north, Z up); local frame of hex_post:
-             xi through the wall, s along the flat at mid-wall, p mid-wall perimeter
-  solver     3d, mechanical linear (direct_mumps), 1 static step at t = 0, xdmf output
-             (4 steps until 2026-10-27, identical fields)
+  geometria  D = 0.153464101 m (circoscritto esterno), t = 3 mm, H = 4 m, orientation vertical
+             distanza tra gli spigoli a metà parete 0.150 m; mesh nf 8, nt 1, nz 400 (hex, 38496 nodi)
+  materiale  E 1.7e+11 Pa, nu 0.3, alpha 1.8e-5 1/K, T_ref 400 C (673.15 K)
+  BC         base incastrata (u = 0); nessuna BC termica
+  T          sotto il core (z < 1.5 m): 400 C ovunque
+             sopra il core top (z > 2.5 m): spigoli 1, 2, 6 a T1 = 500 C, spigoli 3, 4, 5 a T2 = 550 C
+             nel core: rampa lineare in z, come VP1
+             sezione: T1 per h <= -D/4, lineare per |h| < D/4, T2 per h >= D/4
+             (h lungo la direzione dello spigolo caldo PHI_HOT = -pi/2, h = -y; spigolo caldo 4 a -y)
+  coordinate x, y, z globali (IAEA: X est, Y nord, Z su); terna locale di hex_post:
+             xi nello spessore, s lungo il lato a metà parete, p perimetro a metà parete
+  solver     3d, meccanico lineare (direct_mumps), 1 passo statico a t = 0, output xdmf
+             (4 passi fino al 2026-10-27, campi identici)
 
-Files
------
-  Allrun                    mesh -> solve -> vp2_post -> vp2_benchmark -> vp2_corners -> along_y -> convergence plot
-  input.yaml                as VP1, output filename vp2_fields_3d
-  geometry.yaml             as VP1
-  boundary_conditions.yaml  clamp only (as the former VP1)
-  15_15Ti_local.yaml        as ../VP1/15_15Ti_local.yaml, eigenstrain: vp2_temperature.eigenstrain
-  mesh.geo                  copy of ../VP1/mesh.geo
-  post.yaml                 as VP1, temperature vp2_temperature.T_vp2, closed_form vp2:vp2_temperature
-  vp2_temperature.py        new section shape (only file with new physics)
-  vp2_post.py               hex_post figures with the VP2 closed form
-  vp2_benchmark.py          z3st vs IWGFR/75 and IWGFR/76 tables
-  vp2_corners.py            copy of vp1_corners.py on vp2_temperature
-  ../along_y.py             shared with VP1: T, stress, strain at mid-wall against y (half x >= 0)
-  ../iwgfr.py               shared with VP1: CRP codes (DT1BOW, AT1LEN) and IAEA declared values
-  ../iwgfr_table.py         shared with VP1: z3st vs every reference, diff (%), IAEA band
+File
+----
+  Allrun                    mesh -> solve -> vp2_benchmark -> ../corners.py . -> along_y -> iwgfr_table -> grafico di convergenza
+                            (figure di hex_post con la forma chiusa di VP2: U_hex_shell/Allpost)
+  input.yaml                come VP1, output vp2_fields_3d
+  geometry.yaml             come VP1
+  boundary_conditions.yaml  solo incastro (come il vecchio VP1)
+  15_15Ti_local.yaml        come ../VP1/15_15Ti_local.yaml, eigenstrain: vp2_temperature.eigenstrain
+  mesh.geo                  copia di ../VP1/mesh.geo
+  post.yaml                 come VP1, temperature vp2_temperature.T_vp2, closed_form vp2:vp2_temperature
+  vp2_temperature.py        nuova forma della sezione (unico file con fisica nuova)
+  vp2_benchmark.py          z3st contro le tabelle IWGFR/75 e IWGFR/76 (dati e figure; confronto in ../benchmark.py)
+  benchmark.ipynb           come ../VP1/benchmark.ipynb: benchmark (vp2_benchmark, widget) e spigoli lungo z (../corners.py);
+                            senza il pannello Fig. 2 (vp2_benchmark non ha figure_fig2)
+  vp2_section_nonlinear.ipynb   come ../VP1/vp1_step1_radial_dT.ipynb: T e forma chiusa (C = 4/3), sigma_zz
+                            autoequilibrata (+-E alpha dT / 6), bow e allungamento, anello iperstatico (Q1 e Q2,
+                            usa order2/corner_frame.py), soluzione analitica, punti aperti; salvato con gli output
+  ../along_y.py             condiviso con VP1: T, tensione, deformazione a metà parete contro y (metà x >= 0)
+  ../iwgfr.py               condiviso con VP1: codici CRP (DT1BOW, AT1LEN) e valori dichiarati IAEA
+  ../iwgfr_table.py         condiviso con VP1: z3st contro ogni riferimento, diff (%), banda IAEA
+  order2/
+    Allrun                  solve (mesh, BC e card di ../) -> corner_frame.py
+    input.yaml              come ../input.yaml con mechanical.order: 2, output vp2_Q2_fields_3d
+    vp2_temperature.py      ../vp2_temperature.py senza modifiche (shim con lo stesso nome, come
+                            VP1/z_uniform/vp1_temperature.py): la card e hex_post lo trovano da qui
+    corner_frame.py         momento iperstatico dell'anello agli spigoli: forma chiusa contro Q1 (../) e Q2;
+                            vp2_corner_{along_s,along_z}.png, vp2_corner_summary.json
 
-No native z3st file and no shared U_hex_shell file (hex_post.py) was changed.
+Nessun file nativo di z3st modificato. La forma chiusa VP2 (prima vp2_post.py) è hex_post.VP2 (closed_form vp2:).
 
-Dependencies and functions called
----------------------------------
+Dipendenze e funzioni chiamate
+------------------------------
   vp2_temperature.py
-    T1(z), T2(z)        corner temperatures, _ramp(z) across the core
-    section_shape(h)    0 / linear / 1 over the section
-    T_vp2(x)            T at x = (x, y, z), UFL or numpy
-    eigenstrain(...)    alpha (T_vp2(x) - T_ref) I, read by z3st through the material card
+    T1(z), T2(z)        temperature degli spigoli, _ramp(z) nel core
+    section_shape(h)    0 / lineare / 1 sulla sezione
+    T_vp2(x)            T in x = (x, y, z), UFL o numpy
+    eigenstrain(...)    alpha (T_vp2(x) - T_ref) I, letto da z3st tramite la card del materiale
 
-  vp2_post.py  (imports ../../../../hex_post.py as hp)
-    class VP2(hp.VP1)   kappa = C alpha (T2 - T1) / D, C integrated on the mid-wall perimeter
-                        (hp.perimeter_point) and checked against 4/3; references(): none,
-                        T not linear in (x, y)
-    closed_form(...)    'vp2:' -> VP2, otherwise hp.closed_form
-    run_case()          hp.load_z3st, hp.load_material, hp.frame, hp.analyse, hp.save_all
+  ../../../../hex_post.py
+    class VP2(VP1)      kappa = C alpha (T2 - T1) / D, C integrato sul perimetro a metà parete
+                        (perimeter_point) e controllato contro 4/3; references(): nessuna,
+                        T non lineare in (x, y)
+    closed_form(...)    'vp2:' -> VP2
 
-  vp2_benchmark.py  (hp, vp2_post)
-    z3st_profiles()     hp.load_z3st, vp2_post.closed_form, hp.analyse, section_dims
-    compare()           Y and Z at core top / LRP / URP, dimensions at z = 1.0 / 3.5 m;
-                        Z and dimensions rebased to the T_ref of each source
-                        (alpha (T_ref,case - T_ref,source))
-    figure(), figure_tables()   hp._table, hp._finish
+  vp2_benchmark.py  (../benchmark.py come bc)
+    z3st_profiles()     bc.profiles: hp.load_z3st, hp.closed_form, hp.analyse, section_dims
+    compare()           Y e Z a core top / LRP / URP, dimensioni a z = 1.0 / 3.5 m;
+                        Z e dimensioni riportate alla T_ref di ogni fonte
+                        (alpha (T_ref,caso - T_ref,fonte))
+    figure(), figure_tables()   bc.put_table, bc.axial_panel, bc.flagged_table, hp.finish
 
-  vp2_corners.py  (hp, vp2_post, vp2_temperature)
-    corner_profiles()   u_y, sigma_zz, sigma_ss, sigma_vm, eps_zz, eps_ss at the hot corner 4
-                        and the cold corner 1
+  ../corners.py <caso>  (hp; T1, T2, PHI_HOT del modulo della forma chiusa)
+    corner_profiles()   u_y, sigma_zz, sigma_ss, sigma_vm, eps_zz, eps_ss allo spigolo caldo 4
+                        e allo spigolo freddo 1
     figure_corners()
 
-  ../along_y.py <case>  (hp, the temperature module of post.yaml)
-    profiles()          hp.analyse, hp.perimeter_point: cells at the along_s_z heights on x >= 0,
-                        averaged through the wall, sorted by y; sigma_ss, sigma_zz, eps_ss, eps_zz, alpha (T - T_ref)
-    figure()            3 panels against y, corners 1, 2/6, 3/5, 4 marked
+  ../along_y.py <caso>  (hp, il modulo di temperatura di post.yaml)
+    profiles()          hp.analyse, hp.perimeter_point: celle alle quote along_s_z su x >= 0,
+                        mediate nello spessore, ordinate per y; sigma_ss, sigma_zz, eps_ss, eps_zz, alpha (T - T_ref)
+    figure()            3 pannelli contro y, spigoli 1, 2/6, 3/5, 4 marcati
 
-Closed form
------------
+  order2/corner_frame.py  (hp: load_z3st, load_material, frame, _import, _layers, perimeter_point,
+                          _s_axes, hot_cold, _finish, REF_STYLE, RUN_COLORS)
+    frame_closed_form() H, M_c, sigma_c del telaio esagonale (formule sotto)
+    frame_stiffness()   stesso telaio per rigidezza diretta (6 travi di Eulero-Bernoulli, EA finita):
+                        controllo indipendente, deve coincidere entro 0.1 %
+    walls(), plate_bending()   per ogni lato, nodi delle facce in griglia (z, s); w = u.n a metà parete;
+                        k_ss = d2w/ds2, k_zz = d2w/dz2, sigma_b = 6 D_b (k_ss + nu k_zz) / t^2
+    measures()          lungo z: media di sigma sui lati inclinati e pendenza dsigma/dy sui lati
+                        paralleli a y, come rapporto con la forma chiusa
+
+Forma chiusa (bow)
+------------------
   kappa(z) = alpha int theta h dp / int h^2 dp = C alpha (T2 - T1) / D
-  VP1 (T linear in h): C = 1; VP2: C = 4/3 -> URP bow 16.333 mm against 12.25 mm of VP1.
-  Mean section T is (T1 + T2) / 2 as in VP1: u_z is the VP1 one.
+  VP1 (T lineare in h): C = 1; VP2: C = 4/3 -> bow all'URP 16.333 mm contro i 12.25 mm di VP1.
+  T media della sezione (T1 + T2) / 2 come in VP1: u_z è quello di VP1.
 
-Reference data (mm)
--------------------
-  source                         T_ref   Y core top  Y LRP   Y URP    Z core top  Z LRP   Z URP
+Anello iperstatico: momento agli spigoli (2026-11-05)
+-----------------------------------------------------
+  Perché c'è. Sopra il core T non è armonica nella sezione: è lineare a tratti, con ginocchi
+  esattamente agli spigoli 2, 3, 5, 6 (h = +-D/4). Il teorema di Dundurs (hex_corner_closed_forms.md
+  §B4, note personali, fuori dal repo: /mnt/c/Users/Mat/Desktop/Newcleo/hex_corner_closed_forms.md) non vale, l'anello non chiude da solo e nascono momenti iperstatici. In VP1 (T lineare) M_c = 0
+  (../VP1/VP1_notes.txt, "Tensioni agli spigoli").
+
+  Ipotesi.
+  - Lontano dalle estremità: deformazione piana generalizzata (§B1-B3), eps_zz = a + b x + c y.
+  - Parete = piastra (sigma_nn = 0): deformazione libera di membrana (1+nu) alpha theta - nu eps_zz.
+    La parte -nu eps_zz è lineare in (x, y), quindi congruente; resta (1+nu) alpha theta.
+  - Nessun gradiente di T nello spessore: lati 1-2 e 6-1 a theta1, 3-4 e 4-5 a theta2, lati 2-3 e 5-6
+    (paralleli a y, normale x) con T lineare in y. Nessuna curvatura termica propria.
+  - Telaio esagonale a metà parete, lato R = 0.075 m, rigidezza flessionale per unità di lunghezza
+    D_b = E t^3 / 12 (1 - nu^2) = 420.3 N m; lati inestensibili (EA / (D_b / R^2) ~ 7500).
+
+  Metodo delle forze (i 7 passi di "CLOSED SOLUTIONS" in z3st PROCESS.txt, note personali,
+  /mnt/c/Users/Mat/Desktop/Newcleo/z3st PROCESS.txt).
+  1. Deformazione impressa: allungamento di ogni lato delta_i = (1+nu) alpha theta_i R (theta media sul lato).
+  2. Deformata libera, angoli fissi: percorrendo il semitelaio destro (1 -> 2 -> 3 -> 4) lo spigolo 4
+     si sposta in x di (sqrt(3)/2)(1+nu) alpha R (theta1 - theta2); per simmetria deve stare sull'asse.
+  3. Iperstatiche: taglio sull'asse di simmetria agli spigoli 1 e 4; X1 = H (orizzontale), X2 = M.
+  4. Equilibrio: M(eta) = M + H eta, eta = altezza sopra lo spigolo 4.
+  5. Legame: kappa = M / D_b (nessuna curvatura termica).
+  6. Congruenza: rotazione relativa nulla, int M ds = 0 -> M = -H R, cioè M(y) = H y (zero a y = 0);
+     spostamento orizzontale nullo, H int (eta - R)^2 ds / D_b = scarto, int = 5 R^3 / 4.
+  7. Soluzione:
+
+       M(y) = H y,   M_c = (2 sqrt(3) / 5) D_b (1+nu) alpha (T2 - T1) / R          (spigoli 1 e 4)
+       sigma_c = 6 M_c / t^2 = (sqrt(3) / 5) E alpha (T2 - T1) (t / R) / (1 - nu)
+
+     M_c = 4.543 N m/m, sigma_c = 3.03 MPa agli spigoli 1 e 4, metà (1.51 MPa) a 2, 3, 5, 6.
+     La forma chiusa dà valore e andamento; il segno viene da z3st: allo spigolo freddo 1 la faccia
+     interna è in trazione e l'esterna in compressione, allo spigolo caldo 4 il contrario
+     (il lato caldo, più largo, apre lo spigolo freddo). Lo spigolo interno rientrante, singolare, è
+     quindi aperto (in trazione) agli spigoli freddi 1, 2, 6 e compresso agli spigoli caldi 3, 4, 5.
+     Nelle figure gli spigoli IAEA 1 e 4 sono V2 (freddo) e V5 (caldo) dell'asse di hex_post.
+     Membrana trascurabile: N ~ H = 60.6 N/m -> 0.02 MPa.
+     Telaio per rigidezza diretta (EA finita): 4.5422 N m/m.
+
+  Estrazione da z3st. Una cella nello spessore: le tensioni DG0 sono a metà parete, dove la
+  flessione è nulla. Si usa la curvatura della linea media dagli spostamenti nodali:
+       sigma_b = 6 D_b (k_ss + nu k_zz) / t^2   (faccia interna; esterna con segno opposto)
+  con w = u.n lungo la normale uscente e eps_ss = eps_0 - zeta w,ss (Kirchhoff, zeta uscente).
+  Il termine nu k_zz serve: le pareti inclinate seguono l'inflessione della guaina,
+  k_zz = kappa_trave sin 60 = 8.0e-3 x 0.866 = 6.93e-3 1/m (misurato 6.93e-3), cioè +0.58 MPa;
+  sulle pareti parallele a y k_zz = 0. La differenza di eps_ss tra le due facce non va bene: la eps_ss
+  di membrana varia lungo y ((1+nu) alpha dtheta/dy = 0.0156 1/m) e i nodi delle due facce a pari
+  indice hanno y diverse.
+
+  Risultati (z = 3.0 m, a metà tra core top e punta):
+                         max |sigma_b|   max |FEM - forma chiusa|   media pareti inclinate   pendenza pareti parallele
+    z3st Q2              2.87 MPa        0.06 MPa                   x1.008                   x0.983
+    z3st Q1              3.15 MPa        1.67 MPa                   x1.139                   x-0.54 (segno sbagliato)
+  - A z = 3.0 m Q2 riproduce la forma chiusa su tutto l'anello (M lineare in y, continuo agli spigoli).
+    Non è un plateau: 3.0 m è un punto di attraversamento della pendenza (sotto).
+  - La media sulle pareti inclinate è x1.008 da 2.5 a ~3.9 m (scende fino a x0.86 negli ultimi ~10 cm).
+    Non prova da sola la deformazione piana: la media non vede la parte dispari lungo ogni lato
+    (momenti opposti ai due estremi), e anche Q1, bloccato, dà una media costante (x1.14).
+  - La pendenza sulle pareti parallele va da x2.2 a 2.5 m a x0.86 a ~3.27 m, supera x2.5 a ~3.55 m e
+    diverge verso la punta: entro ~15 % solo tra ~2.85 e 3.4 m. È la parte dispari lungo ogni lato.
+    Ipotesi (non dimostrata): modo distorsionale della sezione a pareti piane, senza azione di membrana
+    circonferenziale (hex_corner_closed_forms.md §D, note personali), che decade lentamente e in modo
+    oscillante dalle due estremità della zona a T costante (ginocchio a 2.5 m, bordo libero a 4 m);
+    trave su suolo elastico: lunghezza di decadimento ~0.15-0.3 m, quindi in 1.5 m non resta un plateau.
+    Per chiuderla: un caso con zona a T costante più lunga, o il profilo lungo s a z = 3.55 m.
+  - Piccole eccezioni all'ipotesi "nessun gradiente nello spessore": T_vp2 è valutata alla y vera, e vicino
+    agli spigoli interni 2, 3, 5, 6 le pareti inclinate scendono sotto y = R/2 (T - T1 <= 0.58 K, 1.2 % di dT,
+    su una zona di ~t). Trascurabile.
+  - Q1 con nt = 1 non regge la flessione delle pareti (locking): sbaglia la forma e, sulle pareti
+    parallele, il segno.
+
+  Limiti.
+  - K_t non si applica: la mesh ha spigoli vivi. Lo spigolo interno (intaglio a 240 gradi) è
+    singolare, sigma ~ r^-0.384 (§C2, lambda_1 = 0.6157): il valore nella cella d'angolo dipende
+    dalla mesh. sigma_c del telaio è la tensione nominale; con un raccordo reale di raggio rho il
+    picco è K_t sigma_c (oppure K_1 rho^(lambda_1 - 1) dal NSIF).
+  - La tensione dominante in VP2 non è questa: sigma_zz autoequilibrata (sezioni piane,
+    sigma_zz = -E alpha (T - T_piano)), +-E alpha (T2 - T1) / 6 = +-25.5 MPa agli spigoli.
+
+Dati di riferimento (mm)
+------------------------
+  fonte                          T_ref   Y core top  Y LRP   Y URP    Z core top  Z LRP   Z URP
   IWGFR/75 AT1BOW linear theory   20 C    1.333      4.333   16.333   -           -       -
-  IWGFR/75 average of 10 codes    20 C    -          -       16.340   -           -       -
+  IWGFR/75 media di 10 codici     20 C    -          -       16.340   -           -       -
   S1 (CEA, SOLO) Part II Table 2  20 C    1.333      4.338   16.334   18.338      22.882  31.973
   STRAW Table III reference        0 C    1.333      4.332   16.328   19.125      23.850  33.300
   STRAW Table IV zero thickness    0 C    1.330      4.333   16.333   19.125      23.850  33.300
-  STRAW Table IV non adiabatic     0 C    1.334      4.336   16.345   (other T field, reference only)
+  STRAW Table IV non adiabatic     0 C    1.334      4.336   16.345   (altro campo di T, solo riferimento)
 
-  STRAW Table III dimensions, mid-wall (across corners OY / across flats OX):
-    hot below core bottom 151.076 / 130.840, hot above core top 151.412 / 131.157, cold 150.000 / 129.904
+  Dimensioni STRAW Table III, a metà parete (tra gli spigoli OY / tra i lati OX):
+    caldo sotto il core bottom 151.076 / 130.840, caldo sopra il core top 151.412 / 131.157, freddo 150.000 / 129.904
 
-  Part II page 27, EXAMPLE 3 (array, natural restraint, pad distances over flats): not VP2, not used.
+  Part II pagina 27, EXAMPLE 3 (fila di elementi, vincolo naturale, distanze dei pad tra i lati): non è VP2, non usato.
 
-Results (z3st run of 2026-10-26, 4 steps, 15.8 s)
--------------------------------------------------
+Risultati (run z3st del 2026-10-26, 4 passi, 15.8 s)
+---------------------------------------------------
   C = 1.33333
-  Y   core top 1.314, LRP 4.311, URP 16.300 mm  (theory 1.333 / 4.333 / 16.333: -0.02 / -0.03 mm)
-  Z   T_ref 0 C: 19.125 / 23.850 / 33.300 mm (= STRAW); T_ref 20 C: S1 - 0.113 mm, constant as in VP1
-  OY / OX above core top: 151.417 / 131.131 mm (STRAW 151.412 / 131.157)
-  No point beyond 0.1 mm and 5 %.
+  Y   core top 1.314, LRP 4.311, URP 16.300 mm  (teoria 1.333 / 4.333 / 16.333: -0.02 / -0.03 mm)
+  Z   T_ref 0 C: 19.125 / 23.850 / 33.300 mm (= STRAW); T_ref 20 C: S1 - 0.113 mm, costante come in VP1
+  OY / OX sopra il core top: 151.417 / 131.131 mm (STRAW 151.412 / 131.157)
+  Nessun punto oltre 0.1 mm e 5 %.
 
-Outputs in U_hex_shell/results/
--------------------------------
-  VP2_*.png, VP2_summary.json                   hex_post figures (vp2_post.py)
+order2 (2026-11-05)
+-------------------
+  Q2: 692 064 DOF (691 200 liberi), 1 rank, 52.8 s (RAM non registrata; per VP1 Q2 ~8 GB RSS
+  letti con ps durante il run); Q1: 115 488 DOF.
+  Stessa mesh e stessa T di ../ (corner_frame.py valuta T con lo shim di order2/ e con il modulo di ../). Usato per l'anello iperstatico
+  (sopra); i confronti con i benchmark restano sul run Q1 di ../.
+
+Output in U_hex_shell/results/
+------------------------------
+  VP2_*.png, VP2_summary.json                   figure di hex_post (Allpost)
   IAEA_VP2_vs_benchmark{,_tables}.png, _summary.json   (vp2_benchmark.py)
-  IAEA_VP2_corners_z.png                         (vp2_corners.py)
+  IAEA_VP2_corners_z.png                         (../corners.py)
   IAEA_VP2_along_y.png                           (../along_y.py)
   IAEA_VP2_vs_codes.png, .csv                    (../iwgfr_table.py)
-  results_organize.py moves them to results/bowing_corner-corner_IAEA_VP2/z-gradient/ (IAEA_VP2_z-gradient_*)
+  results_organize.py li sposta in results/bowing_corner-corner_IAEA_VP2/z-gradient/ (senza il prefisso)
+  order2/: figure e json restano nella cartella del caso (vp2_corner_*).

@@ -1,0 +1,20 @@
+name: 1515Ti_Tdep E only, Di Marcello (VP1)
+
+# Separate effects of alpha(T) and E(T): E(T) of the Di Marcello set, thermal
+# expansion alpha (T - T_ref) with alpha constant as the constant card
+# (../../../15_15Ti_const.yaml). Compared by ../../compare_norms.py with the
+# constant card, the full Di Marcello card (../) and alpha_only (../alpha_only).
+
+# Mechanical properties
+E: materials.steel_1515Ti_Tdep.E_DiMarcello       # (Pa) UFL(T_iter)
+nu: 0.3                                           # (-) as 1515Ti_Tdep.yaml and IAEA VP1
+alpha: 1.8e-5        # (1/K) constant, IAEA VP1
+T_ref: 673.15        # (K) stress-free temperature, VP1 400 °C
+T_initial: 673.15    # (K)
+
+# Thermal properties (T fixed by the Dirichlet on every node: no effect)
+k: materials.steel_1515Ti_Tdep.k_DiMarcello          # (W/m·K)
+cp: materials.steel_1515Ti_Tdep.cp_DiMarcello        # (J/kg·K)
+
+# Physical properties
+rho: 7900.0          # (kg/m³) rho0 at 20 °C

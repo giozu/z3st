@@ -1,0 +1,134 @@
+{
+  "runs": {
+    "z3st Q1": {
+      "element": "Lagrange Q1 hex",
+      "dofs_total": 115488,
+      "dofs_free": 115200,
+      "processes": 1,
+      "time_s": 8.54,
+      "time_label": "8.5",
+      "w_tip_mm": 12.231107533668052,
+      "w_tip_closed_form_mm": 12.250000055234722,
+      "w_tip_err_pct": -0.15422466515497157,
+      "max_abs_w_err_mm": 0.01889252156666958,
+      "kappa_above_core_err_pct": -0.038233184165225184,
+      "w_tip_vs_Q2_pct": -0.04143364926527368
+    },
+    "z3st Q2": {
+      "element": "Lagrange Q2 hex",
+      "dofs_total": 692064,
+      "dofs_free": 691200,
+      "processes": 1,
+      "time_s": 50.35,
+      "time_label": "50.4",
+      "w_tip_mm": 12.236177428507256,
+      "w_tip_closed_form_mm": 12.250000055234722,
+      "w_tip_err_pct": -0.11283776869501695,
+      "max_abs_w_err_mm": 0.013830905921379194,
+      "kappa_above_core_err_pct": -8.388919906247222e-06,
+      "w_tip_vs_Q2_pct": 0.0
+    },
+    "Ansys SOLID185 KEYOPT(2)=3": {
+      "element": "SOLID185 (8-node hex)",
+      "dofs_total": 115488,
+      "dofs_free": 115200,
+      "processes": 4,
+      "time_s": 20.793,
+      "solution_time_s": 2.2,
+      "time_label": "20.8 (2.2)",
+      "keyopt": [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_abs_T_diff_K": 6.580072522410774e-06,
+      "w_tip_mm": 12.23631708854167,
+      "w_tip_closed_form_mm": 12.250000055234722,
+      "w_tip_err_pct": -0.11169768678658824,
+      "max_abs_w_err_mm": 0.013705141091885928,
+      "kappa_above_core_err_pct": 0.00013325833800426328,
+      "w_tip_vs_Q2_pct": 0.001141369804660619
+    }
+  },
+  "vm_along_s": {
+    "inlet core": {
+      "z_m": 1.5,
+      "closed_form": false,
+      "z3st Q1": {
+        "max_vm_MPa": 2.7182089714107582,
+        "max_abs_diff_vs_Q2_MPa": 0.2788412560858585
+      },
+      "z3st Q2": {
+        "max_vm_MPa": 2.457710364441125
+      },
+      "Ansys SOLID185 KEYOPT(2)=3": {
+        "max_vm_MPa": 2.73097234130259,
+        "max_abs_diff_vs_Q2_MPa": 0.2732620301789436
+      }
+    },
+    "mid core": {
+      "z_m": 2.0,
+      "closed_form": false,
+      "z3st Q1": {
+        "max_vm_MPa": 0.2594263197386435,
+        "max_abs_diff_vs_Q2_MPa": 0.2569396887246627
+      },
+      "z3st Q2": {
+        "max_vm_MPa": 0.007339369483684453
+      },
+      "Ansys SOLID185 KEYOPT(2)=3": {
+        "max_vm_MPa": 0.04159190056955112,
+        "max_abs_diff_vs_Q2_MPa": 0.03673057912879067
+      }
+    },
+    "outlet core": {
+      "z_m": 2.5,
+      "closed_form": false,
+      "z3st Q1": {
+        "max_vm_MPa": 2.7164553943412724,
+        "max_abs_diff_vs_Q2_MPa": 0.29937609834327406
+      },
+      "z3st Q2": {
+        "max_vm_MPa": 2.4577148161369777
+      },
+      "Ansys SOLID185 KEYOPT(2)=3": {
+        "max_vm_MPa": 2.7311798571197965,
+        "max_abs_diff_vs_Q2_MPa": 0.27346506355541383
+      }
+    },
+    "tip": {
+      "z_m": 4.0,
+      "closed_form": true,
+      "z3st Q1": {
+        "max_vm_MPa": 0.49501476502568986,
+        "max_err_vs_closed_form_MPa": 0.49501476502568986
+      },
+      "z3st Q2": {
+        "max_vm_MPa": 2.8619475130946892e-08,
+        "max_err_vs_closed_form_MPa": 2.8619475130946892e-08
+      },
+      "Ansys SOLID185 KEYOPT(2)=3": {
+        "max_vm_MPa": 0.08347689312178469,
+        "max_err_vs_closed_form_MPa": 0.08347689312178469
+      }
+    }
+  },
+  "sources": {
+    "ansys": [
+      "/mnt/c/Users/Mat/Desktop/Newcleo/FEM/ansys_vp1/z_gradient/vp1_ansys_nodes.txt",
+      "/mnt/c/Users/Mat/Desktop/Newcleo/FEM/ansys_vp1/z_gradient/vp1_ansys_elems.txt",
+      "/mnt/c/Users/Mat/Desktop/Newcleo/FEM/ansys_vp1/VP1_zramp_files/dp0/SYS-2/MECH/solve.out"
+    ],
+    "z3st Q1": "/home/mat/z3st_macro/z3st/cases/sandbox/U_hex_shell/bowing/corner-corner/IAEA/VP1/output/vp1_const_fields_3d.xdmf",
+    "z3st Q2": "/home/mat/z3st_macro/z3st/cases/sandbox/U_hex_shell/bowing/corner-corner/IAEA/VP1/order2/output/vp1_const_Q2_fields_3d.xdmf"
+  }
+}

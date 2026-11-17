@@ -1,0 +1,10 @@
+#!/bin/bash
+# IAEA VP2 with mechanical.order: 2: mesh, geometry, BCs and card of ../ (run ../Allrun first), T of
+# ../vp2_temperature.py through ./vp2_temperature.py, then corner_frame.py: hyperstatic ring moment at
+# the corners, closed form against Q1 (../) and Q2.
+set -e
+cd "${0%/*}" || exit 1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+python3 -m z3st > log_z3st.md
+python3 corner_frame.py

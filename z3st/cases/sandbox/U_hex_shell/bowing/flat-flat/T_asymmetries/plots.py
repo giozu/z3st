@@ -25,7 +25,7 @@ sigma_zz, eps_nn, eps_ss, eps_zz.
 Figures are written to ``output/profile_{xi,theta,z}.png``; 3D views of the step to
 ``output/3d_{mesh,original,deformed,stress,vonmises,strain}.png``.
 
-Usage: ``python plots.py [step]`` (default: last step).
+Usage: ``python plots.py`` (last step).
 """
 
 import os
@@ -35,11 +35,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 os.environ.setdefault("PYVISTA_OFF_SCREEN", "true")
-import pyvista as pv  # noqa: E402
-
-from gui_fields import A0, D, H, cells_as_points, flat_frame, load_grid  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+# [TBC] rule 4 — drop the chdir comment? loses: gui_fields reads cwd at import,
+# so chdir must precede the import.
+os.chdir(HERE)  # gui_fields reads the case in the working directory
+sys.path.insert(0, os.path.join(HERE, "..", "..", ".."))  # U_hex_shell/gui_fields.py
+from gui_fields import A0, H, flat_frame, load_grid, plot_3d  # noqa: E402
+
 OUT = os.path.join(HERE, "output")
 
 # physical group of each flat, by sector index (see mesh.geo)
@@ -218,60 +221,12 @@ def plot_z(nodes, cells):
     return _finish(fig, axes, r"$z$ (m)")
 
 
-# --. 4. 3D views (pyvista) --..
-def plot_3d(grid, out=OUT, warp=None):
-    """Mesh, original, deformed, sigma_ss, sigma_vm and eps_ss.
-
-    Field panels show the lower half (cut at mid-height), so the through-wall
-    gradient is visible on the cut face. ``warp`` scales the displacement; by
-    default the peak |u| is drawn as 5 % of D.
-    """
-    U = grid.point_data["u"]
-    if warp is None:
-        warp = 0.05 * D / max(np.linalg.norm(U, axis=1).max(), 1e-30)
-    warped = grid.warp_by_vector("u", factor=warp)
-    cut = lambda m: m.clip(normal="z", origin=(0, 0, H / 2))
-    outline = cut(grid).extract_feature_edges()
-    half, warped = cut(grid), cut(warped)
-
-    panels = (
-        ("mesh", "Mesh", grid, None),
-        ("original", "Original, temperature", half, "T (K)"),
-        ("deformed", f"Deformed (x{warp:.0f}), displacement magnitude", warped, "u (um)"),
-        ("stress", "sigma_ss, deformed", warped, "sigma_ss (MPa)"),
-        ("vonmises", "sigma_vm, deformed", warped, "sigma_vm (MPa)"),
-        ("strain", "eps_ss, deformed", warped, "eps_ss (-)"),
-    )
-    for name, title, mesh, scalars in panels:
-        p = pv.Plotter(off_screen=True, window_size=[900, 900])
-        p.add_text(title, font_size=12)
-        if scalars is None:
-            p.add_mesh(mesh, color="lightgray", show_edges=True, line_width=0.3)
-        else:
-            if scalars in mesh.cell_data:
-                mesh = cells_as_points(mesh)
-            p.add_mesh(mesh, scalars=scalars, preference="point", cmap="turbo",
-                       show_edges=False, interpolate_before_map=False,
-                       scalar_bar_args={"title": scalars, "vertical": True,
-                                        "fmt": "%.4g", "position_x": 0.82})
-        if name not in ("mesh", "original"):
-            p.add_mesh(outline, color="black", line_width=0.5, opacity=0.4)
-        p.view_isometric()
-        p.camera.elevation = 25
-        p.reset_camera()
-        path = os.path.join(out, f"3d_{name}.png")
-        p.screenshot(path)
-        p.close()
-        print(f"[INFO] {path}")
-
-
 if __name__ == "__main__":
-    step = int(sys.argv[1]) if len(sys.argv) > 1 else -1
-    grid, nodes, cells = local_data(step)
+    grid, nodes, cells = local_data()
     for name, plot in (("xi", plot_xi), ("theta", plot_theta), ("z", plot_z)):
         path = os.path.join(OUT, f"profile_{name}.png")
         fig = plot(nodes, cells)
         fig.savefig(path, dpi=150)
         plt.close(fig)
         print(f"[INFO] {path}")
-    plot_3d(grid)
+    plot_3d(grid, OUT)

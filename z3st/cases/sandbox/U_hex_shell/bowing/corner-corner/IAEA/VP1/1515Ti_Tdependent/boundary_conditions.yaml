@@ -13,40 +13,40 @@ thermal:
   steel:
    - type: Dirichlet
      region: face1
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face2
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face3
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face4
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face5
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face6
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face1_in
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face2_in
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face3_in
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face4_in
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face5_in
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
    - type: Dirichlet
      region: face6_in
-     temperature: "673.15 + np.clip((z - 1.5) / 1.0, 0.0, 1.0) * (125.0 - 25.0 * y / 0.075)"   # (K)
+     temperature: vp1_temperature.T_vp1   # (K)
 
 mechanical:
   steel:

@@ -17,6 +17,9 @@ eps ≈ a + b y, weighted by E(T) ds, and
     eps_th = (eta(T) - eta(T_ref)) / (1 + eta(T_ref)),  T_ref = 400 °C.
 
 For constant alpha and E this is ../non-regression.py exactly.
+
+Usage: ``python non-regression.py [<case dir>]``, default this folder; the Di
+Marcello set runs it on its own folder (DiMarcello/Allrun).
 Validity: thin wall (eps_th on the mid-wall line), plane sections.
 
   - section-mean u_y at the core top, ACLP and duct top against the beam;
@@ -28,6 +31,7 @@ utils/non_regression.case_hypotheses): a run with another law is NOT COMPARABLE.
 
 import importlib
 import os
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -37,7 +41,7 @@ from z3st.utils.non_regression import case_hypotheses, finish, load_yaml, metric
 from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
-CASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CASE_DIR = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(__file__))
 inp = load_yaml(CASE_DIR, "input.yaml")
 geom = load_yaml(CASE_DIR, inp["geometry_path"])
 mat = load_yaml(CASE_DIR, inp["materials"]["steel"])

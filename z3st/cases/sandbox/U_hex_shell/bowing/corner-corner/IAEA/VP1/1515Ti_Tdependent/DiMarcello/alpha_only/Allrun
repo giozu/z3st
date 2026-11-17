@@ -1,0 +1,8 @@
+#!/bin/bash
+# IAEA VP1, separate effects: eta(T) of the Di Marcello set, E constant. Mesh of ../../../
+# (run ../../../Allrun first), BCs of ../../. No gold: compared by ../../compare_norms.py.
+set -e
+cd "${0%/*}" || exit 1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+python3 -m z3st > log_z3st.md

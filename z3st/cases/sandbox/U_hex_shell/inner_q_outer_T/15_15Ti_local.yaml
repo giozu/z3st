@@ -8,7 +8,7 @@ T_ref: 300.0      # Reference temperature (K)
 T_initial: 600.0  # Initial temperature field (K)
 
 # Thermal properties
-k: k_1515.k       # k(T) from k_1515.py (W/m·K)
+k: materials.steel_1515Ti_Tdep.k_DiMarcello   # k(T) = 13.95 + 0.01163 (T - 273.15) (W/m·K); Homework 2024-2025, NDT (same law as [DiMarcello] of steel_1515Ti_Tdep.py)
 cp: 200           # Specific heat capacity (J/kg·K)
 
 # Physical properties

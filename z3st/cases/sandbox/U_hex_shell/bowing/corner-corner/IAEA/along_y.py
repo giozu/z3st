@@ -47,9 +47,9 @@ def profiles(case_dir):
     path = lambda p: os.path.normpath(os.path.join(case_dir, p))
     mat = hp.load_material(path(cfg["material"]))
     d = hp.load_z3st(path(cfg["fields"]), temperature=cfg["temperature"], case_dir=case_dir)
-    res = hp.analyse(d, mat, cfg.get("support", "clamped"))
+    res = hp.analyse(d, cfg.get("support", "clamped"))
     module, func = cfg["temperature"].rsplit(".", 1)
-    m = hp._import(module, case_dir)
+    m = hp.import_case(module, case_dir)
     if abs(np.cos(m.PHI_HOT)) > 1e-9:
         sys.exit(f"{case_dir}: corners not on +-y (orientation 'vertical' expected)")
     T_of = getattr(m, func)
@@ -59,7 +59,7 @@ def profiles(case_dir):
     x_mid, y_mid, _ = hp.perimeter_point(fr, c["p"], 0.0)
     out = {}
     for name, z in cfg["along_s_z"].items():
-        sel = hp._nearest(c["z"], z) & (x_mid > 0)
+        sel = hp.nearest(c["z"], z) & (x_mid > 0)
         pu, inv = np.unique(np.round(c["p"][sel], 9), return_inverse=True)
         mean = lambda v: np.bincount(inv, weights=v[sel]) / np.bincount(inv)   # through the wall
         x, y, _ = hp.perimeter_point(fr, pu, 0.0)
@@ -103,7 +103,7 @@ def figure(case, prof, corners):
     for lab, yc in corners.items():
         axes[0].text(yc * 1e3, 1.01, f"corner {lab}", ha="center", va="bottom", fontsize=9,
                      transform=axes[0].get_xaxis_transform())
-    return hp._finish(fig, f"IAEA {case}: along y at mid-wall",
+    return hp.finish(fig, f"IAEA {case}: along y at mid-wall",
                       "cell centres (dots), cells through the wall averaged; components in the local frame (s along the flat); "
                       "vertical lines = corners", top=0.93)
 

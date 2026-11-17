@@ -80,7 +80,7 @@ def _temperature_prescribed(problem):
     element through the thickness and T on every face), so -k grad T of it is
     not a solved heat flux and no energy balance holds for it."""
     bcs = [
-        bc["value"] if isinstance(bc, dict) else bc
+        bc["value"]
         for bc_list in getattr(problem, "dirichlet_thermal", {}).values()
         for bc in bc_list
     ]

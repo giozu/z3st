@@ -2,6 +2,6 @@
 fields: output/fields.xdmf
 material: 15_15Ti_local.yaml
 temperature: field   # field | module.func
-support: free        # Clamp_z at the bottom only, rigid-body modes removed: deflection from the chord
+support: free        # no mechanical BC, rigid-body modes removed by the solver: deflection from the chord
 closed_form: radial  # thick cylinder + slab along s; no bow by symmetry
 boundary_conditions: boundary_conditions.yaml

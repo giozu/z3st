@@ -14,7 +14,8 @@ Usage (after ./Allpost)::
 
 For every problem in PROBLEMS:
 
-  - moves ``results/<prefix>*`` into ``results/<subfolder>/`` (names kept);
+  - moves ``results/<prefix>*`` into ``results/<subfolder>/``, renamed
+    ``<prefix in the subfolder><rest>`` (the folder names the case);
   - writes ``geometry_2d.png`` (section at the along-s heights: vertices
     V1..V6, flats, s and xi, temperature, hot/cold flat and vertex) and
     ``geometry_3d.png`` (duct, vertex edges, along-s planes);
@@ -53,29 +54,26 @@ ZERO = 1e-4
 # (subfolder of results/, case folder, {prefix in results/: prefix in the subfolder}, one-line description).
 # The along-s heights are post.yaml along_s_z when given (along_s_<group>.png), else hex_post.s_heights.
 PROBLEMS = (
-    ("inner_q_flux", "inner_q_outer_T", {"inner_q_outer_T_": "inner_q_outer_T_"},
+    ("inner_q_flux", "inner_q_outer_T", {"inner_q_outer_T_": ""},
      "Radial through-wall gradient: inner heat flux q, outer T_o fixed. D6 symmetric: no bowing."),
-    ("bowing_flat-flat_T_asymmetries", "bowing/flat-flat/T_asymmetries", {"T_asymmetries_": "T_asymmetries_"},
+    ("bowing_flat-flat_T_asymmetries", "bowing/flat-flat/T_asymmetries", {"T_asymmetries_": ""},
      "Flat-to-flat bowing: Dirichlet T on the nord (cold) and sud (hot) flats, free duct."),
     # IAEA VP1, one folder per option, never compared with each other. hex_post names the figures
-    # after the case folder (VP1_, z_uniform_); the option goes in every file name.
+    # after the case folder (VP1_, z_uniform_); the folder names the option.
     ("bowing_corner-corner_IAEA_VP1/z-gradient", "bowing/corner-corner/IAEA/VP1",
-     {"VP1_": "IAEA_VP1_z-gradient_", "IAEA_VP1_vs_benchmark": "IAEA_VP1_z-gradient_vs_benchmark",
-      "IAEA_VP1_corners": "IAEA_VP1_z-gradient_corners",
-      "IAEA_VP1_along_y": "IAEA_VP1_z-gradient_along_y", "IAEA_VP1_vs_codes": "IAEA_VP1_z-gradient_vs_codes",
-      "IAEA_VP1_z-gradient_vs_Ansys_": "IAEA_VP1_z-gradient_vs_Ansys_"},
+     {"VP1_": "", "IAEA_VP1_vs_benchmark": "vs_benchmark", "IAEA_VP1_corners": "corners",
+      "IAEA_VP1_along_y": "along_y", "IAEA_VP1_vs_codes": "vs_codes", "IAEA_VP1_z-gradient_vs_Ansys_": "vs_Ansys_"},
      "Corner-to-corner bowing, IAEA VP1 WITH axial gradient: T = 400 °C below the core, ramp across "
      "the core (1.5-2.5 m), cold/hot corner 500/550 °C above; clamped bottom. Comparison with the "
      "published benchmark and with Ansys when exported (same option)."),
     ("bowing_corner-corner_IAEA_VP1/z-uniform", "bowing/corner-corner/IAEA/VP1/z_uniform",
-     {"z_uniform_": "IAEA_VP1_z-uniform_", "IAEA_VP1_z-uniform_vs_Ansys_": "IAEA_VP1_z-uniform_vs_Ansys_"},
+     {"z_uniform_": "", "IAEA_VP1_z-uniform_vs_Ansys_": "vs_Ansys_"},
      "Corner-to-corner bowing, IAEA VP1 step 1 WITHOUT axial gradient (Z_UNIFORM): the core-top section "
      "(cold/hot corner 500/550 °C) over the whole height; clamped bottom. Comparison with Ansys "
      "(same option)."),
     ("bowing_corner-corner_IAEA_VP2/z-gradient", "bowing/corner-corner/IAEA/VP2",
-     {"VP2_": "IAEA_VP2_z-gradient_", "IAEA_VP2_vs_benchmark": "IAEA_VP2_z-gradient_vs_benchmark",
-      "IAEA_VP2_corners": "IAEA_VP2_z-gradient_corners", "IAEA_VP2_along_y": "IAEA_VP2_z-gradient_along_y",
-      "IAEA_VP2_vs_codes": "IAEA_VP2_z-gradient_vs_codes"},
+     {"VP2_": "", "IAEA_VP2_vs_benchmark": "vs_benchmark", "IAEA_VP2_corners": "corners",
+      "IAEA_VP2_along_y": "along_y", "IAEA_VP2_vs_codes": "vs_codes"},
      "Corner-to-corner bowing, IAEA VP2 (IWGFR/75 example 2) WITH axial gradient: as VP1, section "
      "non-linear (corners 1, 2, 6 at 500 °C, 3, 4, 5 at 550 °C above the core, linear between corners); "
      "clamped bottom. Comparison with the published benchmark and the CRP codes."),
@@ -100,32 +98,7 @@ def load(case_rel):
     if not os.path.isfile(h5):
         return None
     d = hp.load_z3st(xdmf, temperature=cfg.get("temperature", "field"), case_dir=case_dir)
-    return hp.analyse(d, None, cfg.get("support", "free"), None)   # the material is not used without closed form
-
-
-def thermal_sides(res, z):
-    """Mean T of each flat, T of each vertex, inner and outer face, at z (K)."""
-    fr, T = res["frame"], res["data"]["T"]
-    nd = fr["nodes"]
-    at_z = hp._nearest(nd["z"], z)
-    flats = np.array([T[at_z & (nd["sector"] == m)].mean() for m in range(6)])
-    P = 6 * fr["L_mid"]
-    verts = []
-    for m in range(6):
-        dist = np.abs((nd["p"] - m * fr["L_mid"] + P / 2) % P - P / 2)
-        sel = at_z & (dist < dist[at_z].min() + 1e-3 * fr["L_mid"])
-        verts.append(T[sel].mean())
-    xi_in, xi_out = nd["xi"][at_z].min(), nd["xi"][at_z].max()
-    inner = T[at_z & hp._nearest(np.where(at_z, nd["xi"], np.inf), xi_in)].mean()
-    outer = T[at_z & hp._nearest(np.where(at_z, nd["xi"], np.inf), xi_out)].mean()
-    return {"flats": flats, "verts": np.array(verts), "inner": inner, "outer": outer,
-            "span": np.ptp(T[at_z])}
-
-
-def same_around(th):
-    """Flats within 5 % of the T range at that height: no hot or cold side
-    (the nodal mean of a flat moves by ~2 % with the corner nodes)."""
-    return np.ptp(th["flats"]) < 0.05 * th["span"]
+    return hp.analyse(d, cfg.get("support", "free"), None)
 
 
 def hot_cold_text(res, z, th, name=None):
@@ -139,7 +112,7 @@ def hot_cold_text(res, z, th, name=None):
              f"cold flat {names[f.argmin()]} ({f.min() - 273.15:.1f} °C); "
              f"hot vertex V{v.argmax() + 1} ({v.max() - 273.15:.1f} °C), "
              f"cold vertex V{v.argmin() + 1} ({v.min() - 273.15:.1f} °C)"]
-    if same_around(th):
+    if hp.same_around(th):
         lines[0] = (head + f"every flat at the same T (spread {np.ptp(f):.1e} K, D6 symmetric): "
                     "no hot or cold flat/vertex")
     dT = th["inner"] - th["outer"]
@@ -153,14 +126,14 @@ def hot_cold_text(res, z, th, name=None):
 def along_s_flags(res, z, keys=None):
     """Panels (``keys``, default all) along s at z whose scale is at the statistical zero."""
     fr = res["frame"]
-    layers, single = hp._layers(fr)
+    layers, single = hp.wall_layers(fr)
     out = []
     for key, scale, _ in hp.PANELS:
         if keys is not None and key not in keys:
             continue
         f = fr["nodes"] if key == "u_n" else fr["cells"]
-        sides = ("inner", "outer") if (key == "u_n" or not single) else ("inner",)
-        v = np.concatenate([hp._ring(f, res[key], z, layers[s][1] if key == "u_n" else layers[s][0])[1]
+        sides = hp.drawn_sides(key, single)
+        v = np.concatenate([hp.ring(f, res[key], z, layers[s][1] if key == "u_n" else layers[s][0])[1]
                             for s in sides]) * scale
         amax, span = np.abs(v).max(), np.ptp(v)
         if amax < ZERO:
@@ -199,14 +172,14 @@ def fig_geometry_2d(res, zs, title, path):
     nrow = -(-len(zs) // ncol)
     fig, axes = plt.subplots(nrow, ncol, figsize=(7.5 * ncol, 7.8 * nrow), squeeze=False)
     for ax, (tag, z) in zip(axes.flat, zs.items()):
-        at_z = hp._nearest(nd["z"], z)
+        at_z = hp.nearest(nd["z"], z)
         X = res["data"]["X"][at_z]
         sc = ax.scatter(X[:, 0] * 1e3, X[:, 1] * 1e3, c=T[at_z] - 273.15, cmap="coolwarm", s=14, zorder=3)
         fig.colorbar(sc, ax=ax, shrink=0.7, label="T (°C)")
         for xi in (-half_t, half_t):
             ax.plot(*_outline(fr, xi), color="k", lw=0.8)
-        th = thermal_sides(res, z)
-        uniform = th["span"] < 1e-3 or same_around(th)
+        th = hp.thermal_sides(res, z)
+        uniform = th["span"] < 1e-3 or hp.same_around(th)
         R = fr["a_mid"] / np.cos(np.pi / 6)
         for m in range(6):
             ang = fr["a0"] + m * np.pi / 3
@@ -252,7 +225,7 @@ def fig_geometry_2d(res, zs, title, path):
         wall = hot_cold_text(res, z, th).split("\n")[-1] if th["span"] >= 1e-3 else "T uniform"
         ax.set_title(f"{tag}: section at z = {z * 1e3:.1f} mm\n{wall}", fontsize=9)
     fig.suptitle(title, fontweight="bold")
-    fig.text(0.5, 0.015, "s: perimeter coordinate at mid-wall, from V1 counter-clockwise (p = 0 at V1); "
+    fig.text(0.5, 0.015, "p: perimeter coordinate at mid-wall, from V1 counter-clockwise (p = 0 at V1); "
              "ξ: through the wall, outward, 0 at mid-wall. Flat and vertex T: nodal means at that z.",
              ha="center", fontsize=8.5)
     fig.tight_layout(rect=(0, 0.04 / nrow, 1, 1 - 0.04 / nrow))
@@ -264,7 +237,7 @@ def fig_geometry_3d(res, zs, title, path):
     fr, d = res["frame"], res["data"]
     nd = fr["nodes"]
     X, T = d["X"], d["T"] - 273.15
-    outer = hp._nearest(nd["xi"], nd["xi"].max())
+    outer = hp.nearest(nd["xi"], nd["xi"].max())
     R = (fr["a_mid"] + fr["t"] / 2) / np.cos(np.pi / 6) * 1e3
     z0, z1 = fr["z0"] * 1e3, (fr["z0"] + fr["H"]) * 1e3
     # outer faces: one strip per flat and z band, coloured by the mean nodal T
@@ -364,7 +337,9 @@ def readme(sub, desc, files, heights, notes, flags, beam):
 
 def main():
     index = ["# results", "", "One subfolder per problem; each has `geometry_2d.png`, `geometry_3d.png` "
-             "and a README with hot/cold sides and the statistical-zero flags.", ""]
+             "and a README with hot/cold sides and the statistical-zero flags.", "",
+             "Stress and strain components, local frame (n, s, z) and coordinates p, s, ξ: "
+             "[components.png](components.png) (python results_components.py).", ""]
     for sub, case_rel, prefixes, desc in PROBLEMS:
         dest = os.path.join(RESULTS, sub)
         os.makedirs(dest, exist_ok=True)
@@ -378,7 +353,7 @@ def main():
             continue
         _, cfg = fields_h5(case_rel)
         heights = cfg.get("along_s_z") or hp.s_heights(res)
-        notes = {t: hot_cold_text(res, z, thermal_sides(res, z), t) for t, z in heights.items()}
+        notes = {t: hot_cold_text(res, z, hp.thermal_sides(res, z), t) for t, z in heights.items()}
         flags = {t: along_s_flags(res, z) for t, z in heights.items()}
         beam = beam_flags(res)
         # new along-s figures replace every older along-s figure of the same series
@@ -395,7 +370,7 @@ def main():
             elif stem in heights:
                 annotate(f, notes[stem], flags[stem])
             else:
-                kind = next((k for k in beam if name.endswith(f"_{k}.png")), None)
+                kind = next((k for k in beam if f"_{name}".endswith(f"_{k}.png")), None)
                 if kind is not None:
                     annotate(f, "bowing along z", [beam[kind]])
             shutil.move(f, os.path.join(dest, name))

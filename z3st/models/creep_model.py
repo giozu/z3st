@@ -235,13 +235,9 @@ class CreepModel:
                 continue
 
             # σ_eq_trial on the material's cells (DG0 interpolation)
+            V0 = pred.function_space
             _, _, sig_eq_tr = self._creep_trial(u, material, T)
-            tmp = dolfinx.fem.Function(pred.function_space)
-            expr = dolfinx.fem.Expression(
-                sig_eq_tr, pred.function_space.element.interpolation_points
-            )
-            tmp.interpolate(expr, cells0=cells)
-            sig = tmp.x.array[cells]
+            sig = self._interpolate_on_cells(sig_eq_tr, V0, cells)
 
             # With creep_A0 == 0 or creep_Q == 0, A(T) = A0·exp(-Q/RT) folds to a
             # meshless UFL constant and dolfinx cannot derive the Expression's MPI
@@ -251,16 +247,10 @@ class CreepModel:
                 A_val = float(material["creep_A0"])
                 Adt = dt * np.full_like(sig, A_val)
             else:
-                Texpr = dolfinx.fem.Expression(
-                    ufl.as_ufl(self._creep_A(material, T)),
-                    pred.function_space.element.interpolation_points,
-                )
-                tmp.interpolate(Texpr, cells0=cells)
-                Adt = dt * tmp.x.array[cells]
+                Adt = dt * self._interpolate_on_cells(self._creep_A(material, T), V0, cells)
 
             # G (Pa) and β (1/Pa) per cell: G is a UFL(T) expression when E or
             # nu is a function of T, β = B/(R·T) is a UFL(T) for the nabarro_herring_structure law.
-            V0 = pred.function_space
             G = self._interpolate_on_cells(material["G"], V0, cells)
             beta = self._interpolate_on_cells(self._creep_beta(material, T), V0, cells)
             Cdt = dt * self._creep_irr_C(material)

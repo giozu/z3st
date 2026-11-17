@@ -1,0 +1,9 @@
+#!/bin/bash
+# IAEA VP1 z-gradient with mechanical.order: 2: mesh, geometry, BCs and card of ../ (run ../Allrun first),
+# then compare_order.py: Q1 (../), Q2 and Ansys KEYOPT(2)=3 against the closed forms.
+set -e
+cd "${0%/*}" || exit 1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+python3 -m z3st > log_z3st.md
+python3 compare_order.py

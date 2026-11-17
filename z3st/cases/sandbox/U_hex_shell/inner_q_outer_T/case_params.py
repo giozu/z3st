@@ -16,7 +16,6 @@ the flat (0 at mid-flat), z along the axis.
 
 import importlib
 import os
-import sys
 
 import numpy as np
 import yaml
@@ -60,9 +59,8 @@ E = float(_mat["E"])                                # (Pa)
 NU = float(_mat["nu"])                              # (-)
 ALPHA = float(_mat["alpha"])                        # (1/K)
 T_REF = float(_mat["T_ref"])                        # (K) stress-free temperature
-_module, _func = _mat["k"].split(".")
-sys.path.insert(0, HERE)
-k = getattr(importlib.import_module(_module), _func)  # (W/m.K)
+_module, _func = _mat["k"].rsplit(".", 1)
+k = getattr(importlib.import_module(f"z3st.{_module}"), _func)  # (W/m.K), card hook
 
 # --- Boundary conditions ----------------------------------------------------
 _thermal = {bc["type"]: bc for bc in _bcs["thermal"]["steel"]}

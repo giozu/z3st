@@ -1,5 +1,5 @@
 #!/bin/bash
-# IAEA VP1 on a circular tube: same T field (vp1_temperature.py, copy of ../vp1_temperature.py),
+# IAEA VP1 on a circular tube: same T field (vp1_temperature.py loads ../vp1_temperature.py),
 # same material, clamp and mesh layout as VP1, same mid-wall perimeter. Then the comparison
 # hexagon (../output) vs tube vs thin-shell closed form.
 set -e

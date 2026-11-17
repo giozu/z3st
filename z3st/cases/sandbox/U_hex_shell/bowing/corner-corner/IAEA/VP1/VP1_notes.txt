@@ -1,124 +1,208 @@
-IAEA VP1 - IWGFR/75 App. 2, EXAMPLE 1: single wrapper, linear thermal gradient
+IAEA VP1 - IWGFR/75 App. 2, EXAMPLE 1: guaina singola, gradiente termico lineare
 ================================================================================
 
-Two cases on the same mesh, BCs and temperature:
-  VP1/                       constant 15-15Ti (IAEA VP1 values)
-  VP1/1515Ti_Tdependent/     T-dependent 15-15Ti (materials/1515Ti_Tdep.yaml, Sobolev)
-They are compared with each other and with the beam solution, not with the
-IAEA/IWGFR benchmarks.
+Due casi sulla stessa mesh, con le stesse BC e la stessa temperatura:
+  VP1/                       15-15Ti costante (valori IAEA VP1)
+  VP1/1515Ti_Tdependent/     15-15Ti dipendente da T (materials/1515Ti_Tdep.yaml, Sobolev)
+Si confrontano tra loro e con la soluzione di trave, non con i benchmark IAEA/IWGFR.
+Sullo stesso caso costante: VP1/order2/ (spostamento Q2, confronto Q1 / Q2 / Ansys, vedi sotto).
 
-Case
+Caso
 ----
-  geometry   D = 0.153464101 m (outer circumscribed), t = 3 mm, H = 4 m, orientation vertical
-             mid-wall corner-to-corner depth 0.150 m; mesh nf 8, nt 1, nz 400 (hex, 38496 nodes)
-  BC         thermal: Dirichlet T(y, z) on face1..6 and face1_in..6_in (string expression)
-             mechanical: bottom fully clamped (u = 0)
+  geometria  D = 0.153464101 m (circoscritto esterno), t = 3 mm, H = 4 m, orientation vertical
+             distanza tra gli spigoli a metà parete 0.150 m; mesh nf 8, nt 1, nz 400 (hex, 38496 nodi)
+  BC         termiche: Dirichlet T(y, z) su face1..6 e face1_in..6_in (espressione stringa)
+             meccaniche: base incastrata (u = 0)
   T          T(y, z) = 673.15 + clip((z - 1.5) / 1.0, 0, 1) * (125 - 25 y / 0.075)   (K)
-             400 C below the core, linear ramp across it (1.5-2.5 m), constant above;
-             above the core 500 C at the cold corner (+y), 550 C at the hot corner (-y)
-             nt = 1: every node lies on a Dirichlet face, so T is the expression itself
-  solver     3d, thermal and mechanical on, linear (direct_mumps), 1 static step at t = 0, xdmf output
+             400 C sotto il core, rampa lineare nel core (1.5-2.5 m), costante sopra;
+             sopra il core 500 C allo spigolo freddo (+y), 550 C allo spigolo caldo (-y)
+             nt = 1: ogni nodo sta su una faccia di Dirichlet, quindi T è l'espressione stessa
+  solver     3d, termico e meccanico attivi, lineare (direct_mumps), 1 passo statico a t = 0, output xdmf
 
-  material   VP1/15_15Ti_const.yaml        E 1.7e+11 Pa, nu 0.3, alpha 1.8e-5 1/K, T_ref 400 C
+  materiale  VP1/15_15Ti_const.yaml        E 1.7e+11 Pa, nu 0.3, alpha 1.8e-5 1/K, T_ref 400 C
              1515Ti_Tdependent/1515Ti_Tdep_local.yaml
-                                           E(T) = E_Sobolev, 167.2 GPa at 400 C, 154.3 GPa at 550 C
+                                           E(T) = E_Sobolev, 167.2 GPa a 400 C, 154.3 GPa a 550 C
                                            eps_th = (eta(T) - eta(T_ref)) / (1 + eta(T_ref)), eta Sobolev
-                                           (secant alpha 400-550 C = 1.93e-5 1/K), T_ref 400 C
-                                           k, cp Sobolev; nu 0.3; no alpha in the card
+                                           (alpha secante 400-550 C = 1.93e-5 1/K), T_ref 400 C
+                                           k, cp Sobolev; nu 0.3; niente alpha nella card
 
-Files
------
+File
+----
   VP1/
-    Allrun                    mesh -> solve -> non-regression.py -> convergence plot
-    input.yaml                thermal true, card 15_15Ti_const.yaml, output vp1_const_fields_3d
-    geometry.yaml, mesh.geo   duct and mesh (also used by 1515Ti_Tdependent/ and z_uniform/)
-    boundary_conditions.yaml  thermal Dirichlet T(y, z) + clamp (z_uniform/ reads only the clamp)
-    15_15Ti_const.yaml        constant card, alpha read by z3st (no eigenstrain hook)
-    non-regression.py         u_y vs beam at core top / ACLP / duct top, von Mises tracked
+    Allrun                    mesh -> solve -> non-regression.py -> grafico di convergenza
+    input.yaml                termico true, card 15_15Ti_const.yaml, output vp1_const_fields_3d
+    geometry.yaml, mesh.geo   guaina e mesh (usate anche da 1515Ti_Tdependent/, z_uniform/ e order2/)
+    boundary_conditions.yaml  Dirichlet termico T(y, z) + incastro (z_uniform/ legge solo l'incastro)
+    15_15Ti_const.yaml        card costante, alpha letto da z3st (nessun hook eigenstrain)
+    non-regression.py         u_y contro la trave a core top / ACLP / duct top, von Mises tracked
   VP1/1515Ti_Tdependent/
-    Allrun                    solve (mesh of ../) -> non-regression.py -> convergence plot
-    input.yaml                as ../, card 1515Ti_Tdep_local.yaml, output vp1_tdep_fields_3d
-    boundary_conditions.yaml  as ../
-    1515Ti_Tdep_local.yaml    hooks of materials/steel_1515Ti_Tdep.py, T_ref = 400 C
-    non-regression.py         as ../non-regression.py, beam with eta(T) and E(T)
+    Allrun                    solve (mesh di ../) -> non-regression.py -> grafico di convergenza
+    input.yaml                come ../, card 1515Ti_Tdep_local.yaml, output vp1_tdep_fields_3d
+    boundary_conditions.yaml  come ../
+    1515Ti_Tdep_local.yaml    hook di materials/steel_1515Ti_Tdep.py, T_ref = 400 C
+    non-regression.py         come ../non-regression.py, trave con eta(T) ed E(T)
+  VP1/order2/
+    Allrun                    solve (mesh, BC e card di ../) -> compare_order.py
+    input.yaml                come ../input.yaml con mechanical.order: 2, output vp1_const_Q2_fields_3d
+    compare_order.py          z3st Q1 (../), z3st Q2 e Ansys SOLID185 KEYOPT(2)=3 contro le forme chiuse;
+                              order_{vm_along_s,bowing,cost}.png, order_summary.json
 
-Native z3st files: the string Dirichlet temperature was added by the colleague
-(commit 98e2603, models/thermal_model.py); _temperature_prescribed() was added
-to utils/writer.py (commit 4b97ab6). No other native file was changed.
+File nativi di z3st: la temperatura di Dirichlet da stringa è stata aggiunta dal collega
+(commit 98e2603, models/thermal_model.py); _temperature_prescribed() è stata aggiunta
+in utils/writer.py (commit 4b97ab6). Nessun altro file nativo è stato modificato.
+mechanical.order è una chiave nativa (core/finite_element_setup.py, default 1).
 
-Dependencies and functions called
----------------------------------
+Dipendenze e funzioni chiamate
+------------------------------
   z3st, models/thermal_model.py
-    Dirichlet 'temperature' string   eval in x, y, z, np -> Function on V_t, constant in time
+    stringa 'temperature' di Dirichlet   eval in x, y, z, np -> Function su V_t, costante nel tempo
   z3st, core/spine.py
-    E, k, cp strings                 resolved as module.func, built as UFL on T_iter
+    stringhe E, k, cp                risolte come module.func, costruite come UFL su T_iter
+  z3st, core/finite_element_setup.py
+    mechanical.order                 V_m = Lagrange(order) vettoriale; V_t resta Lagrange 1
   z3st, models/mechanical_model.py
-    alpha (T - T_ref) I              constant card
-    eigenstrain hook                 1515Ti card: steel_1515Ti_Tdep.eigenstrain(T, material)
+    alpha (T - T_ref) I              card costante
+    hook eigenstrain                 card 1515Ti: steel_1515Ti_Tdep.eigenstrain(T, material)
                                      -> thermal_strain(T, T_ref, expansion_law)
   z3st, utils/writer.py
-    _temperature_prescribed(problem)   True when the thermal Dirichlet BCs constrain every
-                                     T dof (owned dofs counted, summed over the MPI ranks);
-                                     HeatFlux is then not written and the log reports:
+    _temperature_prescribed(problem)   True quando le BC di Dirichlet termiche vincolano tutti i
+                                     dof di T (dof posseduti contati, sommati sui rank MPI);
+                                     HeatFlux non viene scritto e il log riporta:
       [INFO] HeatFlux not written: every temperature dof is Dirichlet-constrained, so T is
       the imposed field and -k grad T is not a solved heat flux.
+    _u_for_output(u)                 con order 2 u è interpolato su CG1 (valori ai vertici, esatti);
+                                     Stress e Strain restano DG0 (centro cella)
   materials/steel_1515Ti_Tdep.py
     E_Sobolev(T), k_Sobolev(T), cp_Sobolev(T), eta_Sobolev(T), thermal_strain(T, T_ref, law)
 
   VP1/non-regression.py  (z3st.utils.non_regression, utils_extract_xdmf)
-    beam_uy(z)          closed form, kappa0 = alpha dT/dy, dT/dy = 50 K / 0.150 m
+    beam_uy(z)          forma chiusa, kappa0 = alpha dT/dy, dT/dy = 50 K / 0.150 m
     von_mises(S)
-    section mean of u_y at every node level; metric() at the stations, tracked() for von Mises; finish()
-  1515Ti_Tdependent/non-regression.py  (as above + steel_1515Ti_Tdep)
-    temperature(y, z)   T of boundary_conditions.yaml
-    midwall_hexagon()   points and ds on the mid-wall line, corners at +-R on y
-    beam_uy(z)          kappa(z) from the plane-section fit eps ~ a + b y weighted by E(T) ds,
-                        kappa = -b, u_y = int kappa (z - s) ds (trapezoid, 4001 points)
+    media di sezione di u_y a ogni livello di nodi; metric() alle stazioni, tracked() per von Mises; finish()
+  1515Ti_Tdependent/non-regression.py  (come sopra + steel_1515Ti_Tdep)
+    temperature(y, z)   T di boundary_conditions.yaml
+    midwall_hexagon()   punti e ds sulla linea a metà parete, spigoli a +-R su y
+    beam_uy(z)          kappa(z) dal fit a sezioni piane eps ~ a + b y pesato con E(T) ds,
+                        kappa = -b, u_y = int kappa (z - s) ds (trapezi, 4001 punti)
+  order2/compare_order.py  (../../../../../hex_post.py, ../compare_ansys.py)
+    dofs(d)             DOF di Q1 e Q2 dalla topologia (vertici + lati + facce + celle), totali e liberi
+                        (base incastrata tolta); controlla l'ordine VTK e V - E + F - C = 0
+    z3st_time(), z3st_ranks(), ansys_run()   tempo e processi dai log; KEYOPT, equazioni e tempi da solve.out
+    errors(r, cf)       w in punta e lungo z, kappa sopra il core contro hex_post.VP1 (trave)
+    fig_vm(), fig_bowing(), fig_cost()
 
-Closed form
------------
+Forma chiusa
+------------
   u_y(z) = int_0^z kappa(s) (z - s) ds,  kappa = alpha dT/dy r(z),  r = clip(z - 1.5, 0, 1)
-  constant:  u_y = kappa0 (z - 1.5)^3 / 6 (core), kappa0 [1/6 + (z - 2.5)/2 + (z - 2.5)^2/2] (above)
-             core top 1.000, ACLP 3.250, duct top 12.250 mm (as verification/fuel_assembly/IAEA/vp1)
-  Tdep:      same integral, kappa from the E(T)-weighted fit of eps_th(T) on the section;
-             reduces to the constant one for constant alpha and E
-  T linear in y in every section: nearly stress-free bow (the y·z term over the core and the
-  kinks at z = 1.5 and 2.5 m leave ~3 MPa), so E(T) has almost no effect on u.
+  costante:  u_y = kappa0 (z - 1.5)^3 / 6 (core), kappa0 [1/6 + (z - 2.5)/2 + (z - 2.5)^2/2] (sopra)
+             core top 1.000, ACLP 3.250, duct top 12.250 mm (come verification/fuel_assembly/IAEA/vp1)
+  Tdep:      stesso integrale, kappa dal fit di eps_th(T) sulla sezione pesato con E(T);
+             si riduce a quello costante per alpha ed E costanti
+  T lineare in y in ogni sezione: bow quasi privo di tensioni (i ginocchi a z = 1.5 e 2.5 m
+  lasciano 2.5-2.7 MPa nella cella vicina, Q2-Q1; il termine y·z nel core solo ~0.01 MPa, Q2), quindi
+  E(T) non ha quasi effetto su u.
 
-Results (z3st runs of 2026-10-27, 1 step)
------------------------------------------
-                          constant              T-dependent
-  u_y core top  (mm)      0.9860 / 1.0000       1.0510 / 1.0662      z3st / beam, -1.4 %
+Tensioni agli spigoli: perché M_c = 0 in VP1
+--------------------------------------------
+  Formula del telaio iperstatico: sigma_corner = +- K_t 6 M_c / t^2, con M_c dalla chiusura
+  dell'anello (metodo delle forze). In VP1 sopra il core M_c = 0:
+  - T è lineare in (x, y), quindi armonica (anche nello spessore vale la stessa funzione
+    lineare); il flusso netto attorno al foro è nullo (oint dT/dn ds = 0).
+  - Teorema di Dundurs (hex_corner_closed_forms.md §B4, note personali, fuori dal repo:
+    /mnt/c/Users/Mat/Desktop/Newcleo/hex_corner_closed_forms.md): con laplaciano di T = 0, in una
+    sezione multiconnessa restano solo le tensioni di chiusura (condizioni di Michell): la
+    disclinazione Omega = (1+nu) alpha oint dT/dn ds e i due vettori di Burgers (dislocazioni).
+    Omega = 0 da solo non basta (es. T = Re(c/z): armonica, flusso netto nullo, tensioni non nulle).
+    In VP1 T è lineare su tutta la sezione (f = a z + b): tutte e tre le chiusure sono nulle e la
+    deformazione termica è congruente ovunque, quindi le tensioni nel piano sono nulle.
+  - Visto come telaio: i lati inclinati hanno una curvatura termica alpha (grad T . n) che
+    compensa esattamente lo scarto di chiusura dovuto agli allungamenti diversi dei lati;
+    il campo libero u = alpha (theta P - |P|^2 g / 2) (hex_post.VP1._free) è congruente.
+  Verifica: sopra il core Q2 dà sigma_vm ~ 3e-8 MPa (order2/). Le tensioni restano solo ai
+  ginocchi della rampa (z = 1.5 e 2.5 m, effetto di guscio lungo z, non di telaio) e
+  all'incastro. M_c != 0 richiede T non armonica nella sezione: VP2 (../VP2/VP2_notes.txt).
+
+Risultati (run z3st del 2026-10-27, 1 passo)
+--------------------------------------------
+                          costante              dipendente da T
+  u_y core top  (mm)      0.9860 / 1.0000       1.0510 / 1.0662      z3st / trave, -1.4 %
   u_y ACLP      (mm)      3.2350 / 3.2500       3.4740 / 3.4903      -0.5 %
   u_y duct top  (mm)     12.2311 / 12.2500     13.2066 / 13.2271     -0.15 %
-  von Mises max / median  2.73 / 0.06 MPa       2.82 / 0.10 MPa      max at the ramp kink z = 1.5 m
-  Tdep / constant at the duct top: 1.07975 (z3st), 1.07976 (beam)
-  z3st sits ~0.015 mm below the beam at every station with both cards; tolerance 2 %
-  (verification/fuel_assembly/IAEA/vp1: -2.1 % at the core top).
+  von Mises max / mediana 2.73 / 0.06 MPa       2.82 / 0.10 MPa      max al ginocchio della rampa z = 1.5 m
+  Tdep / costante al duct top: 1.07975 (z3st), 1.07976 (trave)
+  z3st sta ~0.015 mm sotto la trave a ogni stazione con entrambe le card; tolleranza 2 %
+  (verification/fuel_assembly/IAEA/vp1: -2.1 % al core top).
 
-Limits
+order2: Q1, Q2 e Ansys KEYOPT(2)=3 (2026-11-05)
+-----------------------------------------------
+  Stesso caso costante (opzione z-gradient); cambia solo l'elemento.
+  Ansys: SOLID185, KEYOPT(2)=3 (simplified enhanced strain), letto da solve.out.
+    export  FEM/ansys_vp1/z_gradient/vp1_ansys_{nodes,elems}.txt (20-10 18:40, stesso run di
+            VP1_zramp_files/dp0/SYS-2/MECH/solve.out); le copie .txt in MECH sono state
+            sovrascritte il 28-10 con un'altra soluzione (eps_th diverso di ~1 K): non usarle.
+    card    EX 1.7e11, NUXY 0.3, ALPX 1.8e-5, REFT 400 C: uguale a 15_15Ti_const.yaml
+    T       ricostruita da EPTH: |T_Ansys - T_z3st| max 6.6e-6 K (stessa opzione)
+
+                         DOF (totali / liberi)   processi  tempo (s)    w punta     kappa sopra   sigma_vm max
+                                                                        vs trave    il core       in punta
+  z3st Q1                115 488 / 115 200       1         8.5          -0.154 %    -0.038 %      0.50 MPa
+  z3st Q2                692 064 / 691 200       1         50.4         -0.113 %     0.000 %      3e-8 MPa
+  Ansys KEYOPT(2)=3      115 488 / 115 200       4         20.8 (2.2)   -0.112 %    +0.000 %      0.08 MPa
+
+  DOF liberi = senza la base incastrata (= "Number of equations" di Ansys); z3st tiene le righe
+  di Dirichlet nella matrice e risolve i totali. Q2 = 96 x 3 x 801 nodi x 3.
+  Tempi non confrontabili: z3st = run intera (lettura mesh, compilazione delle forme,
+  2 iterazioni staggered = 2 solve meccanici, output), WSL; Ansys = elapsed totale
+  (fase di soluzione tra parentesi), 4 processi distribuiti, Windows.
+
+  Interpretazione:
+  - -0.11 % in punta comune a Q2 e Ansys: non è discretizzazione. È il taglio termico nel core
+    (gamma = w' - psi), che la trave di Eulero-Bernoulli esclude: w - w_trave cresce linearmente
+    nel core fino a -13.7 um a z = 2.5 m e resta costante sopra (dw/dz ~ -1.4e-5, ordine di
+    alpha c R^2 / 2). Stesso valore di beam1d (-13.8 um).
+  - Q1 - Q2 = -0.041 % in punta: deficit di curvatura sopra il core (-0.038 %) e sigma_vm
+    spuria 0.26-0.50 MPa dove la forma chiusa dà sezione senza tensioni. Con una sola cella Q1
+    nello spessore il campo libero, quadratico, non è rappresentabile (locking / errore di
+    consistenza). Q2 lo rappresenta esattamente; l'enhanced strain di Ansys quasi (0.04-0.08 MPa
+    vicino agli spigoli, celle non parallelepipede).
+  - Ingresso/uscita core (z = 1.5 / 2.5 m): sigma_vm max 2.72 (Q1), 2.46 (Q2), 2.73 (Ansys) MPa
+    nella cella vicina al ginocchio di T (dT/dz discontinua). Dipende da dz = 10 mm: non è un
+    valore a convergenza e Q2 non è un riferimento (la figura dà le differenze da Q2, non errori).
+  - Punto di valutazione: z3st DG0 al centro cella, Ansys ETABLE S = media degli 8 valori
+    nodali dell'elemento = media dei punti di Gauss 2x2x2, cioè circa il centroide. Non spiega
+    le differenze.
+
+Limiti
 ------
-  - T is fixed on every node: the thermal equation is never solved, k and cp have no effect,
-    and -k grad T would not be a balanced flux (about 6 kW/m2 through the slanted faces,
-    about -1.5 kW/m3 from dk/dT |grad T|^2). HeatFlux is therefore not written
-    (utils/writer.py, _temperature_prescribed(), see below).
-  - eta Sobolev is not the IAEA alpha: the Tdep bow is 8 % larger by definition.
-  - The T expression is written in boundary_conditions.yaml of both cases and in
+  - T è fissata su ogni nodo: l'equazione termica non viene mai risolta, k e cp non hanno
+    effetto, e -k grad T non sarebbe un flusso bilanciato (circa 6 kW/m2 attraverso le facce
+    inclinate, circa -1.5 kW/m3 da dk/dT |grad T|^2). Per questo HeatFlux non viene scritto
+    (utils/writer.py, _temperature_prescribed(), vedi sopra).
+  - eta Sobolev non è l'alpha IAEA: il bow Tdep è più grande dell'8 % per definizione.
+  - L'espressione di T è scritta in boundary_conditions.yaml di entrambi i casi e in
     1515Ti_Tdependent/non-regression.py.
+  - Una cella nello spessore: le tensioni DG0 sono a metà parete, quindi la parte flessionale
+    nello spessore non si vede nelle figure lungo s (in VP1 è comunque nulla, vedi sopra).
 
-Changes of 2026-10-27
----------------------
-  - VP1: thermal model on, T from the Dirichlet expression instead of vp1_temperature.eigenstrain;
-    card 15_15Ti_const.yaml (15_15Ti_local.yaml kept for z_uniform/). Same fields as before (4e-9).
-  - 1515Ti_Tdependent/ created: T-dependent card on the same T.
-  - All bowing cases (VP1, z_uniform, cylinder, cylinder/fine, cylinder/fine_hex, VP2,
-    1515Ti_Tdependent): 1 static step instead of 4 (identical fields, <= 4e-9).
-  - VP1/Allrun: vp1_benchmark, vp1_corners, ../along_y, ../iwgfr_table removed (benchmark
-    comparisons, read vp1_temperature); the files are kept.
-  - VP1/non-regression.py replaced (it was the copy of the inner q + out T case);
-    VP1/diagnostics.py and VP1/case_params.py removed (same case; z3st loaded diagnostics.py
-    at every run and failed with a warning).
-  - utils/writer.py: HeatFlux skipped when every T dof is Dirichlet-constrained (both VP1
-    cases: log line above, no HeatFlux in the .h5; non-regression and gold unchanged, PASS).
-  - Still on vp1_temperature (thermal off): z_uniform/, cylinder/, cylinder/fine*/, and the
-    post files post.yaml, gui_fields.py, compare_ansys.py, vp1_benchmark.py, vp1_corners.py.
+Modifiche del 2026-10-27
+------------------------
+  - VP1: modello termico attivo, T dall'espressione di Dirichlet invece di vp1_temperature.eigenstrain;
+    card 15_15Ti_const.yaml (15_15Ti_local.yaml resta per z_uniform/). Stessi campi di prima (4e-9).
+  - Creato 1515Ti_Tdependent/: card dipendente da T sulla stessa T.
+  - Tutti i casi di bowing (VP1, z_uniform, cylinder, cylinder/fine, cylinder/fine_hex, VP2,
+    1515Ti_Tdependent): 1 passo statico invece di 4 (campi identici, <= 4e-9).
+  - VP1/Allrun: tolti vp1_benchmark, vp1_corners, ../along_y, ../iwgfr_table (confronti con i
+    benchmark, leggono vp1_temperature); i file restano.
+  - VP1/non-regression.py sostituito (era la copia del caso inner q + out T);
+    VP1/diagnostics.py e VP1/case_params.py rimossi (stesso caso; z3st caricava diagnostics.py
+    a ogni run e falliva con un warning).
+  - utils/writer.py: HeatFlux saltato quando tutti i dof di T sono vincolati da Dirichlet (entrambi
+    i casi VP1: riga di log sopra, niente HeatFlux nel .h5; non-regression e gold invariati, PASS).
+  - Ancora su vp1_temperature (termico spento): z_uniform/, cylinder/, cylinder/fine*/, e i
+    file di post post.yaml, gui_fields.py, compare_ansys.py, vp1_benchmark.py, vp1_corners.py.
+
+Modifiche del 2026-11-05
+------------------------
+  - Creato order2/ (nessun file esistente toccato): input.yaml con mechanical.order: 2, Allrun,
+    compare_order.py; run Q2 eseguito (50.4 s; ~8 GB RSS letti con ps durante il run, non nel log).
+  - Note tradotte in italiano; aggiunte le sezioni "Tensioni agli spigoli" e "order2".

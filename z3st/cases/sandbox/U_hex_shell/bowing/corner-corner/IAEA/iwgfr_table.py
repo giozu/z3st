@@ -36,12 +36,12 @@ import sys
 import matplotlib
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
-import yaml  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 U_HEX = os.path.abspath(os.path.join(HERE, *[os.pardir] * 3))
 sys.path.insert(0, U_HEX)
 sys.path.insert(0, HERE)
+import benchmark as bc  # noqa: E402
 import hex_post as hp  # noqa: E402
 import iwgfr  # noqa: E402
 
@@ -56,15 +56,13 @@ def pct(fem, ref):
 
 
 def z3st_values(case_dir):
-    bm = hp._import(f"{os.path.basename(case_dir).lower()}_benchmark", case_dir)
-    with open(os.path.join(case_dir, "post.yaml")) as fh:
-        xdmf = os.path.join(case_dir, yaml.safe_load(fh)["fields"])
-    p = bm.z3st_profiles(xdmf)
-    zs = np.array([bm.STATIONS[s] for s in iwgfr.STATIONS])
+    bm = hp.import_case(f"{os.path.basename(case_dir).lower()}_benchmark", case_dir)
+    p = bm.z3st_profiles()
+    zs = np.array([bc.STATIONS[s] for s in iwgfr.STATIONS])
     Y = np.interp(zs, p["z"], p["w"]) * 1e3
-    Z20 = (np.interp(zs, p["z"], p["u_z"]) + bm.shift_per_m(p, 20.0) * zs) * 1e3
+    Z20 = (np.interp(zs, p["z"], p["u_z"]) + bc.shift_per_m(p, 20.0) * zs) * 1e3
     _, L0, L = p["dH"]
-    dH20 = ((L - L0) + bm.shift_per_m(p, 20.0) * L0) * 1e3
+    dH20 = ((L - L0) + bc.shift_per_m(p, 20.0) * L0) * 1e3
     return bm, p, Y, Z20, dH20, L0
 
 
@@ -106,7 +104,7 @@ def table_y(ex, bm, Y):
     for name, s in bm.SOURCES.items():   # the Part II tables already in the benchmark (not from iwgfr.py)
         if name in iwgfr.CODES or name in iwgfr.SENSITIVITY or name.startswith("IWGFR/75") or not s["Y"]:
             continue
-        notes = {st: bm._note(name, "Y", st) for st in iwgfr.STATIONS}
+        notes = {st: bm.note(name, "Y", st) for st in iwgfr.STATIONS}
         note = (next(iter(notes.values())) if len(set(notes.values())) == 1
                 else "; ".join(f"{st}: {n}" for st, n in notes.items() if n))
         add(s["label"], "IWGFR/76 table", s["Y"], note,
@@ -151,7 +149,7 @@ def table_other(ex, bm, p, Y, Z20, dH20, L0):
 
 
 def _draw(ax, header, rows, fill, widths):
-    tb = hp._table(ax, header, rows, fill=True)
+    tb = hp.table(ax, header, rows, fill=True)
     for (i, c), cell in tb.get_celld().items():
         cell.set_width(widths[c])
         if c == len(header) - 1 and i > 0:

@@ -7,16 +7,20 @@
 #
 #     ./Allpost      post-process every subfolder with a post.yaml, at any depth
 #                    (hex_post.py), compare IAEA VP1 z_uniform with Ansys
-#                    (bowing/corner-corner/IAEA/VP1/compare_ansys.py) and group
+#                    (bowing/corner-corner/IAEA/VP1/compare_ansys.py), draw the
+#                    legend of the components (results_components.py) and group
 #                    results/ by problem (results_organize.py). The 1515Ti_Tdependent
 #                    sets are post-processed only together with the constant card
-#                    (compare_const*.py) and with Ansys when ANSYS_1515TI is set, in
-#                    results/bowing_corner-corner_IAEA_VP1/1515Ti_Tdep/
+#                    (compare_const*.py, compare_alpha_E.py for the separate effects
+#                    of alpha(T) and E(T)) and with Ansys when ANSYS_1515TI is set, in
+#                    results/bowing_corner-corner_IAEA_VP1/1515Ti_Tdep/; the stress
+#                    peaks of the 3D runs are catalogued in results/peaks/
+#                    (peaks_catalogue.py)
 #
 # Reads only the existing outputs: run the cases first. A subfolder with no
 # output is skipped. Every figure and summary goes to results/, first named
 # after its subfolder (<subfolder>_<figure>.png, IAEA_VP1_<option>_vs_Ansys_<figure>),
-# then moved to results/<problem>/.
+# then moved to results/<problem>/ as <figure>.png (the folder names the case).
 
 set -e
 cd "${0%/*}" || exit 1
@@ -29,6 +33,7 @@ python3 bowing/corner-corner/IAEA/VP1/compare_ansys.py
 VP1=bowing/corner-corner/IAEA/VP1
 python3 $VP1/1515Ti_Tdependent/compare_const.py
 python3 $VP1/1515Ti_Tdependent/compare_const_corners.py
+python3 $VP1/1515Ti_Tdependent/compare_alpha_E.py   # needs alpha_only/ and E_only/ run
 A=${ANSYS_1515TI:-}   # folder with Sobolev/ and DiMarcello/ Ansys exports
 for law in Sobolev DiMarcello; do
     case=$VP1/1515Ti_Tdependent; [ "$law" = DiMarcello ] && case=$case/DiMarcello
@@ -38,4 +43,6 @@ for law in Sobolev DiMarcello; do
         echo "SKIP: no Ansys export in \${ANSYS_1515TI}/$law"
     fi
 done
+python3 results_components.py
+python3 peaks_catalogue.py
 python3 results_organize.py

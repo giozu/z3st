@@ -71,3 +71,13 @@ energies.txt
 *.bbl
 *.blg
 force_displacement.txt
+
+# --. U_hex_shell / U_hex_beam: notes, notebooks and comparison scripts --..
+# Not needed to run a case or write its output (Allrun, non-regression.py and the
+# case inputs stay tracked); the comparison scripts are called only by Allpost.
+z3st/cases/sandbox/U_hex_shell/**/*.md
+z3st/cases/sandbox/U_hex_beam/**/*.md
+z3st/cases/sandbox/U_hex_shell/**/*.ipynb
+z3st/cases/sandbox/U_hex_beam/**/*.ipynb
+z3st/cases/sandbox/U_hex_shell/**/compare_*.py
+z3st/cases/sandbox/U_hex_shell/**/fine_check.*

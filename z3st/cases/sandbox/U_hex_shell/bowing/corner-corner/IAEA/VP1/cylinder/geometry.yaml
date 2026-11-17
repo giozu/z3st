@@ -5,9 +5,6 @@ H: 4.000    # height (m)
 t: 0.003    # wall thickness (m), as VP1
 Lz: 4.000   # height (m), read by the z3st mesh manager
 
-# read by vp1_temperature.py only (same T field as VP1): D is the hexagon outer
-# circumscribed diameter, D - 2 t / sqrt(3) = 0.150 m the corner-to-corner depth
-D: 0.153464101
 orientation: vertical # sector boundaries at the hexagon vertices (90, 150, ..., 30 deg); hot direction -y
 
 nf: 8       # elements along each 60-degree sector (VP1: 8 per flat, same element length 9.375 mm)

@@ -10,7 +10,7 @@ perimeter, same T field, material, clamp and mesh layout. Compared at the same
 polar angle, so the difference is the effect of the corners.
 
 Runs (all z-gradient, bottom clamped):
-  hexagon, IWGFR mesh   ../output/vp1_step1_fields_3d       nf 8, nt 1, 400 layers of 10 mm
+  hexagon, IWGFR mesh   ../output/vp1_const_fields_3d       nf 8, nt 1, 400 layers of 10 mm
   tube, IWGFR mesh      output/vp1_tube_fields_3d           same layout
   hexagon, fine         fine_hex/output/vp1_hex_fine_...    nt 3, 1 mm layers within 100 mm of
   tube, fine            fine/output/vp1_tube_fine_...       the core entry and exit (mesh.geo there)
@@ -150,7 +150,7 @@ def bow(d, e):
 
 def main():
     mat = hp.load_material(os.path.join(HERE, "15_15Ti_local.yaml"))
-    m = hp._import("vp1_temperature", HERE)
+    m = hp.import_case("vp1_temperature", HERE)
     D = {}
     D["hex_c"] = load(*RUNS["hex_c"])
     fr = D["hex_c"]["fr"]
@@ -167,7 +167,7 @@ def main():
     verts = np.arange(7) * fr["L_mid"] * 1e3
     for row, (name, z) in enumerate(HEIGHTS.items()):
         prof = {k: at_height(D[k], z) for k in ("hex_c", "hex_f", "tube_f")}
-        zt, lo, hi = layers_lohi(D["tube_f"])
+        _, lo, hi = layers_lohi(D["tube_f"])
         sel = (lo <= z + 1e-9) & (hi >= z - 1e-9)
         cf = tube_closed_form(mat, Rm, t, m, lo[sel], hi[sel])[0].mean() if z < 3.9 else 0.0
         summary["heights"][name] = {"z_m": z, "closed_ss_mean_MPa": float(cf / 1e6)}
@@ -176,10 +176,6 @@ def main():
                 "ss_MPa": [float(v["ss"].min() / 1e6), float(v["ss"].max() / 1e6)],
                 "ss_mean_MPa": float(v["ss"].mean() / 1e6),
                 "zz_MPa": [float(v["zz"].min() / 1e6), float(v["zz"].max() / 1e6)]}
-        pu, v = at_height(D["tube_f"], z)
-        summary["heights"][name]["tube_f"] = {"ss_MPa": [float(v["ss"].min() / 1e6), float(v["ss"].max() / 1e6)],
-                                              "ss_mean_MPa": float(v["ss"].mean() / 1e6),
-                                              "zz_MPa": [float(v["zz"].min() / 1e6), float(v["zz"].max() / 1e6)]}
         for col, key in enumerate(("ss", "zz")):
             ax = axs[row, col]
             for k in ("hex_c", "hex_f", "tube_f"):
@@ -197,7 +193,7 @@ def main():
     for ax in axs[-1]:
         ax.set_xticks(verts)
         ax.set_xticklabels([f"V{i % 6 + 1}\n{v:.0f}" for i, v in enumerate(verts)], fontsize=7)
-        ax.set_xlabel("s along the perimeter (mm)", fontsize=8)
+        ax.set_xlabel("p along the perimeter (mm)", fontsize=8)
     axs[0, 0].legend(fontsize=6.2, loc="lower right")
     axs[0, 1].legend(fontsize=6.2, loc="lower right")
     fig.suptitle("IAEA VP1: hexagon vs tube of the same perimeter (through-wall mean, V5 hot, V2 cold)", fontsize=9)
@@ -238,7 +234,7 @@ def main():
             zu, v = along_z(D["hex_f"], key, phi0=phi0)
             ax.plot(v / 1e6, zu, "-", color=col, lw=1.2, label=f"hexagon, {lab}")
             zu, v = along_z(D["tube_f"], key, phi0=phi0)
-            ax.plot(v / 1e6, zu, "--", color=col, lw=0.9, label=f"tube, same angle")
+            ax.plot(v / 1e6, zu, "--", color=col, lw=0.9, label="tube, same angle")
         ax.set_ylim(z0 - 0.1, z0 + 0.1)
         ax.set_xlabel(f"{title} (MPa)", fontsize=7.5)
         ax.set_title(f"{title}, fine", fontsize=8)

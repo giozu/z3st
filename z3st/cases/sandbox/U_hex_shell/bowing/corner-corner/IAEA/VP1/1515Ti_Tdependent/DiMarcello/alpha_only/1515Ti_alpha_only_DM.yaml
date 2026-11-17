@@ -1,0 +1,24 @@
+name: 1515Ti_Tdep alpha only, Di Marcello (VP1)
+
+# Separate effects of alpha(T) and E(T): thermal expansion eta(T) of the
+# Di Marcello set (eigenstrain hook), E constant as the constant card
+# (../../../15_15Ti_const.yaml). Compared by ../../compare_norms.py with the
+# constant card, the full Di Marcello card (../) and E_only (../E_only).
+
+# Mechanical properties
+E: 1.7e+11                                        # (Pa) constant, IAEA VP1
+nu: 0.3                                           # (-) as 1515Ti_Tdep.yaml and IAEA VP1
+
+# Thermal expansion: eta(T) through the eigenstrain hook, no 'alpha'
+eigenstrain: materials.steel_1515Ti_Tdep.eigenstrain
+expansion_law: DiMarcello
+swelling_law: none
+T_ref: 673.15        # (K) stress-free temperature, VP1 400 °C: strain (eta(T) - eta(T_ref)) / (1 + eta(T_ref))
+T_initial: 673.15    # (K)
+
+# Thermal properties (T fixed by the Dirichlet on every node: no effect)
+k: materials.steel_1515Ti_Tdep.k_DiMarcello          # (W/m·K)
+cp: materials.steel_1515Ti_Tdep.cp_DiMarcello        # (J/kg·K)
+
+# Physical properties
+rho: 7900.0          # (kg/m³) rho0 at 20 °C

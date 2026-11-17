@@ -19,7 +19,7 @@ Each subfolder carries a ``post.yaml`` (paths relative to the subfolder)::
     material: ../15_15Ti_local.yaml    # E, nu, alpha, T_ref (and k for 'radial'); 'vp1' also E(T) + eigenstrain hooks
     temperature: field                 # field | module.func, f(x) with x = (x, y, z)
     support: free                      # clamped (bottom fixed) | free
-    closed_form: none                  # none | radial | vp1:<module> (<module> may be a path, ../vp1_temperature)
+    closed_form: none                  # none | radial | vp1:<module> | vp2:<module> (<module> may be a path, ../vp1_temperature)
     boundary_conditions: ../boundary_conditions.yaml   # 'radial' only: q and T_o
     stations_z: [0.25, 0.5, 0.75, 1.0] # heights of the tables (m), optional
     along_s_z: {inlet core: 1.5, tip: 4.0}  # heights of the along-s figures (m), optional
@@ -65,6 +65,8 @@ Closed forms (``closed_form``), never fitted to the FEM:
           With a T-dependent card (E(T) hook, eigenstrain hook in place of
           alpha): kappa and u_z from the plane-section fit of eps_th(T) on
           the mid-wall line, weighted by E(T) ds; FEM only along s.
+  vp2     vp1 times the section factor C = 4/3 of the VP2 temperature
+          (T1 on the cold half, T2 on the hot half); FEM only along s.
   none    FEM only, said so in the figure.
 
 With several runs, each run is compared with its own closed form.
@@ -103,12 +105,13 @@ COMPASS = {90: "nord", 30: "nord-est", 330: "sud-est", 270: "sud", 210: "sud-wes
 CURVATURE = ("rotation", "gauss")   # post.yaml 'curvature', the first is the default
 RUN_COLORS = ("tab:blue", "tab:orange", "tab:green", "tab:purple")
 LAYER_STYLES = {"inner": "-", "outer": "--"}
+VERTEX_COLORS = ("darkred", "darkblue")   # hot, cold vertex lines along s
 
 
 # --. reading --..
-def _last(group, step_index):
+def _last(group):
     keys = sorted(group, key=lambda k: float(k.replace("_", ".")))
-    return group[keys[step_index]][:]
+    return group[keys[-1]][:]
 
 
 def _tensor(a):
@@ -125,7 +128,7 @@ def _pad3(a):
     return out
 
 
-def _import(name, case_dir):
+def import_case(name, case_dir):
     """Module ``name`` of ``case_dir``: two case folders may hold a module of the
     same name (VP1/vp1_temperature.py and VP1/z_uniform/vp1_temperature.py)."""
     case_dir = os.path.abspath(case_dir)
@@ -138,20 +141,20 @@ def _import(name, case_dir):
     return importlib.import_module(name)
 
 
-def load_z3st(xdmf, step_index=-1, temperature="field", case_dir=HERE):
-    """Mesh and fields of a step: X, cells (VTK order), u (nodes), T (nodes),
+def load_z3st(xdmf, temperature="field", case_dir=HERE):
+    """Mesh and fields of the last step: X, cells (VTK order), u (nodes), T (nodes),
     S and E (cell 3x3 tensors, DG0)."""
     with h5py.File(os.path.splitext(xdmf)[0] + ".h5", "r") as h:
         X = _pad3(h["Mesh/mesh/geometry"][:])
         cells = h["Mesh/mesh/topology"][:]
         f = h["Function"]
-        u = _pad3(_last(f["Displacement"], step_index))
-        S = _tensor(_last(f["Stress"], step_index))
-        E = _tensor(_last(f["Strain"], step_index))
-        T = _last(f["Temperature"], step_index).ravel() if "Temperature" in f else None
+        u = _pad3(_last(f["Displacement"]))
+        S = _tensor(_last(f["Stress"]))
+        E = _tensor(_last(f["Strain"]))
+        T = _last(f["Temperature"]).ravel() if "Temperature" in f else None
     if temperature != "field":
         module, func = temperature.rsplit(".", 1)
-        T = np.asarray(getattr(_import(module, case_dir), func)(X.T), dtype=float)
+        T = np.asarray(getattr(import_case(module, case_dir), func)(X.T), dtype=float)
         T = np.broadcast_to(T, (len(X),)).copy()
     return {"X": X, "cells": cells, "u": u, "T": T, "S": S, "E": E}
 
@@ -167,7 +170,7 @@ def load_material(path):
     return out
 
 
-def _hook(path):
+def card_hook(path):
     """Function of a card hook, module.func of the z3st package (materials.steel_1515Ti_Tdep.E_Sobolev)."""
     module, func = path.rsplit(".", 1)
     # import z3st applies its plot style (utils/plotstyle): rcParams, and the titles as no-ops
@@ -238,14 +241,14 @@ def perimeter_point(fr, p, xi=0.0):
 _REF = np.array([[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0],
                  [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]], dtype=float)
 _G = 0.5 + np.array([-1, 1]) * 0.5 / np.sqrt(3)
-_GP = np.array([[a, b, c] for a in _G for b in _G for c in _G])
+GAUSS_POINTS = np.array([[a, b, c] for a in _G for b in _G for c in _G])
 
 
-def _shape():
-    xi = _GP[:, None, :]
+def shape_functions():
+    xi = GAUSS_POINTS[:, None, :]
     lin = np.where(_REF[None] == 1, xi, 1 - xi)            # (g, n, 3)
     N = lin.prod(axis=2)
-    dN = np.empty((len(_GP), 8, 3))
+    dN = np.empty((len(GAUSS_POINTS), 8, 3))
     sgn = np.where(_REF == 1, 1.0, -1.0)
     for k in range(3):
         others = [j for j in range(3) if j != k]
@@ -258,14 +261,14 @@ def sections(d, fr):
     the layer centroid), with eps_zz = du_z/dz of the nodal u at the Gauss
     points."""
     X, cells = d["X"], d["cells"]
-    N, dN = _shape()
+    N, dN = shape_functions()
     Xc = X[cells]
     J = np.einsum("gnk,cnd->cgdk", dN, Xc)
-    w = np.abs(np.linalg.det(J)) / len(_GP)
+    w = np.abs(np.linalg.det(J)) / len(GAUSS_POINTS)
     xg = np.einsum("gn,cnd->cgd", N, Xc)
     dNdz = np.einsum("gnk,cgk->cgn", dN, np.linalg.inv(J)[..., 2])
 
-    layers, inv = np.unique(np.round(fr["cells"]["z"], 9), return_inverse=True)
+    layers, inv = levels(fr["cells"]["z"])
     dz = np.bincount(inv, weights=np.ptp(Xc[:, :, 2], axis=1)) / np.bincount(inv)
     L = lambda v: np.bincount(inv, weights=v) / dz
     A = L(w.sum(1))
@@ -286,12 +289,12 @@ def rotations(d):
     cell faces (V / 8 h of every cell around it). Needs a mesh extruded
     along z: the same nodes in x, y on every plane."""
     X, cells, uz = d["X"], d["cells"], d["u"][:, 2]
-    planes, inv = np.unique(np.round(X[:, 2], 9), return_inverse=True)
+    planes, inv = levels(X[:, 2])
     if len(set(np.bincount(inv))) != 1:
         raise ValueError("curvature 'rotation' needs a mesh extruded along z (equal node planes): use 'gauss'")
-    _, dN = _shape()
+    _, dN = shape_functions()
     Xc = X[cells]
-    V = np.abs(np.linalg.det(np.einsum("gnk,cnd->cgdk", dN, Xc))).sum(1) / len(_GP)
+    V = np.abs(np.linalg.det(np.einsum("gnk,cnd->cgdk", dN, Xc))).sum(1) / len(GAUSS_POINTS)
     h = np.ptp(Xc[:, :, 2], axis=1)
     wn = np.bincount(cells.ravel(), weights=np.repeat(V / (8 * h), 8), minlength=len(X))
     P = lambda v: np.bincount(inv, weights=wn * v)
@@ -315,7 +318,7 @@ def axis_curvature(d, fr, method="rotation"):
     raise ValueError(f"curvature: {method}, expected one of {CURVATURE}")
 
 
-def _integrate_twice(z, k):
+def integrate_twice(z, k):
     """u'' = k along z with u = u' = 0 at z[0]."""
     slope = np.concatenate([[0.0], np.cumsum(0.5 * (k[1:] + k[:-1]) * np.diff(z))])
     return np.concatenate([[0.0], np.cumsum(0.5 * (slope[1:] + slope[:-1]) * np.diff(z))])
@@ -326,20 +329,26 @@ def chord(z, u):
     return u - (u[0] + (u[-1] - u[0]) * (z - z[0]) / (z[-1] - z[0]))
 
 
+def levels(v):
+    """Distinct values of v (rounded to 1e-9) and the index of every entry among them."""
+    return np.unique(np.round(v, 9), return_inverse=True)
+
+
+def level_mean(v, values):
+    """Distinct values of v and the mean of ``values``, (n,) or (n, k), on each."""
+    lev, inv = levels(v)
+    cnt = np.bincount(inv)
+    if values.ndim == 1:
+        return lev, np.bincount(inv, weights=values) / cnt
+    return lev, np.stack([np.bincount(inv, weights=c) / cnt for c in values.T], axis=1)
+
+
 def section_mean_u(f, u):
-    """Mean displacement of the nodes of each section, at every node (in-plane only)."""
-    zu, inv = np.unique(np.round(f["z"], 9), return_inverse=True)
-    cnt = np.bincount(inv)
+    """Mean in-plane displacement of the nodes of each section, at every node (u_z left 0)."""
+    _, inv = levels(f["z"])
     out = np.zeros_like(u)
-    for i in range(2):
-        out[:, i] = (np.bincount(inv, weights=u[:, i]) / cnt)[inv]
+    out[:, :2] = level_mean(f["z"], u[:, :2])[1][inv]
     return out
-
-
-def along_z_mean(f, values):
-    zu, inv = np.unique(np.round(f["z"], 9), return_inverse=True)
-    cnt = np.bincount(inv)
-    return zu, np.stack([np.bincount(inv, weights=v) / cnt for v in np.atleast_2d(values.T)], axis=1)
 
 
 # --. closed forms --..
@@ -350,14 +359,13 @@ class Radial:
 
     bows = False
 
-    def __init__(self, mat, bcs, case_dir, fr):
+    def __init__(self, mat, bcs, fr):
         th = {bc["type"]: bc for bc in bcs["thermal"]["steel"]}
         self.q = -float(th["Neumann"]["flux"])              # (W/m2) into the wall
         self.T_o = float(th["Dirichlet"]["temperature"])
-        module, func = mat["k"].split(".")
-        k = getattr(_import(module, case_dir), func)
+        k = card_hook(mat["k"])
         self.k0, self.k1 = k(self.T_o), k(self.T_o + 1.0) - k(self.T_o)
-        self.mat, self.fr = mat, fr
+        self.mat = mat
         self.t = fr["t"]
         self.Rc = 3 * fr["L_mid"] / np.pi                   # same mid-wall perimeter 6 L
         self.a, self.b = self.Rc - self.t / 2, self.Rc + self.t / 2
@@ -427,8 +435,8 @@ class VP1:
     bows = True
 
     def __init__(self, module, mat, case_dir, fr):
-        self.m = _import(module, case_dir)
-        self.mat, self.fr = mat, fr
+        self.m = import_case(module, case_dir)
+        self.mat = mat
         self.e = -np.array([np.cos(self.m.PHI_HOT), np.sin(self.m.PHI_HOT)])   # towards the cold corner
         self.Rc = 3 * fr["L_mid"] / np.pi
         self._zz = np.linspace(fr["z0"], fr["z0"] + fr["H"], 40001)
@@ -437,7 +445,7 @@ class VP1:
         return self.mat["alpha"] * (self.m.T2(z) - self.m.T1(z)) / self.m.D
 
     def w(self, z):
-        return np.interp(z, self._zz, _integrate_twice(self._zz, self.kappa(self._zz)))
+        return np.interp(z, self._zz, integrate_twice(self._zz, self.kappa(self._zz)))
 
     def u_z(self, z):
         zz = self._zz
@@ -500,9 +508,9 @@ class VP1Tdep(VP1):
 
     def __init__(self, module, mat, case_dir, fr):
         super().__init__(module, mat, case_dir, fr)
-        E = _hook(mat["E"])
-        eps_th = _hook(mat["eigenstrain"].rsplit(".", 1)[0] + ".thermal_strain")
-        law = mat["expansion_law"] or "Sobolev"
+        E = card_hook(mat["E"])
+        eps_th = card_hook(mat["eigenstrain"].rsplit(".", 1)[0] + ".thermal_strain")
+        law = mat["expansion_law"] or "Sobolev"   # native default of steel_1515Ti_Tdep.eigenstrain
         p = (np.arange(6 * 400) + 0.5) * fr["L_mid"] / 400       # mid-wall line, 400 points a flat
         x, y, _ = perimeter_point(fr, p, 0.0)
         A = np.stack([np.ones_like(x), x, y], axis=1)
@@ -525,19 +533,49 @@ class VP1Tdep(VP1):
         return {}, "T-dependent card: eps_th(T) not linear in x, no stress-free solution along s: FEM only"
 
 
+class VP2(VP1):
+    """VP1 closed form times the section factor C of the VP2 temperature
+    (IAEA VP2): kappa = alpha int theta h dp / int h^2 dp = C alpha (T2 - T1) / D,
+    h along the hot-corner direction, p the mid-wall perimeter of the mesh.
+    For T1 on the cold half, T2 on the hot half, linear between, C = 4/3
+    (IWGFR/75 AT1BOW). The section-mean T is (T1 + T2) / 2: u_z as VP1."""
+
+    def __init__(self, module, mat, case_dir, fr):
+        super().__init__(module, mat, case_dir, fr)
+        p = np.linspace(0.0, 6 * fr["L_mid"], 60001)
+        x, y, _ = perimeter_point(fr, p, 0.0)
+        h = x * np.cos(self.m.PHI_HOT) + y * np.sin(self.m.PHI_HOT)
+        g = self.m.section_shape(h)
+        self.C = float(np.trapezoid((g - np.trapezoid(g, p) / p[-1]) * h, p) / np.trapezoid(h**2, p) * self.m.D)
+        if abs(self.C - 4.0 / 3.0) > 1e-3:
+            raise ValueError(f"VP2 section factor C = {self.C:.5f}, expected 4/3: geometry.yaml and the mesh differ")
+
+    def kappa(self, z):
+        return self.C * super().kappa(z)
+
+    def references(self, fr, z, layers):
+        return {}, "T not linear in (x, y): no stress-free closed form, FEM only"
+
+
 def closed_form(cfg, mat, case_dir, fr):
+    """Closed form of post.yaml 'closed_form': none | radial | vp1:<module> | vp2:<module>."""
     kind = str(cfg.get("closed_form", "none"))
+    if kind == "none":
+        return None
     if kind == "radial":
         with open(os.path.join(case_dir, cfg["boundary_conditions"])) as fh:
-            return Radial(mat, yaml.safe_load(fh), case_dir, fr)
-    if kind.startswith("vp1:"):
-        mod_dir, module = os.path.split(os.path.normpath(os.path.join(case_dir, kind.split(":", 1)[1])))
+            return Radial(mat, yaml.safe_load(fh), fr)
+    name, _, module_path = kind.partition(":")
+    mod_dir, module = os.path.split(os.path.normpath(os.path.join(case_dir, module_path)))
+    if name == "vp1":
         return (VP1 if "alpha" in mat else VP1Tdep)(module, mat, mod_dir, fr)
-    return None
+    if name == "vp2":
+        return VP2(module, mat, mod_dir, fr)
+    raise ValueError(f"closed_form: {kind}, expected none | radial | vp1:<module> | vp2:<module>")
 
 
 # --. analysis --..
-def analyse(d, mat, support="free", closed=None, curvature=CURVATURE[0]):
+def analyse(d, support="free", closed=None, curvature=CURVATURE[0]):
     """FEM quantities of one dataset, projected on the closed-form bowing
     direction when there is one; curvature: rotation | gauss (axis_curvature)."""
     fr = frame(d)
@@ -558,11 +596,25 @@ def analyse(d, mat, support="free", closed=None, curvature=CURVATURE[0]):
     else:
         k_max = kap[np.argmax(np.linalg.norm(kap, axis=1))]
         e = k_max / np.linalg.norm(k_max) if np.linalg.norm(k_max) > 1e-9 else np.array([1.0, 0.0])
-    zn, ubar = along_z_mean(fr["nodes"], d["u"])
+    zn, ubar = level_mean(fr["nodes"]["z"], d["u"])
     w = ubar[:, :2] @ e
     res.update({"e": e, "e_perp": np.array([-e[1], e[0]]), "z_sec": z_sec, "kappa": kap @ e,
                 "z_nodes": zn, "u_bar": ubar, "w": w if support == "clamped" else chord(zn, w)})
     return res
+
+
+def check_same_case(runs, ref, T_tol):
+    """Exit unless every analyse result of ``runs`` {label: res} has the mesh,
+    the nodal T (within T_tol, K) and the bowing direction of ``ref``: results
+    of different cases are never compared."""
+    for lab, r in runs.items():
+        if not (np.array_equal(r["data"]["cells"], ref["data"]["cells"]) and np.allclose(r["data"]["X"], ref["data"]["X"])):
+            sys.exit(f"{lab}: mesh differs from the reference run")
+        dT = np.abs(r["data"]["T"] - ref["data"]["T"]).max()
+        if dT > T_tol:
+            sys.exit(f"T of {lab} and the reference differ by up to {dT:.2e} K (> {T_tol} K): not the same case")
+        if not np.allclose(r["e"], ref["e"], atol=1e-6):   # w of every run along the same direction
+            sys.exit(f"{lab}: bowing direction {r['e']} differs from the reference run {ref['e']}")
 
 
 def max_stresses(res):
@@ -619,14 +671,14 @@ def _closed_forms(runs):
 
 
 # --. figures --..
-def _finish(fig, title, subtitle, top=0.90):
+def finish(fig, title, subtitle, top=0.90):
     fig.suptitle(title, fontsize=15, fontweight="bold", y=0.995)
     fig.text(0.5, 0.96, subtitle, ha="center", va="top", fontsize=10)
     fig.tight_layout(rect=(0, 0, 1, top))
     return fig
 
 
-def _table(ax, header, rows, fill=False):
+def table(ax, header, rows, fill=False):
     """Table on ``ax``; ``fill`` stretches it over the whole axes."""
     ax.axis("off")
     kw = {"bbox": [0, 0, 1, 1]} if fill else {"loc": "center"}
@@ -642,16 +694,16 @@ def _table(ax, header, rows, fill=False):
     return tb
 
 
-def _zoom_bulk(ax, data, fr, refs=(), ratio=5.0):
+def _zoom_bulk(ax, data, fr, refs=()):
     """Full range on ``ax``; when the ``data`` within one D of the bottom and
     of the top (Saint-Venant end zones) stretch the x range to more than
-    ``ratio`` times that of the rest, an inset zoomed on the rest. ``data``,
+    5 times that of the rest, an inset zoomed on the rest. ``data``,
     ``refs``: (x, z_mm, style) with style the plot kwargs; ``refs`` (reference
     lines) are drawn in the inset only."""
     z_lo, z_hi = (fr["z0"] + fr["D"]) * 1e3, (fr["z0"] + fr["H"] - fr["D"]) * 1e3
     allx = np.concatenate([x for x, _, _ in data])
     bulk = np.concatenate([x[(z > z_lo) & (z < z_hi)] for x, z, _ in data])
-    if not bulk.size or np.ptp(allx) <= ratio * max(np.ptp(bulk), 1e-12 * np.abs(allx).max()):
+    if not bulk.size or np.ptp(allx) <= 5.0 * max(np.ptp(bulk), 1e-12 * np.abs(allx).max()):
         return
     lo, hi = bulk.min(), bulk.max()
     pad = 0.1 * max(hi - lo, 1e-3 * np.abs(bulk).max(), 1e-30)
@@ -667,72 +719,75 @@ def _zoom_bulk(ax, data, fr, refs=(), ratio=5.0):
     ins.grid(alpha=0.4)
 
 
-def fig_beam(runs, zs, title, kind):
-    """VTB layout: quantity on x, axial position (mm) on y; closed form as
-    circles on the same axes; table at the stations."""
-    r0 = runs[0][1]
-    cf = r0["closed"]
+def _beam_spec(kind, r0):
+    """Settings of fig_beam for ``kind`` 'w' or 'kappa'; ``diff`` is the
+    difference from the closed form shown in the panel and the table."""
     is_w = kind == "w"
-    zkey = "z_nodes" if is_w else "z_sec"
-    scale, unit = (1e3, "mm") if is_w else (1.0, "1/m")
-    name = "Bowing displacement" if is_w else "Curvature κ"
-    rel = cf is not None and cf.bows
-    if rel:   # curves, their difference from the closed form, table below
-        fig = plt.figure(figsize=(14, 11))
-        gs = fig.add_gridspec(2, 2, height_ratios=(3, 1.1), hspace=0.3)
-        ax, tax = fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[1, :])
-        dax = fig.add_subplot(gs[0, 1], sharey=ax)
-    else:     # curve (or note) next to the table
-        fig = plt.figure(figsize=(14, 6.5))
-        gs = fig.add_gridspec(1, 2, width_ratios=(1, 1.1), wspace=0.15)
-        ax, tax, dax = fig.add_subplot(gs[0]), fig.add_subplot(gs[1]), None
+    cf, fr = r0["closed"], r0["frame"]
+    sp = {"is_w": is_w, "zkey": "z_nodes" if is_w else "z_sec", "scale": 1e3 if is_w else 1.0,
+          "unit": "mm" if is_w else "1/m", "name": "Bowing displacement" if is_w else "Curvature κ",
+          "rel": cf is not None and cf.bows}
+    if is_w:
+        sp["dunit"], sp["diff"] = "µm", lambda v, ref, c: (v - ref) * 1e6
+    else:     # in % of the largest closed-form κ: defined also where κ_closed = 0
+        zg = np.linspace(fr["z0"], fr["z0"] + fr["H"], 401)
+        sp["dunit"], sp["diff"] = "% of max closed-form κ", lambda v, ref, c: (v - ref) / np.abs(c.kappa(zg)).max() * 100
+    return sp
 
-    fr = r0["frame"]
+
+def _own(r, cf):
+    """Closed form a run is compared with: its own, else that of the first run."""
+    return r["closed"] if r["closed"] is not None else cf
+
+
+def _beam_curves(ax, runs, kind, sp, cfs, fr):
+    """FEM lines and closed-form circles (red; with several closed forms, the colour of their run)."""
+    lines = [(r[kind] * sp["scale"], r[sp["zkey"]] * 1e3, dict(color=color, lw=1.6, label=f"FEM {label}"))
+             for (label, r), color in zip(runs, RUN_COLORS)]
+    zc = np.linspace(fr["z0"], fr["z0"] + fr["H"], 26)
+    one = len(cfs) == 1
+    points = [((c.w(zc) if sp["is_w"] else c.kappa(zc)) * sp["scale"], zc * 1e3,
+               dict(ls="none", marker="o", mfc="none", ms=7, mec="red" if one else color,
+                    label="closed form (equation)" if one else f"closed form, {lab}")) for lab, c, color in cfs]
+    for x, z, style in lines + points:
+        ax.plot(x, z, **style)
+    ax.set(xlabel=f"{sp['name']} ({sp['unit']})", ylabel="Axial location (mm)")
+    ax.grid(alpha=0.4)
+    ax.legend(loc="upper left", fontsize=9)
+    _zoom_bulk(ax, lines + points, fr)
+
+
+def _beam_difference(dax, ax, runs, kind, sp, cf, fr):
+    """FEM - closed form along z, each run against its own closed form."""
+    zkey = sp["zkey"]
+    lines = []
+    for (label, r), color in zip(runs, RUN_COLORS):
+        c = _own(r, cf)
+        ref = c.w(r[zkey]) if sp["is_w"] else c.kappa(r[zkey])
+        lines.append((sp["diff"](r[kind], ref, c), r[zkey] * 1e3, dict(color=color, lw=1.6, label=f"FEM {label}")))
+    for x, z, style in lines:
+        dax.plot(x, z, **style)
+    dax.axvline(0, color="red", lw=1.0)
+    dax.set(xlabel=f"FEM − closed form ({sp['dunit']})", title="Difference from the closed form")
+    dax.grid(alpha=0.4)
+    dax.legend(loc="upper left", fontsize=9)
+    plt.setp(dax.get_yticklabels(), visible=False)
+    _zoom_bulk(dax, lines, fr, refs=[(np.zeros(2), np.array(ax.get_ylim()), dict(color="red", lw=1.0))])
+
+
+def _beam_zero_note(ax, runs, kind, sp):
+    """Closed form zero by symmetry: a note with the FEM round-off instead of the curves."""
     fem_max = max(np.abs(r[kind]).max() for _, r in runs)
-    cfs = _closed_forms(runs)
-    own = lambda r: r["closed"] if r["closed"] is not None else cf     # closed form a run is compared with
-    if rel:   # one difference for the panel and the table, each run against its own closed form
-        if is_w:
-            dunit, diff = "µm", (lambda v, ref, c: (v - ref) * 1e6)
-        else:     # in % of the largest closed-form κ: defined also where κ_closed = 0
-            zg = np.linspace(fr["z0"], fr["z0"] + fr["H"], 401)
-            dunit, diff = "% of max closed-form κ", (lambda v, ref, c: (v - ref) / np.abs(c.kappa(zg)).max() * 100)
-    if cf is None or cf.bows:
-        lines = [(r[kind] * scale, r[zkey] * 1e3, dict(color=color, lw=1.6, label=f"FEM {label}"))
-                 for (label, r), color in zip(runs, RUN_COLORS)]
-        points = []
-        zc = np.linspace(fr["z0"], fr["z0"] + fr["H"], 26)
-        for lab, c, color in cfs:    # red circles; with several closed forms, the colour of their run
-            v = c.w(zc) if is_w else c.kappa(zc)
-            one = len(cfs) == 1
-            points.append((v * scale, zc * 1e3, dict(ls="none", marker="o", mfc="none", ms=7,
-                                                     mec="red" if one else color,
-                                                     label="closed form (equation)" if one else f"closed form, {lab}")))
-        for x, z, style in lines + points:
-            ax.plot(x, z, **style)
-        ax.set(xlabel=f"{name} ({unit})", ylabel="Axial location (mm)")
-        ax.grid(alpha=0.4)
-        ax.legend(loc="upper left", fontsize=9)
-        _zoom_bulk(ax, lines + points, fr)
-    if rel:   # difference panel
-        lines = [(diff(r[kind], own(r).w(r[zkey]) if is_w else own(r).kappa(r[zkey]), own(r)), r[zkey] * 1e3,
-                  dict(color=color, lw=1.6, label=f"FEM {label}")) for (label, r), color in zip(runs, RUN_COLORS)]
-        for x, z, style in lines:
-            dax.plot(x, z, **style)
-        dax.axvline(0, color="red", lw=1.0)
-        dax.set(xlabel=f"FEM − closed form ({dunit})", title="Difference from the closed form")
-        dax.grid(alpha=0.4)
-        dax.legend(loc="upper left", fontsize=9)
-        plt.setp(dax.get_yticklabels(), visible=False)
-        _zoom_bulk(dax, lines, fr, refs=[(np.zeros(2), np.array(ax.get_ylim()), dict(color="red", lw=1.0))])
-    if not (cf is None or cf.bows):
-        ax.axis("off")
-        ax.text(0.5, 0.5, f"Closed form: {name.lower()} = 0\n(temperature symmetric under\nthe hexagon rotations)\n\n"
-                f"FEM: max |{'w' if is_w else 'κ'}| = {fem_max * scale:.1e} {unit}\n(round-off, nothing to plot)",
-                ha="center", va="center", fontsize=12, transform=ax.transAxes,
-                bbox=dict(boxstyle="round", fc="#f4f4f4", ec="0.7"))
+    ax.axis("off")
+    ax.text(0.5, 0.5, f"Closed form: {sp['name'].lower()} = 0\n(temperature symmetric under\nthe hexagon rotations)\n\n"
+            f"FEM: max |{'w' if sp['is_w'] else 'κ'}| = {fem_max * sp['scale']:.1e} {sp['unit']}\n(round-off, nothing to plot)",
+            ha="center", va="center", fontsize=12, transform=ax.transAxes,
+            bbox=dict(boxstyle="round", fc="#f4f4f4", ec="0.7"))
 
-    rows = beam_table(runs, zs)
+
+def _beam_table(tax, runs, zs, sp, cf, cfs):
+    """Closed form(s), FEM and their difference at the stations zs (beam_table)."""
+    is_w, rel, diff = sp["is_w"], sp["rel"], sp["diff"]
     key = (lambda lab: f"w_{lab}_mm") if is_w else (lambda lab: f"kappa_{lab}")
     ck = "w_closed_mm" if is_w else "kappa_closed"
     ckey = lambda lab, c: ck if c is cf else (f"w_closed_{lab}_mm" if is_w else f"kappa_closed_{lab}")
@@ -741,40 +796,69 @@ def fig_beam(runs, zs, title, kind):
               + [f"FEM\n{lab}" for lab, _ in runs] + ([f"{lab}\n− closed form" for lab, _ in runs] if rel else []))
     si = 1e-3 if is_w else 1.0     # table w in mm
     body = []
-    for row in rows:
+    for row in beam_table(runs, zs):
         line = [f"{row['z_m'] * 1e3:.0f}"] + [fmt(row[ckey(lab, c)]) for lab, c, _ in cfs]
         line += [fmt(row[key(lab)]) for lab, _ in runs]
         if rel:
-            dv = [f"{diff(row[key(lab)] * si, row[ckey(lab, own(r))] * si, own(r)):+.2f}" for lab, r in runs]
+            dv = [f"{diff(row[key(lab)] * si, row[ckey(lab, _own(r, cf))] * si, _own(r, cf)):+.2f}" for lab, r in runs]
             line += [s.replace("-0.00", "0.00").replace("+0.00", "0.00") for s in dv]
         body.append(line)
     if rel:
-        tb = _table(tax, header, body, fill=True)
+        tb = table(tax, header, body, fill=True)
         for (r, _), cell in tb.get_celld().items():
             if r == 0:
                 cell.set_height(cell.get_height() * 1.6)
     else:
-        _table(tax, header, body)
-    ttl = f"{name} ({unit}) at the stations"
+        table(tax, header, body)
+    ttl = f"{sp['name']} ({sp['unit']}) at the stations"
     if rel:
-        ttl += f"; differences from the closed form in {dunit}"
+        ttl += f"; differences from the closed form in {sp['dunit']}"
     tax.set_title(ttl, fontsize=11)
-    sub = f"{name} along the axis"
+
+
+def _beam_subtitle(sp, cf, support):
+    sub = f"{sp['name']} along the axis"
     if cf is None:
         sub += " — no closed form for this case: FEM only"
     elif not cf.bows:
         sub += " — closed form zero by symmetry: values in the table"
     else:
         sub += " — FEM (lines) vs closed form (circles)"
-    if not is_w:
+    if not sp["is_w"]:
         sub += "\nFEM curvature: plane-section fit of ε_zz over each section"
-    elif r0["support"] == "clamped":
+    elif support == "clamped":
         sub += "\nclamped base, u = u' = 0; FEM: mean of the nodes of each section"
     else:
         sub += "\nfree ends: measured from the chord between the two ends; FEM: mean of the nodes of each section"
+    return sub
+
+
+def fig_beam(runs, zs, title, kind):
+    """VTB layout: quantity on x, axial position (mm) on y; closed form as
+    circles on the same axes; table at the stations."""
+    r0 = runs[0][1]
+    cf, fr = r0["closed"], r0["frame"]
+    sp = _beam_spec(kind, r0)
+    cfs = _closed_forms(runs)
+    if sp["rel"]:   # curves, their difference from the closed form, table below
+        fig = plt.figure(figsize=(14, 11))
+        gs = fig.add_gridspec(2, 2, height_ratios=(3, 1.1), hspace=0.3)
+        ax, tax = fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[1, :])
+        dax = fig.add_subplot(gs[0, 1], sharey=ax)
+    else:     # curve (or note) next to the table
+        fig = plt.figure(figsize=(14, 6.5))
+        gs = fig.add_gridspec(1, 2, width_ratios=(1, 1.1), wspace=0.15)
+        ax, tax = fig.add_subplot(gs[0]), fig.add_subplot(gs[1])
+    if cf is None or cf.bows:
+        _beam_curves(ax, runs, kind, sp, cfs, fr)
+    else:
+        _beam_zero_note(ax, runs, kind, sp)
+    if sp["rel"]:
+        _beam_difference(dax, ax, runs, kind, sp, cf, fr)
+    _beam_table(tax, runs, zs, sp, cf, cfs)
     fig.suptitle(title, fontsize=15, fontweight="bold", y=0.995)
-    fig.text(0.5, 0.965, sub, ha="center", va="top", fontsize=10)
-    fig.subplots_adjust(top=0.89 if rel else 0.83, bottom=0.04 if rel else 0.09, left=0.07, right=0.97)
+    fig.text(0.5, 0.965, _beam_subtitle(sp, cf, r0["support"]), ha="center", va="top", fontsize=10)
+    fig.subplots_adjust(top=0.89 if sp["rel"] else 0.83, bottom=0.04 if sp["rel"] else 0.09, left=0.07, right=0.97)
     return fig
 
 
@@ -811,11 +895,11 @@ def fig_displacement(runs, title):
         sub += " — no closed form: FEM only"
     if r0["support"] != "clamped":
         sub += "\nrigid-body modes removed by the solver: u_x, u_y defined up to a rigid motion"
-    return _finish(fig, title, sub, top=0.91)
+    return finish(fig, title, sub, top=0.91)
 
 
-def _max_per_z(z, v):
-    zu, inv = np.unique(np.round(z, 9), return_inverse=True)
+def max_per_z(z, v):
+    zu, inv = levels(z)
     out = np.full(len(zu), -np.inf)
     np.maximum.at(out, inv, v)
     return zu, out
@@ -825,9 +909,9 @@ def fig_stress_z(runs, title):
     fig, ax = plt.subplots(1, 2, figsize=(13, 7), sharey=True)
     for (label, r), color in zip(runs, RUN_COLORS):
         zc = r["frame"]["cells"]["z"]
-        z, v = _max_per_z(zc, r["vm"] * 1e-6)
+        z, v = max_per_z(zc, r["vm"] * 1e-6)
         ax[0].plot(v, z * 1e3, "-", color=color, label=f"FEM {label}")
-        z, v = _max_per_z(zc, np.abs(r["ss"]) * 1e-6)
+        z, v = max_per_z(zc, np.abs(r["ss"]) * 1e-6)
         ax[1].plot(v, z * 1e3, "-", color=color, label=f"FEM {label}")
         m = max_stresses(r)["von Mises"]
         ax[0].plot(m["MPa"], m["z_m"] * 1e3, "*", color=color, ms=14, mec="k",
@@ -838,26 +922,25 @@ def fig_stress_z(runs, title):
         a.set_xscale("symlog", linthresh=1.0)
         a.grid(alpha=0.4)
         a.legend(fontsize=8)
-    return _finish(fig, title, "Largest stresses of each section along the axis (linear below 1 MPa, log above)",
+    return finish(fig, title, "Largest stresses of each section along the axis (linear below 1 MPa, log above)",
                    top=0.93)
 
 
-def _nearest(v, target):
+def nearest(v, target):
     d = np.abs(v - target)
     return d < d.min() + 1e-9
 
 
-def _ring(f, field, z, xi):
-    m = _nearest(f["z"], z) & _nearest(f["xi"], xi)
-    pu, inv = np.unique(np.round(f["p"][m], 9), return_inverse=True)
-    return pu, np.bincount(inv, weights=field[m]) / np.bincount(inv)
+def ring(f, field, z, xi):
+    m = nearest(f["z"], z) & nearest(f["xi"], xi)
+    return level_mean(f["p"][m], field[m])
 
 
-def _layers(fr):
+def wall_layers(fr):
     """Wall layers drawn along s: {side: (cell xi, node xi)}, and whether
     there is a single cell through the wall."""
-    xc = np.unique(np.round(fr["cells"]["xi"], 9))
-    xn = np.unique(np.round(fr["nodes"]["xi"], 9))
+    xc = levels(fr["cells"]["xi"])[0]
+    xn = levels(fr["nodes"]["xi"])[0]
     return {"inner": (xc[0], xn[0]), "outer": (xc[-1], xn[-1])}, len(xc) == 1
 
 
@@ -877,14 +960,14 @@ RECAP_LS, RECAP_NAMES = ("-", "--", "-."), ("solid", "dashed", "dash-dot")   # o
 LEVEL_COLORS = ("tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown")
 
 
-def _references(r0, z):
+def along_s_references(r0, z):
     fr0, cf = r0["frame"], r0["closed"]
     if cf is None:
         return {}, "no closed form for this case: FEM only"
-    return cf.references(fr0, z, _layers(fr0)[0])
+    return cf.references(fr0, z, wall_layers(fr0)[0])
 
 
-def _sides(key, single):
+def drawn_sides(key, single):
     """Wall layers drawn: with one cell through the wall the cell fields have
     a single (mid-wall) layer."""
     return ("inner", "outer") if (key == "u_n" or not single) else ("inner",)
@@ -893,7 +976,7 @@ def _sides(key, single):
 def _draw_s(ax, runs, z, key, refs):
     """Closed forms and FEM of every run along s at z, for one panel key."""
     scale = PANEL[key][0]
-    sides = _sides(key, _layers(runs[0][1]["frame"])[1])
+    sides = drawn_sides(key, wall_layers(runs[0][1]["frame"])[1])
     for label, side, p, v in refs.get(key, []):
         if side in ("inner", "outer") and side not in sides:
             continue
@@ -903,19 +986,56 @@ def _draw_s(ax, runs, z, key, refs):
         ax.plot(p * 1e3, v * scale, label=lab, **REF_STYLE[side])
     for (label, r), color in zip(runs, RUN_COLORS):
         f = r["frame"]["nodes"] if key == "u_n" else r["frame"]["cells"]
-        lay, _ = _layers(r["frame"])
+        lay, _ = wall_layers(r["frame"])
         for side in sides:
             xi_c, xi_n = lay[side]
-            p, v = _ring(f, r[key], z, xi_n if key == "u_n" else xi_c)
+            p, v = ring(f, r[key], z, xi_n if key == "u_n" else xi_c)
             lc = color if len(runs) > 1 else ("tab:blue" if side == "inner" else "tab:red")
             tag = side if len(sides) > 1 else "mid-wall"
             ax.plot(p * 1e3, v * scale, LAYER_STYLES[side], color=lc, lw=1.5, label=f"FEM {label}, {tag}")
 
 
-def _s_axes(ax, fr0, key, flats=False, xlabel=False):
+def thermal_sides(res, z):
+    """Mean T of each flat, T of each vertex, inner and outer face, at z (K)."""
+    fr, T = res["frame"], res["data"]["T"]
+    nd = fr["nodes"]
+    at_z = nearest(nd["z"], z)
+    flats = np.array([T[at_z & (nd["sector"] == m)].mean() for m in range(6)])
+    P = 6 * fr["L_mid"]
+    verts = []
+    for m in range(6):
+        dist = np.abs((nd["p"] - m * fr["L_mid"] + P / 2) % P - P / 2)
+        sel = at_z & (dist < dist[at_z].min() + 1e-3 * fr["L_mid"])
+        verts.append(T[sel].mean())
+    xi_in, xi_out = nd["xi"][at_z].min(), nd["xi"][at_z].max()
+    inner = T[at_z & nearest(np.where(at_z, nd["xi"], np.inf), xi_in)].mean()
+    outer = T[at_z & nearest(np.where(at_z, nd["xi"], np.inf), xi_out)].mean()
+    return {"flats": flats, "verts": np.array(verts), "inner": inner, "outer": outer,
+            "span": np.ptp(T[at_z])}
+
+
+def same_around(th):
+    """Flats within 5 % of the T range at that height: no hot or cold side
+    (the nodal mean of a flat moves by ~2 % with the corner nodes)."""
+    return np.ptp(th["flats"]) < 0.05 * th["span"]
+
+
+def hot_cold(res, z):
+    """Hot and cold vertex (0..5) at z from the nodal T, None when T is
+    uniform or the flats are within 5 % of the T range (same_around)."""
+    th = thermal_sides(res, z)
+    if th["span"] < 1e-3 or same_around(th):
+        return None
+    return int(np.argmax(th["verts"])), int(np.argmin(th["verts"]))
+
+
+def s_axes(ax, fr0, key, flats=False, xlabel=False, hc=None):
+    """Vertex lines (hot / cold vertex of ``hc`` in VERTEX_COLORS), labels and ticks."""
     L = fr0["L_mid"] * 1e3
     for m in range(7):
-        ax.axvline(m * L, color="k", lw=1.0, alpha=0.55)
+        k = hc.index(m % 6) if hc and m % 6 in hc else None
+        ax.axvline(m * L, color="k" if k is None else VERTEX_COLORS[k], lw=1.0 if k is None else 2.0,
+                   alpha=0.55 if k is None else 0.9)
     ax.set_ylabel(PANEL[key][1])
     ax.ticklabel_format(axis="y", useOffset=False)
     ax.grid(alpha=0.35)
@@ -925,9 +1045,14 @@ def _s_axes(ax, fr0, key, flats=False, xlabel=False):
             ax.text((m + 0.5) * L, 1.01, fr0["flats"][m], ha="center", va="bottom", fontsize=9,
                     transform=ax.get_xaxis_transform())
     if xlabel:
-        ax.set_xlabel("s along the perimeter at mid-wall (mm); vertical lines = vertices V1..V6")
+        ax.set_xlabel("p along the perimeter at mid-wall (mm); vertical lines = vertices V1..V6"
+                      + (" (dark red hot, dark blue cold)" if hc else ""))
         ax.set_xticks(np.arange(7) * L)
-        ax.set_xticklabels([f"V{m % 6 + 1}\n{m * L:.0f}" for m in range(7)])
+        tag = {hc[0]: " hot", hc[1]: " cold"} if hc else {}
+        ax.set_xticklabels([f"V{m % 6 + 1}{tag.get(m % 6, '')}\n{m * L:.0f}" for m in range(7)])
+        for m, lab in enumerate(ax.get_xticklabels()):
+            if m % 6 in tag:
+                lab.set_color(VERTEX_COLORS[hc.index(m % 6)])
 
 
 def _layer_note(single):
@@ -938,19 +1063,19 @@ def _layer_note(single):
 def fig_along_s(runs, z, title):
     r0 = runs[0][1]
     fr0 = r0["frame"]
-    refs, ref_note = _references(r0, z)
+    refs, ref_note = along_s_references(r0, z)
     fig, axes = plt.subplots(3, 2, figsize=(16, 12.5), sharex=True)
     for i, (ax, (key, _, _)) in enumerate(zip(axes.flat, PANELS)):
         _draw_s(ax, runs, z, key, refs)
-        _s_axes(ax, fr0, key, flats=i < 2, xlabel=i >= 4)
+        s_axes(ax, fr0, key, flats=i < 2, xlabel=i >= 4, hc=hot_cold(r0, z))
     where = f"z = {z * 1e3:.1f} mm" if fr0["is_3d"] else "plane-strain section"
-    return _finish(fig, title, f"Along s, {where} — {_layer_note(_layers(fr0)[1])}\n{ref_note}", top=0.92)
+    return finish(fig, title, f"Along s, {where} — {_layer_note(wall_layers(fr0)[1])}\n{ref_note}", top=0.92)
 
 
 def _z_cells(fr, z):
     """Cell layers used for the height z (two when z falls on a cell face)."""
     zc = fr["cells"]["z"]
-    return np.unique(np.round(zc[_nearest(zc, z)], 9))
+    return levels(zc[nearest(zc, z)])[0]
 
 
 def fig_along_s_levels(runs, levels, keys, title):
@@ -958,17 +1083,17 @@ def fig_along_s_levels(runs, levels, keys, title):
     one row each, then a recap row with the heights overlaid."""
     r0 = runs[0][1]
     fr0 = r0["frame"]
-    single = _layers(fr0)[1]
+    single = wall_layers(fr0)[1]
     n = len(levels)
     fig, axes = plt.subplots(n + 1, 2, figsize=(16, 3.3 * (n + 1) + 1.2), sharex=True)
     for i, (name, z) in enumerate(levels.items()):
-        refs, note = _references(r0, z)
+        refs, note = along_s_references(r0, z)
         cells = "/".join(f"{c * 1e3:.0f}" for c in _z_cells(fr0, z))
         ref = "closed form shown" if refs else "FEM only: no closed form at this height"
         for j, key in enumerate(keys):
             ax = axes[i, j]
             _draw_s(ax, runs, z, key, refs)
-            _s_axes(ax, fr0, key, flats=i == 0)
+            s_axes(ax, fr0, key, flats=i == 0, hc=hot_cold(r0, z))
             ax.set_title(f"{name}: z = {z * 1e3:.0f} mm (cell layer {cells} mm) — {ref}", fontsize=9,
                          loc="left", pad=16 if i == 0 else 4)
     # recap: color = height; solid first run, dashed the others, dotted the closed form
@@ -979,23 +1104,24 @@ def fig_along_s_levels(runs, levels, keys, title):
         for (name, z), color in zip(levels.items(), LEVEL_COLORS):
             for k, (label, r) in enumerate(runs):
                 f = r["frame"]["nodes"] if key == "u_n" else r["frame"]["cells"]
-                xi_c, xi_n = _layers(r["frame"])[0][side]
-                p, v = _ring(f, r[key], z, xi_n if key == "u_n" else xi_c)
+                xi_c, xi_n = wall_layers(r["frame"])[0][side]
+                p, v = ring(f, r[key], z, xi_n if key == "u_n" else xi_c)
                 ax.plot(p * 1e3, v * scale, RECAP_LS[k % len(RECAP_LS)], color=color, lw=1.5,
                         label=name if k == 0 else None)
-            refs, _ = _references(r0, z)
+            refs, _ = along_s_references(r0, z)
             cand = [c for c in refs.get(key, []) if c[1] == "hex" and (side in c[0] or single)]
             for lab, _, p, v in cand[:1]:
                 ax.plot(p * 1e3, v * scale, ":", color=color, lw=2.2)
-        _s_axes(ax, fr0, key, xlabel=True)
+        hcs = {hot_cold(r0, z) for z in levels.values()}
+        s_axes(ax, fr0, key, xlabel=True, hc=hcs.pop() if len(hcs) == 1 else None)   # same at every height
         wall = f"{side} face" if key == "u_n" else ("mid-wall" if single else "inner layer")
         others = ", ".join(f"{RECAP_NAMES[k % len(RECAP_LS)]} {lab}" for k, (lab, _) in enumerate(runs) if k)
         ax.set_title(f"recap: all heights overlaid ({wall}; solid FEM {runs[0][0]}"
                      + (f", {others}" if others else "") + ", dotted closed form where it exists)",
                      fontsize=9, loc="left")
     sub = (f"Along s at {n} heights (rows) and recap (bottom) — {_layer_note(single)}\n"
-           + _references(r0, max(levels.values()))[1])
-    return _finish(fig, title, sub, top=1 - 1.3 / (3.3 * (n + 1) + 1.2))
+           + along_s_references(r0, max(levels.values()))[1])
+    return finish(fig, title, sub, top=1 - 1.3 / (3.3 * (n + 1) + 1.2))
 
 
 def fig_max_table(runs, title):
@@ -1006,9 +1132,9 @@ def fig_max_table(runs, title):
                          f"{v['to_vertex_mm']:.2f}", f"{v['xi_mm']:+.2f}", f"{v['z_m'] * 1e3:.1f}",
                          f"({v['x_m'] * 1e3:+.1f}, {v['y_m'] * 1e3:+.1f})"])
     fig, ax = plt.subplots(figsize=(15, 1.3 + 0.36 * (len(rows) + 1)))
-    _table(ax, ["code", "quantity", "value (MPa)", "flat", "s (mm)", "to vertex (mm)", "ξ (mm)",
+    table(ax, ["code", "quantity", "value (MPa)", "flat", "s (mm)", "to vertex (mm)", "ξ (mm)",
                 "z (mm)", "(x, y) (mm)"], rows, fill=True)
-    return _finish(fig, title, "Maximum stresses: magnitude and position (cell values; s from mid-flat, "
+    return finish(fig, title, "Maximum stresses: magnitude and position (cell values; s from mid-flat, "
                    "ξ from mid-wall, outward)", top=0.85)
 
 
@@ -1056,15 +1182,15 @@ def fig_vtb_3d(res, title, path):
         p.close()
     fig, ax = plt.subplots(1, 2, figsize=(9, 10))
     for a, (img, v, lab, sub) in zip(ax, panels):
-        im = a.imshow(img)
+        a.imshow(img)
         a.axis("off")
         a.set_title(sub, fontsize=11)
         sm = plt.cm.ScalarMappable(cmap="coolwarm", norm=plt.Normalize(v.min(), v.max()))
         fig.colorbar(sm, ax=a, fraction=0.08, shrink=0.55, location="left", pad=0.02, label=lab)
     sub = ("Temperature mapping (left) and duct bowing (right, magnified), as VTB hex_duct_linear"
            if bows else "Temperature mapping (left) and deformed shape (right, magnified): no bowing")
-    sub += f"\nview across the bowing plane: the bowing direction points to the right"
-    _finish(fig, title, sub, top=0.93).savefig(path, dpi=130)
+    sub += "\nview across the bowing plane: the bowing direction points to the right"
+    finish(fig, title, sub, top=0.93).savefig(path, dpi=130)
     plt.close(fig)
     print(f"[INFO] {path}")
 
@@ -1076,7 +1202,7 @@ def s_heights(res):
         return {"section": 0.0}
     zc = fr["cells"]["z"]
     z_vm = zc[np.argmax(res["vm"])]
-    z_mid = zc[_nearest(zc, fr["z0"] + fr["H"] / 2)][0]
+    z_mid = zc[nearest(zc, fr["z0"] + fr["H"] / 2)][0]
     out = {"zmaxvm": z_vm}
     if abs(z_mid - z_vm) > 1e-9:
         out["zmid"] = z_mid
@@ -1133,7 +1259,7 @@ def run_case(case_dir):
         sys.exit(f"{case}: no Temperature in {xdmf}; set 'temperature: module.func' in post.yaml")
     mat = load_material(path(cfg["material"]))
     cf = closed_form(cfg, mat, case_dir, frame(d))
-    res = analyse(d, mat, cfg.get("support", "free"), cf, cfg.get("curvature", CURVATURE[0]))
+    res = analyse(d, cfg.get("support", "free"), cf, cfg.get("curvature", CURVATURE[0]))
     save_all([("z3st", res)], RESULTS, f"{case}_", case, cfg.get("stations_z"), levels=cfg.get("along_s_z"))
     return res
 

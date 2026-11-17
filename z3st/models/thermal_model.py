@@ -5,6 +5,7 @@
 # Version: 0.4.1 (2026)
 # --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. --- --.. ..- .-.. .-.. ---
 
+import re
 import sys
 
 import dolfinx
@@ -89,18 +90,31 @@ class ThermalModel:
                         )
                         sys.exit(1)
 
-                    # Spatial temperature: a string is an expression in x, y, z (m)
-                    # and np, giving T (K); constant in time. Evaluated with eval: the
-                    # case input is trusted, as are the material modules it imports.
+                    # Spatial temperature: a string is either a "module.func" T(x) (K)
+                    # called on the (3, N) coordinates (m), like the material hooks, or
+                    # an expression in x, y, z (m) and np, giving T (K). Constant in time.
+                    # The expression is evaluated with eval: the case input is trusted,
+                    # as are the material modules it imports.
                     if isinstance(temperature, str):
+                        T_fun = None
+                        if re.fullmatch(r"[A-Za-z_]\w*(\.[A-Za-z_]\w*)+", temperature):
+                            try:
+                                T_fun = self.resolve_function(temperature)
+                            except (ImportError, AttributeError):
+                                pass  # not a module.func: an expression such as np.pi
                         T_f = dolfinx.fem.Function(V_t)
-                        T_f.interpolate(
-                            lambda X, e=temperature: np.broadcast_to(
-                                eval(e, {"__builtins__": {}, "np": np},
-                                     {"x": X[0], "y": X[1], "z": X[2]}),
-                                X.shape[1],
+                        if T_fun is not None:
+                            T_f.interpolate(
+                                lambda X, f=T_fun: np.broadcast_to(f(X), X.shape[1])
                             )
-                        )
+                        else:
+                            T_f.interpolate(
+                                lambda X, e=temperature: np.broadcast_to(
+                                    eval(e, {"__builtins__": {}, "np": np},
+                                         {"x": X[0], "y": X[1], "z": X[2]}),
+                                    X.shape[1],
+                                )
+                            )
                         dofs = dolfinx.fem.locate_dofs_topological(
                             V_t, self.fdim, self.facet_tags.find(region_id)
                         )

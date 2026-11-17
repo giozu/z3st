@@ -21,12 +21,11 @@ and tracked. Derivation in "Exercise - Thermal stress in hexagone- flats.ipynb".
 
 import importlib
 import os
-import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from z3st.utils.non_regression import error_metric, finish, load_case, metric, tracked
+from z3st.utils.non_regression import error_metric, finish, load_case, load_yaml, metric, tracked
 from z3st.utils.utils_extract_xdmf import extract_field_xdmf
 
 # --.. ..- .-.. .-.. --- configuration --.. ..- .-.. .-.. ---
@@ -39,12 +38,12 @@ D, t, H = float(geom["D"]), float(geom["t"]), float(geom["H"])  # m
 nf, nz = int(geom["nf"]), int(geom["nz"])                       # elements along a flat, along z
 E, nu, alpha = float(mat["E"]), float(mat["nu"]), float(mat["alpha"])  # Pa, -, 1/K
 
-sys.path.insert(0, CASE_DIR)
 module, func = mat["k"].rsplit(".", 1)
-k = getattr(importlib.import_module(module), func)  # W/m·K, k(T) of the card
+k = getattr(importlib.import_module(f"z3st.{module}"), func)  # W/m·K, k(T) hook of the card
 
-q = 7000.0   # W/m²  into the inner faces (boundary_conditions.yaml)
-To = 500.0   # K     outer faces (boundary_conditions.yaml)
+bcs = {bc["type"]: bc for bc in load_yaml(CASE_DIR, inp["boundary_conditions_path"])["thermal"]["steel"]}
+q = -float(bcs["Neumann"]["flux"])            # W/m²  into the inner faces
+To = float(bcs["Dirichlet"]["temperature"])   # K     outer faces
 
 R_o = D / 2                                   # m  outer circumradius
 R_i = R_o - 2 * t / np.sqrt(3)                # m  inner circumradius
@@ -56,14 +55,6 @@ TOLERANCE = 1.0e-2  # -
 
 
 # --.. ..- .-.. .-.. --- analytic functions --.. ..- .-.. .-.. ---
-def wall_drop():
-    """T_i - T_o from k((T_i + T_o)/2) (T_i - T_o) = q t (exact for linear k)."""
-    dT = q * t / k(To)
-    for _ in range(50):
-        dT = q * t / k(To + dT / 2)
-    return dT
-
-
 def analytic_T(xi):
     """Kirchhoff: int_To^T k dT = q (t/2 - xi), k linear in T."""
     k0, k1 = k(To), k(To + 1.0) - k(To)
@@ -96,7 +87,7 @@ def rel_l2(num, ref, scale=None):
 
 
 # --.. ..- .-.. .-.. --- results --.. ..- .-.. .-.. ---
-dT_ref = wall_drop()
+dT_ref = analytic_T(-t / 2) - To  # K, T_i - T_o
 
 x, y, z, T_all = extract_field_xdmf(XDMF_FILE, field_name="Temperature", step_index=-1)
 _, _, xi, s = local_frame(x, y)
