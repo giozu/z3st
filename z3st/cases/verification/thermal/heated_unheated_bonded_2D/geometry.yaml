@@ -1,0 +1,14 @@
+name: bonded_slab
+geometry_type: rect
+
+a: 0.02  # heated layer thickness, 0 < x < a (m)
+Lx: 0.10 # slab thickness (m)
+Ly: 0.02 # slab height (m)
+
+labels:
+  xmin: 1
+  xmax: 2
+  ymin: 3
+  ymax: 4
+  heated: 10
+  cold: 11

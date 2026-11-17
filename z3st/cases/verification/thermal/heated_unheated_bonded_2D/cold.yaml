@@ -1,0 +1,10 @@
+name: cold
+k: 50.0               # Thermal conductivity (W/m·K)
+cp: 500.0             # Specific heat capacity (J/kg·K)
+rho: 8000.0           # Density (kg/m³)
+E: 2.0e+11            # Young's modulus (Pa), unused (mechanics off)
+nu: 0.30              # Poisson's ratio (-), unused
+alpha: 1.5e-5         # Thermal expansion coefficient (1/K), unused
+T_ref: 300.0          # Reference temperature (K)
+mu_gamma: 0.0         # Attenuation coefficient (1/m)
+gamma_heating: 0.0    # No source

@@ -1,0 +1,6 @@
+# xmin, ymin and ymax are adiabatic (natural BC); all heat leaves through xmax.
+thermal:
+  cold:
+  - type: Dirichlet
+    region: xmax
+    temperature: 500.0   # (K)
