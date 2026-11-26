@@ -19,3 +19,6 @@ creep_n: 5.89
 creep_Q: 3.21e+5
 hydrogen_content: 0.0
 heating_rate: 4.0
+
+# y: "z3st.materials.zircaloy_loca.y_beta"
+# y: 0.58

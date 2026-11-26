@@ -4,9 +4,9 @@ Ro: 4.765e-3
 Lz: 77.0e-3
 
 labels:
-  zircaloy: 1
-  chromium: 2
-  bottom: 11
-  outer: 12
-  top: 13
-  inner: 14
+  zircaloy: 10
+  chromium: 11
+  bottom: 3
+  outer: 2
+  top: 4
+  inner: 1
