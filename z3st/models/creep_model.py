@@ -31,7 +31,8 @@ The scalar equation is solved by a predictor–corrector split that keeps the
 exact consistent tangent without symbolic nesting (a fully unrolled symbolic
 Newton makes the AD Jacobian grow combinatorially in FFCx):
 
-* a DG0 *predictor* field Δγ₀ holds the exact root, computed cell-wise by a
+* a quadrature-space *predictor* field Δγ₀ holds the exact root at every
+  integration point, computed by a
   vectorised numpy Newton after every mechanical solve (cheap, warm-started);
 * the UFL expression carries one symbolic Newton step from the predictor,
   ``Δγ(u) = Δγ₀ − g(Δγ₀, u)/g'(Δγ₀, u)``.
@@ -41,7 +42,8 @@ vanishes, and ``ufl.derivative`` of the one-step formula yields exactly the
 implicit-function-theorem consistent tangent −(∂g/∂u)/g' through a small
 expression tree. The global problem stays on the displacement space alone.
 
-The accumulated ε_cr lives on a DG0 tensor space per creeping material and is
+The accumulated ε_cr lives on a quadrature tensor space (degree ``q_degree``,
+the degree of the mechanical measures) per creeping material and is
 advanced once per converged time step (mirroring ``update_plastic_history``).
 It is deviatoric by construction (radial-return direction), so creep is
 volume-preserving.
@@ -51,6 +53,7 @@ tensors (axisymmetric / 2d / 3d). Not combinable with damage or plasticity on
 the same run — spine.load_materials guards this.
 """
 
+import basix.ufl
 import dolfinx
 import numpy as np
 import ufl
@@ -235,26 +238,84 @@ class CreepModel:
 
     # --. state management --..
 
+    def _creep_space(self, shape):
+        """Quadrature space of degree ``self.q_degree`` (the degree of the
+        mechanical measures), so ε_cr and Δγ₀ sit exactly on the points where
+        the residual is integrated."""
+        if not hasattr(self, "_creep_V"):
+            self._creep_V = {}
+        if shape not in self._creep_V:
+            el = basix.ufl.quadrature_element(
+                self.mesh.topology.cell_name(), value_shape=shape, degree=self.q_degree)
+            self._creep_V[shape] = dolfinx.fem.functionspace(self.mesh, el)
+        return self._creep_V[shape]
+
+    def _creep_dofs(self, name):
+        """Quadrature-point (block) indices of material ``name``'s cells."""
+        if not hasattr(self, "_creep_dofs_cache"):
+            self._creep_dofs_cache = {}
+        if name not in self._creep_dofs_cache:
+            cells = self.cell_tags.find(self.label_map[name])
+            dm = self._creep_space(()).dofmap
+            self._creep_dofs_cache[name] = (cells, dm.list[cells].ravel())
+        return self._creep_dofs_cache[name]
+
     def _creep_field(self, name):
-        """Accumulated creep strain ε_cr of material ``name`` — a DG0 tensor
-        Function, allocated lazily and zero-initialised."""
+        """Accumulated creep strain ε_cr of material ``name`` — a quadrature
+        tensor Function, allocated lazily and zero-initialised."""
         if not hasattr(self, "eps_cr"):
             self.eps_cr = {}
         if name not in self.eps_cr:
-            V = dolfinx.fem.functionspace(self.mesh, ("DG", 0, (3, 3)))
+            V = self._creep_space((3, 3))
             self.eps_cr[name] = dolfinx.fem.Function(V, name=f"CreepStrain_{name}")
         return self.eps_cr[name]
 
     def _creep_predictor(self, name):
         """Equivalent creep-strain increment predictor Δγ₀ of material
-        ``name`` — a DG0 scalar Function holding the exact radial-return root,
-        maintained by :meth:`update_creep_predictor`."""
+        ``name`` — a quadrature scalar Function holding the exact radial-return
+        root at every integration point, maintained by
+        :meth:`update_creep_predictor`."""
         if not hasattr(self, "_dgamma0"):
             self._dgamma0 = {}
         if name not in self._dgamma0:
-            V = dolfinx.fem.functionspace(self.mesh, ("DG", 0))
+            V = self._creep_space(())
             self._dgamma0[name] = dolfinx.fem.Function(V, name=f"CreepDGamma0_{name}")
         return self._dgamma0[name]
+
+    def _creep_exprs(self, name, material, u, T, dt):
+        """Compiled Expressions for material ``name``, rebuilt only when u, T
+        (by identity) or dt change: JIT lookups per staggered iteration
+        otherwise dominate the run time on small meshes."""
+        if not hasattr(self, "_creep_expr_cache"):
+            self._creep_expr_cache = {}
+        c = self._creep_expr_cache.get(name)
+        if (c is not None and c["u"] is u and c["T"] is T and c["dt"] == dt
+                and c["y"] is material.get("y")):
+            return c
+        V = self._creep_space(())
+        pts = V.element.interpolation_points
+        _, _, sig_eq_tr = self._creep_trial(u, material, T)
+        A_T_ufl, n_ufl = self._creep_params(material, T)
+        const_A = "y" not in material and (
+            float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0)
+        c = {
+            "u": u, "T": T, "dt": dt, "y": material.get("y"),
+            "tmp": dolfinx.fem.Function(V),
+            "sig": dolfinx.fem.Expression(sig_eq_tr, pts),
+            # With creep_A0 == 0 or creep_Q == 0, A(T) folds to a meshless UFL
+            # constant and dolfinx cannot derive the Expression's communicator.
+            "A": None if const_A else dolfinx.fem.Expression(ufl.as_ufl(A_T_ufl), pts),
+            "n": None if (const_A or isinstance(n_ufl, (int, float)))
+                 else dolfinx.fem.Expression(ufl.as_ufl(n_ufl), pts),
+            "n_const": float(material["creep_n"]) if const_A
+                       else (float(n_ufl) if isinstance(n_ufl, (int, float)) else None),
+            "inc": dolfinx.fem.Expression(
+                self.creep_increment(u, material, T, dt),
+                self._creep_space((3, 3)).element.interpolation_points),
+            "delta": dolfinx.fem.Function(self._creep_space((3, 3))),
+        }
+        self._creep_expr_cache[name] = c
+        return c
 
     def update_creep_predictor(self, u, T):
         """Refresh the predictor Δγ₀ to the exact root of the radial-return
@@ -269,66 +330,26 @@ class CreepModel:
             if not self.creep_active(material):
                 continue
             pred = self._creep_predictor(name)
-            cells = self.cell_tags.find(self.label_map[name])
+            cells, dofs = self._creep_dofs(name)
             if dt <= 0.0:
                 pred.x.array[:] = 0.0
                 continue
 
-            # σ_eq_trial on the material's cells (DG0 interpolation)
-            _, _, sig_eq_tr = self._creep_trial(u, material, T)
-            tmp = dolfinx.fem.Function(pred.function_space)
-            expr = dolfinx.fem.Expression(
-                sig_eq_tr, pred.function_space.element.interpolation_points
-            )
-            tmp.interpolate(expr, cells0=cells)
-            sig = tmp.x.array[cells]
-
-            # With creep_A0 == 0 or creep_Q == 0, A(T) = A0·exp(-Q/RT) folds to a
-            # meshless UFL constant and dolfinx cannot derive the Expression's MPI
-            # communicator, so short-circuit to zeros or the constant value instead of
-            # interpolating.
-
-            # Commento questo blocco "if-else" perché ora A(T) dipende dalla fase (alpha/beta) e dal contenuto di idrogeno, quindi va calcolato dinamicamente
-            # if float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0:
-            #     A_val = float(material["creep_A0"])
-            #     Adt = dt * np.full_like(sig, A_val)
-            # else:
-            #     Texpr = dolfinx.fem.Expression(
-            #         ufl.as_ufl(self._creep_A(material, T)),
-            #         pred.function_space.element.interpolation_points,
-            #     )
-            #     tmp.interpolate(Texpr, cells0=cells)
-            #     Adt = dt * tmp.x.array[cells]
-
-            # G = float(getattr(material["G"], "value", material["G"]))
-            # n = float(material["creep_n"])
-
-            # Aggiungo queste righe per ottenere A(T) e n in base alla fase (alpha/beta) e al contenuto di idrogeno
-            A_T_ufl, n_ufl = self._creep_params(material, T)
-
-            if "y" not in material and (float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0):
-                A_val = float(material["creep_A0"])
-                Adt = dt * np.full_like(sig, A_val)
-                n = np.full_like(sig, float(material["creep_n"]))
+            # σ_eq_trial, A(T, y) and n(y) at the material's quadrature points
+            c = self._creep_exprs(name, material, u, T, dt)
+            tmp = c["tmp"]
+            tmp.interpolate(c["sig"], cells0=cells)
+            sig = tmp.x.array[dofs].copy()
+            if c["A"] is None:
+                Adt = dt * np.full_like(sig, float(material["creep_A0"]))
             else:
-                # Valuta A(T, y) su tutte le celle del materiale
-                A_expr = dolfinx.fem.Expression(
-                    ufl.as_ufl(A_T_ufl),
-                    pred.function_space.element.interpolation_points,
-                )
-                tmp.interpolate(A_expr, cells0=cells)
-                Adt = dt * tmp.x.array[cells]
-
-                # Valuta n(y) su tutte le celle del materiale
-                if isinstance(n_ufl, (int, float)):
-                    n = np.full_like(sig, float(n_ufl))
-                else:
-                    n_expr = dolfinx.fem.Expression(
-                        ufl.as_ufl(n_ufl),
-                        pred.function_space.element.interpolation_points,
-                    )
-                    tmp.interpolate(n_expr, cells0=cells)
-                    n = tmp.x.array[cells]
+                tmp.interpolate(c["A"], cells0=cells)
+                Adt = dt * tmp.x.array[dofs]
+            if c["n"] is None:
+                n = np.full_like(sig, c["n_const"])
+            else:
+                tmp.interpolate(c["n"], cells0=cells)
+                n = tmp.x.array[dofs].copy()
 
             G = float(getattr(material["G"], "value", material["G"]))
 
@@ -338,7 +359,7 @@ class CreepModel:
             # Warm-started Newton on g(x) = x − Adt·(σ − 3Gx)^n − Cdt·(σ − 3Gx),
             # clamped to the admissible interval [0, σ/3G). The irradiation term
             # is linear in the base, so g stays increasing and concave.
-            x_old = pred.x.array[cells].copy()
+            x_old = pred.x.array[dofs].copy()
             x = np.clip(x_old, 0.0, sig / (3.0 * G) * (1 - 1e-12))
             for _ in range(_PRED_NEWTON_ITS):
                 base = np.maximum(sig - 3.0 * G * x, 0.0)
@@ -356,7 +377,7 @@ class CreepModel:
                 print(f"  [WARNING] creep predictor Newton for '{name}' not "
                       f"fully converged (max rel residual {worst:.2e}); "
                       "consider smaller dt.")
-            pred.x.array[cells] = x
+            pred.x.array[dofs] = x
             pred.x.scatter_forward()
 
             if x.size:
@@ -383,18 +404,16 @@ class CreepModel:
             if not self.creep_active(material):
                 continue
             eps_cr = self._creep_field(name)
-            delta = dolfinx.fem.Function(eps_cr.function_space)
-            expr = dolfinx.fem.Expression(
-                self.creep_increment(u, material, T, dt),
-                eps_cr.function_space.element.interpolation_points,
-            )
-            cells = self.cell_tags.find(self.label_map[name])
-            delta.interpolate(expr, cells0=cells)
+            c = self._creep_exprs(name, material, u, T, dt)
+            cells, dofs = self._creep_dofs(name)
+            # delta is only ever written on this material's cells: zero elsewhere.
+            delta = c["delta"]
+            delta.interpolate(c["inc"], cells0=cells)
             eps_cr.x.array[:] += delta.x.array
             eps_cr.x.scatter_forward()
 
             # Equivalent accumulated creep strain (diagnostic)
-            arr = eps_cr.x.array.reshape(-1, 9)[cells]
+            arr = eps_cr.x.array.reshape(-1, 9)[dofs]
             eq = np.sqrt(2.0 / 3.0 * np.sum(arr * arr, axis=1))
             if eq.size:
                 print(f"  [creep] {name}: max equivalent creep strain = {eq.max():.4e}")

@@ -376,6 +376,11 @@ class Spine(
                 print(f"  → creep: Norton, A0 = {mat['creep_A0']:.3e} Pa^-n/s, "
                       f"n = {mat['creep_n']:.2f}, Q = {mat['creep_Q']:.3e} J/mol")
 
+                # Creep calculated on the quadrature points of the mechanical residual:
+                # the measures (Solver._build_measures) and the writer projection use this degree.
+                if self.q_degree is None:
+                    self.q_degree = 2 * int(self.input_file.get("mechanical", {}).get("order", 1)) + 1
+
             # Without T_ref the thermal eigenstrain alpha*(T - T_ref) is dropped
             # silently (MechanicalModel.eigenstrain), and the initial
             # temperature falls back to T_ref when T_initial is absent.

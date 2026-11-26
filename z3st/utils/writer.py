@@ -251,20 +251,20 @@ class OutputWriter:
             cells = _mat_cells(name)
             if mech and name in problem.stress:
                 self._stress_sources.append((
-                    self._make_interp_or_proj(problem.stress[name], self.V_tensor_cells),
-                    self._make_interp_or_proj(problem.stress[name], self.V_tensor_points),
+                    self._make_interp_or_proj(problem.stress[name], self.V_tensor_cells, cells),
+                    self._make_interp_or_proj(problem.stress[name], self.V_tensor_points, cells),
                     cells,
                 ))
                 if name in problem.energy_density:
                     self._psi_sources.append((
-                        self._make_interp_or_proj(problem.energy_density[name], self.V_scalar_cells),
-                        self._make_interp_or_proj(problem.energy_density[name], self.V_scalar_points),
+                        self._make_interp_or_proj(problem.energy_density[name], self.V_scalar_cells, cells),
+                        self._make_interp_or_proj(problem.energy_density[name], self.V_scalar_points, cells),
                         cells,
                     ))
             if therm:
                 q_expr = -material["k"] * ufl.grad(problem.T)
                 self._heatflux_sources.append((
-                    self._make_interp_or_proj(q_expr, self.V_vector_cells),
+                    self._make_interp_or_proj(q_expr, self.V_vector_cells, cells),
                     cells,
                 ))
 
@@ -330,7 +330,7 @@ class OutputWriter:
 
     # ---------- field-update helpers ----------
 
-    def _make_interp_or_proj(self, ufl_expr, V):
+    def _make_interp_or_proj(self, ufl_expr, V, cells=None):
         """Build either a ``dolfinx.fem.Expression`` (for interpolation) or a
         cached ``LinearProblem`` (for L2 projection), depending on whether the
         UFL expression can be directly interpolated into ``V``.
@@ -343,6 +343,10 @@ class OutputWriter:
 
         For those we fall back to projection: one linear solve per write() call,
         with the ``LinearProblem`` matrix assembled once and re-used per step.
+        With ``cells`` the projection integrates over those cells only, so a
+        material law is never evaluated on (and blended across the interface
+        with) another material's cells; the 1e-10 mass elsewhere keeps the
+        system regular without biasing the material's dofs.
         """
         try:
             return dolfinx.fem.Expression(ufl_expr, V.element.interpolation_points)
@@ -353,9 +357,19 @@ class OutputWriter:
             )
             u_tr = ufl.TrialFunction(V)
             v = ufl.TestFunction(V)
-            dx = ufl.dx(metadata=self._metadata) if self._metadata else ufl.dx
-            a = ufl.inner(u_tr, v) * dx
-            L = ufl.inner(ufl_expr, v) * dx
+            md = self._metadata or {}
+            dx = ufl.Measure("dx", domain=self.mesh, metadata=md)
+            if cells is None:
+                a = ufl.inner(u_tr, v) * dx
+                L = ufl.inner(ufl_expr, v) * dx
+            else:
+                tdim = self.mesh.topology.dim
+                c = np.unique(np.asarray(cells, dtype=np.int32))
+                mt = dolfinx.mesh.meshtags(self.mesh, tdim, c, np.ones_like(c))
+                dx_m = ufl.Measure("dx", domain=self.mesh, subdomain_data=mt,
+                                   subdomain_id=1, metadata=md)
+                a = ufl.inner(u_tr, v) * dx_m + 1e-10 * ufl.inner(u_tr, v) * dx
+                L = ufl.inner(ufl_expr, v) * dx_m
             return dolfinx.fem.petsc.LinearProblem(
                 a, L,
                 # MUMPS: plain PETSc LU is serial-only and errors on
