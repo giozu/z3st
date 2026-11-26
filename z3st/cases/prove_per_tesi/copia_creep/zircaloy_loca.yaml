@@ -1,0 +1,20 @@
+name: zircaloy-loca
+
+E: 80.0e+9          # (Pa) Modulo di Young ad alta T
+nu: 0.37            # (-) Coefficiente di Poisson
+
+k: 17.0             # (W/(m*K)) Conducibilità termica
+cp: 350.0           # (J/(kg*K)) Calore specifico
+rho: 6500.0         # (kg/m^3) Densità
+
+alpha: 0.0          # (1/K) Poniamo alpha=0 per isolare la sola deformazione di creep (come in Fig. 8)
+T_ref: 823.0        # (K)
+T_initial: 823.0    # (K)
+
+creep: norton
+creep_A0: 1.0       # Valore dummy richiesto dal parser (ignorato quando è presente 'y')
+creep_n: 1.0        # Valore dummy richiesto dal parser
+creep_Q: 1.0        # Valore dummy richiesto dal parser
+
+y: "z3st.materials.zircaloy_loca.y_beta"
+hydrogen_content: 500.0   # (wppm) 0.0 per la curva verde di Fig. 8, oppure 500.0 per la curva blu

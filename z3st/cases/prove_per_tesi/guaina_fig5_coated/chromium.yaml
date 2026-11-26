@@ -1,0 +1,15 @@
+name: Chromium
+E: 2.228e+11        # Pa (stima a ~1100 K da 264110 - 10*T - 0.025*T^2 MPa; usa E costante col predittore di creep)
+nu: 0.21            # -
+k: 76.0             # W/(m*K)
+cp: 520.0           # J/(kg*K)
+rho: 7190.0         # kg/m^3
+alpha: 8.2e-6       # 1/K
+T_ref: 823.0        # K
+T_initial: 823.0    # K
+
+# Modello di creep termico TRANSURANUS (OPERA-HPC D2.1, Tabella 5, p. 20)
+creep: norton
+creep_A0: 3.2557e-41  # Pa^-6.2 s^-1 [5.16e-3 * (1e-6)^6.2]
+creep_n: 6.2          # -
+creep_Q: 3.0627e+5    # J/mol [306.27 kJ/mol]
