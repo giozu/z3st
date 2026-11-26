@@ -415,5 +415,7 @@ class CreepModel:
             # Equivalent accumulated creep strain (diagnostic)
             arr = eps_cr.x.array.reshape(-1, 9)[dofs]
             eq = np.sqrt(2.0 / 3.0 * np.sum(arr * arr, axis=1))
-            if eq.size:
-                print(f"  [creep] {name}: max equivalent creep strain = {eq.max():.4e}")
+            
+            # Global max: a rank may own none of this material's cells.
+            eq_max = self.mesh.comm.allreduce(float(eq.max()) if eq.size else 0.0, op=MPI.MAX)
+            print(f"  [creep] {name}: max equivalent creep strain = {eq_max:.4e}")
