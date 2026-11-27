@@ -9,7 +9,7 @@ Lz    = 77.0e-3;    // Altezza totale provino (m)
 
 n_C = 11;     // nodes across the cladding
 n_L = 5;      // nodes across the coating
-n_z = 2;      // nodes along z (solution is z-independent)
+n_z = 40;     // nodes along z (solution is z-independent)
 
 Point(1) = {Ri, 0, 0};
 Point(2) = {Ro, 0, 0};
@@ -34,7 +34,7 @@ Plane Surface(2) = {2};
 
 Transfinite Line {1, 5} = n_C;
 Transfinite Line {2, 4} = n_L;
-Transfinite Line {3, 6, 7} = n_z;
+Transfinite Line {3, 6, 7} = n_z Using Progression 1;
 Transfinite Surface {1, 2};
 Recombine Surface {1, 2};
 
