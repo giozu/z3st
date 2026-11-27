@@ -15,3 +15,5 @@ gmsh mesh.geo -2 > log_mesh.md
 start=$SECONDS
 Z3ST_PLAIN_LOG=1 mpirun -n "$NP" python3 -m z3st > log_z3st.md
 echo "[Allrun_mpi] Solve completed in $((SECONDS - start)) s on $NP rank(s)  (solver log: log_z3st.md)"
+
+python3 -m z3st.utils.plot_convergence log_z3st.md

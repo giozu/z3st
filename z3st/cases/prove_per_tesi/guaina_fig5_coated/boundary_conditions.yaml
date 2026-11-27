@@ -14,7 +14,7 @@ mechanical:
     - { type: Clamp_x, region: top}    # top cap, tappo, u_r = 0 on top
     - { type: Clamp_y, region: bottom} # bottom fixed on z
     - { type: Clamp_x, region: bottom} # bottom cap, tappo, u_r = 0 on bottom
-  chromium:
-    - { type: Clamp_y, region: bottom} # bottom fixed on z
-    - { type: Clamp_x, region: bottom} # bottom cap, tappo, u_r = 0 on bottom
-    - { type: Clamp_x, region: top}    # top cap, tappo, u_r = 0 on top
+  # chromium: # commentato perche le boundary conditions top e bottom di zircaloy valgono anche qui
+    # - { type: Clamp_x, region: top}    # top cap, tappo, u_r = 0 on top (commentato perche quello sopra vale anche per chromium, la linea "top è una sola")
+    # - { type: Clamp_y, region: bottom} # bottom fixed on z (idem)
+    # - { type: Clamp_x, region: bottom} # bottom cap, tappo, u_r = 0 on bottom (idem)
