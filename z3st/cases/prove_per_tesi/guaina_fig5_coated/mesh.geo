@@ -8,8 +8,8 @@ Lplug = 5.0e-3;     // Altezza tappi terminali (m)
 Lz    = 77.0e-3;    // Altezza totale provino (m)
 
 n_C = 11;     // nodes across the cladding
-n_L = 11;     // nodes across the liner, coating
-n_z = 11;     // nodes along z
+n_L = 5;      // nodes across the coating
+n_z = 2;      // nodes along z (solution is z-independent)
 
 Point(1) = {Ri, 0, 0};
 Point(2) = {Ro, 0, 0};

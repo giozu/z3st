@@ -8,18 +8,11 @@ materials:
 regime: axisymmetric
 
 solver_settings:
-  max_iters: 25
-  relax_T: 0.9
-  relax_u: 0.5
-  relax_aitken: true
-  relax_adaptive: true
-  relax_min: 0.05
-  relax_max: 1.0
-
-time_adaptivity:
-  enabled: true
-  dt_min: 0.05
-  max_cuts: 8
+  max_iters: 100
+  relax_T: 1.0
+  relax_u: 1.0
+  relax_aitken: false
+  relax_adaptive: false
 
 models:
   thermal: true
@@ -29,21 +22,22 @@ thermal:
   analysis: transient
   solver: linear
   linear_solver: direct_mumps
-  rtol: 1.0e-6
-  stag_tol: 1.0e-5
+  rtol: 1.0e-8
+  stag_tol: 1.0e-8
   convergence: rel_norm
 
 mechanical:
-  solver: nonlinear
-  linear_solver: direct_mumps
-  rtol: 1.0e-6
-  stag_tol: 1.0e-4
+  solver: nonlinear # with creep (nonlinear problem), z3st switches automatically to nonlinear Newton SNES
+  linear_solver: direct_mumps # this linear solver is nice, iterative_amg is good fro DOFs > 1e5
+  rtol: 1.0e-8
+  stag_tol: 1e-6
   convergence: rel_norm
   order: 1
 
-time: [0.0, 87.5]
-lhr:  [0.0, 0.0]
-n_steps: 175
+# dt = 5 s below ~1000 K (creep negligible), 0.5 s, 0.25 s, then 0.1 s above 1143 K (t > 80 s)
+time: [0.0, 45.0, 70.0, 80.0, 87.5]
+lhr:  [0.0, 0.0, 0.0, 0.0, 0.0]
+n_steps: [9, 50, 40, 75]
 
 output:
   format: xdmf

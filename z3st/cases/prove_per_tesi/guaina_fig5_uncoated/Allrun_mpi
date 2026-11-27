@@ -1,0 +1,17 @@
+#!/bin/bash
+cd "${0%/*}" || exit 1
+
+#   ./Allrun_mpi        # 2 ranks (default)
+#   ./Allrun_mpi 4      # 4 ranks
+NP="${1:-2}"
+
+# One BLAS thread per rank, so the ranks do not oversubscribe the cores.
+export PATH="/home/giovanni/miniconda3/envs/z3st/bin:$PATH" # conda activate z3st
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+echo "[Allrun_mpi] Solving on $NP rank(s)..."
+gmsh mesh.geo -2 > log_mesh.md
+start=$SECONDS
+Z3ST_PLAIN_LOG=1 mpirun -n "$NP" python3 -m z3st > log_z3st.md
+echo "[Allrun_mpi] Solve completed in $((SECONDS - start)) s on $NP rank(s)  (solver log: log_z3st.md)"

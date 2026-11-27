@@ -1,28 +1,36 @@
 SetFactory("OpenCASCADE");
 
-Ri    = 4.18e-3;
-Ro    = 4.75e-3;
-Rplug = 2.50e-3;
-Lplug = 5.0e-3;
-Lz    = 77.0e-3;
+// Same tube as guaina_fig5_coated, without the Cr layer. End plugs are not
+// meshed: the closed end enters as the end-cap load on "top"
+// (boundary_conditions.yaml), "bottom" is the mid-plane symmetry.
 
-Rectangle(1) = {Rplug, 0.0,        0.0, Ro - Rplug, Lplug};
-Rectangle(2) = {Ri,    Lplug,      0.0, Ro - Ri,    Lz - 2.0 * Lplug};
-Rectangle(3) = {Rplug, Lz - Lplug, 0.0, Ro - Rplug, Lplug};
+Ri = 4.18e-3;    // inner radius (m)
+Ro = 4.75e-3;    // outer radius (m)
+Lz = 77.0e-3;    // height (m); the solution does not depend on z
 
-BooleanUnion{ Surface{1}; Delete; }{ Surface{2, 3}; Delete; }
+n_C = 11;        // nodes across the cladding
+n_z = 2;         // nodes along z (solution is z-independent)
 
-Mesh.CharacteristicLengthMin = 2.0e-4;
-Mesh.CharacteristicLengthMax = 5.0e-4;
+Point(1) = {Ri, 0, 0};
+Point(2) = {Ro, 0, 0};
+Point(3) = {Ro, Lz, 0};
+Point(4) = {Ri, Lz, 0};
 
-eps = 1e-6;
-c_bot[]   = Curve In BoundingBox{Rplug-eps, -eps,      -eps, Ro+eps, eps,         eps};
-c_top[]   = Curve In BoundingBox{Rplug-eps, Lz-eps,    -eps, Ro+eps, Lz+eps,      eps};
-c_outer[] = Curve In BoundingBox{Ro-eps,    -eps,      -eps, Ro+eps, Lz+eps,      eps};
-c_inner[] = Curve In BoundingBox{Ri-eps,    Lplug-eps, -eps, Ri+eps, Lz-Lplug+eps, eps};
+Line(1) = {1, 2};  // bottom
+Line(2) = {2, 3};  // outer radius
+Line(3) = {3, 4};  // top
+Line(4) = {4, 1};  // inner radius
+
+Curve Loop(1) = {1, 2, 3, 4};
+Plane Surface(1) = {1};
+
+Transfinite Line {1, 3} = n_C;
+Transfinite Line {2, 4} = n_z;
+Transfinite Surface {1};
+Recombine Surface {1};
 
 Physical Surface("zircaloy", 1) = {1};
-Physical Curve("bottom",   11) = {c_bot[]};
-Physical Curve("outer",    12) = {c_outer[]};
-Physical Curve("top",      13) = {c_top[]};
-Physical Curve("inner",    14) = {c_inner[]};
+Physical Curve("bottom", 11) = {1};
+Physical Curve("outer", 12) = {2};
+Physical Curve("top", 13) = {3};
+Physical Curve("inner", 14) = {4};
