@@ -1,0 +1,11 @@
+geometry_type: cylinder
+Ri: 4.18e-3
+Ro: 4.75e-3
+Lz: 77.0e-3
+
+labels:
+  zircaloy: 1
+  bottom: 11
+  outer: 12
+  top: 13
+  inner: 14

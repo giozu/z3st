@@ -1,0 +1,21 @@
+name: Zircaloy-4 Uncoated Cladding (LOCA high-T creep, Pastore et al. 2021)
+E: 6.5e+10
+nu: 0.34                # -
+k: 18.0                 # W/(m*K)
+cp: 330.0               # J/(kg*K)
+rho: 6560.0             # kg/m^3
+alpha: 6.5e-6           # 1/K
+T_ref: 823.0            # K
+T_initial: 823.0        # K
+
+# High-temperature LOCA creep model (D2.1 Eq. 10-11, Tables 3-4)
+creep: norton
+hydrogen_content: 0.0   # wppm
+heating_rate: 4.0       # K/s
+
+creep: norton
+creep_A0: 8.73e-32
+creep_n: 5.89
+creep_Q: 3.21e+5
+hydrogen_content: 0.0
+heating_rate: 4.0

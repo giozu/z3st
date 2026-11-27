@@ -70,6 +70,86 @@ class CreepModel:
     def creep_active(self, material):
         return material.get("creep", None) is not None
 
+    def _creep_params(self, material, T):
+        # 1. Sicurezza: se la simulazione è solo meccanica (senza campo termico),
+        # prende la temperatura iniziale dalla scheda del materiale.
+        if T is None:
+            T = float(material.get("T_initial", material.get("T_ref", 293.15)))
+
+        # 2. Caso standard (se NON c'è "ys" nel materiale):
+        # usa i vecchi parametri fissi del file YAML, così non rompiamo i vecchi test.
+        if "y" not in material:
+            A0 = float(material["creep_A0"])
+            Q = float(material["creep_Q"])
+            n = float(material["creep_n"])
+            return A0 * ufl.exp(-Q / (R_GAS * T)), n
+
+        # # 3. Caso LOCA (se c'è "ys" nel materiale):
+        # # Prende la frazione di fase beta y_s (collegata in spine.py)
+        # y = material["y"]
+
+        # # Parametri fase ALPHA (Tabella 3 del report D2.1, pag. 18)
+        # # Nota: nel report A è in MPa^-n, io moltiplico per (10^-6)^n per portarlo in Pascal
+        # n_alpha = 5.89
+        # A_alpha = 19370.0 * (1e-6 ** n_alpha)
+        # Q_alpha = 3.21e5 + 25.0 * (T - 923.15)  # in J/mol
+
+        # # Parametri fase BETA (Tabella 3 del report D2.1, pag. 18)
+        # n_beta = 3.78
+        # A_beta = 7.9 * (1e-6 ** n_beta)
+        # Q_beta = 1.42e5  # in J/mol
+
+        # # Interpolazione lineare tra fase alpha (1 - y) e fase beta (y)
+        # ln_A = (1.0 - y) * np.log(A_alpha) + y * np.log(A_beta)
+        # Q = (1.0 - y) * Q_alpha + y * Q_beta
+        # n = (1.0 - y) * n_alpha + y * n_beta
+
+        # # Calcola il termine completo A(T, y) = A * exp(-Q / RT)
+        # A_T = ufl.exp(ln_A) * ufl.exp(-Q / (R_GAS * T))
+        # return A_T, n
+        H = float(material.get("hydrogen_content", 0.0))
+        dT_dt = float(material.get("heating_rate", 4.0))
+
+        # 1. Soglia di transizione alpha -> alpha+beta (Tabella 4, pag. 18 D2.1)
+        if dT_dt < 0.1:
+            T_onset_default = 1083.0 - 0.152 * H
+        else:
+            T_onset_default = (1113.0 - 0.156 * H) * (dT_dt ** 0.0118)
+        T_onset = float(material.get("T_onset_override", T_onset_default)) # Questo blocco permette di sovrascrivere la temperatura di transizione se si vuole forzare un valore specifico, altrimenti usa il valore calcolato in base al contenuto di idrogeno e al tasso di riscaldamento.
+
+        y_raw = material["y"]
+        y = ufl.conditional(ufl.ge(T, T_onset), material["y"], 0.0)
+
+        # 2. Fase ALPHA (Tabella 3, pag. 18 D2.1)
+        n_alpha = 5.89
+        A_alpha = 19370.0 * (1e-6 ** n_alpha) # (MPa^-n -> Pa^-n)
+        Q_alpha = 3.21e5 + 25.0 * (T - 923.15) # (J/mol)
+
+        # 3. Fase BETA (Tabella 3, pag. 18 D2.1)
+        n_beta = 3.78
+        A_beta = 7.9 * (1e-6 ** n_beta) # (MPa^-n -> Pa^-n)
+        Q_beta = 1.42e5 # (J/mol)
+
+        # Interpolazione lineare tra fase alpha e fase beta (ramo eps_dot > 0.003 s^-1)
+        ln_A_hi = (1.0 - y) * np.log(A_alpha) + y * np.log(A_beta)
+        Q_hi = (1.0 - y) * Q_alpha + y * Q_beta
+        n_hi = (1.0 - y) * n_alpha + y * n_beta
+        A_T_hi = ufl.exp(ln_A_hi) * ufl.exp(-Q_hi / (R_GAS * T))
+
+        # 4. Ramo superplastico (Tabella 3: eps_dot <= 0.003 s^-1 nella regione mista)
+        n_sp = 2.33
+        A_sp = 0.24 * (1e-6 ** n_sp)
+        Q_sp = 1.02e5
+        A_T_sp = A_sp * ufl.exp(-Q_sp / (R_GAS * T))
+
+        # Attiva il ramo superplastico sopra T_onset finché la velocità di creep resta <= 0.003 s^-1
+        rate_sp = A_T_sp * (30.0e6 ** n_sp)
+        use_sp = ufl.And(ufl.ge(T, T_onset), ufl.le(rate_sp, 0.003))
+
+        A_T = ufl.conditional(use_sp, A_T_sp, A_T_hi)
+        n = ufl.conditional(use_sp, n_sp, n_hi)
+        return A_T, n
+
     def _creep_A(self, material, T):
         """Norton prefactor A(T) = A0·exp(−Q/RT). T may be a UFL field or a
         float (mechanical-only runs fall back to the card's T_initial)."""
@@ -110,8 +190,14 @@ class CreepModel:
         a no-op in value but supplies the exact IFT consistent tangent."""
         _, s_tr, sig_eq_tr = self._creep_trial(u, material, T)
         G = material["G"]
-        n = float(material["creep_n"])
-        Adt = dt * self._creep_A(material, T)
+        # Commento queste due righe perché ora A(T) e n dipendono dalla fase (alppha/beta) e dal contenuto di idrogeno, quindi vanno calcolati dinamicamente 
+        # n = float(material["creep_n"])
+        # Adt = dt * self._creep_A(material, T)
+
+        # Aggiungo queste due righe per ottenere A(T) e n in base alla fase (alpha/beta) e al contenuto di idrogeno
+        A_T, n = self._creep_params(material, T)
+        Adt = dt * A_T
+
         Cdt = dt * self._creep_irr_C(material)
 
         dg0 = self._creep_predictor(material["__label__"])
@@ -201,19 +287,52 @@ class CreepModel:
             # meshless UFL constant and dolfinx cannot derive the Expression's MPI
             # communicator, so short-circuit to zeros or the constant value instead of
             # interpolating.
-            if float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0:
+
+            # Commento questo blocco "if-else" perché ora A(T) dipende dalla fase (alpha/beta) e dal contenuto di idrogeno, quindi va calcolato dinamicamente
+            # if float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0:
+            #     A_val = float(material["creep_A0"])
+            #     Adt = dt * np.full_like(sig, A_val)
+            # else:
+            #     Texpr = dolfinx.fem.Expression(
+            #         ufl.as_ufl(self._creep_A(material, T)),
+            #         pred.function_space.element.interpolation_points,
+            #     )
+            #     tmp.interpolate(Texpr, cells0=cells)
+            #     Adt = dt * tmp.x.array[cells]
+
+            # G = float(getattr(material["G"], "value", material["G"]))
+            # n = float(material["creep_n"])
+
+            # Aggiungo queste righe per ottenere A(T) e n in base alla fase (alpha/beta) e al contenuto di idrogeno
+            A_T_ufl, n_ufl = self._creep_params(material, T)
+
+            if "y" not in material and (float(material["creep_A0"]) == 0.0 or float(material["creep_Q"]) == 0.0):
                 A_val = float(material["creep_A0"])
                 Adt = dt * np.full_like(sig, A_val)
+                n = np.full_like(sig, float(material["creep_n"]))
             else:
-                Texpr = dolfinx.fem.Expression(
-                    ufl.as_ufl(self._creep_A(material, T)),
+                # Valuta A(T, y) su tutte le celle del materiale
+                A_expr = dolfinx.fem.Expression(
+                    ufl.as_ufl(A_T_ufl),
                     pred.function_space.element.interpolation_points,
                 )
-                tmp.interpolate(Texpr, cells0=cells)
+                tmp.interpolate(A_expr, cells0=cells)
                 Adt = dt * tmp.x.array[cells]
 
+                # Valuta n(y) su tutte le celle del materiale
+                if isinstance(n_ufl, (int, float)):
+                    n = np.full_like(sig, float(n_ufl))
+                else:
+                    n_expr = dolfinx.fem.Expression(
+                        ufl.as_ufl(n_ufl),
+                        pred.function_space.element.interpolation_points,
+                    )
+                    tmp.interpolate(n_expr, cells0=cells)
+                    n = tmp.x.array[cells]
+
             G = float(getattr(material["G"], "value", material["G"]))
-            n = float(material["creep_n"])
+
+            # Qui riprende il codice originale
             Cdt = dt * self._creep_irr_C(material)
 
             # Warm-started Newton on g(x) = x − Adt·(σ − 3Gx)^n − Cdt·(σ − 3Gx),

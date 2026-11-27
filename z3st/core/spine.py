@@ -217,6 +217,17 @@ class Spine(
             else:
                 print(f"  → Gc not defined for {name}")
 
+            # ys, read from material card gm
+            if "y" in mat:
+                if isinstance(mat["y"], str):
+                    print(f"  → y defined as symbolic function: {mat['y']}")
+                    y_func = self.resolve_function(mat["y"])
+                    mat["_y_func"] = y_func
+                else:
+                    print(f"  → y defined as constant: {mat['y']}")
+            else:
+                print(f"  → y not defined for {name}")    
+
             # Cohesive fracture prescribes the strength surface directly, so
             # p_c/tau_c are read from the card and never derived from lc.
             if self.on.get("cohesive", False) and "p_c" in mat:
@@ -565,6 +576,11 @@ class Spine(
                 k_func = mat["_k_func"]
                 mat["k"] = self.call_material_function(k_func, self.T_iter, mat)
                 print("\nk expression for", name, "→", mat["k"])
+
+            if "_y_func" in mat and self.T:
+                y_func = mat["_y_func"]
+                mat["y"] = self.call_material_function(y_func, self.T_iter, mat)
+                print("\ny expression for", name, "→", mat["y"])
 
             # Data-driven conductivity
             if "_k_model" in mat and self.T is not None:
