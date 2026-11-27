@@ -32,6 +32,7 @@ thermal:
 mechanical:
   solver: nonlinear
   linear_solver: direct_mumps
+  # constitutive: hyperelastic
   rtol: 1.0e-9
   stag_tol: 1.0e-7
   convergence: rel_norm

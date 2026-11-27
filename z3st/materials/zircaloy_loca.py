@@ -12,4 +12,5 @@ def y_beta(T, material):
     T_mid = 1159.0 - 0.096 * H
     delta_T = 44.0 - 0.026 * H
     
-    return 0.5 * (1.0 + ufl.tanh((T - T_mid) / delta_T))
+    # return 0.5 * (1.0 + ufl.tanh((T - T_mid) / delta_T))
+    return 0.58
