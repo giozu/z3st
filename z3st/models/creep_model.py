@@ -351,17 +351,6 @@ class CreepModel:
                 tmp.interpolate(c["n"], cells0=cells)
                 n = tmp.x.array[dofs].copy()
 
-                # Valuta n(y) su tutte le celle del materiale
-                if isinstance(n_ufl, (int, float)):
-                    n = np.full_like(sig, float(n_ufl))
-                else:
-                    n_expr = dolfinx.fem.Expression(
-                        ufl.as_ufl(n_ufl),
-                        pred.function_space.element.interpolation_points,
-                    )
-                    tmp.interpolate(n_expr, cells0=cells)
-                    n = tmp.x.array[cells]
-
             G = float(getattr(material["G"], "value", material["G"]))
 
             # Qui riprende il codice originale
